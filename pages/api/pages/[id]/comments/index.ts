@@ -79,7 +79,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
       extractedMentions.map((mention) =>
         publishPageEvent({
           pageId,
-          scope: WebhookEventNames.PageMention,
+          scope: WebhookEventNames.PageMentionCreated,
           commentId: pageComment.id,
           spaceId: page.spaceId,
           mention

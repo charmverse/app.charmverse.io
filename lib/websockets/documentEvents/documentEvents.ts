@@ -438,14 +438,18 @@ export class DocumentEventHandler {
           })
           .flat();
 
-        if (extractedMentions.length) {
+        // Don't create notifications for self mentions
+        const filteredMentions = extractedMentions.filter((mention) => mention.value !== session.user.id);
+
+        if (filteredMentions.length) {
           await Promise.all(
-            extractedMentions.map((mention) =>
+            filteredMentions.map((mention) =>
               publishPageEvent({
                 pageId: room.doc.id,
-                scope: WebhookEventNames.PageMention,
+                scope: WebhookEventNames.PageMentionCreated,
                 spaceId: room.doc.spaceId,
-                mention
+                mention,
+                userId: session.user.id
               })
             )
           );

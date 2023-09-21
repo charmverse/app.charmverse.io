@@ -11,7 +11,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ProposalTask } from './getProposalStatusChangeTasks';
 import { getProposalStatusChangeTasks } from './getProposalStatusChangeTasks';
-import type { ProposalWithCommentsAndUsers } from './interface';
 
 export type ProposalTasksGroup = {
   marked: ProposalTask[];

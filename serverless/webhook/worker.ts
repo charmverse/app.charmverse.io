@@ -24,8 +24,9 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         const { webhookURL, signingSecret, ...webhookData } = JSON.parse(body) as WebhookPayload;
 
         switch (webhookData.event.scope) {
-          case WebhookEventNames.PageMention: {
+          case WebhookEventNames.PageMentionCreated: {
             const mentionedUserId = webhookData.event.mention.value;
+            const mentionAuthorId = webhookData.event.user.id;
             const eventId = webhookData.id;
             await prisma.pageNotification.upsert({
               create: {
@@ -37,7 +38,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                 id: eventId,
                 record: {
                   create: {
-                    createdBy: mentionedUserId,
+                    createdBy: mentionAuthorId,
                     spaceId: webhookData.spaceId,
                     userId: mentionedUserId
                   }

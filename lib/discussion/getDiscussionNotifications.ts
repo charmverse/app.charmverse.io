@@ -117,68 +117,6 @@ async function getPageMentions(userId: string): Promise<DiscussionNotificationsG
   return discussionNotificationsGroup;
 }
 
-// async function getCommentBlockMentions({
-//   userId,
-//   username,
-//   spaceRecord,
-//   spaceIds
-// }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-//   const blockComments = await prisma.block.findMany({
-//     where: {
-//       type: 'comment',
-//       spaceId: {
-//         in: spaceIds
-//       },
-//       deletedAt: null
-//     },
-//     select: {
-//       id: true,
-//       createdBy: true,
-//       spaceId: true,
-//       fields: true,
-//       parentId: true
-//     }
-//   });
-
-//   const pages = await prisma.page.findMany({
-//     where: {
-//       id: {
-//         in: blockComments.map((block) => block.parentId)
-//       }
-//     }
-//   });
-
-//   const mentions: GetDiscussionsResponse['mentions'] = [];
-//   const discussionUserIds: string[] = [];
-
-//   for (const comment of blockComments) {
-//     const page = pages.find((p) => p.id === comment.parentId);
-//     const content = (comment.fields as any)?.content as PageContent;
-//     if (page && content) {
-//       const extractedMentions = extractMentions(content, username);
-//       extractedMentions.forEach((mention) => {
-//         if (page && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
-//           discussionUserIds.push(mention.createdBy);
-//           mentions.push({
-//             ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
-//             mentionId: mention.id,
-//             createdAt: mention.createdAt,
-//             userId: mention.createdBy,
-//             text: mention.text,
-//             commentId: comment.id,
-//             taskId: mention.id
-//           });
-//         }
-//       });
-//     }
-//   }
-//   return {
-//     mentions,
-//     discussionUserIds,
-//     comments: []
-//   };
-// }
-
 /**
  * Get all comments from threads that match these 2:
  * 1. My page, but not my comments

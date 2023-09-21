@@ -80,7 +80,10 @@ export enum WebhookEventNames {
   ProposalUserVoted = 'proposal.user_voted',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
-  PageMention = 'page.mention'
+  PageMentionCreated = 'page.mention.created',
+  PageInlineCommentCreated = 'page.inline_comment.created',
+  PageInlineCommentMentionCreated = 'page.inline_comment.mention.created',
+  PageInlineCommentReplied = 'page.inline_comment.replied'
 }
 
 // Utils to share common props among events
@@ -136,10 +139,10 @@ export type WebhookEvent<T = WebhookEventNames> =
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.PageMention;
+      user: UserEntity;
+      scope: WebhookEventNames.PageMentionCreated;
       page: PageEntity;
       mention: UserMentionMetadata;
-      commentId?: string;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.UserJoined;
