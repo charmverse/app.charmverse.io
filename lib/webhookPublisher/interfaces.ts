@@ -58,6 +58,7 @@ export type PageEntity = {
   title: string;
   path: string;
   type: PageType;
+  author: UserEntity;
 };
 
 export enum WebhookNameSpaces {
@@ -140,9 +141,15 @@ export type WebhookEvent<T = WebhookEventNames> =
     })
   | (WebhookEventSharedProps<T> & {
       user: UserEntity;
-      scope: WebhookEventNames.PageMentionCreated;
+      scope: WebhookEventNames.PageMentionCreated | WebhookEventNames.PageInlineCommentMentionCreated;
       page: PageEntity;
       mention: UserMentionMetadata;
+    })
+  | (WebhookEventSharedProps<T> & {
+      user: UserEntity;
+      scope: WebhookEventNames.PageInlineCommentCreated | WebhookEventNames.PageInlineCommentReplied;
+      page: PageEntity;
+      comment: CommentEntity;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.UserJoined;

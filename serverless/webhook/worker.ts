@@ -24,7 +24,8 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         const { webhookURL, signingSecret, ...webhookData } = JSON.parse(body) as WebhookPayload;
 
         switch (webhookData.event.scope) {
-          case WebhookEventNames.PageMentionCreated: {
+          case WebhookEventNames.PageMentionCreated:
+          case WebhookEventNames.PageInlineCommentMentionCreated: {
             const mentionedUserId = webhookData.event.mention.value;
             const mentionAuthorId = webhookData.event.user.id;
             const eventId = webhookData.id;
@@ -52,6 +53,99 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
               }
             });
 
+            break;
+          }
+          case WebhookEventNames.PageInlineCommentCreated: {
+            const targetUserId = webhookData.event.page.author.id;
+            const eventId = webhookData.id;
+            await prisma.pageNotification.upsert({
+              create: {
+                page: {
+                  connect: {
+                    id: webhookData.event.page.id
+                  }
+                },
+                type: webhookData.event.scope.split('.').slice(1).join('.'),
+                id: eventId,
+                notificationMetadata: {
+                  create: {
+                    createdBy: webhookData.event.user.id,
+                    spaceId: webhookData.spaceId,
+                    userId: targetUserId
+                  }
+                },
+                comment: {
+                  connect: {
+                    id: webhookData.event.comment.id
+                  }
+                }
+              },
+              update: {},
+              where: {
+                id: eventId
+              }
+            });
+
+            break;
+          }
+
+          case WebhookEventNames.PageInlineCommentReplied: {
+            const eventId = webhookData.id;
+
+            const comment = await prisma.comment.findFirstOrThrow({
+              where: {
+                id: webhookData.event.comment.id
+              },
+              select: {
+                threadId: true
+              }
+            });
+
+            const threadId = comment.threadId;
+
+            const previousComment = await prisma.comment.findFirstOrThrow({
+              where: {
+                threadId,
+                id: {
+                  notIn: [webhookData.event.comment.id]
+                }
+              },
+              orderBy: {
+                createdAt: 'desc'
+              },
+              take: 1,
+              select: {
+                userId: true
+              }
+            });
+
+            await prisma.pageNotification.upsert({
+              create: {
+                page: {
+                  connect: {
+                    id: webhookData.event.page.id
+                  }
+                },
+                type: webhookData.event.scope.split('.').slice(1).join('.'),
+                id: eventId,
+                notificationMetadata: {
+                  create: {
+                    createdBy: webhookData.event.user.id,
+                    spaceId: webhookData.spaceId,
+                    userId: previousComment.userId
+                  }
+                },
+                comment: {
+                  connect: {
+                    id: webhookData.event.comment.id
+                  }
+                }
+              },
+              update: {},
+              where: {
+                id: eventId
+              }
+            });
             break;
           }
           default:

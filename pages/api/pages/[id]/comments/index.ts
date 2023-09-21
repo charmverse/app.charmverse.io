@@ -54,7 +54,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const page = await prisma.page.findUnique({
     where: { id: pageId },
-    select: { spaceId: true }
+    select: { spaceId: true, createdBy: true }
   });
 
   if (!page) {
@@ -79,14 +79,24 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
       extractedMentions.map((mention) =>
         publishPageEvent({
           pageId,
-          scope: WebhookEventNames.PageMentionCreated,
-          commentId: pageComment.id,
+          scope: WebhookEventNames.PageInlineCommentMentionCreated,
           spaceId: page.spaceId,
-          mention
+          userId,
+          mention,
+          commentId: pageComment.id
         })
       )
     );
   }
+
+  await publishPageEvent({
+    pageId,
+    scope: WebhookEventNames.PageInlineCommentReplied,
+    spaceId: page.spaceId,
+    userId,
+    mention: null,
+    commentId: pageComment.id
+  });
 
   res.status(200).json({
     ...pageComment,

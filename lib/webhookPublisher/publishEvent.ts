@@ -1,5 +1,5 @@
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import type { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
   getBountyEntity,
@@ -144,12 +144,21 @@ export async function publishUserProposalEvent(context: ProposalUserEventContext
   });
 }
 
-type PageEventContext = {
-  scope: WebhookEventNames.PageMentionCreated;
-  pageId: string;
-  spaceId: string;
-  mention: UserMentionMetadata;
+type PageEventContext = (
+  | {
+      scope: WebhookEventNames.PageMentionCreated | WebhookEventNames.PageInlineCommentMentionCreated;
+      mention: UserMentionMetadata;
+      commentId: null | string;
+    }
+  | {
+      scope: WebhookEventNames.PageInlineCommentCreated | WebhookEventNames.PageInlineCommentReplied;
+      mention: null;
+      commentId: string;
+    }
+) & {
   userId: string;
+  spaceId: string;
+  pageId: string;
 };
 
 export async function publishPageEvent(context: PageEventContext) {
@@ -158,11 +167,26 @@ export async function publishPageEvent(context: PageEventContext) {
     getPageEntity(context.pageId),
     getUserEntity(context.userId)
   ]);
+
+  if (
+    context.scope === WebhookEventNames.PageInlineCommentCreated ||
+    context.scope === WebhookEventNames.PageInlineCommentReplied
+  ) {
+    const comment = await getCommentEntity(context.commentId, { inlineComment: true });
+    return publishWebhookEvent(context.spaceId, {
+      scope: context.scope,
+      page,
+      space,
+      comment,
+      user
+    });
+  }
+
   return publishWebhookEvent(context.spaceId, {
     scope: context.scope,
     page,
     space,
-    mention: context.mention,
+    mention: context.mention as UserMentionMetadata,
     user
   });
 }

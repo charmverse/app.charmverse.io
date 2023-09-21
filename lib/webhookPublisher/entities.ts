@@ -34,7 +34,26 @@ export async function getBountyEntity(id: string): Promise<BountyEntity> {
   };
 }
 
-export async function getCommentEntity(id: string): Promise<CommentEntity> {
+export async function getCommentEntity(
+  id: string,
+  options: { inlineComment?: boolean } = { inlineComment: false }
+): Promise<CommentEntity> {
+  if (options.inlineComment) {
+    const inlineComment = await prisma.comment.findUniqueOrThrow({
+      where: {
+        id
+      }
+    });
+
+    const author = await getUserEntity(inlineComment.userId);
+    return {
+      id,
+      author,
+      createdAt: inlineComment.createdAt.toISOString(),
+      parentId: null
+    };
+  }
+
   const comment = await prisma.postComment.findUniqueOrThrow({
     where: {
       id
@@ -131,15 +150,26 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
 }
 
 export async function getPageEntity(id: string): Promise<PageEntity> {
-  return prisma.page.findFirstOrThrow({
+  const page = await prisma.page.findFirstOrThrow({
     where: {
       id
     },
     select: {
+      createdBy: true,
       id: true,
       title: true,
       path: true,
       type: true
     }
   });
+
+  const author = await getUserEntity(page.createdBy);
+
+  return {
+    id,
+    title: page.title,
+    path: page.path,
+    type: page.type,
+    author
+  };
 }
