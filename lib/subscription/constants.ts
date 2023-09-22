@@ -54,6 +54,7 @@ export const subscriptionDetails = {
   enterprise: [
     'Everything in Community, and',
     '200+ monthly active members',
+    'Custom block limit',
     'Custom guest limit',
     'Custom video upload limit',
     'Usage & engagement analytics',
