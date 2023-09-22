@@ -2,12 +2,13 @@ import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import type { KeyboardEvent, MouseEvent, ClipboardEvent } from 'react';
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePage } from 'hooks/usePage';
@@ -88,6 +89,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const pageId = node.attrs.pageId as string;
   const allViews = useAppSelector(getSortedViews);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
@@ -103,8 +105,14 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
 
   const [shownCardId, setShownCardId] = useState<string | null>(null);
 
-  const boards = useAppSelector(getSortedBoards);
-  const board = boards.find((b) => b.id === pageId);
+  const boards = useAppSelector(getBoards);
+  const board = boards?.[pageId];
+
+  useEffect(() => {
+    if (!board && pageId) {
+      dispatch(initialDatabaseLoad({ pageId }));
+    }
+  }, [pageId]);
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 

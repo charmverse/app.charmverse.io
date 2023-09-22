@@ -1,8 +1,8 @@
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { mutate } from 'swr';
 
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileDialogGlobal } from 'components/common/UserProfile/UserProfileDialogGlobal';
@@ -10,16 +10,18 @@ import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImport
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getPagesListCacheKey, usePages } from 'hooks/usePages';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import useDatadogLogger from './hooks/useDatadogLogger';
 
 export function GlobalComponents() {
-  const dispatch = useAppDispatch();
+  const router = useRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setPages } = usePages();
+  const { onClick: openSettingsModal, open: isSettingsDialogOpen } = useSettingsDialog();
   // Register logs to Datadog
   useDatadogLogger();
 
@@ -32,7 +34,6 @@ export function GlobalComponents() {
     // Refetch pages after restoration
     if (currentSpace) {
       await mutate(getPagesListCacheKey(currentSpace.id));
-      dispatch(initialLoad({ spaceId: currentSpace.id }));
       mutate(`archived-pages-${currentSpace.id}`);
       // This is required to make the delete page banner go away
       setPages((_pages) => {
@@ -57,6 +58,20 @@ export function GlobalComponents() {
       unsubscribeRestoreListener();
     };
   }, [currentSpace?.id]);
+
+  useEffect(() => {
+    const account = router.query.account;
+    const subscription = router.query.subscription;
+
+    if (!isSettingsDialogOpen && router.isReady) {
+      if (account) {
+        openSettingsModal('account');
+      }
+      if (subscription) {
+        openSettingsModal('subscription');
+      }
+    }
+  }, [isSettingsDialogOpen, router.isReady, openSettingsModal, router.query.account, router.query.subscription]);
 
   return (
     <>

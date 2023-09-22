@@ -16,16 +16,15 @@ import {
   requireUser
 } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
-import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
 import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -33,67 +32,7 @@ export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getBlocks).post(createBlocks).put(updateBlocks).delete(deleteBlocks);
-
-async function getBlocks(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
-  const referer = req.headers.referer as string;
-  const url = new URL(referer);
-
-  url.hash = '';
-  url.search = '';
-  const pathnameParts = referer ? url.pathname.split('/') : [];
-  const domain = getValidSubdomain(req.headers.host) || pathnameParts[1];
-  const customDomain = getValidCustomDomain(req.headers.host);
-  const spaceDomain = customDomain || domain;
-
-  if (!spaceDomain) {
-    throw new InvalidStateError('invalid referrer url');
-  }
-  // publicly shared focalboard
-  if (spaceDomain === 'share') {
-    const pageId = pathnameParts[pathnameParts.length - 1];
-    if (!pageId) {
-      throw new InvalidStateError('invalid referrer url');
-    }
-    const searchQuery = generatePageQuery({
-      pageIdOrPath: pageId,
-      spaceIdOrDomain: req.query.spaceId as string
-    });
-    const page = await prisma.page.findFirst({ where: searchQuery });
-    if (!page) {
-      throw new NotFoundError('page not found');
-    }
-    const blocks = page.boardId ? await prisma.block.findMany({ where: { rootId: page.boardId } }) : [];
-    return res.status(200).json(blocks);
-  } else {
-    let spaceId = req.query.spaceId as string | undefined;
-
-    // TODO: Once all clients are updated to pass in spaceId, we should remove this way of looking up the space id
-    // WARNING: patchBlock api method does not pass in spaceId, so this is needed.
-    if (!spaceId) {
-      const space = await getSpaceByDomain(spaceDomain);
-      spaceId = space?.id;
-    }
-
-    if (!spaceId) {
-      throw new NotFoundError('space not found');
-    }
-
-    const blocks = await prisma.block.findMany({
-      where: {
-        spaceId,
-        id: req.query.id
-          ? (req.query.id as string)
-          : req.query.ids
-          ? {
-              in: req.query.ids as string[]
-            }
-          : undefined
-      }
-    });
-    return res.status(200).json(blocks);
-  }
-}
+handler.use(requireUser).post(createBlocks).put(updateBlocks).delete(deleteBlocks);
 
 async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block, ServerBlockFields>[]>) {
   const data = req.body as Omit<Block, ServerBlockFields>[];
@@ -101,8 +40,8 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   const url = new URL(referer);
   url.hash = '';
   url.search = '';
-  const domain = getValidSubdomain(req.headers.host);
-  const customDomain = getValidCustomDomain(req.headers.host);
+  const domain = getSpaceDomainFromHost(req.headers.host);
+  const customDomain = getCustomDomainFromHost(req.headers.host);
   let spaceDomain = customDomain || domain;
 
   if (!spaceDomain) {

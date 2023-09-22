@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSessionStorage } from 'hooks/useSessionStorage';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -53,12 +54,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
   const [blockQuota, setBlockQuota] = useState(10);
 
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', {
-      spaceId: space.id,
-      type: 'billing/settings'
-    });
-  }, []);
+  useTrackPageView({ type: 'billing/settings' });
 
   useEffect(() => {
     // Ensure that we remove the pending screen after the subscription is created
@@ -104,7 +100,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         {isLoadingSpaceSubscription ? (
           <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
-        ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
+        ) : spaceSubscription && !!spaceSubscription.status ? (
           <SubscriptionInformation
             minimumBlockQuota={minimumBlockQuota}
             space={space}
@@ -114,7 +110,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         ) : (
           <CreateSubscriptionInformation
             pendingPayment={pendingPayment || false}
-            spaceSubscription={spaceSubscription}
             onUpgrade={handleShowCheckoutForm}
             spaceId={space.id}
           />

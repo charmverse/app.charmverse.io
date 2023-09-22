@@ -242,6 +242,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       }
     },
     components: {
+      MuiPopover: {
+        defaultProps: {
+          disableRestoreFocus: true
+        }
+      },
       MuiAvatar: {
         styleOverrides: {
           root: ({ ownerState }) => ({

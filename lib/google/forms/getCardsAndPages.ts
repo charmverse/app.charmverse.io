@@ -7,6 +7,7 @@ import { blockToPrisma } from 'lib/focalboard/block';
 import type { PrismaBlockSortOf } from 'lib/focalboard/block';
 import type { IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { createCard } from 'lib/focalboard/card';
+import { getPagePath } from 'lib/pages';
 import { isTruthy } from 'lib/utilities/types';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;
@@ -101,7 +102,7 @@ export function getCardsAndPages(data: GoogleFormInput): CharmVerseModelOutput {
       type: 'card_synced',
       contentText: '',
       parentId: rootId, // important to inherit permissions
-      path: `path-${uuid()}`,
+      path: getPagePath(),
       updatedAt: prismaBlock.updatedAt,
       permissions: {
         createMany: initialPermissions

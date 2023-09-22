@@ -10,8 +10,8 @@ import type { MagicLinkResponseStatus } from 'components/invite/page/PageInviteL
 import { PageInviteLink } from 'components/invite/page/PageInviteLink';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionSsr } from 'lib/session/withSession';
-import { getValidCustomDomain } from 'lib/utilities/domains/getValidCustomDomain';
-import { getValidSubdomain } from 'lib/utilities/getValidSubdomain';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 
 type Props = { email?: string; error?: Extract<MagicLinkResponseStatus, 'error_invalid_page_id'> };
 
@@ -52,14 +52,14 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
     if (permissions.read) {
       // redirect to page, taking consideration for custom domains
       const hostName = context.req.headers?.host;
-      const isDomainInPath = !getValidCustomDomain(hostName) && !getValidSubdomain(hostName);
+      const isDomainInPath = !getCustomDomainFromHost(hostName) && !getSpaceDomainFromHost(hostName);
       log.debug('[page-invite] Redirecting user to view page', {
         pageId,
         userId: sessionUserId
       });
       return {
         redirect: {
-          destination: `/${isDomainInPath ? `${page.space.domain}/` : ''}${page.path}`,
+          destination: encodeURI(`/${isDomainInPath ? `${page.space.domain}/` : ''}${page.path}`),
           permanent: false
         }
       };

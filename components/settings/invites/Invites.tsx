@@ -1,14 +1,15 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
 
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePendingLocalAction } from 'hooks/usePendingLocalAction';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 
 import Legend from '../Legend';
 
@@ -25,9 +26,10 @@ export function Invites({ space }: { space: Space }) {
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const { isPendingAction, setPendingAction } = usePendingLocalAction('open-token-gate-modal');
   const isTokenGatePending = useRef(false);
-  const { openWalletSelectorModal } = useContext(Web3Connection);
-  const { account } = useWeb3AuthSig();
+  const { connectWallet } = useContext(Web3Connection);
+  const { account } = useWeb3Account();
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
+  useTrackPageView({ type: 'settings/invites' });
 
   if (account && isTokenGatePending.current) {
     setPendingAction();
@@ -39,7 +41,7 @@ export function Invites({ space }: { space: Space }) {
       popupTokenGateState.open();
     } else {
       isTokenGatePending.current = true;
-      openWalletSelectorModal();
+      connectWallet();
     }
   }
 

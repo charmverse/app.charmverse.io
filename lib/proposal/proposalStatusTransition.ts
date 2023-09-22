@@ -13,6 +13,8 @@ export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStat
 
 export const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
 
+export type ProposalStatusWithArchived = ProposalStatus | 'archived';
+
 export function getProposalStatuses(evaluationType: ProposalEvaluationType = 'vote'): ProposalStatus[] {
   if (evaluationType === 'rubric') {
     return ['draft', 'discussion', 'evaluation_active', 'evaluation_closed'];
@@ -32,7 +34,7 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   evaluation_closed: 'Evaluation Closed'
 };
 
-export const PROPOSAL_STATUS_LABELS_WITH_ARCHIVED: Record<ProposalStatus | 'archived', string> = {
+export const PROPOSAL_STATUS_LABELS_WITH_ARCHIVED: Record<ProposalStatusWithArchived, string> = {
   ...PROPOSAL_STATUS_LABELS,
   archived: 'Archived'
 };

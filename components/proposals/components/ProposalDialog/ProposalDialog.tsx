@@ -5,6 +5,7 @@ import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
@@ -75,6 +76,12 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
       publishToLens: !!user?.publishToLensDefault
     }));
   }, [user?.id]);
+
+  useEffect(() => {
+    if (page?.id) {
+      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type });
+    }
+  }, [page?.id]);
 
   function close() {
     onClose();

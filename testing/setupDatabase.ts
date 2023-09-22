@@ -10,8 +10,8 @@ import type {
   Page,
   Post,
   PostComment,
-  ProposalStatus,
   ProposalEvaluationType,
+  ProposalStatus,
   Role,
   RoleSource,
   SubscriptionTier,
@@ -24,12 +24,12 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { DataSourceType } from 'lib/focalboard/board';
+import type { IViewType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -41,11 +41,13 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
+import type { CustomBoardProps } from './generateBoardStub';
 import { boardWithCardsArgs } from './generateBoardStub';
 
 export async function generateSpaceUser({
@@ -64,7 +66,7 @@ export async function generateSpaceUser({
       username: 'Username',
       wallets: {
         create: {
-          address: Wallet.createRandom().address
+          address: randomETHWalletAddress()
         }
       },
       spaceRoles: {
@@ -630,6 +632,7 @@ export function createPage(
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
+      index: options.index,
       path: options.path ?? getPagePath(),
       title: options.title || 'Example',
       type: options.type ?? 'page',
@@ -654,7 +657,8 @@ export function createPage(
         : undefined,
       parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
-      boardId: options.boardId ?? null
+      boardId: options.boardId ?? null,
+      additionalPaths: options.additionalPaths
     },
     include: {
       permissions: {
@@ -1061,24 +1065,37 @@ export async function generateProposal({
   };
 }
 
+/**
+ * Generate a board with default properties of title, date, and a single select field
+ * @param linkedSourceId - Used for providing a linked source for the boards views
+ * @returns
+ */
 export async function generateBoard({
   createdBy,
   spaceId,
   parentId,
   cardCount,
+  boardTitle,
   views,
+  viewType,
   addPageContent,
   viewDataSource,
-  boardPageType
+  boardPageType,
+  linkedSourceId,
+  customProps
 }: {
   createdBy: string;
   spaceId: string;
   parentId?: string;
   cardCount?: number;
+  boardTitle?: string;
   views?: number;
+  viewType?: IViewType;
   viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
+  linkedSourceId?: string;
+  customProps?: CustomBoardProps;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1086,9 +1103,13 @@ export async function generateBoard({
     parentId,
     cardCount,
     views,
+    boardTitle,
     addPageContent,
     viewDataSource,
-    boardPageType
+    boardPageType,
+    viewType,
+    linkedSourceId,
+    customProps
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({
@@ -1143,20 +1164,22 @@ export async function generateForumComment({
 }
 
 export async function createPost(
-  options: Partial<Post> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
+  options: Partial<Post> & { categoryId: string; createdBy: string } & {
+    pagePermissions?: Prisma.PagePermissionCreateManyPageInput[];
+  }
 ): Promise<Post> {
   const forumPost = await prisma.post.create({
     data: {
       createdAt: options.createdAt || new Date(),
       updatedAt: options.updatedAt || new Date(),
-      deletedAt: options.deletedAt || null,
-      id: options.id || v4(),
+      deletedAt: options.deletedAt,
+      id: options.id,
       title: options.title || 'New Forum Post',
       content: options.content || {},
       contentText: options.contentText || 'Some text in the forum',
       path: options.path || getPagePath(),
-      categoryId: options.categoryId || v4(),
-      createdBy: options.createdBy || v4(),
+      categoryId: options.categoryId,
+      createdBy: options.createdBy,
       spaceId: options.spaceId || v4(),
       pinned: options.pinned ?? false,
       locked: options.locked ?? false

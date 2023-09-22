@@ -45,6 +45,7 @@ type Context = {
   notificationDisplayType: NotificationDisplayType | null;
   openNotificationsModal: (type?: NotificationDisplayType) => void;
   closeNotificationsModal: () => void;
+  isLoading: boolean;
 };
 
 const NotificationsContext = createContext<Readonly<Context>>({
@@ -53,11 +54,12 @@ const NotificationsContext = createContext<Readonly<Context>>({
   markAsRead: async () => {},
   notificationDisplayType: null,
   openNotificationsModal: () => {},
-  closeNotificationsModal: () => {}
+  closeNotificationsModal: () => {},
+  isLoading: false
 });
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
-  const { tasks, mutate: mutateTasks } = useTasks();
+  const { tasks, mutate: mutateTasks, isLoading } = useTasks();
   const { user } = useUser();
   const currentUserId = user?.id;
   const { query, isReady } = useRouter();
@@ -146,6 +148,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
+      isLoading,
       unmarkedNotificationPreviews,
       markedNotificationPreviews,
       markAsRead,
@@ -154,6 +157,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       closeNotificationsModal
     }),
     [
+      isLoading,
       unmarkedNotificationPreviews,
       markedNotificationPreviews,
       markAsRead,

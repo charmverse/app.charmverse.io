@@ -257,6 +257,7 @@ function CenterPanel(props: Props) {
       const newCardOrder = insertLast
         ? [...activeView.fields.cardOrder, card.id]
         : [card.id, ...activeView.fields.cardOrder];
+
       // update view order first so that when we add the block it appears in the right spot
       await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
 
@@ -448,6 +449,7 @@ function CenterPanel(props: Props) {
         ) : null
       )}
       <div
+        data-test={`database-container-${props.board.id}`}
         // remount components between pages
         className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
         ref={backgroundRef}

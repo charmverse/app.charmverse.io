@@ -7,6 +7,8 @@ import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
 
+import { baseUrl } from 'config/constants';
+
 import { loginBrowserUser } from '../utils/mocks';
 
 type Fixtures = {
@@ -75,7 +77,7 @@ test.beforeAll(async () => {
 });
 
 test.describe.serial('Database with proposals as datasource', async () => {
-  test('create a board', async ({ page, pagesSidebar, databasePage }) => {
+  test('create a database with proposals as source', async ({ page, pagesSidebar, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
       browserPage: page,
@@ -98,15 +100,108 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await expect(pagesSidebar.databasePage).toBeVisible();
 
     // Initialise the new database
-    await expect(databasePage.selectProposalsAsSource).toBeVisible();
+    await expect(databasePage.selectProposalsAsSource()).toBeVisible();
 
     // This is important as we want to simulate multiple clicks to ensure the card creation only happens once
     await Promise.all([
-      databasePage.selectProposalsAsSource.click(),
-      databasePage.selectProposalsAsSource.click(),
-      databasePage.selectProposalsAsSource.click()
+      databasePage.selectProposalsAsSource().click(),
+      databasePage.selectProposalsAsSource().click(),
+      databasePage.selectProposalsAsSource().click()
     ]);
 
+    await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
+
+    await databasePage.page.waitForTimeout(500);
+
+    // Wait until the database is initialised
+
+    const syncedCards = await prisma.page.findMany({
+      where: {
+        syncWithPageId: {
+          not: null
+        },
+        spaceId: space.id
+      },
+      select: {
+        id: true,
+        syncWithPageId: true,
+        parentId: true
+      }
+    });
+    // Regression check to make sure we did not create duplicate cards
+    expect(syncedCards.length).toBe(3);
+
+    databasePagePath = (
+      await prisma.page.findFirstOrThrow({
+        where: {
+          id: syncedCards[0].parentId as string
+        },
+        select: {
+          path: true
+        }
+      })
+    ).path;
+
+    const allTargetProposalIds = [firstProposal.id, secondProposal.id, thirdProposal.id];
+
+    // We should only create cards for none draft proposals
+    expect(syncedCards.map((c) => c.syncWithPageId)).toEqual(expect.arrayContaining(allTargetProposalIds));
+
+    for (const card of syncedCards) {
+      const row = databasePage.getTableRowByCardId({ cardId: card.id });
+
+      await expect(row).toBeVisible();
+
+      const selectProps = await row.locator('data-test=select-preview').all();
+
+      const categorySelect = selectProps[0];
+
+      expect((await categorySelect.allInnerTexts())[0]).toEqual(proposalCategory.title);
+
+      const proposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({ cardId: card.id });
+
+      expect((await proposalStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
+
+      const syncedProposalUrl = databasePage.getTablePropertyProposalUrlLocator({ cardId: card.id });
+      const proposalPage = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: card.syncWithPageId as string
+        },
+        select: {
+          path: true
+        }
+      });
+
+      expect(await syncedProposalUrl.getAttribute('href')).toEqual(`${baseUrl}/${space.domain}/${proposalPage.path}`);
+    }
+
+    // Make sure the UI only displays 3 cards
+    await expect(databasePage.getTableRowByIndex({ index: 0 })).toBeVisible();
+    await expect(databasePage.getTableRowByIndex({ index: 1 })).toBeVisible();
+    await expect(databasePage.getTableRowByIndex({ index: 2 })).toBeVisible();
+    await expect(databasePage.getTableRowByIndex({ index: 3 })).not.toBeVisible();
+  });
+
+  test('view archived proposals as source', async ({ page, pagesSidebar, databasePage }) => {
+    // Arrange ------------------
+    await loginBrowserUser({
+      browserPage: page,
+      userId: spaceUser.id
+    });
+
+    // Mark the proposal as archived
+    await prisma.proposal.update({
+      where: {
+        id: secondProposal.id
+      },
+      data: {
+        archived: true
+      }
+    });
+
+    await page.goto(`${baseUrl}/${space.domain}/${databasePagePath}`);
+
+    // This is a refresh response
     await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
 
     await databasePage.page.waitForTimeout(500);
@@ -128,31 +223,14 @@ test.describe.serial('Database with proposals as datasource', async () => {
     // Regression check to make sure we did not create duplicate cards
     expect(syncedCards.length).toBe(3);
 
-    const allTargetProposalIds = [firstProposal.id, secondProposal.id, thirdProposal.id];
+    const syncedArchivedProposalCardId = syncedCards.find((c) => c.syncWithPageId === secondProposal.id)?.id as string;
 
-    // We should only create cards for none draft proposals
-    expect(syncedCards.map((c) => c.syncWithPageId)).toEqual(expect.arrayContaining(allTargetProposalIds));
+    const archivedRowProposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({
+      cardId: syncedArchivedProposalCardId
+    });
 
-    for (const card of syncedCards) {
-      const row = databasePage.getTableRowByCardId({ cardId: card.id });
+    await expect(archivedRowProposalStatusBadge).toBeVisible();
 
-      await expect(row).toBeVisible();
-
-      const selectProps = await row.locator('data-test=select-preview').all();
-
-      const categorySelect = selectProps[0];
-
-      expect((await categorySelect.allInnerTexts())[0]).toEqual(proposalCategory.title);
-
-      const statusSelect = selectProps[1];
-
-      expect((await statusSelect.allInnerTexts())[0]).toEqual('Feedback');
-    }
-
-    // Make sure the UI only displays 3 cards
-    await expect(databasePage.getTableRowByIndex({ index: 0 })).toBeVisible();
-    await expect(databasePage.getTableRowByIndex({ index: 1 })).toBeVisible();
-    await expect(databasePage.getTableRowByIndex({ index: 2 })).toBeVisible();
-    await expect(databasePage.getTableRowByIndex({ index: 3 })).not.toBeVisible();
+    await expect((await archivedRowProposalStatusBadge.allInnerTexts())[0]).toEqual('Archived');
   });
 });

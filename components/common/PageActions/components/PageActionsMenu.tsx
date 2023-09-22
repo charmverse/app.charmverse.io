@@ -84,6 +84,7 @@ export function PageActionsMenu({
       )}
       <MenuItem
         dense
+        data-testid='delete-page-action'
         onClick={onClickDelete}
         disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
       >
@@ -95,7 +96,6 @@ export function PageActionsMenu({
           <ArchiveProposalAction proposalId={page.id} containerStyle={{ ml: -2 }} />
         </MenuItem>
       )}
-
       {!hideDuplicateAction && page.type && (
         <DuplicatePageAction
           onComplete={handleClose}
@@ -105,7 +105,6 @@ export function PageActionsMenu({
         />
       )}
       <CopyPageLinkAction path={`/${page.path}`} />
-
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Open in new tab</ListItemText>

@@ -4,18 +4,22 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 
-import { initialLoad, initialReadOnlyLoad } from './initialLoad';
+import { blockLoad, databaseViewsLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
+/**
+ * @loadedBoardViews is a map of boardIds for which we have loaded views
+ */
 type ViewsState = {
   current: string;
   views: { [key: string]: BoardView };
+  loadedBoardViews: { [key: string]: boolean };
 };
 
 const viewsSlice = createSlice({
   name: 'views',
-  initialState: { views: {}, current: '' } as ViewsState,
+  initialState: { views: {}, current: '', loadedBoardViews: {} } as ViewsState,
   reducers: {
     setCurrent: (state, action: PayloadAction<string>) => {
       state.current = action.payload;
@@ -42,20 +46,33 @@ const viewsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(initialReadOnlyLoad.fulfilled, (state, action) => {
-      state.views = {};
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
+      state.views = state.views ?? {};
+      state.loadedBoardViews = state.loadedBoardViews ?? {};
       for (const block of action.payload) {
         if (block.type === 'view') {
           state.views[block.id] = block as BoardView;
+          state.loadedBoardViews[block.rootId] = true;
         }
       }
     });
-    builder.addCase(initialLoad.fulfilled, (state, action) => {
-      state.views = {};
-      for (const block of action.payload.blocks) {
+
+    builder.addCase(databaseViewsLoad.fulfilled, (state, action) => {
+      state.views = state.views ?? {};
+      state.loadedBoardViews = state.loadedBoardViews ?? {};
+      for (const block of action.payload) {
         if (block.type === 'view') {
           state.views[block.id] = block as BoardView;
+          state.loadedBoardViews[block.rootId] = true;
         }
+      }
+    });
+
+    builder.addCase(blockLoad.fulfilled, (state, action) => {
+      state.views = state.views ?? {};
+      const block = action.payload;
+      if (block.type === 'view') {
+        state.views[block.id] = block as BoardView;
       }
     });
   }
@@ -74,6 +91,12 @@ export const getSortedViews = createSelector(getViews, (views) => {
 export function getView(viewId: string | undefined): (state: RootState) => BoardView | null {
   return (state: RootState): BoardView | null => {
     return viewId ? state.views.views[viewId] ?? null : null;
+  };
+}
+
+export function getLoadedBoardViews(): (state: RootState) => Record<string, boolean> {
+  return (state: RootState): Record<string, boolean> => {
+    return state.views.loadedBoardViews;
   };
 }
 

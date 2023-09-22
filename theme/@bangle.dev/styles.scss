@@ -531,6 +531,11 @@ ol li {
   top: 3px;
 }
 
+.readonly {
+  .charm-placeholder::before {
+    display: none;
+  }
+}
 
 
 /** Begin Resizable columns **/
@@ -595,7 +600,7 @@ ol li {
 }
 
 .bangle-editor-core.readonly {
-  p, h1, h2, h3, ul, ol, code, .charm-column-row, .bangle-nv-container {
+  p, h1, h2, h3, ul, ol, code, .tableScrollWrapper, .charm-column-row, .bangle-nv-container {
     &:has(div.charm-row-decoration-suggestions) {
       // important for column row, as it uses inline-styles
       display: none !important;

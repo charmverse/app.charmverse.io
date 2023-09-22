@@ -1,9 +1,9 @@
+import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
 import { Divider, Drawer, Grid, IconButton, InputLabel, Stack, TextField, Typography } from '@mui/material';
 import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import log from 'loglevel';
 import type { FormEvent, SyntheticEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,6 +12,7 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -76,13 +77,7 @@ export function CheckoutForm({
 
   const couponField = watch('coupon');
   const emailField = watch('email');
-
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', {
-      spaceId: space.id,
-      type: 'billing/checkout'
-    });
-  }, []);
+  useTrackPageView({ type: 'billing/checkout' });
 
   const [paymentType, setPaymentType] = useState<PaymentType>('card');
   const [cryptoDrawerOpen, setCryptoDrawerOpen] = useState(false);

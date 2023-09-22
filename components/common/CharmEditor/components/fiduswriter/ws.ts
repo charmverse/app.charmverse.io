@@ -1,14 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { log } from '@charmverse/core/log';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
 import { websocketsHost } from 'config/constants';
 import type {
+  ClientDiffMessage,
   ClientMessage,
   ClientRestartMessage,
   ClientSubscribeMessage,
-  ServerMessage,
   RequestResendMessage,
+  ServerMessage,
   WrappedSocketMessage
 } from 'lib/websockets/documentEvents/interfaces';
 
@@ -50,7 +52,7 @@ export interface WebSocketConnector extends WebSocketConnectorProps {}
 export class WebSocketConnector {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
-  // Messages object used to ensure that data is received in right order.
+  // Messages dataect used to ensure that data is received in right order.
   messages: { server: number; client: number; lastTen: WrappedMessage[] } = {
     server: 0,
     client: 0,
@@ -351,6 +353,43 @@ export class WebSocketConnector {
     } else {
       this.messagesToSend.push(getData);
     }
+  }
+
+  extractPagePath(data: ClientDiffMessage) {
+    const ds = data.ds[0];
+    const content0 = ds.slice?.content?.[0];
+    const content1 = ds.slice?.content?.[1];
+
+    if (!ds || !content0 || !content1) {
+      return null;
+    }
+
+    // Check if the step type is replace
+    const isReplace = ds.stepType === 'replace' && ds.from === ds.to;
+
+    if (!isReplace) {
+      return null;
+    }
+
+    const isImage = content0.type === 'image';
+    const isParagraph = content1.type === 'paragraph';
+
+    if (!isImage || !isParagraph) {
+      return null;
+    }
+
+    // Check if the paragraph's first content is a text with the first mark of that text being a link and get the href attribute of that link
+    let href = null;
+    const content10 = content1.content?.[0];
+    if (content10.type === 'text' && content10.marks.length > 0 && content10.marks[0].type === 'link') {
+      href = content10.marks[0].attrs.href;
+    }
+
+    if (href.startsWith(window.location.origin)) {
+      href = href.split('/').at(-1);
+    }
+
+    return href;
   }
 
   setRecentlySentTimer(timer: number) {

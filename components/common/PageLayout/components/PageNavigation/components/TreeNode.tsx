@@ -4,8 +4,9 @@ import Typography from '@mui/material/Typography';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getSortedViews } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { getSortedViews, getLoadedBoardViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import { formatViewTitle } from 'lib/focalboard/boardView';
@@ -58,9 +59,10 @@ function DraggableTreeNode({
       handlerId: monitor.getHandlerId()
     })
   }));
+  const databasesDispatch = useAppDispatch();
+  const loadedViews = useAppSelector(getLoadedBoardViews());
 
   const dndEnabled = (!!onDropAdjacent && !!onDropChild) || (isFavorites && !!onDropAdjacent);
-
   const [{ canDrop, isOverCurrent }, drop] = useDrop<ParentMenuNode, any, { canDrop: boolean; isOverCurrent: boolean }>(
     () => ({
       accept: 'item',
@@ -159,6 +161,13 @@ function DraggableTreeNode({
 
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
+
+  useEffect(() => {
+    if (expanded && loadedViews && item.type.match(/board/) && !loadedViews[item.id]) {
+      databasesDispatch(databaseViewsLoad({ pageId: item.id }));
+    }
+  }, [expanded, loadedViews?.[item.id]]);
+
   const hideChildren = !expanded;
 
   useEffect(() => {
@@ -196,19 +205,22 @@ function DraggableTreeNode({
       {hideChildren ? (
         <div>{/* empty div to trick TreeView into showing expand icon */}</div>
       ) : item.type.match(/board/) ? (
-        views.map(
-          (view) =>
-            !view.fields.inline && (
-              <BoardViewTreeItem
-                key={view.id}
-                href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
-                label={view.title || formatViewTitle(view)}
-                nodeId={view.id}
-                viewType={view.fields.viewType}
-                onClick={onClick}
-              />
-            )
-        )
+        /* empty div to trick TreeView into showing expand icon when a board is expanded but views are not available yet */
+        <div>
+          {views.map(
+            (view) =>
+              !view.fields.inline && (
+                <BoardViewTreeItem
+                  key={view.id}
+                  href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+                  label={view.title || formatViewTitle(view)}
+                  nodeId={view.id}
+                  viewType={view.fields.viewType}
+                  onClick={onClick}
+                />
+              )
+          )}
+        </div>
       ) : item.children.length > 0 ? (
         item.children.map((childItem) => (
           // eslint-disable-next-line no-use-before-define

@@ -5,6 +5,7 @@ import { MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
+import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -28,6 +29,7 @@ export function DuplicatePageAction({
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const router = useRouter();
   const { refreshBounty } = useBounties();
+  const { refreshProposal } = useProposals();
 
   const disabled = !pagePermissions?.read || !userSpacePermissions?.createPage;
 
@@ -43,6 +45,8 @@ export function DuplicatePageAction({
       }
       if (pageType === 'bounty' || pageType === 'bounty_template') {
         refreshBounty(duplicatePageResponse.rootPageId);
+      } else if (pageType === 'proposal') {
+        refreshProposal(duplicatePageResponse.rootPageId);
       }
       onComplete?.();
     }
@@ -61,7 +65,12 @@ export function DuplicatePageAction({
       }
     >
       <div>
-        <MenuItem dense disabled={excludedPageTypes.includes(pageType) || disabled} onClick={duplicatePage}>
+        <MenuItem
+          data-testid='duplicate-page-action'
+          dense
+          disabled={excludedPageTypes.includes(pageType) || disabled}
+          onClick={duplicatePage}
+        >
           <ListItemIcon>
             <FileCopyOutlinedIcon fontSize='small' />
           </ListItemIcon>

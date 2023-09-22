@@ -16,8 +16,6 @@ import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
-import { SubscriptionSettings } from 'components/settings/subscription/SubscriptionSettings';
-import ProfileSettings from 'components/u/ProfileSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
@@ -30,10 +28,11 @@ import type { SpaceSettingsTab, UserSettingsTab } from './config';
 import { ACCOUNT_TABS, SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
+import ProfileSettings from './profile/ProfileSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
-import { useBlockCount } from './subscription/hooks/useBlockCount';
 import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
+import { SubscriptionSettings } from './subscription/SubscriptionSettings';
 import { UpgradeChip } from './subscription/UpgradeWrapper';
 
 interface TabPanelProps extends BoxProps {
@@ -109,13 +108,9 @@ export function SpaceSettingsDialog() {
   const { activePath, onClose, onClick, open, unsavedChanges } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
-  const { spaceSubscription, subscriptionEnded } = useSpaceSubscription();
-  const { blockCount } = useBlockCount();
+  const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-
-  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
-  const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
 
   const handleClose = (e: any) => {
     if (unsavedChanges) {
@@ -182,7 +177,7 @@ export function SpaceSettingsDialog() {
                 active={activePath === tab.path}
                 section={tab.path}
               >
-                {tab.path === 'subscription' && passedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
+                {tab.path === 'subscription' && hasPassedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
                   <UpgradeChip forceDisplay upgradeContext='upgrade' />
                 ) : null}
               </SidebarLink>

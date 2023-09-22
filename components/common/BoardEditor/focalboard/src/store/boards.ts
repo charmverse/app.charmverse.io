@@ -3,7 +3,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import type { Board } from 'lib/focalboard/board';
 
-import { initialLoad, initialReadOnlyLoad } from './initialLoad';
+import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
@@ -43,9 +43,9 @@ const boardsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(initialReadOnlyLoad.fulfilled, (state, action) => {
-      state.boards = {};
-      state.templates = {};
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
+      state.boards = state.boards ?? {};
+      state.templates = state.templates ?? {};
       for (const block of action.payload) {
         if (block.type === 'board' && block.fields.isTemplate) {
           state.templates[block.id] = block as Board;
@@ -54,15 +54,12 @@ const boardsSlice = createSlice({
         }
       }
     });
-    builder.addCase(initialLoad.fulfilled, (state, action) => {
-      state.boards = {};
-      state.templates = {};
-      for (const block of action.payload.blocks) {
-        if (block.type === 'board' && block.fields.isTemplate) {
-          state.templates[block.id] = block as Board;
-        } else if (block.type === 'board' && !block.fields.isTemplate) {
-          state.boards[block.id] = block as Board;
-        }
+
+    builder.addCase(blockLoad.fulfilled, (state, action) => {
+      state.boards = state.boards ?? {};
+      const block = action.payload;
+      if (block.type === 'board') {
+        state.boards[block.id] = block as Board;
       }
     });
   }

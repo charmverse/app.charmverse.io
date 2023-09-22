@@ -18,9 +18,9 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-import type { NewPageInput, PagesMap } from 'lib/pages';
+import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
-import { findParentOfType } from 'lib/pages/findParentOfType';
+import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
@@ -41,26 +41,6 @@ function mapPageToMenuNode(page: PageMeta): MenuNode {
     spaceId: page.spaceId
   };
 }
-
-export function filterVisiblePages(pageMap: PagesMap<PageMeta>, rootPageIds: string[] = []): MenuNode[] {
-  return Object.values(pageMap)
-    .filter((page): page is PageMeta =>
-      isTruthy(
-        page &&
-          (page.type === 'board' ||
-            page.type === 'page' ||
-            page.type === 'linked_board' ||
-            rootPageIds?.includes(page.id)) &&
-          !findParentOfType({
-            pageId: page.id,
-            pageType: 'card',
-            pageMap
-          })
-      )
-    )
-    .map(mapPageToMenuNode);
-}
-
 type PageNavigationProps = {
   deletePage?: (id: string) => void;
   isFavorites?: boolean;
@@ -83,7 +63,9 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
     ? Object.values(pages)
         .filter((page): page is PageMeta => isTruthy(page))
         .map(mapPageToMenuNode)
-    : filterVisiblePages(pages);
+    : filterVisiblePages(pages)
+        .filter((page): page is PageMeta => isTruthy(page))
+        .map(mapPageToMenuNode);
 
   const currentPageId = currentPage?.id ?? '';
 
@@ -163,9 +145,9 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
             type: 'page_reordered',
             payload: {
               pageId: droppedItem.id,
-              currentParentId: droppedItem.parentId,
               newParentId: containerItem.parentId,
-              newIndex: droppedItem.index
+              newIndex: droppedItem.index,
+              trigger: 'sidebar-to-sidebar'
             }
           });
         }
@@ -211,9 +193,9 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           type: 'page_reordered',
           payload: {
             pageId: droppedItem.id,
-            currentParentId: droppedItem.parentId,
             newParentId: containerItem.id,
-            newIndex: droppedItem.index
+            newIndex: droppedItem.index,
+            trigger: 'sidebar-to-sidebar'
           }
         });
       }

@@ -245,7 +245,14 @@ export function PageLink({
   }
 
   return (
-    <PageAnchor href={href} onClick={stopPropagation} color='inherit'>
+    <PageAnchor
+      href={href}
+      onClick={stopPropagation}
+      color='inherit'
+      onDragStart={(event) => {
+        event.dataTransfer.setData('sidebar-page', JSON.stringify({ pageId, pageType }));
+      }}
+    >
       <span onClick={preventDefault}>
         <PageIcon
           pageType={pageType}
@@ -376,6 +383,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         ContentProps={ContentProps}
         TransitionProps={TransitionProps}
         ref={ref}
+        data-test={`page-tree-item-${pageId}`}
       >
         {children}
       </StyledTreeItem>

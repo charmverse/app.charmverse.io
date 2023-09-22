@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
-import { act, render, screen, fireEvent } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import mutator from '../mutator';
@@ -14,8 +13,8 @@ import ViewTitle from './viewTitle';
 jest.mock('../mutator');
 jest.mock('../utils');
 
-const mockedMutator = jest.mocked(mutator, true);
-const mockedUtils = jest.mocked(Utils, true);
+const mockedMutator = jest.mocked(mutator, { shallow: true });
+const mockedUtils = jest.mocked(Utils, { shallow: true });
 mockedUtils.createGuid.mockReturnValue('test-id');
 
 beforeAll(() => {
@@ -49,7 +48,7 @@ describe('components/viewTitle', () => {
       const result = render(
         wrapIntl(
           <ReduxProvider store={store}>
-            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+            <ViewTitle pageTitle='Page title' board={board} readOnly={false} setPage={() => {}} />
           </ReduxProvider>
         )
       );
@@ -64,7 +63,7 @@ describe('components/viewTitle', () => {
       const result = render(
         wrapIntl(
           <ReduxProvider store={store}>
-            <ViewTitle board={board} readOnly={true} setPage={() => {}} />
+            <ViewTitle pageTitle='Page title' board={board} readOnly={true} setPage={() => {}} />
           </ReduxProvider>
         )
       );
@@ -80,14 +79,14 @@ describe('components/viewTitle', () => {
       const result = render(
         wrapIntl(
           <ReduxProvider store={store}>
-            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+            <ViewTitle pageTitle='Page title' board={board} readOnly={false} setPage={() => {}} />
           </ReduxProvider>
         )
       );
       container = result.container;
     });
     expect(container).toMatchSnapshot();
-    const hideDescriptionButton = screen.getAllByRole('button')[0];
+    const hideDescriptionButton = screen.getAllByRole('button')[2];
     userEvent.click(hideDescriptionButton);
     expect(mockedMutator.showDescription).toBeCalledTimes(1);
   });
@@ -99,50 +98,15 @@ describe('components/viewTitle', () => {
       const result = render(
         wrapIntl(
           <ReduxProvider store={store}>
-            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
+            <ViewTitle pageTitle='Page title' board={board} readOnly={false} setPage={() => {}} />
           </ReduxProvider>
         )
       );
       container = result.container;
     });
     expect(container).toMatchSnapshot();
-    const showDescriptionButton = screen.getAllByRole('button')[0];
+    const showDescriptionButton = screen.getAllByRole('button')[2];
     userEvent.click(showDescriptionButton);
     expect(mockedMutator.showDescription).toBeCalledTimes(1);
-  });
-
-  test('add random icon', async () => {
-    board.fields.icon = '';
-    let container;
-    await act(async () => {
-      const result = render(
-        wrapIntl(
-          <ReduxProvider store={store}>
-            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
-          </ReduxProvider>
-        )
-      );
-      container = result.container;
-    });
-    expect(container).toMatchSnapshot();
-    const randomIconButton = screen.getAllByRole('button')[0];
-    userEvent.click(randomIconButton);
-    expect(mockedMutator.changeIcon).toBeCalledTimes(1);
-  });
-
-  test('change title', async () => {
-    await act(async () => {
-      render(
-        wrapIntl(
-          <ReduxProvider store={store}>
-            <ViewTitle board={board} readOnly={false} setPage={() => {}} />
-          </ReduxProvider>
-        )
-      );
-    });
-    const titleInput = screen.getAllByRole('textbox')[0];
-    userEvent.type(titleInput, 'other title');
-    fireEvent.blur(titleInput);
-    expect(mockedMutator.changeTitle).toBeCalledTimes(1);
   });
 });

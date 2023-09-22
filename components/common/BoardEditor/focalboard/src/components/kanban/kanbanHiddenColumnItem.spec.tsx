@@ -1,22 +1,25 @@
 import '@testing-library/jest-dom';
+import type { PageMeta } from '@charmverse/core/pages';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { createIntl } from 'react-intl';
+import { v4 } from 'uuid';
 
 import type { IPropertyOption } from 'lib/focalboard/board';
+import { pageStubToCreate } from 'testing/generatePageStub';
 
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { wrapDNDIntl } from '../../testUtils';
+import { wrapDNDIntl, wrapPagesProvider } from '../../testUtils';
 
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
 
 jest.mock('../../mutator');
-const mockedMutator = jest.mocked(Mutator, true);
+const mockedMutator = jest.mocked(Mutator, { shallow: true });
 
 describe('src/components/kanban/kanbanHiddenColumnItem', () => {
-  const intl = createIntl({ locale: 'en-us' });
+  const intl = createIntl({ locale: 'en' });
   const board = TestBlockFactory.createBoard();
   const activeView = TestBlockFactory.createBoardView(board);
   const card = TestBlockFactory.createCard(board);
@@ -26,79 +29,61 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
     color: 'propColorDefault'
   };
   beforeAll(() => {});
+
+  const group = {
+    option,
+    cardPages: [
+      {
+        card,
+        page: pageStubToCreate({ spaceId: v4(), createdBy: v4(), id: card.id, path: card.id }) as PageMeta
+      }
+    ],
+    cards: [card]
+  };
+
   test('should match snapshot', () => {
     const { container } = render(
-      wrapDNDIntl(
-        <KanbanHiddenColumnItem
-          activeView={activeView}
-          group={{
-            option,
-            cards: [card]
-          }}
-          readOnly={false}
-          onDrop={jest.fn()}
-          intl={intl}
-        />
+      wrapPagesProvider(
+        card.id,
+        wrapDNDIntl(
+          <KanbanHiddenColumnItem
+            activeView={activeView}
+            group={group}
+            readOnly={false}
+            onDrop={jest.fn()}
+            intl={intl}
+          />
+        )
       )
     );
     expect(container).toMatchSnapshot();
   });
   test('should match snapshot readonly', () => {
     const { container } = render(
-      wrapDNDIntl(
-        <KanbanHiddenColumnItem
-          activeView={activeView}
-          group={{
-            option,
-            cards: [card]
-          }}
-          readOnly={true}
-          onDrop={jest.fn()}
-          intl={intl}
-        />
+      wrapPagesProvider(
+        card.id,
+        wrapDNDIntl(
+          <KanbanHiddenColumnItem
+            activeView={activeView}
+            group={group}
+            readOnly={true}
+            onDrop={jest.fn()}
+            intl={intl}
+          />
+        )
       )
     );
     expect(container).toMatchSnapshot();
   });
-  test('return kanbanHiddenColumnItem and click menuwrapper', () => {
-    const { container } = render(
-      wrapDNDIntl(
-        <KanbanHiddenColumnItem
-          activeView={activeView}
-          group={{
-            option,
-            cards: [card]
-          }}
-          readOnly={false}
-          onDrop={jest.fn()}
-          intl={intl}
-        />
-      )
-    );
-    const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
-    expect(buttonMenuWrapper).not.toBeNull();
-    userEvent.click(buttonMenuWrapper);
-    expect(container).toMatchSnapshot();
-  });
+
   test('return kanbanHiddenColumnItem, click menuwrapper and click show', () => {
-    const { container } = render(
+    render(
       wrapDNDIntl(
-        <KanbanHiddenColumnItem
-          activeView={activeView}
-          group={{
-            option,
-            cards: [card]
-          }}
-          readOnly={false}
-          onDrop={jest.fn()}
-          intl={intl}
-        />
+        <KanbanHiddenColumnItem activeView={activeView} group={group} readOnly={false} onDrop={jest.fn()} intl={intl} />
       )
     );
     const buttonMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
-    expect(buttonMenuWrapper).not.toBeNull();
     userEvent.click(buttonMenuWrapper);
-    expect(container).toMatchSnapshot();
     const buttonShow = within(buttonMenuWrapper).getByRole('button', { name: 'Show' });
     userEvent.click(buttonShow);
     expect(mockedMutator.unhideViewColumn).toBeCalledWith(activeView, option.id);

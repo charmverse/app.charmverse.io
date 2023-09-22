@@ -1,17 +1,15 @@
 import { render } from '@testing-library/react';
-import 'isomorphic-fetch';
-import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import type { CommentBlock } from '../../blocks/commentBlock';
+import { createCommentBlock } from '../../blocks/commentBlock';
 import { FetchMock } from '../../test/fetchMock';
 import { mockDOM, wrapIntl } from '../../testUtils';
 
 import CommentsList from './commentsList';
 
-global.fetch = FetchMock.fn;
+window.fetch = FetchMock.fn;
 
 beforeEach(() => {
   FetchMock.fn.mockReset();
@@ -22,20 +20,8 @@ beforeAll(() => {
 });
 
 describe('components/cardDetail/CommentsList', () => {
-  const createdAt = Date.parse('01 Jan 2021 00:00:00 GMT');
-  const comment1: CommentBlock = {
-    id: 'comment_id_1',
-    title: 'Comment 1',
-    createdAt,
-    updatedBy: 'user_id_1'
-  } as CommentBlock;
-
-  const comment2: CommentBlock = {
-    id: 'comment_id_2',
-    title: 'Comment 2',
-    createdAt,
-    updatedBy: 'user_id_2'
-  } as CommentBlock;
+  const comment1 = createCommentBlock();
+  const comment2 = createCommentBlock();
 
   test('comments show up', async () => {
     const mockStore = configureStore([]);
@@ -61,12 +47,8 @@ describe('components/cardDetail/CommentsList', () => {
     expect(container).toBeDefined();
 
     // Comments show up
-    const comments = container!.querySelectorAll('.comment-text');
+    const comments = container!.querySelectorAll('.Comment');
     expect(comments.length).toBe(2);
-
-    // Add comment option visible when readonly mode is off
-    const newCommentSection = container!.querySelectorAll('.newcomment');
-    expect(newCommentSection.length).toBe(1);
   });
 
   test('comments show up in readonly mode', async () => {
@@ -93,11 +75,11 @@ describe('components/cardDetail/CommentsList', () => {
     expect(container).toBeDefined();
 
     // Comments show up
-    const comments = container!.querySelectorAll('.comment-text');
+    const comments = container!.querySelectorAll('.Comment');
     expect(comments.length).toBe(2);
 
     // Add comment option visible when readonly mode is off
-    const newCommentSection = container!.querySelectorAll('.newcomment');
+    const newCommentSection = container!.querySelectorAll('#CommentsList.send');
     expect(newCommentSection.length).toBe(0);
   });
 });

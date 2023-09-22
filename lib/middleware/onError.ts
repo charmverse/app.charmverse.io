@@ -1,7 +1,8 @@
 import { log } from '@charmverse/core/log';
+import { Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { SystemError } from 'lib/utilities/errors';
+import { DataNotFoundError, SystemError } from 'lib/utilities/errors';
 
 import { UnknownError } from './errors';
 import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';
@@ -9,6 +10,12 @@ import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 
 export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
+  // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
+  // P2025 is thrown when a record is not found
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+    return res.status(404).json(new DataNotFoundError(`Data not found`));
+  }
+
   // We need to change strategy to validate the error since Prototypes are not always correct
   const isValidSystemError =
     validationProps.every((prop) => !!err[prop]) && typeof err.code === 'number' && err.code >= 400 && err.code <= 599;

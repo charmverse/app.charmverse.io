@@ -3,6 +3,9 @@ import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
+import type { PageType } from '@charmverse/core/prisma-client';
+
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -23,10 +26,12 @@ import * as inlineComment from './components/inlineComment';
 import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import { plugins as linkPlugins } from './components/link/link.plugins';
+import { linkedPagePluginKeyName } from './components/linkedPage/linkedPage.constants';
+import { linkedPagePlugins } from './components/linkedPage/linkedPage.plugins';
 import * as listItem from './components/listItem/listItem';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
-import { nestedPagePluginKeyName, nestedPagePlugins } from './components/nestedPage';
+import { nestedPagePlugins } from './components/nestedPage';
 import * as nft from './components/nft/nft.plugins';
 import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
@@ -45,7 +50,7 @@ export const actionsPluginKey = new PluginKey('row-actions');
 export const emojiPluginKey = new PluginKey(emojiSuggestKeyName);
 export const mentionPluginKey = new PluginKey(mentionPluginKeyName);
 export const floatingMenuPluginKey = new PluginKey('floatingMenu');
-export const nestedPagePluginKey = new PluginKey(nestedPagePluginKeyName);
+export const linkedPagePluginKey = new PluginKey(linkedPagePluginKeyName);
 export const inlineCommentPluginKey = new PluginKey(inlineComment.pluginKeyName);
 export const linksPluginKey = new PluginKey('links');
 export const inlinePalettePluginKey = new PluginKey('inlinePalette');
@@ -84,6 +89,54 @@ export function charmEditorPlugins({
   placeholderText?: string;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
+    new Plugin({
+      props: {
+        handleDOMEvents: {
+          drop(view, ev) {
+            if (!ev.dataTransfer || !pageId) {
+              return false;
+            }
+
+            const coordinates = view.posAtCoords({
+              left: ev.clientX,
+              top: ev.clientY
+            });
+
+            if (!coordinates) {
+              return false;
+            }
+
+            const data = ev.dataTransfer.getData('sidebar-page');
+            if (!data) {
+              return false;
+            }
+
+            try {
+              const parsedData = JSON.parse(data) as { pageId: string | null; pageType: PageType };
+              if (!parsedData.pageId) {
+                return false;
+              }
+              ev.preventDefault();
+              emitSocketMessage({
+                type: 'page_reordered',
+                payload: {
+                  pageId: parsedData.pageId,
+                  newParentId: pageId,
+                  newIndex: -1,
+                  trigger: 'sidebar-to-editor',
+                  pos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
+                }
+              });
+              // + 1 for dropping in non empty node
+              // + 0 for dropping in empty node (blank line)
+              return false;
+            } catch (_) {
+              return false;
+            }
+          }
+        }
+      }
+    }),
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
@@ -110,9 +163,10 @@ export function charmEditorPlugins({
       pageId,
       spaceId
     }),
-    nestedPagePlugins({
-      key: nestedPagePluginKey
+    linkedPagePlugins({
+      key: linkedPagePluginKey
     }),
+    nestedPagePlugins(),
     imagePlugins({
       handleDragAndDrop: false
     })

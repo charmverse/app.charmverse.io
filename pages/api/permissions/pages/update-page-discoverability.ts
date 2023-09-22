@@ -1,4 +1,4 @@
-import type { UpdatePagePermissionDiscoverabilityRequest } from '@charmverse/core/dist/cjs/pages';
+import type { UpdatePagePermissionDiscoverabilityRequest } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

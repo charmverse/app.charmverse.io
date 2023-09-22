@@ -35,8 +35,9 @@ export function LinkCharmVerseDatabase(props: Props) {
   }, [pages, searchTerm]);
 
   return (
-    <SidebarContent>
+    <SidebarContent data-test='linked-database-options'>
       <TextField
+        data-test='linked-database-search'
         autoFocus
         placeholder='Search pages'
         value={searchTerm}

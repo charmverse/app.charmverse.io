@@ -20,13 +20,19 @@ export class DocumentPage extends GlobalPage {
     public charmEditor = page.locator('data-test=page-charmeditor >> div[contenteditable]').first(),
     public proposalBanner = page.locator('data-test=proposal-banner'),
     public documentTitle = page.locator(`data-test=editor-page-title`),
-    public openAsPageButton = page.locator('data-test=open-as-page')
+    public openAsPageButton = page.locator('data-test=open-as-page'),
+    public joinSpaceButton = page.locator('data-test=public-bounty-space-action'),
+    public cardDetailProperties = page.locator('data-test=card-detail-properties')
   ) {
     super(page);
   }
 
   async goToPage({ domain, path }: { domain: string; path: string }) {
     return this.page.goto(`${baseUrl}/${domain}/${path}`);
+  }
+
+  getSelectProperties() {
+    return this.cardDetailProperties.locator('data-test=closed-select-input').all();
   }
 
   openTrash() {
@@ -48,5 +54,11 @@ export class DocumentPage extends GlobalPage {
   async isPageEditable() {
     const isEditable = await this.charmEditor.getAttribute('contenteditable');
     return isEditable === 'true';
+  }
+
+  async typeText(text: string) {
+    const charmEditorSelector = '.ProseMirror.bangle-editor';
+    await this.page.click(charmEditorSelector);
+    await this.page.type(charmEditorSelector, text);
   }
 }

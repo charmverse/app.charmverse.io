@@ -32,6 +32,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
   {
     title: 'Grants',
     sourceTemplateId: null,
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -516,6 +517,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
   },
   {
     title: 'Budget',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -1655,6 +1657,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
   },
   {
     title: 'Investments',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -2079,6 +2082,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
   },
   {
     title: 'Protocol Changes',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -2429,6 +2433,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
   },
   {
     title: 'Metagov Changes',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -3123,6 +3128,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
   },
   {
     title: 'Delegate Governance',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [

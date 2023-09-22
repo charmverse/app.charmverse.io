@@ -27,7 +27,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 
@@ -128,7 +128,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const { logoutWallet } = useWeb3AuthSig();
+  const { logoutWallet } = useWeb3Account();
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
@@ -196,6 +196,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
           />
           <SidebarLink
             active={false}
+            external
             href={charmverseDiscordInvite}
             icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
             label='Support & Feedback'
