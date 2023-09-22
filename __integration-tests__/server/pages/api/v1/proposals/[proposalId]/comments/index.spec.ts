@@ -309,7 +309,7 @@ describe('GET /api/v1/proposals/{proposalId}/comments', () => {
       },
       {
         id: childComments[1].id,
-        createdAt: childComments[0].createdAt.toISOString(),
+        createdAt: childComments[1].createdAt.toISOString(),
         content: {
           markdown: childCommentText,
           text: childCommentText
