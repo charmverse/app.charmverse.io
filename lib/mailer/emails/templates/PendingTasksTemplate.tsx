@@ -6,8 +6,8 @@ import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import { baseUrl } from 'config/constants';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import { DiscussionNotification } from 'lib/discussion/interfaces';
 import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
+import { DiscussionNotification } from 'lib/notifications/interfaces';
 import type { ProposalNotification } from 'lib/proposal/getProposalStatusChangeTasks';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { VoteTask } from 'lib/votes/interfaces';

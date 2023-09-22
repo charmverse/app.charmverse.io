@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 
-import { getPostCategories } from '../categories/getPostCategories';
+import { getPostCategories } from './getPostCategories';
 
 export async function getPostCategoriesUsersRecord({ spaceId }: { spaceId: string }) {
   const spaceRoles = await prisma.spaceRole.findMany({

@@ -1,29 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { TaskUser } from 'lib/discussion/interfaces';
+import type { ForumNotification, NotificationsGroup } from './interfaces';
+import { notificationMetadataIncludeStatement, sortByDate } from './utils';
 
-export type ForumNotification = {
-  taskId: string;
-  taskType: 'post.created' | 'post.comment.created' | 'post.mention.created' | 'post.comment.mention.created';
-  spaceId: string;
-  spaceDomain: string;
-  spaceName: string;
-  postId: string;
-  postPath: string;
-  postTitle: string;
-  createdAt: string;
-  commentId: string | null;
-  mentionId: string | null;
-  commentText: string;
-  createdBy: TaskUser | null;
-};
-
-export type ForumNotificationsGroup = {
-  marked: ForumNotification[];
-  unmarked: ForumNotification[];
-};
-
-export async function getForumNotifications(userId: string): Promise<ForumNotificationsGroup> {
+export async function getForumNotifications(userId: string): Promise<NotificationsGroup<ForumNotification>> {
   const postNotifications = await prisma.postNotification.findMany({
     where: {
       notificationMetadata: {
@@ -31,37 +11,32 @@ export async function getForumNotifications(userId: string): Promise<ForumNotifi
       }
     },
     include: {
-      post: true,
-      comment: true,
-      notificationMetadata: {
-        include: {
-          space: {
-            select: {
-              name: true,
-              domain: true
-            }
-          },
-          user: {
-            select: {
-              id: true,
-              username: true,
-              path: true,
-              avatar: true,
-              avatarTokenId: true
-            }
-          }
+      post: {
+        select: {
+          id: true,
+          path: true,
+          title: true
         }
+      },
+      comment: {
+        select: {
+          id: true,
+          contentText: true
+        }
+      },
+      notificationMetadata: {
+        include: notificationMetadataIncludeStatement
       }
     }
   });
 
-  const forumNotificationsGroup: ForumNotificationsGroup = {
+  const forumNotificationsGroup: NotificationsGroup<ForumNotification> = {
     marked: [],
     unmarked: []
   };
 
   postNotifications.forEach((notification) => {
-    const forumNotification: ForumNotification = {
+    const forumNotification = {
       taskId: notification.id,
       commentId: notification.commentId,
       commentText: notification.comment?.contentText ?? '',
@@ -75,7 +50,7 @@ export async function getForumNotifications(userId: string): Promise<ForumNotifi
       spaceId: notification.notificationMetadata.spaceId,
       spaceName: notification.notificationMetadata.space.name,
       taskType: notification.type as ForumNotification['taskType']
-    };
+    } as ForumNotification;
 
     if (notification.notificationMetadata.seenAt) {
       forumNotificationsGroup.marked.push(forumNotification);
@@ -88,10 +63,4 @@ export async function getForumNotifications(userId: string): Promise<ForumNotifi
     marked: forumNotificationsGroup.marked.sort(sortByDate),
     unmarked: forumNotificationsGroup.unmarked.sort(sortByDate)
   };
-}
-
-// utils
-
-function sortByDate<T extends { createdAt: string }>(a: T, b: T): number {
-  return a.createdAt > b.createdAt ? -1 : 1;
 }
