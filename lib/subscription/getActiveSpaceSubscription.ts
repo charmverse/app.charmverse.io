@@ -2,6 +2,8 @@ import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type Stripe from 'stripe';
 
+import { DeprecatedFreeTrial } from 'lib/subscription/constants';
+
 import type { SubscriptionFieldsFromStripe } from './mapStripeFields';
 import { mapStripeFields } from './mapStripeFields';
 import { stripeClient } from './stripe';
@@ -54,7 +56,8 @@ export async function getActiveSpaceSubscription({
     }
   });
 
-  if (stripeData.status === 'cancelled') {
+  // if user still has a deprecated free trial, we don't want to show it as active, just ignore it
+  if (stripeData.status === 'cancelled' || stripeData.status === DeprecatedFreeTrial) {
     return null;
   }
 
