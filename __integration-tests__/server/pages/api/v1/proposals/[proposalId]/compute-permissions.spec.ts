@@ -4,7 +4,6 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import type { PublicProposalApiPermissions } from 'pages/api/v1/proposals/[proposalId]/compute-permissions';
 import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
@@ -55,6 +54,9 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
       userId: proposalAuthor.id
     });
 
+    // This value will be true in a later test when we look for base proposal permissions only
+    expect(authorResponse.permissions.vote).toBe(false);
+
     expect(authorResponse).toMatchObject<PublicProposalApiPermissions>({
       proposalId: proposal.id,
       userId: proposalAuthor.id,
@@ -68,7 +70,7 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
           authorization: `Bearer ${apiKey.token}`
         })
         .expect(200)
-    ).body as PublicApiProposal[];
+    ).body as PublicProposalApiPermissions;
 
     const memberPermissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
@@ -82,7 +84,7 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
     });
   });
 
-  it('should return a proposal when called with a super API key', async () => {
+  it('should return computed proposal permissions when called with a super API key', async () => {
     const authorResponse = (
       await request(baseUrl)
         .get(`/api/v1/proposals/${proposal.id}/compute-permissions?spaceId=${space.id}&userId=${proposalAuthor.id}`)
@@ -110,7 +112,7 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
           authorization: `Bearer ${superApiKey.token}`
         })
         .expect(200)
-    ).body as PublicApiProposal[];
+    ).body as PublicProposalApiPermissions;
 
     const memberPermissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
@@ -143,5 +145,55 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
       .get(`/api/v1/proposals/${proposal.id}/compute-permissions?spaceId=${space.id}&userId=${proposalAuthor.id}`)
       .set({ authorization: `Bearer ${otherSpaceSuperApiKey.token}` })
       .expect(401);
+  });
+});
+describe('GET /api/v1/proposals/{proposalId}/compute-permissions?basePermissionsOnly=true', () => {
+  it('should return base permissions without policies applied when called with basePermissionsOnly parameter', async () => {
+    const authorResponse = (
+      await request(baseUrl)
+        .get(
+          `/api/v1/proposals/${proposal.id}/compute-permissions?userId=${proposalAuthor.id}&basePermissionsOnly=true`
+        )
+        .set({
+          authorization: `Bearer ${apiKey.token}`
+        })
+        .expect(200)
+    ).body as PublicProposalApiPermissions;
+
+    const authorPermissions = await premiumPermissionsApiClient.proposals.computeBaseProposalPermissions({
+      resourceId: proposal.id,
+      userId: proposalAuthor.id
+    });
+
+    expect(authorResponse).toMatchObject<PublicProposalApiPermissions>({
+      proposalId: proposal.id,
+      userId: proposalAuthor.id,
+      permissions: authorPermissions
+    });
+
+    expect(authorResponse.permissions.vote).toBe(true);
+
+    const memberResponse = (
+      await request(baseUrl)
+        .get(`/api/v1/proposals/${proposal.id}/compute-permissions?spaceId=${space.id}&userId=${spaceMember.id}`)
+        .set({
+          authorization: `Bearer ${superApiKey.token}`
+        })
+        .expect(200)
+    ).body as PublicProposalApiPermissions;
+
+    const memberPermissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: proposal.id,
+      userId: spaceMember.id
+    });
+
+    expect(memberResponse).toMatchObject<PublicProposalApiPermissions>({
+      proposalId: proposal.id,
+      userId: spaceMember.id,
+      permissions: memberPermissions
+    });
+
+    // No permissions exist for this proposals category, so we expect the member to have no vote permission even in the base configuration
+    expect(memberResponse.permissions.vote).toBe(false);
   });
 });

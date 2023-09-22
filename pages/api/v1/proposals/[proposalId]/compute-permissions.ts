@@ -77,7 +77,7 @@ export type PublicProposalApiPermissions = {
  * /proposals/{proposalIdOrPath}/compute-permissions:
  *   get:
  *     summary: Compute user permissions for a proposal
- *     description: Compute the permissions for a given resource and user.
+ *     description: Compute the permissions for a proposal and user depending on the current proposal stage.
  *     tags:
  *      - 'Space API'
  *     parameters:
@@ -91,6 +91,12 @@ export type PublicProposalApiPermissions = {
  *         in: query
  *         required: false
  *         description: The ID of the user for whom to compute permissions. Optional.
+ *         schema:
+ *           type: string
+ *        - name: basePermissionsOnly
+ *         in: query
+ *         required: false
+ *         description: Set this parameter to retrieve the maximum permissions a user can have for a proposal, without restrictions applied by the proposal's current stage. For instance, normally, a space member with comment permissions in the proposal's category may only comment during the discussion stage. When this option is enabled, you will always receive true for this users' comment permission whatever stage the proposal is in.
  *         schema:
  *           type: string
  *     responses:
@@ -109,7 +115,14 @@ async function computeProposalPermissions(req: NextApiRequest, res: NextApiRespo
       page: generatePageQuery({
         pageIdOrPath: req.query.proposalId as string,
         spaceIdOrDomain: spaceId
-      })
+      }),
+      spaceId:
+        req.authorizedSpaceId ??
+        (req.spaceIdRange
+          ? {
+              in: req.spaceIdRange
+            }
+          : undefined)
     },
     select: {
       id: true
@@ -118,7 +131,11 @@ async function computeProposalPermissions(req: NextApiRequest, res: NextApiRespo
 
   const userId = req.query.userId as string | undefined;
 
-  const permissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+  const useBase = req.query.basePermissionsOnly === 'true';
+
+  const permissions = await premiumPermissionsApiClient.proposals[
+    useBase ? 'computeBaseProposalPermissions' : 'computeProposalPermissions'
+  ]({
     resourceId: proposal.id,
     userId
   });
