@@ -28,9 +28,6 @@ export async function getForumNotifications(userId: string): Promise<ForumNotifi
     where: {
       notificationMetadata: {
         userId
-      },
-      type: {
-        in: ['post.created', 'post.comment.created', 'post.mention.created', 'post.comment.mention.created']
       }
     },
     include: {

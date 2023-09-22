@@ -25,6 +25,13 @@ export type CommentEntity = {
   author: UserEntity;
 };
 
+export type InlineCommentEntity = {
+  createdAt: string;
+  id: string;
+  threadId: string;
+  author: UserEntity;
+};
+
 export type PostEntity = {
   createdAt: string;
   id: string;
@@ -71,12 +78,10 @@ export enum WebhookNameSpaces {
 
 export enum WebhookEventNames {
   BountyCompleted = 'bounty.completed',
-  ForumPostCommentCreated = 'forum.post.comment.created',
-  ForumPostCommentUpvoted = 'forum.post.comment.upvoted',
-  ForumPostCommentDownvoted = 'forum.post.comment.downvoted',
+  ForumCommentCreated = 'forum.comment.created',
+  ForumCommentUpvoted = 'forum.comment.upvoted',
+  ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
-  ForumPostMentionCreated = 'forum.post.mention.created',
-  ForumPostCommentMentionCreated = 'forum.post.comment.mention.created',
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
@@ -85,11 +90,7 @@ export enum WebhookEventNames {
   HelloWorld = 'hello.world',
   PageMentionCreated = 'page.mention.created',
   PageInlineCommentCreated = 'page.inline_comment.created',
-  PageInlineCommentMentionCreated = 'page.inline_comment.mention.created',
-  PageInlineCommentReplied = 'page.inline_comment.replied',
-  PageCommentCreated = 'page.comment.created',
-  PageCommentMentionCreated = 'page.comment.mention.created',
-  PageCommentReplied = 'page.comment.replied'
+  PageCommentCreated = 'page.comment.created'
 }
 
 // Utils to share common props among events
@@ -105,18 +106,18 @@ export type WebhookEvent<T = WebhookEventNames> =
       post: PostEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ForumPostCommentCreated;
+      scope: WebhookEventNames.ForumCommentCreated;
       comment: CommentEntity;
-      post: PostEntity | null;
+      post: PostEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ForumPostCommentUpvoted;
+      scope: WebhookEventNames.ForumCommentUpvoted;
       comment: CommentEntity;
       post: PostEntity;
       voter: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ForumPostCommentDownvoted;
+      scope: WebhookEventNames.ForumCommentDownvoted;
       comment: CommentEntity;
       post: PostEntity;
       voter: UserEntity;
@@ -146,17 +147,21 @@ export type WebhookEvent<T = WebhookEventNames> =
     })
   | (WebhookEventSharedProps<T> & {
       user: UserEntity;
-      scope:
-        | WebhookEventNames.PageInlineCommentCreated
-        | WebhookEventNames.PageInlineCommentReplied
-        | WebhookEventNames.PageCommentCreated
-        | WebhookEventNames.PageCommentReplied
-        | WebhookEventNames.PageMentionCreated
-        | WebhookEventNames.PageInlineCommentMentionCreated
-        | WebhookEventNames.PageCommentMentionCreated;
+      scope: WebhookEventNames.PageMentionCreated;
       page: PageEntity;
-      comment: CommentEntity | null;
-      mention: UserMentionMetadata | null;
+      mention: UserMentionMetadata;
+    })
+  | (WebhookEventSharedProps<T> & {
+      user: UserEntity;
+      scope: WebhookEventNames.PageInlineCommentCreated;
+      page: PageEntity;
+      inlineComment: InlineCommentEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      user: UserEntity;
+      scope: WebhookEventNames.PageCommentCreated;
+      page: PageEntity;
+      comment: CommentEntity;
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.UserJoined;

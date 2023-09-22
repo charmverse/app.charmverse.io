@@ -5,12 +5,13 @@ import nc from 'next-connect';
 import type { CreateCommentInput } from 'lib/comments';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { createPageCommentNotifications } from 'lib/pages/comments/createPageCommentNotifications';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPageEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -70,14 +71,12 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const pageComment = await createPageComment({ pageId, userId, ...body });
 
-  await createPageCommentNotifications({
+  await publishPageEvent({
     commentId: pageComment.id,
+    scope: WebhookEventNames.PageCommentCreated,
     pageId,
-    userId,
     spaceId: page.spaceId,
-    content: body.content,
-    parentId: body.parentId,
-    pageAuthor: page.createdBy
+    userId
   });
 
   res.status(200).json({

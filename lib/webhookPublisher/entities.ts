@@ -5,6 +5,7 @@ import { baseUrl } from 'config/constants';
 import type {
   BountyEntity,
   CommentEntity,
+  InlineCommentEntity,
   PageEntity,
   PostEntity,
   ProposalEntity,
@@ -34,29 +35,15 @@ export async function getBountyEntity(id: string): Promise<BountyEntity> {
   };
 }
 
-export async function getCommentEntity(
-  id: string,
-  options: { inlineComment?: boolean } = { inlineComment: false }
-): Promise<CommentEntity> {
-  if (options.inlineComment) {
-    const inlineComment = await prisma.comment.findUniqueOrThrow({
-      where: {
-        id
-      }
-    });
-
-    const author = await getUserEntity(inlineComment.userId);
-    return {
-      id,
-      author,
-      createdAt: inlineComment.createdAt.toISOString(),
-      parentId: null
-    };
-  }
-
+export async function getCommentEntity(id: string): Promise<CommentEntity> {
   const comment = await prisma.postComment.findUniqueOrThrow({
     where: {
       id
+    },
+    select: {
+      createdAt: true,
+      createdBy: true,
+      parentId: true
     }
   });
   const author = await getUserEntity(comment.createdBy);
@@ -65,6 +52,27 @@ export async function getCommentEntity(
     author,
     createdAt: comment.createdAt.toISOString(),
     parentId: comment.parentId
+  };
+}
+
+export async function getInlineCommentEntity(id: string): Promise<InlineCommentEntity> {
+  const inlineComment = await prisma.comment.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdAt: true,
+      userId: true,
+      threadId: true
+    }
+  });
+
+  const author = await getUserEntity(inlineComment.userId);
+  return {
+    id,
+    author,
+    createdAt: inlineComment.createdAt.toISOString(),
+    threadId: inlineComment.threadId
   };
 }
 

@@ -8,7 +8,8 @@ import {
   getSpaceEntity,
   getPostEntity,
   getProposalEntity,
-  getPageEntity
+  getPageEntity,
+  getInlineCommentEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -28,7 +29,7 @@ export async function publishPostEvent(context: PostEventContext) {
 }
 
 type CommentEventContext = {
-  scope: WebhookEventNames.ForumPostCommentCreated;
+  scope: WebhookEventNames.ForumCommentCreated;
   spaceId: string;
   postId: string;
   commentId: string;
@@ -49,7 +50,7 @@ export async function publishPostCommentEvent(context: CommentEventContext) {
 }
 
 type CommentVoteEventContext = {
-  scope: WebhookEventNames.ForumPostCommentDownvoted | WebhookEventNames.ForumPostCommentUpvoted;
+  scope: WebhookEventNames.ForumCommentDownvoted | WebhookEventNames.ForumCommentUpvoted;
   spaceId: string;
   postId: string;
   commentId: string;
@@ -144,17 +145,20 @@ export async function publishUserProposalEvent(context: ProposalUserEventContext
   });
 }
 
-type PageEventContext = {
-  scope:
-    | WebhookEventNames.PageMentionCreated
-    | WebhookEventNames.PageCommentMentionCreated
-    | WebhookEventNames.PageInlineCommentMentionCreated
-    | WebhookEventNames.PageInlineCommentCreated
-    | WebhookEventNames.PageInlineCommentReplied
-    | WebhookEventNames.PageCommentReplied
-    | WebhookEventNames.PageCommentCreated;
-  mention: UserMentionMetadata | null;
-  commentId: null | string;
+type PageEventContext = (
+  | {
+      scope: WebhookEventNames.PageMentionCreated;
+      mention: UserMentionMetadata;
+    }
+  | {
+      scope: WebhookEventNames.PageCommentCreated;
+      commentId: string;
+    }
+  | {
+      scope: WebhookEventNames.PageInlineCommentCreated;
+      inlineCommentId: string;
+    }
+) & {
   userId: string;
   spaceId: string;
   pageId: string;
@@ -167,20 +171,38 @@ export async function publishPageEvent(context: PageEventContext) {
     getUserEntity(context.userId)
   ]);
 
-  const comment = context.commentId
-    ? await getCommentEntity(context.commentId, {
-        inlineComment:
-          context.scope === WebhookEventNames.PageInlineCommentCreated ||
-          context.scope === WebhookEventNames.PageInlineCommentReplied
-      })
-    : null;
-
-  return publishWebhookEvent(context.spaceId, {
-    scope: context.scope,
-    page,
-    space,
-    comment,
-    user,
-    mention: context.mention
-  });
+  switch (context.scope) {
+    case WebhookEventNames.PageInlineCommentCreated: {
+      const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.PageInlineCommentCreated,
+        page,
+        space,
+        inlineComment,
+        user
+      });
+    }
+    case WebhookEventNames.PageMentionCreated: {
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.PageMentionCreated,
+        page,
+        space,
+        user,
+        mention: context.mention
+      });
+    }
+    case WebhookEventNames.PageCommentCreated: {
+      const comment = await getCommentEntity(context.commentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.PageCommentCreated,
+        page,
+        space,
+        comment,
+        user
+      });
+    }
+    default: {
+      return null;
+    }
+  }
 }

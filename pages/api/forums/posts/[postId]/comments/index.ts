@@ -5,11 +5,12 @@ import nc from 'next-connect';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput, PostCommentWithVote } from 'lib/forums/comments/interface';
 import { listPostComments } from 'lib/forums/comments/listPostComments';
-import { createPostCommentNotifications } from 'lib/forums/notifications/createPostCommentNotifications';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishPostCommentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -69,10 +70,12 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const postComment = await createPostComment({ postId, userId, ...body });
 
-  await createPostCommentNotifications({
-    postComment,
+  // Publish webhook event if needed
+  await publishPostCommentEvent({
+    scope: WebhookEventNames.ForumCommentCreated,
     spaceId: post.spaceId,
-    userId
+    commentId: postComment.id,
+    postId
   });
 
   res.status(200).json({

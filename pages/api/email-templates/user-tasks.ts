@@ -135,7 +135,6 @@ const createProposalTasks = ({
     pagePath: randomName(),
     pageTitle,
     taskId: v4(),
-    eventDate: new Date(),
     createdAt: new Date(),
     status,
     spaceDomain: randomName(),

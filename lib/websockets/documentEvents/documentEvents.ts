@@ -449,8 +449,7 @@ export class DocumentEventHandler {
                 scope: WebhookEventNames.PageMentionCreated,
                 spaceId: room.doc.spaceId,
                 mention,
-                userId: session.user.id,
-                commentId: null
+                userId: session.user.id
               })
             )
           );

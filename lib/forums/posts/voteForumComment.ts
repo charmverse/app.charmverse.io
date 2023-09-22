@@ -73,7 +73,7 @@ export async function voteForumComment({
 
     // Publish webhook event if needed
     await publishPostCommentVoteEvent({
-      scope: upvoted ? WebhookEventNames.ForumPostCommentUpvoted : WebhookEventNames.ForumPostCommentUpvoted,
+      scope: upvoted ? WebhookEventNames.ForumCommentUpvoted : WebhookEventNames.ForumCommentUpvoted,
       spaceId: post.spaceId,
       commentId,
       postId,
