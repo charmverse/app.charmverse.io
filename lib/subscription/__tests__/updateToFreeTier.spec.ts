@@ -1,7 +1,7 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { NotFoundError } from 'lib/middleware';
 import { stripeMock, stripeMockIds } from 'testing/stripeMock';
 import { addSpaceSubscription } from 'testing/utils/spaces';
 
@@ -55,7 +55,16 @@ describe('updateProSubscription', () => {
     await expect(updateToFreeTier(spaceId, userId)).resolves.not.toThrow();
   });
 
-  it(`Should fail if the space has no subscription`, async () => {
+  it(`Should update to free tier even if space does not have active subscription`, async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const spaceId = space.id;
+    const userId = user.id;
+
+    await expect(updateToFreeTier(spaceId, userId)).resolves.not.toThrow();
+  });
+
+  it(`Should fail if the space does not exist`, async () => {
     const spaceId = v4();
     const userId = v4();
 
@@ -63,6 +72,6 @@ describe('updateProSubscription', () => {
       .fn()
       .mockResolvedValue(stripeMock.stripeClient.subscriptions.retrieve);
 
-    await expect(updateToFreeTier(spaceId, userId)).rejects.toBeInstanceOf(NotFoundError);
+    await expect(updateToFreeTier(spaceId, userId)).rejects.toBeInstanceOf(DataNotFoundError);
   });
 });

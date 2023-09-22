@@ -13,7 +13,7 @@ import { Constants } from '../constants';
 import { Utils } from '../utils';
 
 import { getBoard } from './boards';
-import { initialDatabaseLoad } from './databaseBlocksLoad';
+import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 import { getView } from './views';
 
 import type { RootState } from './index';
@@ -80,6 +80,14 @@ const cardsSlice = createSlice({
         } else if (block.type === 'card' && !block.fields.isTemplate) {
           state.cards[block.id] = block as Card;
         }
+      }
+    });
+
+    builder.addCase(blockLoad.fulfilled, (state, action) => {
+      state.cards = state.cards ?? {};
+      const block = action.payload;
+      if (block.type === 'card') {
+        state.cards[block.id] = block as Card;
       }
     });
   }
