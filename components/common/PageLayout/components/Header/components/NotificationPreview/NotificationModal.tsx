@@ -212,7 +212,7 @@ export function NotificationModal() {
             <DialogContent sx={{ height: 'calc(100% - 145px)', px: { xs: 0, md: 3 } }}>
               <LoadingComponent isLoading={isLoading} label='Fetching your notifications' size={24}>
                 {unmarkedNotifications.map((notification) => (
-                  <Fragment key={notification.taskId}>
+                  <Fragment key={notification.id}>
                     <NotificationPreview
                       large
                       unmarked
@@ -224,7 +224,7 @@ export function NotificationModal() {
                   </Fragment>
                 ))}
                 {markedNotifications.map((notification) => (
-                  <Fragment key={notification.taskId}>
+                  <Fragment key={notification.id}>
                     <NotificationPreview
                       large
                       notification={notification}

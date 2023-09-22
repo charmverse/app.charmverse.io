@@ -71,7 +71,7 @@ export async function getVoteNotifications(userId: string): Promise<Notification
       postTitle: post?.title ?? null,
       spaceDomain: space.domain,
       spaceName: space.name,
-      taskId: notification.id,
+      spaceId: space.id,
       type: notification.type as VoteNotification['type'],
       createdAt: notification.notificationMetadata.createdAt.toISOString(),
       deadline: notification.vote.deadline

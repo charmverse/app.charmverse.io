@@ -37,7 +37,7 @@ export async function getForumNotifications(userId: string): Promise<Notificatio
 
   postNotifications.forEach((notification) => {
     const forumNotification = {
-      taskId: notification.id,
+      id: notification.id,
       commentId: notification.commentId,
       commentText: notification.comment?.contentText ?? '',
       createdAt: notification.notificationMetadata.createdAt.toISOString(),

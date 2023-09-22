@@ -16,7 +16,7 @@ import { useUser } from 'hooks/useUser';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
 import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 
-type MarkAsReadParams = { taskId: string; groupType: NotificationGroupType; type: NotificationType };
+type MarkAsReadParams = { id: string; groupType: NotificationGroupType; type: NotificationType };
 export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>;
 
 export type NotificationDetails = {
@@ -25,7 +25,7 @@ export type NotificationDetails = {
   createdBy: NotificationActor | null;
   groupType: NotificationGroupType;
   type: NotificationType;
-  taskId: string;
+  id: string;
   content: string;
   href: string;
   title: string;
@@ -95,16 +95,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   }, [tasks]);
 
   const markAsRead: MarkNotificationAsRead = useCallback(
-    async ({
-      taskId,
-      type,
-      groupType
-    }: {
-      taskId: string;
-      groupType: NotificationGroupType;
-      type: NotificationType;
-    }) => {
-      await charmClient.tasks.markTasks([{ id: taskId, type }]);
+    async ({ id, groupType }: { id: string; groupType: NotificationGroupType; type: NotificationType }) => {
+      await charmClient.tasks.markNotifications([{ id }]);
 
       mutateTasks(
         (_tasks) => {
@@ -112,7 +104,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
             return;
           }
 
-          const taskIndex = _tasks?.[groupType].unmarked.findIndex((t) => t.taskId === taskId);
+          const taskIndex = _tasks?.[groupType].unmarked.findIndex((t) => t.id === id);
           if (typeof taskIndex === 'number' && taskIndex > -1) {
             const marked = [_tasks?.[groupType].unmarked[taskIndex], ..._tasks[groupType].marked];
             const unmarkedItems = _tasks[groupType].unmarked;

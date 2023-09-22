@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { markTasks } from '../markTasks';
+import { markTasks } from '../markNotifications';
 
 let user: User;
 let userNotification: UserNotification;

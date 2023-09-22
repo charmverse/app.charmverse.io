@@ -1,6 +1,6 @@
 import type { Application, ApplicationStatus, Bounty, BountyStatus } from '@charmverse/core/prisma';
 
-import type { BountyTask } from './getBountyTasks';
+import type { BountyTask } from '../notifications/getBountyNotifications';
 
 export function getBountyAction({
   isSpaceAdmin,

@@ -48,13 +48,15 @@ export async function createPostNotification({
   userId,
   type
 }: CreatePostNotificationInput) {
+  const notificationId = v4();
   await prisma.postNotification.create({
     data: {
       type,
-      id: v4(),
+      id: notificationId,
       mentionId,
       notificationMetadata: {
         create: {
+          id: notificationId,
           createdBy,
           spaceId,
           userId
@@ -128,13 +130,15 @@ export async function createPageNotification({
   userId,
   type
 }: CreatePageNotificationInput) {
+  const notificationId = v4();
   await prisma.pageNotification.create({
     data: {
       type,
-      id: v4(),
+      id: notificationId,
       mentionId,
       notificationMetadata: {
         create: {
+          id: notificationId,
           createdBy,
           spaceId,
           userId
@@ -176,12 +180,14 @@ export async function createProposalNotification({
   spaceId: string;
   userId: string;
 }) {
+  const notificationId = v4();
   await prisma.proposalNotification.create({
     data: {
       type,
-      id: v4(),
+      id: notificationId,
       notificationMetadata: {
         create: {
+          id: notificationId,
           createdBy,
           spaceId,
           userId
@@ -209,12 +215,14 @@ export async function createVoteNotification({
   spaceId: string;
   userId: string;
 }) {
+  const notificationId = v4();
   await prisma.voteNotification.create({
     data: {
       type,
-      id: v4(),
+      id: notificationId,
       notificationMetadata: {
         create: {
+          id: notificationId,
           createdBy,
           spaceId,
           userId

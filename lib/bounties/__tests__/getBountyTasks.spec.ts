@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { createApplication } from 'lib/applications/actions';
 import { generateUserAndSpaceWithApiToken, generateBounty } from 'testing/setupDatabase';
 
-import { getBountyTasks } from '../getBountyTasks';
+import { getBountyTasks } from '../../notifications/getBountyNotifications';
 
 describe('getBountyTasks', () => {
   it('Should not return any task when there is no action', async () => {

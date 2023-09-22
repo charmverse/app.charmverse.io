@@ -34,7 +34,7 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
     const notificationMetadata = notification.notificationMetadata;
     const page = notification.page;
     const discussionNotification = {
-      taskId: notification.id,
+      id: notification.id,
       bountyId: page.bountyId,
       bountyTitle: page.title || 'Untitled',
       commentId: notification.commentId,

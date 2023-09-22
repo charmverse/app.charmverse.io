@@ -31,7 +31,7 @@ export function NotificationPreviewPopover({ close }: { close: VoidFunction }) {
         <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
           {latestNotifications.length > 0 ? (
             latestNotifications.map((notification) => (
-              <Fragment key={notification.taskId}>
+              <Fragment key={notification.id}>
                 <NotificationPreview notification={notification} markAsRead={markAsRead} onClose={close} />
                 <Divider />
               </Fragment>

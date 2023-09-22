@@ -6,6 +6,7 @@ export function sortByDate<T extends { createdAt: string | Date }>(a: T, b: T): 
 export const notificationMetadataIncludeStatement = {
   space: {
     select: {
+      id: true,
       name: true,
       domain: true
     }

@@ -7,6 +7,15 @@ export type NotificationActor = Pick<
   'id' | 'username' | 'path' | 'avatar' | 'avatarContract' | 'avatarTokenId' | 'avatarChain' | 'deletedAt'
 >;
 
+interface NotificationBase {
+  id: string;
+  spaceId: string;
+  spaceDomain: string;
+  spaceName: string;
+  createdAt: string;
+  createdBy: NotificationActor | null;
+}
+
 export type DiscussionNotificationType =
   | 'mention.created'
   | 'inline_comment.created'
@@ -16,17 +25,11 @@ export type DiscussionNotificationType =
   | 'comment.replied'
   | 'comment.mention.created';
 
-interface DiscussionNotificationBase {
-  taskId: string;
-  spaceId: string;
-  spaceDomain: string;
-  spaceName: string;
+interface DiscussionNotificationBase extends NotificationBase {
   pageId: string;
   pagePath: string;
   pageTitle: string;
   pageType: PageType;
-  createdAt: string;
-  createdBy: NotificationActor | null;
   bountyId: string | null;
   bountyTitle: string | null;
   type: DiscussionNotificationType;
@@ -71,20 +74,14 @@ export type ForumNotificationType =
   | 'post.mention.created'
   | 'post.comment.mention.created';
 
-interface ForumNotificationBase {
-  taskId: string;
-  spaceId: string;
+interface ForumNotificationBase extends NotificationBase {
   type: ForumNotificationType;
-  spaceDomain: string;
-  spaceName: string;
   postId: string;
   postPath: string;
   postTitle: string;
-  createdAt: string;
   commentId: null | string;
   mentionId: null | string;
   commentText: string;
-  createdBy: NotificationActor | null;
 }
 
 export type ForumNotification = ForumNotificationBase &
@@ -120,29 +117,18 @@ export type ProposalNotificationType =
   | 'proposal.vote'
   | 'proposal.evaluation_closed';
 
-export type ProposalNotification = {
-  id: string;
-  spaceDomain: string;
-  spaceName: string;
+export type ProposalNotification = NotificationBase & {
   pageTitle: string;
   pagePath: string;
   status: ProposalStatus;
   pageId: string;
-  taskId: string;
   type: ProposalNotificationType;
-  createdAt: Date;
-  createdBy?: NotificationActor | null;
 };
 
 export type VoteNotificationType = 'vote.created';
 
-export type VoteNotification = {
-  id: string;
+export type VoteNotification = NotificationBase & {
   status: VoteStatus;
-  createdBy: NotificationActor | null;
-  taskId: string;
-  spaceName: string;
-  spaceDomain: string;
   pagePath: string | null;
   pageTitle: string | null;
   pageType: PageType | null;
@@ -152,7 +138,6 @@ export type VoteNotification = {
   type: VoteNotificationType;
   title: string;
   userChoice: string[] | null;
-  createdAt: string;
   deadline: Date;
 };
 

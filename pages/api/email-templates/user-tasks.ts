@@ -1,9 +1,9 @@
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
-import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
+import type { BountyTask } from 'lib/notifications/getBountyNotifications';
 import type {
   DiscussionNotification,
   ForumNotification,
@@ -34,7 +34,7 @@ const createDiscussionTask = ({
   const id = v4();
   return {
     mentionId: id,
-    taskId: id,
+    id,
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
@@ -74,7 +74,7 @@ const createForumTask = ({
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
-    taskId: v4(),
+    id: v4(),
     type: 'post.comment.created',
     spaceName,
     postId: v4(),
@@ -136,15 +136,16 @@ const createProposalTasks = ({
   status
 }: Omit<
   ProposalNotification,
-  'id' | 'taskId' | 'spaceDomain' | 'pagePath' | 'pageId' | 'createdAt' | 'eventDate'
+  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'createdAt' | 'eventDate' | 'spaceId' | 'createdBy'
 >): ProposalNotification => {
   return {
     id: v4(),
     type,
+    createdBy: null,
+    spaceId: v4(),
     pagePath: randomName(),
     pageTitle,
-    taskId: v4(),
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     status,
     spaceDomain: randomName(),
     spaceName,
@@ -159,12 +160,11 @@ const createBountyTask = ({
   status
 }: Omit<
   BountyTask,
-  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'taskId' | 'createdAt' | 'createdBy'
+  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'createdAt' | 'createdBy'
 >): BountyTask => {
   const id = v4();
   return {
     id,
-    taskId: id,
     action,
     pagePath: randomName(),
     pageTitle,

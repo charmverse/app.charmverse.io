@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 
-import { getBountyAction, getBountyActor } from './getBountyAction';
+import { getBountyAction, getBountyActor } from '../bounties/getBountyAction';
 
 export type BountyTaskAction =
   | 'application_pending'
@@ -18,7 +18,6 @@ export type BountyTaskAction =
 
 export interface BountyTask {
   id: string;
-  taskId: string;
   eventDate: Date;
   spaceDomain: string;
   spaceName: string;
@@ -42,16 +41,10 @@ function sortBounties(bounties: BountyTask[]) {
   });
 }
 
-export async function getBountyTasks(userId: string): Promise<{
+export async function getBountyNotifications(userId: string): Promise<{
   marked: BountyTask[];
   unmarked: BountyTask[];
 }> {
-  const userNotifications = await prisma.userNotification.findMany({
-    where: {
-      userId
-    }
-  });
-
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       userId
@@ -101,7 +94,7 @@ export async function getBountyTasks(userId: string): Promise<{
     }
   });
 
-  const userNotificationIds = new Set(userNotifications.map((userNotification) => userNotification.taskId));
+  const userNotificationIds = new Set();
 
   const bountyRecord: { marked: BountyTask[]; unmarked: BountyTask[] } = {
     marked: [],
@@ -134,7 +127,6 @@ export async function getBountyTasks(userId: string): Promise<{
 
           bountiesWithActorIds.push({
             id: bountyTaskId,
-            taskId: bountyTaskId,
             eventDate: application.updatedAt,
             createdAt: application.updatedAt,
             pageId: page.id,
@@ -162,7 +154,7 @@ export async function getBountyTasks(userId: string): Promise<{
       createdBy: mapNotificationActor(actorUser)
     };
 
-    if (!userNotificationIds.has(bountyTask.taskId)) {
+    if (!userNotificationIds.has(bountyTask.id)) {
       bountyRecord.unmarked.push(bountyTask);
     } else {
       bountyRecord.marked.push(bountyTask);

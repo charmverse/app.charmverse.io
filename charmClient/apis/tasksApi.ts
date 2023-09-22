@@ -1,5 +1,5 @@
 import * as http from 'adapters/http';
-import type { MarkTask } from 'lib/userNotifications/markTasks';
+import type { MarkNotification } from 'lib/userNotifications/markNotifications';
 import type { GetTasksResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 
@@ -16,7 +16,7 @@ export class TasksApi {
     return http.PUT('/api/tasks/state', payload);
   }
 
-  markTasks(tasks: MarkTask[]) {
+  markNotifications(tasks: MarkNotification[]) {
     return http.POST('/api/tasks/mark', tasks);
   }
 }

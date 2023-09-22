@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getBountyTasks } from 'lib/notifications/getBountyNotifications';
+import type { BountyTasksGroup } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getForumNotifications } from 'lib/notifications/getForumNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
@@ -35,7 +35,7 @@ async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksRespon
     getDiscussionNotifications(userId),
     getVoteNotifications(userId),
     getProposalNotifications(userId),
-    getBountyTasks(userId),
+    getBountyNotifications(userId),
     getForumNotifications(userId)
   ]);
 

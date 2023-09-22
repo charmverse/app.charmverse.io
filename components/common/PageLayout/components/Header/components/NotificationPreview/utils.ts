@@ -1,7 +1,7 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { NotificationType } from '@charmverse/core/prisma';
 
-import type { BountyTask } from 'lib/bounties/getBountyTasks';
+import type { BountyTask } from 'lib/notifications/getBountyNotifications';
 import type {
   DiscussionNotification,
   ForumNotification,
@@ -25,7 +25,7 @@ function getForumContent(n: ForumNotification) {
 
 export function getForumNotificationPreviewItems(notifications: ForumNotification[]) {
   return notifications.map((n) => ({
-    taskId: n.taskId,
+    id: n.id,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
@@ -46,7 +46,7 @@ function getDiscussionContent(n: DiscussionNotification) {
 
 export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
   return notifications.map((n) => ({
-    taskId: n.taskId,
+    id: n.id,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
@@ -102,7 +102,7 @@ function getBountyContent(n: BountyTask) {
 
 export function getBountiesNotificationPreviewItems(notifications: BountyTask[]) {
   return notifications.map((n) => ({
-    taskId: n.taskId,
+    id: n.id,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
@@ -149,7 +149,7 @@ function getProposalNotificationStatus(status: ProposalStatus) {
 
 export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[], currentUserId?: string) {
   return notifications.map((n) => ({
-    taskId: n.taskId,
+    id: n.id,
     createdAt: n.createdAt,
     createdBy: n.createdBy || null,
     spaceName: n.spaceName,
@@ -177,13 +177,13 @@ const getVoteContent = (n: VoteNotification, currentUserId: string) => {
 
 export function getVoteNotificationPreviewItems(notifications: VoteNotification[], currentUserId?: string) {
   return notifications.map((n) => ({
-    taskId: n.taskId,
+    id: n.id,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
     groupType: 'votes' as NotificationGroupType,
     type: NotificationType.vote,
-    href: `/${n.spaceDomain}/${n.pagePath}?voteId=${n.taskId}`,
+    href: `/${n.spaceDomain}/${n.pagePath}?voteId=${n.id}`,
     content: getVoteContent(n, currentUserId || ''),
     title: 'New Poll'
   }));

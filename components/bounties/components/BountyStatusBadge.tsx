@@ -20,7 +20,7 @@ import type { ReactNode } from 'react';
 import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import type { BountyTaskAction } from 'lib/bounties/getBountyTasks';
+import type { BountyTaskAction } from 'lib/notifications/getBountyNotifications';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { fancyTrim } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
