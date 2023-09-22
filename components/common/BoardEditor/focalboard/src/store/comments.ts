@@ -11,7 +11,7 @@ const commentsSlice = createSlice({
   name: 'comments',
   initialState: { comments: {}, loadedCardComments: {} } as {
     comments: { [key: string]: CommentBlock };
-    loadedCardComments: Record<string, boolean>;
+    loadedCardComments: Record<string, true>;
   },
   reducers: {
     updateComments: (state, action: PayloadAction<CommentBlock[]>) => {
@@ -54,10 +54,10 @@ export function getCardComments(cardId?: string): (state: RootState) => CommentB
   };
 }
 
-export function hasLoadedCardComments(cardId?: string): (state: RootState) => boolean {
-  return (state: RootState): boolean => {
+export function hasLoadedCardComments(cardId?: string): (state: RootState) => true | null {
+  return (state: RootState): true | null => {
     if (!cardId) {
-      return false;
+      return null;
     }
     return state.comments.loadedCardComments[cardId];
   };
