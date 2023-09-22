@@ -24,7 +24,6 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
@@ -42,6 +41,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
@@ -66,7 +66,7 @@ export async function generateSpaceUser({
       username: 'Username',
       wallets: {
         create: {
-          address: Wallet.createRandom().address
+          address: randomETHWalletAddress()
         }
       },
       spaceRoles: {

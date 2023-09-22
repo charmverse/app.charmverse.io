@@ -4,7 +4,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 
-import { databaseViewsLoad, initialDatabaseLoad } from './databaseBlocksLoad';
+import { blockLoad, databaseViewsLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
@@ -65,6 +65,14 @@ const viewsSlice = createSlice({
           state.views[block.id] = block as BoardView;
           state.loadedBoardViews[block.rootId] = true;
         }
+      }
+    });
+
+    builder.addCase(blockLoad.fulfilled, (state, action) => {
+      state.views = state.views ?? {};
+      const block = action.payload;
+      if (block.type === 'view') {
+        state.views[block.id] = block as BoardView;
       }
     });
   }

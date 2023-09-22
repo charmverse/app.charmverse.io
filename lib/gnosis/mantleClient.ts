@@ -1,5 +1,5 @@
 import type { SafeTransactionData } from '@safe-global/safe-core-sdk-types';
-import { utils } from 'ethers';
+import { getAddress } from 'viem';
 
 import * as http from 'adapters/http';
 
@@ -196,7 +196,7 @@ export function proposeTransaction({
   chainId: number;
 }) {
   return http.POST(
-    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/${utils.getAddress(safeAddress)}/propose`,
+    `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/${getAddress(safeAddress)}/propose`,
     {
       ...safeTransactionData,
       safeTxHash: txHash,

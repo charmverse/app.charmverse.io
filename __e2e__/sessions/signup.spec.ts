@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
-import { Wallet } from 'ethers';
+
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';
@@ -31,8 +32,7 @@ test('signup - allows user to sign up and create a workspace using Metamask wall
   loginPage,
   signupPage
 }) => {
-  const wallet = Wallet.createRandom();
-  const address = wallet.address;
+  const address = randomETHWalletAddress();
 
   await mockWeb3({
     page: sandboxPage,

@@ -41,7 +41,7 @@ export function SelectPreview({
       <Tooltip title={readOnlyMessage ?? null}>
         <Stack
           display='inline-flex'
-          width='min-content'
+          width='fit-content'
           gap={0.5}
           flexDirection='row'
           flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
