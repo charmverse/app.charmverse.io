@@ -6,7 +6,7 @@ import type { Server, Socket } from 'socket.io';
 
 import type { Block } from 'lib/focalboard/block';
 import type { FailedImportsError } from 'lib/notion/types';
-import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
+import type { ExtendedVote } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
 export type ResourceWithSpaceId = Resource & { spaceId: string };
@@ -52,8 +52,7 @@ type PagesDeleted = {
 
 type VotesCreated = {
   type: 'votes_created';
-  // We need a VoteTask, not just an extended vote, so this can be passed to the users' tasks, which will span different spaces
-  payload: VoteTask[];
+  payload: ExtendedVote[];
 };
 
 type VotesDeleted = {

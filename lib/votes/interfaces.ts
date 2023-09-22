@@ -1,7 +1,5 @@
 import type { User, UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
 
-import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
-
 export const DEFAULT_THRESHOLD = 50;
 
 export const VOTE_STATUS = ['InProgress', 'Passed', 'Rejected', 'Cancelled'] as const;
@@ -24,17 +22,6 @@ export interface ExtendedVote extends Vote {
   userChoice: null | string[];
   totalVotes: number;
 }
-
-export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {
-  // page?: PageMeta;
-  // space: Space;
-  createdBy: NotificationActor | null;
-  taskId: string;
-  spaceName: string;
-  spaceDomain: string;
-  pagePath: string;
-  pageTitle: string;
-};
 
 export type UserVoteExtendedDTO = UserVote & {
   user: Pick<User, 'avatar' | 'username' | 'id'>;

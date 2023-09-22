@@ -11,7 +11,8 @@ import {
   getPostEntity,
   getProposalEntity,
   getPageEntity,
-  getInlineCommentEntity
+  getInlineCommentEntity,
+  getVoteEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -236,4 +237,19 @@ export async function publishPageEvent(context: PageEventContext) {
       return null;
     }
   }
+}
+
+type VoteEventContext = {
+  scope: WebhookEventNames.VoteCreated;
+  voteId: string;
+  spaceId: string;
+};
+
+export async function publishVoteEvent(context: VoteEventContext) {
+  const [space, vote] = await Promise.all([getSpaceEntity(context.spaceId), getVoteEntity(context.voteId)]);
+  return publishWebhookEvent(context.spaceId, {
+    scope: context.scope,
+    space,
+    vote
+  });
 }

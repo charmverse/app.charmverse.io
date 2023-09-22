@@ -5,13 +5,12 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { createVote as createVoteService } from 'lib/votes';
+import { createVote } from 'lib/votes';
 import { getVotesByPage } from 'lib/votes/getVotesByPage';
-import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
+import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -20,7 +19,7 @@ handler
   .get(getVotes)
   .use(requireUser)
   .use(requireKeys(['deadline', 'voteOptions', 'title', 'type', 'threshold'], 'body'))
-  .post(createVote);
+  .post(createVoteController);
 
 async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]>) {
   const postId = req.query.postId as string;
@@ -86,7 +85,7 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
   );
 }
 
-async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {
+async function createVoteController(req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {
   const newVote = req.body as VoteDTO;
   const userId = req.session.user.id;
   const pageId = newVote.pageId;
@@ -154,11 +153,10 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     }
   }
 
-  const vote = await createVoteService({
+  const vote = await createVote({
     ...newVote,
     createdBy: userId
   } as VoteDTO);
-  const voteAuthor = await prisma.user.findUnique({ where: { id: userId } });
 
   if (pageId && vote.context === 'proposal') {
     trackUserAction('new_vote_created', {
@@ -176,42 +174,17 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     });
   }
 
-  const space = await prisma.space.findUniqueOrThrow({ where: { id: vote.spaceId } });
-
-  let voteTask: VoteTask | undefined;
-  if (existingPage) {
-    voteTask = {
-      ...vote,
-      createdBy: mapNotificationActor(voteAuthor),
-      taskId: vote.id,
-      spaceName: space.name,
-      spaceDomain: space.domain,
-      pagePath: existingPage.path,
-      pageTitle: existingPage.title
-    };
-  } else if (existingPost) {
-    voteTask = {
-      ...vote,
-      createdBy: mapNotificationActor(voteAuthor),
-      taskId: vote.id,
-      spaceName: space.name,
-      spaceDomain: space.domain,
-      pagePath: `forum/post/${existingPost.path}`,
-      pageTitle: existingPost.title
-    };
-  } else {
+  if (!existingPage || !existingPost) {
     log.debug('Cannot create vote task as no page or post was found.');
   }
 
-  if (voteTask) {
-    relay.broadcast(
-      {
-        type: 'votes_created',
-        payload: [voteTask]
-      },
-      vote.spaceId
-    );
-  }
+  relay.broadcast(
+    {
+      type: 'votes_created',
+      payload: [vote]
+    },
+    vote.spaceId
+  );
 
   return res.status(201).json(vote);
 }

@@ -2,14 +2,16 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import type { DiscussionNotification } from 'lib/discussion/interfaces';
-import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
+import type {
+  DiscussionNotification,
+  ForumNotification,
+  ProposalNotification,
+  VoteNotification
+} from 'lib/notifications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
-import type { ProposalNotification } from 'lib/proposal/getProposalStatusChangeTasks';
 import randomName from 'lib/utilities/randomName';
-import type { VoteTask } from 'lib/votes/interfaces';
 
 import { templatesContainer } from './page-invite';
 
@@ -22,9 +24,9 @@ const createDiscussionTask = ({
   pageTitle,
   spaceName,
   mentionText,
-  type = 'page'
+  pageType = 'page'
 }: {
-  type?: DiscussionNotification['type'];
+  pageType?: DiscussionNotification['pageType'];
   spaceName: string;
   mentionText: string;
   pageTitle: string;
@@ -44,15 +46,19 @@ const createDiscussionTask = ({
     bountyId: null,
     bountyTitle: null,
     commentId: null,
-    type,
+    type: 'mention.created',
     createdBy: {
       id: v4(),
       username: '',
       avatar: '',
       path: '',
-      avatarTokenId: null
+      avatarTokenId: null,
+      avatarChain: 1,
+      avatarContract: '0x495f...7b',
+      deletedAt: null
     },
-    type: 'inline_comment.created'
+    inlineCommentId: null,
+    pageType
   };
 };
 
@@ -83,7 +89,10 @@ const createForumTask = ({
       username: '',
       avatar: '',
       path: '',
-      avatarTokenId: null
+      avatarTokenId: null,
+      avatarChain: 1,
+      avatarContract: '0x495f...7b',
+      deletedAt: null
     }
   };
 };
@@ -95,10 +104,10 @@ const createVoteTasks = ({
   spaceName
 }: {
   voteTitle: string;
-  deadline: VoteTask['deadline'];
+  deadline: VoteNotification['deadline'];
   spaceName: string;
   pageTitle: string;
-}): VoteTask => {
+}): VoteNotification => {
   return {
     deadline,
     id: v4(),
@@ -121,7 +130,7 @@ const createVoteTasks = ({
 };
 
 const createProposalTasks = ({
-  action,
+  type,
   pageTitle,
   spaceName,
   status
@@ -131,7 +140,7 @@ const createProposalTasks = ({
 >): ProposalNotification => {
   return {
     id: v4(),
-    action,
+    type,
     pagePath: randomName(),
     pageTitle,
     taskId: v4(),
@@ -188,13 +197,13 @@ const templates = {
       ],
       proposalTasks: [
         createProposalTasks({
-          action: 'discuss',
+          type: 'proposal.discuss',
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
           spaceName: 'Uniswap',
           status: 'discussion'
         }),
         createProposalTasks({
-          action: 'start_discussion',
+          type: 'proposal.start_discussion',
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
           status: 'draft'
@@ -205,13 +214,13 @@ const templates = {
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
           spaceName: 'CharmVerse',
-          type: 'bounty'
+          pageType: 'bounty'
         }),
         createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse',
-          type: 'bounty'
+          pageType: 'bounty'
         }),
         createDiscussionTask({
           mentionText: "Let's have a meeting @ghostpepper",

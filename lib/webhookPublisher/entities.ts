@@ -10,7 +10,8 @@ import type {
   PostEntity,
   ProposalEntity,
   SpaceEntity,
-  UserEntity
+  UserEntity,
+  VoteEntity
 } from './interfaces';
 
 export async function getBountyEntity(id: string): Promise<BountyEntity> {
@@ -133,6 +134,25 @@ export async function getSpaceEntity(id: string): Promise<SpaceEntity> {
     name: space.name,
     avatar: space.spaceImage ?? undefined,
     url: `${baseUrl}/${space.domain}`
+  };
+}
+
+export async function getVoteEntity(id: string): Promise<VoteEntity> {
+  const vote = await prisma.vote.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      pageId: true,
+      postId: true,
+      title: true
+    }
+  });
+  return {
+    id,
+    pageId: vote.pageId,
+    postId: vote.postId,
+    title: vote.title
   };
 }
 

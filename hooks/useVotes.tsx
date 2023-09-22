@@ -66,7 +66,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         const votesToAssign = newVotes.reduce((acc, vote) => {
           // In future, we'll want to check if the vote is linked to current space.
           // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions
-          const createdBy = typeof vote.createdBy === 'string' ? vote.createdBy : vote.createdBy?.id || '';
+          const createdBy = typeof vote.createdBy === 'string' ? vote.createdBy : '';
           acc[vote.id] = { ...vote, createdBy };
 
           return acc;
@@ -75,14 +75,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ...prev, ...votesToAssign };
       });
 
-      // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
-      newVotes.forEach((newVote) => {
-        if (!mutatedTasks.votes.unmarked.find((vote) => vote.id === newVote.id)) {
-          mutatedTasks.votes.unmarked.push(newVote);
-        }
-      });
-      mutateTasks(mutatedTasks);
+      mutateTasks();
     });
 
     const unsubscribeFromDeletedVotes = subscribe('votes_deleted', (deletedVotes) => {

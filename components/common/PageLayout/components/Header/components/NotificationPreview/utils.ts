@@ -2,11 +2,13 @@ import type { ProposalStatus } from '@charmverse/core/prisma';
 import { NotificationType } from '@charmverse/core/prisma';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import type { DiscussionNotification } from 'lib/discussion/interfaces';
-import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
-import type { NotificationGroupType } from 'lib/notifications/interfaces';
-import type { ProposalNotification } from 'lib/proposal/getProposalStatusChangeTasks';
-import type { VoteTask } from 'lib/votes/interfaces';
+import type {
+  DiscussionNotification,
+  ForumNotification,
+  NotificationGroupType,
+  ProposalNotification,
+  VoteNotification
+} from 'lib/notifications/interfaces';
 
 function getForumContent(n: ForumNotification) {
   const { createdBy, commentId, postTitle } = n;
@@ -159,7 +161,7 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalNoti
   }));
 }
 
-const getVoteContent = (n: VoteTask, currentUserId: string) => {
+const getVoteContent = (n: VoteNotification, currentUserId: string) => {
   const { createdBy, title, userChoice } = n;
   const isCreator = currentUserId === createdBy?.id;
   if (userChoice) {
@@ -173,7 +175,7 @@ const getVoteContent = (n: VoteTask, currentUserId: string) => {
     : `Poll "${title}" created.`;
 };
 
-export function getVoteNotificationPreviewItems(notifications: VoteTask[], currentUserId?: string) {
+export function getVoteNotificationPreviewItems(notifications: VoteNotification[], currentUserId?: string) {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,

@@ -1,4 +1,4 @@
-import type { PageType, ProposalStatus, User } from '@charmverse/core/prisma';
+import type { PageType, ProposalStatus, User, VoteStatus } from '@charmverse/core/prisma';
 
 export type NotificationGroupType = 'forum' | 'discussions' | 'votes' | 'proposals' | 'bounties';
 
@@ -113,6 +113,7 @@ export type ForumNotification = ForumNotificationBase &
 
 export type ProposalNotificationType =
   | 'proposal.start_review'
+  | 'proposal.start_discussion'
   | 'proposal.start_vote'
   | 'proposal.review'
   | 'proposal.discuss'
@@ -131,6 +132,28 @@ export type ProposalNotification = {
   type: ProposalNotificationType;
   createdAt: Date;
   createdBy?: NotificationActor | null;
+};
+
+export type VoteNotificationType = 'vote.created';
+
+export type VoteNotification = {
+  id: string;
+  status: VoteStatus;
+  createdBy: NotificationActor | null;
+  taskId: string;
+  spaceName: string;
+  spaceDomain: string;
+  pagePath: string | null;
+  pageTitle: string | null;
+  pageType: PageType | null;
+  postPath: string | null;
+  postTitle: string | null;
+  postCategoryId: string | null;
+  type: VoteNotificationType;
+  title: string;
+  userChoice: string[] | null;
+  createdAt: string;
+  deadline: Date;
 };
 
 export type NotificationsGroup<T> = {

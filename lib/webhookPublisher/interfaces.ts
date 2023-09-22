@@ -60,6 +60,13 @@ export type BountyEntity = {
   customReward: string | null;
 };
 
+export type VoteEntity = {
+  id: string;
+  pageId: string | null;
+  postId: string | null;
+  title: string;
+};
+
 export type PageEntity = {
   id: string;
   title: string;
@@ -72,8 +79,7 @@ export enum WebhookNameSpaces {
   Bounty = 'bounty',
   Forum = 'forum',
   user = 'user',
-  Proposal = 'proposal',
-  Page = 'page'
+  Proposal = 'proposal'
 }
 
 export enum WebhookEventNames {
@@ -91,7 +97,8 @@ export enum WebhookEventNames {
   HelloWorld = 'hello.world',
   PageMentionCreated = 'page.mention.created',
   PageInlineCommentCreated = 'page.inline_comment.created',
-  PageCommentCreated = 'page.comment.created'
+  PageCommentCreated = 'page.comment.created',
+  VoteCreated = 'vote.created'
 }
 
 // Utils to share common props among events
@@ -177,6 +184,10 @@ export type WebhookEvent<T = WebhookEventNames> =
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.HelloWorld;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.VoteCreated;
+      vote: VoteEntity;
     });
 
 // Webhook payload being sent by out API toward theirs

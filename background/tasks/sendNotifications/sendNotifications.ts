@@ -9,7 +9,7 @@ import type { PendingTasksProps } from 'lib/mailer/emails/templates/PendingTasks
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getForumNotifications } from 'lib/notifications/getForumNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
-import { getVoteTasks } from 'lib/votes/getVoteTasks';
+import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 
 const notificationTaskLimiter = RateLimit(100);
 
@@ -54,7 +54,7 @@ export async function getNotifications(): Promise<PendingTasksProps[]> {
     await notificationTaskLimiter();
 
     const discussionTasks = await getDiscussionNotifications(user.id);
-    const voteTasks = await getVoteTasks(user.id);
+    const voteTasks = await getVoteNotifications(user.id);
     const bountyTasks = await getBountyTasks(user.id);
     const forumTasks = await getForumNotifications(user.id);
 

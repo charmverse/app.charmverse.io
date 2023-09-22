@@ -6,11 +6,9 @@ import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import { baseUrl } from 'config/constants';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import type { ForumNotification } from 'lib/forums/notifications/getForumNotifications';
+import type { ForumNotification, ProposalNotification, VoteNotification } from 'lib/notifications/interfaces';
 import { DiscussionNotification } from 'lib/notifications/interfaces';
-import type { ProposalNotification } from 'lib/proposal/getProposalStatusChangeTasks';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import type { VoteTask } from 'lib/votes/interfaces';
 import { colors, greyColor2 } from 'theme/colors';
 
 import { EmailWrapper, Feedback, Footer, Header } from './components';
@@ -33,7 +31,7 @@ const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', margi
 export interface PendingTasksProps {
   discussionTasks: DiscussionNotification[];
   totalTasks: number;
-  voteTasks: VoteTask[];
+  voteTasks: VoteNotification[];
   proposalTasks: ProposalNotification[];
   bountyTasks: BountyTask[];
   forumTasks: ForumNotification[];
@@ -128,7 +126,7 @@ export default function PendingTasks(props: PendingTasksProps) {
       </>
     ) : null;
 
-  const bountyDiscussions = props.discussionTasks.filter((discussion) => discussion.type === 'bounty');
+  const bountyDiscussions = props.discussionTasks.filter((discussion) => discussion.pageType === 'bounty');
   const bountySection =
     totalBountyTasks > 0 ? (
       <>
@@ -255,7 +253,7 @@ export default function PendingTasks(props: PendingTasksProps) {
   );
 }
 
-function VoteTaskMjml({ task }: { task: VoteTask }) {
+function VoteTaskMjml({ task }: { task: VoteNotification }) {
   const pageWorkspaceTitle = `${task.pageTitle} | ${task.spaceName}`;
   return (
     <MjmlText>

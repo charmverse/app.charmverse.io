@@ -2,9 +2,9 @@ import { testUtilsForum, testUtilsPages, testUtilsUser } from '@charmverse/core/
 
 import { createPage, createVote } from 'testing/setupDatabase';
 
-import { getVoteTasks } from '../getVoteTasks';
+import { getVoteNotifications } from '../getVoteNotifications';
 
-describe('getVoteTasks', () => {
+describe('getVoteNotifications', () => {
   it('should get votes tasks for a user only in the pages they have access to', async () => {
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
@@ -20,7 +20,7 @@ describe('getVoteTasks', () => {
     });
 
     // Not included as the vote has been cancelled
-    const invisibleVote = await createVote({
+    await createVote({
       pageId: visiblePage.id,
       createdBy: adminUser.id,
       spaceId: space.id,
@@ -63,7 +63,7 @@ describe('getVoteTasks', () => {
       spaceId: space.id
     });
     // Same vote conditions as above, but on a page the user cannot see
-    const hiddenPageCreatedVote = await createVote({
+    await createVote({
       pageId: hiddenPage.id,
       createdBy: adminUser.id,
       spaceId: space.id,
@@ -73,7 +73,7 @@ describe('getVoteTasks', () => {
 
     const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
-    const votes = await getVoteTasks(spaceMember.id);
+    const votes = await getVoteNotifications(spaceMember.id);
 
     expect(votes.unmarked).toHaveLength(3);
 
@@ -101,7 +101,7 @@ describe('getVoteTasks', () => {
       categoryId: hiddenForumCategory.id
     });
 
-    const inProgressHiddenVote = await createVote({
+    await createVote({
       postId: hiddenCategoryPost.id,
       createdBy: adminUser.id,
       spaceId: space.id,
@@ -127,7 +127,7 @@ describe('getVoteTasks', () => {
       categoryId: viewOnlyForumCategory.id
     });
 
-    const inProgressViewableVote = await createVote({
+    await createVote({
       postId: viewOnlyCategoryPost.id,
       createdBy: adminUser.id,
       spaceId: space.id,
@@ -164,7 +164,7 @@ describe('getVoteTasks', () => {
     });
     const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
-    const votes = await getVoteTasks(spaceMember.id);
+    const votes = await getVoteNotifications(spaceMember.id);
 
     expect(votes.unmarked).toHaveLength(1);
 

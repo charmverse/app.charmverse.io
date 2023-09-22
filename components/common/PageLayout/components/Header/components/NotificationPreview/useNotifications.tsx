@@ -13,7 +13,6 @@ import {
 } from 'components/common/PageLayout/components/Header/components/NotificationPreview/utils';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
-import type { TaskUser } from 'lib/discussion/interfaces';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
 import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 
@@ -23,7 +22,7 @@ export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>
 export type NotificationDetails = {
   spaceName: string;
   createdAt: string | Date;
-  createdBy: NotificationActor | TaskUser | null;
+  createdBy: NotificationActor | null;
   groupType: NotificationGroupType;
   type: NotificationType;
   taskId: string;

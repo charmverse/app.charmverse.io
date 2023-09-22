@@ -3,34 +3,37 @@ import nc from 'next-connect';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
-import type { DiscussionNotificationsGroup } from 'lib/discussion/getDiscussionNotifications';
-import { getDiscussionNotifications } from 'lib/discussion/getDiscussionNotifications';
-import type { ForumNotificationsGroup } from 'lib/forums/notifications/getForumNotifications';
-import { getForumNotifications } from 'lib/forums/notifications/getForumNotifications';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ProposalNotificationsGroup } from 'lib/notifications/getProposalNotifications';
+import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
+import { getForumNotifications } from 'lib/notifications/getForumNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
+import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
+import type {
+  DiscussionNotification,
+  ForumNotification,
+  NotificationsGroup,
+  ProposalNotification,
+  VoteNotification
+} from 'lib/notifications/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { VoteTasksGroup } from 'lib/votes/getVoteTasks';
-import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getTasks);
 
 export interface GetTasksResponse {
-  discussions: DiscussionNotificationsGroup;
-  votes: VoteTasksGroup;
-  proposals: ProposalNotificationsGroup;
+  discussions: NotificationsGroup<DiscussionNotification>;
+  votes: NotificationsGroup<VoteNotification>;
+  proposals: NotificationsGroup<ProposalNotification>;
   bounties: BountyTasksGroup;
-  forum: ForumNotificationsGroup;
+  forum: NotificationsGroup<ForumNotification>;
 }
 
 async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
   const userId = req.session.user.id;
   const [discussionTasks, voteTasks, proposalTasks, bountiesTasks, forumTasks] = await Promise.all([
     getDiscussionNotifications(userId),
-    getVoteTasks(userId),
+    getVoteNotifications(userId),
     getProposalNotifications(userId),
     getBountyTasks(userId),
     getForumNotifications(userId)
