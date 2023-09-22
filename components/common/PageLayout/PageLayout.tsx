@@ -193,9 +193,9 @@ function PageLayout({ children }: PageLayoutProps) {
                     <BlocksExceededBanner />
 
                     {/* TODO: add action href */}
-                    <AnnouncementBanner actionLabel='Learn more' actionHref='https://wp.pl' expiryDate='2023-09-29'>
+                    {/* <AnnouncementBanner actionLabel='Learn more' actionHref='' expiryDate='2023-09-29'>
                       No more free trials! Everyone gets 30k blocks on us.
-                    </AnnouncementBanner>
+                    </AnnouncementBanner> */}
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer
