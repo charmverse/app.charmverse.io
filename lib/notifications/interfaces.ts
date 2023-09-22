@@ -1,8 +1,11 @@
-import type { User } from '@charmverse/core/prisma';
+import type { PageType, ProposalStatus, User } from '@charmverse/core/prisma';
 
 export type NotificationGroupType = 'forum' | 'discussions' | 'votes' | 'proposals' | 'bounties';
 
-export type TaskUser = Pick<User, 'id' | 'username' | 'path' | 'avatar' | 'avatarTokenId'>;
+export type NotificationActor = Pick<
+  User,
+  'id' | 'username' | 'path' | 'avatar' | 'avatarContract' | 'avatarTokenId' | 'avatarChain' | 'deletedAt'
+>;
 
 export type DiscussionNotificationType =
   | 'mention.created'
@@ -10,7 +13,8 @@ export type DiscussionNotificationType =
   | 'inline_comment.replied'
   | 'inline_comment.mention.created'
   | 'comment.created'
-  | 'comment.replied';
+  | 'comment.replied'
+  | 'comment.mention.created';
 
 interface DiscussionNotificationBase {
   taskId: string;
@@ -20,12 +24,12 @@ interface DiscussionNotificationBase {
   pageId: string;
   pagePath: string;
   pageTitle: string;
-  type: 'bounty' | 'page';
+  pageType: PageType;
   createdAt: string;
-  createdBy: TaskUser | null;
+  createdBy: NotificationActor | null;
   bountyId: string | null;
   bountyTitle: string | null;
-  taskType: DiscussionNotificationType;
+  type: DiscussionNotificationType;
   text: string;
   commentId: null | string;
   mentionId: null | string;
@@ -36,27 +40,27 @@ export type DiscussionNotification = DiscussionNotificationBase &
   (
     | {
         mentionId: string;
-        taskType: 'mention.created';
+        type: 'mention.created';
       }
     | {
         inlineCommentId: string;
-        taskType: 'inline_comment.created';
+        type: 'inline_comment.created';
       }
     | {
         inlineCommentId: string;
-        taskType: 'inline_comment.replied';
+        type: 'inline_comment.replied';
       }
     | {
         mentionId: string;
-        taskType: 'inline_comment.mention.created';
+        type: 'inline_comment.mention.created';
       }
     | {
         commentId: string;
-        taskType: 'comment.created';
+        type: 'comment.created';
       }
     | {
         commentId: string;
-        taskType: 'comment.replied';
+        type: 'comment.replied';
       }
   );
 
@@ -70,7 +74,7 @@ export type ForumNotificationType =
 interface ForumNotificationBase {
   taskId: string;
   spaceId: string;
-  taskType: ForumNotificationType;
+  type: ForumNotificationType;
   spaceDomain: string;
   spaceName: string;
   postId: string;
@@ -80,32 +84,54 @@ interface ForumNotificationBase {
   commentId: null | string;
   mentionId: null | string;
   commentText: string;
-  createdBy: TaskUser | null;
+  createdBy: NotificationActor | null;
 }
 
 export type ForumNotification = ForumNotificationBase &
   (
     | {
         commentId: string;
-        taskType: 'post.comment.created';
+        type: 'post.comment.created';
       }
     | {
         commentId: string;
-        taskType: 'post.comment.replied';
+        type: 'post.comment.replied';
       }
     | {
         mentionId: string;
-        taskType: 'post.mention.created';
+        type: 'post.mention.created';
       }
     | {
         mentionId: string;
         commentId: string;
-        taskType: 'post.comment.mention.created';
+        type: 'post.comment.mention.created';
       }
     | {
-        taskType: 'post.created';
+        type: 'post.created';
       }
   );
+
+export type ProposalNotificationType =
+  | 'proposal.start_review'
+  | 'proposal.start_vote'
+  | 'proposal.review'
+  | 'proposal.discuss'
+  | 'proposal.vote'
+  | 'proposal.evaluation_closed';
+
+export type ProposalNotification = {
+  id: string;
+  spaceDomain: string;
+  spaceName: string;
+  pageTitle: string;
+  pagePath: string;
+  status: ProposalStatus;
+  pageId: string;
+  taskId: string;
+  type: ProposalNotificationType;
+  createdAt: Date;
+  createdBy?: NotificationActor | null;
+};
 
 export type NotificationsGroup<T> = {
   marked: T[];

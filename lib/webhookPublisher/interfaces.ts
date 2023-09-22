@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
+import type { PageType, ProposalStatus } from '@charmverse/core/dist/cjs/prisma-client';
 
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
@@ -86,6 +86,7 @@ export enum WebhookEventNames {
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
+  ProposalStatusChanged = 'proposal.status_changed',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
   PageMentionCreated = 'page.mention.created',
@@ -138,6 +139,13 @@ export type WebhookEvent<T = WebhookEventNames> =
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.ProposalUserVoted;
       proposal: ProposalEntity;
+      user: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.ProposalStatusChanged;
+      proposal: ProposalEntity;
+      newStatus: ProposalStatus;
+      oldStatus: ProposalStatus | null;
       user: UserEntity;
     })
   | (WebhookEventSharedProps<T> & {

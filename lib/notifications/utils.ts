@@ -16,7 +16,10 @@ export const notificationMetadataIncludeStatement = {
       username: true,
       path: true,
       avatar: true,
-      avatarTokenId: true
+      avatarTokenId: true,
+      avatarContract: true,
+      avatarChain: true,
+      deletedAt: true
     }
   }
 } as const;

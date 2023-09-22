@@ -8,8 +8,8 @@ import { getDiscussionNotifications } from 'lib/discussion/getDiscussionNotifica
 import type { ForumNotificationsGroup } from 'lib/forums/notifications/getForumNotifications';
 import { getForumNotifications } from 'lib/forums/notifications/getForumNotifications';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ProposalNotificationsGroup } from 'lib/proposal/getProposalNotifications';
-import { getProposalNotifications } from 'lib/proposal/getProposalNotifications';
+import type { ProposalNotificationsGroup } from 'lib/notifications/getProposalNotifications';
+import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { VoteTasksGroup } from 'lib/votes/getVoteTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';

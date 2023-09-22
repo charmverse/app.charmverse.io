@@ -28,7 +28,7 @@ describe('getProposalStatusChangeTasks', () => {
       userId: user1.id
     });
 
-    const { proposal: updatedProposal } = await updateProposalStatus({
+    const updatedProposal = await updateProposalStatus({
       proposalId: authoredDraftProposal.proposal.id,
       newStatus: 'discussion',
       userId: user1.id
@@ -56,12 +56,11 @@ describe('getProposalStatusChangeTasks', () => {
       userId: user2.id
     });
 
-    const { proposal: updatedReviewProposal, workspaceEvent: reviewProposalWorkspaceEvent } =
-      await updateProposalStatus({
-        proposalId: reviewProposal.proposal.id,
-        newStatus: 'discussion',
-        userId: user2.id
-      });
+    const updatedReviewProposal = await updateProposalStatus({
+      proposalId: reviewProposal.proposal.id,
+      newStatus: 'discussion',
+      userId: user2.id
+    });
 
     await updateProposalStatus({
       proposalId: updatedReviewProposal.id,
@@ -204,7 +203,7 @@ describe('getProposalStatusChangeTasks', () => {
       }
     });
 
-    const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(user1.id, events);
+    const { proposalTasks } = await getProposalStatusChangeTasks(user1.id, events);
 
     expect(proposalTasks).toEqual(
       expect.arrayContaining([
@@ -247,7 +246,5 @@ describe('getProposalStatusChangeTasks', () => {
         })
       ])
     );
-
-    expect(unmarkedWorkspaceEvents).toEqual(expect.arrayContaining([reviewProposalWorkspaceEvent.id]));
   });
 });

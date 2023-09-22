@@ -3,12 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-import { getDiscussionNotifications } from 'lib/discussion/getDiscussionNotifications';
-import { getForumNotifications } from 'lib/forums/notifications/getForumNotifications';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import type { PendingTasksProps } from 'lib/mailer/emails/templates/PendingTasksTemplate';
-import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
+import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
+import { getForumNotifications } from 'lib/notifications/getForumNotifications';
+import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 const notificationTaskLimiter = RateLimit(100);
@@ -24,18 +24,7 @@ export async function sendUserNotifications(): Promise<number> {
   return notificationsToSend.length;
 }
 
-export async function getNotifications(): Promise<(PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]> {
-  // Get all the workspace events within the past day
-  const workspaceEvents = await prisma.workspaceEvent.findMany({
-    where: {
-      createdAt: {
-        lte: new Date(),
-        gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
-      },
-      type: 'proposal_status_change'
-    }
-  });
-
+export async function getNotifications(): Promise<PendingTasksProps[]> {
   const usersWithSafes = await prisma.user.findMany({
     where: {
       deletedAt: null,
@@ -57,7 +46,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     return !snoozedUntil || snoozedUntil > new Date();
   });
 
-  const notifications: (PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[] = [];
+  const notifications: PendingTasksProps[] = [];
 
   // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
   for (const user of activeUsersWithSafes) {
@@ -69,29 +58,13 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     const bountyTasks = await getBountyTasks(user.id);
     const forumTasks = await getForumNotifications(user.id);
 
-    const sentTasks = await prisma.userNotification.findMany({
-      where: {
-        taskId: {
-          in: [...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)]
-        },
-        userId: user.id
-      },
-      select: {
-        taskId: true
-      }
-    });
-
-    const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
-
     const voteTasksNotSent = voteTasks.unmarked;
-    const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
-    const { proposalTasks = [], unmarkedWorkspaceEvents = [] } =
-      workspaceEventsNotSent.length !== 0 ? await getProposalStatusChangeTasks(user.id, workspaceEventsNotSent) : {};
+    const proposalNotifications = await getProposalNotifications(user.id);
 
     const totalTasks =
       discussionTasks.unmarked.length +
       voteTasksNotSent.length +
-      proposalTasks.length +
+      proposalNotifications.unmarked.length +
       bountyTasks.unmarked.length +
       forumTasks.unmarked.length;
 
@@ -99,7 +72,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
       notSent:
         voteTasksNotSent.length +
         discussionTasks.unmarked.length +
-        proposalTasks.length +
+        proposalNotifications.unmarked.length +
         bountyTasks.unmarked.length +
         forumTasks.unmarked.length
     });
@@ -110,8 +83,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
       // Get only the unmarked discussion tasks
       discussionTasks: discussionTasks.unmarked,
       voteTasks: voteTasksNotSent,
-      proposalTasks,
-      unmarkedWorkspaceEvents,
+      proposalTasks: proposalNotifications.unmarked,
       bountyTasks: bountyTasks.unmarked,
       forumTasks: forumTasks.unmarked
     });
@@ -120,11 +92,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
   return notifications.filter((notification) => notification.totalTasks > 0);
 }
 
-async function sendNotification(
-  notification: PendingTasksProps & {
-    unmarkedWorkspaceEvents: string[];
-  }
-) {
+async function sendNotification(notification: PendingTasksProps) {
   try {
     // remember that we sent these tasks
     await prisma.$transaction([
@@ -133,16 +101,6 @@ async function sendNotification(
           data: {
             userId: notification.user.id,
             taskId: proposalTask.id,
-            channel: 'email',
-            type: 'proposal'
-          }
-        })
-      ),
-      ...notification.unmarkedWorkspaceEvents.map((unmarkedWorkspaceEvent) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: unmarkedWorkspaceEvent,
             channel: 'email',
             type: 'proposal'
           }
@@ -195,7 +153,6 @@ async function sendNotification(
       error,
       forumTaskIds: notification.forumTasks.map((forumTask) => forumTask.taskId),
       proposalTaskIds: notification.proposalTasks.map((proposalTask) => proposalTask.id),
-      unmarkedWorkspaceEventIds: notification.unmarkedWorkspaceEvents,
       voteTaskIds: notification.voteTasks.map((voteTask) => voteTask.id),
       discussionTaskIds: notification.discussionTasks.map(
         (discussionTask) => discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? ''

@@ -49,7 +49,7 @@ export async function getForumNotifications(userId: string): Promise<Notificatio
       spaceDomain: notification.notificationMetadata.space.domain,
       spaceId: notification.notificationMetadata.spaceId,
       spaceName: notification.notificationMetadata.space.name,
-      taskType: notification.type as ForumNotification['taskType']
+      type: notification.type as ForumNotification['type']
     } as ForumNotification;
 
     if (notification.notificationMetadata.seenAt) {

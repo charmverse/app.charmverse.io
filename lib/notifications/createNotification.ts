@@ -1,6 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import type { DiscussionNotificationType, ForumNotificationType, ProposalNotificationType } from './interfaces';
+
 type CreatePostNotificationInput = {
   createdBy: string;
   postId: string;
@@ -8,6 +10,7 @@ type CreatePostNotificationInput = {
   userId: string;
   commentId?: string;
   mentionId?: string;
+  type: ForumNotificationType;
 } & (
   | {
       type: 'post.created';
@@ -76,6 +79,7 @@ type CreatePageNotificationInput = {
   commentId?: string;
   mentionId?: string;
   inlineCommentId?: string;
+  type: DiscussionNotificationType;
 } & (
   | {
       type: 'comment.created';
@@ -148,6 +152,39 @@ export async function createPageNotification({
       page: {
         connect: {
           id: pageId
+        }
+      }
+    }
+  });
+}
+
+export async function createProposalNotification({
+  type,
+  createdBy,
+  spaceId,
+  userId,
+  proposalId
+}: {
+  type: ProposalNotificationType;
+  proposalId: string;
+  createdBy: string;
+  spaceId: string;
+  userId: string;
+}) {
+  await prisma.proposalNotification.create({
+    data: {
+      type,
+      id: v4(),
+      notificationMetadata: {
+        create: {
+          createdBy,
+          spaceId,
+          userId
+        }
+      },
+      proposal: {
+        connect: {
+          id: proposalId
         }
       }
     }

@@ -1,21 +1,14 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProposalNotification } from './getProposalStatusChangeTasks';
+import type { NotificationsGroup, ProposalNotification, ProposalNotificationType } from 'lib/notifications/interfaces';
+import { notificationMetadataIncludeStatement, sortByDate } from 'lib/notifications/utils';
 
-export type ProposalNotificationsGroup = {
-  marked: ProposalNotification[];
-  unmarked: ProposalNotification[];
-};
-
-export async function getProposalNotifications(userId: string): Promise<ProposalNotificationsGroup> {
+export async function getProposalNotifications(userId: string): Promise<NotificationsGroup<ProposalNotification>> {
   const proposalNotifications = await prisma.proposalNotification.findMany({
     where: {
       notificationMetadata: {
         userId
-      },
-      type: {
-        in: ['proposal.status_changed']
       }
     },
     include: {
@@ -27,31 +20,12 @@ export async function getProposalNotifications(userId: string): Promise<Proposal
         }
       },
       notificationMetadata: {
-        include: {
-          space: {
-            select: {
-              name: true,
-              domain: true
-            }
-          },
-          user: {
-            select: {
-              id: true,
-              username: true,
-              path: true,
-              avatar: true,
-              avatarTokenId: true,
-              avatarContract: true,
-              avatarChain: true,
-              deletedAt: true
-            }
-          }
-        }
+        include: notificationMetadataIncludeStatement
       }
     }
   });
 
-  const proposalNotificationsGroup: ProposalNotificationsGroup = {
+  const proposalNotificationsGroup: NotificationsGroup<ProposalNotification> = {
     marked: [],
     unmarked: []
   };
@@ -60,8 +34,7 @@ export async function getProposalNotifications(userId: string): Promise<Proposal
     const page = notification.proposal.page as Page;
     const proposalNotification: ProposalNotification = {
       taskId: notification.id,
-      // TODO getProposalAction
-      action: null,
+      type: notification.type as ProposalNotificationType,
       createdAt: notification.notificationMetadata.createdAt,
       id: notification.id,
       pageId: page.id,
@@ -84,9 +57,4 @@ export async function getProposalNotifications(userId: string): Promise<Proposal
     marked: proposalNotificationsGroup.marked.sort(sortByDate),
     unmarked: proposalNotificationsGroup.unmarked.sort(sortByDate)
   };
-}
-
-// utils
-function sortByDate<T extends { createdAt: Date }>(a: T, b: T): number {
-  return a.createdAt > b.createdAt ? -1 : 1;
 }

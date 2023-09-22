@@ -1,3 +1,5 @@
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
+
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -109,19 +111,48 @@ export async function publishBountyEvent(context: BountyEventContext) {
   });
 }
 
-type ProposalEventContext = {
-  scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
-  proposalId: string;
-  spaceId: string;
-};
+type ProposalEventContext =
+  | {
+      scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
+      proposalId: string;
+      spaceId: string;
+    }
+  | {
+      userId: string;
+      spaceId: string;
+      proposalId: string;
+      scope: WebhookEventNames.ProposalStatusChanged;
+      newStatus: ProposalStatus;
+      oldStatus: ProposalStatus | null;
+    };
 
 export async function publishProposalEvent(context: ProposalEventContext) {
   const [space, proposal] = await Promise.all([getSpaceEntity(context.spaceId), getProposalEntity(context.proposalId)]);
-  return publishWebhookEvent(context.spaceId, {
-    scope: context.scope,
-    proposal,
-    space
-  });
+
+  switch (context.scope) {
+    case WebhookEventNames.ProposalStatusChanged: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user,
+        oldStatus: context.oldStatus,
+        newStatus: context.newStatus
+      });
+    }
+    case WebhookEventNames.ProposalPassed:
+    case WebhookEventNames.ProposalFailed: {
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space
+      });
+    }
+    default: {
+      return null;
+    }
+  }
 }
 
 type ProposalUserEventContext = {

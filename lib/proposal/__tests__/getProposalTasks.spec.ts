@@ -5,7 +5,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { generateRoleWithSpaceRole, generateUserAndSpace } from 'testing/setupDatabase';
 
-import { getProposalNotifications } from '../getProposalNotifications';
+import { getProposalNotifications } from '../../notifications/getProposalNotifications';
 
 describe('getProposalNotifications', () => {
   it('Should only return non deleted proposals', async () => {

@@ -8,12 +8,6 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
     where: {
       notificationMetadata: {
         userId
-      },
-      // Proposal discussion notifications will be handled in getProposalNotifications
-      page: {
-        type: {
-          not: 'proposal'
-        }
       }
     },
     include: {
@@ -37,24 +31,26 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
   };
 
   pageNotifications.forEach((notification) => {
+    const notificationMetadata = notification.notificationMetadata;
+    const page = notification.page;
     const discussionNotification = {
       taskId: notification.id,
-      bountyId: notification.page.bountyId,
-      bountyTitle: notification.page.title || 'Untitled',
+      bountyId: page.bountyId,
+      bountyTitle: page.title || 'Untitled',
       commentId: notification.commentId,
       inlineCommentId: notification.inlineCommentId,
       mentionId: notification.mentionId,
-      createdAt: notification.notificationMetadata.createdAt.toISOString(),
-      createdBy: notification.notificationMetadata.user,
+      createdAt: notificationMetadata.createdAt.toISOString(),
+      createdBy: notificationMetadata.user,
       pageId: notification.pageId,
-      pagePath: notification.page.path,
-      pageTitle: notification.page.title || 'Untitled',
-      spaceDomain: notification.notificationMetadata.space.domain,
-      spaceId: notification.notificationMetadata.spaceId,
-      spaceName: notification.notificationMetadata.space.name,
-      type: notification.page.bountyId ? 'bounty' : 'page',
+      pagePath: page.path,
+      pageTitle: page.title || 'Untitled',
+      spaceDomain: notificationMetadata.space.domain,
+      spaceId: notificationMetadata.spaceId,
+      spaceName: notificationMetadata.space.name,
+      pageType: page.type,
       text: '',
-      taskType: notification.type
+      type: notification.type
     } as DiscussionNotification;
 
     if (notification.notificationMetadata.seenAt) {

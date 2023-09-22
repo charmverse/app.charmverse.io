@@ -52,7 +52,7 @@ const createDiscussionTask = ({
       path: '',
       avatarTokenId: null
     },
-    taskType: 'inline_comment.created'
+    type: 'inline_comment.created'
   };
 };
 
@@ -69,7 +69,7 @@ const createForumTask = ({
     spaceId: v4(),
     spaceDomain: randomName(),
     taskId: v4(),
-    taskType: 'post.comment.created',
+    type: 'post.comment.created',
     spaceName,
     postId: v4(),
     postTitle,

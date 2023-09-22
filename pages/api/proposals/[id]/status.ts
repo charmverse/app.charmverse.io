@@ -45,7 +45,7 @@ async function updateProposalStatusController(req: NextApiRequest, res: NextApiR
     spaceId: proposalPage?.spaceId || ''
   });
 
-  return res.status(200).send(updatedProposal.proposal);
+  return res.status(200).send(updatedProposal);
 }
 
 export default withSessionRoute(handler);

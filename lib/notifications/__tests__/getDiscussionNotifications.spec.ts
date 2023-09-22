@@ -150,16 +150,6 @@ describe('getDiscussionNotifications', () => {
       }
     });
 
-    await prisma.userNotification.createMany({
-      data: [
-        {
-          taskId: discussionIds[0],
-          type: 'mention',
-          userId: user1.id
-        }
-      ]
-    });
-
     // This will be skipped as the mention was created by the same user
     await generateBounty({
       spaceId: space2.id,
