@@ -166,12 +166,13 @@ async function mapReducePageComments({
  *           type: boolean
  *     responses:
  *       200:
- *         description: List of proposals
+ *         description: List of proposal comments
  *         content:
  *            application/json:
  *              schema:
  *                type: array
- *                $ref: '#/components/schemas/ProposalComment'
+ *                items:
+ *                  $ref: '#/components/schemas/ProposalComment'
  *
  */
 async function getProposalComments(req: NextApiRequest, res: NextApiResponse<PublicApiProposalComment[]>) {
