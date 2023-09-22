@@ -1,5 +1,5 @@
+/* eslint-disable no-continue */
 import { log } from '@charmverse/core/log';
-import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
@@ -7,8 +7,10 @@ import { getPostCategoriesUsersRecord } from 'lib/forums/categories/getPostCateg
 import {
   createPageNotification,
   createPostNotification,
+  createProposalNotification,
   createVoteNotification
 } from 'lib/notifications/createNotification';
+import { ProposalNotificationType } from 'lib/notifications/interfaces';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { publicPermissionsClient } from 'lib/permissions/api/client';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
@@ -340,27 +342,70 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
               return;
             }
 
-            const spaceRole = await prisma.spaceRole.findFirstOrThrow({
+            const proposal = await prisma.proposal.findUniqueOrThrow({
               where: {
-                userId,
+                id: proposalId
+              },
+              select: {
+                createdBy: true,
+                categoryId: true,
+                status: true,
+                authors: {
+                  select: {
+                    userId: true
+                  }
+                },
+                reviewers: {
+                  select: {
+                    userId: true,
+                    role: {
+                      select: {
+                        id: true
+                      }
+                    }
+                  }
+                },
+                page: {
+                  select: {
+                    deletedAt: true
+                  }
+                }
+              }
+            });
+
+            const isProposalDeleted = proposal.page?.deletedAt;
+            if (isProposalDeleted) {
+              return;
+            }
+
+            const proposalAuthorIds = proposal.authors.map(({ userId: authorId }) => authorId);
+            const proposalReviewerIds = proposal.reviewers.map(({ userId: reviewerId }) => reviewerId);
+            const proposalReviewerRoleIds = proposal.reviewers
+              .map(({ role }) => role?.id)
+              .filter((roleId) => roleId) as string[];
+
+            const space = await prisma.space.findUniqueOrThrow({
+              where: {
+                id: spaceId
+              },
+              select: {
+                domain: true,
+                name: true,
+                paidTier: true,
+                notifyNewProposals: true
+              }
+            });
+
+            const notifyNewProposals = space.notifyNewProposals;
+
+            const spaceRoles = await prisma.spaceRole.findMany({
+              where: {
                 spaceId
               },
               select: {
-                spaceId: true,
-                space: {
-                  select: {
-                    domain: true,
-                    name: true,
-                    paidTier: true,
-                    notifyNewProposals: true
-                  }
-                },
+                userId: true,
+                id: true,
                 spaceRoleToRole: {
-                  where: {
-                    spaceRole: {
-                      userId
-                    }
-                  },
                   select: {
                     role: {
                       select: {
@@ -372,121 +417,65 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
               }
             });
 
-            // We should not send role-based notifications for free spaces
-            const roleIds =
-              spaceRole.space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
             const spacePermissionsClient = await getPermissionsClient({
               resourceId: spaceId,
               resourceIdType: 'space'
             });
-            const accessibleProposalCategories =
-              await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
-                spaceId,
-                userId
-              });
 
-            const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
+            for (const spaceRole of spaceRoles) {
+              // We should not send role-based notifications for free spaces
+              const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
 
-            const categoryMap = accessibleProposalCategories.reduce((map, category) => {
-              map.set(category.id, category);
-              return map;
-            }, new Map<string, ProposalCategoryWithPermissions>());
-
-            const proposal = await prisma.proposal.findUnique({
-              where: {
-                archived: false,
-                id: proposalId,
-                status: {
-                  in: ['discussion', 'review', 'reviewed', 'vote_active', 'evaluation_active', 'evaluation_closed']
-                },
-                OR: [
-                  {
-                    categoryId: {
-                      in: accessibleProposalCategoryIds
-                    }
-                  },
-                  {
-                    createdBy: userId
-                  },
-                  {
-                    authors: {
-                      some: {
-                        userId
-                      }
-                    }
-                  },
-                  {
-                    reviewers: {
-                      some: {
-                        userId
-                      }
-                    }
-                  },
-                  {
-                    reviewers: {
-                      some: {
-                        roleId: {
-                          in: roleIds
-                        }
-                      }
-                    }
-                  }
-                ]
-              },
-              include: {
-                space: {
-                  select: {
-                    notifyNewProposals: true,
-                    domain: true,
-                    name: true
-                  }
-                },
-                authors: true,
-                reviewers: true,
-                page: {
-                  select: {
-                    id: true,
-                    path: true,
-                    title: true,
-                    deletedAt: true
-                  }
-                }
+              const accessibleProposalCategories =
+                await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
+                  spaceId,
+                  userId
+                });
+              const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
+              // The user who triggered the event should not receive a notification
+              if (spaceRole.userId === userId) {
+                continue;
               }
-            });
 
-            if (!proposal || proposal.page?.deletedAt) {
-              return;
-            }
+              const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
+              const isReviewer = proposalReviewerIds.includes(spaceRole.userId);
+              const isReviewerRole = proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId));
+              const isProposalCategoryAccessible = proposal.categoryId
+                ? accessibleProposalCategoryIds.includes(proposal.categoryId)
+                : true;
 
-            const isAuthor = proposal.authors.some((author) => author.userId === userId);
-            const isReviewer = proposal.reviewers.some((reviewer) =>
-              reviewer.roleId ? roleIds.includes(reviewer.roleId) : reviewer.userId === userId
-            );
+              if (!isProposalCategoryAccessible) {
+                continue;
+              }
+              const notifyNewEvents = Boolean(
+                notifyNewProposals && notifyNewProposals < new Date(webhookData.createdAt)
+              );
+              const action = getProposalAction({
+                currentStatus: proposal.status,
+                isAuthor,
+                isReviewer: isReviewer || isReviewerRole,
+                notifyNewEvents
+              });
+              if (!action) {
+                continue;
+              }
 
-            const notifyNewProposals = proposal.space.notifyNewProposals;
+              const categoryPermission = accessibleProposalCategories.find(({ id }) => id === proposal.categoryId);
+              if (
+                categoryPermission &&
+                ((action === 'discuss' && !categoryPermission.permissions.comment_proposals) ||
+                  (action === 'vote' && !categoryPermission.permissions.vote_proposals))
+              ) {
+                continue;
+              }
 
-            // Check notifications are enabled for space-wide proposal notifications
-            const notifyNewEvents = Boolean(notifyNewProposals && notifyNewProposals < new Date(webhookData.createdAt));
-
-            const action = getProposalAction({
-              currentStatus: proposal.status,
-              isAuthor,
-              isReviewer,
-              notifyNewEvents
-            });
-
-            if (!action) {
-              return;
-            }
-
-            // check category permissions
-            const category = proposal.categoryId && categoryMap.get(proposal.categoryId);
-            if (
-              category &&
-              ((action === 'discuss' && !category.permissions.comment_proposals) ||
-                (action === 'vote' && !category.permissions.vote_proposals))
-            ) {
-              return;
+              await createProposalNotification({
+                createdBy: userId,
+                proposalId,
+                spaceId,
+                userId,
+                type: `proposal.${action}`
+              });
             }
 
             break;
@@ -617,9 +606,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           }
         }
       } catch (e) {
-        // eslint-disable-next-line no-console
         log.error(`Error in processing SQS Worker`, { body, error: e, record });
-
         batchItemFailures.push({ itemIdentifier: record.messageId });
       }
     })

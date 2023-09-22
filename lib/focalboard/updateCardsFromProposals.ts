@@ -62,8 +62,7 @@ export async function updateCardsFromProposals({
           categoryId: true,
           archived: true
         }
-      },
-      workspaceEvents: true
+      }
     }
   });
 
@@ -261,9 +260,6 @@ export async function updateCardsFromProposals({
           databaseProposalProps.proposalStatus.options.find((opt) => opt.value === pageWithProposal.proposal?.status)
             ?.id ?? '';
       }
-      const createdAt = pageWithProposal.workspaceEvents.find(
-        (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
-      )?.createdAt;
       if (pageWithProposal.proposal?.evaluationType) {
         const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
         const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
@@ -283,7 +279,7 @@ export async function updateCardsFromProposals({
         title: pageWithProposal.title,
         boardId,
         spaceId: pageWithProposal.spaceId,
-        createdAt,
+        createdAt: pageWithProposal.createdAt,
         createdBy: userId,
         properties,
         hasContent: pageWithProposal.hasContent,

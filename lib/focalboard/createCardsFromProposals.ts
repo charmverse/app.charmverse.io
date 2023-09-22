@@ -64,8 +64,7 @@ export async function createCardsFromProposals({
           status: true,
           evaluationType: true
         }
-      },
-      workspaceEvents: true
+      }
     }
   });
 
@@ -156,10 +155,6 @@ export async function createCardsFromProposals({
   });
 
   for (const pageProposal of pageProposals) {
-    const createdAt = pageProposal.workspaceEvents.find(
-      (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
-    )?.createdAt;
-
     let properties: Record<string, BoardPropertyValue> = {};
 
     if (proposalProps.proposalCategory) {
@@ -194,7 +189,7 @@ export async function createCardsFromProposals({
       title: pageProposal.title,
       boardId,
       spaceId: pageProposal.spaceId,
-      createdAt,
+      createdAt: pageProposal.createdAt,
       createdBy: userId,
       properties: properties as any,
       hasContent: pageProposal.hasContent,
