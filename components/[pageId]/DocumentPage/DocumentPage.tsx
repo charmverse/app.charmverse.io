@@ -201,7 +201,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
       setConnectionError(null);
     }
   }
-
   // reset error whenever page id changes
   useEffect(() => {
     setConnectionError(null);

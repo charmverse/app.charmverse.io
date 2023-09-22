@@ -22,7 +22,8 @@ export class DocumentPage extends GlobalPage {
     public documentTitle = page.locator(`data-test=editor-page-title`),
     public openAsPageButton = page.locator('data-test=open-as-page'),
     public joinSpaceButton = page.locator('data-test=public-bounty-space-action'),
-    public cardDetailProperties = page.locator('data-test=card-detail-properties')
+    public cardDetailProperties = page.locator('data-test=card-detail-properties'),
+    public cardComments = page.locator('data-test=card-page-comments')
   ) {
     super(page);
   }
@@ -49,6 +50,10 @@ export class DocumentPage extends GlobalPage {
 
   waitForDialog() {
     return this.page.waitForSelector('data-test=dialog');
+  }
+
+  getCardCommentContent(commentId: string) {
+    return this.cardComments.locator(`data-test=card-comment-content-${commentId} >> div[contenteditable]`).first();
   }
 
   async isPageEditable() {

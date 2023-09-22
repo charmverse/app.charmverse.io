@@ -45,7 +45,7 @@ const CommentsList = React.memo((props: Props) => {
   const { comments } = props;
 
   return (
-    <div className='CommentsList'>
+    <div className='CommentsList' data-test='card-page-comments'>
       {/* New comment */}
       {!props.readOnly && (
         <NewCommentInput
