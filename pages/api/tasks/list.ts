@@ -2,8 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getBountyTasks } from 'lib/notifications/getBountyNotifications';
-import type { BountyTasksGroup } from 'lib/notifications/getBountyNotifications';
+import { getBountyNotifications, type BountyTasksGroup } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getForumNotifications } from 'lib/notifications/getForumNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';

@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { markTasks } from '../markNotifications';
+import { markNotifications } from '../markNotifications';
 
 let user: User;
 let userNotification: UserNotification;
@@ -23,15 +23,11 @@ beforeAll(async () => {
 describe('markTasks', () => {
   it('Should create notification for a task if its not present', async () => {
     const taskId = v4();
-    await markTasks(
-      [
-        {
-          id: taskId,
-          type: 'mention'
-        }
-      ],
-      user.id
-    );
+    await markNotifications([
+      {
+        id: taskId
+      }
+    ]);
 
     const userNotifications = await prisma.userNotification.findMany({
       where: {

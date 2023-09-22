@@ -97,7 +97,7 @@ const createForumTask = ({
   };
 };
 
-const createVoteTasks = ({
+const createVoteNotifications = ({
   voteTitle,
   deadline,
   pageTitle,
@@ -129,7 +129,7 @@ const createVoteTasks = ({
   } as any;
 };
 
-const createProposalTasks = ({
+const createProposalNotifications = ({
   type,
   pageTitle,
   spaceName,
@@ -186,8 +186,8 @@ const templates = {
         email: '<userEmail>',
         username: 'ghostpepper'
       },
-      totalTasks: 6,
-      bountyTasks: [
+      totalNotifications: 6,
+      bountyNotifications: [
         createBountyTask({
           action: 'application_pending',
           pageTitle: 'Create a new protocol',
@@ -195,21 +195,21 @@ const templates = {
           status: 'open'
         })
       ],
-      proposalTasks: [
-        createProposalTasks({
+      proposalNotifications: [
+        createProposalNotifications({
           type: 'proposal.discuss',
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
           spaceName: 'Uniswap',
           status: 'discussion'
         }),
-        createProposalTasks({
+        createProposalNotifications({
           type: 'proposal.start_discussion',
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
           status: 'draft'
         })
       ],
-      discussionTasks: [
+      discussionNotifications: [
         createDiscussionTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
@@ -243,34 +243,34 @@ const templates = {
           spaceName: 'CharmVerse'
         })
       ],
-      voteTasks: [
-        createVoteTasks({
+      voteNotifications: [
+        createVoteNotifications({
           deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
           pageTitle: 'This is a really really long vote title',
           spaceName: 'This is a really really long space name',
           voteTitle:
             'Should we add this section? I think it can be a great addition but need all of your votes to decide'
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 26 * 60 * 60 * 1000),
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse',
           voteTitle: 'Should we format the text?'
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 32 * 60 * 60 * 1000),
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse',
           voteTitle: "Let's vote"
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 52 * 60 * 60 * 1000),
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse Demo',
           voteTitle: 'We should all vote on this'
         })
       ],
-      forumTasks: [
+      forumNotifications: [
         createForumTask({
           postTitle: "New idea. Let's discuss!",
           commentText: 'Great idea. Keep it up',

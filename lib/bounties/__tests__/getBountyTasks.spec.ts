@@ -1,11 +1,10 @@
 import { v4 as uuid } from 'uuid';
 
 import { createApplication } from 'lib/applications/actions';
+import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { generateUserAndSpaceWithApiToken, generateBounty } from 'testing/setupDatabase';
 
-import { getBountyTasks } from '../../notifications/getBountyNotifications';
-
-describe('getBountyTasks', () => {
+describe('getBountyNotifications', () => {
   it('Should not return any task when there is no action', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
@@ -32,13 +31,13 @@ describe('getBountyTasks', () => {
       ]
     });
 
-    const application = await createApplication({
+    await createApplication({
       bountyId: inProgressBounty.id,
       message: 'My application message',
       userId: user.id
     });
 
-    const bountyTasks = await getBountyTasks(user.id);
+    const bountyTasks = await getBountyNotifications(user.id);
 
     expect(bountyTasks.unmarked).toEqual([]);
   });
@@ -69,7 +68,7 @@ describe('getBountyTasks', () => {
       ]
     });
 
-    const bountyTasks = await getBountyTasks(user.id);
+    const bountyTasks = await getBountyNotifications(user.id);
 
     expect(bountyTasks.unmarked.length).toEqual(0);
   });
@@ -138,7 +137,7 @@ describe('getBountyTasks', () => {
       status: 'rejected'
     });
 
-    const bountyTasks = await getBountyTasks(user.id);
+    const bountyTasks = await getBountyNotifications(user.id);
 
     expect(bountyTasks.unmarked).toEqual(
       expect.arrayContaining([
@@ -220,7 +219,7 @@ describe('getBountyTasks', () => {
       status: 'complete'
     });
 
-    const bountyTasks = await getBountyTasks(user.id);
+    const bountyTasks = await getBountyNotifications(user.id);
 
     expect(bountyTasks.unmarked).toEqual(
       expect.arrayContaining([
@@ -272,7 +271,7 @@ describe('getBountyTasks', () => {
       status: 'applied'
     });
 
-    const bountyTasks = await getBountyTasks(user.id);
+    const bountyTasks = await getBountyNotifications(user.id);
 
     expect(bountyTasks.unmarked).toEqual(
       expect.arrayContaining([

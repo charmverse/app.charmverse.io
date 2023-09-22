@@ -24,6 +24,7 @@ type Props = {
   large?: boolean;
   unmarked?: boolean;
 };
+
 export function NotificationPreview({ notification, markAsRead, onClose, large, unmarked }: Props) {
   const { groupType, type, spaceName, createdBy, id, href, content, title, createdAt } = notification;
 

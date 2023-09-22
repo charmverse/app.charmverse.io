@@ -122,7 +122,7 @@ describe('getForumNotifications', () => {
 
     const { unmarked: newNotifications } = await getForumNotifications(spaceUser.id);
 
-    expect(newNotifications.some((notif) => notif.taskId === post.id && notif.postId === post.id)).toBe(true);
+    expect(newNotifications.some((notif) => notif.id === post.id && notif.postId === post.id)).toBe(true);
 
     expect(newNotifications.length).toBe(1);
   });

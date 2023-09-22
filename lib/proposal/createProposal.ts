@@ -36,6 +36,11 @@ export type CreateProposalInput = {
   fields?: ProposalFields;
 };
 
+export type CreatedProposal = {
+  page: PageWithPermissions;
+  proposal: ProposalWithUsers;
+};
+
 export async function createProposal({
   userId,
   spaceId,

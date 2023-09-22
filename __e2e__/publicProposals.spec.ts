@@ -18,7 +18,7 @@ test.beforeAll(async () => {
 });
 
 test.describe.serial('Make a proposals page public and visit it', async () => {
-  let proposal: Page & { proposal: ProposalWithUsers; workspaceEvent: WorkspaceEvent };
+  let proposal: Page & { proposal: ProposalWithUsers };
 
   test('visit a public proposal page', async () => {
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
