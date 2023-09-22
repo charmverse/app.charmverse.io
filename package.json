@@ -198,7 +198,7 @@
     "nanoevents": "^6.0.2",
     "nanoid": "^3.3.6",
     "nanoid-dictionary": "^3.0.0",
-    "next": "^13.4.19",
+    "next": "^13.5.2",
     "next-connect": "^0.13.0",
     "next-swagger-doc": "^0.3.6",
     "node-cron": "^3.0.0",
