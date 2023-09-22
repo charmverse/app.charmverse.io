@@ -101,6 +101,7 @@ exports[`components/cardDetail/comment return comment 1`] = `
       </div>
       <div
         class="MuiBox-root css-ir5tdx"
+        data-test="card-comment-content-3401cfff-85bb-4aa3-8df2-d23a36068706"
       >
         <div
           class="bangle-editor-core readonly"
@@ -262,6 +263,7 @@ exports[`components/cardDetail/comment return comment and delete comment 1`] = `
       </div>
       <div
         class="MuiBox-root css-ir5tdx"
+        data-test="card-comment-content-3401cfff-85bb-4aa3-8df2-d23a36068706"
       >
         <div
           class="bangle-editor-core readonly"
@@ -353,6 +355,7 @@ exports[`components/cardDetail/comment return comment readonly 1`] = `
       </div>
       <div
         class="MuiBox-root css-ir5tdx"
+        data-test="card-comment-content-3401cfff-85bb-4aa3-8df2-d23a36068706"
       >
         <div
           class="bangle-editor-core readonly"
