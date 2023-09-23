@@ -1,4 +1,4 @@
-import type { PageType, ProposalStatus, User, VoteStatus } from '@charmverse/core/prisma';
+import type { BountyStatus, PageType, ProposalStatus, User, VoteStatus } from '@charmverse/core/prisma';
 
 export type NotificationGroupType = 'forum' | 'discussions' | 'votes' | 'proposals' | 'bounties';
 
@@ -139,6 +139,24 @@ export type VoteNotification = NotificationBase & {
   title: string;
   userChoice: string[] | null;
   deadline: Date;
+};
+
+export type BountyNotificationType =
+  | 'application.pending'
+  | 'application.accepted'
+  | 'application.rejected'
+  | 'application.submitted'
+  | 'application.approved'
+  | 'application.payment_pending'
+  | 'application.payment_completed'
+  | 'suggestion_created';
+
+export type BountyNotification = NotificationBase & {
+  status: BountyStatus;
+  pagePath: string;
+  pageTitle: string;
+  applicationId: string | null;
+  type: BountyNotificationType;
 };
 
 export type NotificationsGroup<T> = {

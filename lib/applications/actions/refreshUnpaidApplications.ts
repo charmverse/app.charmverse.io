@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
 
-export async function refreshUnpaidApplications() {
+export async function refreshUnpaidApplications(userId?: string) {
   const applications = await prisma.application.findMany({
     where: {
       status: { in: ['processing', 'complete'] },
@@ -15,7 +15,9 @@ export async function refreshUnpaidApplications() {
 
   for (const application of applications) {
     try {
-      const { updated } = await refreshPaymentStatus(application.id);
+      const { updated } = await refreshPaymentStatus({
+        applicationId: application.id
+      });
 
       if (updated) {
         updatedApplicationsCount += 1;

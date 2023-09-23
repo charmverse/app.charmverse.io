@@ -36,7 +36,9 @@ export async function createTransaction({
 
   // multisig tx
   if (safeTxHash) {
-    await refreshPaymentStatus(applicationId);
+    await refreshPaymentStatus({
+      applicationId
+    });
   }
 
   return tx;

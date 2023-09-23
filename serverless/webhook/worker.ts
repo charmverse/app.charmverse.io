@@ -3,8 +3,10 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
+import { getBountyReviewerIds } from 'lib/bounties/getBountyReviewerIds';
 import { getPostCategoriesUsersRecord } from 'lib/forums/categories/getPostCategoriesUsersRecord';
 import {
+  createBountyNotification,
   createPageNotification,
   createPostNotification,
   createProposalNotification,
@@ -571,6 +573,228 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                   });
                 }
               }
+            }
+
+            break;
+          }
+
+          case WebhookEventNames.BountyApplicationCreated: {
+            const bountyId = webhookData.event.bounty.id;
+            const spaceId = webhookData.spaceId;
+            const applicationId = webhookData.event.application.id;
+
+            const application = await prisma.application.findUniqueOrThrow({
+              where: {
+                id: applicationId
+              },
+              select: {
+                createdBy: true
+              }
+            });
+
+            const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+
+            for (const bountyReviewerId of bountyReviewerIds) {
+              await createBountyNotification({
+                bountyId,
+                createdBy: application.createdBy,
+                spaceId,
+                type: 'application.pending',
+                userId: bountyReviewerId,
+                applicationId
+              });
+            }
+
+            break;
+          }
+
+          case WebhookEventNames.BountyApplicationAccepted: {
+            const applicationId = webhookData.event.application.id;
+            const bountyId = webhookData.event.bounty.id;
+            const spaceId = webhookData.spaceId;
+
+            const application = await prisma.application.findUniqueOrThrow({
+              where: {
+                id: applicationId
+              },
+              select: {
+                createdBy: true,
+                acceptedBy: true
+              }
+            });
+
+            if (application.acceptedBy) {
+              await createBountyNotification({
+                bountyId,
+                createdBy: application.acceptedBy,
+                spaceId,
+                type: 'application.accepted',
+                userId: application.createdBy,
+                applicationId
+              });
+            }
+
+            break;
+          }
+
+          case WebhookEventNames.BountyApplicationRejected: {
+            const applicationId = webhookData.event.application.id;
+            const bountyId = webhookData.event.bounty.id;
+            const spaceId = webhookData.spaceId;
+            const userId = webhookData.event.user.id;
+
+            const application = await prisma.application.findUniqueOrThrow({
+              where: {
+                id: applicationId
+              },
+              select: {
+                status: true,
+                createdBy: true
+              }
+            });
+
+            if (application.status === 'rejected') {
+              await createBountyNotification({
+                bountyId,
+                createdBy: userId,
+                spaceId,
+                type: 'application.accepted',
+                userId: application.createdBy,
+                applicationId
+              });
+            }
+
+            break;
+          }
+
+          case WebhookEventNames.BountyApplicationSubmitted: {
+            const applicationId = webhookData.event.application.id;
+            const bountyId = webhookData.event.bounty.id;
+            const spaceId = webhookData.spaceId;
+            const application = await prisma.application.findUniqueOrThrow({
+              where: {
+                id: applicationId
+              },
+              select: {
+                createdBy: true
+              }
+            });
+
+            const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+
+            for (const bountyReviewerId of bountyReviewerIds) {
+              await createBountyNotification({
+                bountyId,
+                createdBy: application.createdBy,
+                spaceId,
+                type: 'application.submitted',
+                userId: bountyReviewerId,
+                applicationId
+              });
+            }
+
+            break;
+          }
+
+          case WebhookEventNames.BountyApplicationApproved: {
+            const applicationId = webhookData.event.application.id;
+            const bountyId = webhookData.event.bounty.id;
+            const spaceId = webhookData.spaceId;
+            const userId = webhookData.event.user.id;
+
+            const application = await prisma.application.findUniqueOrThrow({
+              where: {
+                id: applicationId
+              },
+              select: {
+                createdBy: true
+              }
+            });
+
+            await createBountyNotification({
+              bountyId,
+              createdBy: userId,
+              spaceId,
+              type: 'application.approved',
+              userId: application.createdBy,
+              applicationId
+            });
+
+            const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+
+            for (const bountyReviewerId of bountyReviewerIds) {
+              await createBountyNotification({
+                bountyId,
+                createdBy: userId,
+                spaceId,
+                type: 'application.payment_pending',
+                userId: bountyReviewerId,
+                applicationId
+              });
+            }
+
+            break;
+          }
+
+          case WebhookEventNames.BountyApplicationPaymentCompleted: {
+            const applicationId = webhookData.event.application.id;
+            const bountyId = webhookData.event.bounty.id;
+            const spaceId = webhookData.spaceId;
+            const userId = webhookData.event.user.id;
+
+            const application = await prisma.application.findUniqueOrThrow({
+              where: {
+                id: applicationId
+              },
+              select: {
+                createdBy: true
+              }
+            });
+
+            await createBountyNotification({
+              bountyId,
+              createdBy: userId,
+              spaceId,
+              type: 'application.payment_completed',
+              userId: application.createdBy,
+              applicationId
+            });
+
+            break;
+          }
+
+          case WebhookEventNames.BountySuggestionCreated: {
+            const bountyId = webhookData.event.bounty.id;
+            const spaceId = webhookData.spaceId;
+            const spaceAdmins = await prisma.spaceRole.findMany({
+              where: {
+                spaceId,
+                isAdmin: true
+              },
+              select: {
+                userId: true
+              }
+            });
+
+            const bounty = await prisma.bounty.findUniqueOrThrow({
+              where: {
+                id: bountyId
+              },
+              select: {
+                createdBy: true
+              }
+            });
+
+            const spaceAdminUserIds = spaceAdmins.map(({ userId }) => userId);
+
+            for (const spaceAdminUserId of spaceAdminUserIds) {
+              await createBountyNotification({
+                bountyId,
+                createdBy: bounty.createdBy,
+                spaceId,
+                type: 'suggestion_created',
+                userId: spaceAdminUserId
+              });
             }
 
             break;

@@ -7,6 +7,8 @@ import { NotFoundError } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getBountyOrThrow } from './getBounty';
 import type { BountyCreationData } from './interfaces';
@@ -194,6 +196,13 @@ export async function createBounty({
       permissionsToAssign: permissions
     });
   }
+
+  await publishBountyEvent({
+    scope: WebhookEventNames.BountySuggestionCreated,
+    bountyId,
+    spaceId: space.id,
+    userId: createdBy
+  });
 
   return getBountyOrThrow(bountyId);
 }

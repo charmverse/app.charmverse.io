@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from 'config/constants';
 
 import type {
+  ApplicationEntity,
   BountyEntity,
   CommentEntity,
   InlineCommentEntity,
@@ -174,6 +175,24 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
     googleEmail: user.googleAccounts[0]?.email,
     walletAddress: user.wallets[0]?.address,
     discordId: user.discordUser?.discordId
+  };
+}
+
+export async function getApplicationEntity(id: string): Promise<ApplicationEntity> {
+  const application = await prisma.application.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdAt: true,
+      createdBy: true
+    }
+  });
+
+  return {
+    id,
+    createdAt: application.createdAt.toISOString(),
+    user: await getUserEntity(application.createdBy)
   };
 }
 

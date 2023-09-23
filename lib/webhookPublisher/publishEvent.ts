@@ -12,7 +12,8 @@ import {
   getProposalEntity,
   getPageEntity,
   getInlineCommentEntity,
-  getVoteEntity
+  getVoteEntity,
+  getApplicationEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -91,25 +92,77 @@ export async function publishMemberEvent(context: MemberEventContext) {
   });
 }
 
-type BountyEventContext = {
-  scope: WebhookEventNames.BountyCompleted;
-  bountyId: string;
-  spaceId: string;
-  userId: string;
-};
+type BountyEventContext =
+  | {
+      scope: WebhookEventNames.BountyCompleted | WebhookEventNames.BountySuggestionCreated;
+      bountyId: string;
+      spaceId: string;
+      userId: string;
+    }
+  | {
+      scope:
+        | WebhookEventNames.BountyApplicationCreated
+        | WebhookEventNames.BountyApplicationAccepted
+        | WebhookEventNames.BountyApplicationSubmitted;
+      bountyId: string;
+      spaceId: string;
+      applicationId: string;
+    }
+  | {
+      scope:
+        | WebhookEventNames.BountyApplicationRejected
+        | WebhookEventNames.BountyApplicationApproved
+        | WebhookEventNames.BountyApplicationPaymentCompleted;
+      bountyId: string;
+      spaceId: string;
+      applicationId: string;
+      userId: string;
+    };
 
 export async function publishBountyEvent(context: BountyEventContext) {
-  const [space, bounty, user] = await Promise.all([
-    getSpaceEntity(context.spaceId),
-    getBountyEntity(context.bountyId),
-    getUserEntity(context.userId)
-  ]);
-  return publishWebhookEvent(context.spaceId, {
-    scope: context.scope,
-    bounty,
-    space,
-    user
-  });
+  const [space, bounty] = await Promise.all([getSpaceEntity(context.spaceId), getBountyEntity(context.bountyId)]);
+  switch (context.scope) {
+    case WebhookEventNames.BountyCompleted: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        bounty,
+        space,
+        user
+      });
+    }
+
+    case WebhookEventNames.BountyApplicationCreated:
+    case WebhookEventNames.BountyApplicationAccepted: {
+      const application = await getApplicationEntity(context.applicationId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        bounty,
+        space,
+        application
+      });
+    }
+
+    case WebhookEventNames.BountyApplicationRejected:
+    case WebhookEventNames.BountyApplicationApproved:
+    case WebhookEventNames.BountyApplicationPaymentCompleted: {
+      const [application, user] = await Promise.all([
+        getApplicationEntity(context.applicationId),
+        getUserEntity(context.userId)
+      ]);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        bounty,
+        space,
+        application,
+        user
+      });
+    }
+
+    default: {
+      return null;
+    }
+  }
 }
 
 type ProposalEventContext =

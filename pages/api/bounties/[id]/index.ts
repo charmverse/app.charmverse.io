@@ -94,7 +94,10 @@ async function updateBounty(req: NextApiRequest, res: NextApiResponse<BountyWith
     updateContent: body
   });
 
-  const rolledUpBounty = await rollupBountyStatus(bounty.id);
+  const rolledUpBounty = await rollupBountyStatus({
+    bountyId: id as string,
+    userId
+  });
 
   res.status(200).json(rolledUpBounty);
 }

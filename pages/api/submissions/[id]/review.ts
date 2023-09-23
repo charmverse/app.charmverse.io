@@ -61,15 +61,19 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
     userId
   });
 
-  await rollupBountyStatus(updatedSubmission.bountyId);
+  await rollupBountyStatus({
+    bountyId: submission.bounty.id,
+    userId
+  });
 
   const { spaceId, rewardAmount, rewardToken, id, page, customReward } = submission.bounty;
   if (decision === 'approve') {
     trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
     await publishBountyEvent({
-      scope: WebhookEventNames.BountyCompleted,
+      scope: WebhookEventNames.BountyApplicationApproved,
       bountyId: submission.bounty.id,
       spaceId,
+      applicationId: submissionId as string,
       userId
     });
   } else {
@@ -82,6 +86,14 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
         rewardAmount,
         resourceId: id,
         customReward
+      });
+
+      await publishBountyEvent({
+        applicationId: submissionId as string,
+        bountyId: submission.bounty.id,
+        scope: WebhookEventNames.BountyApplicationRejected,
+        spaceId,
+        userId
       });
     }
 

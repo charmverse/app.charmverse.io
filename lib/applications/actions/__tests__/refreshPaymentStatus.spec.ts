@@ -37,7 +37,10 @@ describe('refreshPaymentStatus', () => {
       bountyCap: 1
     });
 
-    const res = await refreshPaymentStatus(bountyWithSubmission.applications[0].id);
+    const res = await refreshPaymentStatus({
+      applicationId: bountyWithSubmission.applications[0].id,
+      userId: user.id
+    });
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
 
     expect(res.application.status).toBe('complete');
@@ -59,7 +62,10 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const res = await refreshPaymentStatus(applicationId);
+    const res = await refreshPaymentStatus({
+      applicationId,
+      userId: user.id
+    });
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
     const updatedTransaction = await getPaymentTxById(transaction.id);
 
@@ -86,7 +92,10 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const res = await refreshPaymentStatus(applicationId);
+    const res = await refreshPaymentStatus({
+      applicationId,
+      userId: user.id
+    });
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
     const updatedTransaction = await getPaymentTxById(transaction.id);
 
@@ -111,7 +120,10 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const res = await refreshPaymentStatus(applicationId);
+    const res = await refreshPaymentStatus({
+      applicationId,
+      userId: user.id
+    });
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
     const updatedTransaction = await getPaymentTxById(transaction.id);
 
@@ -136,7 +148,10 @@ describe('refreshPaymentStatus', () => {
     const applicationId = bountyWithSubmission.applications[0].id;
     const transaction = await createTransaction({ applicationId, chainId: '1', transactionId: '0x123' });
 
-    const res = await refreshPaymentStatus(applicationId);
+    const res = await refreshPaymentStatus({
+      applicationId,
+      userId: user.id
+    });
     const bounty = await prisma.bounty.findUnique({ where: { id: res.application.bountyId } });
     const updatedTransaction = await getPaymentTxById(transaction.id);
 

@@ -60,6 +60,12 @@ export type BountyEntity = {
   customReward: string | null;
 };
 
+export type ApplicationEntity = {
+  id: string;
+  createdAt: string;
+  user: UserEntity;
+};
+
 export type VoteEntity = {
   id: string;
   pageId: string | null;
@@ -84,6 +90,13 @@ export enum WebhookNameSpaces {
 
 export enum WebhookEventNames {
   BountyCompleted = 'bounty.completed',
+  BountyApplicationCreated = 'bounty.application.created',
+  BountyApplicationRejected = 'bounty.application.rejected',
+  BountyApplicationAccepted = 'bounty.application.accepted',
+  BountyApplicationSubmitted = 'bounty.application.submitted',
+  BountyApplicationPaymentCompleted = 'bounty.payment.completed',
+  BountySuggestionCreated = 'bounty.suggestion.created',
+  BountyApplicationApproved = 'bounty.application.approved',
   ForumCommentCreated = 'forum.comment.created',
   ForumCommentUpvoted = 'forum.comment.upvoted',
   ForumCommentDownvoted = 'forum.comment.downvoted',
@@ -157,6 +170,44 @@ export type WebhookEvent<T = WebhookEventNames> =
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.BountyCompleted;
+      bounty: BountyEntity;
+      user: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.BountyApplicationCreated;
+      bounty: BountyEntity;
+      application: ApplicationEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.BountyApplicationAccepted;
+      bounty: BountyEntity;
+      application: ApplicationEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.BountyApplicationRejected;
+      bounty: BountyEntity;
+      application: ApplicationEntity;
+      user: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.BountyApplicationSubmitted;
+      bounty: BountyEntity;
+      application: ApplicationEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.BountyApplicationApproved;
+      bounty: BountyEntity;
+      application: ApplicationEntity;
+      user: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.BountyApplicationPaymentCompleted;
+      bounty: BountyEntity;
+      application: ApplicationEntity;
+      user: UserEntity;
+    })
+  | (WebhookEventSharedProps<T> & {
+      scope: WebhookEventNames.BountySuggestionCreated;
       bounty: BountyEntity;
       user: UserEntity;
     })
