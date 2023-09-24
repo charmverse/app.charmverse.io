@@ -43,7 +43,7 @@ async function fetchSpaceWebhookSubscriptionStatus(spaceId: Space['id'], scope: 
   return webhookSubscription;
 }
 
-export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string, event: WebhookEvent<T>) {
+export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) {
   try {
     if (!SQS_QUEUE_NAME) {
       throw new Error('Webhook SQS env var missing');
@@ -62,11 +62,10 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string
     const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
 
     // If no subscription, we stop here
-    if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
-      return;
+    if (subscription && subscription.space.webhookSubscriptionUrl && subscription.space.webhookSigningSecret) {
+      webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
+      webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
     }
-    webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
-    webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
 
     // Add the message to the queue
     await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));

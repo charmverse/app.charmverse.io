@@ -1,4 +1,5 @@
 import type { Node } from '@bangle.dev/pm';
+import type { PageType } from '@charmverse/core/prisma-client';
 
 import type { DocumentEventHandler } from './documentEvents';
 import type { ClientDiffMessage } from './interfaces';
@@ -11,7 +12,7 @@ export type DocumentRoom = {
     spaceId: string;
     version: number;
     content: any;
-    type: string;
+    type: PageType;
     galleryImage: string | null;
     hasContent: boolean;
     diffs: ClientDiffMessage[];

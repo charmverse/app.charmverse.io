@@ -13,7 +13,7 @@ import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPageEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishBountyEvent, publishPageEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';
@@ -443,15 +443,33 @@ export class DocumentEventHandler {
 
         if (filteredMentions.length) {
           await Promise.all(
-            filteredMentions.map((mention) =>
-              publishPageEvent({
-                pageId: room.doc.id,
-                scope: WebhookEventNames.PageMentionCreated,
-                spaceId: room.doc.spaceId,
-                mention,
-                userId: session.user.id
-              })
-            )
+            filteredMentions.map((mention) => {
+              if (room.doc.type === 'bounty') {
+                return publishBountyEvent({
+                  bountyId: room.doc.id,
+                  scope: WebhookEventNames.BountyMentionCreated,
+                  spaceId: room.doc.spaceId,
+                  mention,
+                  userId: session.user.id
+                });
+              } else if (room.doc.type === 'proposal') {
+                return publishProposalEvent({
+                  proposalId: room.doc.id,
+                  scope: WebhookEventNames.ProposalMentionCreated,
+                  spaceId: room.doc.spaceId,
+                  mention,
+                  userId: session.user.id
+                });
+              } else {
+                return publishPageEvent({
+                  pageId: room.doc.id,
+                  scope: WebhookEventNames.PageMentionCreated,
+                  spaceId: room.doc.spaceId,
+                  mention,
+                  userId: session.user.id
+                });
+              }
+            })
           );
         }
 

@@ -32,8 +32,7 @@ export async function getProposalNotifications(userId: string): Promise<Notifica
 
   proposalNotifications.forEach((notification) => {
     const page = notification.proposal.page as Page;
-    const proposalNotification: ProposalNotification = {
-      type: notification.type as ProposalNotificationType,
+    const proposalNotification = {
       createdAt: notification.notificationMetadata.createdAt.toISOString(),
       id: notification.id,
       pageId: page.id,
@@ -43,8 +42,12 @@ export async function getProposalNotifications(userId: string): Promise<Notifica
       createdBy: notification.notificationMetadata.user,
       spaceDomain: notification.notificationMetadata.space.domain,
       spaceName: notification.notificationMetadata.space.name,
-      spaceId: notification.notificationMetadata.space.id
-    };
+      spaceId: notification.notificationMetadata.space.id,
+      commentId: notification.commentId,
+      inlineCommentId: notification.inlineCommentId,
+      mentionId: notification.mentionId,
+      type: notification.type
+    } as ProposalNotification;
 
     if (notification.notificationMetadata.seenAt) {
       proposalNotificationsGroup.marked.push(proposalNotification);

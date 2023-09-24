@@ -52,9 +52,7 @@ export function getDiscussionsNotificationPreviewItems(notifications: Discussion
     spaceName: n.spaceName,
     groupType: 'discussions' as NotificationGroupType,
     type: NotificationType.mention,
-    href: `/${n.spaceDomain}/${'pagePath' in n && n.pagePath}?${
-      n.commentId ? `commentId=${n.commentId}` : `mentionId=${n.mentionId}`
-    }`,
+    href: `/${n.spaceDomain}/${'pagePath' in n && n.pagePath}?mentionId=${n.mentionId}`,
     content: getDiscussionContent(n),
     title: 'Discussion'
   }));

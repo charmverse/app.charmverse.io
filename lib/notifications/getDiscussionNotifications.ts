@@ -37,7 +37,6 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
       id: notification.id,
       bountyId: page.bountyId,
       bountyTitle: page.title || 'Untitled',
-      commentId: notification.commentId,
       inlineCommentId: notification.inlineCommentId,
       mentionId: notification.mentionId,
       createdAt: notificationMetadata.createdAt.toISOString(),

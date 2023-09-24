@@ -45,7 +45,6 @@ const createDiscussionTask = ({
     text: mentionText,
     bountyId: null,
     bountyTitle: null,
-    commentId: null,
     type: 'mention.created',
     createdBy: {
       id: v4(),
@@ -75,7 +74,7 @@ const createForumTask = ({
     spaceId: v4(),
     spaceDomain: randomName(),
     id: v4(),
-    type: 'post.comment.created',
+    type: 'comment.created',
     spaceName,
     postId: v4(),
     postTitle,
@@ -130,17 +129,30 @@ const createVoteNotifications = ({
 };
 
 const createProposalNotifications = ({
-  type,
   pageTitle,
   spaceName,
   status
 }: Omit<
   ProposalNotification,
-  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'createdAt' | 'eventDate' | 'spaceId' | 'createdBy'
+  | 'id'
+  | 'spaceDomain'
+  | 'pagePath'
+  | 'pageId'
+  | 'createdAt'
+  | 'eventDate'
+  | 'spaceId'
+  | 'createdBy'
+  | 'type'
+  | 'commentId'
+  | 'inlineCommentId'
+  | 'mentionId'
 >): ProposalNotification => {
   return {
     id: v4(),
-    type,
+    commentId: v4(),
+    inlineCommentId: null,
+    mentionId: null,
+    type: 'comment.created',
     createdBy: null,
     spaceId: v4(),
     pagePath: randomName(),
@@ -197,13 +209,11 @@ const templates = {
       ],
       proposalNotifications: [
         createProposalNotifications({
-          type: 'proposal.discuss',
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
           spaceName: 'Uniswap',
           status: 'discussion'
         }),
         createProposalNotifications({
-          type: 'proposal.start_discussion',
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
           status: 'draft'

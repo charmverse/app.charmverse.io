@@ -3,8 +3,14 @@ import { v4 } from 'uuid';
 
 import type {
   BountyNotificationType,
+  CommentNotification,
+  CommentNotificationType,
   DiscussionNotificationType,
   ForumNotificationType,
+  InlineCommentNotification,
+  InlineCommentNotificationType,
+  MentionNotification,
+  MentionNotificationType,
   ProposalNotificationType,
   VoteNotificationType
 } from './interfaces';
@@ -21,23 +27,8 @@ type CreatePostNotificationInput = {
   | {
       type: 'post.created';
     }
-  | {
-      type: 'post.comment.created';
-      commentId: string;
-    }
-  | {
-      type: 'post.comment.replied';
-      commentId: string;
-    }
-  | {
-      type: 'post.mention.created';
-      mentionId: string;
-    }
-  | {
-      type: 'post.comment.mention.created';
-      mentionId: string;
-      commentId: string;
-    }
+  | CommentNotification
+  | MentionNotification
 );
 
 export async function createPostNotification({
@@ -88,38 +79,7 @@ type CreatePageNotificationInput = {
   mentionId?: string;
   inlineCommentId?: string;
   type: DiscussionNotificationType;
-} & (
-  | {
-      type: 'comment.created';
-      commentId: string;
-    }
-  | {
-      type: 'comment.replied';
-      commentId: string;
-    }
-  | {
-      type: 'comment.mention.created';
-      mentionId: string;
-      commentId: string;
-    }
-  | {
-      type: 'inline_comment.created';
-      inlineCommentId: string;
-    }
-  | {
-      type: 'inline_comment.replied';
-      inlineCommentId: string;
-    }
-  | {
-      type: 'inline_comment.mention.created';
-      mentionId: string;
-      inlineCommentId: string;
-    }
-  | {
-      type: 'mention.created';
-      mentionId: string;
-    }
-);
+} & (InlineCommentNotification | MentionNotification);
 
 export async function createPageNotification({
   createdBy,
@@ -145,13 +105,6 @@ export async function createPageNotification({
           userId
         }
       },
-      comment: commentId
-        ? {
-            connect: {
-              id: commentId
-            }
-          }
-        : undefined,
       inlineComment: inlineCommentId
         ? {
             connect: {
@@ -168,19 +121,37 @@ export async function createPageNotification({
   });
 }
 
-export async function createProposalNotification({
-  type,
-  createdBy,
-  spaceId,
-  userId,
-  proposalId
-}: {
+export type CreateProposalNotificationInput = {
   type: ProposalNotificationType;
   proposalId: string;
   createdBy: string;
   spaceId: string;
   userId: string;
-}) {
+  commentId?: string;
+  mentionId?: string;
+  inlineCommentId?: string;
+} & (
+  | CommentNotification
+  | InlineCommentNotification
+  | MentionNotification
+  | {
+      type: Exclude<
+        ProposalNotificationType,
+        CommentNotificationType | InlineCommentNotificationType | MentionNotificationType
+      >;
+    }
+);
+
+export async function createProposalNotification({
+  type,
+  createdBy,
+  spaceId,
+  userId,
+  proposalId,
+  commentId,
+  inlineCommentId,
+  mentionId
+}: CreateProposalNotificationInput) {
   const notificationId = v4();
   await prisma.proposalNotification.create({
     data: {
@@ -194,6 +165,15 @@ export async function createProposalNotification({
           userId
         }
       },
+      comment: commentId
+        ? {
+            connect: {
+              id: commentId
+            }
+          }
+        : undefined,
+      inlineComment: inlineCommentId ? { connect: { id: inlineCommentId } } : undefined,
+      mentionId,
       proposal: {
         connect: {
           id: proposalId
@@ -244,15 +224,26 @@ type CreateBountyNotificationInput = {
   createdBy: string;
   spaceId: string;
   userId: string;
+  mentionId?: string;
+  inlineCommentId?: string;
+  applicationId?: string;
 } & (
   | {
-      type: Exclude<BountyNotificationType, 'suggestion_created'>;
+      type: Exclude<
+        BountyNotificationType,
+        | 'suggestion_created'
+        | 'mention.created'
+        | 'inline_comment.created'
+        | 'inline_comment.replied'
+        | 'inline_comment.mention.created'
+      >;
       applicationId: string;
     }
   | {
       type: 'suggestion_created';
-      applicationId?: string;
     }
+  | MentionNotification
+  | InlineCommentNotification
 );
 
 export async function createBountyNotification({
@@ -261,7 +252,9 @@ export async function createBountyNotification({
   spaceId,
   userId,
   bountyId,
-  applicationId
+  applicationId,
+  inlineCommentId,
+  mentionId
 }: CreateBountyNotificationInput) {
   const notificationId = v4();
   await prisma.bountyNotification.create({
@@ -276,6 +269,8 @@ export async function createBountyNotification({
           userId
         }
       },
+      mentionId,
+      inlineComment: inlineCommentId ? { connect: { id: inlineCommentId } } : undefined,
       application: applicationId
         ? {
             connect: {

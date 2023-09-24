@@ -10,7 +10,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPageEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishBountyEvent, publishPageEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -39,7 +39,7 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
 
   const page = await prisma.page.findUnique({
     where: { id: pageId },
-    select: { spaceId: true, createdBy: true }
+    select: { spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true }
   });
 
   if (!page) {
@@ -60,6 +60,30 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     userId,
     content
   });
+
+  if (page.type === 'bounty' && page.bountyId) {
+    await publishBountyEvent({
+      bountyId: page.bountyId,
+      scope: WebhookEventNames.BountyInlineCommentCreated,
+      inlineCommentId: createdComment.id,
+      spaceId: page.spaceId
+    });
+  } else if (page.type === 'proposal' && page.proposalId) {
+    await publishProposalEvent({
+      proposalId: page.proposalId,
+      scope: WebhookEventNames.ProposalInlineCommentCreated,
+      inlineCommentId: createdComment.id,
+      spaceId: page.spaceId
+    });
+  } else {
+    await publishPageEvent({
+      pageId,
+      scope: WebhookEventNames.PageInlineCommentCreated,
+      inlineCommentId: createdComment.id,
+      spaceId: page.spaceId,
+      userId
+    });
+  }
 
   await publishPageEvent({
     pageId,

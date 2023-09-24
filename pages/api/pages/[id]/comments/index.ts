@@ -11,7 +11,7 @@ import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPageEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishPageEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -53,7 +53,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const page = await prisma.page.findUnique({
     where: { id: pageId },
-    select: { spaceId: true, createdBy: true }
+    select: { spaceId: true, createdBy: true, type: true, proposalId: true }
   });
 
   if (!page) {
@@ -71,13 +71,14 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const pageComment = await createPageComment({ pageId, userId, ...body });
 
-  await publishPageEvent({
-    commentId: pageComment.id,
-    scope: WebhookEventNames.PageCommentCreated,
-    pageId,
-    spaceId: page.spaceId,
-    userId
-  });
+  if (page.type === 'proposal' && page.proposalId) {
+    await publishProposalEvent({
+      commentId: pageComment.id,
+      scope: WebhookEventNames.ProposalCommentCreated,
+      proposalId: page.proposalId,
+      spaceId: page.spaceId
+    });
+  }
 
   res.status(200).json({
     ...pageComment,

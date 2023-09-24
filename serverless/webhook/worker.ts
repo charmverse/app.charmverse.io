@@ -5,6 +5,7 @@ import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 
 
 import { getBountyReviewerIds } from 'lib/bounties/getBountyReviewerIds';
 import { getPostCategoriesUsersRecord } from 'lib/forums/categories/getPostCategoriesUsersRecord';
+import { createInlineCommentNotification } from 'lib/notifications/createInlineCommentNotification';
 import {
   createBountyNotification,
   createPageNotification,
@@ -12,7 +13,6 @@ import {
   createProposalNotification,
   createVoteNotification
 } from 'lib/notifications/createNotification';
-import { ProposalNotificationType } from 'lib/notifications/interfaces';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { publicPermissionsClient } from 'lib/permissions/api/client';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
@@ -58,142 +58,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           }
 
           case WebhookEventNames.PageInlineCommentCreated: {
-            const pageAuthorId = webhookData.event.page.author.id;
-            const pageId = webhookData.event.page.id;
-            const spaceId = webhookData.spaceId;
-            const inlineCommentId = webhookData.event.inlineComment.id;
-            const inlineCommentAuthorId = webhookData.event.inlineComment.author.id;
-            const inlineComment = await prisma.comment.findFirstOrThrow({
-              where: {
-                id: inlineCommentId
-              },
-              select: {
-                content: true,
-                threadId: true
-              }
-            });
-            const threadId = inlineComment.threadId;
-            const inlineCommentContent = inlineComment.content as PageContent;
-            if (inlineCommentAuthorId !== pageAuthorId) {
-              await createPageNotification({
-                type: 'inline_comment.created',
-                createdBy: inlineCommentAuthorId,
-                inlineCommentId,
-                pageId,
-                spaceId,
-                userId: pageAuthorId
-              });
-            }
-
-            const previousInlineComment = await prisma.comment.findFirst({
-              where: {
-                threadId
-              },
-              orderBy: {
-                createdAt: 'desc'
-              },
-              skip: 1,
-              take: 1,
-              select: {
-                id: true,
-                userId: true
-              }
-            });
-
-            if (previousInlineComment && previousInlineComment?.id !== inlineCommentId) {
-              await createPageNotification({
-                type: 'inline_comment.replied',
-                createdBy: inlineCommentAuthorId,
-                inlineCommentId,
-                pageId,
-                spaceId,
-                userId: previousInlineComment.userId
-              });
-            }
-
-            const extractedMentions = extractMentions(inlineCommentContent);
-            for (const extractedMention of extractedMentions) {
-              const mentionedUserId = extractedMention.value;
-              if (mentionedUserId !== inlineCommentAuthorId) {
-                await createPageNotification({
-                  type: 'inline_comment.mention.created',
-                  createdBy: inlineCommentAuthorId,
-                  inlineCommentId,
-                  mentionId: extractedMention.id,
-                  pageId,
-                  spaceId,
-                  userId: mentionedUserId
-                });
-              }
-            }
-
-            break;
-          }
-
-          case WebhookEventNames.PageCommentCreated: {
-            const pageAuthorId = webhookData.event.page.author.id;
-            const pageId = webhookData.event.page.id;
-            const spaceId = webhookData.spaceId;
-            const commentId = webhookData.event.comment.id;
-            const commentAuthorId = webhookData.event.comment.author.id;
-            const comment = await prisma.pageComment.findFirstOrThrow({
-              where: {
-                id: commentId
-              },
-              select: {
-                content: true,
-                parentId: true
-              }
-            });
-            const commentParentId = comment.parentId;
-            const commentContent = comment.content as PageContent;
-            if (commentAuthorId !== pageAuthorId) {
-              await createPageNotification({
-                type: 'comment.created',
-                commentId,
-                createdBy: commentAuthorId,
-                pageId,
-                spaceId,
-                userId: pageAuthorId
-              });
-            }
-
-            if (commentParentId) {
-              const parentComment = await prisma.pageComment.findFirstOrThrow({
-                where: {
-                  parentId: commentParentId
-                },
-                select: {
-                  createdBy: true
-                }
-              });
-
-              await createPageNotification({
-                type: 'comment.replied',
-                commentId,
-                createdBy: commentAuthorId,
-                pageId,
-                spaceId,
-                userId: parentComment.createdBy
-              });
-            }
-
-            const extractedMentions = extractMentions(commentContent);
-            for (const extractedMention of extractedMentions) {
-              const mentionedUserId = extractedMention.value;
-              if (mentionedUserId !== commentAuthorId) {
-                await createPageNotification({
-                  type: 'comment.mention.created',
-                  commentId,
-                  createdBy: commentAuthorId,
-                  mentionId: extractedMention.id,
-                  pageId,
-                  spaceId,
-                  userId: mentionedUserId
-                });
-              }
-            }
-
+            await createInlineCommentNotification(webhookData.event);
             break;
           }
 
@@ -247,7 +112,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                     postId,
                     spaceId,
                     userId,
-                    type: 'post.mention.created'
+                    type: 'mention.created'
                   });
                 }
               }
@@ -278,26 +143,17 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             const postCommentContent = postComment.content as PageContent;
             const postCommentAuthor = postComment.createdBy;
             const postId = postComment.post.id;
-            const postCategoriesUsersRecord = await getPostCategoriesUsersRecord({
-              spaceId
-            });
             const extractedMentions = extractMentions(postCommentContent);
-            const postCategoriesUsersRecords = Object.values(postCategoriesUsersRecord);
-            for (const postCategoriesUserRecord of postCategoriesUsersRecords) {
-              const userMentions = extractedMentions.filter(
-                (mention) => mention.value === postCategoriesUserRecord.userId
-              );
-              for (const userMention of userMentions) {
-                await createPostNotification({
-                  commentId: postComment.id,
-                  createdBy: postComment.createdBy,
-                  mentionId: userMention.id,
-                  postId,
-                  spaceId,
-                  userId: postCategoriesUserRecord.userId,
-                  type: 'post.comment.mention.created'
-                });
-              }
+            for (const userMention of extractedMentions) {
+              await createPostNotification({
+                commentId: postComment.id,
+                createdBy: postComment.createdBy,
+                mentionId: userMention.id,
+                postId,
+                spaceId,
+                userId: userMention.value,
+                type: 'comment.mention.created'
+              });
             }
 
             const parentId = postComment.parentId;
@@ -308,7 +164,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                 postId,
                 spaceId,
                 userId: postAuthor,
-                type: 'post.comment.created'
+                type: 'comment.created'
               });
             }
 
@@ -328,10 +184,101 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                 postId,
                 spaceId,
                 userId: parentCommentAuthor,
-                type: 'post.comment.replied'
+                type: 'comment.replied'
               });
             }
 
+            break;
+          }
+
+          case WebhookEventNames.ProposalMentionCreated: {
+            const mentionedUserId = webhookData.event.mention.value;
+            const mentionAuthorId = webhookData.event.user.id;
+
+            await createProposalNotification({
+              type: 'mention.created',
+              createdBy: mentionAuthorId,
+              mentionId: webhookData.event.mention.id,
+              proposalId: webhookData.event.proposal.id,
+              spaceId: webhookData.spaceId,
+              userId: mentionedUserId
+            });
+
+            break;
+          }
+
+          case WebhookEventNames.ProposalCommentCreated: {
+            const spaceId = webhookData.spaceId;
+            const commentAuthorId = webhookData.event.comment.author.id;
+            const proposalId = webhookData.event.proposal.id;
+            const commentId = webhookData.event.comment.id;
+            const proposalAuthorIds = webhookData.event.proposal.authors.map(({ id }) => id);
+
+            const pageComment = await prisma.pageComment.findFirstOrThrow({
+              where: {
+                id: commentId
+              },
+              select: {
+                parentId: true,
+                content: true
+              }
+            });
+
+            // Send notification only for top-level comments
+            if (!pageComment.parentId) {
+              for (const proposalAuthorId of proposalAuthorIds) {
+                if (proposalAuthorId !== commentAuthorId) {
+                  await createProposalNotification({
+                    type: 'comment.created',
+                    createdBy: commentAuthorId,
+                    commentId,
+                    proposalId,
+                    spaceId,
+                    userId: proposalAuthorId
+                  });
+                }
+              }
+            } else {
+              const parentComment = await prisma.pageComment.findUniqueOrThrow({
+                where: {
+                  id: pageComment.parentId
+                },
+                select: {
+                  createdBy: true
+                }
+              });
+              const parentCommentAuthorId = parentComment.createdBy;
+              await createProposalNotification({
+                type: 'comment.replied',
+                createdBy: commentAuthorId,
+                commentId,
+                proposalId,
+                spaceId,
+                userId: parentCommentAuthorId
+              });
+            }
+
+            const pageCommentContent = pageComment.content as PageContent;
+
+            const extractedMentions = extractMentions(pageCommentContent);
+            for (const extractedMention of extractedMentions) {
+              const mentionedUserId = extractedMention.value;
+              await createProposalNotification({
+                type: 'comment.mention.created',
+                createdBy: commentAuthorId,
+                commentId,
+                mentionId: extractedMention.id,
+                proposalId,
+                spaceId,
+                userId: mentionedUserId
+              });
+            }
+
+            break;
+          }
+
+          case WebhookEventNames.ProposalInlineCommentCreated: {
+            await createInlineCommentNotification(webhookData.event);
             break;
           }
 
@@ -341,7 +288,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             const proposalId = webhookData.event.proposal.id;
             const newStatus = webhookData.event.newStatus;
             if (newStatus === 'draft') {
-              return;
+              break;
             }
 
             const proposal = await prisma.proposal.findUniqueOrThrow({
@@ -377,7 +324,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
 
             const isProposalDeleted = proposal.page?.deletedAt;
             if (isProposalDeleted) {
-              return;
+              break;
             }
 
             const proposalAuthorIds = proposal.authors.map(({ userId: authorId }) => authorId);
@@ -476,7 +423,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                 proposalId,
                 spaceId,
                 userId,
-                type: `proposal.${action}`
+                type: action
               });
             }
 
@@ -512,7 +459,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             });
 
             if (!vote) {
-              return;
+              break;
             }
 
             const spaceId = vote.space.id;
@@ -575,6 +522,27 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
               }
             }
 
+            break;
+          }
+
+          case WebhookEventNames.BountyMentionCreated: {
+            const mentionedUserId = webhookData.event.mention.value;
+            const mentionAuthorId = webhookData.event.user.id;
+
+            await createBountyNotification({
+              type: 'mention.created',
+              createdBy: mentionAuthorId,
+              mentionId: webhookData.event.mention.id,
+              bountyId: webhookData.event.bounty.id,
+              spaceId: webhookData.spaceId,
+              userId: mentionedUserId
+            });
+
+            break;
+          }
+
+          case WebhookEventNames.BountyInlineCommentCreated: {
+            await createInlineCommentNotification(webhookData.event);
             break;
           }
 
@@ -648,21 +616,18 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                 id: applicationId
               },
               select: {
-                status: true,
                 createdBy: true
               }
             });
 
-            if (application.status === 'rejected') {
-              await createBountyNotification({
-                bountyId,
-                createdBy: userId,
-                spaceId,
-                type: 'application.accepted',
-                userId: application.createdBy,
-                applicationId
-              });
-            }
+            await createBountyNotification({
+              bountyId,
+              createdBy: userId,
+              spaceId,
+              type: 'application.rejected',
+              userId: application.createdBy,
+              applicationId
+            });
 
             break;
           }

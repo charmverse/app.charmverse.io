@@ -27,6 +27,7 @@ export async function getBountyEntity(id: string): Promise<BountyEntity> {
   });
   return {
     createdAt: bounty.createdAt.toISOString(),
+    author: await getUserEntity(bounty.createdBy),
     id: bounty.id,
     title: bounty.page?.title ?? '',
     rewardToken: bounty.rewardToken,

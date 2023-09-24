@@ -7,6 +7,45 @@ export type NotificationActor = Pick<
   'id' | 'username' | 'path' | 'avatar' | 'avatarContract' | 'avatarTokenId' | 'avatarChain' | 'deletedAt'
 >;
 
+export type CommentNotification =
+  | {
+      type: 'comment.created';
+      commentId: string;
+    }
+  | {
+      type: 'comment.replied';
+      commentId: string;
+    }
+  | {
+      type: 'comment.mention.created';
+      mentionId: string;
+      commentId: string;
+    };
+
+export type InlineCommentNotification =
+  | {
+      type: 'inline_comment.created';
+      inlineCommentId: string;
+    }
+  | {
+      type: 'inline_comment.replied';
+      inlineCommentId: string;
+    }
+  | {
+      type: 'inline_comment.mention.created';
+      mentionId: string;
+      inlineCommentId: string;
+    };
+
+export type MentionNotification = {
+  type: 'mention.created';
+  mentionId: string;
+};
+
+export type CommentNotificationType = CommentNotification['type'];
+export type InlineCommentNotificationType = InlineCommentNotification['type'];
+export type MentionNotificationType = MentionNotification['type'];
+
 interface NotificationBase {
   id: string;
   spaceId: string;
@@ -16,15 +55,7 @@ interface NotificationBase {
   createdBy: NotificationActor | null;
 }
 
-export type DiscussionNotificationType =
-  | 'mention.created'
-  | 'inline_comment.created'
-  | 'inline_comment.replied'
-  | 'inline_comment.mention.created'
-  | 'comment.created'
-  | 'comment.replied'
-  | 'comment.mention.created';
-
+export type DiscussionNotificationType = InlineCommentNotificationType | MentionNotificationType;
 interface DiscussionNotificationBase extends NotificationBase {
   pageId: string;
   pagePath: string;
@@ -34,45 +65,13 @@ interface DiscussionNotificationBase extends NotificationBase {
   bountyTitle: string | null;
   type: DiscussionNotificationType;
   text: string;
-  commentId: null | string;
   mentionId: null | string;
   inlineCommentId: null | string;
 }
 
-export type DiscussionNotification = DiscussionNotificationBase &
-  (
-    | {
-        mentionId: string;
-        type: 'mention.created';
-      }
-    | {
-        inlineCommentId: string;
-        type: 'inline_comment.created';
-      }
-    | {
-        inlineCommentId: string;
-        type: 'inline_comment.replied';
-      }
-    | {
-        mentionId: string;
-        type: 'inline_comment.mention.created';
-      }
-    | {
-        commentId: string;
-        type: 'comment.created';
-      }
-    | {
-        commentId: string;
-        type: 'comment.replied';
-      }
-  );
+export type DiscussionNotification = DiscussionNotificationBase & (MentionNotification | InlineCommentNotification);
 
-export type ForumNotificationType =
-  | 'post.created'
-  | 'post.comment.created'
-  | 'post.comment.replied'
-  | 'post.mention.created'
-  | 'post.comment.mention.created';
+export type ForumNotificationType = CommentNotificationType | MentionNotificationType | 'post.created';
 
 interface ForumNotificationBase extends NotificationBase {
   type: ForumNotificationType;
@@ -86,36 +85,24 @@ interface ForumNotificationBase extends NotificationBase {
 
 export type ForumNotification = ForumNotificationBase &
   (
-    | {
-        commentId: string;
-        type: 'post.comment.created';
-      }
-    | {
-        commentId: string;
-        type: 'post.comment.replied';
-      }
-    | {
-        mentionId: string;
-        type: 'post.mention.created';
-      }
-    | {
-        mentionId: string;
-        commentId: string;
-        type: 'post.comment.mention.created';
-      }
+    | CommentNotification
+    | MentionNotification
     | {
         type: 'post.created';
       }
   );
 
 export type ProposalNotificationType =
-  | 'proposal.start_review'
-  | 'proposal.start_discussion'
-  | 'proposal.start_vote'
-  | 'proposal.review'
-  | 'proposal.discuss'
-  | 'proposal.vote'
-  | 'proposal.evaluation_closed';
+  | CommentNotificationType
+  | MentionNotificationType
+  | InlineCommentNotificationType
+  | 'start_review'
+  | 'start_discussion'
+  | 'start_vote'
+  | 'review'
+  | 'discuss'
+  | 'vote'
+  | 'evaluation_closed';
 
 export type ProposalNotification = NotificationBase & {
   pageTitle: string;
@@ -123,7 +110,10 @@ export type ProposalNotification = NotificationBase & {
   status: ProposalStatus;
   pageId: string;
   type: ProposalNotificationType;
-};
+  commentId: string | null;
+  inlineCommentId: string | null;
+  mentionId: string | null;
+} & (CommentNotification | MentionNotification | InlineCommentNotification);
 
 export type VoteNotificationType = 'vote.created';
 
@@ -142,6 +132,8 @@ export type VoteNotification = NotificationBase & {
 };
 
 export type BountyNotificationType =
+  | MentionNotificationType
+  | InlineCommentNotificationType
   | 'application.pending'
   | 'application.accepted'
   | 'application.rejected'
@@ -151,13 +143,16 @@ export type BountyNotificationType =
   | 'application.payment_completed'
   | 'suggestion_created';
 
-export type BountyNotification = NotificationBase & {
-  status: BountyStatus;
-  pagePath: string;
-  pageTitle: string;
-  applicationId: string | null;
-  type: BountyNotificationType;
-};
+export type BountyNotification =
+  | (NotificationBase & {
+      status: BountyStatus;
+      pagePath: string;
+      pageTitle: string;
+      applicationId: string | null;
+      type: BountyNotificationType;
+    })
+  | MentionNotification
+  | InlineCommentNotification;
 
 export type NotificationsGroup<T> = {
   marked: T[];

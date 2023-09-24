@@ -92,11 +92,21 @@ export async function publishMemberEvent(context: MemberEventContext) {
   });
 }
 
-type BountyEventContext =
+type BountyEventContext = {
+  spaceId: string;
+  bountyId: string;
+} & (
+  | {
+      scope: WebhookEventNames.BountyMentionCreated;
+      mention: UserMentionMetadata;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.BountyInlineCommentCreated;
+      inlineCommentId: string;
+    }
   | {
       scope: WebhookEventNames.BountyCompleted | WebhookEventNames.BountySuggestionCreated;
-      bountyId: string;
-      spaceId: string;
       userId: string;
     }
   | {
@@ -104,8 +114,6 @@ type BountyEventContext =
         | WebhookEventNames.BountyApplicationCreated
         | WebhookEventNames.BountyApplicationAccepted
         | WebhookEventNames.BountyApplicationSubmitted;
-      bountyId: string;
-      spaceId: string;
       applicationId: string;
     }
   | {
@@ -113,15 +121,34 @@ type BountyEventContext =
         | WebhookEventNames.BountyApplicationRejected
         | WebhookEventNames.BountyApplicationApproved
         | WebhookEventNames.BountyApplicationPaymentCompleted;
-      bountyId: string;
-      spaceId: string;
-      applicationId: string;
       userId: string;
-    };
+      applicationId: string;
+    }
+);
 
 export async function publishBountyEvent(context: BountyEventContext) {
   const [space, bounty] = await Promise.all([getSpaceEntity(context.spaceId), getBountyEntity(context.bountyId)]);
   switch (context.scope) {
+    case WebhookEventNames.BountyMentionCreated: {
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        bounty,
+        space,
+        mention: context.mention,
+        user: await getUserEntity(context.userId)
+      });
+    }
+
+    case WebhookEventNames.BountyInlineCommentCreated: {
+      const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        bounty,
+        space,
+        inlineComment
+      });
+    }
+
     case WebhookEventNames.BountyCompleted: {
       const user = await getUserEntity(context.userId);
       return publishWebhookEvent(context.spaceId, {
@@ -167,6 +194,25 @@ export async function publishBountyEvent(context: BountyEventContext) {
 
 type ProposalEventContext =
   | {
+      scope: WebhookEventNames.ProposalMentionCreated;
+      mention: UserMentionMetadata;
+      spaceId: string;
+      proposalId: string;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.ProposalInlineCommentCreated;
+      inlineCommentId: string;
+      spaceId: string;
+      proposalId: string;
+    }
+  | {
+      scope: WebhookEventNames.ProposalCommentCreated;
+      commentId: string;
+      spaceId: string;
+      proposalId: string;
+    }
+  | {
       scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
       proposalId: string;
       spaceId: string;
@@ -184,6 +230,34 @@ export async function publishProposalEvent(context: ProposalEventContext) {
   const [space, proposal] = await Promise.all([getSpaceEntity(context.spaceId), getProposalEntity(context.proposalId)]);
 
   switch (context.scope) {
+    case WebhookEventNames.ProposalMentionCreated: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user,
+        mention: context.mention
+      });
+    }
+    case WebhookEventNames.ProposalInlineCommentCreated: {
+      const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        inlineComment
+      });
+    }
+    case WebhookEventNames.ProposalCommentCreated: {
+      const comment = await getCommentEntity(context.commentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        comment
+      });
+    }
     case WebhookEventNames.ProposalStatusChanged: {
       const user = await getUserEntity(context.userId);
       return publishWebhookEvent(context.spaceId, {
@@ -236,10 +310,6 @@ type PageEventContext = (
       mention: UserMentionMetadata;
     }
   | {
-      scope: WebhookEventNames.PageCommentCreated;
-      commentId: string;
-    }
-  | {
       scope: WebhookEventNames.PageInlineCommentCreated;
       inlineCommentId: string;
     }
@@ -274,16 +344,6 @@ export async function publishPageEvent(context: PageEventContext) {
         space,
         user,
         mention: context.mention
-      });
-    }
-    case WebhookEventNames.PageCommentCreated: {
-      const comment = await getCommentEntity(context.commentId);
-      return publishWebhookEvent(context.spaceId, {
-        scope: WebhookEventNames.PageCommentCreated,
-        page,
-        space,
-        comment,
-        user
       });
     }
     default: {
