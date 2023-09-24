@@ -77,7 +77,7 @@ export type PublicProposalApiPermissions = {
  * /proposals/{proposalIdOrPath}/compute-permissions:
  *   get:
  *     summary: Compute user permissions for a proposal
- *     description: Compute the permissions for a proposal and user depending on the current proposal stage. See documentation for the basePermissionsOnly parameter to ignore proposal stage when getting user permissions
+ *     description: Compute the permissions for a proposal and user depending on the current proposal stage.
  *     tags:
  *      - 'Space API'
  *     parameters:
@@ -93,17 +93,6 @@ export type PublicProposalApiPermissions = {
  *         description: The ID of the user for whom to compute permissions. Optional.
  *         schema:
  *           type: string
- *       - name: basePermissionsOnly
- *         in: query
- *         required: false
- *         description: |
- *            Set this parameter to true to retrieve the maximum permissions a user can have for a proposal, without restrictions applied by the proposal's current stage.<br /><br />
- *            As an example, a space member with comment permissions in the proposal's category can only comment when the proposal is in the feedback or review stage.
- *            The **default behaviour for this API endpoint will be to only return true for the users' comment permission if the proposal is in feedback or review**.<br /><br />
- *            When **basePermissionsOnly is enabled, you will always receive true for this users' comment permission whatever stage the proposal is in**.<br /><br />
- *            Users lacking permissions in the proposal's category will consistently receive false for comment permissions, irrespective of the value of this setting.
- *         schema:
- *           type: boolean
  *     responses:
  *       200:
  *         description: Computed permissions for the proposal and user.
@@ -136,11 +125,7 @@ async function computeProposalPermissions(req: NextApiRequest, res: NextApiRespo
 
   const userId = req.query.userId as string | undefined;
 
-  const useBase = req.query.basePermissionsOnly === 'true';
-
-  const permissions = await premiumPermissionsApiClient.proposals[
-    useBase ? 'computeBaseProposalPermissions' : 'computeProposalPermissions'
-  ]({
+  const permissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });
