@@ -36,6 +36,8 @@ const proposalText = `This is an improvement idea`;
 const commentText = 'This is a comment';
 const childCommentTtext = 'This is a child comment';
 
+const voteOptions = ['Yes', 'No', 'Abstain'];
+
 beforeAll(async () => {
   const generated = await generateUserAndSpace();
   space = generated.space;
@@ -109,10 +111,28 @@ beforeAll(async () => {
       { group: 'user', id: proposalReviewer.id }
     ]
   });
+
+  await prisma.vote.create({
+    data: {
+      deadline: new Date(),
+      status: 'InProgress',
+      threshold: 20,
+      title: 'Test Vote',
+      context: 'proposal',
+      page: { connect: { id: proposal.page.id } },
+      author: { connect: { id: proposalAuthor.id } },
+      space: { connect: { id: space.id } },
+      voteOptions: {
+        createMany: {
+          data: voteOptions.map((opt) => ({ name: opt }))
+        }
+      }
+    }
+  });
 });
 
 describe('GET /api/v1/proposals/{proposalId}', () => {
-  it('should return a proposal when called with an API key', async () => {
+  it('should return a proposal when called with an API key as well as vote options if they exist', async () => {
     const response = (
       await request(baseUrl)
         .get(`/api/v1/proposals/${proposal.id}`)
@@ -120,7 +140,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
           authorization: `Bearer ${apiKey.token}`
         })
         .expect(200)
-    ).body as PublicApiProposal[];
+    ).body as PublicApiProposal;
 
     expect(response).toMatchObject<PublicApiProposal>(
       expect.objectContaining<PublicApiProposal>({
@@ -149,7 +169,8 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
         ]),
         title: proposal.page.title,
         status: proposal.status,
-        url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`
+        url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
+        voteOptions: expect.arrayContaining(voteOptions)
       })
     );
   });
@@ -162,7 +183,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
           authorization: `Bearer ${superApiKey.token}`
         })
         .expect(200)
-    ).body as PublicApiProposal[];
+    ).body as PublicApiProposal;
 
     expect(response).toEqual<PublicApiProposal>(
       expect.objectContaining<PublicApiProposal>({

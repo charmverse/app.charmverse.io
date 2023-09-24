@@ -63,6 +63,14 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
       status: true,
       page: {
         select: {
+          votes: {
+            where: {
+              context: 'proposal'
+            },
+            select: {
+              voteOptions: true
+            }
+          },
           path: true,
           createdAt: true,
           title: true,
@@ -135,8 +143,10 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
     reviewers: proposal.reviewers.map((reviewer) => ({
       id: reviewer.role?.id ?? (reviewer.reviewer?.id as string),
       type: reviewer.role ? 'role' : 'user'
-    }))
+    })),
+    voteOptions: proposal.page?.votes[0]?.voteOptions.map((opt) => opt.name)
   };
+
   return res.status(200).json(apiProposal);
 }
 

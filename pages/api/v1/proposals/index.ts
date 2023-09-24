@@ -109,6 +109,7 @@ export type PublicApiProposal = {
   status: ProposalStatus;
   title: string;
   url: string;
+  voteOptions?: string[];
 };
 
 handler.get(listProposals);
@@ -159,6 +160,14 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
         status: true,
         page: {
           select: {
+            votes: {
+              where: {
+                context: 'proposal'
+              },
+              select: {
+                voteOptions: true
+              }
+            },
             path: true,
             createdAt: true,
             title: true,
@@ -230,7 +239,8 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       reviewers: proposal.reviewers.map((reviewer) => ({
         id: reviewer.role?.id ?? (reviewer.reviewer?.id as string),
         type: reviewer.role ? 'role' : 'user'
-      }))
+      })),
+      voteOptions: proposal.page?.votes[0]?.voteOptions.map((opt) => opt.name)
     };
     return apiProposal;
   });
