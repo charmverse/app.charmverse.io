@@ -15,7 +15,7 @@ handler.post(requireKeys(['userId'], 'body'), voteComment);
 
 /**
  * @swagger
- * /proposals/{proposalIdOrPath}/comments/{commentId}:
+ * /proposals/{proposalIdOrPath}/comments/{commentId}/vote:
  *   post:
  *     summary: Up/downvote a proposal comment
  *     description: Adds a vote for a proposal comment by a specific user

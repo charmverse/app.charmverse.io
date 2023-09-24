@@ -91,6 +91,10 @@ type ProposalReviewer = {
  *        url:
  *          type: string
  *          example: https://app.charmverse.io/charmverse/proposals?id=3334afc4-5f0a-4d3c-8889-56fcc2b2ed8d
+ *        voteOptions:
+ *          type: array
+ *          items:
+ *            type: string
  *
  */
 export type PublicApiProposal = {
