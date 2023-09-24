@@ -70,10 +70,12 @@ type ProposalReviewer = {
  *              type: string
  *        authors:
  *          type: array
- *          $ref: '#/components/schemas/ProposalAuthor'
+ *          items:
+ *            $ref: '#/components/schemas/ProposalAuthor'
  *        reviewers:
  *          type: array
- *          $ref: '#/components/schemas/ProposalReviewer'
+ *          items:
+ *            $ref: '#/components/schemas/ProposalReviewer'
  *        status:
  *          type: string
  *          example: vote_active
@@ -181,7 +183,8 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
               select: {
                 wallets: true,
                 id: true,
-                googleAccounts: true
+                googleAccounts: true,
+                verifiedEmails: true
               }
             }
           }
@@ -218,7 +221,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       authors: proposal.authors.map((author) => ({
         userId: author.author?.id,
         address: author.author?.wallets[0]?.address,
-        email: author.author?.googleAccounts[0]?.email
+        email: author.author?.googleAccounts[0]?.email ?? author.author.verifiedEmails[0].email
       })),
       reviewers: proposal.reviewers.map((reviewer) => ({
         id: reviewer.role?.id ?? (reviewer.reviewer?.id as string),

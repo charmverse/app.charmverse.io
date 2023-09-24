@@ -52,7 +52,7 @@ describe('PUT /api/v1/proposals/{proposalId}/comments/{commentId}', () => {
     await request(baseUrl)
       .put(`/api/v1/proposals/${proposal.id}/comments/${proposalComment.id}`)
       .set({ authorization: `Bearer ${spaceApiKey.token}` })
-      .send({ userId: user.id, content: 'New' })
+      .send({ userId: user.id, contentMarkdown: 'New' })
       .expect(401);
   });
 
@@ -63,7 +63,7 @@ describe('PUT /api/v1/proposals/{proposalId}/comments/{commentId}', () => {
       await request(baseUrl)
         .put(`/api/v1/proposals/${proposal.id}/comments/${proposalComment.id}`)
         .set({ authorization: `Bearer ${superApiKey.token}` })
-        .send({ userId: user.id, content: newContent })
+        .send({ userId: user.id, contentMarkdown: newContent })
         .expect(200)
     ).body;
 
@@ -102,7 +102,7 @@ describe('PUT /api/v1/proposals/{proposalId}/comments/{commentId}', () => {
     await request(baseUrl)
       .put(`/api/v1/proposals/${otherSpaceProposal.id}/comments/${otherSpaceProposalComment.id}`)
       .set({ authorization: `Bearer ${superApiKey.token}` })
-      .send({ userId: user.id, content: 'new' })
+      .send({ userId: user.id, contentMarkdown: 'new' })
       .expect(404);
   });
 });

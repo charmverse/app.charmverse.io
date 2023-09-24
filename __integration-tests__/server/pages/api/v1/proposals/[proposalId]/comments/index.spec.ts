@@ -554,7 +554,7 @@ describe('POST /api/v1/proposals/{proposalId}/comments', () => {
     await request(baseUrl)
       .post(`/api/v1/proposals/${proposal.id}/comments`)
       .set({ authorization: `Bearer ${spaceApiKey.token}` })
-      .send({ userId: user.id, content: 'Comment' })
+      .send({ userId: user.id, contentMarkdown: 'Comment' })
       .expect(401);
   });
 
@@ -565,7 +565,7 @@ describe('POST /api/v1/proposals/{proposalId}/comments', () => {
       await request(baseUrl)
         .post(`/api/v1/proposals/${proposal.id}/comments`)
         .set({ authorization: `Bearer ${superApiKey.token}` })
-        .send({ userId: user.id, content: contentText })
+        .send({ userId: user.id, contentMarkdown: contentText })
         .expect(201)
     ).body;
 
@@ -595,7 +595,7 @@ describe('POST /api/v1/proposals/{proposalId}/comments', () => {
     await request(baseUrl)
       .post(`/api/v1/proposals/${otherSpaceProposal.id}/comments`)
       .set({ authorization: `Bearer ${superApiKey.token}` })
-      .send({ userId: user.id, content: 'Example' })
+      .send({ userId: user.id, contentMarkdown: 'Example' })
       .expect(404);
   });
 });

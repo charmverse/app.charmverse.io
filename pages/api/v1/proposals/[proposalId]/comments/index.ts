@@ -13,7 +13,12 @@ const handler = defaultHandler();
 
 handler.get(requireApiKey, logApiRequest, getProposalComments);
 
-handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId', 'content'], 'body'), createProposalComment);
+handler.post(
+  requireSuperApiKey,
+  logApiRequest,
+  requireKeys(['userId', 'contentMarkdown'], 'body'),
+  createProposalComment
+);
 
 /**
  * @swagger
@@ -248,9 +253,9 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
  *                 type: string
  *                 description: User ID of comment author
  *                 example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
- *               content:
+ *               contentMarkdown:
  *                 type: string
- *                 description: Content of the comment
+ *                 description: Content of the comment as a string or markdown
  *                 example: "This is a comment."
  *               parentId:
  *                 type: string
@@ -293,13 +298,13 @@ async function createProposalComment(req: NextApiRequest, res: NextApiResponse<P
 
   const userId = req.body.userId as string;
 
-  const commentContent = await parseMarkdown(req.body.content);
+  const commentContent = await parseMarkdown(req.body.contentMarkdown);
 
   const proposalComment = await prisma.pageComment.create({
     data: {
       page: { connect: { id: proposal.id } },
       parentId: req.body.parentId,
-      contentText: req.body.content,
+      contentText: req.body.contentMarkdown,
       user: { connect: { id: userId } },
       content: commentContent
     }
@@ -309,8 +314,8 @@ async function createProposalComment(req: NextApiRequest, res: NextApiResponse<P
     id: proposalComment.id,
     createdAt: proposalComment.createdAt.toISOString(),
     content: {
-      markdown: req.body.content,
-      text: req.body.content
+      markdown: req.body.contentMarkdown,
+      text: req.body.contentMarkdown
     },
     createdBy: userId,
     downvotes: 0,

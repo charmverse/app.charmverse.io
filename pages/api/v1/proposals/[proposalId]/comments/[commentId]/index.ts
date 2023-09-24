@@ -11,7 +11,7 @@ import type { PublicApiProposalComment } from '../index';
 
 const handler = superApiHandler();
 
-handler.put(requireKeys(['userId', 'content'], 'body'), updateProposalComment);
+handler.put(requireKeys(['contentMarkdown'], 'body'), updateProposalComment);
 
 /**
  * @swagger
@@ -63,15 +63,20 @@ handler.put(requireKeys(['userId', 'content'], 'body'), updateProposalComment);
 async function updateProposalComment(req: NextApiRequest, res: NextApiResponse<PublicApiProposalComment>) {
   // This should never be undefined, but adding this safeguard for future proofing
 
-  const newCommentText = req.body.content;
+  const newCommentText = req.body.contentMarkdown;
 
-  const proposal = await prisma.proposal.findFirstOrThrow({
+  const existingComment = await prisma.pageComment.findFirstOrThrow({
     where: {
-      page: generatePageQuery({
-        pageIdOrPath: req.query.proposalId as string
-      }),
-      spaceId: {
-        in: req.spaceIdRange
+      id: req.query.commentId as string,
+      page: {
+        ...generatePageQuery({
+          pageIdOrPath: req.query.proposalId as string
+        }),
+        spaceId: req.authorizedSpaceId
+          ? req.authorizedSpaceId
+          : {
+              in: req.spaceIdRange
+            }
       }
     },
     select: {
@@ -79,13 +84,11 @@ async function updateProposalComment(req: NextApiRequest, res: NextApiResponse<P
     }
   });
 
-  const commentId = req.query.commentId as string;
-
   const commentContent = await parseMarkdown(newCommentText);
 
   const proposalComment = await prisma.pageComment.update({
     where: {
-      id: commentId
+      id: existingComment.id
     },
     data: {
       contentText: newCommentText,
