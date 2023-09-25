@@ -63,7 +63,7 @@
     "storybook": "storybook dev -p 6006",
     "update-core": "npm install @charmverse/core",
     "build-storybook": "storybook build",
-    "chromatic:ci": "chromatic --exit-zero-on-changes"
+    "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

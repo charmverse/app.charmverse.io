@@ -15,6 +15,7 @@ const mockedMutator = jest.mocked(mutator, { shallow: true });
 const board = TestBlockFactory.createBoard();
 const card = TestBlockFactory.createCard(board);
 const comment = TestBlockFactory.createComment(card);
+comment.id = '4fc4c4b8-e289-417f-9148-14b3cc744925';
 const dateFixed = Date.parse('01 Oct 2020');
 comment.createdAt = dateFixed;
 comment.updatedAt = dateFixed;
