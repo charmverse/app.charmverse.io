@@ -42,7 +42,7 @@ export const subscriptionDetails = {
     'Upload limit/video: 20MB'
   ],
   community: [
-    'All Public Good features, and',
+    'All Public Goods features, and',
     'Include 30,000 blocks',
     'Comprehensive access control. Unlimited roles',
     'Custom domain',
