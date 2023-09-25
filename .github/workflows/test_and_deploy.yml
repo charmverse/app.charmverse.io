@@ -22,8 +22,6 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
-    outputs:
-      build_id: ${{ steps.get_build_id.outputs.build_id }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -35,12 +33,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Calculate Build ID
-        id: get_build_id
-        run: |
-          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
-          echo "build_id=$build_id" >> $GITHUB_OUTPUT
-
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
@@ -48,9 +40,6 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
 
   chromatic:
     name: Publish to Chromatic
@@ -69,9 +58,6 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - uses: chromaui/action@v1
         with:
@@ -93,9 +79,6 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - run: npm run typecheck
       - run: npm run lint
@@ -122,7 +105,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     strategy:
-      max-parallel: 8
+      max-parallel: 10
       fail-fast: false
       matrix:
         include:
@@ -200,18 +183,15 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
+        env: 
+          REACT_APP_APP_ENV: 'test'
         run: ${{matrix.test_command}}
 
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/optimize-cache-strategy'    # << change before merge
     needs: [test, integration-test]
@@ -228,34 +208,17 @@ jobs:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
-      - name: Calculate Build ID
+      - name: Calculate Build ID and add to env file
         id: get_build_id
         run: |
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
+          echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
 
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'production'
-          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
-          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
-          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY }}
-          NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
-          NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
-          NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
-          NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
-          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          REACT_APP_APP_ENV: 'production'
 
       - name: Build and Push Docker image
         id: docker_build_push
