@@ -20,7 +20,7 @@ import { getProposalAction } from 'lib/proposal/getProposalAction';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { signJwt } from 'lib/webhookPublisher/authentication';
-import { WebhookEventNames, type WebhookPayload } from 'lib/webhookPublisher/interfaces';
+import { WebhookEventNames, whiteListedWebhookEvents, type WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 /**
  * SQS worker, message are executed one by one
@@ -792,6 +792,17 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             processed: true
           }
         });
+
+        const isWhitelistedEvent = whiteListedWebhookEvents.includes(webhookData.event.scope);
+
+        if (!isWhitelistedEvent) {
+          log.debug('Webhook event not whitelisted', {
+            scope: webhookData.event.scope,
+            webhookEventId,
+            spaceId: webhookData.spaceId
+          });
+          return;
+        }
 
         if (webhookURL && signingSecret) {
           const secret = Buffer.from(signingSecret, 'hex');

@@ -119,6 +119,20 @@ export enum WebhookEventNames {
   VoteCreated = 'vote.created'
 }
 
+export const whiteListedWebhookEvents = [
+  'bounty.completed',
+  'forum.comment.created',
+  'forum.comment.upvoted',
+  'forum.comment.downvoted',
+  'forum.post.created',
+  'proposal.passed',
+  'proposal.failed',
+  'proposal.suggestion_approved',
+  'proposal.user_voted',
+  'user.joined',
+  'hello.world'
+];
+
 // Utils to share common props among events
 type WebhookEventSharedProps = {
   space: SpaceEntity;
