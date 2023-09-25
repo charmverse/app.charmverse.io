@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { isAddress } from 'viem';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
@@ -9,6 +9,6 @@ describe('randomETHWalletAddress', () => {
     expect(address).toBe(address.toLowerCase());
 
     // Address validity check
-    expect(utils.isAddress(address)).toBe(true);
+    expect(isAddress(address)).toBe(true);
   });
 });

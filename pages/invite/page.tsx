@@ -59,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
       });
       return {
         redirect: {
-          destination: `/${isDomainInPath ? `${page.space.domain}/` : ''}${page.path}`,
+          destination: encodeURI(`/${isDomainInPath ? `${page.space.domain}/` : ''}${page.path}`),
           permanent: false
         }
       };

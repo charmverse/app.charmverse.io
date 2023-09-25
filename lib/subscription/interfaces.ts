@@ -10,7 +10,6 @@ export type CreateProSubscriptionRequest = {
   name?: string;
   address?: AddressParam;
   coupon?: string;
-  freeTrial?: boolean;
 };
 
 /**

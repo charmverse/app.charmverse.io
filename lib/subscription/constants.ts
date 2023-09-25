@@ -5,7 +5,7 @@ import { isProdEnv } from 'config/constants';
 export type SubscriptionPeriod = 'monthly' | 'annual';
 
 // Equivalent to 30k
-export const defaultFreeTrialBlockQuota = 30;
+export const defaultFreeBlockQuota = 30;
 
 export const communityProduct = {
   id: 'community',
@@ -36,22 +36,25 @@ export const subscriptionDetails = {
   free: [
     'Community space with docs, databases, & forum',
     'Member Directory, Proposal Builder, & crypto payments',
-    'Up to 200 monthly active members',
+    'Include 500,000 blocks',
     'Integrate with Discord, Snapshot, Safe, & NFTs/POAPs',
     'Compatible with most EVM chains',
     'Upload limit/video: 20MB'
   ],
   community: [
-    'Everything in Free, and',
+    'All Public Good features, and',
+    'Include 30,000 blocks',
     'Comprehensive access control. Unlimited roles',
-    'Invite 100 guests',
     'Custom domain',
     'API access',
+    'Invite 100 guests',
+    'Up to 200 monthly active members',
     'Upload limit/video: 1GB'
   ],
   enterprise: [
     'Everything in Community, and',
     '200+ monthly active members',
+    'Custom block limit',
     'Custom guest limit',
     'Custom video upload limit',
     'Usage & engagement analytics',
@@ -65,8 +68,9 @@ export const SubscriptionStatus = {
   pending: 'pending',
   cancelled: 'cancelled',
   cancel_at_end: 'cancel_at_end',
-  free_trial: 'free_trial',
   unpaid: 'unpaid'
 };
 
 export type SubscriptionStatusType = keyof typeof SubscriptionStatus;
+
+export const DeprecatedFreeTrial = 'deprecated_free_trial';
