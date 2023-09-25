@@ -25,7 +25,7 @@ type CreatePostNotificationInput = {
   type: ForumNotificationType;
 } & (
   | {
-      type: 'post.created';
+      type: 'created';
     }
   | CommentNotification
   | MentionNotification
@@ -231,16 +231,12 @@ type CreateBountyNotificationInput = {
   | {
       type: Exclude<
         BountyNotificationType,
-        | 'suggestion_created'
-        | 'mention.created'
-        | 'inline_comment.created'
-        | 'inline_comment.replied'
-        | 'inline_comment.mention.created'
+        'suggestion.created' | MentionNotificationType | InlineCommentNotificationType
       >;
       applicationId: string;
     }
   | {
-      type: 'suggestion_created';
+      type: 'suggestion.created';
     }
   | MentionNotification
   | InlineCommentNotification

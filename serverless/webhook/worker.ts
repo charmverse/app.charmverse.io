@@ -116,7 +116,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                   postId,
                   spaceId,
                   userId,
-                  type: 'post.created'
+                  type: 'created'
                 });
 
                 for (const userMention of userMentions) {
@@ -419,6 +419,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                 isReviewer: isReviewer || isReviewerRole,
                 notifyNewEvents
               });
+
               if (!action) {
                 continue;
               }
@@ -426,7 +427,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
               const categoryPermission = accessibleProposalCategories.find(({ id }) => id === proposal.categoryId);
               if (
                 categoryPermission &&
-                ((action === 'discuss' && !categoryPermission.permissions.comment_proposals) ||
+                ((action === 'start_discussion' && !categoryPermission.permissions.comment_proposals) ||
                   (action === 'vote' && !categoryPermission.permissions.vote_proposals))
               ) {
                 continue;
@@ -505,7 +506,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                   await createVoteNotification({
                     createdBy: vote.author.id,
                     spaceId,
-                    type: 'vote.created',
+                    type: 'new_vote',
                     userId: spaceUserId,
                     voteId
                   });
@@ -528,7 +529,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                   await createVoteNotification({
                     createdBy: vote.author.id,
                     spaceId,
-                    type: 'vote.created',
+                    type: 'new_vote',
                     userId: spaceUserId,
                     voteId
                   });
@@ -771,7 +772,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
                 bountyId,
                 createdBy: bounty.createdBy,
                 spaceId,
-                type: 'suggestion_created',
+                type: 'suggestion.created',
                 userId: spaceAdminUserId
               });
             }

@@ -60,9 +60,6 @@ interface DiscussionNotificationBase extends NotificationBase {
   pageId: string;
   pagePath: string;
   pageTitle: string;
-  pageType: PageType;
-  bountyId: string | null;
-  bountyTitle: string | null;
   type: DiscussionNotificationType;
   text: string;
   mentionId: null | string;
@@ -71,7 +68,7 @@ interface DiscussionNotificationBase extends NotificationBase {
 
 export type DiscussionNotification = DiscussionNotificationBase & (MentionNotification | InlineCommentNotification);
 
-export type ForumNotificationType = CommentNotificationType | MentionNotificationType | 'post.created';
+export type ForumNotificationType = CommentNotificationType | MentionNotificationType | 'created';
 
 interface ForumNotificationBase extends NotificationBase {
   type: ForumNotificationType;
@@ -88,7 +85,7 @@ export type ForumNotification = ForumNotificationBase &
     | CommentNotification
     | MentionNotification
     | {
-        type: 'post.created';
+        type: 'created';
       }
   );
 
@@ -98,10 +95,10 @@ export type ProposalNotificationType =
   | InlineCommentNotificationType
   | 'start_review'
   | 'start_discussion'
-  | 'start_vote'
-  | 'review'
-  | 'discuss'
+  | 'reviewed'
+  | 'needs_review'
   | 'vote'
+  | 'evaluation_active'
   | 'evaluation_closed';
 
 export type ProposalNotification = NotificationBase & {
@@ -113,18 +110,26 @@ export type ProposalNotification = NotificationBase & {
   commentId: string | null;
   inlineCommentId: string | null;
   mentionId: string | null;
-} & (CommentNotification | MentionNotification | InlineCommentNotification);
+} & (
+    | CommentNotification
+    | MentionNotification
+    | InlineCommentNotification
+    | {
+        type: Exclude<
+          ProposalNotificationType,
+          CommentNotificationType | MentionNotificationType | InlineCommentNotificationType
+        >;
+      }
+  );
 
-export type VoteNotificationType = 'vote.created';
+export type VoteNotificationType = 'new_vote';
 
 export type VoteNotification = NotificationBase & {
   status: VoteStatus;
-  pagePath: string | null;
-  pageTitle: string | null;
-  pageType: PageType | null;
-  postPath: string | null;
-  postTitle: string | null;
-  postCategoryId: string | null;
+  pagePath: string;
+  pageTitle: string;
+  pageType: 'page' | 'proposal';
+  categoryId: string | null;
   type: VoteNotificationType;
   title: string;
   userChoice: string[] | null;
@@ -141,7 +146,7 @@ export type BountyNotificationType =
   | 'application.approved'
   | 'application.payment_pending'
   | 'application.payment_completed'
-  | 'suggestion_created';
+  | 'suggestion.created';
 
 export type BountyNotification = NotificationBase & {
   status: BountyStatus;
@@ -160,7 +165,7 @@ export type BountyNotification = NotificationBase & {
         applicationId: string;
       }
     | {
-        type: 'suggestion_created';
+        type: 'suggestion.created';
       }
   );
 

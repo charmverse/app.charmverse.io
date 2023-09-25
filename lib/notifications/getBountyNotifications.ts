@@ -52,8 +52,7 @@ export async function getBountyNotifications(userId: string): Promise<Notificati
       spaceDomain: notificationMetadata.space.domain,
       spaceId: notificationMetadata.spaceId,
       spaceName: notificationMetadata.space.name,
-      status: notification.bounty.status,
-      type: notification.type
+      status: notification.bounty.status
     } as BountyNotification;
 
     if (notification.notificationMetadata.seenAt) {

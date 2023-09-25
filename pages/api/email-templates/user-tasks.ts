@@ -23,10 +23,8 @@ const handler = nc({
 const createDiscussionTask = ({
   pageTitle,
   spaceName,
-  mentionText,
-  pageType = 'page'
+  mentionText
 }: {
-  pageType?: DiscussionNotification['pageType'];
   spaceName: string;
   mentionText: string;
   pageTitle: string;
@@ -43,8 +41,6 @@ const createDiscussionTask = ({
     spaceName,
     pageTitle,
     text: mentionText,
-    bountyId: null,
-    bountyTitle: null,
     type: 'mention.created',
     createdBy: {
       id: v4(),
@@ -56,8 +52,7 @@ const createDiscussionTask = ({
       avatarContract: '0x495f...7b',
       deletedAt: null
     },
-    inlineCommentId: null,
-    pageType
+    inlineCommentId: null
   };
 };
 
@@ -235,14 +230,12 @@ const templates = {
         createDiscussionTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
-          spaceName: 'CharmVerse',
-          pageType: 'bounty'
+          spaceName: 'CharmVerse'
         }),
         createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse',
-          pageType: 'bounty'
+          spaceName: 'CharmVerse'
         }),
         createDiscussionTask({
           mentionText: "Let's have a meeting @ghostpepper",

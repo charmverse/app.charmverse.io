@@ -75,8 +75,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const unmarkedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
-      ...getVoteNotificationPreviewItems(tasks.votes.unmarked, currentUserId),
-      ...getProposalsNotificationPreviewItems(tasks.proposals.unmarked, currentUserId),
+      ...getVoteNotificationPreviewItems(tasks.votes.unmarked),
+      ...getProposalsNotificationPreviewItems(tasks.proposals.unmarked),
       ...getBountiesNotificationPreviewItems(tasks.bounties.unmarked),
       ...getDiscussionsNotificationPreviewItems(tasks.discussions.unmarked),
       ...getForumNotificationPreviewItems(tasks.forum.unmarked)
@@ -86,8 +86,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const markedNotificationPreviews: NotificationDetails[] = useMemo(() => {
     if (!tasks) return [];
     return [
-      ...getVoteNotificationPreviewItems(tasks.votes.marked, currentUserId),
-      ...getProposalsNotificationPreviewItems(tasks.proposals.marked, currentUserId),
+      ...getVoteNotificationPreviewItems(tasks.votes.marked),
+      ...getProposalsNotificationPreviewItems(tasks.proposals.marked),
       ...getBountiesNotificationPreviewItems(tasks.bounties.marked),
       ...getDiscussionsNotificationPreviewItems(tasks.discussions.marked),
       ...getForumNotificationPreviewItems(tasks.forum.marked)

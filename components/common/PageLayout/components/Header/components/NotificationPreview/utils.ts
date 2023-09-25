@@ -3,24 +3,65 @@ import { NotificationType } from '@charmverse/core/prisma';
 
 import type {
   BountyNotification,
+  CommentNotification,
   DiscussionNotification,
   ForumNotification,
+  InlineCommentNotification,
+  NotificationActor,
   NotificationGroupType,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
 
-function getForumContent(n: ForumNotification) {
-  const { createdBy, commentId, postTitle } = n;
-  if (commentId) {
-    return createdBy?.username
-      ? `${createdBy?.username} left a comment on ${postTitle}.`
-      : `New comment on ${postTitle}.`;
+function getCommentTypeNotificationContent({
+  notificationType,
+  createdBy,
+  title
+}: {
+  notificationType: InlineCommentNotification['type'] | CommentNotification['type'] | 'mention.created';
+  title: string;
+  createdBy: NotificationActor | null;
+}) {
+  switch (notificationType) {
+    case 'inline_comment.created':
+    case 'comment.created': {
+      return createdBy?.username ? `${createdBy?.username} left a comment in ${title}.` : `New comment in ${title}.`;
+    }
+    case 'inline_comment.replied':
+    case 'comment.replied': {
+      return createdBy?.username
+        ? `${createdBy?.username} replied to your comment in ${title}.`
+        : `New reply to your comment in ${title}.`;
+    }
+    case 'inline_comment.mention.created':
+    case 'comment.mention.created':
+    case 'mention.created': {
+      return createdBy?.username
+        ? `${createdBy?.username} mentioned you in ${title}.`
+        : `You were mentioned in ${title}.`;
+    }
+    default: {
+      return '';
+    }
   }
+}
 
-  return createdBy?.username
-    ? `${createdBy?.username} created "${postTitle}" post on forum.`
-    : `New forum post "${postTitle}"`;
+function getForumContent(n: ForumNotification) {
+  const { createdBy, postTitle, type } = n;
+  switch (type) {
+    case 'created': {
+      return createdBy?.username
+        ? `${createdBy?.username} created "${postTitle}".`
+        : `New forum post "${postTitle}" created`;
+    }
+    default: {
+      return getCommentTypeNotificationContent({
+        createdBy,
+        notificationType: type,
+        title: postTitle
+      });
+    }
+  }
 }
 
 export function getForumNotificationPreviewItems(notifications: ForumNotification[]) {
@@ -38,10 +79,21 @@ export function getForumNotificationPreviewItems(notifications: ForumNotificatio
 }
 
 function getDiscussionContent(n: DiscussionNotification) {
-  const { createdBy, pageTitle } = n;
-  return pageTitle
-    ? `${createdBy?.username} left a comment in ${pageTitle}.`
-    : `${createdBy?.username} left a comment.`;
+  const { type, createdBy, pageTitle } = n;
+  switch (type) {
+    case 'mention.created': {
+      return createdBy?.username
+        ? `${createdBy?.username} mentioned you in ${pageTitle}.`
+        : `You were mentioned in ${pageTitle}.`;
+    }
+    default: {
+      return getCommentTypeNotificationContent({
+        createdBy,
+        notificationType: type,
+        title: pageTitle
+      });
+    }
+  }
 }
 
 export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
@@ -61,41 +113,41 @@ export function getDiscussionsNotificationPreviewItems(notifications: Discussion
 function getBountyContent(n: BountyNotification) {
   const { createdBy, type, pageTitle: title } = n;
 
-  if (type === 'application.pending') {
-    return `${createdBy?.username} applied for ${title} bounty.`;
+  switch (type) {
+    case 'application.pending': {
+      return `${createdBy?.username} applied for ${title} bounty.`;
+    }
+    case 'application.submitted': {
+      return `${createdBy?.username} applied for bounty ${title}.`;
+    }
+    case 'application.accepted': {
+      return `Your application for ${title} bounty was accepted.`;
+    }
+    case 'application.rejected': {
+      return `Your application for ${title} bounty has been rejected.`;
+    }
+    case 'application.approved': {
+      return `Your application for ${title} bounty was approved.`;
+    }
+    case 'application.payment_pending': {
+      return `Payment required for ${title}.`;
+    }
+    case 'application.payment_completed': {
+      return `You have been paid for ${title}.`;
+    }
+    case 'suggestion.created': {
+      return createdBy?.username
+        ? `${createdBy?.username} suggested a new bounty: ${title}.`
+        : `New bounty suggestion: ${title}.`;
+    }
+    default: {
+      return getCommentTypeNotificationContent({
+        createdBy,
+        notificationType: type,
+        title
+      });
+    }
   }
-
-  if (type === 'application.submitted') {
-    return `${createdBy?.username} submitted work for ${title} bounty.`;
-  }
-
-  if (type === 'application.accepted') {
-    return `Your application for ${title} bounty was accepted.`;
-  }
-
-  if (type === 'application.rejected') {
-    return `Your application for ${title} bounty has been rejected.`;
-  }
-
-  if (type === 'application.approved') {
-    return `Your submission for ${title} bounty was approved.`;
-  }
-
-  if (type === 'application.payment_pending') {
-    return `Bounty ${title} is ready for payment.`;
-  }
-
-  if (type === 'application.payment_completed') {
-    return `Bounty ${title} has been paid.`;
-  }
-
-  if (type === 'suggestion_created') {
-    return createdBy?.username ? `${createdBy?.username} suggested new ${title} bounty.` : 'New bounty suggestion.';
-  }
-
-  return createdBy?.username
-    ? `${createdBy?.username} updated ${title} bounty status.`
-    : `Bounty status ${title} updated.`;
 }
 
 export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]) {
@@ -112,22 +164,43 @@ export function getBountiesNotificationPreviewItems(notifications: BountyNotific
   }));
 }
 
-function getProposalContent(n: ProposalNotification, currentUserId: string) {
-  const status = 'status' in n ? n.status : null;
-  const { createdBy, pageTitle: title } = n;
-  const isCreator = currentUserId === createdBy?.id;
-  if (status) {
-    return createdBy?.username
-      ? isCreator
-        ? `You updated proposal ${title}`
-        : `${createdBy?.username} updated proposal ${title}.`
-      : `Proposal ${title} updated.`;
+function getProposalContent(n: ProposalNotification) {
+  const { type, createdBy, pageTitle: title } = n;
+
+  switch (type) {
+    case 'start_discussion': {
+      return createdBy?.username
+        ? `${createdBy?.username} seeking feedback for ${title}.`
+        : `Feedback requested for ${title}.`;
+    }
+    case 'start_review': {
+      return createdBy?.username
+        ? `${createdBy?.username} seeking review for ${title}.`
+        : `Review requested for ${title}.`;
+    }
+    case 'reviewed': {
+      return `Review completed for ${title}`;
+    }
+    case 'vote': {
+      return `Voting started for ${title}`;
+    }
+    case 'needs_review': {
+      return `Review required for ${title}`;
+    }
+    case 'evaluation_active': {
+      return `Evaluation started for ${title}`;
+    }
+    case 'evaluation_closed': {
+      return `Evaluation completed for ${title}`;
+    }
+    default: {
+      return getCommentTypeNotificationContent({
+        createdBy,
+        notificationType: type,
+        title
+      });
+    }
   }
-  return createdBy?.username
-    ? isCreator
-      ? `You updated ${title} proposal.`
-      : `${createdBy?.username} updated ${title} proposal.`
-    : `Proposal ${title} updated.`;
 }
 
 function getProposalNotificationStatus(status: ProposalStatus) {
@@ -145,7 +218,7 @@ function getProposalNotificationStatus(status: ProposalStatus) {
   }
 }
 
-export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[], currentUserId?: string) {
+export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[]) {
   return notifications.map((n) => ({
     id: n.id,
     createdAt: n.createdAt,
@@ -154,26 +227,12 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalNoti
     groupType: 'proposals' as NotificationGroupType,
     type: NotificationType.proposal,
     href: `/${n.spaceDomain}/${n.pagePath}`,
-    content: getProposalContent(n, currentUserId || ''),
+    content: getProposalContent(n),
     title: `Proposal: ${getProposalNotificationStatus(n.status)}`
   }));
 }
 
-const getVoteContent = (n: VoteNotification, currentUserId: string) => {
-  const { createdBy, title, userChoice } = n;
-  const isCreator = currentUserId === createdBy?.id;
-  if (userChoice) {
-    return createdBy?.username ? `${createdBy?.username} added a vote in "${title}".` : `New vote in "${title}".`;
-  }
-
-  return createdBy?.username
-    ? isCreator
-      ? `You created new vote "${title}".`
-      : `${createdBy?.username} created a poll "${title}".`
-    : `Poll "${title}" created.`;
-};
-
-export function getVoteNotificationPreviewItems(notifications: VoteNotification[], currentUserId?: string) {
+export function getVoteNotificationPreviewItems(notifications: VoteNotification[]) {
   return notifications.map((n) => ({
     id: n.id,
     createdAt: n.createdAt,
@@ -182,7 +241,7 @@ export function getVoteNotificationPreviewItems(notifications: VoteNotification[
     groupType: 'votes' as NotificationGroupType,
     type: NotificationType.vote,
     href: `/${n.spaceDomain}/${n.pagePath}?voteId=${n.id}`,
-    content: getVoteContent(n, currentUserId || ''),
+    content: `Polling started for "${n.title}".`,
     title: 'New Poll'
   }));
 }

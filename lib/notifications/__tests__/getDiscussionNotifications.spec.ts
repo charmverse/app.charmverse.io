@@ -383,10 +383,6 @@ describe('getDiscussionNotifications', () => {
       (item) => item.mentionId === discussionIds[8] && item.pageId === page1.id && item.inlineCommentId === comment1.id
     );
 
-    expectSome(newNotifications, (item) => item.mentionId === discussionIds[7] && item.bountyId === bounty2.id);
-
-    expectSome(newNotifications, (item) => item.mentionId === discussionIds[4] && item.bountyId === bounty1.id);
-
     expectSome(newNotifications, (item) => item.mentionId === discussionIds[3] && item.pageId === page2.id);
 
     // finds the comment block mention
