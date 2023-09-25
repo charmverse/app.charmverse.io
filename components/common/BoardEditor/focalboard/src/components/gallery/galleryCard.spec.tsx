@@ -41,6 +41,9 @@ describe('src/components/gallery/GalleryCard', () => {
   contentImage.id = 'contentId-image';
   contentImage.fields.fileId = 'test.jpg';
 
+  const contentComment = TestBlockFactory.createComment(card);
+  contentComment.id = 'contentId-Comment';
+
   let store: MockStoreEnhanced<unknown, unknown>;
 
   beforeEach(() => {
@@ -151,7 +154,7 @@ describe('src/components/gallery/GalleryCard', () => {
 
   describe('with a comment content', () => {
     beforeEach(() => {
-      card.fields.contentOrder = [];
+      card.fields.contentOrder = [contentComment.id];
       const state = {
         cards: {
           cards: {

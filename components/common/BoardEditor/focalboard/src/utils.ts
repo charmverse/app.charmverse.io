@@ -10,6 +10,7 @@ import { createBoard } from 'lib/focalboard/board';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
 
+import { createCommentBlock } from './blocks/commentBlock';
 import type { IAppWindow } from './types';
 
 declare let window: IAppWindow;
@@ -27,6 +28,7 @@ enum IDType {
   Board = 'b',
   Card = 'c',
   View = 'v',
+  Session = 's',
   User = 'u',
   Token = 'k',
   BlockID = 'a'
@@ -529,7 +531,8 @@ class Utils {
         return createBoardView(block);
       case 'card':
         return createCard(block);
-
+      case 'comment':
+        return createCommentBlock(block);
       default:
         return block;
     }
