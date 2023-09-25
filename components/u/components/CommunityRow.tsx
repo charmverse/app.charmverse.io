@@ -16,8 +16,12 @@ import { useEffect, useState } from 'react';
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
-import type { ProfileBountyEvent, UserCommunity } from 'lib/profile/interfaces';
+import type {
+  ProfileProposalEvent,
+  ProfileVoteEvent,
+  ProfileBountyEvent,
+  CommunityDetails
+} from 'lib/profile/interfaces';
 
 import { ProfileItemContainer } from './CollectibleRow';
 
@@ -26,14 +30,6 @@ const TASK_TABS = [
   { icon: <TaskOutlinedIcon />, label: 'Proposals', type: 'proposal' },
   { icon: <BountyIcon />, label: 'Bounties', type: 'bounty' }
 ] as const;
-
-export type CommunityDetails = UserCommunity & {
-  proposals: DeepDaoProposal[];
-  votes: DeepDaoVote[];
-  bounties: ProfileBountyEvent[];
-  joinDate: string;
-  latestEventDate?: string;
-};
 
 interface CommunityRowProps {
   community: CommunityDetails;
@@ -119,7 +115,7 @@ function EventRow(event: EventRowProps) {
   );
 }
 
-function VotesPanel({ events }: { events: DeepDaoVote[] }) {
+function VotesPanel({ events }: { events: ProfileVoteEvent[] }) {
   return (
     <>
       {events
@@ -143,7 +139,7 @@ function VotesPanel({ events }: { events: DeepDaoVote[] }) {
   );
 }
 
-function ProposalsPanel({ events }: { events: DeepDaoProposal[] }) {
+function ProposalsPanel({ events }: { events: ProfileProposalEvent[] }) {
   return (
     <>
       {events

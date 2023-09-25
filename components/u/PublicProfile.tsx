@@ -9,10 +9,10 @@ import { ProfileWidgets } from 'components/common/UserProfile/components/Profile
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
+import type { CommunityDetails } from 'lib/profile/interfaces';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
-import type { CommunityDetails } from './components/CommunityRow';
 import CommunityRow from './components/CommunityRow';
 import { UserDetailsFormWithSave } from './components/UserDetails/UserDetailsForm';
 import { UserDetailsReadonly } from './components/UserDetails/UserDetailsReadonly';
