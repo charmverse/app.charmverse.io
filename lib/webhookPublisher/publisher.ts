@@ -49,8 +49,10 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       throw new Error('Webhook SQS env var missing');
     }
 
+    const webhookMessageId = v4();
+
     const webhookPayload: WebhookPayload = {
-      id: v4(),
+      id: webhookMessageId,
       event,
       createdAt: new Date().toISOString(),
       spaceId,
@@ -66,6 +68,12 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
       webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
     }
+
+    await prisma.webhookMessage.create({
+      data: {
+        id: webhookMessageId
+      }
+    });
 
     // Add the message to the queue
     await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));

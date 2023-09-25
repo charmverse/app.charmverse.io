@@ -40,6 +40,20 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         // Gets message information
         const { webhookURL, signingSecret, ...webhookData } = JSON.parse(body) as WebhookPayload;
 
+        const webhookEventId = webhookData.id;
+
+        const webhookMessage = await prisma.webhookMessage.findUnique({
+          where: {
+            id: webhookEventId,
+            processed: true
+          }
+        });
+
+        if (webhookMessage) {
+          log.debug('Webhook message already processed', { webhookEventId });
+          return;
+        }
+
         switch (webhookData.event.scope) {
           case WebhookEventNames.DocumentMentionCreated: {
             const mentionedUserId = webhookData.event.mention.value;
@@ -768,6 +782,15 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           default:
             break;
         }
+
+        await prisma.webhookMessage.update({
+          where: {
+            id: webhookEventId
+          },
+          data: {
+            processed: true
+          }
+        });
 
         if (webhookURL && signingSecret) {
           const secret = Buffer.from(signingSecret, 'hex');
