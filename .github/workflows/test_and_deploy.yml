@@ -215,6 +215,7 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
+          REACT_APP_WEBSOCKETS_HOST: https://sockets.charmverse.io
 
       - name: Build and Push Docker image
         id: docker_build_push

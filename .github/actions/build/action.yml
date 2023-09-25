@@ -4,6 +4,9 @@ inputs:
   REACT_APP_APP_ENV:
     description: "..."
     required: false
+  REACT_APP_WEBSOCKETS_HOST:
+    description: "..."
+    required: false
 
 runs:
   using: "composite"
