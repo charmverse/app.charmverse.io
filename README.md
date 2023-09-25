@@ -326,7 +326,7 @@ There are several cron tasks managed inside the /background/tasks folder. These 
 To debug notifications, you can run a command to read back current tasks:
 
 ```
-react-env --path .env.local -- npm run notifications:debug
+dotenv -e .env.local -- npm run notifications:debug
 ```
 
 # Stuff related to running in Elastic Beanstalk

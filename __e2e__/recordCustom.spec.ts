@@ -1,7 +1,7 @@
 // silence compiler error
 export {};
 
-// Run the test server with npm run start:test, then execute 'react-env --path .env.test.local -- ts-node __e2e__/record-custom.spec.ts'
+// Run the test server with npm run start:test, then execute 'dotenv -e .env.test.local -- ts-node __e2e__/record-custom.spec.ts'
 // Once the page loads, click 'Record' to start recording your interaction with the app
 
 // (async () => {

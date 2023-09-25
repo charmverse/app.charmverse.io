@@ -3,8 +3,8 @@ The scripts in this folder can be run as one-offs with ts-node.
 You will need to have ts-node and dotenv installed globally.
 
 ```
-$ npm i -g ts-node dotenv
-$ react-env --path .env.local -- ts-node scripts/<myscript>.ts
+$ npm i -g ts-node dotenv-cli
+$ dotenv -e .env.local -- ts-node scripts/<myscript>.ts
 
 ```
 
