@@ -130,7 +130,6 @@ export default function PendingNotifications(props: PendingNotifications) {
       </>
     ) : null;
 
-  const bountyDiscussions = props.discussionNotifications.filter((discussion) => discussion.pageType === 'bounty');
   const bountySection =
     totalBountyNotifications > 0 ? (
       <>
@@ -157,14 +156,6 @@ export default function PendingNotifications(props: PendingNotifications) {
         </MjmlText>
         {props.bountyNotifications.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
           <BountyTaskMjml key={proposalTask.id} task={proposalTask} />
-        ))}
-        {bountyDiscussions.length > 0 && (
-          <MjmlText>
-            <div style={h3Style}>Bounty Discussions</div>
-          </MjmlText>
-        )}
-        {bountyDiscussions.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
-          <DiscussionNotification key={discussionTask.mentionId} task={discussionTask} />
         ))}
         {totalBountyNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
         <MjmlDivider />
