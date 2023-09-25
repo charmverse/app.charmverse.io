@@ -51,6 +51,10 @@ export class DocumentPage extends GlobalPage {
     return this.page.waitForSelector('data-test=dialog');
   }
 
+  getCardCommentContent(commentId: string) {
+    return this.page.locator(`data-test=card-comment-content-${commentId} >> div[contenteditable]`).first();
+  }
+
   async isPageEditable() {
     const isEditable = await this.charmEditor.getAttribute('contenteditable');
     return isEditable === 'true';
