@@ -1,168 +1,70 @@
-import type { BountyStatus } from '@charmverse/core/prisma';
+import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
-import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
+import type { BountyNotification, NotificationsGroup } from './interfaces';
+import { notificationMetadataIncludeStatement, sortByDate } from './utils';
 
-import { getBountyAction, getBountyActor } from '../bounties/getBountyAction';
-
-export type BountyTaskAction =
-  | 'application_pending'
-  | 'application_approved'
-  | 'application_rejected'
-  | 'work_submitted'
-  | 'work_approved'
-  | 'payment_needed'
-  | 'payment_complete'
-  | 'suggested_bounty';
-
-export interface BountyTask {
-  id: string;
-  eventDate: Date;
-  spaceDomain: string;
-  spaceName: string;
-  pageId: string;
-  pageTitle: string;
-  pagePath: string;
-  status: BountyStatus;
-  action: BountyTaskAction | null;
-  createdAt: Date;
-  createdBy: NotificationActor | null;
-}
-
-export type BountyTasksGroup = {
-  marked: BountyTask[];
-  unmarked: BountyTask[];
-};
-
-function sortBounties(bounties: BountyTask[]) {
-  bounties.sort((bountyA, bountyB) => {
-    return bountyA.eventDate > bountyB.eventDate ? -1 : 1;
-  });
-}
-
-export async function getBountyNotifications(userId: string): Promise<{
-  marked: BountyTask[];
-  unmarked: BountyTask[];
-}> {
-  const spaceRoles = await prisma.spaceRole.findMany({
+export async function getBountyNotifications(userId: string): Promise<NotificationsGroup<BountyNotification>> {
+  const pageNotifications = await prisma.bountyNotification.findMany({
     where: {
-      userId
+      notificationMetadata: {
+        userId
+      }
     },
-    select: {
-      spaceId: true,
-      isAdmin: true,
-      spaceRoleToRole: {
-        where: {
-          spaceRole: {
-            userId
-          }
-        },
+    include: {
+      bounty: {
         select: {
-          role: {
+          status: true,
+          page: {
             select: {
-              id: true
+              id: true,
+              path: true,
+              type: true,
+              title: true
             }
           }
         }
+      },
+      notificationMetadata: {
+        include: notificationMetadataIncludeStatement
       }
     }
   });
 
-  const spaceIds = spaceRoles.map((spaceRole) => spaceRole.spaceId);
-  const roleIds = spaceRoles
-    .map((spaceRole) => spaceRole.spaceRoleToRole)
-    .flat()
-    .map(({ role }) => role.id);
-
-  const pagesWithBounties = await prisma.page.findMany({
-    where: {
-      deletedAt: null,
-      spaceId: {
-        in: spaceIds
-      },
-      type: 'bounty'
-    },
-    include: {
-      bounty: {
-        include: {
-          permissions: true,
-          applications: true
-        }
-      },
-      space: true
-    }
-  });
-
-  const userNotificationIds = new Set();
-
-  const bountyRecord: { marked: BountyTask[]; unmarked: BountyTask[] } = {
+  const bountyNotificationsGroup: NotificationsGroup<BountyNotification> = {
     marked: [],
     unmarked: []
   };
-  const bountiesWithActorIds: (Omit<BountyTask, 'createdBy'> & { actorId: string | null })[] = [];
 
-  pagesWithBounties.forEach(({ bounty, ...page }) => {
-    if (bounty) {
-      const isSpaceAdmin = !!spaceRoles.find((space) => space.isAdmin && space.spaceId === bounty.spaceId);
-      const isReviewer = bounty.permissions.some((perm) =>
-        perm.roleId ? roleIds.includes(perm.roleId) : perm.userId === userId
-      );
-      const applications = isReviewer
-        ? bounty.applications
-        : bounty.applications.filter((app) => app.createdBy === userId);
+  pageNotifications.forEach((notification) => {
+    const notificationMetadata = notification.notificationMetadata;
+    const page = notification.bounty.page as Page;
+    const bountyNotification = {
+      id: notification.id,
+      applicationId: notification.applicationId,
+      createdAt: notificationMetadata.createdAt.toISOString(),
+      createdBy: notificationMetadata.user,
+      inlineCommentId: notification.inlineCommentId,
+      mentionId: notification.mentionId,
+      pageId: page.id,
+      pagePath: page.path,
+      pageTitle: page.title || 'Untitled',
+      spaceDomain: notificationMetadata.space.domain,
+      spaceId: notificationMetadata.spaceId,
+      spaceName: notificationMetadata.space.name,
+      status: notification.bounty.status,
+      type: notification.type
+    } as BountyNotification;
 
-      applications.forEach((application) => {
-        const isApplicant = application.createdBy === userId;
-        const action = getBountyAction({
-          isSpaceAdmin,
-          bountyStatus: bounty.status,
-          applicationStatus: application.status,
-          isApplicant,
-          isReviewer
-        });
-
-        if (action) {
-          const bountyTaskId = `${bounty.id}.${application.id}.${action}`;
-
-          bountiesWithActorIds.push({
-            id: bountyTaskId,
-            eventDate: application.updatedAt,
-            createdAt: application.updatedAt,
-            pageId: page.id,
-            pagePath: page.path,
-            pageTitle: page.title,
-            spaceDomain: page.space.domain,
-            spaceName: page.space.name,
-            status: bounty.status,
-            action,
-            actorId: getBountyActor({ bounty, application, isApplicant, isReviewer, isSpaceAdmin })
-          });
-        }
-      });
-    }
-  });
-
-  // gather and query all actors with a single query
-  const actorIds = bountiesWithActorIds.map((b) => b.actorId).filter((id): id is string => id !== null);
-  const actors = await prisma.user.findMany({ where: { id: { in: actorIds } } });
-
-  bountiesWithActorIds.forEach(({ actorId, ...bountyWithActorId }) => {
-    const actorUser = actors.find((actor) => actor.id === actorId) || null;
-    const bountyTask: BountyTask = {
-      ...bountyWithActorId,
-      createdBy: mapNotificationActor(actorUser)
-    };
-
-    if (!userNotificationIds.has(bountyTask.id)) {
-      bountyRecord.unmarked.push(bountyTask);
+    if (notification.notificationMetadata.seenAt) {
+      bountyNotificationsGroup.marked.push(bountyNotification);
     } else {
-      bountyRecord.marked.push(bountyTask);
+      bountyNotificationsGroup.unmarked.push(bountyNotification);
     }
   });
 
-  sortBounties(bountyRecord.marked);
-  sortBounties(bountyRecord.unmarked);
-
-  return bountyRecord;
+  return {
+    marked: bountyNotificationsGroup.marked.sort(sortByDate),
+    unmarked: bountyNotificationsGroup.unmarked.sort(sortByDate)
+  };
 }

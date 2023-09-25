@@ -3,8 +3,8 @@ import { v4 } from 'uuid';
 
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
-import type { BountyTask } from 'lib/notifications/getBountyNotifications';
 import type {
+  BountyNotification,
   DiscussionNotification,
   ForumNotification,
   ProposalNotification,
@@ -165,27 +165,40 @@ const createProposalNotifications = ({
   };
 };
 
-const createBountyTask = ({
-  action,
+const createBountyNotification = ({
   pageTitle,
   spaceName,
   status
 }: Omit<
-  BountyTask,
-  'id' | 'spaceDomain' | 'pagePath' | 'pageId' | 'eventDate' | 'createdAt' | 'createdBy'
->): BountyTask => {
+  BountyNotification,
+  | 'id'
+  | 'spaceDomain'
+  | 'pagePath'
+  | 'pageId'
+  | 'eventDate'
+  | 'createdAt'
+  | 'createdBy'
+  | 'applicationId'
+  | 'mentionId'
+  | 'inlineCommentId'
+  | 'spaceId'
+  | 'type'
+>): BountyNotification => {
   const id = v4();
   return {
     id,
-    action,
     pagePath: randomName(),
     pageTitle,
     status,
     spaceDomain: randomName(),
     spaceName,
     pageId: v4(),
-    eventDate: new Date(),
-    createdAt: new Date(),
+    applicationId: null,
+    inlineCommentId: v4(),
+    mentionId: null,
+    spaceId: v4(),
+    type: 'inline_comment.created',
+    createdAt: new Date().toISOString(),
     createdBy: null
   };
 };
@@ -200,8 +213,7 @@ const templates = {
       },
       totalNotifications: 6,
       bountyNotifications: [
-        createBountyTask({
-          action: 'application_pending',
+        createBountyNotification({
           pageTitle: 'Create a new protocol',
           spaceName: 'Uniswap',
           status: 'open'

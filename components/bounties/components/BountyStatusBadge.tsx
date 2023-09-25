@@ -1,5 +1,6 @@
 import type { Bounty, BountyStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
+import { AddCommentOutlined, PersonOutline } from '@mui/icons-material';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
@@ -20,7 +21,7 @@ import type { ReactNode } from 'react';
 import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import type { BountyTaskAction } from 'lib/notifications/getBountyNotifications';
+import type { BountyNotification } from 'lib/notifications/interfaces';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { fancyTrim } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
@@ -42,26 +43,34 @@ export const BOUNTY_STATUS_ICONS: Record<BountyStatus, ReactNode> = {
   paid: <PaidIcon />
 };
 
-const BOUNTY_ACTION_LABELS: Record<BountyTaskAction, string> = {
-  application_pending: 'Application pending',
-  application_approved: 'Application approved',
-  application_rejected: 'Application rejected',
-  work_submitted: 'Work submitted',
-  work_approved: 'Work approved',
-  payment_needed: 'Payment needed',
-  payment_complete: 'Payment complete',
-  suggested_bounty: 'Suggested bounty'
+const BOUNTY_ACTION_LABELS: Record<BountyNotification['type'], string> = {
+  'application.pending': 'Application pending',
+  'application.accepted': 'Application accepted',
+  'application.rejected': 'Application rejected',
+  'application.submitted': 'Work submitted',
+  'application.approved': 'Submission approved',
+  'application.payment_pending': 'Payment needed',
+  'application.payment_completed': 'Payment complete',
+  suggestion_created: 'Suggested bounty',
+  'inline_comment.created': 'Inline comment created',
+  'inline_comment.mention.created': 'Inline comment mention created',
+  'inline_comment.replied': 'Inline comment replied',
+  'mention.created': 'Mention created'
 };
 
-const BOUNTY_ACTION_ICONS: Record<BountyTaskAction, ReactNode> = {
-  application_pending: <ModeStandbyIcon />,
-  application_approved: <CheckCircleOutlineIcon />,
-  application_rejected: <ModeStandbyIcon />,
-  work_submitted: <CheckCircleOutlineIcon />,
-  work_approved: <CheckCircleOutlineIcon />,
-  payment_needed: <PaidIcon />,
-  payment_complete: <PaidIcon />,
-  suggested_bounty: <LightbulbIcon />
+const BOUNTY_ACTION_ICONS: Record<BountyNotification['type'], ReactNode> = {
+  'application.pending': <ModeStandbyIcon />,
+  'application.accepted': <CheckCircleOutlineIcon />,
+  'application.rejected': <ModeStandbyIcon />,
+  'application.submitted': <CheckCircleOutlineIcon />,
+  'application.approved': <CheckCircleOutlineIcon />,
+  'application.payment_pending': <PaidIcon />,
+  'application.payment_completed': <PaidIcon />,
+  suggestion_created: <LightbulbIcon />,
+  'inline_comment.created': <AddCommentOutlined />,
+  'inline_comment.replied': <AddCommentOutlined />,
+  'inline_comment.mention.created': <PersonOutline />,
+  'mention.created': <PersonOutline />
 };
 
 export const BOUNTY_STATUS_COLORS: Record<BountyStatus, BrandColor> = {
@@ -72,23 +81,27 @@ export const BOUNTY_STATUS_COLORS: Record<BountyStatus, BrandColor> = {
   paid: 'gray'
 };
 
-export const BOUNTY_ACTION_COLORS: Record<BountyTaskAction, BrandColor> = {
-  application_pending: 'teal',
-  application_approved: 'teal',
-  application_rejected: 'red',
-  work_submitted: 'yellow',
-  work_approved: 'yellow',
-  payment_needed: 'pink',
-  payment_complete: 'gray',
-  suggested_bounty: 'purple'
+export const BOUNTY_ACTION_COLORS: Record<BountyNotification['type'], BrandColor> = {
+  'application.pending': 'teal',
+  'application.accepted': 'teal',
+  'application.rejected': 'red',
+  'application.submitted': 'yellow',
+  'application.approved': 'yellow',
+  'application.payment_pending': 'pink',
+  'application.payment_completed': 'gray',
+  suggestion_created: 'purple',
+  'inline_comment.created': 'teal',
+  'inline_comment.mention.created': 'teal',
+  'inline_comment.replied': 'teal',
+  'mention.created': 'teal'
 };
 
-const isBountyStatus = (status: BountyStatus | BountyTaskAction): status is BountyStatus =>
+const isBountyStatus = (status: BountyStatus | BountyNotification['type']): status is BountyStatus =>
   status in BOUNTY_STATUS_LABELS;
-const isBountyAction = (status: BountyStatus | BountyTaskAction): status is BountyTaskAction =>
+const isBountyAction = (status: BountyStatus | BountyNotification['type']): status is BountyNotification['type'] =>
   status in BOUNTY_ACTION_LABELS;
 
-const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus | BountyTaskAction }>`
+const StyledBountyStatusChip = styled(Chip)<{ status: BountyStatus | BountyNotification['type'] }>`
   background-color: ${({ status, theme }) => {
     if (isBountyStatus(status)) {
       return theme.palette[BOUNTY_STATUS_COLORS[status]].main;
@@ -137,7 +150,7 @@ export function BountyStatusNexusChip({
   size = 'small'
 }: {
   size?: ChipProps['size'];
-  action: BountyTaskAction;
+  action: BountyNotification['type'];
 }) {
   return (
     <StyledBountyStatusChip

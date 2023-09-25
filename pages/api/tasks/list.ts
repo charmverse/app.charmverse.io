@@ -2,12 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getBountyNotifications, type BountyTasksGroup } from 'lib/notifications/getBountyNotifications';
+import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getForumNotifications } from 'lib/notifications/getForumNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
 import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import type {
+  BountyNotification,
   DiscussionNotification,
   ForumNotification,
   NotificationsGroup,
@@ -24,7 +25,7 @@ export interface GetTasksResponse {
   discussions: NotificationsGroup<DiscussionNotification>;
   votes: NotificationsGroup<VoteNotification>;
   proposals: NotificationsGroup<ProposalNotification>;
-  bounties: BountyTasksGroup;
+  bounties: NotificationsGroup<BountyNotification>;
   forum: NotificationsGroup<ForumNotification>;
 }
 

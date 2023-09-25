@@ -143,16 +143,26 @@ export type BountyNotificationType =
   | 'application.payment_completed'
   | 'suggestion_created';
 
-export type BountyNotification =
-  | (NotificationBase & {
-      status: BountyStatus;
-      pagePath: string;
-      pageTitle: string;
-      applicationId: string | null;
-      type: BountyNotificationType;
-    })
-  | MentionNotification
-  | InlineCommentNotification;
+export type BountyNotification = NotificationBase & {
+  status: BountyStatus;
+  pageId: string;
+  pagePath: string;
+  pageTitle: string;
+  applicationId: string | null;
+  type: BountyNotificationType;
+  inlineCommentId: string | null;
+  mentionId: string | null;
+} & (
+    | MentionNotification
+    | InlineCommentNotification
+    | {
+        type: Exclude<BountyNotificationType, MentionNotificationType | InlineCommentNotificationType>;
+        applicationId: string;
+      }
+    | {
+        type: 'suggestion_created';
+      }
+  );
 
 export type NotificationsGroup<T> = {
   marked: T[];

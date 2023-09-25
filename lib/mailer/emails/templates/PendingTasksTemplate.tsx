@@ -5,8 +5,12 @@ import { MjmlColumn, MjmlDivider, MjmlSection, MjmlText } from 'mjml-react';
 import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/components/BountyStatusBadge';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import { baseUrl } from 'config/constants';
-import type { BountyTask } from 'lib/notifications/getBountyNotifications';
-import type { ForumNotification, ProposalNotification, VoteNotification } from 'lib/notifications/interfaces';
+import type {
+  BountyNotification,
+  ForumNotification,
+  ProposalNotification,
+  VoteNotification
+} from 'lib/notifications/interfaces';
 import { DiscussionNotification } from 'lib/notifications/interfaces';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { colors, greyColor2 } from 'theme/colors';
@@ -33,7 +37,7 @@ export interface PendingNotifications {
   totalNotifications: number;
   voteNotifications: VoteNotification[];
   proposalNotifications: ProposalNotification[];
-  bountyNotifications: BountyTask[];
+  bountyNotifications: BountyNotification[];
   forumNotifications: ForumNotification[];
   // eslint-disable-next-line
   user: TemplateUser;
@@ -318,7 +322,7 @@ function ProposalTaskMjml({ task }: { task: ProposalNotification }) {
   );
 }
 
-function BountyTaskMjml({ task }: { task: BountyTask }) {
+function BountyTaskMjml({ task }: { task: BountyNotification }) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>

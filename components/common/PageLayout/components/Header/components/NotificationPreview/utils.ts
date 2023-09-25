@@ -1,8 +1,8 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { NotificationType } from '@charmverse/core/prisma';
 
-import type { BountyTask } from 'lib/notifications/getBountyNotifications';
 import type {
+  BountyNotification,
   DiscussionNotification,
   ForumNotification,
   NotificationGroupType,
@@ -58,38 +58,38 @@ export function getDiscussionsNotificationPreviewItems(notifications: Discussion
   }));
 }
 
-function getBountyContent(n: BountyTask) {
-  const { createdBy, action, pageTitle: title } = n;
+function getBountyContent(n: BountyNotification) {
+  const { createdBy, type, pageTitle: title } = n;
 
-  if (action === 'application_pending') {
+  if (type === 'application.pending') {
     return `${createdBy?.username} applied for ${title} bounty.`;
   }
 
-  if (action === 'work_submitted') {
+  if (type === 'application.submitted') {
     return `${createdBy?.username} submitted work for ${title} bounty.`;
   }
 
-  if (action === 'application_approved') {
-    return `Your application for ${title} bounty was approved.`;
+  if (type === 'application.accepted') {
+    return `Your application for ${title} bounty was accepted.`;
   }
 
-  if (action === 'application_rejected') {
+  if (type === 'application.rejected') {
     return `Your application for ${title} bounty has been rejected.`;
   }
 
-  if (action === 'work_approved') {
+  if (type === 'application.approved') {
     return `Your submission for ${title} bounty was approved.`;
   }
 
-  if (action === 'payment_needed') {
+  if (type === 'application.payment_pending') {
     return `Bounty ${title} is ready for payment.`;
   }
 
-  if (action === 'payment_complete') {
+  if (type === 'application.payment_completed') {
     return `Bounty ${title} has been paid.`;
   }
 
-  if (action === 'suggested_bounty') {
+  if (type === 'suggestion_created') {
     return createdBy?.username ? `${createdBy?.username} suggested new ${title} bounty.` : 'New bounty suggestion.';
   }
 
@@ -98,7 +98,7 @@ function getBountyContent(n: BountyTask) {
     : `Bounty status ${title} updated.`;
 }
 
-export function getBountiesNotificationPreviewItems(notifications: BountyTask[]) {
+export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]) {
   return notifications.map((n) => ({
     id: n.id,
     createdAt: n.createdAt,
