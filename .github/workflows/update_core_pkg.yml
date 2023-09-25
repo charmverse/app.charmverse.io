@@ -46,24 +46,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           REACT_APP_APP_ENV: 'production'
-          REACT_APP_DD_CLIENT_TOKEN: ${{ secrets.REACT_APP_DD_CLIENT_TOKEN }}
-          REACT_APP_DD_RUM_CLIENT_TOKEN: ${{ secrets.REACT_APP_DD_RUM_CLIENT_TOKEN }}
-          REACT_APP_DD_RUM_APP_ID: ${{ secrets.REACT_APP_DD_RUM_APP_ID }}
-          REACT_APP_TELEGRAM_BOT_ID: ${{ secrets.REACT_APP_TELEGRAM_BOT_ID }}
-          REACT_APP_IFRAMELY_API_KEY: ${{ secrets.REACT_APP_IFRAMELY_API_KEY }}
-          REACT_APP_WEBSOCKETS_HOST: https://sockets.charmverse.io
-          REACT_APP_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.REACT_APP_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          REACT_APP_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.REACT_APP_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
-          REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
-          REACT_APP_GOOGLE_AUTH_DOMAIN: ${{ secrets.REACT_APP_GOOGLE_AUTH_DOMAIN }}
-          REACT_APP_GOOGLE_PROJECT_ID: ${{ secrets.REACT_APP_GOOGLE_PROJECT_ID }}
-          REACT_APP_GOOGLE_STORAGE_BUCKET: ${{ secrets.REACT_APP_GOOGLE_STORAGE_BUCKET }}
-          REACT_APP_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_GOOGLE_MESSAGING_SENDER_ID }}
-          REACT_APP_STRIPE_PUBLIC_KEY: ${{ secrets.REACT_APP_STRIPE_PUBLIC_KEY }}
-          REACT_APP_GOOGLE_APP_ID: ${{ secrets.REACT_APP_GOOGLE_APP_ID }}
-          REACT_APP_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.REACT_APP_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
-          REACT_APP_WALLETCONNECT_PROJECTID: ${{ secrets.REACT_APP_WALLETCONNECT_PROJECTID }}
-          REACT_APP_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+
       - name: Save dependency and build using another cache key to do one step restore in subsequent jobs
         id: update_cache_build
         uses: actions/cache/save@v3
@@ -177,8 +160,9 @@ jobs:
                     .IMGTAG = "${{ needs.build-docker-image.outputs.img_tag }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-      - name: Bundle Webapp beanstalk payload
+      - name: Add build_id and Bundle Webapp beanstalk payload
         run: |
+          echo "REACT_APP_BUILD_ID=${{ needs.build-test-env.outputs.build_id }}" >> ./.ebstalk.apps.env/webapp.env
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Bundle CronWorker beanstalk payload
