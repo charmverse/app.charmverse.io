@@ -74,7 +74,7 @@ export type VoteEntity = {
   title: string;
 };
 
-export type PageEntity = {
+export type DocumentEntity = {
   id: string;
   title: string;
   path: string;
@@ -114,8 +114,8 @@ export enum WebhookEventNames {
   ProposalMentionCreated = 'proposal.mention.created',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
-  PageMentionCreated = 'page.mention.created',
-  PageInlineCommentCreated = 'page.inline_comment.created',
+  DocumentMentionCreated = 'document.mention.created',
+  DocumentInlineCommentCreated = 'document.inline_comment.created',
   VoteCreated = 'vote.created'
 }
 
@@ -245,14 +245,14 @@ export type WebhookEvent = WebhookEventSharedProps &
       }
     | {
         user: UserEntity;
-        scope: WebhookEventNames.PageMentionCreated;
-        page: PageEntity;
+        scope: WebhookEventNames.DocumentMentionCreated;
+        document: DocumentEntity;
         mention: UserMentionMetadata;
       }
     | {
         user: UserEntity;
-        scope: WebhookEventNames.PageInlineCommentCreated;
-        page: PageEntity;
+        scope: WebhookEventNames.DocumentInlineCommentCreated;
+        document: DocumentEntity;
         inlineComment: InlineCommentEntity;
       }
     | {

@@ -4,7 +4,7 @@ import type { DiscussionNotification, NotificationsGroup } from './interfaces';
 import { notificationMetadataIncludeStatement, sortByDate } from './utils';
 
 export async function getDiscussionNotifications(userId: string): Promise<NotificationsGroup<DiscussionNotification>> {
-  const pageNotifications = await prisma.pageNotification.findMany({
+  const pageNotifications = await prisma.documentNotification.findMany({
     where: {
       notificationMetadata: {
         userId

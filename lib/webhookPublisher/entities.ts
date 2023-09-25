@@ -7,7 +7,7 @@ import type {
   BountyEntity,
   CommentEntity,
   InlineCommentEntity,
-  PageEntity,
+  DocumentEntity,
   PostEntity,
   ProposalEntity,
   SpaceEntity,
@@ -197,8 +197,8 @@ export async function getApplicationEntity(id: string): Promise<ApplicationEntit
   };
 }
 
-export async function getPageEntity(id: string): Promise<PageEntity> {
-  const page = await prisma.page.findFirstOrThrow({
+export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
+  const document = await prisma.page.findFirstOrThrow({
     where: {
       id
     },
@@ -211,13 +211,13 @@ export async function getPageEntity(id: string): Promise<PageEntity> {
     }
   });
 
-  const author = await getUserEntity(page.createdBy);
+  const author = await getUserEntity(document.createdBy);
 
   return {
     id,
-    title: page.title,
-    path: page.path,
-    type: page.type,
+    title: document.title,
+    path: document.path,
+    type: document.type,
     author
   };
 }

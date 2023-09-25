@@ -10,7 +10,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishBountyEvent, publishPageEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishBountyEvent, publishDocumentEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -76,18 +76,18 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
       spaceId: page.spaceId
     });
   } else {
-    await publishPageEvent({
-      pageId,
-      scope: WebhookEventNames.PageInlineCommentCreated,
+    await publishDocumentEvent({
+      documentId: pageId,
+      scope: WebhookEventNames.DocumentInlineCommentCreated,
       inlineCommentId: createdComment.id,
       spaceId: page.spaceId,
       userId
     });
   }
 
-  await publishPageEvent({
-    pageId,
-    scope: WebhookEventNames.PageInlineCommentCreated,
+  await publishDocumentEvent({
+    documentId: pageId,
+    scope: WebhookEventNames.DocumentInlineCommentCreated,
     inlineCommentId: createdComment.id,
     spaceId: page.spaceId,
     userId

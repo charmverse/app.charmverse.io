@@ -10,7 +10,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadCreate, ThreadWithComments } from 'lib/threads';
 import { createThread } from 'lib/threads';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishBountyEvent, publishPageEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishBountyEvent, publishDocumentEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -72,9 +72,9 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
       spaceId: page.spaceId
     });
   } else {
-    await publishPageEvent({
-      pageId,
-      scope: WebhookEventNames.PageInlineCommentCreated,
+    await publishDocumentEvent({
+      documentId: pageId,
+      scope: WebhookEventNames.DocumentInlineCommentCreated,
       inlineCommentId,
       spaceId: page.spaceId,
       userId

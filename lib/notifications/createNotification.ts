@@ -70,7 +70,7 @@ export async function createPostNotification({
   });
 }
 
-type CreatePageNotificationInput = {
+type CreateDocumentNotificationInput = {
   createdBy: string;
   pageId: string;
   spaceId: string;
@@ -81,7 +81,7 @@ type CreatePageNotificationInput = {
   type: DiscussionNotificationType;
 } & (InlineCommentNotification | MentionNotification);
 
-export async function createPageNotification({
+export async function createDocumentNotification({
   createdBy,
   commentId,
   mentionId,
@@ -90,9 +90,9 @@ export async function createPageNotification({
   spaceId,
   userId,
   type
-}: CreatePageNotificationInput) {
+}: CreateDocumentNotificationInput) {
   const notificationId = v4();
-  await prisma.pageNotification.create({
+  await prisma.documentNotification.create({
     data: {
       type,
       id: notificationId,

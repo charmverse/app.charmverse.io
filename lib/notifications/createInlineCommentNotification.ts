@@ -5,12 +5,12 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEventBody } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createBountyNotification, createPageNotification, createProposalNotification } from './createNotification';
+import { createBountyNotification, createDocumentNotification, createProposalNotification } from './createNotification';
 
 export async function createInlineCommentNotification(
   data: WebhookEventBody<
     | WebhookEventNames.BountyInlineCommentCreated
-    | WebhookEventNames.PageInlineCommentCreated
+    | WebhookEventNames.DocumentInlineCommentCreated
     | WebhookEventNames.ProposalInlineCommentCreated
   >
 ) {
@@ -86,11 +86,11 @@ export async function createInlineCommentNotification(
       }
       break;
     }
-    case WebhookEventNames.PageInlineCommentCreated: {
-      const authorId = data.page.author.id;
-      const pageId = data.page.id;
+    case WebhookEventNames.DocumentInlineCommentCreated: {
+      const authorId = data.document.author.id;
+      const pageId = data.document.id;
       if (inlineCommentAuthorId !== authorId) {
-        await createPageNotification({
+        await createDocumentNotification({
           type: 'inline_comment.created',
           createdBy: inlineCommentAuthorId,
           inlineCommentId,
@@ -101,7 +101,7 @@ export async function createInlineCommentNotification(
       }
 
       if (previousInlineComment && previousInlineComment?.id !== inlineCommentId) {
-        await createPageNotification({
+        await createDocumentNotification({
           type: 'inline_comment.replied',
           createdBy: inlineCommentAuthorId,
           inlineCommentId,
@@ -115,7 +115,7 @@ export async function createInlineCommentNotification(
       for (const extractedMention of extractedMentions) {
         const mentionedUserId = extractedMention.value;
         if (mentionedUserId !== inlineCommentAuthorId) {
-          await createPageNotification({
+          await createDocumentNotification({
             type: 'inline_comment.mention.created',
             createdBy: inlineCommentAuthorId,
             inlineCommentId,

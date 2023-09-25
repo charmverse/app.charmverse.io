@@ -11,7 +11,7 @@ import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPageEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishDocumentEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

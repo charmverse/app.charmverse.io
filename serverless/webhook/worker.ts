@@ -8,7 +8,7 @@ import { getPostCategoriesUsersRecord } from 'lib/forums/categories/getPostCateg
 import { createInlineCommentNotification } from 'lib/notifications/createInlineCommentNotification';
 import {
   createBountyNotification,
-  createPageNotification,
+  createDocumentNotification,
   createPostNotification,
   createProposalNotification,
   createVoteNotification
@@ -41,15 +41,15 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         const { webhookURL, signingSecret, ...webhookData } = JSON.parse(body) as WebhookPayload;
 
         switch (webhookData.event.scope) {
-          case WebhookEventNames.PageMentionCreated: {
+          case WebhookEventNames.DocumentMentionCreated: {
             const mentionedUserId = webhookData.event.mention.value;
             const mentionAuthorId = webhookData.event.user.id;
 
-            await createPageNotification({
+            await createDocumentNotification({
               type: 'mention.created',
               createdBy: mentionAuthorId,
               mentionId: webhookData.event.mention.id,
-              pageId: webhookData.event.page.id,
+              pageId: webhookData.event.document.id,
               spaceId: webhookData.spaceId,
               userId: mentionedUserId
             });
@@ -57,7 +57,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             break;
           }
 
-          case WebhookEventNames.PageInlineCommentCreated: {
+          case WebhookEventNames.DocumentInlineCommentCreated: {
             await createInlineCommentNotification(webhookData.event);
             break;
           }

@@ -10,7 +10,7 @@ import {
   getSpaceEntity,
   getPostEntity,
   getProposalEntity,
-  getPageEntity,
+  getDocumentEntity,
   getInlineCommentEntity,
   getVoteEntity,
   getApplicationEntity
@@ -304,43 +304,43 @@ export async function publishUserProposalEvent(context: ProposalUserEventContext
   });
 }
 
-type PageEventContext = (
+type DocumentEventContext = (
   | {
-      scope: WebhookEventNames.PageMentionCreated;
+      scope: WebhookEventNames.DocumentMentionCreated;
       mention: UserMentionMetadata;
     }
   | {
-      scope: WebhookEventNames.PageInlineCommentCreated;
+      scope: WebhookEventNames.DocumentInlineCommentCreated;
       inlineCommentId: string;
     }
 ) & {
   userId: string;
   spaceId: string;
-  pageId: string;
+  documentId: string;
 };
 
-export async function publishPageEvent(context: PageEventContext) {
-  const [space, page, user] = await Promise.all([
+export async function publishDocumentEvent(context: DocumentEventContext) {
+  const [space, document, user] = await Promise.all([
     getSpaceEntity(context.spaceId),
-    getPageEntity(context.pageId),
+    getDocumentEntity(context.documentId),
     getUserEntity(context.userId)
   ]);
 
   switch (context.scope) {
-    case WebhookEventNames.PageInlineCommentCreated: {
+    case WebhookEventNames.DocumentInlineCommentCreated: {
       const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
       return publishWebhookEvent(context.spaceId, {
-        scope: WebhookEventNames.PageInlineCommentCreated,
-        page,
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document,
         space,
         inlineComment,
         user
       });
     }
-    case WebhookEventNames.PageMentionCreated: {
+    case WebhookEventNames.DocumentMentionCreated: {
       return publishWebhookEvent(context.spaceId, {
-        scope: WebhookEventNames.PageMentionCreated,
-        page,
+        scope: WebhookEventNames.DocumentMentionCreated,
+        document,
         space,
         user,
         mention: context.mention
