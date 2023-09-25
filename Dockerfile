@@ -9,8 +9,10 @@ FROM node:18.15.0-slim AS BASE_APP
 WORKDIR /app
 
 # We should split out dependencies copying into separate layer
-COPY node_modules/ ./node_modules/
-COPY . .
+COPY package.json package-lock.json ./app/
+RUN npm ci --omit dev --no-audit --no-fund
+
+COPY .next/ ./.next/
 
 ENV PORT 3000
 
