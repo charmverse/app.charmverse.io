@@ -18,6 +18,13 @@ export type SpaceEntity = {
   url: string;
 };
 
+export type CardEntity = {
+  id: string;
+  title: string;
+  path: string;
+  author: UserEntity;
+};
+
 export type CommentEntity = {
   createdAt: string;
   id: string;
@@ -29,6 +36,12 @@ export type InlineCommentEntity = {
   createdAt: string;
   id: string;
   threadId: string;
+  author: UserEntity;
+};
+
+export type BlockCommentEntity = {
+  createdAt: string;
+  id: string;
   author: UserEntity;
 };
 
@@ -116,7 +129,11 @@ export enum WebhookEventNames {
   HelloWorld = 'hello.world',
   DocumentMentionCreated = 'document.mention.created',
   DocumentInlineCommentCreated = 'document.inline_comment.created',
-  VoteCreated = 'vote.created'
+  VoteCreated = 'vote.created',
+  CardMentionCreated = 'card.mention.created',
+  CardInlineCommentCreated = 'card.inline_comment.created',
+  CardBlockCommentCreated = 'card.block_comment.created',
+  CardPersonPropertyAssigned = 'card.person_property.assigned'
 }
 
 export const whiteListedWebhookEvents = [
@@ -279,6 +296,33 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.VoteCreated;
         vote: VoteEntity;
+      }
+    | {
+        scope: WebhookEventNames.CardBlockCommentCreated;
+        space: SpaceEntity;
+        card: CardEntity;
+        blockComment: BlockCommentEntity;
+      }
+    | {
+        scope: WebhookEventNames.CardInlineCommentCreated;
+        space: SpaceEntity;
+        card: CardEntity;
+        inlineComment: InlineCommentEntity;
+      }
+    | {
+        scope: WebhookEventNames.CardPersonPropertyAssigned;
+        space: SpaceEntity;
+        card: CardEntity;
+        assignedUser: UserEntity;
+        personPropertyId: string;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.CardMentionCreated;
+        space: SpaceEntity;
+        card: CardEntity;
+        user: UserEntity;
+        mention: UserMentionMetadata;
       }
   );
 

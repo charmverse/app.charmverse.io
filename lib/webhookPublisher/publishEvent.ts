@@ -8,12 +8,14 @@ import {
   getUserEntity,
   getCommentEntity,
   getSpaceEntity,
+  getCardEntity,
   getPostEntity,
   getProposalEntity,
   getDocumentEntity,
   getInlineCommentEntity,
   getVoteEntity,
-  getApplicationEntity
+  getApplicationEntity,
+  getBlockCommentEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -365,4 +367,83 @@ export async function publishVoteEvent(context: VoteEventContext) {
     space,
     vote
   });
+}
+
+type CardEventContext =
+  | {
+      scope: WebhookEventNames.CardBlockCommentCreated;
+      cardId: string;
+      spaceId: string;
+      blockCommentId: string;
+    }
+  | {
+      scope: WebhookEventNames.CardInlineCommentCreated;
+      cardId: string;
+      spaceId: string;
+      inlineCommentId: string;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.CardPersonPropertyAssigned;
+      cardId: string;
+      spaceId: string;
+      assignedUserId: string;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.CardMentionCreated;
+      cardId: string;
+      spaceId: string;
+      mention: UserMentionMetadata;
+      userId: string;
+    };
+
+export async function publishCardEvent(context: CardEventContext) {
+  const { scope } = context;
+  const [space, card] = await Promise.all([getSpaceEntity(context.spaceId), getCardEntity(context.cardId)]);
+
+  switch (scope) {
+    case WebhookEventNames.CardBlockCommentCreated: {
+      const blockComment = await getBlockCommentEntity(context.blockCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        blockComment
+      });
+    }
+    case WebhookEventNames.CardInlineCommentCreated: {
+      const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        inlineComment
+      });
+    }
+    case WebhookEventNames.CardPersonPropertyAssigned: {
+      const assignedUser = await getUserEntity(context.assignedUserId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        assignedUser,
+        personPropertyId: context.assignedUserId,
+        user: await getUserEntity(context.userId)
+      });
+    }
+    case WebhookEventNames.CardMentionCreated: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        mention: context.mention,
+        user
+      });
+    }
+    default: {
+      return null;
+    }
+  }
 }

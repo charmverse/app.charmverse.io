@@ -31,6 +31,9 @@ const createDiscussionTask = ({
 }): DiscussionNotification => {
   const id = v4();
   return {
+    blockCommentId: null,
+    pageType: 'page',
+    personPropertyId: null,
     mentionId: id,
     id,
     createdAt: new Date().toISOString(),

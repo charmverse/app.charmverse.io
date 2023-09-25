@@ -22,6 +22,21 @@ export type CommentNotification =
       commentId: string;
     };
 
+export type BlockCommentNotification =
+  | {
+      type: 'block_comment.created';
+      blockCommentId: string;
+    }
+  | {
+      type: 'block_comment.replied';
+      blockCommentId: string;
+    }
+  | {
+      type: 'block_comment.mention.created';
+      mentionId: string;
+      blockCommentId: string;
+    };
+
 export type InlineCommentNotification =
   | {
       type: 'inline_comment.created';
@@ -45,6 +60,7 @@ export type MentionNotification = {
 export type CommentNotificationType = CommentNotification['type'];
 export type InlineCommentNotificationType = InlineCommentNotification['type'];
 export type MentionNotificationType = MentionNotification['type'];
+export type BlockCommentNotificationType = BlockCommentNotification['type'];
 
 interface NotificationBase {
   id: string;
@@ -55,7 +71,12 @@ interface NotificationBase {
   createdBy: NotificationActor | null;
 }
 
-export type DiscussionNotificationType = InlineCommentNotificationType | MentionNotificationType;
+export type DiscussionNotificationType =
+  | InlineCommentNotificationType
+  | MentionNotificationType
+  | BlockCommentNotificationType
+  | 'person_assigned';
+
 interface DiscussionNotificationBase extends NotificationBase {
   pageId: string;
   pagePath: string;
@@ -64,9 +85,21 @@ interface DiscussionNotificationBase extends NotificationBase {
   text: string;
   mentionId: null | string;
   inlineCommentId: null | string;
+  blockCommentId: null | string;
+  pageType: PageType;
+  personPropertyId: null | string;
 }
 
-export type DiscussionNotification = DiscussionNotificationBase & (MentionNotification | InlineCommentNotification);
+export type DiscussionNotification = DiscussionNotificationBase &
+  (
+    | MentionNotification
+    | InlineCommentNotification
+    | BlockCommentNotification
+    | {
+        type: 'person_assigned';
+        personPropertyId: string;
+      }
+  );
 
 export type ForumNotificationType = CommentNotificationType | MentionNotificationType | 'created';
 

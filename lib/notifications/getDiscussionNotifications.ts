@@ -1,10 +1,11 @@
+import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscussionNotification, NotificationsGroup } from './interfaces';
 import { notificationMetadataIncludeStatement, sortByDate } from './utils';
 
 export async function getDiscussionNotifications(userId: string): Promise<NotificationsGroup<DiscussionNotification>> {
-  const pageNotifications = await prisma.documentNotification.findMany({
+  const documentNotifications = await prisma.documentNotification.findMany({
     where: {
       notificationMetadata: {
         userId
@@ -25,23 +26,48 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
     }
   });
 
+  const cardNotifications = await prisma.cardNotification.findMany({
+    where: {
+      notificationMetadata: {
+        userId
+      }
+    },
+    include: {
+      card: {
+        include: {
+          page: {
+            select: {
+              bountyId: true,
+              path: true,
+              type: true,
+              title: true
+            }
+          }
+        }
+      },
+      notificationMetadata: {
+        include: notificationMetadataIncludeStatement
+      }
+    }
+  });
+
   const discussionNotificationsGroup: NotificationsGroup<DiscussionNotification> = {
     marked: [],
     unmarked: []
   };
 
-  pageNotifications.forEach((notification) => {
+  [...documentNotifications, ...cardNotifications].forEach((notification) => {
     const notificationMetadata = notification.notificationMetadata;
-    const page = notification.page;
-    const discussionNotification = {
+    const page = ('card' in notification ? notification.card.page : notification.page) as Page;
+    const blockCommentId = 'card' in notification ? notification.blockCommentId : null;
+    const personPropertyId = 'card' in notification ? notification.personPropertyId : null;
+    const discussionNotification: DiscussionNotification = {
       id: notification.id,
-      bountyId: page.bountyId,
-      bountyTitle: page.title || 'Untitled',
       inlineCommentId: notification.inlineCommentId,
       mentionId: notification.mentionId,
       createdAt: notificationMetadata.createdAt.toISOString(),
       createdBy: notificationMetadata.user,
-      pageId: notification.pageId,
+      pageId: page.id,
       pagePath: page.path,
       pageTitle: page.title || 'Untitled',
       spaceDomain: notificationMetadata.space.domain,
@@ -49,8 +75,10 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
       spaceName: notificationMetadata.space.name,
       pageType: page.type,
       text: '',
-      type: notification.type
-    } as DiscussionNotification;
+      type: notification.type as any,
+      blockCommentId,
+      personPropertyId
+    };
 
     if (notification.notificationMetadata.seenAt) {
       discussionNotificationsGroup.marked.push(discussionNotification);

@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { Page } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
 
@@ -12,7 +13,9 @@ import type {
   ProposalEntity,
   SpaceEntity,
   UserEntity,
-  VoteEntity
+  VoteEntity,
+  BlockCommentEntity,
+  CardEntity
 } from './interfaces';
 
 export async function getBountyEntity(id: string): Promise<BountyEntity> {
@@ -136,6 +139,42 @@ export async function getSpaceEntity(id: string): Promise<SpaceEntity> {
     name: space.name,
     avatar: space.spaceImage ?? undefined,
     url: `${baseUrl}/${space.domain}`
+  };
+}
+
+export async function getCardEntity(id: string): Promise<CardEntity> {
+  const card = await prisma.block.findUniqueOrThrow({
+    where: {
+      id,
+      type: 'card'
+    },
+    include: {
+      page: true
+    }
+  });
+  return {
+    id,
+    title: card.page?.title ?? '',
+    path: (card.page as Page).path,
+    author: await getUserEntity(card.createdBy)
+  };
+}
+
+export async function getBlockCommentEntity(id: string): Promise<BlockCommentEntity> {
+  const blockComment = await prisma.block.findUniqueOrThrow({
+    where: {
+      id,
+      type: 'comment'
+    },
+    select: {
+      createdAt: true,
+      createdBy: true
+    }
+  });
+  return {
+    id,
+    createdAt: blockComment.createdAt.toISOString(),
+    author: await getUserEntity(blockComment.createdBy)
   };
 }
 

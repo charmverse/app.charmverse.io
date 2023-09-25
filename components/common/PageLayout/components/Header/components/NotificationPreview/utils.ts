@@ -2,11 +2,12 @@ import type { ProposalStatus } from '@charmverse/core/prisma';
 import { NotificationType } from '@charmverse/core/prisma';
 
 import type {
+  BlockCommentNotificationType,
   BountyNotification,
-  CommentNotification,
+  CommentNotificationType,
   DiscussionNotification,
   ForumNotification,
-  InlineCommentNotification,
+  InlineCommentNotificationType,
   NotificationActor,
   NotificationGroupType,
   ProposalNotification,
@@ -18,22 +19,29 @@ function getCommentTypeNotificationContent({
   createdBy,
   title
 }: {
-  notificationType: InlineCommentNotification['type'] | CommentNotification['type'] | 'mention.created';
+  notificationType:
+    | InlineCommentNotificationType
+    | CommentNotificationType
+    | 'mention.created'
+    | BlockCommentNotificationType;
   title: string;
   createdBy: NotificationActor | null;
 }) {
   switch (notificationType) {
     case 'inline_comment.created':
+    case 'block_comment.created':
     case 'comment.created': {
       return createdBy?.username ? `${createdBy?.username} left a comment in ${title}.` : `New comment in ${title}.`;
     }
     case 'inline_comment.replied':
+    case 'block_comment.replied':
     case 'comment.replied': {
       return createdBy?.username
         ? `${createdBy?.username} replied to your comment in ${title}.`
         : `New reply to your comment in ${title}.`;
     }
     case 'inline_comment.mention.created':
+    case 'block_comment.mention.created':
     case 'comment.mention.created':
     case 'mention.created': {
       return createdBy?.username
@@ -98,6 +106,11 @@ function getDiscussionContent(n: DiscussionNotification) {
       return createdBy?.username
         ? `${createdBy?.username} mentioned you in ${pageTitle}.`
         : `You were mentioned in ${pageTitle}.`;
+    }
+    case 'person_assigned': {
+      return createdBy?.username
+        ? `${createdBy?.username} assigned you to ${pageTitle}.`
+        : `You were assigned to ${pageTitle}.`;
     }
     default: {
       return getCommentTypeNotificationContent({
@@ -205,15 +218,11 @@ function getProposalContent(n: ProposalNotification) {
   const { type, createdBy, pageTitle: title } = n;
 
   switch (type) {
+    case 'start_review':
     case 'start_discussion': {
       return createdBy?.username
         ? `${createdBy?.username} seeking feedback for ${title}.`
         : `Feedback requested for ${title}.`;
-    }
-    case 'start_review': {
-      return createdBy?.username
-        ? `${createdBy?.username} seeking review for ${title}.`
-        : `Review requested for ${title}.`;
     }
     case 'reviewed': {
       return `Review completed for ${title}`;

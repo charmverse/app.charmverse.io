@@ -1,7 +1,7 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationsGroup, ProposalNotification, ProposalNotificationType } from 'lib/notifications/interfaces';
+import type { NotificationsGroup, ProposalNotification } from 'lib/notifications/interfaces';
 import { notificationMetadataIncludeStatement, sortByDate } from 'lib/notifications/utils';
 
 export async function getProposalNotifications(userId: string): Promise<NotificationsGroup<ProposalNotification>> {

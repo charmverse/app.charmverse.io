@@ -2,6 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type {
+  BlockCommentNotification,
+  BlockCommentNotificationType,
   BountyNotificationType,
   CommentNotification,
   CommentNotificationType,
@@ -78,7 +80,6 @@ type CreateDocumentNotificationInput = {
   commentId?: string;
   mentionId?: string;
   inlineCommentId?: string;
-  type: DiscussionNotificationType;
 } & (InlineCommentNotification | MentionNotification);
 
 export async function createDocumentNotification({
@@ -179,6 +180,65 @@ export async function createProposalNotification({
           id: proposalId
         }
       }
+    }
+  });
+}
+
+export type CreateCardNotificationInput = {
+  type: BlockCommentNotificationType | InlineCommentNotificationType | MentionNotificationType | 'person_assigned';
+  cardId: string;
+  createdBy: string;
+  spaceId: string;
+  userId: string;
+  blockCommentId?: string;
+  mentionId?: string;
+  inlineCommentId?: string;
+  personPropertyId?: string;
+} & (
+  | BlockCommentNotification
+  | InlineCommentNotification
+  | MentionNotification
+  | {
+      type: 'person_assigned';
+      personPropertyId: string;
+    }
+);
+
+export async function createCardNotification({
+  type,
+  personPropertyId,
+  createdBy,
+  spaceId,
+  userId,
+  blockCommentId,
+  inlineCommentId,
+  mentionId,
+  cardId
+}: CreateCardNotificationInput) {
+  const notificationId = v4();
+  await prisma.cardNotification.create({
+    data: {
+      type,
+      id: notificationId,
+      notificationMetadata: {
+        create: {
+          id: notificationId,
+          createdBy,
+          spaceId,
+          userId
+        }
+      },
+      blockComment: blockCommentId
+        ? {
+            connect: {
+              id: blockCommentId
+            }
+          }
+        : undefined,
+      inlineComment: inlineCommentId ? { connect: { id: inlineCommentId } } : undefined,
+      mentionId,
+      card: { connect: { id: cardId } },
+      personPropertyId
     }
   });
 }

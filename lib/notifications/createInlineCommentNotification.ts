@@ -5,13 +5,19 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEventBody } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createBountyNotification, createDocumentNotification, createProposalNotification } from './createNotification';
+import {
+  createBountyNotification,
+  createCardNotification,
+  createDocumentNotification,
+  createProposalNotification
+} from './createNotification';
 
 export async function createInlineCommentNotification(
   data: WebhookEventBody<
     | WebhookEventNames.BountyInlineCommentCreated
     | WebhookEventNames.DocumentInlineCommentCreated
     | WebhookEventNames.ProposalInlineCommentCreated
+    | WebhookEventNames.CardInlineCommentCreated
   >
 ) {
   const spaceId = data.space.id;
@@ -86,6 +92,7 @@ export async function createInlineCommentNotification(
       }
       break;
     }
+
     case WebhookEventNames.DocumentInlineCommentCreated: {
       const authorId = data.document.author.id;
       const pageId = data.document.id;
@@ -165,6 +172,50 @@ export async function createInlineCommentNotification(
             inlineCommentId,
             mentionId: extractedMention.id,
             proposalId,
+            spaceId,
+            userId: mentionedUserId
+          });
+        }
+      }
+      break;
+    }
+
+    case WebhookEventNames.CardInlineCommentCreated: {
+      const authorId = data.card.author.id;
+      const cardId = data.card.id;
+      const extractedMentions = extractMentions(inlineCommentContent);
+
+      if (inlineCommentAuthorId !== authorId) {
+        await createCardNotification({
+          type: 'inline_comment.created',
+          createdBy: inlineCommentAuthorId,
+          inlineCommentId,
+          cardId,
+          spaceId,
+          userId: authorId
+        });
+      }
+
+      if (previousInlineComment && previousInlineComment?.id !== inlineCommentId) {
+        await createCardNotification({
+          type: 'inline_comment.replied',
+          createdBy: inlineCommentAuthorId,
+          inlineCommentId,
+          cardId,
+          spaceId,
+          userId: previousInlineComment.userId
+        });
+      }
+
+      for (const extractedMention of extractedMentions) {
+        const mentionedUserId = extractedMention.value;
+        if (mentionedUserId !== inlineCommentAuthorId) {
+          await createCardNotification({
+            type: 'inline_comment.mention.created',
+            createdBy: inlineCommentAuthorId,
+            inlineCommentId,
+            mentionId: extractedMention.id,
+            cardId,
             spaceId,
             userId: mentionedUserId
           });
