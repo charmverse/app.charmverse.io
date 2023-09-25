@@ -364,7 +364,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -393,7 +393,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -500,7 +500,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -529,7 +529,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1038,7 +1038,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -1067,7 +1067,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1168,7 +1168,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -1197,7 +1197,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1703,7 +1703,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -1732,7 +1732,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1839,7 +1839,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -1868,7 +1868,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -2377,7 +2377,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -2406,7 +2406,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -2507,7 +2507,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
@@ -2536,7 +2536,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-rm7u2m-MuiStack-root"
+                    class=" css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>

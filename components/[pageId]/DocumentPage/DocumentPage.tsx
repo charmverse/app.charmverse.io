@@ -10,8 +10,16 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
+import { getCardComments, hasLoadedCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
+import {
+  blockLoad,
+  commentsLoad,
+  databaseViewsLoad
+} from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
+import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
@@ -90,6 +98,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+  const blocksDispatch = useAppDispatch();
 
   const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
     bountyId: page.bountyId
@@ -100,7 +109,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const proposalId = page.proposalId;
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
-
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
   // keep a ref in sync for printing
@@ -113,15 +121,25 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     }
   }, [printRef, _printRef]);
 
+  const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
+
+  const hasLoadedCardCommentsForCurrentCard = useAppSelector(hasLoadedCardComments(page.cardId ?? page.id));
+
+  const cannotComment = readOnly || !pagePermissions.comment;
+
   const card = useAppSelector((state) => {
-    if (page.cardId) {
-      return state.cards.cards[page.cardId] ?? state.cards.templates[page.cardId] ?? null;
+    if (page?.type !== 'card') {
+      return null;
     }
-    return null;
+    return state.cards.cards[page.id] ?? state.cards.templates[page.id];
   });
 
   const board = useAppSelector((state) => {
-    return card ? state.boards.boards[card.parentId] : null;
+    if (!card) {
+      return null;
+    }
+
+    return state.boards.boards[card.parentId];
   });
 
   const cards = useAppSelector((state) => {
@@ -138,6 +156,19 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
     }
     return [];
   });
+
+  useEffect(() => {
+    if (page?.type === 'card') {
+      if (!card) {
+        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+        blocksDispatch(blockLoad({ blockId: page.id }));
+        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+      }
+      if (!hasLoadedCardCommentsForCurrentCard) {
+        blocksDispatch(commentsLoad({ pageId: page.id }));
+      }
+    }
+  }, [page.id]);
 
   const activeView = boardViews[0];
 
@@ -170,7 +201,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
       setConnectionError(null);
     }
   }
-
   // reset error whenever page id changes
   useEffect(() => {
     setConnectionError(null);
@@ -273,50 +303,56 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       />
                     </Box>
                   )}
-                  <div className='focalboard-body font-family-default'>
-                    <div className='CardDetail content'>
-                      {/* Property list */}
-                      {card && board && (
-                        <>
-                          <CardDetailProperties
-                            syncWithPageId={page.syncWithPageId}
-                            board={board}
-                            card={card}
-                            cards={cards}
-                            activeView={activeView}
-                            views={boardViews}
-                            readOnly={readOnly}
-                            pageUpdatedAt={page.updatedAt.toString()}
-                            pageUpdatedBy={page.updatedBy}
-                          />
-                          <AddBountyButton readOnly={readOnly} cardId={page.id} />
-                        </>
-                      )}
-                      {proposalId && (
-                        <ProposalProperties
-                          pageId={page.id}
-                          proposalId={proposalId}
-                          pagePermissions={pagePermissions}
-                          snapshotProposalId={page.snapshotProposalId}
-                          refreshPagePermissions={refreshPage}
-                          readOnly={readonlyProposalProperties}
-                          isTemplate={page.type === 'proposal_template'}
-                          title={page.title}
-                          proposalPage={page}
-                        />
-                      )}
-                      {(draftBounty || page.bountyId) && (
-                        <BountyProperties
-                          bountyId={page.bountyId}
-                          pageId={page.id}
-                          pagePath={page.path}
+                  <CardPropertiesWrapper>
+                    {/* Property list */}
+                    {card && board && (
+                      <>
+                        <CardDetailProperties
+                          syncWithPageId={page.syncWithPageId}
+                          board={board}
+                          card={card}
+                          cards={cards}
+                          activeView={activeView}
+                          views={boardViews}
                           readOnly={readOnly}
-                          permissions={bountyPermissions || null}
-                          refreshBountyPermissions={() => refreshBountyPermissions()}
+                          pageUpdatedAt={page.updatedAt.toString()}
+                          pageUpdatedBy={page.updatedBy}
                         />
-                      )}
-                    </div>
-                  </div>
+                        <AddBountyButton readOnly={readOnly} cardId={page.id} />
+                      </>
+                    )}
+                    {proposalId && (
+                      <ProposalProperties
+                        pageId={page.id}
+                        proposalId={proposalId}
+                        pagePermissions={pagePermissions}
+                        snapshotProposalId={page.snapshotProposalId}
+                        refreshPagePermissions={refreshPage}
+                        readOnly={readonlyProposalProperties}
+                        isTemplate={page.type === 'proposal_template'}
+                        title={page.title}
+                        proposalPage={page}
+                      />
+                    )}
+                    {(draftBounty || page.bountyId) && (
+                      <BountyProperties
+                        bountyId={page.bountyId}
+                        pageId={page.id}
+                        pagePath={page.path}
+                        readOnly={readOnly}
+                        permissions={bountyPermissions || null}
+                        refreshBountyPermissions={() => refreshBountyPermissions()}
+                      />
+                    )}
+                    {(page.type === 'card' || page.type === 'card_synced') && (
+                      <CommentsList
+                        comments={comments}
+                        rootId={card?.rootId ?? page.id}
+                        cardId={card?.id ?? page.id}
+                        readOnly={cannotComment}
+                      />
+                    )}
+                  </CardPropertiesWrapper>
                 </CharmEditor>
 
                 {page.type === 'proposal' && (

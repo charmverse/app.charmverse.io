@@ -1,4 +1,4 @@
-import type { MediaSetFragment, ProfileFragment } from '@lens-protocol/client';
+import type { ProfilePictureSetFragment, ProfileFragment } from '@lens-protocol/client';
 import LanguageIcon from '@mui/icons-material/Language';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Divider, Link, Stack, Typography } from '@mui/material';
@@ -39,7 +39,7 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
           <Avatar
             size='large'
             name={lensProfile.name ?? ''}
-            avatar={(lensProfile.picture as MediaSetFragment)?.original?.url}
+            avatar={(lensProfile.picture as ProfilePictureSetFragment)?.original?.url}
             variant='circular'
           />
           <Stack>
