@@ -7,6 +7,7 @@ import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { publishInlineCommentEvent } from 'lib/notifications/publishInlineCommentEvent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -39,7 +40,7 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
 
   const page = await prisma.page.findUnique({
     where: { id: pageId },
-    select: { spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true }
+    select: { spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true, cardId: true, id: true }
   });
 
   if (!page) {
@@ -61,35 +62,9 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     content
   });
 
-  if (page.type === 'bounty' && page.bountyId) {
-    await publishBountyEvent({
-      bountyId: page.bountyId,
-      scope: WebhookEventNames.BountyInlineCommentCreated,
-      inlineCommentId: createdComment.id,
-      spaceId: page.spaceId
-    });
-  } else if (page.type === 'proposal' && page.proposalId) {
-    await publishProposalEvent({
-      proposalId: page.proposalId,
-      scope: WebhookEventNames.ProposalInlineCommentCreated,
-      inlineCommentId: createdComment.id,
-      spaceId: page.spaceId
-    });
-  } else {
-    await publishDocumentEvent({
-      documentId: pageId,
-      scope: WebhookEventNames.DocumentInlineCommentCreated,
-      inlineCommentId: createdComment.id,
-      spaceId: page.spaceId,
-      userId
-    });
-  }
-
-  await publishDocumentEvent({
-    documentId: pageId,
-    scope: WebhookEventNames.DocumentInlineCommentCreated,
+  await publishInlineCommentEvent({
     inlineCommentId: createdComment.id,
-    spaceId: page.spaceId,
+    page,
     userId
   });
 

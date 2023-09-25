@@ -5,12 +5,18 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { publishInlineCommentEvent } from 'lib/notifications/publishInlineCommentEvent';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadCreate, ThreadWithComments } from 'lib/threads';
 import { createThread } from 'lib/threads';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishBountyEvent, publishDocumentEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import {
+  publishBountyEvent,
+  publishCardEvent,
+  publishDocumentEvent,
+  publishProposalEvent
+} from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,7 +38,7 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
 
   const page = await prisma.page.findUnique({
     where: { id: pageId },
-    select: { spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true }
+    select: { id: true, spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true, cardId: true }
   });
 
   if (!page) {
@@ -57,29 +63,11 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
 
   const inlineCommentId = newThread.comments[0].id;
 
-  if (page.type === 'bounty' && page.bountyId) {
-    await publishBountyEvent({
-      bountyId: page.bountyId,
-      scope: WebhookEventNames.BountyInlineCommentCreated,
-      inlineCommentId,
-      spaceId: page.spaceId
-    });
-  } else if (page.type === 'proposal' && page.proposalId) {
-    await publishProposalEvent({
-      proposalId: page.proposalId,
-      scope: WebhookEventNames.ProposalInlineCommentCreated,
-      inlineCommentId,
-      spaceId: page.spaceId
-    });
-  } else {
-    await publishDocumentEvent({
-      documentId: pageId,
-      scope: WebhookEventNames.DocumentInlineCommentCreated,
-      inlineCommentId,
-      spaceId: page.spaceId,
-      userId
-    });
-  }
+  await publishInlineCommentEvent({
+    inlineCommentId,
+    page,
+    userId
+  });
 
   trackUserAction('page_comment_created', {
     pageId,
