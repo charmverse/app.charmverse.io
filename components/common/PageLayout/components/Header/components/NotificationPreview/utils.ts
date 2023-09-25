@@ -65,17 +65,30 @@ function getForumContent(n: ForumNotification) {
 }
 
 export function getForumNotificationPreviewItems(notifications: ForumNotification[]) {
-  return notifications.map((n) => ({
-    id: n.id,
-    createdAt: n.createdAt,
-    createdBy: n.createdBy,
-    spaceName: n.spaceName,
-    groupType: 'forum' as NotificationGroupType,
-    type: NotificationType.forum,
-    href: `/${n.spaceDomain}/forum/post/${n.postPath}`,
-    content: getForumContent(n),
-    title: 'Forum Post'
-  }));
+  return notifications.map((n) => {
+    const type = n.type;
+    const urlSearchParams = new URLSearchParams();
+    if (type === 'comment.created' || type === 'comment.replied') {
+      urlSearchParams.set('commentId', n.commentId);
+    } else if (type === 'mention.created') {
+      urlSearchParams.set('mentionId', n.mentionId);
+    } else if (type === 'comment.mention.created') {
+      urlSearchParams.set('commentId', n.commentId);
+      urlSearchParams.set('mentionId', n.mentionId);
+    }
+
+    return {
+      id: n.id,
+      createdAt: n.createdAt,
+      createdBy: n.createdBy,
+      spaceName: n.spaceName,
+      groupType: 'forum' as NotificationGroupType,
+      type: NotificationType.forum,
+      href: `/${n.spaceDomain}/forum/post/${n.postPath}${urlSearchParams.size ? `?${urlSearchParams.toString()}` : ''}`,
+      content: getForumContent(n),
+      title: 'Forum Post'
+    };
+  });
 }
 
 function getDiscussionContent(n: DiscussionNotification) {
@@ -97,17 +110,29 @@ function getDiscussionContent(n: DiscussionNotification) {
 }
 
 export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
-  return notifications.map((n) => ({
-    id: n.id,
-    createdAt: n.createdAt,
-    createdBy: n.createdBy,
-    spaceName: n.spaceName,
-    groupType: 'discussions' as NotificationGroupType,
-    type: NotificationType.mention,
-    href: `/${n.spaceDomain}/${'pagePath' in n && n.pagePath}?mentionId=${n.mentionId}`,
-    content: getDiscussionContent(n),
-    title: 'Discussion'
-  }));
+  return notifications.map((n) => {
+    const type = n.type;
+    const urlSearchParams = new URLSearchParams();
+    if (type === 'inline_comment.created' || type === 'inline_comment.replied') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+    } else if (type === 'mention.created') {
+      urlSearchParams.set('mentionId', n.mentionId);
+    } else if (type === 'inline_comment.mention.created') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+      urlSearchParams.set('mentionId', n.mentionId);
+    }
+    return {
+      id: n.id,
+      createdAt: n.createdAt,
+      createdBy: n.createdBy,
+      spaceName: n.spaceName,
+      groupType: 'discussions' as NotificationGroupType,
+      type: NotificationType.mention,
+      href: `/${n.spaceDomain}/${n.pagePath}${urlSearchParams.size ? `?${urlSearchParams.toString()}` : ''}`,
+      content: getDiscussionContent(n),
+      title: 'Discussion'
+    };
+  });
 }
 
 function getBountyContent(n: BountyNotification) {
@@ -151,17 +176,29 @@ function getBountyContent(n: BountyNotification) {
 }
 
 export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]) {
-  return notifications.map((n) => ({
-    id: n.id,
-    createdAt: n.createdAt,
-    createdBy: n.createdBy,
-    spaceName: n.spaceName,
-    groupType: 'bounties' as NotificationGroupType,
-    type: NotificationType.bounty,
-    href: `/${n.spaceDomain}/${n.pagePath}`,
-    content: getBountyContent(n),
-    title: 'Bounty'
-  }));
+  return notifications.map((n) => {
+    const type = n.type;
+    const urlSearchParams = new URLSearchParams();
+    if (type === 'inline_comment.created' || type === 'inline_comment.replied') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+    } else if (type === 'mention.created') {
+      urlSearchParams.set('mentionId', n.mentionId);
+    } else if (type === 'inline_comment.mention.created') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+      urlSearchParams.set('mentionId', n.mentionId);
+    }
+    return {
+      id: n.id,
+      createdAt: n.createdAt,
+      createdBy: n.createdBy,
+      spaceName: n.spaceName,
+      groupType: 'bounties' as NotificationGroupType,
+      type: NotificationType.bounty,
+      href: `/${n.spaceDomain}/${n.pagePath}${urlSearchParams.size ? `?${urlSearchParams.toString()}` : ''}`,
+      content: getBountyContent(n),
+      title: 'Bounty'
+    };
+  });
 }
 
 function getProposalContent(n: ProposalNotification) {
@@ -219,17 +256,35 @@ function getProposalNotificationStatus(status: ProposalStatus) {
 }
 
 export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[]) {
-  return notifications.map((n) => ({
-    id: n.id,
-    createdAt: n.createdAt,
-    createdBy: n.createdBy || null,
-    spaceName: n.spaceName,
-    groupType: 'proposals' as NotificationGroupType,
-    type: NotificationType.proposal,
-    href: `/${n.spaceDomain}/${n.pagePath}`,
-    content: getProposalContent(n),
-    title: `Proposal: ${getProposalNotificationStatus(n.status)}`
-  }));
+  return notifications.map((n) => {
+    const type = n.type;
+    const urlSearchParams = new URLSearchParams();
+    if (type === 'inline_comment.created' || type === 'inline_comment.replied') {
+      urlSearchParams.set('inlineCommentId', n.inlineCommentId);
+    } else if (type === 'mention.created') {
+      urlSearchParams.set('mentionId', n.mentionId);
+    } else if (type === 'inline_comment.mention.created') {
+      urlSearchParams.set('inlineCommentId', n.inlineCommentId);
+      urlSearchParams.set('mentionId', n.mentionId);
+    } else if (type === 'comment.created' || type === 'comment.replied') {
+      urlSearchParams.set('commentId', n.commentId);
+    } else if (type === 'comment.mention.created') {
+      urlSearchParams.set('commentId', n.commentId);
+      urlSearchParams.set('mentionId', n.mentionId);
+    }
+
+    return {
+      id: n.id,
+      createdAt: n.createdAt,
+      createdBy: n.createdBy || null,
+      spaceName: n.spaceName,
+      groupType: 'proposals' as NotificationGroupType,
+      type: NotificationType.proposal,
+      href: `/${n.spaceDomain}/${n.pagePath}${urlSearchParams.size ? `?${urlSearchParams.toString()}` : ''}`,
+      content: getProposalContent(n),
+      title: `Proposal: ${getProposalNotificationStatus(n.status)}`
+    };
+  });
 }
 
 export function getVoteNotificationPreviewItems(notifications: VoteNotification[]) {

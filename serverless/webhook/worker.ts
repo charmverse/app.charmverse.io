@@ -50,7 +50,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         });
 
         if (webhookMessage) {
-          log.debug('Webhook message already processed', { webhookEventId });
+          log.debug('Webhook message already processed', { webhookEventId, spaceId: webhookData.spaceId });
           return;
         }
 
