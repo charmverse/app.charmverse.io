@@ -9,6 +9,7 @@ FROM node:18.15.0-slim AS BASE_APP
 WORKDIR /app
 
 # We should split out dependencies copying into separate layer
+COPY node_modules/ ./node_modules/
 COPY . .
 
 ENV PORT 3000
