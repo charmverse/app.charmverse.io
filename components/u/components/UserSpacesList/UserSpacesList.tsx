@@ -1,5 +1,4 @@
 import { Box, Stack } from '@mui/material';
-import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
@@ -9,7 +8,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { MemberPropertiesForm } from 'components/common/UserProfile/components/MemberPropertiesForm';
 import { useMemberPropertyValues } from 'components/common/UserProfile/hooks/useMemberPropertyValues';
 import { UserProfileDialog } from 'components/common/UserProfile/UserProfileDialog';
-import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { CommunityDetails } from 'lib/profile/interfaces';

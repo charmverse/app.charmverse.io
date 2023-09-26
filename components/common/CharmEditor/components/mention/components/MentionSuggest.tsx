@@ -54,8 +54,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
             (member) =>
               filterByUserCustomName(member, searchText) ||
               filterByDiscordName(member, searchText) ||
-              filterByUsername(member, searchText) ||
-              filterByPath(member, searchText)
+              filterByUsername(member, searchText)
           )
         : members,
     [members, searchText, searchText]
@@ -185,10 +184,6 @@ function filterByDiscordName(member: Member, searchText: string) {
 
 function filterByUsername(member: Member, searchText: string) {
   return member.username.toLowerCase().match(searchText);
-}
-
-function filterByPath(member: Member, searchText: string) {
-  return member.path?.toLowerCase().match(searchText);
 }
 
 export default memo(MentionSuggest);
