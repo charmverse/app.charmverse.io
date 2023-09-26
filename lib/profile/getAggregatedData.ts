@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { combineCommunityData } from './combineCommunityData';
-import { getCommunities } from './getCommunities';
+import { getUserSpaces } from './getUserSpaces';
 import type { CommunityDetails, DeepDaoProfile, ProfileVoteEvent, ProfileBountyEvent } from './interfaces';
 
 export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes'> & {
@@ -10,7 +10,7 @@ export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'tot
 };
 
 export async function getAggregatedData(userId: string): Promise<AggregatedProfileData> {
-  const charmverseCommunities = await getCommunities({
+  const charmverseCommunities = await getUserSpaces({
     userId
   });
 

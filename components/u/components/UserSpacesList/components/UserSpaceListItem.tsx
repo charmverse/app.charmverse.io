@@ -4,7 +4,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import Avatar from 'components/common/Avatar';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { MemberProperties } from 'components/common/UserProfile/components/MemberProperties';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
@@ -13,7 +12,6 @@ import { isTouchScreen } from 'lib/utilities/browser';
 type Props = {
   spaceName: string;
   properties: PropertyValueWithDetails[];
-  spaceImage: string | null;
   readOnly?: boolean;
   onEdit: VoidFunction;
   expanded?: boolean;
@@ -26,7 +24,6 @@ const StyledAccordionSummary = styled(AccordionSummary)`
 export function UserSpaceListItem({
   spaceName,
   properties,
-  spaceImage,
   readOnly,
   onEdit,
   expanded: defaultExpanded = false
@@ -53,7 +50,6 @@ export function UserSpaceListItem({
       }}
     >
       <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Avatar className='hidden-on-visible' avatar={spaceImage} name={spaceName} variant='rounded' size='large' />
         <Box
           display='flex'
           flex='0 1 auto'

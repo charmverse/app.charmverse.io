@@ -4,7 +4,7 @@ import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 
 import type { UserCommunity } from './interfaces';
 
-export async function getCommunities({ userId }: { userId: string }): Promise<UserCommunity[]> {
+export async function getUserSpaces({ userId }: { userId: string }): Promise<UserCommunity[]> {
   const [userWorkspaces] = await Promise.all([getSpacesOfUser(userId)]);
 
   const hiddenItems = (
