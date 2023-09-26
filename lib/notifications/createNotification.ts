@@ -7,7 +7,6 @@ import type {
   BountyNotificationType,
   CommentNotification,
   CommentNotificationType,
-  DiscussionNotificationType,
   ForumNotificationType,
   InlineCommentNotification,
   InlineCommentNotificationType,
@@ -109,7 +108,7 @@ export async function createDocumentNotification({
       inlineComment: inlineCommentId
         ? {
             connect: {
-              id: commentId
+              id: inlineCommentId
             }
           }
         : undefined,

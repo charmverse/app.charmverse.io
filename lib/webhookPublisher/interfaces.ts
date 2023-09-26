@@ -4,7 +4,7 @@ import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
 export type UserEntity = {
   id: string;
-  avatar?: string;
+  avatar?: string | null;
   discordId?: string;
   walletAddress?: string;
   googleEmail?: string;

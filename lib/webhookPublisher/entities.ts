@@ -41,17 +41,28 @@ export async function getBountyEntity(id: string): Promise<BountyEntity> {
   };
 }
 
-export async function getCommentEntity(id: string): Promise<CommentEntity> {
-  const comment = await prisma.postComment.findUniqueOrThrow({
-    where: {
-      id
-    },
-    select: {
-      createdAt: true,
-      createdBy: true,
-      parentId: true
-    }
-  });
+export async function getCommentEntity(id: string, isPostComment?: boolean): Promise<CommentEntity> {
+  const comment = isPostComment
+    ? await prisma.postComment.findUniqueOrThrow({
+        where: {
+          id
+        },
+        select: {
+          createdAt: true,
+          createdBy: true,
+          parentId: true
+        }
+      })
+    : await prisma.pageComment.findUniqueOrThrow({
+        where: {
+          id
+        },
+        select: {
+          createdAt: true,
+          createdBy: true,
+          parentId: true
+        }
+      });
   const author = await getUserEntity(comment.createdBy);
   return {
     id,

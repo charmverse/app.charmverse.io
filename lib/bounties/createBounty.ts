@@ -164,14 +164,6 @@ export async function createBounty({
           bountyId
         }
       })
-      // prisma.pagePermission.createMany({
-      //   data: bountyPagePermissionSet.map(p => {
-      //     return {
-      //       ...p,
-      //       pageId: linkedPageId
-      //     };
-      //   })
-      // })
     ]);
   }
 

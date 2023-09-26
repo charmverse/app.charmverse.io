@@ -33,7 +33,8 @@ export async function updateProposalStatus({
     },
     select: {
       spaceId: true,
-      archived: true
+      archived: true,
+      status: true
     }
   });
 

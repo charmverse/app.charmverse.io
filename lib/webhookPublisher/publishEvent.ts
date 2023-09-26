@@ -44,7 +44,7 @@ type CommentEventContext = {
 export async function publishPostCommentEvent(context: CommentEventContext) {
   const [post, comment, space] = await Promise.all([
     getPostEntity(context.postId),
-    getCommentEntity(context.commentId),
+    getCommentEntity(context.commentId, true),
     getSpaceEntity(context.spaceId)
   ]);
   return publishWebhookEvent(context.spaceId, {
@@ -66,7 +66,7 @@ type CommentVoteEventContext = {
 export async function publishPostCommentVoteEvent(context: CommentVoteEventContext) {
   const [post, comment, space, voter] = await Promise.all([
     getPostEntity(context.postId),
-    getCommentEntity(context.commentId),
+    getCommentEntity(context.commentId, true),
     getSpaceEntity(context.spaceId),
     getUserEntity(context.voterId)
   ]);
