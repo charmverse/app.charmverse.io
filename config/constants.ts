@@ -1,8 +1,8 @@
 import env from '@beam-australia/react-env';
 
 // Note: NODE_ENV can only be 'development' or 'production' according to Next.js, but we don't want to mix them with test env
-export const isTestEnv = (env('APP_ENV') ?? process.env.NODE_ENV) === 'test';
-export const isStagingEnv = (env('APP_ENV') ?? process.env.APP_ENV) === 'staging';
+export const isTestEnv = (env('APP_ENV') ?? process.env.REACT_APP_APP_ENV ?? process.env.NODE_ENV) === 'test';
+export const isStagingEnv = (env('APP_ENV') ?? process.env.REACT_APP_APP_ENV) === 'staging';
 export const isDevEnv = process.env.NODE_ENV === 'development' && !isTestEnv && !isStagingEnv;
 export const isProdEnv = process.env.NODE_ENV === 'production' && !isTestEnv && !isStagingEnv;
 export const isNodeEnv = typeof window === 'undefined';
