@@ -9,9 +9,9 @@ import { memberProfileLabels, memberProfileNames } from 'lib/profile/memberProfi
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
 
 type MappedFeatures = Record<
-  Feature,
+  Feature | 'rewards',
   {
-    id: Feature;
+    id: Feature | 'rewards';
     isHidden: boolean;
     title: string;
     path: StaticPagesType;

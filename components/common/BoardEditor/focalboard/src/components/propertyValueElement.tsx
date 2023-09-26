@@ -9,15 +9,18 @@ import { useIntl } from 'react-intl';
 
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
+import { RewardStatusChip } from 'components/rewards/components/RewardChip';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
 import { TextInput } from '../../../components/properties/TextInput';
@@ -94,6 +97,7 @@ function PropertyValueElement(props: Props) {
       dateTime: formatDateTime
     }
   });
+
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
@@ -140,7 +144,9 @@ function PropertyValueElement(props: Props) {
 
   let propertyValueElement: ReactNode = null;
 
-  if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === STATUS_BLOCK_ID) {
+  if (propertyTemplate.type === 'rewardStatus') {
+    return <RewardStatusChip status={propertyValue as RewardStatus} />;
+  } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === STATUS_BLOCK_ID) {
     // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
     // We should migrate over the proposals as datasource blocks to the same format as proposals table
     return (
@@ -152,6 +158,8 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
+  } else if (propertyTemplate.type === 'rewardReviewers') {
+    return <UserAndRoleSelect readOnly onChange={() => null} value={propertyValue as any} />;
   } else if (
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
