@@ -1,4 +1,3 @@
-import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
@@ -151,7 +150,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
-    if (!isOldBuild && data.buildId !== env('REACT_APP_BUILD_ID')) {
+    if (!isOldBuild && data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
       setIsOldBuild(true);
       log.info('Requested user to refresh their browser to get new version');
     }

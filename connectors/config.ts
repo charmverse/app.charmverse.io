@@ -1,4 +1,3 @@
-import env from '@beam-australia/react-env';
 import { RPCList } from 'connectors/index';
 import type { Address } from 'viem';
 import { createPublicClient, custom, createWalletClient, http } from 'viem';
@@ -9,8 +8,8 @@ import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MockConnector } from 'wagmi/connectors/mock';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
 import { publicProvider } from 'wagmi/providers/public';
-
 import 'viem/window';
+
 import { isTestEnv } from 'config/constants';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -38,7 +37,7 @@ export const coinbaseWalletConnector = new CoinbaseWalletConnector({
 export const walletConnectConnector = new WalletConnectConnector({
   chains,
   options: {
-    projectId: env('WALLETCONNECT_PROJECTID')
+    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECTID as string
   }
 });
 

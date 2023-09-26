@@ -28,7 +28,7 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          REACT_APP_APP_ENV: 'test'
+          NEXT_PUBLIC_APP_ENV: 'test'
 
   integration-test:
     name: Tests
@@ -118,7 +118,7 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
         with:
-          REACT_APP_APP_ENV: 'test'
+          NEXT_PUBLIC_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
