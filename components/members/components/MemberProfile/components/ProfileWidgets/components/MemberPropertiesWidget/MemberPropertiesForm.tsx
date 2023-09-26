@@ -12,10 +12,10 @@ import type {
   UpdateMemberPropertyValuePayload
 } from 'lib/members/interfaces';
 
-import { useMemberCollections } from '../../../hooks/useMemberCollections';
-import { useMutateMemberPropertyValues } from '../../../hooks/useMutateMemberPropertyValues';
-import { NftsList } from '../../NftsList';
-import { PoapsList } from '../../PoapsList';
+import { useMemberCollections } from '../../../../../../hooks/useMemberCollections';
+import { useMutateMemberPropertyValues } from '../../../../../../hooks/useMutateMemberPropertyValues';
+import { NftsList } from '../CollectionWidget/NftsList';
+import { PoapsList } from '../CollectionWidget/PoapsList';
 
 type Props = {
   properties?: PropertyValueWithDetails[];

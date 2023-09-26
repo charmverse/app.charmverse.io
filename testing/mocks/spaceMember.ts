@@ -1,5 +1,4 @@
-import type { Social } from 'components/u/interfaces';
-import type { Member } from 'lib/members/interfaces';
+import type { Social, Member } from 'lib/members/interfaces';
 
 import { createMockUser } from './user';
 

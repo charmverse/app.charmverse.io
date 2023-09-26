@@ -5,13 +5,11 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import Avatar from 'components/settings/space/components/LargeAvatar';
-import type { PublicUserFields } from 'components/u/components/UserDetails/utils';
 import { useUser } from 'hooks/useUser';
+import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
-import type { Social } from '../../interfaces';
-
-import { SocialIcons } from './SocialIcons';
+import { SocialIcons } from '../../SocialIcons';
 
 type UserFields = {
   id: string;
@@ -19,7 +17,7 @@ type UserFields = {
   avatar?: string | null;
   username: string;
   profile?: any;
-} & PublicUserFields;
+};
 
 type UserDetailsMiniProps = {
   user: UserFields;

@@ -7,9 +7,8 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import FieldLabel from 'components/common/form/FieldLabel';
+import type { Social } from 'lib/members/interfaces';
 import debounce from 'lib/utilities/debounce';
-
-import type { Social } from '../interfaces';
 
 export const schema = yup.object({
   twitterURL: yup

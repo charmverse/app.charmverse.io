@@ -25,7 +25,7 @@ import { NotificationsProvider } from 'components/common/PageLayout/components/H
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
+import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';

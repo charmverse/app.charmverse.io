@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
@@ -6,26 +7,50 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
+import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
+import { ProfileWidgets } from 'components/members/components/MemberProfile/components/ProfileWidgets/ProfileWidgets';
+import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
 import Legend from 'components/settings/Legend';
-import type { EditableFields } from 'components/u/components/UserDetails/UserDetailsForm';
-import { UserDetailsForm } from 'components/u/components/UserDetails/UserDetailsForm';
+import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
+import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
-import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
-import { UserProfileDialog } from '../UserProfileDialog';
+import { useOnboarding } from '../hooks/useOnboarding';
 
 import { OnboardingEmailForm } from './OnboardingEmailForm';
-import { MemberPropertiesForm } from './ProfileWidgets/MemberPropertiesWidget/MemberPropertiesForm';
-import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
 type Step = 'email_step' | 'profile_step';
 
-export function CurrentUserProfile({
+export function UserOnboardingDialogGlobal() {
+  const { space } = useCurrentSpace();
+  const { user } = useUser();
+  const { showOnboardingFlow, completeOnboarding } = useOnboarding({ user, spaceId: space?.id });
+
+  // Wait for user to load before deciding what to show
+  if (!user) {
+    return null;
+  }
+  // Show member profile for onboarding
+  if (showOnboardingFlow) {
+    log.info('[user-journey] Show onboarding flow');
+    return (
+      <div data-test='member-onboarding-form'>
+        <UserOnboardingDialog key={user.id} isOnboarding currentUser={user} onClose={completeOnboarding} />
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function UserOnboardingDialog({
   currentUser,
   onClose,
   isOnboarding = false
@@ -116,7 +141,7 @@ export function CurrentUserProfile({
   }
 
   return (
-    <UserProfileDialog fluidSize={currentStep === 'email_step'} onClose={handleClose} title={title}>
+    <DialogContainer fluidSize={currentStep === 'email_step'} onClose={handleClose} title={title}>
       {currentStep === 'email_step' ? (
         <OnboardingEmailForm onClick={goNextStep} />
       ) : currentStep === 'profile_step' ? (
@@ -157,6 +182,6 @@ export function CurrentUserProfile({
           />
         </>
       ) : null}
-    </UserProfileDialog>
+    </DialogContainer>
   );
 }
