@@ -26,7 +26,7 @@ export default function useDatadogLogger() {
         forwardErrorsToLogs: true,
         sessionSampleRate: 100,
         env: appEnv,
-        version: env('REACT_APP_BUILD_ID')
+        version: env('BUILD_ID')
       });
     }
   }, []);

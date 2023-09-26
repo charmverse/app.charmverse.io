@@ -15,25 +15,25 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { useIdentityTypes } from 'components/settings/account/components/useIdentityTypes';
+import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import type { LoggedInUser } from 'models';
 
-import type { Social } from '../../interfaces';
-import { IdentityIcon } from '../IdentityIcon';
-import IdentityModal from '../IdentityModal';
-import { SocialInputs } from '../SocialInputs';
-import { TimezoneAutocomplete } from '../TimezoneAutocomplete';
-import UserDescription from '../UserDescription';
+import { useUpdateProfileAvatar } from '../hooks/useUpdateProfileAvatar';
+import { useUserDetails } from '../hooks/useUserDetails';
 
-import { useUpdateProfileAvatar } from './hooks/useUpdateProfileAvatar';
-import { useUserDetails } from './hooks/useUserDetails';
+import { IdentityIcon } from './IdentityIcon';
+import IdentityModal from './IdentityModal';
+import { SocialInputs } from './SocialInputs';
+import { TimezoneAutocomplete } from './TimezoneAutocomplete';
+import UserDescription from './UserDescription';
 
 export type EditableFields = Partial<Omit<UserDetailsType, 'id'>>;
 

@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import Avatar from 'components/common/Avatar';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { MemberProperties } from 'components/common/UserProfile/components/ProfileWidgets/MemberPropertiesWidget/MemberProperties';
+import { MemberProperties } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberProperties';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import type {

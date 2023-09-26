@@ -5,10 +5,10 @@ import { useUser } from 'hooks/useUser';
 import type { NFTData } from 'lib/blockchain/getNFTs';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 
-import { NftsList } from '../NftsList';
-import { PoapsList } from '../PoapsList';
+import { ProfileWidget } from '../ProfileWidget';
 
-import { ProfileWidget } from './ProfileWidget';
+import { NftsList } from './NftsList';
+import { PoapsList } from './PoapsList';
 
 export function CollectionWidget({
   userId,

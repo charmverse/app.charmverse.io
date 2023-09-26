@@ -5,7 +5,7 @@ import { mutate } from 'swr';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
-import { UserProfileDialogGlobal } from 'components/common/UserProfile/UserProfileDialogGlobal';
+import { MemberProfileDialogGlobal } from 'components/members/components/MemberProfileDialogGlobal';
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -14,6 +14,7 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
+import { UserOnboardingDialogGlobal } from './components/UserOnboardingDialog';
 import useDatadogLogger from './hooks/useDatadogLogger';
 
 export function GlobalComponents() {
@@ -76,7 +77,8 @@ export function GlobalComponents() {
   return (
     <>
       <HexagonalAvatarMask id='hexagon-avatar' />
-      <UserProfileDialogGlobal />
+      <MemberProfileDialogGlobal />
+      <UserOnboardingDialogGlobal />
       <Snackbar />
     </>
   );

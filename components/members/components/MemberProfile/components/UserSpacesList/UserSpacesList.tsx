@@ -3,9 +3,10 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useMemberPropertyValues } from 'components/common/UserProfile/hooks/useMemberPropertyValues';
 import { useUser } from 'hooks/useUser';
 import type { CommunityDetails } from 'lib/profile/interfaces';
+
+import { useMemberPropertyValues } from '../../../../hooks/useMemberPropertyValues';
 
 import { UserSpacesListItem } from './components/UserSpacesListItem';
 

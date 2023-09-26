@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
+import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -31,7 +31,7 @@ const StyledTypography = styled(Typography)`
 `;
 
 export default function Mention({ node }: NodeViewProps) {
-  const { showUserProfile } = useUserProfile();
+  const { showUserId } = useMemberDialog();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { getMemberById } = useMembers();
   const { pages } = usePages();
@@ -59,7 +59,7 @@ export default function Mention({ node }: NodeViewProps) {
     value = (
       <MentionContainer color='secondary'>
         <Typography
-          onClick={() => member?.id && showUserProfile(member.id)}
+          onClick={() => member?.id && showUserId(member.id)}
           component='span'
           color='secondary'
           sx={{ cursor: 'pointer' }}

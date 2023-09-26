@@ -1,14 +1,16 @@
 import styled from '@emotion/styled';
 import { Edit as EditIcon } from '@mui/icons-material';
-import { Box, useMediaQuery } from '@mui/material';
+import { Box, Stack, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
-import { PublicProfile } from 'components/u/PublicProfile';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { Member } from 'lib/members/interfaces';
+
+import { ProfileTabs } from './components/ProfileTabs';
+import { UserDetailsReadonly } from './components/UserDetailsReadonly';
 
 const ContentContainer = styled(Container)`
   width: 100%;
@@ -63,7 +65,10 @@ export function MemberProfile({
       }
     >
       <ContentContainer top={20}>
-        <PublicProfile user={member} readOnly />
+        <Stack spacing={2}>
+          <UserDetailsReadonly user={member} />
+          <ProfileTabs user={member} readOnly />
+        </Stack>
       </ContentContainer>
     </Dialog>
   );

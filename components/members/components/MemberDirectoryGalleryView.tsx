@@ -8,15 +8,14 @@ import Avatar from 'components/common/Avatar';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
-import { SocialIcons } from 'components/u/components/UserDetails/SocialIcons';
-import type { Social } from 'components/u/interfaces';
+import { SocialIcons } from 'components/members/components/SocialIcons';
+import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
+import type { Social, Member } from 'lib/members/interfaces';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -51,14 +50,14 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
-  const { showUserProfile } = useUserProfile();
+  const { showUserId } = useMemberDialog();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
   function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
-    showUserProfile(member.id);
+    showUserId(member.id);
   }
 
   function onClickEdit(e: MouseEvent<HTMLElement>) {
