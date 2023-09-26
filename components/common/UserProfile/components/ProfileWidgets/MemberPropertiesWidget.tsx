@@ -1,5 +1,6 @@
 import type { MemberPropertyType } from '@charmverse/core/prisma-client';
 
+import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
@@ -52,7 +53,10 @@ export function MemberPropertiesWidget({
     );
 
   return (
-    <ProfileWidget title='CharmVerse Details'>
+    <ProfileWidget
+      avatar={space && <WorkspaceAvatar name={space?.name} image={space?.spaceImage} size='small' />}
+      title={space ? `${space?.name} Profile` : ' '}
+    >
       <MemberProperties properties={currentSpacePropertyNonEmptyValues} />
     </ProfileWidget>
   );

@@ -6,11 +6,13 @@ import Link from 'components/common/Link';
 export function ProfileWidget({
   title,
   children,
+  avatar,
   avatarSrc,
   link,
   avatarVariant = 'rounded'
 }: {
   avatarVariant?: 'rounded' | 'square';
+  avatar?: React.ReactNode;
   avatarSrc?: string;
   title: string;
   children: React.ReactNode;
@@ -20,6 +22,7 @@ export function ProfileWidget({
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Stack direction='row' justifyContent='space-between' alignItems='center' px={2} pt={1}>
         <Stack spacing={1} direction='row' alignItems='center'>
+          {avatar}
           {avatarSrc && <Avatar variant={avatarVariant} src={avatarSrc} sx={{ width: 24, height: 24 }} />}
           <Typography variant='h6' fontWeight={700}>
             {title}
