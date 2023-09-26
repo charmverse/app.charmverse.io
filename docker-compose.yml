@@ -85,6 +85,13 @@ services:
       - NEXT_PUBLIC_APP_ENV=staging
     profiles:
       - stg-sockets
+
+  stg-sockets-sidecar:
+    extends:
+      service: stg-sockets
+    ports:
+      - '3002:3000'
+    profiles:
       - stg-webapp
 
   devapp:
