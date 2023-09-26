@@ -6,7 +6,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import type { ReactNode } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { IdentityIcon } from 'components/u/components/IdentityIcon';
+import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 
 interface IdentityProviderItemProps extends ListItemProps {
   text?: string;

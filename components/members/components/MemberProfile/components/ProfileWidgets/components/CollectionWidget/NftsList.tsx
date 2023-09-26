@@ -8,9 +8,10 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
 import type { NFTData } from 'lib/blockchain/getNFTs';
 
+import { updateProfileItem } from '../../../../utils';
+import { NonPinnedItem, ProfileItemContainer } from '../../../ProfileItemContainer';
+
 import { NftAvatarGalleryPopup } from './NftAvatarGallery/NftAvatarGalleryPopup';
-import { NonPinnedItem, ProfileItemContainer } from './ProfileItemContainer';
-import { updateProfileItem } from './utils';
 
 const totalShownNfts = 5;
 

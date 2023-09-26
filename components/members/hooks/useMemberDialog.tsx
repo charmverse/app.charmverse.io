@@ -3,19 +3,17 @@ import { createContext, useContext, useMemo, useState } from 'react';
 
 interface Context {
   memberId: string | null;
-  setMemberId: Dispatch<SetStateAction<string | null>>;
-  showUserProfile: (memberId: string) => void;
+  showUserId: (memberId: string) => void;
   hideUserProfile: VoidFunction;
 }
 
 const ContextElement = createContext<Readonly<Context>>({
   memberId: null,
-  setMemberId: () => {},
-  showUserProfile: () => {},
+  showUserId: () => {},
   hideUserProfile: () => {}
 });
 
-export const useUserProfile = () => useContext(ContextElement);
+export const useMemberDialog = () => useContext(ContextElement);
 
 export function UserProfileProvider({ children }: { children: ReactNode }) {
   const [memberId, setMemberId] = useState<string | null>(null);
@@ -24,15 +22,14 @@ export function UserProfileProvider({ children }: { children: ReactNode }) {
     setMemberId(null);
   }
 
-  function showUserProfile(newUserProfileId: string) {
+  function showUserId(newUserProfileId: string) {
     setMemberId(newUserProfileId);
   }
 
   const value = useMemo(
     () => ({
       memberId,
-      setMemberId,
-      showUserProfile,
+      showUserId,
       hideUserProfile
     }),
     [memberId]

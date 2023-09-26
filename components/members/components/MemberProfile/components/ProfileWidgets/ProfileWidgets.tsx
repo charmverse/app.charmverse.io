@@ -6,14 +6,14 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 
-import { useMemberCollections } from '../../hooks/useMemberCollections';
-import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
+import { useMemberCollections } from '../../../../hooks/useMemberCollections';
+import { useMemberPropertyValues } from '../../../../hooks/useMemberPropertyValues';
 
-import { CollectionWidget } from './CollectionWidget';
-import { EnsWidget } from './EnsWidget';
-import { LensProfileWidget } from './LensProfileWidget';
-import { MemberPropertiesWidget } from './MemberPropertiesWidget/MemberPropertiesWidget';
-import { SummonProfileWidget } from './SummonProfileWidget';
+import { CollectionWidget } from './components/CollectionWidget/CollectionWidget';
+import { EnsWidget } from './components/EnsWidget';
+import { LensProfileWidget } from './components/LensProfileWidget';
+import { MemberPropertiesWidget } from './components/MemberPropertiesWidget/MemberPropertiesWidget';
+import { SummonProfileWidget } from './components/SummonProfileWidget';
 
 export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?: boolean }) {
   const { space } = useCurrentSpace();
