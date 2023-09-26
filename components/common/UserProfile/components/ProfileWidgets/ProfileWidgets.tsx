@@ -53,7 +53,7 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
   const readOnlyMemberProperties = !space || !canEditSpaceProfile(space.id);
 
   if (isLoading) {
-    return <LoadingComponent isLoading />;
+    return <LoadingComponent isLoading minHeight={300} />;
   }
 
   return (
