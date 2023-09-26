@@ -1,5 +1,10 @@
 import type { RewardBlock } from '@charmverse/core/prisma-client';
 
+import type { Card, CardPropertyValue } from 'lib/focalboard/card';
+import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+
+import type { ApplicationMeta } from '../interfaces';
+
 export type RewardPropertyOption = { id: string; color: string; value: string };
 
 export type RewardPropertyField = { id: string; name: string; type: string; options: RewardPropertyOption[] };
@@ -31,7 +36,7 @@ export type RewardBlockUpdateInput = RewardBlockInput & {
   id: string;
 };
 
-export type RewardPropertyValue = string | string[] | number;
+export type RewardPropertyValue = CardPropertyValue | ApplicationMeta[] | TargetPermissionGroup<'user' | 'role'>[];
 
 export type RewardPropertiesField = Record<string, RewardPropertyValue>;
 
@@ -40,3 +45,5 @@ export type RewardPropertyValues = { properties: RewardPropertiesField };
 export type RewardFields = RewardPropertyValues;
 
 export type RewardFieldsProp = { fields: RewardFields };
+
+export type RewardCard = Card<RewardPropertyValue>;
