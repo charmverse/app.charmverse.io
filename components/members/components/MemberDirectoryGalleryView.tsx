@@ -14,6 +14,7 @@ import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 
@@ -35,6 +36,7 @@ const StyledBox = styled(Box)`
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { getDisplayProperties } = useMemberProperties();
   const { formatDate } = useDateFormatter();
+  const { onClick: openSettings } = useSettingsDialog();
   const visibleProperties = getDisplayProperties('gallery');
   const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;
@@ -59,12 +61,17 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
     showUserProfile(member.id);
   }
 
+  function onClickEdit(e: MouseEvent<HTMLElement>) {
+    e.stopPropagation();
+    openSettings('profile');
+  }
+
   const social = (member.profile?.social as Social) ?? {};
   const content = (
     <Card sx={{ width: '100%' }}>
       {isUserCard && (
         <Tooltip title='Edit my member profile'>
-          <IconButton size='small' className='icons'>
+          <IconButton size='small' className='icons' onClick={onClickEdit}>
             <EditIcon fontSize='small' />
           </IconButton>
         </Tooltip>

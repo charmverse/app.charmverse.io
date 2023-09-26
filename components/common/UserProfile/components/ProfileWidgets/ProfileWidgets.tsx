@@ -15,7 +15,7 @@ import { LensProfileWidget } from './LensProfileWidget';
 import { MemberPropertiesWidget } from './MemberPropertiesWidget';
 import { SummonProfileWidget } from './SummonProfileWidget';
 
-export function ProfileWidgets({ userId }: { userId: string }) {
+export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?: boolean }) {
   const { space } = useCurrentSpace();
   const { memberPropertyValues = [], isLoading: isLoadingMemberPropertiesValues } = useMemberPropertyValues(userId);
   const { memberProfiles } = useFeaturesAndMembers();
@@ -70,7 +70,13 @@ export function ProfileWidgets({ userId }: { userId: string }) {
                 !hideCollections &&
                 (!nftsError || !poapsError) && (
                   <Grid item xs={12} md={6} alignItems='stretch' key={id}>
-                    <CollectionWidget mutateNfts={mutateNfts} nfts={nfts} poaps={poaps} userId={userId} />
+                    <CollectionWidget
+                      mutateNfts={mutateNfts}
+                      nfts={nfts}
+                      poaps={poaps}
+                      userId={userId}
+                      readOnly={readOnly}
+                    />
                   </Grid>
                 )
               );
