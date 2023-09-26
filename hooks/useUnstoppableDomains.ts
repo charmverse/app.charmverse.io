@@ -1,4 +1,3 @@
-import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { useState, useEffect } from 'react';
 
@@ -13,7 +12,7 @@ import type { UdomainsPopupLoginState } from 'lib/oauth/interfaces';
 import { getAppUrl } from 'lib/utilities/browser';
 import { DisabledAccountError, BrowserPopupError } from 'lib/utilities/errors';
 
-const clientID = env('UNSTOPPABLE_DOMAINS_CLIENT_ID');
+const clientID = process.env.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID as string;
 
 const UDOMAINS_AUTH_URL = '/authenticate/udomains';
 
