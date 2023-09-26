@@ -23,12 +23,13 @@ export function PublicProfile(props: { user: Member | PublicUser | LoggedInUser;
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         tabs={[
-          ['Profile', <ProfileWidgets key='profile' userId={props.user.id} />],
+          ['Profile', <ProfileWidgets key='profile' userId={props.user.id} />, { sx: { px: 0 } }],
           [
             'Organizations',
             <Stack key='organizations'>
               <UserSpacesList userId={props.user.id} />
-            </Stack>
+            </Stack>,
+            { sx: { px: 0 } }
           ]
         ]}
       />
