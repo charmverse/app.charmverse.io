@@ -32,7 +32,7 @@ export async function duplicatePage({
     parentId,
     updateTitle: true,
     includePermissions: true,
-    resetAdditionalPaths: true
+    resetPaths: true
   });
 
   if (rootPageIds.length > 1) {

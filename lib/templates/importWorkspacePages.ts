@@ -26,7 +26,7 @@ type WorkspaceImportOptions = {
   parentId?: string | null;
   updateTitle?: boolean;
   includePermissions?: boolean;
-  resetAdditionalPaths?: boolean;
+  resetPaths?: boolean;
 };
 
 type UpdateRefs = {
@@ -119,7 +119,7 @@ export async function generateImportWorkspacePages({
   parentId: rootParentId,
   updateTitle,
   includePermissions,
-  resetAdditionalPaths
+  resetPaths
 }: WorkspaceImportOptions): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
@@ -295,13 +295,13 @@ export async function generateImportWorkspacePages({
       }
     };
 
-    if (resetAdditionalPaths && newPageContent.data.additionalPaths) {
+    if (newPageContent.data.additionalPaths) {
       const additionalPath = generatePagePathFromPathAndTitle({
         existingPagePath: newPageContent.data.path,
         title: newPageContent.data.title as string
       });
 
-      newPageContent.data.additionalPaths = [additionalPath];
+      newPageContent.data.additionalPaths = resetPaths ? [additionalPath] : [];
     }
 
     if (node.type.match('card')) {
@@ -481,7 +481,7 @@ export async function importWorkspacePages({
   parentId,
   updateTitle,
   includePermissions,
-  resetAdditionalPaths
+  resetPaths
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
@@ -500,7 +500,7 @@ export async function importWorkspacePages({
     parentId,
     updateTitle,
     includePermissions,
-    resetAdditionalPaths
+    resetPaths
   });
 
   const pagesToCreate = pageArgs.length;
