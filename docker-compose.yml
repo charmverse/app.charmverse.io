@@ -88,9 +88,12 @@ services:
 
   stg-sockets-sidecar:
     extends:
-      service: stg-sockets
+      service: defaults
+    command: ['sh', '-c', 'node ./.next/server/websockets.js']
     ports:
       - '3002:3000'
+    environment:
+      - NEXT_PUBLIC_APP_ENV=staging
     profiles:
       - stg-webapp
 
