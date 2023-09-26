@@ -36,7 +36,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           REACT_APP_APP_ENV: 'staging'
-          REACT_APP_WEBSOCKETS_HOST: 'https://${{ env.STAGE }}.charmverse.co:3002'
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -64,6 +63,9 @@ jobs:
           done
 
           rm .ebextensions*/06_cloudwatch_alarm.config
+
+          # substituting the websocket domain name
+          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env 
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
