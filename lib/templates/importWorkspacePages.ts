@@ -11,7 +11,7 @@ import { v4, validate } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPagePath } from 'lib/pages/utils';
+import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
@@ -26,6 +26,7 @@ type WorkspaceImportOptions = {
   parentId?: string | null;
   updateTitle?: boolean;
   includePermissions?: boolean;
+  resetAdditionalPaths?: boolean;
 };
 
 type UpdateRefs = {
@@ -117,7 +118,8 @@ export async function generateImportWorkspacePages({
   exportName,
   parentId: rootParentId,
   updateTitle,
-  includePermissions
+  includePermissions,
+  resetAdditionalPaths
 }: WorkspaceImportOptions): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
@@ -292,6 +294,15 @@ export async function generateImportWorkspacePages({
         }
       }
     };
+
+    if (resetAdditionalPaths) {
+      const additionalPath = generatePagePathFromPathAndTitle({
+        existingPagePath: newPageContent.data.path,
+        title: newPageContent.data.title as string
+      });
+
+      newPageContent.data.additionalPaths = [additionalPath];
+    }
 
     if (node.type.match('card')) {
       const cardBlock = node.blocks?.card;
@@ -469,7 +480,8 @@ export async function importWorkspacePages({
   exportName,
   parentId,
   updateTitle,
-  includePermissions
+  includePermissions,
+  resetAdditionalPaths
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
@@ -487,7 +499,8 @@ export async function importWorkspacePages({
     exportName,
     parentId,
     updateTitle,
-    includePermissions
+    includePermissions,
+    resetAdditionalPaths
   });
 
   const pagesToCreate = pageArgs.length;
