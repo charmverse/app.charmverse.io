@@ -9,7 +9,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.get(getBuildId);
 
 async function getBuildId(req: NextApiRequest, res: NextApiResponse) {
-  return res.status(200).json({ buildId: process.env.NEXT_PUBLIC_BUILD_ID });
+  return res.status(200).json({ buildId: process.env.REACT_APP_BUILD_ID });
 }
 
 export default withSessionRoute(handler);
