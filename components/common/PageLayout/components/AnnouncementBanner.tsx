@@ -53,6 +53,7 @@ export function AnnouncementBanner({
               onClick={onActionClick}
               variant='outlined'
               external
+              target='_blank'
             >
               {actionLabel}
             </Button>
