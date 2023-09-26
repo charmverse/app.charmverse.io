@@ -7,6 +7,7 @@ import type { MouseEvent } from 'react';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSubdomainPath } from 'lib/utilities/browser';
+import { isExternalUrl } from 'lib/utilities/isExternalUrl';
 
 const hoverStyle: { [key: string]: string } = {
   blue: 'color: #111',
@@ -51,7 +52,9 @@ export default function Link({ external, href, onClick, children, color = 'prima
     );
   }
 
-  return external ? (
+  const isExternal = external || isExternalUrl(href);
+
+  return isExternal ? (
     <StyledMuiLink href={href} color={color} onClick={onClick} rel='noreferrer' underline='none' {...restProps}>
       {children}
     </StyledMuiLink>
