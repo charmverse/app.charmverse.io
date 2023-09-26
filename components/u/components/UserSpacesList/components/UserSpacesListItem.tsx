@@ -76,6 +76,7 @@ export function UserSpacesListItem({
   const hasVotes = space.votes.length > 0;
   const hasProposals = space.proposals.length > 0;
   const hasBounties = space.bounties.length > 0;
+  const showTabs = hasVotes || hasProposals || hasBounties;
   const isCollapsible = hasVotes || hasProposals || hasBounties || properties.length > 0;
   const defaultTab = hasVotes ? 0 : hasProposals ? 1 : hasBounties ? 2 : null;
   const { formatDate } = useDateFormatter();
@@ -177,22 +178,26 @@ export function UserSpacesListItem({
       <Collapse in={!isCollapsed}>
         <Box className='hidden-on-visible'>
           <MemberProperties properties={properties} />
-          <Tabs
-            sx={{
-              mb: 2
-            }}
-            indicatorColor='primary'
-            value={currentTab}
-          >
-            {hasVotes && <TaskTab task={TASK_TABS[0]} value={0} onClick={() => setCurrentTab(0)} />}
-            {hasProposals && <TaskTab task={TASK_TABS[1]} value={1} onClick={() => setCurrentTab(1)} />}
-            {hasBounties && <TaskTab task={TASK_TABS[2]} value={2} onClick={() => setCurrentTab(2)} />}
-          </Tabs>
-          <Stack gap={2}>
-            {currentTab === 0 && <VotesPanel events={space.votes} />}
-            {currentTab === 1 && <ProposalsPanel events={space.proposals} />}
-            {currentTab === 2 && <BountyEventsPanel events={space.bounties} />}
-          </Stack>
+          {showTabs && (
+            <>
+              <Tabs
+                sx={{
+                  mb: 2
+                }}
+                indicatorColor='primary'
+                value={currentTab}
+              >
+                {hasVotes && <TaskTab task={TASK_TABS[0]} value={0} onClick={() => setCurrentTab(0)} />}
+                {hasProposals && <TaskTab task={TASK_TABS[1]} value={1} onClick={() => setCurrentTab(1)} />}
+                {hasBounties && <TaskTab task={TASK_TABS[2]} value={2} onClick={() => setCurrentTab(2)} />}
+              </Tabs>
+              <Stack gap={2}>
+                {currentTab === 0 && <VotesPanel events={space.votes} />}
+                {currentTab === 1 && <ProposalsPanel events={space.proposals} />}
+                {currentTab === 2 && <BountyEventsPanel events={space.bounties} />}
+              </Stack>
+            </>
+          )}
         </Box>
       </Collapse>
     </ProfileItemContainer>
