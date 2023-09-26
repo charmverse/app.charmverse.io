@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import Avatar from 'components/common/Avatar';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { MemberProperties } from 'components/common/UserProfile/components/MemberProperties';
+import { MemberProperties } from 'components/common/UserProfile/components/ProfileWidgets/MemberPropertiesWidget/MemberProperties';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 import type {
@@ -62,7 +62,6 @@ type UserSpacesListItemProps = {
   visible: boolean;
   properties: PropertyValueWithDetails[];
   onClick: () => void;
-  onEdit?: () => void;
 };
 
 export function UserSpacesListItem({
@@ -70,8 +69,7 @@ export function UserSpacesListItem({
   properties,
   showVisibilityIcon,
   visible,
-  onClick,
-  onEdit
+  onClick
 }: UserSpacesListItemProps) {
   const hasVotes = space.votes.length > 0;
   const hasProposals = space.proposals.length > 0;
@@ -121,19 +119,6 @@ export function UserSpacesListItem({
               >
                 {space.name}
               </Typography>
-              {onEdit && (
-                <IconButton
-                  className='icons'
-                  sx={{ mx: 1, opacity: isTouchScreen() ? (!isCollapsed ? 1 : 0) : 'inherit' }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onEdit();
-                  }}
-                >
-                  <EditIcon fontSize='small' />
-                </IconButton>
-              )}
             </Box>
             {space.joinDate && (
               <Typography variant='subtitle2'>
