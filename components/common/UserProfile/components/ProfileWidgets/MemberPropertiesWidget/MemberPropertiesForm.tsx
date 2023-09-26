@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type {
   MemberPropertyValueType,
@@ -31,6 +32,7 @@ export function MemberPropertiesForm({
   refreshPropertyValues,
   showCollectionOptions
 }: Props) {
+  const { membersRecord } = useMembers();
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
   const {
     control,
@@ -67,7 +69,7 @@ export function MemberPropertiesForm({
 
   function getPlaceholder(type: string) {
     if (type === 'name') {
-      return user?.username;
+      return membersRecord[userId]?.username;
     }
     return undefined;
   }
