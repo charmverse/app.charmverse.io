@@ -23,7 +23,7 @@ export function PublicProfile(props: { user: Member | PublicUser | LoggedInUser;
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         tabs={[
-          ['Profile', <ProfileWidgets key='profile' userId={props.user.id} />, { sx: { px: 0 } }],
+          ['Profile', <ProfileWidgets key='profile' readOnly={readOnly} userId={props.user.id} />, { sx: { px: 0 } }],
           [
             'Organizations',
             <Stack key='organizations'>
