@@ -157,6 +157,7 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
+      # union joe need a cup of joe
       - name: Deploy websockets to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
