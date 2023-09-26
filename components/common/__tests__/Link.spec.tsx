@@ -14,7 +14,7 @@ describe('Atomic Link component', () => {
     expect(link?.getAttribute('href')).toBe('https://app.cv.io');
   });
 
-  it('should prefix url with space domain and retur path', async () => {
+  it('should prefix url with space domain and return path', async () => {
     const renderedLink = renderWithTheme(<Link href='/forum/page-123'>test label</Link>, { hydrate: false });
     const link = renderedLink.getByText('test label');
 
