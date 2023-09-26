@@ -1,22 +1,31 @@
 import type { MemberPropertyType } from '@charmverse/core/prisma-client';
+import { Edit as EditIcon } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
+import { useState } from 'react';
 
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
+import { useUser } from 'hooks/useUser';
 import type { MemberPropertyValuesBySpace } from 'lib/members/interfaces';
 
-import { MemberProperties } from '../MemberProperties';
+import { ProfileWidget } from '../ProfileWidget';
 
-import { ProfileWidget } from './ProfileWidget';
+import { MemberProperties } from './MemberProperties';
+import { MemberPropertiesFormDialog } from './MemberPropertiesFormDialog';
 
 export function MemberPropertiesWidget({
   memberPropertyValues,
+  readOnly,
   userId
 }: {
   userId: string;
+  readOnly: boolean;
   memberPropertyValues: MemberPropertyValuesBySpace[];
 }) {
+  const [showPropertiesForm, setShowPropertiesForm] = useState<boolean>(false);
+  const { user } = useUser();
   const { space } = useCurrentSpace();
   const { members } = useMembers();
   const { getDisplayProperties } = useMemberProperties();
@@ -52,12 +61,35 @@ export function MemberPropertiesWidget({
         )
     );
 
+  function openPropertiesForm() {
+    setShowPropertiesForm(true);
+  }
+  function hidePropertiesForm() {
+    setShowPropertiesForm(false);
+  }
+
   return (
-    <ProfileWidget
-      avatar={space && <WorkspaceAvatar name={space?.name} image={space?.spaceImage} size='small' />}
-      title={space ? `${space?.name} Profile` : ' '}
-    >
-      <MemberProperties properties={currentSpacePropertyNonEmptyValues} />
-    </ProfileWidget>
+    <>
+      <ProfileWidget
+        avatarComponent={space && <WorkspaceAvatar name={space?.name} image={space?.spaceImage} size='small' />}
+        linkComponent={
+          !readOnly && (
+            <Tooltip title='Edit profile'>
+              <span>
+                <IconButton size='small' color='secondary' onClick={openPropertiesForm}>
+                  <EditIcon fontSize='small' />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )
+        }
+        title={space ? `${space?.name} Profile` : ' '}
+      >
+        <MemberProperties properties={currentSpacePropertyNonEmptyValues} />
+      </ProfileWidget>
+      {showPropertiesForm && space && user && (
+        <MemberPropertiesFormDialog spaceId={space.id} userId={userId} onClose={hidePropertiesForm} />
+      )}
+    </>
   );
 }
