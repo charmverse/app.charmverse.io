@@ -295,7 +295,7 @@ export async function generateImportWorkspacePages({
       }
     };
 
-    if (resetAdditionalPaths) {
+    if (resetAdditionalPaths && newPageContent.data.additionalPaths) {
       const additionalPath = generatePagePathFromPathAndTitle({
         existingPagePath: newPageContent.data.path,
         title: newPageContent.data.title as string
