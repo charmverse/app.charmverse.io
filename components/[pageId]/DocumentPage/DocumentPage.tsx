@@ -78,7 +78,7 @@ const StyledBannerContainer = styled.div<{ showPageActionSidebar: boolean }>(
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: var(--z-index-pageBar);
   }
 `
 );

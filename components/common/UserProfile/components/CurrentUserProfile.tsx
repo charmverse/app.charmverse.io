@@ -19,8 +19,8 @@ import type { LoggedInUser } from 'models';
 import { useMemberPropertyValues } from '../hooks/useMemberPropertyValues';
 import { UserProfileDialog } from '../UserProfileDialog';
 
-import { MemberPropertiesForm } from './MemberPropertiesForm';
 import { OnboardingEmailForm } from './OnboardingEmailForm';
+import { MemberPropertiesForm } from './ProfileWidgets/MemberPropertiesWidget/MemberPropertiesForm';
 import { ProfileWidgets } from './ProfileWidgets/ProfileWidgets';
 
 type Step = 'email_step' | 'profile_step';

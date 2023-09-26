@@ -14,12 +14,14 @@ export function CollectionWidget({
   userId,
   mutateNfts,
   nfts,
-  poaps
+  poaps,
+  readOnly
 }: {
   userId: string;
   nfts: NFTData[];
   poaps: ExtendedPoap[];
   mutateNfts: KeyedMutator<NFTData[]>;
+  readOnly?: boolean;
 }) {
   const { user } = useUser();
 
@@ -27,7 +29,7 @@ export function CollectionWidget({
     <ProfileWidget title='Collection'>
       <Stack spacing={2}>
         {nfts.length !== 0 && (
-          <NftsList userId={userId} nfts={nfts} mutateNfts={mutateNfts} readOnly={user?.id !== userId} />
+          <NftsList userId={userId} nfts={nfts} mutateNfts={mutateNfts} readOnly={readOnly || user?.id !== userId} />
         )}
         {poaps.length !== 0 && <PoapsList poaps={poaps} />}
       </Stack>

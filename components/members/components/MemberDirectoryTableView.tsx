@@ -24,6 +24,7 @@ import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 
@@ -47,6 +48,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const { getDisplayProperties } = useMemberProperties();
   const visibleProperties = getDisplayProperties('table');
   const { showUserProfile } = useUserProfile();
+  const { onClick: openSettings } = useSettingsDialog();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -65,9 +67,8 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             size='small'
             className='icons'
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              showUserProfile(member.id);
+              openSettings('profile');
             }}
             style={{
               opacity: 1
@@ -161,18 +162,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
 
               return (
                 <TableCell key={property.id}>
-                  {member.id !== user?.id ? (
-                    <Link
-                      color='inherit'
-                      href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-                    >
-                      {content}
-                    </Link>
-                  ) : (
-                    <Box sx={{ cursor: 'pointer' }} onClick={() => showUserProfile(member.id)}>
-                      {content}
-                    </Box>
-                  )}
+                  <Box sx={{ cursor: 'pointer' }} onClick={() => showUserProfile(member.id)}>
+                    {content}
+                  </Box>
                 </TableCell>
               );
             }

@@ -68,8 +68,8 @@ export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts,
                   );
                 })
             )}
-            {currentUser?.id === userId && emptyNftsCount !== 0 ? (
-              <Tooltip title='Add upto 5 NFTs'>
+            {!readOnly && currentUser?.id === userId && emptyNftsCount !== 0 ? (
+              <Tooltip title='Add up to 5 NFTs'>
                 <div>
                   <NonPinnedItem
                     onClick={() => {

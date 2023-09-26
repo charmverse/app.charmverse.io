@@ -12,12 +12,16 @@ import { useMemberPropertyValues } from '../../hooks/useMemberPropertyValues';
 import { CollectionWidget } from './CollectionWidget';
 import { EnsWidget } from './EnsWidget';
 import { LensProfileWidget } from './LensProfileWidget';
-import { MemberPropertiesWidget } from './MemberPropertiesWidget';
+import { MemberPropertiesWidget } from './MemberPropertiesWidget/MemberPropertiesWidget';
 import { SummonProfileWidget } from './SummonProfileWidget';
 
-export function ProfileWidgets({ userId }: { userId: string }) {
+export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?: boolean }) {
   const { space } = useCurrentSpace();
-  const { memberPropertyValues = [], isLoading: isLoadingMemberPropertiesValues } = useMemberPropertyValues(userId);
+  const {
+    memberPropertyValues = [],
+    isLoading: isLoadingMemberPropertiesValues,
+    canEditSpaceProfile
+  } = useMemberPropertyValues(userId);
   const { memberProfiles } = useFeaturesAndMembers();
 
   const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
@@ -46,8 +50,10 @@ export function ProfileWidgets({ userId }: { userId: string }) {
     isLoadingMemberPropertiesValues &&
     isLoadingLensProfile;
 
+  const readOnlyMemberProperties = !space || !canEditSpaceProfile(space.id);
+
   if (isLoading) {
-    return <LoadingComponent isLoading />;
+    return <LoadingComponent isLoading minHeight={300} />;
   }
 
   return (
@@ -70,7 +76,13 @@ export function ProfileWidgets({ userId }: { userId: string }) {
                 !hideCollections &&
                 (!nftsError || !poapsError) && (
                   <Grid item xs={12} md={6} alignItems='stretch' key={id}>
-                    <CollectionWidget mutateNfts={mutateNfts} nfts={nfts} poaps={poaps} userId={userId} />
+                    <CollectionWidget
+                      mutateNfts={mutateNfts}
+                      nfts={nfts}
+                      poaps={poaps}
+                      userId={userId}
+                      readOnly={readOnly}
+                    />
                   </Grid>
                 )
               );
@@ -78,7 +90,11 @@ export function ProfileWidgets({ userId }: { userId: string }) {
             case 'charmverse':
               return space ? (
                 <Grid item xs={12} md={6} alignItems='stretch' key={id}>
-                  <MemberPropertiesWidget memberPropertyValues={memberPropertyValues} userId={userId} />
+                  <MemberPropertiesWidget
+                    memberPropertyValues={memberPropertyValues}
+                    readOnly={readOnlyMemberProperties}
+                    userId={userId}
+                  />
                 </Grid>
               ) : null;
 

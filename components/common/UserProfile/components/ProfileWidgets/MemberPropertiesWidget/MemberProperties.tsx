@@ -4,7 +4,13 @@ import { SelectPreview } from 'components/common/form/fields/Select/SelectPrevie
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
-export function MemberProperties({ properties }: { properties: PropertyValueWithDetails[] }) {
+export function MemberProperties({
+  properties,
+  onClickEdit
+}: {
+  properties: PropertyValueWithDetails[];
+  onClickEdit?: () => void;
+}) {
   const { formatDate } = useDateFormatter();
 
   return (

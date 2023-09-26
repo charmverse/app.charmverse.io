@@ -87,7 +87,7 @@ export function CreateSubscriptionInformation({
             </Box>
           </DesktopIconContainer>
           <Typography variant='h6' mb={1}>
-            Public Good
+            Public Goods
           </Typography>
           {isFreeSpace ? <Chip size='small' label='Current Plan' /> : null}
           <MobileIconContainer>
@@ -101,7 +101,7 @@ export function CreateSubscriptionInformation({
                 onClick={openConfirmFreeTierDowngradeDialog}
                 disabled={pendingPayment || isSwitchToFreeLoading}
               >
-                Switch to public good
+                Switch to Public Goods
               </Button>
               <ConfirmFreeDowngradeModal
                 isOpen={isConfirmDowngradeDialogOpen}
