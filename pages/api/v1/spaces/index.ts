@@ -1,17 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { requireKeys } from 'lib/middleware';
+import { requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { createWorkspaceApi } from 'lib/public-api/createWorkspaceApi';
-import { superApiHandler } from 'lib/public-api/handler';
+import { defaultHandler } from 'lib/public-api/handler';
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { spaceTemplateApiNames } from 'lib/spaces/config';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-const handler = superApiHandler();
+const handler = defaultHandler();
 
-handler.use(requireKeys([{ key: 'name', truthy: true }], 'body')).post(createSpace);
+handler.use(requireSuperApiKey, requireKeys([{ key: 'name', truthy: true }], 'body')).post(createSpace);
 
 /**
  * @swagger
