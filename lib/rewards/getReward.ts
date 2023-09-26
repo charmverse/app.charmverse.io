@@ -3,7 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { RewardReviewer, RewardWithUsers } from './interfaces';
+import type { RewardWithUsers } from './interfaces';
+import { mapDbRewardToReward } from './mapDbRewardToReward';
 
 export function rewardWithUsersInclude() {
   return {
@@ -43,26 +44,7 @@ export async function getReward({
         return null;
       }
 
-      const reviewers = reward.permissions
-        .filter((p) => (p.roleId || p.userId) && p.permissionLevel === 'reviewer')
-        .map((p) => {
-          const group = p.roleId ? 'role' : 'user';
-          return {
-            group,
-            id: (group === 'role' ? p.roleId : p.userId) as string
-          } as RewardReviewer;
-        });
-
-      const allowedSubmitterRoles = reward.permissions.filter((p) => p.permissionLevel === 'submitter' && p.roleId);
-
-      const rewardWithUsers: RewardWithUsers = {
-        ...reward,
-        applications: reward.applications,
-        reviewers,
-        allowedSubmitterRoles:
-          allowedSubmitterRoles.length > 0 ? allowedSubmitterRoles.map((r) => r.roleId as string) : null
-      };
-      return rewardWithUsers;
+      return mapDbRewardToReward(reward);
     });
 }
 

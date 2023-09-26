@@ -5,7 +5,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
-import { getRewardOrThrow } from './getReward';
 import type { RewardReviewer, RewardWithUsers } from './interfaces';
 import { setRewardUsers } from './setRewardUsers';
 
@@ -16,10 +15,10 @@ export type UpdateableRewardFields = Partial<
   >
 > & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] };
 
-export interface RewardUpdate {
+export type RewardUpdate = {
   rewardId: string;
   updateContent: UpdateableRewardFields;
-}
+};
 
 export async function updateRewardSettings({ rewardId, updateContent }: RewardUpdate): Promise<RewardWithUsers> {
   if (!stringUtils.isUUID(rewardId)) {
@@ -48,7 +47,10 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
     typeof updateContent.maxSubmissions === 'number' &&
     reward.maxSubmissions !== null &&
     updateContent.maxSubmissions <
-      countRemainingSubmissionSlots({ applications: reward.applications, limit: updateContent.rewardAmount })
+      (countRemainingSubmissionSlots({
+        applications: reward.applications,
+        limit: updateContent.rewardAmount
+      }) as number)
   ) {
     throw new InvalidInputError('New reward cap cannot be lower than total of active and valid submissions.');
   }
