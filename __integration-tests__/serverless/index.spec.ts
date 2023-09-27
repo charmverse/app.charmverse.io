@@ -2,7 +2,6 @@
 import type { Space } from '@charmverse/core/prisma';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
 import { webhookWorker } from 'serverless/handler';
-import { v4 } from 'uuid';
 
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
