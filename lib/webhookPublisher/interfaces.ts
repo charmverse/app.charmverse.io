@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/dist/cjs/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 

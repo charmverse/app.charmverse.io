@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';

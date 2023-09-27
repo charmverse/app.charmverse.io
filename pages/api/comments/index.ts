@@ -8,6 +8,7 @@ import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { publishInlineCommentEvent } from 'lib/notifications/publishInlineCommentEvent';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -15,15 +16,7 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(
-  requireKeys(['content', 'threadId'], 'body'),
-  providePermissionClients({
-    key: 'spaceId',
-    location: 'body',
-    resourceIdType: 'space'
-  }),
-  addCommentController
-);
+handler.use(requireUser).post(requireKeys(['content', 'threadId'], 'body'), addCommentController);
 
 async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
   const { threadId, content } = req.body as CommentCreate;
@@ -54,12 +47,17 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
-    resourceId: pageId,
-    userId
-  });
+  const permissionSet = await getPermissionsClient({
+    resourceId: thread.pageId,
+    resourceIdType: 'page'
+  }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: thread.pageId,
+      userId
+    })
+  );
 
-  if (!permissions.comment) {
+  if (!permissionSet.comment) {
     throw new ActionNotPermittedError();
   }
 

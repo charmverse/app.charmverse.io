@@ -1,4 +1,4 @@
-import type { ProposalPermissionFlags } from '@charmverse/core/dist/cjs/permissions';
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 

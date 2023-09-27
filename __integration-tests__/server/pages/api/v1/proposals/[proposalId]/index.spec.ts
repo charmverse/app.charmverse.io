@@ -1,7 +1,7 @@
-import type { ProposalWithUsers } from '@charmverse/core/dist/cjs/proposals';
 import type { GoogleAccount, Page, Role, Space, SuperApiToken, User, UserWallet } from '@charmverse/core/prisma';
 import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
