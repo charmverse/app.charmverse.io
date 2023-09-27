@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
 import { log } from '@charmverse/core/log';
+import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
@@ -31,22 +32,23 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
 
         const webhookMessageHash = crypto.createHash('sha256').update(jsonString).digest('hex');
 
-        const webhookMessage = await prisma.webhookMessage.findUnique({
+        const webhookMessage = await prisma.sQSMessage.findUnique({
           where: {
             id: webhookMessageHash
           }
         });
 
         if (webhookMessage) {
-          log.debug('Webhook message already processed', { webhookData });
+          log.debug('Webhook message already processed', { id: webhookMessageHash, ...webhookData });
           return;
         }
 
         await createNotificationsFromEvent(webhookData);
 
-        await prisma.webhookMessage.create({
+        await prisma.sQSMessage.create({
           data: {
-            id: webhookMessageHash
+            id: webhookMessageHash,
+            payload: webhookData as Prisma.InputJsonObject
           }
         });
 
@@ -55,8 +57,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         if (!isWhitelistedEvent) {
           log.debug('Webhook event not whitelisted', {
             scope: webhookData.event.scope,
-            webhookData,
-            spaceId: webhookData.spaceId
+            ...webhookData
           });
           return;
         }

@@ -59,7 +59,6 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
     // Find if the space is subscribed to an event name or name space
     const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
 
-    // If no subscription, we stop here
     if (subscription && subscription.space.webhookSubscriptionUrl && subscription.space.webhookSigningSecret) {
       webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
       webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
