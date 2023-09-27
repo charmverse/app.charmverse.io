@@ -74,6 +74,12 @@ export type BlockCommentEntity = {
   author: UserEntity;
 };
 
+export type CardPropertyEntity = {
+  id: string;
+  name: string;
+  value: string;
+};
+
 export enum WebhookNameSpaces {
   Bounty = 'bounty',
   Forum = 'forum',
@@ -197,7 +203,7 @@ export type WebhookEvent<T = WebhookEventNames> =
       space: SpaceEntity;
       card: DocumentEntity;
       assignedUser: UserEntity;
-      personPropertyId: string;
+      personProperty: CardPropertyEntity;
       user: UserEntity;
     };
 

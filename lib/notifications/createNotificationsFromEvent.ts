@@ -127,7 +127,7 @@ export async function createNotificationsFromEvent(webhookData: {
 
       await createCardNotification({
         type: 'person_assigned',
-        personPropertyId: webhookData.event.personPropertyId,
+        personPropertyId: webhookData.event.personProperty.id,
         cardId,
         spaceId,
         userId: assignedUserId,
