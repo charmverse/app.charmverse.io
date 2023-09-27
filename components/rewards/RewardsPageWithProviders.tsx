@@ -1,3 +1,5 @@
+import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoard';
 import { RewardsPage } from 'components/rewards/RewardsPage';
@@ -12,12 +14,16 @@ export function RewardsPageWithProviders() {
   setTitle(rewardsTitle);
 
   return (
-    <RewardsProvider>
-      <RewardBlocksProvider>
-        <RewardsBoardProvider>
-          <RewardsPage title={rewardsTitle} />
-        </RewardsBoardProvider>
-      </RewardBlocksProvider>
-    </RewardsProvider>
+    <PageDialogProvider>
+      <RewardsProvider>
+        <RewardBlocksProvider>
+          <RewardsBoardProvider>
+            <RewardsPage title={rewardsTitle} />
+          </RewardsBoardProvider>
+        </RewardBlocksProvider>
+      </RewardsProvider>
+
+      <PageDialogGlobal />
+    </PageDialogProvider>
   );
 }
