@@ -9,20 +9,19 @@ import type {
   MentionNotification,
   MentionNotificationType
 } from './interfaces';
+import { upgradedNotificationUserIds } from './utils';
 
 type CreateDocumentNotificationInput = {
   createdBy: string;
   pageId: string;
   spaceId: string;
   userId: string;
-  commentId?: string;
   mentionId?: string;
   inlineCommentId?: string;
 } & (InlineCommentNotification | MentionNotification);
 
 export async function createDocumentNotification({
   createdBy,
-  commentId,
   mentionId,
   pageId,
   inlineCommentId,
@@ -41,7 +40,8 @@ export async function createDocumentNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId
+          userId,
+          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
         }
       },
       inlineComment: inlineCommentId
@@ -101,7 +101,8 @@ export async function createCardNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId
+          userId,
+          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
         }
       },
       blockComment: blockCommentId

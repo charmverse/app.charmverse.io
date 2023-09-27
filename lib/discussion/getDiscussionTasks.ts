@@ -41,14 +41,7 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionNoti
   // Get all the space the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      userId,
-      space: {
-        domain: {
-          not: {
-            startsWith: 'cvt'
-          }
-        }
-      }
+      userId
     },
     select: {
       spaceId: true

@@ -23,3 +23,8 @@ export const notificationMetadataIncludeStatement = {
     }
   }
 } as const;
+
+export const upgradedNotificationUserIds = [
+  '4e1d4522-6437-4393-8ed1-9c56e53235f4',
+  '5906c806-9497-43c7-9ffc-2eecd3c3a3ec'
+];
