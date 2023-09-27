@@ -3,7 +3,7 @@ import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoard';
 import { RewardsPage } from 'components/rewards/RewardsPage';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { setTitle } from 'hooks/usePageTitle';
-import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
+import { RewardBlocksProvider } from 'hooks/useRewardBlocks';
 
 export function RewardsPageWithProviders() {
   const { mappedFeatures } = useFeaturesAndMembers();
@@ -13,11 +13,11 @@ export function RewardsPageWithProviders() {
 
   return (
     <RewardsProvider>
-      <ProposalBlocksProvider>
+      <RewardBlocksProvider>
         <RewardsBoardProvider>
           <RewardsPage title={rewardsTitle} />
         </RewardsBoardProvider>
-      </ProposalBlocksProvider>
+      </RewardBlocksProvider>
     </RewardsProvider>
   );
 }

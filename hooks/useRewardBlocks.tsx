@@ -41,7 +41,7 @@ export const RewardBlocksContext = createContext<Readonly<RewardBlocksContextTyp
 
 export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
-  const { data: rewardBlocks, isLoading, mutate } = useGetRewardBlocks(space?.id);
+  const { data: rewardBlocks, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id });
   const { trigger: createRewardBlocks } = useCreateRewardBlocks(space?.id || '');
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
