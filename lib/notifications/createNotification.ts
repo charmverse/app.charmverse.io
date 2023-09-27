@@ -67,13 +67,9 @@ export type CreateCardNotificationInput = {
   spaceId: string;
   userId: string;
   blockCommentId?: string;
-  mentionId?: string;
-  inlineCommentId?: string;
   personPropertyId?: string;
 } & (
   | BlockCommentNotification
-  | InlineCommentNotification
-  | MentionNotification
   | {
       type: 'person_assigned';
       personPropertyId: string;
@@ -87,8 +83,6 @@ export async function createCardNotification({
   spaceId,
   userId,
   blockCommentId,
-  inlineCommentId,
-  mentionId,
   cardId
 }: CreateCardNotificationInput) {
   const notificationId = v4();
@@ -112,8 +106,6 @@ export async function createCardNotification({
             }
           }
         : undefined,
-      inlineComment: inlineCommentId ? { connect: { id: inlineCommentId } } : undefined,
-      mentionId,
       card: { connect: { id: cardId } },
       personPropertyId
     }

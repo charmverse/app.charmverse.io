@@ -64,10 +64,12 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
       const page = ('card' in notification ? notification.card.page : notification.page) as Page;
       const blockCommentId = 'card' in notification ? notification.blockCommentId : null;
       const personPropertyId = 'card' in notification ? notification.personPropertyId : null;
+      const inlineCommentId = 'inlineCommentId' in notification ? notification.inlineCommentId : null;
+      const mentionId = 'mentionId' in notification ? notification.mentionId : null;
       const discussionNotification = {
         taskId: notification.id,
-        inlineCommentId: notification.inlineCommentId,
-        mentionId: notification.mentionId,
+        inlineCommentId,
+        mentionId,
         createdAt: notificationMetadata.createdAt.toISOString(),
         createdBy: notificationMetadata.user,
         pageId: page.id,

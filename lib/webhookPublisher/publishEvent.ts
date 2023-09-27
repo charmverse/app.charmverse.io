@@ -1,4 +1,5 @@
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
@@ -205,7 +206,7 @@ type CardEventContext =
       scope: WebhookEventNames.CardPersonPropertyAssigned;
       cardId: string;
       spaceId: string;
-      assignedUserId: string;
+      cardProperty: CardPropertyEntity;
       userId: string;
     };
 
@@ -224,13 +225,13 @@ export async function publishCardEvent(context: CardEventContext) {
       });
     }
     case WebhookEventNames.CardPersonPropertyAssigned: {
-      const assignedUser = await getUserEntity(context.assignedUserId);
+      const assignedUser = await getUserEntity(context.cardProperty.value);
       return publishWebhookEvent(context.spaceId, {
         scope,
         space,
         card,
         assignedUser,
-        personPropertyId: context.assignedUserId,
+        personProperty: context.cardProperty,
         user: await getUserEntity(context.userId)
       });
     }

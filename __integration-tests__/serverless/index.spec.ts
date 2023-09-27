@@ -39,7 +39,6 @@ beforeAll(async () => {
 describe('SERVERLESS webhook worker', () => {
   it('should sign payload and execute websocket', async () => {
     const testWebhookPayload: WebhookPayload = {
-      id: v4(),
       createdAt: new Date().toISOString(),
       event: {
         scope: WebhookEventNames.ProposalPassed,

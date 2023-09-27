@@ -3,8 +3,6 @@ import nc from 'next-connect';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
 import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
-import type { DiscussionTasksGroup } from 'lib/discussion/getDiscussionTasks';
-import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import type { ForumTasksGroup } from 'lib/forums/getForumNotifications/getForumNotifications';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
