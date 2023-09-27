@@ -195,7 +195,7 @@ export async function publishDocumentEvent(context: DocumentEventContext) {
   }
 }
 
-type CardEventContext =
+export type CardEventContext =
   | {
       scope: WebhookEventNames.CardBlockCommentCreated;
       cardId: string;

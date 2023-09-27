@@ -1,5 +1,7 @@
 import type { BountyStatus, PageType, ProposalStatus, User, VoteStatus } from '@charmverse/core/prisma-client';
 
+import type { CardPropertyEntity, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+
 export type NotificationGroupType = 'forum' | 'discussions' | 'votes' | 'proposals' | 'bounties';
 
 export type NotificationActor = Pick<
@@ -205,4 +207,10 @@ export type BountyNotification = NotificationBase & {
 export type NotificationsGroup<T> = {
   marked: T[];
   unmarked: T[];
+};
+
+export type CreateEventPayload = {
+  scope: WebhookEventNames.CardPersonPropertyAssigned;
+  cardId: string;
+  cardProperty: CardPropertyEntity;
 };
