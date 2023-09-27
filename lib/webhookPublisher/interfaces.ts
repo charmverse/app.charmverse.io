@@ -1,3 +1,7 @@
+import type { PageType } from '@charmverse/core/dist/cjs/prisma';
+
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+
 export type UserEntity = {
   id: string;
   avatar?: string;
@@ -49,6 +53,27 @@ export type BountyEntity = {
   customReward: string | null;
 };
 
+export type DocumentEntity = {
+  id: string;
+  title: string;
+  path: string;
+  type: PageType;
+  author: UserEntity;
+};
+
+export type InlineCommentEntity = {
+  createdAt: string;
+  id: string;
+  threadId: string;
+  author: UserEntity;
+};
+
+export type BlockCommentEntity = {
+  createdAt: string;
+  id: string;
+  author: UserEntity;
+};
+
 export enum WebhookNameSpaces {
   Bounty = 'bounty',
   Forum = 'forum',
@@ -67,8 +92,28 @@ export enum WebhookEventNames {
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   UserJoined = 'user.joined',
-  HelloWorld = 'hello.world'
+  HelloWorld = 'hello.world',
+  DocumentMentionCreated = 'document.mention.created',
+  DocumentInlineCommentCreated = 'document.inline_comment.created',
+  CardMentionCreated = 'card.mention.created',
+  CardInlineCommentCreated = 'card.inline_comment.created',
+  CardBlockCommentCreated = 'card.block_comment.created',
+  CardPersonPropertyAssigned = 'card.person_property.assigned'
 }
+
+export const whiteListedWebhookEvents = [
+  'bounty.completed',
+  'forum.comment.created',
+  'forum.comment.upvoted',
+  'forum.comment.downvoted',
+  'forum.post.created',
+  'proposal.passed',
+  'proposal.failed',
+  'proposal.suggestion_approved',
+  'proposal.user_voted',
+  'user.joined',
+  'hello.world'
+];
 
 // Utils to share common props among events
 type WebhookEventSharedProps<T = WebhookEventNames> = {
@@ -128,23 +173,57 @@ export type WebhookEvent<T = WebhookEventNames> =
     })
   | (WebhookEventSharedProps<T> & {
       scope: WebhookEventNames.HelloWorld;
-    });
+    })
+  | {
+      user: UserEntity;
+      scope: WebhookEventNames.DocumentMentionCreated;
+      document: DocumentEntity;
+      space: SpaceEntity;
+      mention: UserMentionMetadata;
+    }
+  | {
+      user: UserEntity;
+      scope: WebhookEventNames.DocumentInlineCommentCreated;
+      space: SpaceEntity;
+      document: DocumentEntity;
+      inlineComment: InlineCommentEntity;
+    }
+  | {
+      scope: WebhookEventNames.CardBlockCommentCreated;
+      space: SpaceEntity;
+      card: DocumentEntity;
+      blockComment: BlockCommentEntity;
+    }
+  | {
+      scope: WebhookEventNames.CardInlineCommentCreated;
+      space: SpaceEntity;
+      card: DocumentEntity;
+      inlineComment: InlineCommentEntity;
+    }
+  | {
+      scope: WebhookEventNames.CardPersonPropertyAssigned;
+      space: SpaceEntity;
+      card: DocumentEntity;
+      assignedUser: UserEntity;
+      personPropertyId: string;
+      user: UserEntity;
+    }
+  | {
+      scope: WebhookEventNames.CardMentionCreated;
+      space: SpaceEntity;
+      card: DocumentEntity;
+      user: UserEntity;
+      mention: UserMentionMetadata;
+    };
 
 // Webhook payload being sent by out API toward theirs
 export type WebhookPayload<T = WebhookEventNames> = {
+  id: string;
   createdAt: string;
   event: WebhookEvent<T>;
   spaceId: string;
-  webhookURL: string;
-  signingSecret: string;
+  webhookURL: string | null;
+  signingSecret: string | null;
 };
 
-// Payload example
-// const payload: WebhookPayload = {
-//   createdAt: new Date().toISOString(),
-//   event: {
-//     scope: WebhookEventNames.BountyCompleted,
-//     bounty,
-//     user
-//   }
-// }
+export type WebhookEventBody<T extends WebhookEventNames> = Extract<WebhookEvent, { scope: T }>;

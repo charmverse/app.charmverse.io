@@ -2,6 +2,7 @@
 import type { Space } from '@charmverse/core/prisma';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
 import { webhookWorker } from 'serverless/handler';
+import { v4 } from 'uuid';
 
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -38,6 +39,7 @@ beforeAll(async () => {
 describe('SERVERLESS webhook worker', () => {
   it('should sign payload and execute websocket', async () => {
     const testWebhookPayload: WebhookPayload = {
+      id: v4(),
       createdAt: new Date().toISOString(),
       event: {
         scope: WebhookEventNames.ProposalPassed,

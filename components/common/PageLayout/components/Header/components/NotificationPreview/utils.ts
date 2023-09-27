@@ -4,9 +4,56 @@ import { NotificationType } from '@charmverse/core/prisma';
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
 import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
-import type { NotificationGroupType } from 'lib/notifications/interfaces';
+import type {
+  BlockCommentNotificationType,
+  CommentNotificationType,
+  DiscussionNotification,
+  InlineCommentNotificationType,
+  NotificationActor,
+  NotificationGroupType
+} from 'lib/notifications/interfaces';
 import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import type { VoteTask } from 'lib/votes/interfaces';
+
+function getCommentTypeNotificationContent({
+  notificationType,
+  createdBy,
+  title
+}: {
+  notificationType:
+    | InlineCommentNotificationType
+    | CommentNotificationType
+    | 'mention.created'
+    | BlockCommentNotificationType;
+  title: string;
+  createdBy: NotificationActor | null;
+}) {
+  switch (notificationType) {
+    case 'inline_comment.created':
+    case 'block_comment.created':
+    case 'comment.created': {
+      return createdBy?.username ? `${createdBy?.username} left a comment in ${title}.` : `New comment in ${title}.`;
+    }
+    case 'inline_comment.replied':
+    case 'block_comment.replied':
+    case 'comment.replied': {
+      return createdBy?.username
+        ? `${createdBy?.username} replied to your comment in ${title}.`
+        : `New reply to your comment in ${title}.`;
+    }
+    case 'inline_comment.mention.created':
+    case 'block_comment.mention.created':
+    case 'comment.mention.created':
+    case 'mention.created': {
+      return createdBy?.username
+        ? `${createdBy?.username} mentioned you in ${title}.`
+        : `You were mentioned in ${title}.`;
+    }
+    default: {
+      return '';
+    }
+  }
+}
 
 function getForumContent(n: ForumTask) {
   const { createdBy, commentId, postTitle } = n;
@@ -35,27 +82,51 @@ export function getForumNotificationPreviewItems(notifications: ForumTask[]) {
   }));
 }
 
-function getDiscussionContent(n: DiscussionTask) {
-  const { createdBy, pageTitle } = n;
-  return pageTitle
-    ? `${createdBy?.username} left a comment in ${pageTitle}.`
-    : `${createdBy?.username} left a comment.`;
+function getDiscussionContent(n: DiscussionNotification) {
+  const { createdBy, pageTitle, type } = n;
+  switch (type) {
+    case 'person_assigned': {
+      return createdBy?.username
+        ? `${createdBy?.username} assigned you to ${pageTitle}.`
+        : `You were assigned to ${pageTitle}.`;
+    }
+    default: {
+      return getCommentTypeNotificationContent({
+        createdBy,
+        notificationType: n.type,
+        title: pageTitle
+      });
+    }
+  }
 }
 
-export function getDiscussionsNotificationPreviewItems(notifications: DiscussionTask[]) {
-  return notifications.map((n) => ({
-    taskId: n.taskId,
-    createdAt: n.createdAt,
-    createdBy: n.createdBy,
-    spaceName: n.spaceName,
-    groupType: 'discussions' as NotificationGroupType,
-    type: NotificationType.mention,
-    href: `/${n.spaceDomain}/${'pagePath' in n && n.pagePath}?${
-      n.commentId ? `commentId=${n.commentId}` : `mentionId=${n.mentionId}`
-    }`,
-    content: getDiscussionContent(n),
-    title: 'Discussion'
-  }));
+export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
+  return notifications.map((n) => {
+    const type = n.type;
+    const urlSearchParams = new URLSearchParams();
+    if (type === 'inline_comment.created' || type === 'inline_comment.replied') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+    } else if (type === 'mention.created') {
+      urlSearchParams.set('mentionId', n.mentionId);
+    } else if (type === 'inline_comment.mention.created') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+      urlSearchParams.set('mentionId', n.mentionId);
+    }
+
+    return {
+      taskId: n.taskId,
+      createdAt: n.createdAt,
+      createdBy: n.createdBy,
+      spaceName: n.spaceName,
+      groupType: 'discussions' as NotificationGroupType,
+      type: NotificationType.mention,
+      href: `/${n.spaceDomain}/${n.pagePath}${
+        Array.from(urlSearchParams.values()).length ? `?${urlSearchParams.toString()}` : ''
+      }`,
+      content: getDiscussionContent(n),
+      title: 'Discussion'
+    };
+  });
 }
 
 function getBountyContent(n: BountyTask) {

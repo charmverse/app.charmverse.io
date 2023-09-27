@@ -1,17 +1,10 @@
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-import { getPermissionsClient } from 'lib/permissions/api';
-import { getProposalCommentMentions, getProposalComments } from 'lib/proposal/getProposalTasks';
-import type { ProposalWithCommentsAndUsers } from 'lib/proposal/interface';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { MentionNode, PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
 
-import type { DiscussionPropertiesFromPage } from './getPropertiesFromPage';
 import { getPropertiesFromPage } from './getPropertiesFromPage';
 import { getProposalDiscussionTasks } from './getProposalDiscussionTasks';
 import type { DiscussionTask } from './interfaces';
@@ -41,7 +34,14 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
   // Get all the space the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      userId
+      userId,
+      space: {
+        domain: {
+          not: {
+            startsWith: 'cvt'
+          }
+        }
+      }
     },
     select: {
       spaceId: true
@@ -463,101 +463,6 @@ async function getPageCommentMentions({
     comments: []
   };
 }
-
-/** Currently this code is unused - leaving to see if we should fix */
-// async function getBoardPersonPropertyMentions({
-//   userId,
-//   spaceIds,
-//   spaceRecord
-// }: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
-//   const boards = (
-//     await prisma.block.findMany({
-//       where: {
-//         spaceId: {
-//           in: spaceIds
-//         },
-//         type: 'board',
-//         deletedAt: null
-//       }
-//     })
-//   ).map(prismaToBlock) as Board[];
-
-//   const boardBlocksPersonPropertyRecord: Record<string, string> = {};
-
-//   boards.forEach((board) => {
-//     const personProperty = board.fields.cardProperties.find((cardProperty) => cardProperty.type === 'person');
-//     if (personProperty) {
-//       boardBlocksPersonPropertyRecord[board.id] = personProperty.id;
-//     }
-//   });
-
-//   const cards = await prisma.block.findMany({
-//     where: {
-//       parentId: {
-//         in: Object.keys(boardBlocksPersonPropertyRecord)
-//       },
-//       type: 'card',
-//       deletedAt: null,
-//       createdAt: {
-//         gt: new Date(Date.now() - 1000 * 60 * 60 * 24)
-//       }
-//     },
-//     include: {
-//       page: {
-//         select: {
-//           title: true,
-//           id: true,
-//           path: true,
-//           bountyId: true
-//         }
-//       },
-//       user: {
-//         select: {
-//           username: true,
-//           id: true
-//         }
-//       }
-//     }
-//   });
-
-//   const mentions: GetDiscussionsResponse['mentions'] = [];
-//   const discussionUserIds: string[] = [];
-//   for (const card of cards) {
-//     const blockCard = prismaToBlock(card) as Card;
-//     const personPropertyId = boardBlocksPersonPropertyRecord[card.parentId];
-//     const personPropertyValue = personPropertyId ? blockCard.fields.properties[personPropertyId] ?? [] : [];
-//     const space = spaceRecord[card.spaceId];
-//     if (space && card.page && (personPropertyValue as string[]).includes(userId) && userId !== card.user.id) {
-//       discussionUserIds.push(personPropertyId);
-//       // Need to push author of card to fetch information
-//       discussionUserIds.push(card.user.id);
-//       mentions.push({
-//         pageId: card.page.id,
-//         spaceId: card.spaceId,
-//         spaceDomain: space.domain,
-//         pagePath: card.page.path,
-//         spaceName: space.name,
-//         pageTitle: card.page.title || 'Untitled',
-//         bountyId: card.page.bountyId,
-//         bountyTitle: card.page.title,
-//         type: card.page.bountyId ? 'bounty' : 'page',
-//         mentionId: null,
-//         taskId: `${card.id}.${personPropertyId}`,
-//         // Fake value
-//         createdAt: new Date().toString(),
-//         userId: card.createdBy,
-//         text: `${card.user.username} assigned you in the card ${card.page.title || 'Untitled'}`,
-//         commentId: null
-//       });
-//     }
-//   }
-
-//   return {
-//     mentions,
-//     discussionUserIds,
-//     comments: []
-//   };
-// }
 
 type PageToExtractMentionsFrom = Pick<Page, 'bountyId' | 'content' | 'id' | 'path' | 'title' | 'createdBy' | 'spaceId'>;
 

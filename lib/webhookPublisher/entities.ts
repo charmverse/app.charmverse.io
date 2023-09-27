@@ -2,7 +2,17 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
 
-import type { BountyEntity, CommentEntity, PostEntity, ProposalEntity, SpaceEntity, UserEntity } from './interfaces';
+import type {
+  BlockCommentEntity,
+  BountyEntity,
+  CommentEntity,
+  DocumentEntity,
+  InlineCommentEntity,
+  PostEntity,
+  ProposalEntity,
+  SpaceEntity,
+  UserEntity
+} from './interfaces';
 
 export async function getBountyEntity(id: string): Promise<BountyEntity> {
   const bounty = await prisma.bounty.findUniqueOrThrow({
@@ -119,5 +129,69 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
     googleEmail: user.googleAccounts[0]?.email,
     walletAddress: user.wallets[0]?.address,
     discordId: user.discordUser?.discordId
+  };
+}
+
+export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
+  const document = await prisma.page.findFirstOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdBy: true,
+      id: true,
+      title: true,
+      path: true,
+      type: true
+    }
+  });
+
+  const author = await getUserEntity(document.createdBy);
+
+  return {
+    id,
+    title: document.title,
+    path: document.path,
+    type: document.type,
+    author
+  };
+}
+
+export async function getInlineCommentEntity(id: string): Promise<InlineCommentEntity> {
+  const inlineComment = await prisma.comment.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdAt: true,
+      userId: true,
+      threadId: true
+    }
+  });
+
+  const author = await getUserEntity(inlineComment.userId);
+  return {
+    id,
+    author,
+    createdAt: inlineComment.createdAt.toISOString(),
+    threadId: inlineComment.threadId
+  };
+}
+
+export async function getBlockCommentEntity(id: string): Promise<BlockCommentEntity> {
+  const blockComment = await prisma.block.findUniqueOrThrow({
+    where: {
+      id,
+      type: 'comment'
+    },
+    select: {
+      createdAt: true,
+      createdBy: true
+    }
+  });
+  return {
+    id,
+    createdAt: blockComment.createdAt.toISOString(),
+    author: await getUserEntity(blockComment.createdBy)
   };
 }

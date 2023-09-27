@@ -1,4 +1,5 @@
-import type { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
   getBountyEntity,
@@ -6,7 +7,10 @@ import {
   getCommentEntity,
   getSpaceEntity,
   getPostEntity,
-  getProposalEntity
+  getProposalEntity,
+  getDocumentEntity,
+  getInlineCommentEntity,
+  getBlockCommentEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -140,4 +144,131 @@ export async function publishUserProposalEvent(context: ProposalUserEventContext
     space,
     user
   });
+}
+
+type DocumentEventContext = (
+  | {
+      scope: WebhookEventNames.DocumentMentionCreated;
+      mention: UserMentionMetadata;
+    }
+  | {
+      scope: WebhookEventNames.DocumentInlineCommentCreated;
+      inlineCommentId: string;
+    }
+) & {
+  userId: string;
+  spaceId: string;
+  documentId: string;
+};
+
+export async function publishDocumentEvent(context: DocumentEventContext) {
+  const [space, document, user] = await Promise.all([
+    getSpaceEntity(context.spaceId),
+    getDocumentEntity(context.documentId),
+    getUserEntity(context.userId)
+  ]);
+
+  switch (context.scope) {
+    case WebhookEventNames.DocumentInlineCommentCreated: {
+      const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document,
+        inlineComment,
+        user,
+        space
+      });
+    }
+    case WebhookEventNames.DocumentMentionCreated: {
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.DocumentMentionCreated,
+        document,
+        user,
+        mention: context.mention,
+        space
+      });
+    }
+    default: {
+      return null;
+    }
+  }
+}
+
+type CardEventContext =
+  | {
+      scope: WebhookEventNames.CardBlockCommentCreated;
+      cardId: string;
+      spaceId: string;
+      blockCommentId: string;
+    }
+  | {
+      scope: WebhookEventNames.CardInlineCommentCreated;
+      cardId: string;
+      spaceId: string;
+      inlineCommentId: string;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.CardPersonPropertyAssigned;
+      cardId: string;
+      spaceId: string;
+      assignedUserId: string;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.CardMentionCreated;
+      cardId: string;
+      spaceId: string;
+      mention: UserMentionMetadata;
+      userId: string;
+    };
+
+export async function publishCardEvent(context: CardEventContext) {
+  const { scope } = context;
+  const [space, card] = await Promise.all([getSpaceEntity(context.spaceId), getDocumentEntity(context.cardId)]);
+
+  switch (scope) {
+    case WebhookEventNames.CardBlockCommentCreated: {
+      const blockComment = await getBlockCommentEntity(context.blockCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        blockComment
+      });
+    }
+    case WebhookEventNames.CardInlineCommentCreated: {
+      const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        inlineComment
+      });
+    }
+    case WebhookEventNames.CardPersonPropertyAssigned: {
+      const assignedUser = await getUserEntity(context.assignedUserId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        assignedUser,
+        personPropertyId: context.assignedUserId,
+        user: await getUserEntity(context.userId)
+      });
+    }
+    case WebhookEventNames.CardMentionCreated: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        mention: context.mention,
+        user
+      });
+    }
+    default: {
+      return null;
+    }
+  }
 }

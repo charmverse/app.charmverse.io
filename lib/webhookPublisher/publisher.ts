@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 } from 'uuid';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
 import type { WebhookEventNames, WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
@@ -75,26 +76,37 @@ async function fetchSpaceWebhookSubscriptionStatus(spaceId: Space['id'], scope: 
 //   }
 // }
 
-export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string, event: WebhookEvent<T>) {
+export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) {
   try {
     if (!SQS_QUEUE_NAME) {
       throw new Error('Webhook SQS env var missing');
     }
+
+    const webhookMessageId = v4();
+
+    const webhookPayload: WebhookPayload = {
+      id: webhookMessageId,
+      event,
+      createdAt: new Date().toISOString(),
+      spaceId,
+      webhookURL: null,
+      signingSecret: null
+    };
+
     // Find if the space is subscribed to an event name or name space
     const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
 
     // If no subscription, we stop here
-    if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
-      return;
+    if (subscription && subscription.space.webhookSubscriptionUrl && subscription.space.webhookSigningSecret) {
+      webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
+      webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
     }
 
-    const webhookPayload: WebhookPayload = {
-      event,
-      createdAt: new Date().toISOString(),
-      spaceId,
-      webhookURL: subscription.space.webhookSubscriptionUrl,
-      signingSecret: subscription.space.webhookSigningSecret
-    };
+    await prisma.webhookMessage.create({
+      data: {
+        id: webhookMessageId
+      }
+    });
 
     // Add the message to the queue
     await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
