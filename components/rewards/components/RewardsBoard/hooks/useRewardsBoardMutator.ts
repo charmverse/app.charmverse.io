@@ -25,7 +25,7 @@ export function useRewardsBoardMutator() {
       const fields = { ...currentFields, ...updatedFields };
       deletedFields.forEach((field) => delete fields[field]);
 
-      await updateReward({ rewardId: blockId, fields: fields as RewardPropertyValues });
+      await updateReward({ rewardId: blockId, updateContent: { fields: fields as any } });
 
       return;
     }

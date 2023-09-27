@@ -352,6 +352,7 @@ export async function generateImportWorkspacePages({
       const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
       bountyArgs.push({
         ...bounty,
+        fields: bounty.fields as any,
         spaceId: space.id,
         createdBy: space.createdBy,
         id: oldNewPageIdHashMap[node.id]

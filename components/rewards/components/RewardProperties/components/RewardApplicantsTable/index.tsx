@@ -1,3 +1,3 @@
-import Table from './RewardApplicantsTable';
+// import Table from './RewardApplicantsTable';
 
-export default Table;
+// export default Table;

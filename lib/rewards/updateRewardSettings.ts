@@ -11,7 +11,14 @@ import { setRewardUsers } from './setRewardUsers';
 export type UpdateableRewardFields = Partial<
   Pick<
     Reward,
-    'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions' | 'dueDate' | 'customReward'
+    | 'chainId'
+    | 'rewardAmount'
+    | 'rewardToken'
+    | 'approveSubmitters'
+    | 'maxSubmissions'
+    | 'dueDate'
+    | 'customReward'
+    | 'fields'
   >
 > & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] };
 

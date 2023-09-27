@@ -30,7 +30,7 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
 import RewardApplicantForm from './components/RewardApplicantForm';
-import RewardApplicantsTable from './components/RewardApplicantsTable';
+// import RewardApplicantsTable from './components/RewardApplicantsTable';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardSignupButton } from './components/RewardSignupButton';
 
@@ -587,8 +587,9 @@ export default function RewardProperties(props: {
           my: 1
         }}
       />
-
+      {/* 
       {
+        TODO - Replace this with a way to create your own application. We could just use the application input form
         // Reward creator cannot apply to their own reward
         permissions && isSpaceMember && currentReward.createdBy !== user?.id && (
           <div data-test='reward-applicant-form'>
@@ -605,64 +606,65 @@ export default function RewardProperties(props: {
             />
           </div>
         )
-      }
+      } */}
 
       {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
-
+      {/*
+      TODO - Fix this when we fix rewards table
       {rewardPermissions?.review &&
         currentReward.status !== 'suggestion' && ( // &&!draftReward
           <RewardApplicantsTable reward={currentReward} permissions={permissions} />
-        )}
+        )} */}
     </Box>
   );
 }
 
-// utils
+// utils - TODO - Fix this later when we check page permissions
 
-function rollupPermissions({
-  selectedReviewerUsers,
-  selectedReviewerRoles,
-  assignedRoleSubmitters,
-  spaceId
-}: {
-  selectedReviewerUsers: string[];
-  selectedReviewerRoles: string[];
-  assignedRoleSubmitters: string[];
-  spaceId: string;
-}): Pick<RewardPermissions, 'reviewer' | 'submitter'> {
-  const reviewers: RewardPermissions['reviewer'] = [
-    ...selectedReviewerUsers.map((uid) => {
-      return {
-        id: uid,
-        group: 'user' as const
-      };
-    }),
-    ...selectedReviewerRoles.map((uid) => {
-      return {
-        id: uid,
-        group: 'role' as const
-      };
-    })
-  ];
-  const submitters: RewardPermissions['submitter'] =
-    assignedRoleSubmitters.length !== 0
-      ? assignedRoleSubmitters.map((uid) => {
-          return {
-            group: 'role',
-            id: uid
-          };
-        })
-      : [
-          {
-            id: spaceId,
-            group: 'space'
-          }
-        ];
+// function rollupPermissions({
+//   selectedReviewerUsers,
+//   selectedReviewerRoles,
+//   assignedRoleSubmitters,
+//   spaceId
+// }: {
+//   selectedReviewerUsers: string[];
+//   selectedReviewerRoles: string[];
+//   assignedRoleSubmitters: string[];
+//   spaceId: string;
+// }): Pick<RewardPermissions, 'reviewer' | 'submitter'> {
+//   const reviewers: RewardPermissions['reviewer'] = [
+//     ...selectedReviewerUsers.map((uid) => {
+//       return {
+//         id: uid,
+//         group: 'user' as const
+//       };
+//     }),
+//     ...selectedReviewerRoles.map((uid) => {
+//       return {
+//         id: uid,
+//         group: 'role' as const
+//       };
+//     })
+//   ];
+//   const submitters: RewardPermissions['submitter'] =
+//     assignedRoleSubmitters.length !== 0
+//       ? assignedRoleSubmitters.map((uid) => {
+//           return {
+//             group: 'role',
+//             id: uid
+//           };
+//         })
+//       : [
+//           {
+//             id: spaceId,
+//             group: 'space'
+//           }
+//         ];
 
-  const permissionsToSend: Pick<RewardPermissions, 'reviewer' | 'submitter'> = {
-    reviewer: reviewers,
-    submitter: submitters
-  };
+//   const permissionsToSend: Pick<RewardPermissions, 'reviewer' | 'submitter'> = {
+//     reviewer: reviewers,
+//     submitter: submitters
+//   };
 
-  return permissionsToSend;
-}
+//   return permissionsToSend;
+// }

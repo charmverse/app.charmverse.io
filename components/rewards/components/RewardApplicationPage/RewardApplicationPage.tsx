@@ -2,7 +2,10 @@ import Grid from '@mui/material/Grid';
 
 import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { ScrollableWindow } from 'components/common/PageLayout';
 import { useApplication } from 'components/rewards/hooks/useApplication';
+
+import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 
 import { ApplicationComments } from './ApplicationComments';
 import ApplicationInput from './RewardApplicationInput';
@@ -21,13 +24,17 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
     return null;
   }
   return (
-    <div>
-      <Grid container xs={10}>
+    <ScrollableWindow>
+      {/** TODO - Use more elegant layout */}
+      <Grid container px='10%'>
         <Grid item xs={12}>
-          <PageTitleInput onChange={() => null} value='Application' readOnly />
+          <PageTitleInput onChange={() => null} value='Application / Submission for {Bounty}' readOnly />
+          <RewardApplicationStatusChip status={application.status} />
         </Grid>
         <Grid item xs={12}>
-          TODO - Add Bounty properties here
+          <p>-------------</p>
+          <p>TODO - Add Bounty properties here</p>
+          <p>-------------</p>
         </Grid>
         <Grid item xs={12}>
           <ApplicationInput
@@ -48,6 +55,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           <ApplicationComments applicationId={application.id} status={application.status} />
         </Grid>
       </Grid>
-    </div>
+    </ScrollableWindow>
   );
 }
