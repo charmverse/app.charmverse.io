@@ -1,12 +1,12 @@
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { DiscussionNotification, NotificationsGroup } from 'lib/notifications/interfaces';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { MentionNode, PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
 
 import { getPropertiesFromPage } from './getPropertiesFromPage';
-import { getProposalDiscussionTasks } from './getProposalDiscussionTasks';
 import type { DiscussionTask } from './interfaces';
 
 export type DiscussionTasksGroup = {
@@ -30,7 +30,14 @@ export interface GetDiscussionsResponse {
   comments: Discussion[];
 }
 
-export async function getDiscussionTasks(userId: string): Promise<DiscussionTasksGroup> {
+export type DiscussionNotificationsGroup = NotificationsGroup<DiscussionNotification>;
+
+export interface GetDiscussionNotificationsResponse {
+  mentions: DiscussionNotification[];
+  comments: DiscussionNotification[];
+}
+
+export async function getDiscussionTasks(userId: string): Promise<DiscussionNotificationsGroup> {
   // Get all the space the user is part of
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
@@ -99,58 +106,41 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
 
   const context: GetDiscussionsInput = { userId, username, spaceRecord, spaceIds };
 
-  const { mentions, discussionUserIds, comments } = await Promise.all([
-    getPageComments(context),
-    getPageCommentMentions(context),
+  const { mentions, comments } = await Promise.all([
+    getPageInlineComments(context),
+    getPageInlineCommentMentions(context),
     getPageMentions(context),
-    getCommentBlockMentions(context),
-    getProposalDiscussionTasks(context)
-    // getBoardPersonPropertyMentions(context)
+    getBlockCommentMentions(context)
   ]).then((results) => {
     // aggregate the results
     return results.reduce(
       (acc, result) => {
         return {
           mentions: acc.mentions.concat(result.mentions),
-          discussionUserIds: acc.discussionUserIds.concat(result.discussionUserIds),
           comments: acc.comments.concat(result.comments)
         };
       },
-      { mentions: [], discussionUserIds: [], comments: [] }
+      { mentions: [], comments: [] }
     );
   });
 
   const commentIdsFromMentions = Object.values(mentions)
-    .map((item) => item.commentId)
+    .map((item) => item.inlineCommentId ?? item.blockCommentId)
     .filter((item: string | null): item is string => !!item);
 
   // Filter already added comments from mentions
-  const uniqueComments = comments.filter((item) => item.commentId && !commentIdsFromMentions.includes(item.commentId));
-
-  // Only fetch the users that created the mentions
-  const users = await prisma.user.findMany({
-    where: {
-      id: {
-        in: [...new Set(discussionUserIds)]
-      }
-    }
+  const uniqueComments = comments.filter((item) => {
+    const commentId = item.inlineCommentId ?? item.blockCommentId;
+    return commentId && !commentIdsFromMentions.includes(commentId);
   });
 
-  // Create a record for the user
-  const usersRecord = users.reduce<Record<string, User>>((acc, cur) => ({ ...acc, [cur.id]: cur }), {});
-
   // Loop through each mentioned task and attach the user data using usersRecord
-  const mentionedTasks = Object.values(mentions).reduce<DiscussionTasksGroup>(
-    (acc, mentionedTaskWithoutUser) => {
-      const mentionedTask = {
-        ...mentionedTaskWithoutUser,
-        createdBy: usersRecord[mentionedTaskWithoutUser.userId]
-      } as DiscussionTask;
-
-      const taskList = notifiedTaskIds.has(mentionedTask.mentionId ?? mentionedTask.taskId ?? '')
+  const mentionedTasks = mentions.reduce<DiscussionNotificationsGroup>(
+    (acc, mentionTask) => {
+      const taskList = notifiedTaskIds.has(mentionTask.mentionId ?? mentionTask.taskId ?? '')
         ? acc.marked
         : acc.unmarked;
-      taskList.push(mentionedTask);
+      taskList.push(mentionTask);
 
       return acc;
     },
@@ -158,14 +148,11 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
   );
 
   // Loop through each comment task and attach the user data using usersRecord
-  const commentTasks = uniqueComments.reduce<DiscussionTasksGroup>(
-    (acc, commentTaskWithoutUser) => {
-      const commentTask = {
-        ...commentTaskWithoutUser,
-        createdBy: usersRecord[commentTaskWithoutUser.userId]
-      } as DiscussionTask;
-
-      const taskList = notifiedTaskIds.has(commentTask.commentId ?? commentTask.taskId ?? '')
+  const commentTasks = uniqueComments.reduce<DiscussionNotificationsGroup>(
+    (acc, commentTask) => {
+      const taskList = notifiedTaskIds.has(
+        commentTask.inlineCommentId ?? commentTask.blockCommentId ?? commentTask.taskId ?? ''
+      )
         ? acc.marked
         : acc.unmarked;
       taskList.push(commentTask);
@@ -186,12 +173,12 @@ export async function getDiscussionTasks(userId: string): Promise<DiscussionTask
   };
 }
 
-async function getCommentBlockMentions({
+async function getBlockCommentMentions({
   userId,
   username,
   spaceRecord,
   spaceIds
-}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+}: GetDiscussionsInput): Promise<GetDiscussionNotificationsResponse> {
   const blockComments = await prisma.block.findMany({
     where: {
       type: 'comment',
@@ -202,7 +189,18 @@ async function getCommentBlockMentions({
     },
     select: {
       id: true,
-      createdBy: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          path: true,
+          avatar: true,
+          avatarTokenId: true,
+          avatarContract: true,
+          avatarChain: true,
+          deletedAt: true
+        }
+      },
       spaceId: true,
       fields: true,
       parentId: true
@@ -217,7 +215,7 @@ async function getCommentBlockMentions({
     }
   });
 
-  const mentions: GetDiscussionsResponse['mentions'] = [];
+  const mentions: DiscussionNotification[] = [];
   const discussionUserIds: string[] = [];
 
   for (const comment of blockComments) {
@@ -226,24 +224,29 @@ async function getCommentBlockMentions({
     if (page && content) {
       const extractedMentions = extractMentions(content, username);
       extractedMentions.forEach((mention) => {
-        if (page && mention.value === userId && mention.createdBy !== userId && comment.createdBy !== userId) {
+        if (page && mention.value === userId && mention.createdBy !== userId && comment.user.id !== userId) {
           discussionUserIds.push(mention.createdBy);
-          mentions.push({
+          const discussionNotification: DiscussionNotification = {
             ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
             mentionId: mention.id,
+            taskId: mention.id,
             createdAt: mention.createdAt,
-            userId: mention.createdBy,
             text: mention.text,
-            commentId: comment.id,
-            taskId: mention.id
-          });
+            blockCommentId: comment.id,
+            createdBy: comment.user,
+            inlineCommentId: null,
+            pageType: 'page',
+            personPropertyId: null,
+            type: 'block_comment.mention.created'
+          };
+
+          mentions.push(discussionNotification);
         }
       });
     }
   }
   return {
     mentions,
-    discussionUserIds,
     comments: []
   };
 }
@@ -253,11 +256,11 @@ async function getCommentBlockMentions({
  * 1. My page, but not my comments
  * 2. Not my page, just comments that are replies after my comment
  */
-async function getPageComments({
+async function getPageInlineComments({
   userId,
   spaceRecord,
   spaceIds
-}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+}: GetDiscussionsInput): Promise<GetDiscussionNotificationsResponse> {
   const threads = await prisma.thread.findMany({
     where: {
       spaceId: {
@@ -319,6 +322,18 @@ async function getPageComments({
           spaceId: true,
           content: true,
           createdAt: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              path: true,
+              avatar: true,
+              avatarTokenId: true,
+              avatarContract: true,
+              avatarChain: true,
+              deletedAt: true
+            }
+          },
           page: {
             select: {
               title: true,
@@ -370,9 +385,12 @@ async function getPageComments({
     .flat()
     .filter((_comment) => _comment.userId !== userId);
 
-  const allComments = [...myPageComments, ...repliesFromThreads];
+  const allComments = [
+    ...myPageComments.map((c) => ({ ...c, reply: false })),
+    ...repliesFromThreads.map((c) => ({ ...c, reply: true }))
+  ];
 
-  const textComments: Discussion[] = [];
+  const textComments: DiscussionNotification[] = [];
 
   for (const comment of allComments) {
     const content = comment.content as PageContent;
@@ -381,15 +399,21 @@ async function getPageComments({
 
     for (const blockNode of blockNodes) {
       if (isTextContent(blockNode) && blockNode.text.trim()) {
-        textComments.push({
+        const discussionNotification: DiscussionNotification = {
           ...getPropertiesFromPage(comment.page, spaceRecord[comment.page.spaceId]),
           text: blockNode.text,
-          commentId: comment.id,
-          userId: comment.userId,
-          createdAt: new Date(comment.createdAt).toISOString(),
           mentionId: null,
-          taskId: comment.id
-        });
+          taskId: comment.id,
+          createdAt: new Date(comment.createdAt).toISOString(),
+          createdBy: comment.user,
+          inlineCommentId: comment.id,
+          pageType: 'page',
+          personPropertyId: null,
+          type: comment.reply ? 'inline_comment.replied' : 'inline_comment.created',
+          blockCommentId: null
+        };
+
+        textComments.push(discussionNotification);
         break;
       }
     }
@@ -397,17 +421,16 @@ async function getPageComments({
 
   return {
     mentions: [],
-    discussionUserIds: textComments.map((comm) => comm.userId).concat([userId]),
     comments: textComments
   };
 }
 
-async function getPageCommentMentions({
+async function getPageInlineCommentMentions({
   userId,
   username,
   spaceRecord,
   spaceIds
-}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+}: GetDiscussionsInput): Promise<GetDiscussionNotificationsResponse> {
   const comments = await prisma.comment.findMany({
     where: {
       spaceId: {
@@ -430,12 +453,23 @@ async function getPageCommentMentions({
           bountyId: true,
           spaceId: true
         }
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+          path: true,
+          avatar: true,
+          avatarTokenId: true,
+          avatarContract: true,
+          avatarChain: true,
+          deletedAt: true
+        }
       }
     }
   });
 
-  const mentions: GetDiscussionsResponse['mentions'] = [];
-  const discussionUserIds: string[] = [];
+  const mentions: DiscussionNotification[] = [];
 
   for (const comment of comments) {
     const content = comment.content as PageContent;
@@ -443,23 +477,26 @@ async function getPageCommentMentions({
       const extractedMentions = extractMentions(content, username);
       extractedMentions.forEach((mention) => {
         if (mention.value === userId && mention.createdBy !== userId && comment.userId !== userId) {
-          discussionUserIds.push(mention.createdBy);
-          mentions.push({
+          const discussionNotification: DiscussionNotification = {
             ...getPropertiesFromPage(comment.page, spaceRecord[comment.page.spaceId]),
             mentionId: mention.id,
             taskId: mention.id,
             createdAt: mention.createdAt,
-            userId: mention.createdBy,
             text: mention.text,
-            commentId: comment.id
-          });
+            createdBy: comment.user,
+            inlineCommentId: comment.id,
+            pageType: 'page',
+            personPropertyId: null,
+            type: 'inline_comment.mention.created',
+            blockCommentId: null
+          };
+          mentions.push(discussionNotification);
         }
       });
     }
   }
   return {
     mentions,
-    discussionUserIds,
     comments: []
   };
 }
@@ -471,33 +508,53 @@ async function getPageMentions({
   username,
   spaceRecord,
   spaceIds
-}: GetDiscussionsInput): Promise<GetDiscussionsResponse> {
+}: GetDiscussionsInput): Promise<GetDiscussionNotificationsResponse> {
   // Get all the pages of all the spaces this user is part of
-  const mentions: GetDiscussionsResponse['mentions'] = [];
-  const discussionUserIds: string[] = [];
+  const mentions: DiscussionNotification[] = [];
 
-  function extractMentionsFromPage(page: PageToExtractMentionsFrom) {
+  async function extractMentionsFromPage(page: PageToExtractMentionsFrom) {
     const content = page.content as PageContent;
     if (content) {
       const extractedMentions = extractMentions(content, username);
-      extractedMentions.forEach((mention) => {
+      for (const mention of extractedMentions) {
+        const mentionAuthorId = mention.createdBy;
+
+        const user = await prisma.user.findUnique({
+          where: {
+            id: mentionAuthorId
+          },
+          select: {
+            id: true,
+            username: true,
+            path: true,
+            avatar: true,
+            avatarTokenId: true,
+            avatarContract: true,
+            avatarChain: true,
+            deletedAt: true
+          }
+        });
         // Skip mentions not for the user, self mentions and inside user created pages
-        if (mention.value === userId && mention.createdBy !== userId) {
-          discussionUserIds.push(mention.createdBy);
+        if (user && mention.value === userId && mention.createdBy !== userId) {
           // Check if another mention already exists (this is possible if the page was duplicated)
           if (!mentions.some(({ taskId }) => mention.id === taskId)) {
-            mentions.push({
+            const discussionNotification: DiscussionNotification = {
               ...getPropertiesFromPage(page, spaceRecord[page.spaceId]),
               mentionId: mention.id,
               taskId: mention.id,
               createdAt: mention.createdAt,
-              userId: mention.createdBy,
               text: mention.text,
-              commentId: null
-            });
+              createdBy: user,
+              inlineCommentId: null,
+              pageType: 'page',
+              personPropertyId: null,
+              type: 'mention.created',
+              blockCommentId: null
+            };
+            mentions.push(discussionNotification);
           }
         }
-      });
+      }
     }
   }
 
@@ -519,7 +576,7 @@ async function getPageMentions({
       }
     });
     for (const page of pages) {
-      extractMentionsFromPage(page);
+      await extractMentionsFromPage(page);
     }
     // Make page eligible for garbage collection
     pages = null as any;
@@ -527,7 +584,6 @@ async function getPageMentions({
 
   return {
     mentions,
-    discussionUserIds,
     comments: []
   };
 }

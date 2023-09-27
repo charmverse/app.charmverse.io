@@ -3,11 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
 import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import type { PendingTasksProps } from 'lib/mailer/emails/templates/PendingTasksTemplate';
+import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
@@ -64,7 +64,7 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
     await notificationTaskLimiter();
 
-    const discussionTasks = await getDiscussionTasks(user.id);
+    const discussionTasks = await getDiscussionNotifications(user.id);
     const voteTasks = await getVoteTasks(user.id);
     const bountyTasks = await getBountyTasks(user.id);
     const forumTasks = await getForumNotifications(user.id);
@@ -162,7 +162,12 @@ async function sendNotification(
         prisma.userNotification.create({
           data: {
             userId: notification.user.id,
-            taskId: discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? '',
+            taskId:
+              discussionTask.mentionId ??
+              discussionTask.inlineCommentId ??
+              discussionTask.blockCommentId ??
+              discussionTask.taskId ??
+              '',
             channel: 'email',
             type: 'mention'
           }
@@ -198,7 +203,12 @@ async function sendNotification(
       unmarkedWorkspaceEventIds: notification.unmarkedWorkspaceEvents,
       voteTaskIds: notification.voteTasks.map((voteTask) => voteTask.id),
       discussionTaskIds: notification.discussionTasks.map(
-        (discussionTask) => discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? ''
+        (discussionTask) =>
+          discussionTask.mentionId ??
+          discussionTask.inlineCommentId ??
+          discussionTask.blockCommentId ??
+          discussionTask.taskId ??
+          ''
       ),
       bountyTaskIds: notification.bountyTasks.map((bountyTask) => bountyTask.id)
     });

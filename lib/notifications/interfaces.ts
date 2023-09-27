@@ -68,7 +68,7 @@ interface NotificationBase {
   spaceDomain: string;
   spaceName: string;
   createdAt: string;
-  createdBy: NotificationActor | null;
+  createdBy: NotificationActor;
 }
 
 export type DiscussionNotificationType =

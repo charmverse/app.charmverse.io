@@ -94,47 +94,10 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
     }
   });
 
-  const discussionTasks = await getDiscussionTasks(userId);
-
-  [
-    ...discussionTasks.marked.map((d) => ({ ...d, marked: true })),
-    ...discussionTasks.unmarked.map((d) => ({ ...d, marked: false }))
-  ].forEach((task) => {
-    const isMention = task.mentionId !== null;
-    const isComment = task.commentId !== null;
-    const discussionNotification = {
-      taskId: task.taskId,
-      inlineCommentId: task.commentId,
-      mentionId: task.mentionId,
-      createdAt: task.createdAt,
-      createdBy: task.createdBy,
-      pageId: task.pageId,
-      pagePath: task.pagePath,
-      pageTitle: task.pageTitle || 'Untitled',
-      spaceDomain: task.spaceDomain,
-      spaceId: task.spaceId,
-      spaceName: task.spaceName,
-      pageType: task.type,
-      text: '',
-      type:
-        isMention && isComment
-          ? 'inline_comment.mention.created'
-          : isMention
-          ? 'mention.created'
-          : 'inline_comment.created',
-      blockCommentId: null,
-      personPropertyId: null
-    } as DiscussionNotification;
-
-    if (task.marked) {
-      discussionNotificationsGroup.marked.push(discussionNotification);
-    } else {
-      discussionNotificationsGroup.unmarked.push(discussionNotification);
-    }
-  });
+  const discussionTasksGroup = await getDiscussionTasks(userId);
 
   return {
-    marked: discussionNotificationsGroup.marked.sort(sortByDate),
-    unmarked: discussionNotificationsGroup.unmarked.sort(sortByDate)
+    marked: [...discussionNotificationsGroup.marked, ...discussionTasksGroup.marked].sort(sortByDate),
+    unmarked: [...discussionNotificationsGroup.unmarked, ...discussionTasksGroup.unmarked].sort(sortByDate)
   };
 }
