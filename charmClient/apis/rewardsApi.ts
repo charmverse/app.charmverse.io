@@ -7,7 +7,8 @@ import type {
   CreateApplicationCommentPayload,
   ReviewDecision,
   SubmissionContent,
-  SubmissionCreationData
+  SubmissionCreationData,
+  SubmissionUpdateData
 } from 'lib/applications/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
@@ -56,7 +57,13 @@ export class RewardsApi {
     return http.POST<Application>(`/api/applications/${applicationId}/approve`);
   }
 
-  updateApplication(applicationId: string, update: Partial<Application>): Promise<Application> {
+  updateApplication({
+    applicationId,
+    update
+  }: {
+    applicationId: string;
+    update: Partial<Application>;
+  }): Promise<Application> {
     return http.PUT<Application>(`/api/applications/${applicationId}`, update);
   }
 
@@ -72,14 +79,8 @@ export class RewardsApi {
     return http.POST<Application>('/api/submissions', content);
   }
 
-  updateSubmission({
-    submissionId,
-    content
-  }: {
-    submissionId: string;
-    content: SubmissionContent;
-  }): Promise<Application> {
-    return http.PUT<Application>(`/api/submissions/${submissionId}`, content);
+  updateSubmission({ submissionId, submissionContent }: SubmissionUpdateData): Promise<Application> {
+    return http.PUT<Application>(`/api/submissions/${submissionId}`, { content: submissionContent });
   }
 
   reviewSubmission(submissionId: string, decision: ReviewDecision): Promise<Application> {

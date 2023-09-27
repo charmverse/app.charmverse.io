@@ -1,6 +1,7 @@
 import type { Application, ApplicationStatus, Bounty, PageComment, Transaction } from '@charmverse/core/prisma';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { Reward } from 'lib/rewards/interfaces';
 import type { RequiredNotNull } from 'lib/utilities/types';
 
 export interface ApplicationCreationData {
@@ -56,3 +57,7 @@ export interface CreateApplicationCommentPayload {
   content: PageContent | null;
   contentText: string;
 }
+
+export type ApplicationWithReward = Application & {
+  reward: Reward;
+};

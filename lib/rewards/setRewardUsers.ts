@@ -1,6 +1,6 @@
-import { stringUtils } from '@charmverse/core/dist/cjs/utilities';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 

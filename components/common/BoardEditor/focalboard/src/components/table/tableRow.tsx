@@ -34,7 +34,7 @@ type Props = {
   pageTitle: string;
   isSelected: boolean;
   focusOnMount: boolean;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string, parentId?: string) => void;
   readOnly: boolean;
   offset: number;
   pageUpdatedAt: string;
@@ -195,7 +195,7 @@ function TableRow(props: Props) {
                 </div>
 
                 <div className='open-button' data-test={`database-row-open-${card.id}`}>
-                  <Button onClick={() => props.showCard(props.card.id || '')}>
+                  <Button onClick={() => props.showCard(props.card.id || '', props.card.parentId)}>
                     <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                   </Button>
                 </div>

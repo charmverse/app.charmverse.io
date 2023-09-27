@@ -6,6 +6,10 @@
 // import type { RewardWithUsers, ListRewardsRequest } from '@charmverse/core/rewards';
 
 // import type { PageWithReward } from 'lib/pages';
+import { ex } from '@fullcalendar/core/internal-common';
+
+import type { ApplicationWithReward } from 'lib/applications/interfaces';
+import type { BountyPermissionFlags } from 'lib/bounties';
 import type {
   RewardBlockInput,
   RewardBlockUpdateInput,
@@ -56,6 +60,14 @@ type MaybeString = string | null | undefined;
 // export function useGetRewardIdsEvaluatedByUser(spaceId: MaybeString) {
 //   return useGET<RubricRewardsUserInfo>(spaceId ? `/api/spaces/${spaceId}/rewards-evaluated-by-user` : null);
 // }
+
+export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
+  return useGET<BountyPermissionFlags>(rewardId ? `/api/rewards/${rewardId}/permissions` : null);
+}
+
+export function useGetApplication({ applicationId }: { applicationId: string }) {
+  return useGET<ApplicationWithReward>(applicationId ? `/api/applications/${applicationId}` : null);
+}
 
 export function useGetRewards({ spaceId }: { spaceId?: string }) {
   return useGET<RewardWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/rewards` : null);

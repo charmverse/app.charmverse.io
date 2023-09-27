@@ -190,7 +190,7 @@ function mapApplicationToCardPage({
   const card: Card<RewardPropertyValue> = {
     id: application.id || '',
     spaceId: applicationSpaceId,
-    parentId: '',
+    parentId: reward.id,
     schema: 1,
     title: 'APP - rewardPage?.title' || '',
     rootId: applicationSpaceId,

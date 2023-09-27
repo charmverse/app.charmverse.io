@@ -85,6 +85,24 @@ export function RewardsPage({ title }: { title: string }) {
     }
   }, [router.query.id]);
 
+  const showApplication = useCallback(
+    (applicationId: string) => {
+      router.push(`/${currentSpace?.domain}/rewards/applications/${applicationId}`);
+    },
+    [currentSpace]
+  );
+
+  const showRewardOrApplication = useCallback(
+    (id: string | null, rewardId?: string) => {
+      if (id && (!rewardId || id === rewardId)) {
+        openPage(id);
+      } else if (id) {
+        showApplication(id);
+      }
+    },
+    [showReward]
+  );
+
   if (isLoadingAccess) {
     return null;
   }
@@ -182,7 +200,7 @@ export function RewardsPage({ title }: { title: string }) {
                       readOnly={!isAdmin}
                       readOnlySourceData={false}
                       disableAddingCards={true}
-                      showCard={openPage}
+                      showCard={showRewardOrApplication}
                       readOnlyTitle={true}
                       cardIdToFocusOnRender=''
                       addCard={async () => {}}
