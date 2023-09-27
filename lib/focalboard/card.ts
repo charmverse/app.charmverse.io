@@ -17,6 +17,7 @@ export type Card<V = CardPropertyValue> = Block & {
 };
 
 export type CardPage<V = CardPropertyValue> = {
+  subPages?: CardPage<V>[];
   card: Card<V>;
   page: PageMeta;
 };

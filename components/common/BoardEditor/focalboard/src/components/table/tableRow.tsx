@@ -1,4 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import CollapseIcon from '@mui/icons-material/ArrowDropDown';
+import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,7 +14,7 @@ import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TextInput } from '../../../../components/properties/TextInput';
@@ -45,6 +47,9 @@ type Props = {
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
   readOnlyTitle?: boolean;
+  isExpanded?: boolean;
+  setIsExpanded?: (expanded: boolean) => void;
+  indentTitle?: number;
 };
 
 export const columnWidth = (
@@ -72,7 +77,10 @@ function TableRow(props: Props) {
     pageUpdatedAt,
     pageUpdatedBy,
     saveTitle,
-    onDeleteCard
+    onDeleteCard,
+    setIsExpanded,
+    isExpanded,
+    indentTitle
   } = props;
   const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
@@ -175,6 +183,13 @@ function TableRow(props: Props) {
               )}
               <div style={{ display: 'flex', width: '100%' }}>
                 <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
+                  {setIsExpanded &&
+                    (isExpanded ? (
+                      <CollapseIcon onClick={() => setIsExpanded(false)} />
+                    ) : (
+                      <ExpandIcon onClick={() => setIsExpanded(true)} />
+                    ))}
+                  {indentTitle && <div style={{ paddingRight: `${indentTitle}px` }}></div>}
                   <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
                   <TextInput {...commonProps} multiline={wrapColumn} />
                 </div>
@@ -238,4 +253,27 @@ function TableRow(props: Props) {
   );
 }
 
-export default memo(TableRow);
+export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { subPages?: CardPage[] }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <>
+      <TableRow {...props} isExpanded={isExpanded} setIsExpanded={props.subPages?.length ? setIsExpanded : undefined} />
+      {isExpanded &&
+        props.subPages?.map((subPage) => (
+          <ExpandableTableRow
+            key={subPage.card.id}
+            {...props}
+            pageTitle={subPage.page.title}
+            pageUpdatedAt={subPage.page.updatedAt.toISOString()}
+            card={subPage.card}
+            cardPage={subPage.page}
+            subPages={subPage.subPages}
+            indentTitle={22}
+          />
+        ))}
+    </>
+  );
+}
+
+export default memo(ExpandableTableRow);

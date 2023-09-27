@@ -53,7 +53,7 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, card }) => (
+      {cardPages.map(({ page, card, subPages }) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
@@ -77,6 +77,7 @@ function TableRows(props: Props): JSX.Element {
           columnRefs={props.columnRefs}
           cardPage={page}
           readOnlyTitle={props.readOnlyTitle}
+          subPages={subPages}
         />
       ))}
 

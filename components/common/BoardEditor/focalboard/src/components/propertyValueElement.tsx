@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ProposalStatus, ApplicationStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
@@ -14,12 +14,17 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
+import {
+  REWARD_APPLICATION_STATUS_LABELS,
+  RewardApplicationStatusChip
+} from 'components/rewards/components/RewardApplicationStatusChip';
 import { RewardStatusChip } from 'components/rewards/components/RewardChip';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { APPLICANTS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
@@ -145,7 +150,10 @@ function PropertyValueElement(props: Props) {
   let propertyValueElement: ReactNode = null;
 
   if (propertyTemplate.type === 'rewardStatus') {
-    return <RewardStatusChip status={propertyValue as RewardStatus} />;
+    if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
+      return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
+    }
+    return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
   } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === STATUS_BLOCK_ID) {
     // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
     // We should migrate over the proposals as datasource blocks to the same format as proposals table
@@ -194,7 +202,8 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||
     propertyTemplate.type === 'proposalAuthor' ||
-    propertyTemplate.type === 'proposalReviewer'
+    propertyTemplate.type === 'proposalReviewer' ||
+    propertyTemplate.id === APPLICANTS_BLOCK_ID
   ) {
     propertyValueElement = (
       <UserSelect

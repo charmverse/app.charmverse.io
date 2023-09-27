@@ -1,4 +1,4 @@
-import type { BountyStatus as RewardStatus } from '@charmverse/core/prisma';
+import type { ApplicationStatus, BountyStatus as RewardStatus } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -98,14 +98,22 @@ export const REWARD_STATUS_ICONS: Record<RewardStatus, ReactNode> = {
   paid: <PaidIcon />
 };
 
-export function RewardStatusChip({ status, size = 'small' }: { size?: ChipProps['size']; status: RewardStatus }) {
+export function RewardStatusChip({
+  status,
+  size = 'small',
+  showIcon = true
+}: {
+  size?: ChipProps['size'];
+  status: RewardStatus;
+  showIcon?: boolean;
+}) {
   return (
     <StyledRewardStatusChip
       size={size}
       status={status}
       label={REWARD_STATUS_LABELS[status]}
       variant='filled'
-      icon={<span>{REWARD_STATUS_ICONS[status]}</span>}
+      icon={showIcon ? <span>{REWARD_STATUS_ICONS[status]}</span> : undefined}
     />
   );
 }

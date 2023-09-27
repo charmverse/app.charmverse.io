@@ -12,7 +12,9 @@ export function rewardWithUsersInclude() {
       select: {
         id: true,
         createdBy: true,
-        status: true
+        status: true,
+        createdAt: true,
+        updatedAt: true
       }
     },
     permissions: {

@@ -16,8 +16,8 @@ import type { Card, CardPage, CardPropertyValue } from 'lib/focalboard/card';
 import {
   DEFAULT_VIEW_BLOCK_ID,
   REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID,
-  APPLICATIONS_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID,
+  APPLICANTS_BLOCK_ID,
   AVAILABLE_BLOCK_ID,
   DEFAULT_BLOCK_IDS,
   DEFAULT_BOARD_BLOCK_ID,
@@ -27,7 +27,7 @@ import {
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 export type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
@@ -106,7 +106,7 @@ function mapRewardToCardPage({
   reward: BoardReward | RewardWithUsers | null;
   rewardPage?: PageMeta;
   spaceId?: string;
-}) {
+}): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
 
@@ -116,12 +116,13 @@ function mapRewardToCardPage({
     [AVAILABLE_BLOCK_ID]:
       (reward &&
         'maxSubmissions' in reward &&
-        countRemainingSubmissionSlots({
+        reward.maxSubmissions &&
+        `${countRemainingSubmissionSlots({
           applications: reward.applications ?? [],
           limit: reward.maxSubmissions
-        })) ||
+        })} / ${reward.maxSubmissions}`) ||
       '-',
-    [STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
+    [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).toISOString() : '',
     [REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || []
@@ -143,5 +144,89 @@ function mapRewardToCardPage({
     fields: { ...rewardFields, contentOrder: [] }
   };
 
-  return { card, page: rewardPage };
+  return {
+    card,
+    page: rewardPage,
+    subPages:
+      rewardPage && reward && 'applications' in reward
+        ? reward.applications.map((application) =>
+            mapApplicationToCardPage({
+              application,
+              rewardPage,
+              spaceId,
+              reward
+            })
+          )
+        : undefined
+  };
+}
+
+// build mock card from reward and page data
+function mapApplicationToCardPage({
+  application,
+  rewardPage,
+  reward,
+  spaceId
+}: {
+  application: ApplicationMeta;
+  rewardPage: PageMeta;
+  reward: RewardWithUsers;
+  spaceId?: string;
+}) {
+  const applicationFields = { properties: {} };
+  const applicationSpaceId = rewardPage?.spaceId || spaceId || '';
+
+  applicationFields.properties = {
+    ...applicationFields.properties,
+    // add default field values on the fly
+    [AVAILABLE_BLOCK_ID]: '-',
+    [APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
+    [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
+    [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
+    [DUE_DATE_ID]: '-',
+    [REVIEWERS_BLOCK_ID]: []
+  };
+
+  const card: Card<RewardPropertyValue> = {
+    id: application.id || '',
+    spaceId: applicationSpaceId,
+    parentId: '',
+    schema: 1,
+    title: 'APP - rewardPage?.title' || '',
+    rootId: applicationSpaceId,
+    type: 'card' as BlockTypes,
+    updatedBy: application.createdBy || '',
+    createdBy: application.createdBy || '',
+    createdAt: application.createdAt ? new Date(application.createdAt).getTime() : 0,
+    updatedAt: application.updatedAt ? new Date(application.updatedAt).getTime() : 0,
+    deletedAt: null,
+    fields: { ...applicationFields, contentOrder: [] }
+  };
+
+  const applicationPage: PageMeta = {
+    id: application.id || '',
+    spaceId: rewardPage?.spaceId || '',
+    boardId: null,
+    bountyId: rewardPage?.id || '',
+    title: rewardPage?.title || '',
+    type: 'bounty',
+    cardId: application.id || '',
+    createdAt: new Date(application.createdAt),
+    updatedAt: new Date(application.updatedAt),
+    createdBy: application.createdBy || '',
+    deletedAt: null,
+    deletedBy: null,
+    galleryImage: null,
+    hasContent: false,
+    headerImage: null,
+    icon: null,
+    index: 0,
+    parentId: rewardPage?.id || '',
+    path: application.id,
+    proposalId: null,
+    syncWithPageId: null,
+    updatedBy: application.createdBy
+  };
+
+  return { card, page: applicationPage };
 }
