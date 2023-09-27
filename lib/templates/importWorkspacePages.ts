@@ -295,14 +295,17 @@ export async function generateImportWorkspacePages({
       }
     };
 
-    if (newPageContent.data.additionalPaths) {
-      const additionalPath = generatePagePathFromPathAndTitle({
+    if (resetPaths) {
+      const newPath = generatePagePathFromPathAndTitle({
         existingPagePath: newPageContent.data.path,
         title: newPageContent.data.title as string
       });
 
-      newPageContent.data.additionalPaths = resetPaths ? [additionalPath] : [];
+      newPageContent.data.path = newPath;
     }
+
+    // Always reset additional paths
+    newPageContent.data.additionalPaths = [];
 
     if (node.type.match('card')) {
       const cardBlock = node.blocks?.card;
