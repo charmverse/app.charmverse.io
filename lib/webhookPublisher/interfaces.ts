@@ -218,7 +218,6 @@ export type WebhookEvent<T = WebhookEventNames> =
 
 // Webhook payload being sent by out API toward theirs
 export type WebhookPayload<T = WebhookEventNames> = {
-  id: string;
   createdAt: string;
   event: WebhookEvent<T>;
   spaceId: string;
