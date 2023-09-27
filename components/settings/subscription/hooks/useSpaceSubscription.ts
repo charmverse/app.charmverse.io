@@ -2,17 +2,19 @@ import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCount';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { getTimeDifference } from 'lib/utilities/dates';
+import { defaultFreeBlockQuota } from 'lib/subscription/constants';
 
 export function useSpaceSubscription() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setSpace } = useSpaces();
   const { user } = useUser();
+  const { blockCount } = useBlockCount();
 
   const {
     data: spaceSubscription,
@@ -24,21 +26,13 @@ export function useSpaceSubscription() {
     { shouldRetryOnError: false }
   );
 
-  const freeTrialEnds = useMemo(
-    () =>
-      spaceSubscription?.status === 'free_trial'
-        ? getTimeDifference(spaceSubscription?.expiresOn ?? new Date(), 'day', new Date())
-        : 0,
-    [spaceSubscription?.status, spaceSubscription?.expiresOn]
+  const subscriptionEnded = useMemo(
+    () => spaceSubscription?.status === 'past_due' || spaceSubscription?.status === 'unpaid',
+    [spaceSubscription?.status]
   );
 
-  const subscriptionEnded = useMemo(
-    () =>
-      (spaceSubscription?.status === 'free_trial' && freeTrialEnds === 0) ||
-      spaceSubscription?.status === 'past_due' ||
-      spaceSubscription?.status === 'unpaid',
-    [spaceSubscription?.status, freeTrialEnds]
-  );
+  const spaceBlockQuota = defaultFreeBlockQuota * 1000 + (spaceSubscription?.blockQuota || 0) * 1000;
+  const hasPassedBlockQuota = (blockCount?.count || 0) > spaceBlockQuota;
 
   useEffect(() => {
     const unsubscribeFromSpaceSubscriptionUpdates = subscribe('space_subscription', (payload) => {
@@ -59,8 +53,10 @@ export function useSpaceSubscription() {
   return {
     spaceSubscription,
     isLoading,
-    freeTrialEnds,
     subscriptionEnded,
-    refetchSpaceSubscription
+    refetchSpaceSubscription,
+    hasPassedBlockQuota,
+    spaceBlockQuota,
+    paidTier: currentSpace?.paidTier
   };
 }

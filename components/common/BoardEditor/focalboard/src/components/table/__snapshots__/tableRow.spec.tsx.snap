@@ -289,7 +289,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             data-test="select-preview"
           >
             <div
-              class=" css-rm7u2m-MuiStack-root"
+              class=" css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             >
               <div
@@ -318,7 +318,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             data-test="select-preview"
           >
             <div
-              class=" css-rm7u2m-MuiStack-root"
+              class=" css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             />
           </div>
@@ -606,7 +606,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             data-test="select-preview"
           >
             <div
-              class=" css-rm7u2m-MuiStack-root"
+              class=" css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             >
               <div
@@ -635,7 +635,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             data-test="select-preview"
           >
             <div
-              class=" css-rm7u2m-MuiStack-root"
+              class=" css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             />
           </div>

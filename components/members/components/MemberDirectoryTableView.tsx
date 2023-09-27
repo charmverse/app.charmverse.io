@@ -18,15 +18,16 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
-import { DiscordSocialIcon } from 'components/u/components/UserDetails/DiscordSocialIcon';
-import type { Social } from 'components/u/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
+import type { Social, Member } from 'lib/members/interfaces';
 
+import { useMemberDialog } from '../hooks/useMemberDialog';
+
+import { DiscordSocialIcon } from './DiscordSocialIcon';
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
@@ -46,7 +47,8 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const { user } = useUser();
   const { getDisplayProperties } = useMemberProperties();
   const visibleProperties = getDisplayProperties('table');
-  const { showUserProfile } = useUserProfile();
+  const { showUserId } = useMemberDialog();
+  const { onClick: openSettings } = useSettingsDialog();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -65,9 +67,8 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             size='small'
             className='icons'
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              showUserProfile(member.id);
+              openSettings('profile');
             }}
             style={{
               opacity: 1
@@ -161,18 +162,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
 
               return (
                 <TableCell key={property.id}>
-                  {member.id !== user?.id ? (
-                    <Link
-                      color='inherit'
-                      href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-                    >
-                      {content}
-                    </Link>
-                  ) : (
-                    <Box sx={{ cursor: 'pointer' }} onClick={() => showUserProfile(member.id)}>
-                      {content}
-                    </Box>
-                  )}
+                  <Box sx={{ cursor: 'pointer' }} onClick={() => showUserId(member.id)}>
+                    {content}
+                  </Box>
                 </TableCell>
               );
             }

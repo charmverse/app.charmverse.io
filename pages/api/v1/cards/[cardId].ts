@@ -16,6 +16,13 @@ handler.get(getCard).patch(updateCard);
  *     summary: Find card page by ID
  *     tags:
  *      - 'Space API'
+ *     parameters:
+ *       - name: cardIdOrPath
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID or path of the card to retrieve
  *     responses:
  *       200:
  *         description: Card page with content and properties
@@ -46,6 +53,13 @@ export async function getCard(req: NextApiRequest, res: NextApiResponse) {
  *     description: Update a page's title and / or its custom properties.
  *     tags:
  *      - 'Space API'
+ *     parameters:
+ *      - name: cardIdOrPath
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: ID or path of the card to retrieve
  *     requestBody:
  *       content:
  *          application/json:

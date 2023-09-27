@@ -15,7 +15,7 @@ import { v4 } from 'uuid';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace, generateRole } from 'testing/setupDatabase';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 type ProposalWithDetails = Proposal & {
   page: Page;
@@ -37,6 +37,8 @@ let space: Space;
 let superApiKey: SuperApiToken;
 
 const proposalText = `This is an improvement idea`;
+
+const voteOptions = ['Yes', 'No', 'Abstain'];
 
 beforeAll(async () => {
   const generated = await generateUserAndSpace();
@@ -147,6 +149,24 @@ beforeAll(async () => {
     }
   })) as ProposalWithDetails;
 
+  await prisma.vote.create({
+    data: {
+      deadline: new Date(),
+      status: 'InProgress',
+      threshold: 20,
+      title: 'Test Vote',
+      context: 'proposal',
+      page: { connect: { id: proposal.page.id } },
+      author: { connect: { id: proposalAuthor.id } },
+      space: { connect: { id: space.id } },
+      voteOptions: {
+        createMany: {
+          data: voteOptions.map((opt) => ({ name: opt }))
+        }
+      }
+    }
+  });
+
   draftProposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
@@ -230,7 +250,7 @@ beforeAll(async () => {
 
 describe('GET /api/v1/proposals', () => {
   // This test needs to be fixed.
-  it('should return a list of proposals (except draft and private draft) in the space when called with an API key', async () => {
+  it('should return a list of proposals (except draft and private draft), along with vote options if they exist, in the space when called with an API key', async () => {
     const normalApiToken = await prisma.spaceApiToken.create({
       data: {
         token: v4(),
@@ -275,7 +295,8 @@ describe('GET /api/v1/proposals', () => {
 
         title: proposal.page.title,
         status: proposal.status,
-        url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`
+        url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
+        voteOptions
       })
     );
   });

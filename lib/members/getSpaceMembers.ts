@@ -80,7 +80,7 @@ export async function getSpaceMembers({
           createdAt: userData.createdAt,
           deletedAt: userData.deletedAt || undefined,
           updatedAt: userData.updatedAt,
-          profile: userData.profile || undefined,
+          profile: (userData.profile as Member['profile']) || undefined,
           avatar: userData.avatar || undefined,
           avatarTokenId: userData.avatarTokenId || undefined,
           username,

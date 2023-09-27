@@ -17,8 +17,7 @@ export async function createProSubscription({
   billingEmail,
   name,
   address,
-  coupon,
-  freeTrial
+  coupon
 }: {
   spaceId: string;
 } & CreateProSubscriptionRequest): Promise<ProSubscriptionResponse> {
@@ -37,12 +36,6 @@ export async function createProSubscription({
   }
 
   const spaceSubscriptionWithDetails = await getActiveSpaceSubscription({ spaceId });
-
-  if (freeTrial && spaceSubscriptionWithDetails?.status === 'free_trial') {
-    throw new InvalidStateError(
-      `Space already has an active free trial with the id ${spaceSubscriptionWithDetails.id}`
-    );
-  }
 
   if (spaceSubscriptionWithDetails?.status === 'active') {
     throw new InvalidStateError(
@@ -111,7 +104,7 @@ export async function createProSubscription({
       tier: 'community',
       spaceId
     },
-    trial_period_days: freeTrial ? communityProduct.trial : undefined,
+    trial_period_days: undefined,
     customer: customer.id,
     items: [
       {
@@ -125,14 +118,7 @@ export async function createProSubscription({
     payment_settings: {
       save_default_payment_method: 'on_subscription'
     },
-    // This ensures the subscription will be paused after the trial and is not accidentally billed
-    trial_settings: freeTrial
-      ? {
-          end_behavior: {
-            missing_payment_method: 'pause'
-          }
-        }
-      : undefined,
+    trial_settings: undefined,
     payment_behavior: 'default_incomplete',
     expand: ['latest_invoice.payment_intent']
   });

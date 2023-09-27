@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@mui/material/styles';
+import type { RenderOptions } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { SWRConfig } from 'swr';
@@ -13,7 +14,10 @@ import { createThemeLightSensitive } from 'theme';
 import { createMockSpace } from './mocks/space';
 import { createMockUser } from './mocks/user';
 
-export const customRenderWithContext = (ui: ReactNode, { value, ...renderOptions }: { value?: Partial<IContext> }) => {
+export const customRenderWithContext = (
+  ui: ReactNode,
+  { value, renderOptions }: { value?: Partial<IContext>; renderOptions?: RenderOptions }
+) => {
   const theme = createThemeLightSensitive('light');
   const space = createMockSpace();
 
@@ -79,7 +83,18 @@ export const customRenderWithContext = (ui: ReactNode, { value, ...renderOptions
         </UserContext.Provider>
       </ThemeProvider>
     </SWRConfig>,
-    {
+    renderOptions || {
+      hydrate: true
+    }
+  );
+};
+
+export const renderWithTheme = (ui: ReactNode, renderOptions?: RenderOptions) => {
+  const theme = createThemeLightSensitive('light');
+
+  return render(
+    <ThemeProvider theme={theme}>{ui}</ThemeProvider>,
+    renderOptions || {
       hydrate: true
     }
   );
