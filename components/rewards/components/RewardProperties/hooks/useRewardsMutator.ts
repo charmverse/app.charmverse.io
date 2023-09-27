@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 
-import { ProposalsMutator } from 'components/proposals/components/ProposalProperties/proposalsMutator';
-import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { ProposalFieldsProp, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
+import { RewardsMutator } from 'components/rewards/components/RewardProperties/rewardsMutator';
+import { useRewardBlocks } from 'hooks/useRewardBlocks';
+import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
 type Props = {
-  proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
-  onChange?: (values: ProposalPropertiesField) => void;
+  reward: { spaceId?: string; id?: string } & RewardFieldsProp;
+  onChange?: (values: RewardPropertiesField) => void;
 };
 
 export function usePropertiesMutator({ onChange }: Props) {
-  const blocksContext = useProposalBlocks();
-  const [mutator, setMutator] = useState<ProposalsMutator | null>(null);
+  const blocksContext = useRewardBlocks();
+  const [mutator, setMutator] = useState<RewardsMutator | null>(null);
 
   useEffect(() => {
-    const instance = new ProposalsMutator(blocksContext, onChange);
+    const instance = new RewardsMutator(blocksContext, onChange);
     setMutator(instance);
   }, []);
 

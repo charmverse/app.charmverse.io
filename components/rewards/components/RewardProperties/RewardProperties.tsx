@@ -15,7 +15,6 @@ import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import ButtonBoard from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
-import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
@@ -25,18 +24,15 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
-import { MissingPagePermissions } from './components/MissingPagePermissions';
 import RewardApplicantForm from './components/RewardApplicantForm';
 import RewardApplicantsTable from './components/RewardApplicantsTable';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardSignupButton } from './components/RewardSignupButton';
-import RewardSuggestionApproval from './components/RewardSuggestionApproval';
 
 const RewardTypes = ['Token', 'Custom'] as const;
 type RewardType = (typeof RewardTypes)[number];
