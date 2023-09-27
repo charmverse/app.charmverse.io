@@ -443,26 +443,16 @@ export class DocumentEventHandler {
         // Don't create notifications for self mentions
         const filteredMentions = extractedMentions.filter((mention) => mention.value !== session.user.id);
 
-        if (filteredMentions.length) {
+        if (filteredMentions.length && room.doc.type === 'page') {
           await Promise.all(
             filteredMentions.map((mention) => {
-              if (room.doc.type === 'card') {
-                return publishCardEvent({
-                  cardId: room.doc.id,
-                  scope: WebhookEventNames.CardMentionCreated,
-                  spaceId: room.doc.spaceId,
-                  mention,
-                  userId: session.user.id
-                });
-              } else {
-                return publishDocumentEvent({
-                  documentId: room.doc.id,
-                  scope: WebhookEventNames.DocumentMentionCreated,
-                  spaceId: room.doc.spaceId,
-                  mention,
-                  userId: session.user.id
-                });
-              }
+              return publishDocumentEvent({
+                documentId: room.doc.id,
+                scope: WebhookEventNames.DocumentMentionCreated,
+                spaceId: room.doc.spaceId,
+                mention,
+                userId: session.user.id
+              });
             })
           );
         }

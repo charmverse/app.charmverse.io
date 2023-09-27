@@ -33,26 +33,7 @@ export async function createNotificationsFromEvent(webhookData: {
     }
 
     case WebhookEventNames.DocumentInlineCommentCreated: {
-      return createInlineCommentNotification(webhookData.event);
-    }
-
-    case WebhookEventNames.CardInlineCommentCreated: {
-      return createInlineCommentNotification(webhookData.event);
-    }
-
-    case WebhookEventNames.CardMentionCreated: {
-      const mentionedUserId = webhookData.event.mention.value;
-      const mentionAuthorId = webhookData.event.user.id;
-
-      await createCardNotification({
-        type: 'mention.created',
-        createdBy: mentionAuthorId,
-        mentionId: webhookData.event.mention.id,
-        cardId: webhookData.event.card.id,
-        spaceId: webhookData.spaceId,
-        userId: mentionedUserId
-      });
-
+      await createInlineCommentNotification(webhookData.event);
       break;
     }
 

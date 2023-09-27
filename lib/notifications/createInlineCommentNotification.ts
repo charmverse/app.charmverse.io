@@ -8,7 +8,7 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { createCardNotification, createDocumentNotification } from './createNotification';
 
 export async function createInlineCommentNotification(
-  data: WebhookEventBody<WebhookEventNames.DocumentInlineCommentCreated | WebhookEventNames.CardInlineCommentCreated>
+  data: WebhookEventBody<WebhookEventNames.DocumentInlineCommentCreated>
 ) {
   const spaceId = data.space.id;
   const inlineCommentId = data.inlineComment.id;
@@ -83,49 +83,6 @@ export async function createInlineCommentNotification(
       break;
     }
 
-    case WebhookEventNames.CardInlineCommentCreated: {
-      const authorId = data.card.author.id;
-      const cardId = data.card.id;
-      const extractedMentions = extractMentions(inlineCommentContent);
-
-      if (inlineCommentAuthorId !== authorId) {
-        await createCardNotification({
-          type: 'inline_comment.created',
-          createdBy: inlineCommentAuthorId,
-          inlineCommentId,
-          cardId,
-          spaceId,
-          userId: authorId
-        });
-      }
-
-      if (previousInlineComment && previousInlineComment?.id !== inlineCommentId) {
-        await createCardNotification({
-          type: 'inline_comment.replied',
-          createdBy: inlineCommentAuthorId,
-          inlineCommentId,
-          cardId,
-          spaceId,
-          userId: previousInlineComment.userId
-        });
-      }
-
-      for (const extractedMention of extractedMentions) {
-        const mentionedUserId = extractedMention.value;
-        if (mentionedUserId !== inlineCommentAuthorId) {
-          await createCardNotification({
-            type: 'inline_comment.mention.created',
-            createdBy: inlineCommentAuthorId,
-            inlineCommentId,
-            mentionId: extractedMention.id,
-            cardId,
-            spaceId,
-            userId: mentionedUserId
-          });
-        }
-      }
-      break;
-    }
     default:
       break;
   }

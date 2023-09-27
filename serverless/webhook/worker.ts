@@ -33,8 +33,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
 
         const webhookMessage = await prisma.webhookMessage.findUnique({
           where: {
-            id: webhookMessageHash,
-            processed: true
+            id: webhookMessageHash
           }
         });
 
@@ -47,8 +46,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
 
         await prisma.webhookMessage.create({
           data: {
-            id: webhookMessageHash,
-            processed: true
+            id: webhookMessageHash
           }
         });
 

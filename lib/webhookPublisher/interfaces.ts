@@ -56,7 +56,7 @@ export type BountyEntity = {
 export type DocumentEntity = {
   id: string;
   title: string;
-  path: string;
+  url: string;
   type: PageType;
   author: UserEntity;
 };
@@ -95,8 +95,6 @@ export enum WebhookEventNames {
   HelloWorld = 'hello.world',
   DocumentMentionCreated = 'document.mention.created',
   DocumentInlineCommentCreated = 'document.inline_comment.created',
-  CardMentionCreated = 'card.mention.created',
-  CardInlineCommentCreated = 'card.inline_comment.created',
   CardBlockCommentCreated = 'card.block_comment.created',
   CardPersonPropertyAssigned = 'card.person_property.assigned'
 }
@@ -195,25 +193,12 @@ export type WebhookEvent<T = WebhookEventNames> =
       blockComment: BlockCommentEntity;
     }
   | {
-      scope: WebhookEventNames.CardInlineCommentCreated;
-      space: SpaceEntity;
-      card: DocumentEntity;
-      inlineComment: InlineCommentEntity;
-    }
-  | {
       scope: WebhookEventNames.CardPersonPropertyAssigned;
       space: SpaceEntity;
       card: DocumentEntity;
       assignedUser: UserEntity;
       personPropertyId: string;
       user: UserEntity;
-    }
-  | {
-      scope: WebhookEventNames.CardMentionCreated;
-      space: SpaceEntity;
-      card: DocumentEntity;
-      user: UserEntity;
-      mention: UserMentionMetadata;
     };
 
 // Webhook payload being sent by out API toward theirs

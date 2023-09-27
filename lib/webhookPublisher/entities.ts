@@ -142,7 +142,12 @@ export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
       id: true,
       title: true,
       path: true,
-      type: true
+      type: true,
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
 
@@ -151,7 +156,7 @@ export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
   return {
     id,
     title: document.title,
-    path: document.path,
+    url: `${baseUrl}/${document.space.domain}/${document.path}`,
     type: document.type,
     author
   };

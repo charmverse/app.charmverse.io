@@ -64,10 +64,12 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
     await notificationTaskLimiter();
 
-    const discussionTasks = await getDiscussionNotifications(user.id);
-    const voteTasks = await getVoteTasks(user.id);
-    const bountyTasks = await getBountyTasks(user.id);
-    const forumTasks = await getForumNotifications(user.id);
+    const [discussionTasks, voteTasks, bountyTasks, forumTasks] = await Promise.all([
+      getDiscussionNotifications(user.id),
+      getVoteTasks(user.id),
+      getBountyTasks(user.id),
+      getForumNotifications(user.id)
+    ]);
 
     const sentTasks = await prisma.userNotification.findMany({
       where: {

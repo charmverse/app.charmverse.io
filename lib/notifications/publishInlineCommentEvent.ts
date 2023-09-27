@@ -1,7 +1,7 @@
-import type { Page, PageType } from '@charmverse/core/prisma-client';
+import type { PageType } from '@charmverse/core/prisma-client';
 
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishCardEvent, publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 export async function publishInlineCommentEvent({
   inlineCommentId,
@@ -20,21 +20,11 @@ export async function publishInlineCommentEvent({
   inlineCommentId: string;
   userId: string;
 }) {
-  if (page.type === 'card' && page.cardId) {
-    await publishCardEvent({
-      cardId: page.cardId,
-      scope: WebhookEventNames.CardInlineCommentCreated,
-      inlineCommentId,
-      spaceId: page.spaceId,
-      userId
-    });
-  } else {
-    await publishDocumentEvent({
-      documentId: page.id,
-      scope: WebhookEventNames.DocumentInlineCommentCreated,
-      inlineCommentId,
-      spaceId: page.spaceId,
-      userId
-    });
-  }
+  await publishDocumentEvent({
+    documentId: page.id,
+    scope: WebhookEventNames.DocumentInlineCommentCreated,
+    inlineCommentId,
+    spaceId: page.spaceId,
+    userId
+  });
 }
