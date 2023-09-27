@@ -22,7 +22,7 @@ import ApplicationInput from '../RewardApplicantForm/components/ApplicationInput
 import SubmissionInput from '../RewardApplicantForm/components/SubmissionInput';
 
 import { ApplicationComments } from './ApplicationComments';
-import BountyApplicantActions from './BountyApplicantActions';
+import BountyApplicantActions from './RewardApplicantActions';
 
 interface Props {
   submissionsCapReached: boolean;

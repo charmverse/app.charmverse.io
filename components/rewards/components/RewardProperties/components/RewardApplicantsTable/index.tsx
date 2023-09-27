@@ -1,3 +1,3 @@
-import Table from './BountyApplicantsTable';
+import Table from './RewardApplicantsTable';
 
 export default Table;
