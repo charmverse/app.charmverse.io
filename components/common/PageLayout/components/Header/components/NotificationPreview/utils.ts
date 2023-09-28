@@ -14,6 +14,8 @@ import type {
   VoteNotification
 } from 'lib/notifications/interfaces';
 
+import { NotificationDetails } from './useNotifications';
+
 function getUrlSearchParamsFromNotificationType(
   notification:
     | DiscussionNotification
@@ -122,7 +124,7 @@ function getForumContent(n: ForumNotification) {
 
 export function getForumNotificationPreviewItems(notifications: ForumNotification[]) {
   return notifications.map((n) => ({
-    id: n.taskId,
+    taskId: n.taskId,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
@@ -159,7 +161,7 @@ function getDiscussionContent(n: DiscussionNotification) {
 
 export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
   return notifications.map((n) => ({
-    id: n.taskId,
+    taskId: n.taskId,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
@@ -213,7 +215,7 @@ function getBountyContent(n: BountyNotification) {
 
 export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]) {
   return notifications.map((n) => ({
-    id: n.taskId,
+    taskId: n.taskId,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
@@ -277,7 +279,7 @@ function getProposalNotificationStatus(status: ProposalStatus) {
 
 export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[]) {
   return notifications.map((n) => ({
-    id: n.taskId,
+    taskId: n.taskId,
     createdAt: n.createdAt,
     createdBy: n.createdBy || null,
     spaceName: n.spaceName,
@@ -291,7 +293,7 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalNoti
 
 export function getVoteNotificationPreviewItems(notifications: VoteNotification[]) {
   return notifications.map((n) => ({
-    id: n.taskId,
+    taskId: n.taskId,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
