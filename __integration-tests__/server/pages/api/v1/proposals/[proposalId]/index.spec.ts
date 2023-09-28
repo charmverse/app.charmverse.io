@@ -218,6 +218,29 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
     );
   });
 
+  it('should not fail if an author has no google accounts or verified emails in their account', async () => {
+    const { space: secondSpace, user: secondSpaceUser } = await testUtilsUser.generateUserAndSpace();
+
+    const secondSpaceProposal = await testUtilsProposals.generateProposal({
+      spaceId: secondSpace.id,
+      userId: secondSpaceUser.id,
+      authors: [secondSpaceUser.id],
+      proposalStatus: 'discussion'
+    });
+
+    const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });
+
+    const response = (
+      await request(baseUrl)
+        .get(`/api/v1/proposals/${secondSpaceProposal.id}?spaceId=${secondSpace.id}`)
+        .set({ authorization: `Bearer ${otherSuperApiKey.token}` })
+        .send()
+        .expect(200)
+    ).body;
+
+    expect(response.id).toEqual(secondSpaceProposal.id);
+  });
+
   it('should fail if the requester api key is not linked to this space', async () => {
     const otherSpace = await testUtilsUser.generateUserAndSpace();
     const otherSpaceApiKey = await generateSpaceApiKey({
