@@ -21,7 +21,7 @@ async function updateProposalStatusController(req: NextApiRequest, res: NextApiR
   const userId = req.session.user.id;
   const newStatus = req.body.newStatus as ProposalStatus;
 
-  const updatedProposal = await updateProposalStatus({
+  await updateProposalStatus({
     proposalId,
     newStatus,
     userId
@@ -45,7 +45,7 @@ async function updateProposalStatusController(req: NextApiRequest, res: NextApiR
     spaceId: proposalPage?.spaceId || ''
   });
 
-  return res.status(200).send(updatedProposal.proposal);
+  return res.status(200);
 }
 
 export default withSessionRoute(handler);

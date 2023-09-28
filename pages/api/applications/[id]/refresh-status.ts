@@ -13,7 +13,10 @@ handler.use(requireUser).get(refreshStatusHandler);
 async function refreshStatusHandler(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id: applicationId } = req.query;
 
-  const updatedApplication = await refreshPaymentStatus(applicationId as string);
+  const updatedApplication = await refreshPaymentStatus({
+    applicationId: applicationId as string,
+    userId: req.session.user.id
+  });
 
   return res.status(200).json(updatedApplication.application);
 }

@@ -23,7 +23,7 @@ export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>
 export type NotificationDetails = {
   spaceName: string;
   createdAt: string | Date;
-  createdBy: NotificationActor | TaskUser | null;
+  createdBy: NotificationActor;
   groupType: NotificationGroupType;
   type: NotificationType;
   taskId: string;
