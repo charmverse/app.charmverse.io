@@ -35,7 +35,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       trackPageView({
         type: page.type,
         pageId: page.id,
-        spaceId: page.spaceId
+        spaceId: page.spaceId,
+        spaceDomain: currentSpace?.domain
       });
       setCurrentPageId(page.id);
     }
