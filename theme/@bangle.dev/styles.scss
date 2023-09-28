@@ -287,26 +287,45 @@ ol li {
   transition: background-color 150ms ease-in-out;
 }
 
-.bangle-editor li[data-bangle-is-todo] {
-  // display: flex;
-  // flex-direction: row;
-  // position: relative;
+.bangle-editor .old-list li[data-bangle-is-todo] {
+  display: flex;
+  flex-direction: row;
+  position: relative;
 }
 
-.bangle-editor li[data-bangle-is-todo] > span:first-child {
-  // margin-left: -1.5rem;
+.bangle-editor .old-list li[data-bangle-is-todo] > span:first-child {
+  margin-left: -1.5rem;
 }
 
+.bangle-editor .old-list li[data-bangle-is-todo] > span:first-child > input {
+  margin-top: 0.5rem;
+  margin-right: 6px;
+  outline: none;
+  position: relative;
+}
 
 .bangle-editor > ol {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-.bangle-editor ol {
-  // list-style-type: decimal;
-  // list-style-position: outside;
-  // padding-left: 1.5rem;
+.bangle-editor .old-list {
+  list-style-position: outside;
+  padding-left: 1.5rem;
+  // hide new list style
+  p::before {
+    display: none !important;
+  }
+  li {
+    display: list-item;
+  }
+  p {
+    padding-left: 0 !important;
+  }
+}
+ba
+.bangle-editor ol.old-list {
+  list-style-type: decimal;
 }
 
 .bangle-editor > p {

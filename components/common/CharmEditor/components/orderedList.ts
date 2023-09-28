@@ -45,7 +45,7 @@ function specFactory(): RawSpecs {
       group: 'block',
       parseDOM: [
         {
-          tag: 'ol.old-ordered-list',
+          tag: 'ol.old-list',
           getAttrs: (dom: any) => ({
             order: dom.hasAttribute('start') ? +dom.getAttribute('start')! : 1
           })
@@ -53,8 +53,8 @@ function specFactory(): RawSpecs {
       ],
       toDOM: (node) =>
         node.attrs.order === 1
-          ? ['ol', { class: 'old-bullet-list' }, 0]
-          : ['ol', { class: 'old-bullet-list', start: node.attrs.order }, 0]
+          ? ['ol', { class: 'old-list' }, 0]
+          : ['ol', { class: 'old-list', start: node.attrs.order }, 0]
     },
     markdown: {
       toMarkdown(state, node) {

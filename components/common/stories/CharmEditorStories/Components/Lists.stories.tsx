@@ -41,11 +41,12 @@ export function Lists() {
     _.bulletList(
       _.listItem(_.p('Bread')),
       _.listItem(_.p('Milk')),
-      _.listItem(_.p('Vegetables')),
-      _.bulletList(
-        _.listItem(_.p('Cucumber')),
-        _.listItem(_.p('Pumpkin')),
-        _.bulletList(_.listItem(_.p('Squash')), _.bulletList(_.listItem(_.p('Zucchini'))))
+      _.listItem(
+        _.p('Vegetables'),
+        _.bulletList(
+          _.listItem(_.p('Cucumber')),
+          _.listItem(_.p('Pumpkin'), _.bulletList(_.listItem(_.p('Squash'), _.bulletList(_.listItem(_.p('Zucchini'))))))
+        )
       )
     ),
     _.heading({ level: 2 }, 'Ordered list'),
@@ -57,11 +58,15 @@ export function Lists() {
     _.orderedList(
       _.listItem(_.p('Bread')),
       _.listItem(_.p('Milk')),
-      _.listItem(_.p('Vegetables')),
-      _.orderedList(
-        _.listItem(_.p('Cucumber')),
-        _.listItem(_.p('Pumpkin')),
-        _.orderedList(_.listItem(_.p('Squash')), _.orderedList(_.listItem(_.p('Zucchini'))))
+      _.listItem(
+        _.p('Vegetables'),
+        _.orderedList(
+          _.listItem(_.p('Cucumber')),
+          _.listItem(
+            _.p('Pumpkin'),
+            _.orderedList(_.listItem(_.p('Squash'), _.orderedList(_.listItem(_.p('Zucchini')))))
+          )
+        )
       )
     ),
     _.heading({ level: 2 }, 'Todo list'),
@@ -73,8 +78,11 @@ export function Lists() {
     _.heading({ level: 2 }, 'Old Todo list'),
     _.bulletList(
       _.listItem({ todoChecked: true }, _.p('Task 1')),
-      _.listItem({ todoChecked: false }, _.p('Task 2')),
-      _.bulletList({ indent: 1 }, _.listItem({ todoChecked: false }, _.p('Nested task')))
+      _.listItem(
+        { todoChecked: false },
+        _.p('Task 2'),
+        _.bulletList(_.listItem({ todoChecked: false }, _.p('Nested task')))
+      )
     )
   );
   return renderEditorWithContent({ content, title: 'Lists' });
