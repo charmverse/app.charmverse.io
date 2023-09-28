@@ -20,7 +20,7 @@ import { AdminRoleRow } from './components/AdminRoleRow';
 import type { CreateRoleInput } from './components/CreateRoleForm';
 import { CreateRoleForm } from './components/CreateRoleForm';
 import { GuestRoleRow } from './components/GuestRoleRow';
-import ImportDiscordRolesMenuItem from './components/ImportDiscordRolesMenuItem';
+import { ImportDiscordRolesMenuItem } from './components/ImportDiscordRolesMenuItem';
 import { MemberRoleRow } from './components/MemberRoleRow';
 import { DefaultPagePermissions } from './components/RolePermissions/components/DefaultPagePermissions';
 import { RoleRow } from './components/RoleRow';
@@ -162,7 +162,7 @@ export function RoleSettings({ space }: { space: Space }) {
       )}
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <ImportDiscordRolesMenuItem />
+        {/* hide this until we are approved <ImportDiscordRolesMenuItem /> */}
         <ImportGuildRolesMenuItem onClose={handleClose} />
       </Menu>
 
