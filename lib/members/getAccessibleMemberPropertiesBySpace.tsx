@@ -107,3 +107,28 @@ export function accessiblePropertiesByPermissionsQuery({
     }
   };
 }
+
+export function getAllMemberPropertiesBySpace({ spaceId }: { spaceId: string | string[] }) {
+  const spaceIdQuery = typeof spaceId === 'string' ? [spaceId] : spaceId;
+
+  return prisma.memberProperty.findMany({
+    where: {
+      space: { id: { in: spaceIdQuery } }
+    },
+    orderBy: {
+      index: 'asc'
+    },
+    include: {
+      space: true,
+      permissions: {
+        include: {
+          role: {
+            select: {
+              name: true
+            }
+          }
+        }
+      }
+    }
+  });
+}
