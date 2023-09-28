@@ -88,7 +88,7 @@
     "@bangle.dev/tooltip": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.4.1-rc-feat-rewards.1",
+    "@charmverse/core": "^0.4.0",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
@@ -233,7 +233,7 @@
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.6.0",
     "uuid": "^8.3.2",
-    "viem": "^1.10.9",
+    "viem": "1.13.2",
     "wagmi": "^1.4.1",
     "yup": "^0.32.11"
   },
