@@ -89,6 +89,9 @@ export const builders = {
   ...shortcuts
 };
 
+// add an alias to make declarations more concise
+export const _ = builders;
+
 export function jsonDoc(...args: (string | Node | object)[]) {
   return builders.doc(...args).toJSON();
 }

@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
+import { _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { renderEditorWithContent } from '../renderEditor';
 
