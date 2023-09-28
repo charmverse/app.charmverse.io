@@ -3,26 +3,25 @@ import type { PostCategory, SubscriptionTier, User, UserVote, Vote, VoteOptions 
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 
-import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
+import type { NotificationActor, VoteNotification } from 'lib/notifications/interfaces';
 import { publicPermissionsClient } from 'lib/permissions/api/client';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
-import type { VoteTask } from './interfaces';
 
 type VoteWithInfo = Vote & {
   page: { id: string; path: string; title: string } | null;
   post: { id: string; path: string; title: string; categoryId: string } | null;
-  space: { name: string; domain: string; paidTier: SubscriptionTier };
+  space: { name: string; domain: string; paidTier: SubscriptionTier; id: string };
   userVotes: UserVote[];
   voteOptions: VoteOptions[];
-  author: User;
+  author: NotificationActor;
 };
 
 export interface VoteTasksGroup {
-  marked: VoteTask[];
-  unmarked: VoteTask[];
+  marked: VoteNotification[];
+  unmarked: VoteNotification[];
 }
 export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
   const votes = await prisma.vote.findMany({
@@ -42,13 +41,14 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
     },
     include: {
       page: {
-        select: { id: true, path: true, title: true }
+        select: { id: true, path: true, title: true, type: true }
       },
       post: {
         select: { id: true, path: true, title: true, categoryId: true }
       },
       space: {
         select: {
+          id: true,
           name: true,
           domain: true,
           paidTier: true
@@ -56,7 +56,18 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
       },
       userVotes: true,
       voteOptions: true,
-      author: true
+      author: {
+        select: {
+          id: true,
+          username: true,
+          path: true,
+          avatar: true,
+          avatarTokenId: true,
+          avatarContract: true,
+          avatarChain: true,
+          deletedAt: true
+        }
+      }
     }
   });
 
@@ -195,8 +206,8 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
   });
   const markedNotificationIds = new Set(userNotifications.map((userNotification) => userNotification.taskId));
 
-  const marked: VoteTask[] = [];
-  const unmarked: VoteTask[] = [];
+  const marked: VoteNotification[] = [];
+  const unmarked: VoteNotification[] = [];
 
   sortedVotes.forEach((vote) => {
     const voteStatus = calculateVoteStatus(vote);
@@ -209,13 +220,17 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
 
     delete (vote as any).userVotes;
 
-    const task: VoteTask = {
-      ...vote,
-      aggregatedResult,
+    const task: VoteNotification = {
       userChoice,
       status: voteStatus,
-      totalVotes: userVotes.length,
-      createdBy: mapNotificationActor(vote.author),
+      createdBy: vote.author,
+      categoryId: vote.post?.categoryId || null,
+      createdAt: vote.createdAt.toISOString(),
+      deadline: vote.deadline,
+      pageType: vote.page?.type === 'page' ? 'page' : 'proposal',
+      spaceId: vote.space.id,
+      title: vote.title || 'Untitled',
+      type: 'new_vote',
       taskId: vote.id,
       spaceName: vote.space.name,
       spaceDomain: vote.space.domain,
@@ -223,7 +238,7 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
       pageTitle: vote.page?.title || vote.post?.title || 'Untitled'
     };
 
-    if (markedNotificationIds.has(task.id)) {
+    if (markedNotificationIds.has(task.taskId)) {
       marked.push(task);
     } else {
       unmarked.push(task);

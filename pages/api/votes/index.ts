@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -158,7 +159,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     ...newVote,
     createdBy: userId
   } as VoteDTO);
-  const voteAuthor = await prisma.user.findUnique({ where: { id: userId } });
+  const voteAuthor = (await prisma.user.findUnique({ where: { id: userId } })) as User;
 
   if (pageId && vote.context === 'proposal') {
     trackUserAction('new_vote_created', {
@@ -182,7 +183,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
   if (existingPage) {
     voteTask = {
       ...vote,
-      createdBy: mapNotificationActor(voteAuthor),
+      createdBy: mapNotificationActor(voteAuthor) as User,
       taskId: vote.id,
       spaceName: space.name,
       spaceDomain: space.domain,
@@ -192,7 +193,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
   } else if (existingPost) {
     voteTask = {
       ...vote,
-      createdBy: mapNotificationActor(voteAuthor),
+      createdBy: mapNotificationActor(voteAuthor) as User,
       taskId: vote.id,
       spaceName: space.name,
       spaceDomain: space.domain,

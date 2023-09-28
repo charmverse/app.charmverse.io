@@ -1,5 +1,6 @@
-import type { ForumNotificationsContext, ForumNotifications } from './getForumNotifications';
-import { getPropertiesFromPost } from './utils';
+import type { ForumNotification } from 'lib/notifications/interfaces';
+
+import type { ForumNotificationsContext, ForumNotifications } from './getForumTasks';
 /**
  * Get all comments that match these 2:
  * 1. My page, but not my comments
@@ -26,24 +27,32 @@ export function getPostComments({ userId, spacesRecord, posts }: ForumNotificati
     commentIdsFromUser.includes(comment.parentId ?? '')
   );
 
-  const commentReplies = [...commentsOnTheUserPage, ...repliesToUserComments];
+  const commentReplies = [
+    ...commentsOnTheUserPage.map((c) => ({ ...c, reply: false })),
+    ...repliesToUserComments.map((c) => ({ ...c, reply: true }))
+  ];
 
   const commentTasks = commentReplies.map((comment) => {
-    return {
-      ...getPropertiesFromPost(postsRecord[comment.postId], spacesRecord[postsRecord[comment.postId].spaceId]),
-      createdAt: new Date(comment.createdAt).toISOString(),
-      userId: comment.createdBy,
-      commentText: comment.contentText,
+    const commentNotification: ForumNotification = {
       commentId: comment.id,
+      commentText: comment.contentText,
+      createdAt: new Date(comment.createdAt).toISOString(),
+      createdBy: comment.user,
       mentionId: null,
+      postId: comment.postId,
+      postPath: postsRecord[comment.postId].path,
+      postTitle: postsRecord[comment.postId].title,
+      spaceDomain: spacesRecord[postsRecord[comment.postId].spaceId].domain,
+      spaceId: postsRecord[comment.postId].spaceId,
+      spaceName: spacesRecord[postsRecord[comment.postId].spaceId].name,
       taskId: comment.id,
-      taskType: 'post_comment' as const
+      type: comment.reply ? 'comment.replied' : 'comment.created'
     };
+    return commentNotification;
   });
 
   return {
     mentions: [],
-    discussionUserIds: commentTasks.map((comm) => comm.userId).concat([userId]),
     comments: commentTasks
   };
 }
