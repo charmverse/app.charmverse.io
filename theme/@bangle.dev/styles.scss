@@ -334,11 +334,11 @@ ol li {
 }
 
 /** Bullet List */
-.bangle-editor ul:not(.MuiList-root) {
-  list-style-type: disc;
-  list-style-position: outside;
-  padding-left: 24px;
-}
+// .bangle-editor ul:not(.MuiList-root) {
+//   list-style-type: disc;
+//   list-style-position: outside;
+//   padding-left: 24px;
+// }
 
 .bangle-editor ul,
 .bangle-editor ol {
@@ -455,7 +455,7 @@ ol li {
   position: absolute;
   width: 56px;
   height: 24px;
-  margin-top: 5px;
+  margin-top: 3px;
   // opacity: 0;
   transition: opacity 0.2s ease-in-out;
 
@@ -618,3 +618,27 @@ ol li {
 }
 
 /** End columns **/
+
+/** Tab **/
+.charm-tab {
+  tab-size: var(--tab-width);  // should equal list item padding
+
+  &[data-indent='1'] {
+    tab-size: calc(2 * var(--tab-width));
+  }
+  &[data-indent='2'] {
+    tab-size: calc(3 * var(--tab-width));
+  }
+  &[data-indent='3'] {
+    tab-size: calc(4 * var(--tab-width));
+  }
+  &[data-indent='4'] {
+    tab-size: calc(5 * var(--tab-width));
+  }
+  &[data-indent='5'] {
+    tab-size: calc(6 * var(--tab-width));
+  }
+  &[data-indent='6'] {
+    tab-size: calc(7 * var(--tab-width));
+  }
+}

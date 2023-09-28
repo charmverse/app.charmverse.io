@@ -32,7 +32,7 @@ function markInsertion(
       tr.removeMark(Math.max(from, pos), Math.min(pos + node.nodeSize, to), tr.doc.type.schema.marks.insertion);
       tr.addMark(Math.max(from, pos), Math.min(pos + node.nodeSize, to), insertionMark);
       return false;
-    } else if (pos < from || ['bulletList', 'orderedList'].includes(node.type.name)) {
+    } else if (pos < from || ['bulletList', 'orderedList', 'bullet_list', 'ordered_list'].includes(node.type.name)) {
       return true;
     } else if (['table_row', 'table_cell'].includes(node.type.name)) {
       return false;
@@ -97,7 +97,7 @@ function markDeletion(
       );
     } else if (
       !node.attrs.track?.find((t: TrackAttribute) => t.type === 'deletion') &&
-      !['bulletList', 'orderedList'].includes(node.type.name)
+      !['bulletList', 'orderedList', 'bullet_list', 'ordered_list'].includes(node.type.name)
     ) {
       if (node.attrs.track?.find((t: TrackAttribute) => t.type === 'insertion' && t.user === user.id)) {
         let removeStep;

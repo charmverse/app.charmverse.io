@@ -1,0 +1,58 @@
+/* Indent */
+
+.ProseMirror {
+  --list-item-indent: 24px;
+}
+
+/* list item indents */
+
+.ProseMirror ol[data-indent='1'],
+.ProseMirror ul[data-indent='1'] {
+  margin-left: var(--list-item-indent);
+}
+
+.ProseMirror ol[data-indent='2'],
+.ProseMirror ul[data-indent='2'] {
+  margin-left: calc(2 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='3'],
+.ProseMirror ul[data-indent='3'] {
+  margin-left: calc(3 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='4'],
+.ProseMirror ul[data-indent='4'] {
+  margin-left: calc(4 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='5'],
+.ProseMirror ul[data-indent='5'] {
+  margin-left: calc(5 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='6'],
+.ProseMirror ul[data-indent='6'] {
+  margin-left: calc(6 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='7'],
+.ProseMirror ul[data-indent='7'] {
+  margin-left: calc(7 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='8'],
+.ProseMirror ul[data-indent='8'] {
+  margin-left: calc(8 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='9'],
+.ProseMirror ul[data-indent='9'] {
+  margin-left: calc(9 * var(--list-item-indent));
+}
+
+.ProseMirror ol[data-indent='10'],
+.ProseMirror ul[data-indent='10'] {
+  margin-left: calc(10 * var(--list-item-indent));
+}
+
