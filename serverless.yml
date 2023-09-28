@@ -1,12 +1,17 @@
 service: cvServerless
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 useDotenv: true
 
 # Create an optimized package for our functions
 package:
   individually: true
+  patterns:
+    - "!node_modules/.prisma/client/libquery_engine-*"
+    - "node_modules/.prisma/client/libquery_engine-rhel-*"
+    - "!node_modules/prisma/libquery_engine-*"
+    - "!node_modules/@prisma/engines/**"
 
 plugins:
   # This plugins allows to use TS
@@ -17,7 +22,7 @@ plugins:
 custom:
   esbuild:
     watch:
-      pattern: ['serverless/**/*.ts'] # match only typescript files in serverless directory
+      pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
 
 # This uses the lift plugin to generate our SQS setup in AWS
 # Based on https://github.com/getlift/lift/blob/master/docs/queue.md
@@ -48,4 +53,4 @@ functions:
   webhookChecker:
     handler: serverless/handler.webhookChecker
     events:
-      - httpApi: 'POST /webhook'
+      - httpApi: "POST /webhook"
