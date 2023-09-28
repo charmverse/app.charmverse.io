@@ -21,7 +21,7 @@ import { useLensProfile } from 'components/settings/account/hooks/useLensProfile
 import { isDevEnv } from 'config/constants';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { CommentPermissions, CommentWithChildren } from 'lib/comments';
+import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -251,7 +251,9 @@ export function Comment({
           )}
           {!comment.deletedAt && !replyingDisabled && (
             <Stack flexDirection='row' alignItems='center' gap={1}>
-              {handleVoteComment && <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />}
+              {handleVoteComment && (
+                <CommentVote permissions={permissions} votes={comment as GenericCommentWithVote} onVote={voteComment} />
+              )}
               <Tooltip title={!permissions?.add_comment ? 'You do not have permissions to add a comment' : ''}>
                 <Typography
                   sx={{

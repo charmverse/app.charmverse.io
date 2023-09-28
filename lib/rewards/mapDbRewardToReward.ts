@@ -1,4 +1,4 @@
-import type { BountyPermission } from '@charmverse/core/dist/cjs/prisma-client';
+import type { BountyPermission } from '@charmverse/core/prisma-client';
 
 import type { ApplicationMeta, Reward, RewardReviewer, RewardWithUsers } from './interfaces';
 

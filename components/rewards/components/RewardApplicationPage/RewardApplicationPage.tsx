@@ -1,3 +1,4 @@
+import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import Grid from '@mui/material/Grid';
 import { useCallback, useMemo } from 'react';
 
@@ -40,6 +41,8 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
       ? 'Application'
       : 'Submission';
 
+  const expandedSubmissionStatuses: ApplicationStatus[] = ['inProgress', 'complete', 'review', 'processing', 'paid'];
+
   return (
     <ScrollableWindow>
       {/** TODO - Use more elegant layout */}
@@ -49,12 +52,12 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
         </Grid>
         <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center' }}>
           <h3>Applicant</h3>
-          <UserDisplay user={submitter} />
+          <UserDisplay user={submitter} showMiniProfile />
           <RewardApplicationStatusChip status={application.status} />
         </Grid>
         <Grid item xs={12}>
           <p>-------------</p>
-          <p>TODO - Add Bounty properties here</p>
+          <p>TODO - Add Reward properties here</p>
           <p>-------------</p>
         </Grid>
         {application.reward.approveSubmitters && (
@@ -68,6 +71,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
         )}
         <Grid item xs={12}>
           <SubmissionInput
+            expandedOnLoad={expandedSubmissionStatuses.includes(application.status)}
             refreshSubmission={refreshApplication}
             bountyId={application.bountyId}
             permissions={permissions}

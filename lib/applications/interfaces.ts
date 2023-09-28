@@ -56,6 +56,7 @@ export interface ApplicationWithTransactions extends Application {
 export interface CreateApplicationCommentPayload {
   content: PageContent | null;
   contentText: string;
+  parentCommentId?: string;
 }
 
 export type ApplicationWithReward = Application & {

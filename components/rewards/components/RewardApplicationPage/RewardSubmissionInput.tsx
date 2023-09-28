@@ -179,7 +179,7 @@ export default function SubmissionInput({
 
             {!readOnly && !hasCustomReward && (
               <Grid item>
-                <InputLabel>Address to get paid for this bounty</InputLabel>
+                <InputLabel>Address to receive reward</InputLabel>
                 <TextField
                   {...register('walletAddress')}
                   type='text'

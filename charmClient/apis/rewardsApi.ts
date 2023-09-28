@@ -1,12 +1,11 @@
-import type { PermissionCompute, UserPermissionFlags } from '@charmverse/core/dist/cjs/permissions';
-import type { Application, BountyOperation, PageComment, Space } from '@charmverse/core/prisma';
+import type { PermissionCompute, UserPermissionFlags } from '@charmverse/core/permissions';
+import type { Application, ApplicationComment, BountyOperation, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type {
   ApplicationWithTransactions,
   CreateApplicationCommentPayload,
   ReviewDecision,
-  SubmissionContent,
   SubmissionCreationData,
   SubmissionUpdateData
 } from 'lib/applications/interfaces';
@@ -104,25 +103,35 @@ export class RewardsApi {
     publicRewardBoard: boolean;
     spaceId: string;
   }): Promise<Space> {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-reward-board`, {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-bounty-board`, {
       publicRewardBoard
     });
   }
 
-  addApplicationComment(applicationId: string, payload: CreateApplicationCommentPayload) {
-    return http.POST<PageComment>(`/api/applications/${applicationId}/comments`, payload);
+  addApplicationComment({
+    applicationId,
+    payload
+  }: {
+    applicationId: string;
+    payload: CreateApplicationCommentPayload;
+  }) {
+    return http.POST<ApplicationComment>(`/api/applications/${applicationId}/comments/v2`, payload);
   }
 
-  deleteApplicationComment(applicationId: string, pageCommentId: string) {
-    return http.DELETE(`/api/applications/${applicationId}/comments/${pageCommentId}`);
+  deleteApplicationComment({ applicationId, commentId }: { applicationId: string; commentId: string }) {
+    return http.DELETE<ApplicationComment>(`/api/applications/${applicationId}/comments/v2/${commentId}`);
   }
 
-  editApplicationComment(applicationId: string, pageCommentId: string, payload: CreateApplicationCommentPayload) {
-    return http.PUT<PageComment>(`/api/applications/${applicationId}/comments/${pageCommentId}`, payload);
-  }
-
-  getApplicationComments(applicationId: string) {
-    return http.GET<PageComment[]>(`/api/applications/${applicationId}/comments`);
+  editApplicationComment({
+    applicationId,
+    commentId,
+    payload
+  }: {
+    applicationId: string;
+    commentId: string;
+    payload: CreateApplicationCommentPayload;
+  }) {
+    return http.PUT<ApplicationComment>(`/api/applications/${applicationId}/comments/v2/${commentId}`, payload);
   }
 
   refreshApplicationStatus(applicationId: string) {

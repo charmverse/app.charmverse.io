@@ -1,13 +1,16 @@
-import type { Application } from '@charmverse/core/prisma';
+import type { Application, ApplicationComment } from '@charmverse/core/prisma';
 import { FormLabel, Box, Stack } from '@mui/material';
+import { useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetApplicationComments } from 'charmClient/hooks/rewards';
 import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
+import type { CommentWithChildren } from 'lib/comments';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
 export function ApplicationComments({
@@ -20,16 +23,20 @@ export function ApplicationComments({
   const { user } = useUser();
   const {
     data: applicationComments = [],
-    isLoading,
-    mutate: refetchApplicationComments
-  } = useSWR(`/application/${applicationId}/comments`, () =>
-    charmClient.bounties.getApplicationComments(applicationId)
-  );
+    mutate: refetchApplicationComments,
+    isLoading
+  } = useGetApplicationComments({
+    applicationId
+  });
 
-  async function onSendClicked(comment: Omit<CreateCommentPayload, 'parentId'>) {
-    const applicationComment = await charmClient.bounties.addApplicationComment(applicationId, {
-      content: comment.content,
-      contentText: comment.contentText
+  async function onSendClicked(comment: CreateCommentPayload) {
+    const applicationComment = await charmClient.rewards.addApplicationComment({
+      applicationId,
+      payload: {
+        content: comment.content,
+        contentText: comment.contentText,
+        parentCommentId: comment.parentId
+      }
     });
     refetchApplicationComments(
       (_applicationComments) => (_applicationComments ? [..._applicationComments, applicationComment] : []),
@@ -39,17 +46,21 @@ export function ApplicationComments({
     );
   }
 
-  async function updateComment(pageCommentId: string, comment: UpdateCommentPayload) {
-    const updatedComment = await charmClient.bounties.editApplicationComment(applicationId, pageCommentId, {
-      content: comment.content,
-      contentText: comment.contentText
+  async function updateComment(commentId: string, comment: UpdateCommentPayload) {
+    const updatedComment = await charmClient.rewards.editApplicationComment({
+      applicationId,
+      commentId,
+      payload: {
+        content: comment.content,
+        contentText: comment.contentText
+      }
     });
 
     refetchApplicationComments(
       (_applicationComments) =>
         _applicationComments
           ? _applicationComments.map((_applicationComment) =>
-              _applicationComment.id === pageCommentId ? updatedComment : _applicationComment
+              _applicationComment.id === commentId ? updatedComment : _applicationComment
             )
           : [],
       {
@@ -59,18 +70,52 @@ export function ApplicationComments({
   }
 
   async function deleteComment(commentId: string) {
-    await charmClient.bounties.deleteApplicationComment(applicationId, commentId);
+    const softDeletedComment = await charmClient.rewards.deleteApplicationComment({ applicationId, commentId });
 
     refetchApplicationComments(
       (_applicationComments) =>
         _applicationComments
-          ? _applicationComments.filter((_applicationComment) => _applicationComment.id !== commentId)
+          ? _applicationComments.map((_applicationComment) =>
+              _applicationComment.id === commentId ? softDeletedComment : _applicationComment
+            )
           : [],
       {
         revalidate: false
       }
     );
   }
+
+  /**
+   * Application comments use the reward (ex. bounty) page id for the page
+   * The root parent id is the application ID
+   */
+  function buildCommentTree(comments: ApplicationComment[]) {
+    const rootComments: ApplicationComment[] = [];
+    const map: Record<string, ApplicationComment[]> = {};
+    comments.forEach((comment) => {
+      if (comment.parentId) {
+        if (!map[comment.parentId]) {
+          map[comment.parentId] = [];
+        }
+        map[comment.parentId].push(comment);
+      } else {
+        rootComments.push(comment);
+      }
+    });
+
+    function buildSubTree(_parentId: string): CommentWithChildren[] {
+      return (map[_parentId] || []).map((comment) => ({
+        ...comment,
+        children: buildSubTree(comment.id)
+      }));
+    }
+
+    return rootComments.map((comment) => ({ ...comment, children: buildSubTree(comment.id) }));
+  }
+
+  const commentTree = useMemo(() => {
+    return buildCommentTree(applicationComments);
+  }, [applicationComments]);
 
   return (
     <Stack>
@@ -82,9 +127,10 @@ export function ApplicationComments({
           </Box>
         ) : (
           <>
-            {applicationComments.map((comment) => (
+            {commentTree.map((comment) => (
               <Comment
-                replyingDisabled
+                deletingDisabled={false}
+                replyingDisabled={false}
                 inlineCharmEditor
                 permissions={{
                   add_comment: true,
@@ -92,13 +138,7 @@ export function ApplicationComments({
                   downvote: false,
                   upvote: false
                 }}
-                comment={{
-                  ...comment,
-                  upvoted: false,
-                  upvotes: 0,
-                  downvotes: 0,
-                  children: []
-                }}
+                comment={comment}
                 key={comment.id}
                 handleCreateComment={onSendClicked}
                 handleUpdateComment={(commentUpdatePayload) => updateComment(comment.id, commentUpdatePayload)}
