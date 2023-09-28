@@ -6,7 +6,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
-export function ImportDiscordRolesMenuItem() {
+export default function ImportDiscordRolesMenuItem() {
   const router = useRouter();
   const { space } = useCurrentSpace();
 
