@@ -9,11 +9,13 @@ import type {
   UserWallet
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
+import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -406,5 +408,29 @@ describe('GET /api/v1/proposals', () => {
       .set({ authorization: `Bearer ${otherSuperApiKey.token}` })
       .send()
       .expect(401);
+  });
+
+  it('should not fail if an author has no google accounts or verified emails in their account', async () => {
+    const { space: secondSpace, user: secondSpaceUser } = await testUtilsUser.generateUserAndSpace();
+
+    const secondSpaceProposal = await testUtilsProposals.generateProposal({
+      spaceId: secondSpace.id,
+      userId: secondSpaceUser.id,
+      authors: [secondSpaceUser.id],
+      proposalStatus: 'discussion'
+    });
+
+    const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });
+
+    const response = (
+      await request(baseUrl)
+        .get(`/api/v1/proposals?spaceId=${secondSpace.id}`)
+        .set({ authorization: `Bearer ${otherSuperApiKey.token}` })
+        .send()
+        .expect(200)
+    ).body;
+
+    expect(response.length).toEqual(1);
+    expect(response[0].id).toBe(secondSpaceProposal.id);
   });
 });
