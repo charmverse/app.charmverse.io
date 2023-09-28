@@ -162,7 +162,7 @@ export function RoleSettings({ space }: { space: Space }) {
       )}
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        {/* hide this until we are approved <ImportDiscordRolesMenuItem /> */}
+        <ImportDiscordRolesMenuItem />
         <ImportGuildRolesMenuItem onClose={handleClose} />
       </Menu>
 
