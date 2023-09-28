@@ -65,7 +65,7 @@ export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
   return useGET<BountyPermissionFlags>(rewardId ? `/api/rewards/${rewardId}/permissions` : null);
 }
 
-export function useGetApplication({ applicationId }: { applicationId: string }) {
+export function useGetApplication({ applicationId }: { applicationId?: string }) {
   return useGET<ApplicationWithReward>(applicationId ? `/api/applications/${applicationId}` : null);
 }
 
