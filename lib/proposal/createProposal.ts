@@ -11,6 +11,8 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getPagePath } from '../pages';
 
@@ -142,6 +144,15 @@ export async function createProposal({
         rubricCriteria
       })
     : [];
+
+  await publishProposalEvent({
+    scope: WebhookEventNames.ProposalStatusChanged,
+    proposalId: proposal.id,
+    newStatus: proposal.status,
+    spaceId,
+    userId,
+    oldStatus: null
+  });
 
   return {
     page: page as PageWithPermissions,

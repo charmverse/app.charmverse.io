@@ -5,12 +5,14 @@ import { MjmlColumn, MjmlDivider, MjmlSection, MjmlText } from 'mjml-react';
 import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/components/BountyStatusBadge';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import { baseUrl } from 'config/constants';
-import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
-import type { DiscussionNotification } from 'lib/notifications/interfaces';
-import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
+import type {
+  BountyNotification,
+  ForumNotification,
+  ProposalNotification,
+  VoteNotification
+} from 'lib/notifications/interfaces';
+import { DiscussionNotification } from 'lib/notifications/interfaces';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import type { VoteTask } from 'lib/votes/interfaces';
 import { colors, greyColor2 } from 'theme/colors';
 
 import { EmailWrapper, Feedback, Footer, Header } from './components';
@@ -30,13 +32,13 @@ export const buttonStyle = {
 const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
 const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px', marginBottom: '5px' };
 
-export interface PendingTasksProps {
-  discussionTasks: DiscussionNotification[];
-  totalTasks: number;
-  voteTasks: VoteTask[];
-  proposalTasks: ProposalTask[];
-  bountyTasks: BountyTask[];
-  forumTasks: ForumTask[];
+export interface PendingNotifications {
+  discussionNotifications: DiscussionNotification[];
+  totalNotifications: number;
+  voteNotifications: VoteNotification[];
+  proposalNotifications: ProposalNotification[];
+  bountyNotifications: BountyNotification[];
+  forumNotifications: ForumNotification[];
   // eslint-disable-next-line
   user: TemplateUser;
 }
@@ -51,12 +53,12 @@ function ViewAllText({ href }: { href: string }) {
   );
 }
 
-export default function PendingTasks(props: PendingTasksProps) {
-  const totalDiscussionTasks = props.discussionTasks.length;
-  const totalVoteTasks = props.voteTasks.length;
-  const totalProposalTasks = props.proposalTasks.length;
-  const totalBountyTasks = props.bountyTasks.length;
-  const totalForumTasks = props.forumTasks.length;
+export default function PendingNotifications(props: PendingNotifications) {
+  const totalDiscussionNotifications = props.discussionNotifications.length;
+  const totalVoteNotifications = props.voteNotifications.length;
+  const totalProposalNotifications = props.proposalNotifications.length;
+  const totalBountyNotifications = props.bountyNotifications.length;
+  const totalForumNotifications = props.forumNotifications.length;
 
   const nexusDiscussionLink = `${baseUrl}/?notifications=discussion`;
   const nexusVoteLink = `${baseUrl}/?notifications=vote`;
@@ -65,7 +67,7 @@ export default function PendingTasks(props: PendingTasksProps) {
   const nexusForumLink = `${baseUrl}/?notifications=forum`;
 
   const discussionSection =
-    totalDiscussionTasks > 0 ? (
+    totalDiscussionNotifications > 0 ? (
       <>
         <MjmlText>
           <div
@@ -80,7 +82,7 @@ export default function PendingTasks(props: PendingTasksProps) {
               }}
             >
               <span style={h2Style}>
-                {totalDiscussionTasks} Page Comment{totalDiscussionTasks > 1 ? 's' : ''}
+                {totalDiscussionNotifications} Page Comment{totalDiscussionNotifications > 1 ? 's' : ''}
               </span>
             </a>
             <a href={nexusDiscussionLink} style={buttonStyle}>
@@ -88,16 +90,16 @@ export default function PendingTasks(props: PendingTasksProps) {
             </a>
           </div>
         </MjmlText>
-        {props.discussionTasks.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
-          <DiscussionNotifications key={discussionTask.mentionId} task={discussionTask} />
+        {props.discussionNotifications.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
+          <DiscussionNotification key={discussionTask.mentionId} task={discussionTask} />
         ))}
-        {totalDiscussionTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+        {totalDiscussionNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
         <MjmlDivider />
       </>
     ) : null;
 
   const proposalSection =
-    totalProposalTasks > 0 ? (
+    totalProposalNotifications > 0 ? (
       <>
         <MjmlText>
           <div
@@ -112,7 +114,7 @@ export default function PendingTasks(props: PendingTasksProps) {
               }}
             >
               <span style={h2Style}>
-                {totalProposalTasks} Proposal{totalProposalTasks > 1 ? 's' : ''}
+                {totalProposalNotifications} Proposal{totalProposalNotifications > 1 ? 's' : ''}
               </span>
             </a>
             <a href={nexusProposalLink} style={buttonStyle}>
@@ -120,16 +122,16 @@ export default function PendingTasks(props: PendingTasksProps) {
             </a>
           </div>
         </MjmlText>
-        {props.proposalTasks.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
-          <ProposalTaskMjml key={proposalTask.id} task={proposalTask} />
+        {props.proposalNotifications.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
+          <ProposalTaskMjml key={proposalTask.taskId} task={proposalTask} />
         ))}
-        {totalProposalTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
+        {totalProposalNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
         <MjmlDivider />
       </>
     ) : null;
 
   const bountySection =
-    totalBountyTasks > 0 ? (
+    totalBountyNotifications > 0 ? (
       <>
         <MjmlText>
           <div
@@ -144,7 +146,7 @@ export default function PendingTasks(props: PendingTasksProps) {
               }}
             >
               <span style={h2Style}>
-                {totalBountyTasks} Bount{totalBountyTasks > 1 ? 'ies' : 'y'}
+                {totalBountyNotifications} Bount{totalBountyNotifications > 1 ? 'ies' : 'y'}
               </span>
             </a>
             <a href={nexusBountyLink} style={buttonStyle}>
@@ -152,16 +154,16 @@ export default function PendingTasks(props: PendingTasksProps) {
             </a>
           </div>
         </MjmlText>
-        {props.bountyTasks.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
-          <BountyTaskMjml key={proposalTask.id} task={proposalTask} />
+        {props.bountyNotifications.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
+          <BountyTaskMjml key={proposalTask.taskId} task={proposalTask} />
         ))}
-        {totalBountyTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
+        {totalBountyNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
         <MjmlDivider />
       </>
     ) : null;
 
   const voteSection =
-    totalVoteTasks > 0 ? (
+    totalVoteNotifications > 0 ? (
       <>
         <MjmlText>
           <div
@@ -176,7 +178,7 @@ export default function PendingTasks(props: PendingTasksProps) {
               }}
             >
               <span style={h2Style}>
-                {totalVoteTasks} Poll{totalVoteTasks > 1 ? 's' : ''}
+                {totalVoteNotifications} Poll{totalVoteNotifications > 1 ? 's' : ''}
               </span>
             </a>
             <a href={nexusVoteLink} style={buttonStyle}>
@@ -184,16 +186,16 @@ export default function PendingTasks(props: PendingTasksProps) {
             </a>
           </div>
         </MjmlText>
-        {props.voteTasks.slice(0, MAX_ITEMS_PER_TASK).map((voteTask) => (
-          <VoteTaskMjml key={voteTask.id} task={voteTask} />
+        {props.voteNotifications.slice(0, MAX_ITEMS_PER_TASK).map((voteTask) => (
+          <VoteTaskMjml key={voteTask.taskId} task={voteTask} />
         ))}
-        {totalVoteTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusVoteLink} /> : null}
+        {totalVoteNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusVoteLink} /> : null}
         <MjmlDivider />
       </>
     ) : null;
 
   const forumSection =
-    totalForumTasks > 0 ? (
+    totalForumNotifications > 0 ? (
       <>
         <MjmlText>
           <div
@@ -208,7 +210,7 @@ export default function PendingTasks(props: PendingTasksProps) {
               }}
             >
               <span style={h2Style}>
-                {totalForumTasks} Forum Event{totalForumTasks > 1 ? 's' : ''}
+                {totalForumNotifications} Forum Event{totalForumNotifications > 1 ? 's' : ''}
               </span>
             </a>
             <a href={nexusForumLink} style={buttonStyle}>
@@ -216,10 +218,10 @@ export default function PendingTasks(props: PendingTasksProps) {
             </a>
           </div>
         </MjmlText>
-        {props.forumTasks.slice(0, MAX_ITEMS_PER_TASK).map((forumTask) => (
+        {props.forumNotifications.slice(0, MAX_ITEMS_PER_TASK).map((forumTask) => (
           <ForumTask key={forumTask.commentId} task={forumTask} />
         ))}
-        {totalForumTasks > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusForumLink} /> : null}
+        {totalForumNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusForumLink} /> : null}
         <MjmlDivider />
       </>
     ) : null;
@@ -231,7 +233,7 @@ export default function PendingTasks(props: PendingTasksProps) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h3>{tasksRequiresYourAttention({ count: props.totalTasks })}.</h3>
+            <h3>{tasksRequiresYourAttention({ count: props.totalNotifications })}.</h3>
           </MjmlText>
           {proposalSection}
           {voteSection}
@@ -246,7 +248,7 @@ export default function PendingTasks(props: PendingTasksProps) {
   );
 }
 
-function VoteTaskMjml({ task }: { task: VoteTask }) {
+function VoteTaskMjml({ task }: { task: VoteNotification }) {
   const pageWorkspaceTitle = `${task.pageTitle} | ${task.spaceName}`;
   return (
     <MjmlText>
@@ -279,7 +281,7 @@ function VoteTaskMjml({ task }: { task: VoteTask }) {
   );
 }
 
-function ProposalTaskMjml({ task }: { task: ProposalTask }) {
+function ProposalTaskMjml({ task }: { task: ProposalNotification }) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>
@@ -311,7 +313,7 @@ function ProposalTaskMjml({ task }: { task: ProposalTask }) {
   );
 }
 
-function BountyTaskMjml({ task }: { task: BountyTask }) {
+function BountyTaskMjml({ task }: { task: BountyNotification }) {
   const pageWorkspaceTitle = `${task.pageTitle || 'Untitled'} | ${task.spaceName}`;
   return (
     <MjmlText>
@@ -343,7 +345,7 @@ function BountyTaskMjml({ task }: { task: BountyTask }) {
   );
 }
 
-function DiscussionNotifications({
+function DiscussionNotification({
   task: { text, spaceName, pageTitle, pagePath, spaceDomain }
 }: {
   task: DiscussionNotification;
@@ -371,7 +373,11 @@ function DiscussionNotifications({
   );
 }
 
-function ForumTask({ task: { commentText, spaceName, spaceDomain, postPath, postTitle } }: { task: ForumTask }) {
+function ForumTask({
+  task: { commentText, spaceName, spaceDomain, postPath, postTitle }
+}: {
+  task: ForumNotification;
+}) {
   const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>

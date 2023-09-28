@@ -61,7 +61,10 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
     userId
   });
 
-  await rollupBountyStatus(updatedSubmission.bountyId);
+  await rollupBountyStatus({
+    bountyId: updatedSubmission.bountyId,
+    userId
+  });
 
   const { spaceId, rewardAmount, rewardToken, id, page, customReward } = submission.bounty;
   if (decision === 'approve') {

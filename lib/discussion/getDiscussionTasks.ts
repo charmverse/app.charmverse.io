@@ -7,14 +7,7 @@ import type { MentionNode, PageContent, TextContent } from 'lib/prosemirror/inte
 import { shortenHex } from 'lib/utilities/blockchain';
 
 import { getPropertiesFromPage } from './getPropertiesFromPage';
-import type { DiscussionTask } from './interfaces';
 
-export type DiscussionTasksGroup = {
-  marked: DiscussionTask[];
-  unmarked: DiscussionTask[];
-};
-
-export type Discussion = Omit<DiscussionTask, 'createdBy'> & { userId: string };
 export type SpaceRecord = Record<string, Pick<Space, 'name' | 'domain' | 'id'>>;
 
 export type GetDiscussionsInput = {
@@ -23,12 +16,6 @@ export type GetDiscussionsInput = {
   spaceIds: string[];
   spaceRecord: SpaceRecord;
 };
-
-export interface GetDiscussionsResponse {
-  mentions: Discussion[];
-  discussionUserIds: string[];
-  comments: Discussion[];
-}
 
 export type DiscussionNotificationsGroup = NotificationsGroup<DiscussionNotification>;
 
