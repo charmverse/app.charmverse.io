@@ -20,7 +20,7 @@ function cleanup() {
     log.info('[server] Closing HTTP server...');
     httpServer.close(() => {
       log.info('[server] Exiting process...');
-      process.exit(1);
+      process.exit(0);
     });
   });
 }

@@ -40,7 +40,7 @@ export function AnnouncementBanner({
   }
 
   return (
-    <StyledBanner errorBackground={errorBackground} top={20} data-test='subscription-banner'>
+    <StyledBanner errorBackground={errorBackground} top={20}>
       <Box pr={3} display='flex' alignItems='center'>
         {typeof children === 'string' ? <Typography>{children}</Typography> : children}
         {actionLabel && (actionHref || onActionClick) && (
@@ -53,6 +53,7 @@ export function AnnouncementBanner({
               onClick={onActionClick}
               variant='outlined'
               external
+              target='_blank'
             >
               {actionLabel}
             </Button>

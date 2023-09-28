@@ -37,6 +37,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
 
 const CNAME_INSTRUCTIONS_URL = 'https://app.charmverse.io/charmverse/page-7475001106586148';
+const CAA_INSTRUCTIONS_URL = 'https://app.charmverse.io/charmverse/custom-domain-troubleshooting-16172974411857632';
 
 type FormValues = {
   customDomain: string;
@@ -218,30 +219,44 @@ export function SetupCustomDomain({ space }: { space: Space }) {
                             </Stack>
                           </TableCell>
                         </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <LabelWithCopy
-                              label={customDomainVerification?.certificateDetails?.dnsValidation?.name || ''}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Stack direction='row' alignItems='center' gap={1} justifyContent='space-between'>
+                        {customDomainVerification?.certificateDetails?.status !== 'FAILED' ? (
+                          <TableRow>
+                            <TableCell>
                               <LabelWithCopy
-                                label={customDomainVerification?.certificateDetails?.dnsValidation?.value || ''}
+                                label={customDomainVerification?.certificateDetails?.dnsValidation?.name || ''}
                               />
+                            </TableCell>
+                            <TableCell>
+                              <Stack direction='row' alignItems='center' gap={1} justifyContent='space-between'>
+                                <LabelWithCopy
+                                  label={customDomainVerification?.certificateDetails?.dnsValidation?.value || ''}
+                                />
 
-                              {customDomainVerification?.isCertificateVerified ? (
-                                <Tooltip title='Domain verification passed'>
-                                  <CheckCircleOutlineOutlinedIcon color='success' />
-                                </Tooltip>
-                              ) : (
-                                <Tooltip title='Domain verification record does not exist'>
-                                  <ErrorOutlineOutlinedIcon color='warning' />
-                                </Tooltip>
-                              )}
-                            </Stack>
-                          </TableCell>
-                        </TableRow>
+                                {customDomainVerification?.isCertificateVerified ? (
+                                  <Tooltip title='Domain verification passed'>
+                                    <CheckCircleOutlineOutlinedIcon color='success' />
+                                  </Tooltip>
+                                ) : (
+                                  <Tooltip title='Domain verification record does not exist'>
+                                    <ErrorOutlineOutlinedIcon color='warning' />
+                                  </Tooltip>
+                                )}
+                              </Stack>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={2}>
+                              <Typography variant='body2' color='var(--text-orange)' mx={2}>
+                                Due to your DNS provider configuration, we were unable to create certificate for your
+                                domain. You can find instruction on how to setup your provider{' '}
+                                <Link href={CAA_INSTRUCTIONS_URL} external target='_blank'>
+                                  here
+                                </Link>
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </TableContainer>

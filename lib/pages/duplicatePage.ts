@@ -31,7 +31,8 @@ export async function duplicatePage({
     exportData: data,
     parentId,
     updateTitle: true,
-    includePermissions: true
+    includePermissions: true,
+    resetPaths: true
   });
 
   if (rootPageIds.length > 1) {

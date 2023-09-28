@@ -1,8 +1,10 @@
 import type { User } from '@charmverse/core/prisma';
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Block, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { user } from '@guildxyz/sdk';
 import { expect, test } from '__e2e__/testWithFixtures';
+import { v4 as uuid } from 'uuid';
 
 import { baseUrl } from 'config/constants';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -25,6 +27,10 @@ const cardPropertyValues = {
   [boardSchema.text.id]: 'Example text',
   [boardSchema.checkbox.id]: true
 };
+
+let cardComment: Block;
+
+const exampleText = 'User comment on card';
 
 test.beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({
@@ -54,15 +60,42 @@ test.beforeAll(async () => {
       parentId: database.id
     },
     select: {
-      path: true
+      path: true,
+      id: true,
+      parentId: true
     }
   });
 
   cardPagePath = card.path;
+
+  cardComment = await prisma.block.create({
+    data: {
+      id: uuid(),
+      parentId: card.id,
+      rootId: card.parentId as string,
+      schema: 1,
+      title: 'Comment',
+      type: 'comment',
+      updatedBy: spaceUser.id,
+      space: { connect: { id: space.id } },
+      user: { connect: { id: spaceUser.id } },
+      fields: {
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: exampleText }]
+            }
+          ]
+        }
+      }
+    }
+  });
 });
 
 test.describe.serial('Edit database select properties', async () => {
-  test('view a database card properties as a full page', async ({ page, documentPage }) => {
+  test('view a database card properties and comments as a full page', async ({ page, documentPage }) => {
     // Arrange ------------------
     await loginBrowserUser({
       browserPage: page,
@@ -90,5 +123,13 @@ test.describe.serial('Edit database select properties', async () => {
     const selectText = (await select.allInnerTexts())[0].trim();
 
     expect(selectText).toEqual(boardSchema.select.options[0].value);
+
+    const cardCommentBlock = documentPage.getCardCommentContent(cardComment.id);
+
+    await expect(cardCommentBlock).toBeVisible();
+
+    const cardCommentBlockText = (await cardCommentBlock.allInnerTexts())[0];
+
+    expect(cardCommentBlockText).toMatch(exampleText);
   });
 });

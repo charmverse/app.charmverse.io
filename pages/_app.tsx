@@ -1,3 +1,4 @@
+import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
@@ -24,7 +25,7 @@ import { NotificationsProvider } from 'components/common/PageLayout/components/H
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
+import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
@@ -150,9 +151,12 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
-    if (!isOldBuild && data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
+    if (!isOldBuild && data.buildId !== env('BUILD_ID')) {
       setIsOldBuild(true);
-      log.info('Requested user to refresh their browser to get new version');
+      log.info('Requested user to refresh their browser to get new version', {
+        oldVersion: env('BUILD_ID'),
+        newVersion: data.buildId
+      });
     }
   }, 180000);
 

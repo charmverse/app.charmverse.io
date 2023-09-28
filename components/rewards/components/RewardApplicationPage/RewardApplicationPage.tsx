@@ -1,16 +1,14 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import Grid from '@mui/material/Grid';
-import { useCallback, useMemo } from 'react';
 
 import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
-import { PageTitleInput, StyledReadOnlyTitle } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-
-import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
+import { useUser } from 'hooks/useUser';
 
 import { ApplicationComments } from './ApplicationComments';
 import ApplicationInput from './RewardApplicationInput';
@@ -24,6 +22,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const { application, refreshApplication } = useApplication({ applicationId });
   const { members } = useMembers();
   const { pages } = usePages();
+  const { user } = useUser();
 
   const { data: permissions } = useGetRewardPermissions({ rewardId: application?.bountyId });
 
@@ -43,6 +42,10 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
 
   const expandedSubmissionStatuses: ApplicationStatus[] = ['inProgress', 'complete', 'review', 'processing', 'paid'];
 
+  const readonlySubmission =
+    user?.id !== application.createdBy ||
+    (['complete', 'paid', 'processing', 'rejected'] as ApplicationStatus[]).includes(application.status);
+
   return (
     <ScrollableWindow>
       {/** TODO - Use more elegant layout */}
@@ -53,7 +56,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
         <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center' }}>
           <h3>Applicant</h3>
           <UserDisplay user={submitter} showMiniProfile />
-          <RewardApplicationStatusChip status={application.status} />
         </Grid>
         <Grid item xs={12}>
           <p>-------------</p>
@@ -71,6 +73,8 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
         )}
         <Grid item xs={12}>
           <SubmissionInput
+            submission={application}
+            readOnly={readonlySubmission}
             expandedOnLoad={expandedSubmissionStatuses.includes(application.status)}
             refreshSubmission={refreshApplication}
             bountyId={application.bountyId}

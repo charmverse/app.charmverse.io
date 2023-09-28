@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
-import { dispatch } from '@svgdotjs/svg.js';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
@@ -11,7 +10,13 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
+import { getCardComments, hasLoadedCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
+import {
+  blockLoad,
+  commentsLoad,
+  databaseViewsLoad
+} from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -73,7 +78,7 @@ const StyledBannerContainer = styled.div<{ showPageActionSidebar: boolean }>(
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: var(--z-index-pageBar);
   }
 `
 );
@@ -104,10 +109,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const proposalId = page.proposalId;
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
-
-  // eslint-disable-next-line no-console
-  console.log('Rendered doc');
-
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
   // keep a ref in sync for printing
@@ -119,6 +120,12 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
       });
     }
   }, [printRef, _printRef]);
+
+  const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
+
+  const hasLoadedCardCommentsForCurrentCard = useAppSelector(hasLoadedCardComments(page.cardId ?? page.id));
+
+  const cannotComment = readOnly || !pagePermissions.comment;
 
   const card = useAppSelector((state) => {
     if (page?.type !== 'card') {
@@ -151,10 +158,15 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   });
 
   useEffect(() => {
-    if (page?.type === 'card' && !card) {
-      blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
-      blocksDispatch(blockLoad({ blockId: page.id }));
-      blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+    if (page?.type === 'card') {
+      if (!card) {
+        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+        blocksDispatch(blockLoad({ blockId: page.id }));
+        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+      }
+      if (!hasLoadedCardCommentsForCurrentCard) {
+        blocksDispatch(commentsLoad({ pageId: page.id }));
+      }
     }
   }, [page.id]);
 
@@ -189,7 +201,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
       setConnectionError(null);
     }
   }
-
   // reset error whenever page id changes
   useEffect(() => {
     setConnectionError(null);
@@ -331,6 +342,14 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         readOnly={readOnly}
                         permissions={bountyPermissions || null}
                         refreshBountyPermissions={() => refreshBountyPermissions()}
+                      />
+                    )}
+                    {(page.type === 'card' || page.type === 'card_synced') && (
+                      <CommentsList
+                        comments={comments}
+                        rootId={card?.rootId ?? page.id}
+                        cardId={card?.id ?? page.id}
+                        readOnly={cannotComment}
                       />
                     )}
                   </CardPropertiesWrapper>

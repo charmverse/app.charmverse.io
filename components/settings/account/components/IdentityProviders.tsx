@@ -40,10 +40,11 @@ import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
+import { useIdentityTypes } from '../hooks/useIdentityTypes';
+
 import IdentityProviderItem from './IdentityProviderItem';
 import { NewIdentityModal } from './NewIdentityModal';
 import { TelegramLoginIframe } from './TelegramLoginIframe';
-import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
   const { isConnectingIdentity } = useWeb3ConnectionManager();

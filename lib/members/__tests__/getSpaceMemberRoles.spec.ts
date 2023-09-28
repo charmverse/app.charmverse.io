@@ -39,7 +39,7 @@ describe('getSpaceMemberMetadata', () => {
   it('should retrieve admin user roles for single space', async () => {
     const metadataMap = await getSpaceMemberMetadata({ spaceIds: u1Space1.id, memberId: user1.id });
 
-    expect(metadataMap[u1Space1.id].roles.length).toBe(2);
+    expect(metadataMap[u1Space1.id].roles.length).toBe(3);
     expect(metadataMap[u1Space1.id].joinDate).toBeTruthy();
     expect(metadataMap[u1Space2.id]).toBeUndefined();
   });
@@ -47,9 +47,9 @@ describe('getSpaceMemberMetadata', () => {
   it('should retrieve admin user roles for multiple spaces', async () => {
     const metadataMap = await getSpaceMemberMetadata({ spaceIds: [u1Space1.id, u1Space2.id], memberId: user1.id });
 
-    expect(metadataMap[u1Space1.id]?.roles.length).toBe(2);
+    expect(metadataMap[u1Space1.id]?.roles.length).toBe(3);
     expect(metadataMap[u1Space1.id]?.joinDate).toBeTruthy();
-    expect(metadataMap[u1Space2.id]?.roles.length).toBe(1);
+    expect(metadataMap[u1Space2.id]?.roles.length).toBe(2);
     expect(metadataMap[u1Space2.id]?.joinDate).toBeTruthy();
   });
 
@@ -63,7 +63,7 @@ describe('getSpaceMemberMetadata', () => {
   it('should retrieve non-admin user roles for single space', async () => {
     const metadataMap = await getSpaceMemberMetadata({ spaceIds: [u1Space1.id], memberId: user2.id });
 
-    expect(metadataMap[u1Space1.id]?.roles.length).toBe(1);
+    expect(metadataMap[u1Space1.id]?.roles.length).toBe(2);
     expect(metadataMap[u1Space1.id]?.joinDate).toBeTruthy();
   });
 });

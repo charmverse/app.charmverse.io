@@ -191,11 +191,13 @@ function PageLayout({ children }: PageLayoutProps) {
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
                     <BlocksExceededBanner />
-
-                    {/* TODO: add action href */}
-                    {/* <AnnouncementBanner actionLabel='Learn more' actionHref='' expiryDate='2023-09-29'>
+                    <AnnouncementBanner
+                      actionLabel='Learn more'
+                      actionHref='https://x.com/CharmVerse/status/1705253749826929118?s=20'
+                      expiryDate='2023-09-29'
+                    >
                       No more free trials! Everyone gets 30k blocks on us.
-                    </AnnouncementBanner> */}
+                    </AnnouncementBanner>
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer
