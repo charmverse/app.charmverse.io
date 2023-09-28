@@ -24,7 +24,12 @@ import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyTy
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { APPLICANTS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import {
+  ASSIGNEES_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_REVIEWERS_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID
+} from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
@@ -149,7 +154,7 @@ function PropertyValueElement(props: Props) {
 
   let propertyValueElement: ReactNode = null;
 
-  if (propertyTemplate.type === 'rewardStatus') {
+  if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
     if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
@@ -166,8 +171,8 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
-  } else if (propertyTemplate.type === 'rewardReviewers') {
-    return <UserAndRoleSelect readOnly onChange={() => null} value={propertyValue as any} />;
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+    return <UserAndRoleSelect wrapColumn={false} readOnly onChange={() => null} value={propertyValue as any} />;
   } else if (
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
@@ -203,7 +208,7 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'proposalEvaluatedBy' ||
     propertyTemplate.type === 'proposalAuthor' ||
     propertyTemplate.type === 'proposalReviewer' ||
-    propertyTemplate.id === APPLICANTS_BLOCK_ID
+    propertyTemplate.id === ASSIGNEES_BLOCK_ID
   ) {
     propertyValueElement = (
       <UserSelect
@@ -283,7 +288,9 @@ function PropertyValueElement(props: Props) {
     if (propertyTemplate.type === 'url') {
       propertyValueElement = <URLProperty {...commonProps} />;
     } else {
-      propertyValueElement = <TextInput {...commonProps} />;
+      propertyValueElement = (
+        <TextInput {...commonProps} readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID} />
+      );
     }
   } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
     const proposalUrl = getAbsolutePath(`/${propertyValue as string}`, domain);

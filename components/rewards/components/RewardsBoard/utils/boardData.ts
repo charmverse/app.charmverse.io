@@ -4,12 +4,12 @@ import { createBoard } from 'lib/focalboard/board';
 import { rewardAndApplicationStatusBoardColors, rewardDbProperties } from 'lib/focalboard/rewardDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {
-  APPLICANTS_BLOCK_ID,
-  AVAILABLE_BLOCK_ID,
+  ASSIGNEES_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
-  REVIEWERS_BLOCK_ID,
+  REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
   TITLE_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
@@ -48,9 +48,9 @@ export function getDefaultBoard({
 function getDefaultProperties() {
   return [
     rewardDbProperties.rewardDueDate(DUE_DATE_ID, 'Due Date'),
-    rewardDbProperties.rewardApplications(APPLICANTS_BLOCK_ID, 'Assigned'),
-    rewardDbProperties.rewardReviewers(REVIEWERS_BLOCK_ID, 'Reviewer'),
-    rewardDbProperties.rewardAvailableCount(AVAILABLE_BLOCK_ID, 'Available'),
+    rewardDbProperties.rewardAssignees(ASSIGNEES_BLOCK_ID, 'Assigned'),
+    rewardDbProperties.rewardReviewers(REWARD_REVIEWERS_BLOCK_ID, 'Reviewer'),
+    rewardDbProperties.rewardAvailableCount(REWARDS_AVAILABLE_BLOCK_ID, 'Available'),
     rewardDbProperties.rewardStatus(REWARD_STATUS_BLOCK_ID, 'Status')
   ];
 }
@@ -64,9 +64,9 @@ export function getDefaultTableView({ storedBoard }: { storedBoard: RewardProper
   view.fields.columnWidths = {
     [TITLE_BLOCK_ID]: 310,
     [DUE_DATE_ID]: 150,
-    [APPLICANTS_BLOCK_ID]: 200,
-    [REVIEWERS_BLOCK_ID]: 150,
-    [AVAILABLE_BLOCK_ID]: 150,
+    [ASSIGNEES_BLOCK_ID]: 200,
+    [REWARD_REVIEWERS_BLOCK_ID]: 150,
+    [REWARDS_AVAILABLE_BLOCK_ID]: 150,
     [REWARD_STATUS_BLOCK_ID]: 150
   };
 

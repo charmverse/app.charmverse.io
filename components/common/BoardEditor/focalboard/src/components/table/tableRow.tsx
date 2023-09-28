@@ -1,20 +1,26 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import {
+  REWARD_APPLICATION_STATUS_COLORS,
+  rewardApplicationStatusIcons
+} from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TextInput } from '../../../../components/properties/TextInput';
@@ -24,6 +30,11 @@ import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import PropertyValueElement from '../propertyValueElement';
+
+export type CardPageWithCustomIcon = CardPage & {
+  customIcon?: ReactElement | null;
+  subPages?: CardPageWithCustomIcon[];
+};
 
 type Props = {
   hasContent?: boolean;
@@ -47,7 +58,7 @@ type Props = {
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
   readOnlyTitle?: boolean;
-  isExpanded?: boolean;
+  isExpanded?: boolean | null;
   setIsExpanded?: (expanded: boolean) => void;
   indentTitle?: number;
 };
@@ -186,11 +197,23 @@ function TableRow(props: Props) {
                   {setIsExpanded &&
                     (isExpanded ? (
                       <CollapseIcon onClick={() => setIsExpanded(false)} />
-                    ) : (
+                    ) : isExpanded === false ? (
                       <ExpandIcon onClick={() => setIsExpanded(true)} />
+                    ) : (
+                      <span style={{ paddingRight: '24px' }}></span>
                     ))}
+
                   {indentTitle && <div style={{ paddingRight: `${indentTitle}px` }}></div>}
-                  <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+                  {card.customIconType === 'applicationStatus' && card.fields.properties[REWARD_STATUS_BLOCK_ID] && (
+                    <span>
+                      {
+                        rewardApplicationStatusIcons[
+                          card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus
+                        ]
+                      }
+                    </span>
+                  )}
+                  {!card.customIconType && <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />}
                   <TextInput {...commonProps} multiline={wrapColumn} />
                 </div>
 
@@ -254,11 +277,11 @@ function TableRow(props: Props) {
 }
 
 export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { subPages?: CardPage[] }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState<boolean | null>(props.subPages?.length ? false : null);
 
   return (
     <>
-      <TableRow {...props} isExpanded={isExpanded} setIsExpanded={props.subPages?.length ? setIsExpanded : undefined} />
+      <TableRow {...props} isExpanded={isExpanded} setIsExpanded={props.subPages ? setIsExpanded : undefined} />
       {isExpanded &&
         props.subPages?.map((subPage) => (
           <ExpandableTableRow
@@ -269,7 +292,7 @@ export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpan
             card={subPage.card}
             cardPage={subPage.page}
             subPages={subPage.subPages}
-            indentTitle={22}
+            indentTitle={48}
           />
         ))}
     </>

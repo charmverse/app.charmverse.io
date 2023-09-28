@@ -15,10 +15,10 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage, CardPropertyValue } from 'lib/focalboard/card';
 import {
   DEFAULT_VIEW_BLOCK_ID,
-  REVIEWERS_BLOCK_ID,
+  REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  APPLICANTS_BLOCK_ID,
-  AVAILABLE_BLOCK_ID,
+  ASSIGNEES_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
   DEFAULT_BLOCK_IDS,
   DEFAULT_BOARD_BLOCK_ID,
   DUE_DATE_ID,
@@ -113,7 +113,7 @@ function mapRewardToCardPage({
   rewardFields.properties = {
     ...rewardFields.properties,
     // add default field values on the fly
-    [AVAILABLE_BLOCK_ID]:
+    [REWARDS_AVAILABLE_BLOCK_ID]:
       (reward &&
         'maxSubmissions' in reward &&
         reward.maxSubmissions &&
@@ -125,7 +125,7 @@ function mapRewardToCardPage({
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).toISOString() : '',
-    [REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || []
+    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || []
   };
 
   const card: Card<RewardPropertyValue> = {
@@ -179,12 +179,12 @@ function mapApplicationToCardPage({
   applicationFields.properties = {
     ...applicationFields.properties,
     // add default field values on the fly
-    [AVAILABLE_BLOCK_ID]: '-',
-    [APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
+    [REWARDS_AVAILABLE_BLOCK_ID]: '-',
+    [ASSIGNEES_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: '-',
-    [REVIEWERS_BLOCK_ID]: []
+    [REWARD_REVIEWERS_BLOCK_ID]: []
   };
 
   const card: Card<RewardPropertyValue> = {
@@ -195,6 +195,7 @@ function mapApplicationToCardPage({
     title: 'APP - rewardPage?.title' || '',
     rootId: applicationSpaceId,
     type: 'card' as BlockTypes,
+    customIconType: 'applicationStatus',
     updatedBy: application.createdBy || '',
     createdBy: application.createdBy || '',
     createdAt: application.createdAt ? new Date(application.createdAt).getTime() : 0,

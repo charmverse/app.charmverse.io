@@ -14,6 +14,7 @@ export type CardFields<V = CardPropertyValue> = {
 
 export type Card<V = CardPropertyValue> = Block & {
   fields: CardFields<V>;
+  customIconType?: 'applicationStatus';
 };
 
 export type CardPage<V = CardPropertyValue> = {

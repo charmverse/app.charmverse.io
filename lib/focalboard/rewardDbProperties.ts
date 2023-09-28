@@ -2,40 +2,49 @@ import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma-cl
 import { v4 as uuid } from 'uuid';
 
 import type { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
-import type { DatabaseRewardPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
+
+const rewardPropertyTypesList = [
+  'rewardStatus',
+  'rewardAssignees',
+  'rewardReviewers',
+  'rewardAvailableCount',
+  'rewardDueDate'
+] as const;
+type DatabaseRewardPropertyType = (typeof rewardPropertyTypesList)[number];
 
 export const rewardDbProperties: {
-  [key in DatabaseRewardPropertyType]: (id?: string, name?: string) => IPropertyTemplate<key>;
+  [key in DatabaseRewardPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
 } = {
   rewardStatus: (id?: string, name?: string) => ({
     id: id || uuid(),
     name: name || 'Status',
     options: [],
-    type: 'rewardStatus'
+    type: 'select'
   }),
-  rewardApplications: (id?: string, name?: string) => ({
+  rewardAssignees: (id?: string, name?: string) => ({
     id: id || uuid(),
-    name: name || 'Applications',
+    name: name || 'Assigned',
     options: [],
-    type: 'rewardApplications'
+    type: 'person'
   }),
   rewardReviewers: (id?: string, name?: string) => ({
     id: id || uuid(),
     name: name || 'Reviewers',
     options: [],
-    type: 'rewardReviewers'
+    type: 'select'
   }),
   rewardAvailableCount: (id?: string, name?: string) => ({
     id: id || uuid(),
     name: name || 'Available',
     options: [],
-    type: 'rewardAvailableCount'
+    type: 'text'
   }),
   rewardDueDate: (id?: string, name?: string) => ({
     id: id || uuid(),
     name: name || 'Due Date',
     options: [],
-    type: 'rewardDueDate'
+    type: 'date'
   })
 };
 

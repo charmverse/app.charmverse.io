@@ -19,15 +19,6 @@ export const proposalPropertyTypesList = [
 ] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
-export const rewardPropertyTypesList = [
-  'rewardStatus',
-  'rewardApplications',
-  'rewardReviewers',
-  'rewardAvailableCount',
-  'rewardDueDate'
-] as const;
-export type DatabaseRewardPropertyType = (typeof rewardPropertyTypesList)[number];
-
 export type PropertyType =
   | 'text'
   | 'number'
@@ -44,8 +35,7 @@ export type PropertyType =
   | 'createdBy'
   | 'updatedTime'
   | 'updatedBy'
-  | DatabaseProposalPropertyType
-  | DatabaseRewardPropertyType;
+  | DatabaseProposalPropertyType;
 
 export const propertyTypesList: PropertyType[] = [
   'text',

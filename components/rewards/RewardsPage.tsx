@@ -45,10 +45,7 @@ export function RewardsPage({ title }: { title: string }) {
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
-    if (
-      (!_groupByProperty || (_groupByProperty?.type !== 'select' && _groupByProperty?.type !== 'rewardStatus')) &&
-      activeView?.fields.viewType === 'board'
-    ) {
+    if ((!_groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
       _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
     }
 

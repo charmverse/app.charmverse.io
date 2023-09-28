@@ -46,8 +46,8 @@ export const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
   suggestion: 'purple',
   open: 'teal',
   inProgress: 'yellow',
-  complete: 'pink',
-  paid: 'gray'
+  complete: 'blue',
+  paid: 'green'
 };
 
 export const REWARD_ACTION_COLORS: Record<RewardTaskAction, BrandColor> = {
