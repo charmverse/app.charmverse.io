@@ -1,8 +1,11 @@
+import { PageNotFoundError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { publishInlineCommentEvent } from 'lib/notifications/publishInlineCommentEvent';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadCreate, ThreadWithComments } from 'lib/threads';
@@ -26,12 +29,21 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
 
   const userId = req.session.user.id;
 
-  const permissionSet = await req.basePermissionsClient.pages.computePagePermissions({
+  const page = await prisma.page.findUnique({
+    where: { id: pageId },
+    select: { id: true, spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true, cardId: true }
+  });
+
+  if (!page) {
+    throw new PageNotFoundError(pageId);
+  }
+
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
 
-  if (!permissionSet.comment) {
+  if (!permissions.comment) {
     throw new ActionNotPermittedError();
   }
 
@@ -39,6 +51,14 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
     comment,
     context,
     pageId,
+    userId
+  });
+
+  const inlineCommentId = newThread.comments[0].id;
+
+  await publishInlineCommentEvent({
+    inlineCommentId,
+    page,
     userId
   });
 

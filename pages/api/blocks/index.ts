@@ -26,6 +26,8 @@ import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFr
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishCardEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -218,6 +220,17 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     }),
     ...cardPageQueries
   ]);
+
+  for (const block of newBlocks) {
+    if (block.type === 'comment') {
+      await publishCardEvent({
+        scope: WebhookEventNames.CardBlockCommentCreated,
+        blockCommentId: block.id,
+        cardId: block.parentId as string,
+        spaceId: space.id
+      });
+    }
+  }
 
   await Promise.all([
     (async () => {
