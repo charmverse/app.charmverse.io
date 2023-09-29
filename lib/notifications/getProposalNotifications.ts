@@ -41,7 +41,7 @@ export async function getProposalNotifications(userId: string): Promise<Notifica
         pagePath: page.path,
         pageTitle: page.title,
         status: notification.proposal.status,
-        createdBy: notification.notificationMetadata.user,
+        createdBy: notification.notificationMetadata.author,
         spaceDomain: notification.notificationMetadata.space.domain,
         spaceName: notification.notificationMetadata.space.name,
         spaceId: notification.notificationMetadata.space.id,

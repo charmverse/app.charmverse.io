@@ -44,7 +44,7 @@ export async function getForumNotifications(userId: string): Promise<Notificatio
         commentId: notification.commentId,
         commentText: notification.comment?.contentText ?? '',
         createdAt: notification.notificationMetadata.createdAt.toISOString(),
-        createdBy: notification.notificationMetadata.user,
+        createdBy: notification.notificationMetadata.author,
         mentionId: notification.mentionId,
         postId: notification.postId,
         postPath: notification.post.path,

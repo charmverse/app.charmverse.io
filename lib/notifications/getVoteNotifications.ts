@@ -64,7 +64,7 @@ export async function getVoteNotifications(userId: string): Promise<Notification
         userChoice,
         title: notification.vote.title,
         status: voteStatus,
-        createdBy: notification.notificationMetadata.user,
+        createdBy: notification.notificationMetadata.author,
         pagePath: page?.path ?? post?.path ?? '',
         pageTitle: page?.title ?? post?.title ?? 'Untitled',
         pageType: page ? 'page' : 'proposal',

@@ -46,7 +46,7 @@ export async function getBountyNotifications(userId: string): Promise<Notificati
         taskId: notification.id,
         applicationId: notification.applicationId,
         createdAt: notificationMetadata.createdAt.toISOString(),
-        createdBy: notificationMetadata.user,
+        createdBy: notificationMetadata.author,
         inlineCommentId: notification.inlineCommentId,
         mentionId: notification.mentionId,
         pageId: page.id,
