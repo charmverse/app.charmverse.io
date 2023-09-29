@@ -7,8 +7,11 @@ import DoDisturbOutlinedIcon from '@mui/icons-material/DoDisturbOutlined';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
 import RuleIcon from '@mui/icons-material/Rule';
+import type { SvgIconTypeMap } from '@mui/material';
 import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
+import type { OverridableComponent } from '@mui/material/OverridableComponent';
+import Tooltip from '@mui/material/Tooltip';
 import type { ReactNode } from 'react';
 
 import type { BrandColor } from 'theme/colors';
@@ -53,16 +56,42 @@ const StyledRewardApplicationStatusChip = styled(Chip)<{ status: ApplicationStat
   padding-left: 0.3rem;
   padding-right: 0.3rem;
 `;
-export const rewardApplicationStatusIcons: Record<ApplicationStatus, ReactNode> = {
-  applied: <ModeStandbyIcon />,
-  rejected: <DoDisturbOutlinedIcon />,
-  inProgress: <AssignmentIndIcon />,
-  review: <RuleIcon />,
-  complete: <CheckCircleOutlineIcon />,
-  processing: <AccessTimeOutlinedIcon />,
-  paid: <PaidIcon />,
-  cancelled: <DoDisturbOutlinedIcon />
+const REWARD_APPLICATION_STATUS_ICONS: Record<
+  ApplicationStatus,
+  OverridableComponent<SvgIconTypeMap<object, 'svg'>>
+> = {
+  applied: ModeStandbyIcon,
+  rejected: DoDisturbOutlinedIcon,
+  inProgress: AssignmentIndIcon,
+  review: RuleIcon,
+  complete: CheckCircleOutlineIcon,
+  processing: AccessTimeOutlinedIcon,
+  paid: PaidIcon,
+  cancelled: DoDisturbOutlinedIcon
 };
+
+export function RewardApplicationStatusIcon({
+  status,
+  showTooltip,
+  fontSize = 'small'
+}: {
+  status: ApplicationStatus;
+  showTooltip?: boolean;
+  fontSize?: 'small' | 'medium';
+}) {
+  const Icon = REWARD_APPLICATION_STATUS_ICONS[status];
+
+  if (!Icon) {
+    return null;
+  }
+
+  return (
+    <Tooltip title={showTooltip ? REWARD_APPLICATION_STATUS_LABELS[status] : ''}>
+      <Icon color='secondary' />
+    </Tooltip>
+  );
+}
+
 export function RewardApplicationStatusChip({
   status,
   size = 'small',
@@ -79,7 +108,7 @@ export function RewardApplicationStatusChip({
       status={status}
       label={REWARD_APPLICATION_STATUS_LABELS[status]}
       variant='filled'
-      icon={showIcon ? <span>{rewardApplicationStatusIcons[status]}</span> : undefined}
+      icon={showIcon ? <RewardApplicationStatusIcon status={status} showTooltip={true} /> : undefined}
     />
   );
 }

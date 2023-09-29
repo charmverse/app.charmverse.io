@@ -14,7 +14,7 @@ import { PageActionsMenu } from 'components/common/PageActions/components/PageAc
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import {
   REWARD_APPLICATION_STATUS_COLORS,
-  rewardApplicationStatusIcons
+  RewardApplicationStatusIcon
 } from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
@@ -205,13 +205,9 @@ function TableRow(props: Props) {
 
                   {indentTitle && <div style={{ paddingRight: `${indentTitle}px` }}></div>}
                   {card.customIconType === 'applicationStatus' && card.fields.properties[REWARD_STATUS_BLOCK_ID] && (
-                    <span>
-                      {
-                        rewardApplicationStatusIcons[
-                          card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus
-                        ]
-                      }
-                    </span>
+                    <RewardApplicationStatusIcon
+                      status={card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus}
+                    />
                   )}
                   {card.customIconType !== 'applicationStatus' && (
                     <PageIcon
