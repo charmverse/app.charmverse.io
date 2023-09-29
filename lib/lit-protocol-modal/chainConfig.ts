@@ -115,6 +115,14 @@ export const chainConfig = {
     types: ethereumTypesConfig,
     addressValidator: (walletAddress: string) => true
   },
+  zkEvm: {
+    value: 'zkEvm',
+    label: 'Polygon zkEVM',
+    logo: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    nativeToken: 'ETH',
+    types: ethereumTypesConfig,
+    addressValidator: (walletAddress: string) => true
+  },
   mumbai: {
     value: 'mumbai',
     label: 'Mumbai',
