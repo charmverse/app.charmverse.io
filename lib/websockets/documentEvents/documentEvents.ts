@@ -8,6 +8,7 @@ import { archivePages } from 'lib/pages/archivePages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
