@@ -10,6 +10,7 @@ import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTa
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
 import { getProposalTasks } from 'lib/proposal/getProposalTasks';
+import { isUUID } from 'lib/utilities/strings';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 const notificationTaskLimiter = RateLimit(100);
@@ -130,10 +131,9 @@ async function sendNotification(
     ...notification.voteNotifications.map((voteTask) => voteTask.taskId),
     ...notification.bountyNotifications.map((bountyTask) => bountyTask.taskId),
     ...notification.forumNotifications.map((forumTask) => forumTask.taskId)
-  ];
+  ].filter((nid) => isUUID(nid));
 
   try {
-    // remember that we sent these tasks
     await prisma.$transaction([
       prisma.userNotificationMetadata.updateMany({
         where: {

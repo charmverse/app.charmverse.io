@@ -206,14 +206,22 @@ describe('getProposalStatusChangeTasks', () => {
 
     const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(user1.id, events);
 
-    expect(proposalTasks).toEqual(
+    expect(proposalTasks.map((p) => ({ type: p.type, pagePath: p.pagePath }))).toEqual(
       expect.arrayContaining([
         expect.objectContaining<Partial<ProposalNotification>>({
           type: 'vote',
           pagePath: voteActiveProposal.path
         }),
         expect.objectContaining<Partial<ProposalNotification>>({
-          type: 'vote',
+          type: 'evaluation_closed',
+          pagePath: rubricClosedProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'evaluation_active',
+          pagePath: rubricReviewerProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'reviewed',
           pagePath: reviewedProposal.path
         }),
         expect.objectContaining<Partial<ProposalNotification>>({
@@ -225,16 +233,8 @@ describe('getProposalStatusChangeTasks', () => {
           pagePath: authoredStartReviewProposal.path
         }),
         expect.objectContaining<Partial<ProposalNotification>>({
-          type: 'start_review',
+          type: 'needs_review',
           pagePath: reviewProposal.path
-        }),
-        expect.objectContaining<Partial<ProposalNotification>>({
-          type: 'start_review',
-          pagePath: rubricReviewerProposal.path
-        }),
-        expect.objectContaining<Partial<ProposalNotification>>({
-          type: 'evaluation_closed',
-          pagePath: rubricClosedProposal.path
         })
       ])
     );
