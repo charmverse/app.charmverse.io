@@ -4,14 +4,11 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DoDisturbOutlinedIcon from '@mui/icons-material/DoDisturbOutlined';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
-import RequestQuoteOutlinedIcon from '@mui/icons-material/RequestQuoteOutlined';
-import RuleFolderOutlinedIcon from '@mui/icons-material/RuleFolderOutlined';
-import WorkHistoryOutlinedIcon from '@mui/icons-material/WorkHistoryOutlined';
-import Chip from '@mui/material/Chip';
+import RuleIcon from '@mui/icons-material/Rule';
 import type { ChipProps } from '@mui/material/Chip';
+import Chip from '@mui/material/Chip';
 import type { ReactNode } from 'react';
 
 import type { BrandColor } from 'theme/colors';
@@ -28,13 +25,13 @@ export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string>
 };
 
 export const REWARD_APPLICATION_STATUS_COLORS: Record<ApplicationStatus, BrandColor> = {
-  applied: 'gray',
+  applied: 'teal',
   cancelled: 'gray',
   rejected: 'red',
-  inProgress: 'teal',
+  inProgress: 'yellow',
   paid: 'green',
   complete: 'blue',
-  processing: 'yellow',
+  processing: 'purple',
   review: 'orange'
 };
 
@@ -60,7 +57,7 @@ export const rewardApplicationStatusIcons: Record<ApplicationStatus, ReactNode> 
   applied: <ModeStandbyIcon />,
   rejected: <DoDisturbOutlinedIcon />,
   inProgress: <AssignmentIndIcon />,
-  review: <RuleFolderOutlinedIcon />,
+  review: <RuleIcon />,
   complete: <CheckCircleOutlineIcon />,
   processing: <AccessTimeOutlinedIcon />,
   paid: <PaidIcon />,
