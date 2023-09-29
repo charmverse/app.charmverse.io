@@ -56,5 +56,4 @@ export type TokenGateAccessType =
   | 'individual_nft'
   | 'group_token_or_nft'
   | 'dao_members'
-  | 'poap_collectors'
-  | 'cask_subscribers';
+  | 'poap_collectors';
