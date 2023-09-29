@@ -282,21 +282,21 @@ export class DocumentEventHandler {
         docRoom.participants.set(this.id, this);
       } else {
         log.debug('Opening new document room', { socketId: this.id, pageId, userId, connectionCount });
-        const page = await prisma.page.findUniqueOrThrow({
+        const rawPage = await prisma.page.findUniqueOrThrow({
           where: { id: pageId },
           include: {
             diffs: true
           }
         });
 
-        // let page: typeof rawPage | null = null;
+        let page: typeof rawPage | null = null;
 
-        // try {
-        //   ({ page } = await convertAndSavePage(rawPage));
-        // } catch (error) {
-        //   log.error('Could not convert page with old lists', { pageId: rawPage.id, error });
-        //   page = rawPage;
-        // }
+        try {
+          ({ page } = await convertAndSavePage(rawPage));
+        } catch (error) {
+          log.error('Could not convert page with old lists', { pageId: rawPage.id, error });
+          page = rawPage;
+        }
 
         const content = page.content || emptyDocument;
         const participants = new Map();
