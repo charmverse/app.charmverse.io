@@ -94,7 +94,7 @@ function getEventsFromNode({ node, lastNode, lastNodeTracks }: GetTracksProps) {
                 track.data.date === lastTrack.data.date &&
                 (node.isInline || // block level changes almost always need new boxes
                   (node.type.name === 'paragraph' &&
-                    lastNode.type.name === 'listItem' &&
+                    (lastNode.type.name === 'listItem' || lastNode.type.name === 'list_item') &&
                     lastTrack.type === 'insertion')) && // Don't show first paragraphs in list items.
                 (['insertion', 'deletion'].includes(track.type) ||
                   (track.type === 'format_change' &&

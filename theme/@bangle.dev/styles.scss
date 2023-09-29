@@ -656,3 +656,8 @@ ol li {
     tab-size: calc(7 * var(--tab-width));
   }
 }
+
+/** hide tab when a user suggested to delete a list item - it should not exist yet **/
+li .insertion > .charm-tab {
+  display: none;
+}

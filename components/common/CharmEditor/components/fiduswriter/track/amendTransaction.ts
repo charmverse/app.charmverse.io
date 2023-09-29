@@ -124,11 +124,11 @@ function markDeletion(
         if (removeStep && !tr.maybeStep(removeStep).failed) {
           deletionMap.appendMap(removeStep.getMap());
         }
-        if (node.type.name === 'listItem' && listItem) {
+        if ((node.type.name === 'listItem' || node.type.name === 'list_item') && listItem) {
           listItem = false;
         }
       } else if (node.attrs.track) {
-        if (node.type.name === 'listItem') {
+        if (node.type.name === 'listItem' || node.type.name === 'list_item') {
           listItem = true;
         } else if (listItem) {
           // The first child of the first list item (likely a par) will not be merged with the paragraph
