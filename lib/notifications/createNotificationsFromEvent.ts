@@ -75,17 +75,6 @@ export async function createNotificationsFromEvent(webhookData: {
       const previousCommentId = previousComment?.id;
       const previousCommentAuthorId = previousComment?.createdBy;
 
-      if (cardAuthorId !== commentAuthorId) {
-        await createCardNotification({
-          type: 'block_comment.created',
-          createdBy: commentAuthorId,
-          cardId,
-          spaceId,
-          userId: cardAuthorId,
-          blockCommentId
-        });
-      }
-
       if (
         previousCommentId &&
         previousCommentAuthorId &&
@@ -98,6 +87,15 @@ export async function createNotificationsFromEvent(webhookData: {
           cardId,
           spaceId,
           userId: previousCommentAuthorId,
+          blockCommentId
+        });
+      } else if (cardAuthorId !== commentAuthorId) {
+        await createCardNotification({
+          type: 'block_comment.created',
+          createdBy: commentAuthorId,
+          cardId,
+          spaceId,
+          userId: cardAuthorId,
           blockCommentId
         });
       }

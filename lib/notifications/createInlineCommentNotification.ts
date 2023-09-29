@@ -54,7 +54,11 @@ export async function createInlineCommentNotification(
         });
       }
 
-      if (previousInlineComment && previousInlineComment?.id !== inlineCommentId) {
+      if (
+        previousInlineComment &&
+        previousInlineComment?.id !== inlineCommentId &&
+        previousInlineComment.userId !== inlineCommentAuthorId
+      ) {
         await createDocumentNotification({
           type: 'inline_comment.replied',
           createdBy: inlineCommentAuthorId,
