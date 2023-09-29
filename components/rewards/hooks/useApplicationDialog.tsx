@@ -33,6 +33,7 @@ export function ApplicationDialogProvider({ children }: { children: ReactNode })
   const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
 
   function hideApplication() {
+    setCurrentApplicationId(null);
     setIsOpen(false);
   }
 

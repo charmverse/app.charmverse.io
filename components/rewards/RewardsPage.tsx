@@ -1,7 +1,7 @@
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
@@ -27,6 +27,21 @@ import { useApplicationDialog } from './hooks/useApplicationDialog';
 import { useRewards } from './hooks/useRewards';
 
 export function RewardsPage({ title }: { title: string }) {
+  const router = useRouter();
+  const { currentApplicationId, showApplication, isOpen } = useApplicationDialog();
+
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    // Only auto-open application on initial render of the page
+    if (router.query.applicationId && !currentApplicationId && mounted.current === false) {
+      showApplication(router.query.applicationId as string);
+    } else if (!currentApplicationId) {
+      setUrlWithoutRerender(router.pathname, { applicationId: null });
+    }
+    mounted.current = true;
+  }, [currentApplicationId]);
+
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, rewards } = useRewards();
@@ -36,11 +51,9 @@ export function RewardsPage({ title }: { title: string }) {
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
 
   const isAdmin = useIsAdmin();
-
-  const { showApplication } = useApplicationDialog();
   const { showPage: showReward, hidePage: hideReward } = usePageDialog();
   const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
-  const router = useRouter();
+
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
@@ -89,6 +102,7 @@ export function RewardsPage({ title }: { title: string }) {
       if (id && (!rewardId || id === rewardId)) {
         openPage(id);
       } else if (id) {
+        setUrlWithoutRerender(router.pathname, { applicationId: id });
         showApplication(id);
       }
     },
