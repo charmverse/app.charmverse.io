@@ -289,7 +289,14 @@ export class DocumentEventHandler {
           }
         });
 
-        const { page } = await convertAndSavePage(rawPage);
+        let page: typeof rawPage | null = null;
+
+        try {
+          ({ page } = await convertAndSavePage(rawPage));
+        } catch (error) {
+          log.error('Could not convert page with old lists', { pageId: rawPage.id, error });
+          page = rawPage;
+        }
 
         const content = page.content || emptyDocument;
         const participants = new Map();

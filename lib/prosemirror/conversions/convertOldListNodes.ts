@@ -7,7 +7,7 @@ import type { Step } from 'prosemirror-transform';
 import { replaceStep } from 'prosemirror-transform';
 
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent, BlockNode } from 'lib/prosemirror/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ClientDiffMessage } from 'lib/websockets/documentEvents/interfaces';
 
 export function convertDocument(doc: ProsemirrorNode) {
@@ -115,6 +115,7 @@ export async function convertAndSavePage<
         data: {
           createdBy,
           data: rawDiff as any as Prisma.InputJsonObject,
+          pageId,
           version: newVersion
         }
       }),
@@ -131,6 +132,7 @@ export async function convertAndSavePage<
     page.content = doc.toJSON();
     page.diffs.push(res[0]);
     page.version = newVersion;
+    log.info('Updated old lists on page', { pageId, version: page.version });
   }
 
   return { page };
