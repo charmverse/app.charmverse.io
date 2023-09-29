@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 } from 'uuid';
 
 import type {
   BlockCommentNotification,
@@ -28,12 +29,15 @@ export async function createDocumentNotification({
   userId,
   type
 }: CreateDocumentNotificationInput) {
+  const notificationId = v4();
   await prisma.documentNotification.create({
     data: {
+      id: notificationId,
       type,
       mentionId,
       notificationMetadata: {
         create: {
+          id: notificationId,
           createdBy,
           spaceId,
           userId,
@@ -81,11 +85,14 @@ export async function createCardNotification({
   blockCommentId,
   cardId
 }: CreateCardNotificationInput) {
+  const notificationId = v4();
   await prisma.cardNotification.create({
     data: {
+      id: notificationId,
       type,
       notificationMetadata: {
         create: {
+          id: notificationId,
           createdBy,
           spaceId,
           userId,

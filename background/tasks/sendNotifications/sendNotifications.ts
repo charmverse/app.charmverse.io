@@ -127,9 +127,22 @@ async function sendNotification(
     unmarkedWorkspaceEvents: string[];
   }
 ) {
+  const notificationIds = notification.discussionTasks.map((n) => n.taskId);
+
   try {
     // remember that we sent these tasks
     await prisma.$transaction([
+      prisma.userNotificationMetadata.updateMany({
+        where: {
+          id: {
+            in: notificationIds
+          }
+        },
+        data: {
+          seenAt: new Date(),
+          channel: 'email'
+        }
+      }),
       ...notification.proposalTasks.map((proposalTask) =>
         prisma.userNotification.create({
           data: {
