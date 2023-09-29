@@ -71,7 +71,7 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
         inlineCommentId,
         mentionId,
         createdAt: notificationMetadata.createdAt.toISOString(),
-        createdBy: notificationMetadata.user,
+        createdBy: notificationMetadata.author,
         pageId: page.id,
         pagePath: page.path,
         pageTitle: page.title || 'Untitled',
