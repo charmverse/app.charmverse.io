@@ -8,6 +8,7 @@ import { archivePages } from 'lib/pages/archivePages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -281,12 +282,14 @@ export class DocumentEventHandler {
         docRoom.participants.set(this.id, this);
       } else {
         log.debug('Opening new document room', { socketId: this.id, pageId, userId, connectionCount });
-        const page = await prisma.page.findUniqueOrThrow({
+        const rawPage = await prisma.page.findUniqueOrThrow({
           where: { id: pageId },
           include: {
             diffs: true
           }
         });
+
+        const { page } = await convertAndSavePage(rawPage);
 
         const content = page.content || emptyDocument;
         const participants = new Map();
