@@ -472,16 +472,16 @@ ol li {
   margin-top: 3px;
   // opacity: 0;
   transition: opacity 0.2s ease-in-out;
+}
 
-  .charm-drag-handle {
-    display: flex;
-    cursor: grab;
-    opacity: 0.5;
-    transition: opacity 0.2s ease-in-out;
+.charm-drag-handle {
+  display: flex;
+  cursor: grab;
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
 
-    &:hover {
-      opacity: 1;
-    }
+  &:hover {
+    opacity: 1;
   }
 }
 
