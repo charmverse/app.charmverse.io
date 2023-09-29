@@ -140,17 +140,17 @@ describe('getBountyTasks', () => {
 
     const bountyTasks = await getBountyTasks(user.id);
 
-    expect(bountyTasks.unmarked).toEqual(
+    expect(bountyTasks.unmarked).toMatchObject(
       expect.arrayContaining([
         expect.objectContaining({
           status: inProgressBounty.status,
-          action: 'application_approved',
-          id: `${inProgressBounty.id}.${application.id}.application_approved`
+          type: 'application.accepted',
+          taskId: `${inProgressBounty.id}.${application.id}.application.accepted`
         }),
         expect.objectContaining({
           status: inProgressBounty2.status,
-          action: 'application_rejected',
-          id: `${inProgressBounty2.id}.${application2.id}.application_rejected`
+          type: 'application.rejected',
+          taskId: `${inProgressBounty2.id}.${application2.id}.application.rejected`
         })
       ])
     );
@@ -226,13 +226,13 @@ describe('getBountyTasks', () => {
       expect.arrayContaining([
         expect.objectContaining({
           status: inProgressBounty.status,
-          action: 'work_submitted',
-          id: `${inProgressBounty.id}.${application.id}.work_submitted`
+          type: 'application.submitted',
+          taskId: `${inProgressBounty.id}.${application.id}.application.submitted`
         }),
         expect.objectContaining({
           status: inProgressBounty2.status,
-          action: 'payment_needed',
-          id: `${inProgressBounty2.id}.${application2.id}.payment_needed`
+          type: 'application.payment_pending',
+          taskId: `${inProgressBounty2.id}.${application2.id}.application.payment_pending`
         })
       ])
     );
@@ -278,8 +278,8 @@ describe('getBountyTasks', () => {
       expect.arrayContaining([
         expect.objectContaining({
           status: inProgressBounty.status,
-          action: 'suggested_bounty',
-          id: `${inProgressBounty.id}.${application.id}.suggested_bounty`
+          type: 'suggestion.created',
+          taskId: `${inProgressBounty.id}.${application.id}.suggestion.created`
         })
       ])
     );
