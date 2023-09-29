@@ -47,6 +47,22 @@ export async function createInlineCommentNotification(
     case WebhookEventNames.BountyInlineCommentCreated: {
       const authorId = data.bounty.author.id;
       const bountyId = data.bounty.id;
+
+      if (
+        previousInlineComment &&
+        previousInlineComment?.id !== inlineCommentId &&
+        previousInlineComment.userId !== inlineCommentAuthorId
+      ) {
+        await createBountyNotification({
+          type: 'inline_comment.replied',
+          createdBy: inlineCommentAuthorId,
+          inlineCommentId,
+          bountyId,
+          spaceId,
+          userId: previousInlineComment.userId
+        });
+      }
+
       if (inlineCommentAuthorId !== authorId) {
         await createBountyNotification({
           type: 'inline_comment.created',
@@ -55,17 +71,6 @@ export async function createInlineCommentNotification(
           bountyId,
           spaceId,
           userId: authorId
-        });
-      }
-
-      if (previousInlineComment && previousInlineComment?.id !== inlineCommentId) {
-        await createBountyNotification({
-          type: 'inline_comment.replied',
-          createdBy: inlineCommentAuthorId,
-          inlineCommentId,
-          bountyId,
-          spaceId,
-          userId: previousInlineComment.userId
         });
       }
 
@@ -149,7 +154,11 @@ export async function createInlineCommentNotification(
         }
       }
 
-      if (previousInlineComment && previousInlineComment?.id !== inlineCommentId) {
+      if (
+        previousInlineComment &&
+        previousInlineComment?.id !== inlineCommentId &&
+        previousInlineComment.userId !== inlineCommentAuthorId
+      ) {
         await createProposalNotification({
           type: 'inline_comment.replied',
           createdBy: inlineCommentAuthorId,
