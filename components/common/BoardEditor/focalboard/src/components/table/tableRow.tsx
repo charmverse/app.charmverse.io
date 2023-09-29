@@ -213,7 +213,13 @@ function TableRow(props: Props) {
                       }
                     </span>
                   )}
-                  {!card.customIconType && <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />}
+                  {card.customIconType !== 'applicationStatus' && (
+                    <PageIcon
+                      isEditorEmpty={!hasContent}
+                      pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
+                      icon={pageIcon}
+                    />
+                  )}
                   <TextInput {...commonProps} multiline={wrapColumn} />
                 </div>
 

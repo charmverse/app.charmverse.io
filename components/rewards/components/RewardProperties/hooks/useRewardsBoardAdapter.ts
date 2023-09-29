@@ -141,7 +141,8 @@ function mapRewardToCardPage({
     createdAt: rewardPage?.createdAt ? new Date(rewardPage?.createdAt).getTime() : 0,
     updatedAt: rewardPage?.updatedAt ? new Date(rewardPage?.updatedAt).getTime() : 0,
     deletedAt: null,
-    fields: { ...rewardFields, contentOrder: [] }
+    fields: { ...rewardFields, contentOrder: [] },
+    customIconType: 'reward'
   };
 
   return {
