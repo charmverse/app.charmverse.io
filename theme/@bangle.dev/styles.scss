@@ -287,20 +287,21 @@ ol li {
   transition: background-color 150ms ease-in-out;
 }
 
-.bangle-editor li[data-bangle-is-todo] {
+.bangle-editor .old-list li[data-bangle-is-todo] {
   display: flex;
   flex-direction: row;
   position: relative;
 }
 
-.bangle-editor li[data-bangle-is-todo] > span:first-child {
+.bangle-editor .old-list li[data-bangle-is-todo] > span:first-child {
   margin-left: -1.5rem;
 }
 
-.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
+.bangle-editor .old-list li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.5rem;
   margin-right: 6px;
   outline: none;
+  position: relative;
 }
 
 .bangle-editor > ol {
@@ -308,10 +309,23 @@ ol li {
   margin-bottom: 0.5rem;
 }
 
-.bangle-editor ol {
-  list-style-type: decimal;
+.bangle-editor .old-list {
   list-style-position: outside;
   padding-left: 1.5rem;
+  // hide new list style
+  p::before {
+    display: none !important;
+  }
+  li {
+    display: list-item;
+  }
+  p {
+    padding-left: 0 !important;
+  }
+}
+
+.bangle-editor ol.old-list {
+  list-style-type: decimal;
 }
 
 .bangle-editor > p {
@@ -334,11 +348,11 @@ ol li {
 }
 
 /** Bullet List */
-.bangle-editor ul:not(.MuiList-root) {
-  list-style-type: disc;
-  list-style-position: outside;
-  padding-left: 24px;
-}
+// .bangle-editor ul:not(.MuiList-root) {
+//   list-style-type: disc;
+//   list-style-position: outside;
+//   padding-left: 24px;
+// }
 
 .bangle-editor ul,
 .bangle-editor ol {
@@ -455,7 +469,7 @@ ol li {
   position: absolute;
   width: 56px;
   height: 24px;
-  margin-top: 5px;
+  margin-top: 3px;
   // opacity: 0;
   transition: opacity 0.2s ease-in-out;
 
@@ -618,3 +632,27 @@ ol li {
 }
 
 /** End columns **/
+
+/** Tab **/
+.charm-tab {
+  tab-size: var(--tab-width);  // should equal list item padding
+
+  &[data-indent='1'] {
+    tab-size: calc(2 * var(--tab-width));
+  }
+  &[data-indent='2'] {
+    tab-size: calc(3 * var(--tab-width));
+  }
+  &[data-indent='3'] {
+    tab-size: calc(4 * var(--tab-width));
+  }
+  &[data-indent='4'] {
+    tab-size: calc(5 * var(--tab-width));
+  }
+  &[data-indent='5'] {
+    tab-size: calc(6 * var(--tab-width));
+  }
+  &[data-indent='6'] {
+    tab-size: calc(7 * var(--tab-width));
+  }
+}

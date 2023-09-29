@@ -12,8 +12,14 @@ export function spec(): RawSpecs {
       inline: true,
       group: 'inline',
       parseDOM: [{ tag: 'span.charm-tab' }],
-      toDOM: (): DOMOutputSpec => ['span', { class: 'charm-tab', style: 'white-space:pre' }, '\t'],
-      attrs: {}
+      toDOM: (node): DOMOutputSpec => [
+        'span',
+        { class: 'charm-tab', 'data-indent': node.attrs.indent || 0, style: 'white-space:pre' },
+        '\t'
+      ],
+      attrs: {
+        indent: { default: 0 }
+      }
     },
     markdown: {
       toMarkdown: () => null

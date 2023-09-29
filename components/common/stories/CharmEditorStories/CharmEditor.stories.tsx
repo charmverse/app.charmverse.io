@@ -2,56 +2,15 @@ import { Divider, Paper } from '@mui/material';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
 
-import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import {
-  contentWithBlocksAndMarks,
-  contentWithColumnsAndTables,
-  contentWithMedia
-} from 'testing/mocks/charmEditorContent';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
+import { contentWithBlocksAndMarks, contentWithMedia } from 'testing/mocks/charmEditorContent';
 
-function renderEditorWithContent({ content, title }: { content?: PageContent; title?: string }) {
-  return (
-    <CharmEditorComponent
-      allowClickingFooter={true}
-      placeholderText='Custom placeholder... start typing / to see commands'
-      readOnly={false}
-      autoFocus={true}
-      pageActionDisplay={null}
-      pageId='123'
-      disablePageSpecificFeatures={false}
-      enableSuggestingMode={false}
-      enableVoting={true}
-      pageType='page'
-      pagePermissions={undefined}
-      onConnectionEvent={() => {}}
-      snapshotProposalId={null}
-      onParticipantUpdate={() => {}}
-      style={{
-        minHeight: '100px'
-      }}
-      disableNestedPages={true}
-      content={content}
-      isContentControlled={true}
-    >
-      <PageHeader
-        headerImage=''
-        icon=''
-        title={title || 'Custom page title component'}
-        updatedAt={new Date('2021-10-10T10:10:10.000Z').toISOString()}
-        readOnly={false}
-        setPage={() => {}}
-        readOnlyTitle={false}
-      />
-    </CharmEditorComponent>
-  );
-}
+import { renderEditorWithContent } from './renderEditor';
 
 // CharmEditore uses boards state, so we need to mock it
 const store = mockStateStore([], {
@@ -129,20 +88,6 @@ export function InlineEditor() {
 
 export function EditorWithContent() {
   return renderEditorWithContent({ content: contentWithBlocksAndMarks });
-}
-
-export function LayoutColumnComponent() {
-  return renderEditorWithContent({ content: contentWithColumnsAndTables });
-}
-
-export function LayoutTableComponent() {
-  const content = jsonDoc(
-    _.table(
-      _.table_row(_.table_header(_.p('Header 1')), _.table_header(_.p('Header 2'))),
-      _.table_row(_.table_cell(_.p('Cell 1')), _.table_cell(_.p('Cell 2')))
-    )
-  );
-  return renderEditorWithContent({ content, title: 'Table component' });
 }
 
 export function EditorWithMedia() {

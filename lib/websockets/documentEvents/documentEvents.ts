@@ -13,7 +13,7 @@ import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishCardEvent, publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';
@@ -290,6 +290,15 @@ export class DocumentEventHandler {
             diffs: true
           }
         });
+
+        // let page: typeof rawPage | null = null;
+
+        // try {
+        //   ({ page } = await convertAndSavePage(rawPage));
+        // } catch (error) {
+        //   log.error('Could not convert page with old lists', { pageId: rawPage.id, error });
+        //   page = rawPage;
+        // }
 
         const content = page.content || emptyDocument;
         const participants = new Map();

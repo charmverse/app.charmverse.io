@@ -19,10 +19,9 @@ import { TextSelection } from 'prosemirror-state';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
-import * as bulletList from '../../bulletList';
 import { linkedPageSuggestMarkName } from '../../linkedPage/linkedPage.constants';
+import * as listItemCommands from '../../listItemNew/commands';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
-import * as orderedList from '../../orderedList';
 import paragraph from '../../paragraph';
 import { isList } from '../commands';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
@@ -53,8 +52,14 @@ function createTableHeader(state: EditorState, text: string) {
 }
 
 const { convertToParagraph } = paragraph;
-const { toggleTodoList, queryIsBulletListActive, queryIsTodoListActive, toggleBulletList } = bulletList;
-const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
+const {
+  toggleTodoList,
+  queryIsBulletListActive,
+  queryIsTodoListActive,
+  toggleBulletList,
+  toggleOrderedList,
+  queryIsOrderedListActive
+} = listItemCommands;
 
 const setHeadingBlockType =
   (level: number) => (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined) => {

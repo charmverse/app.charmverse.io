@@ -14,6 +14,7 @@ import { Button } from 'components/common/Button';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
@@ -39,6 +40,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
   const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   // only load drafts if user is logged in
   const {
@@ -63,7 +65,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
 
   useEffect(() => {
     if (spaceId && post?.id) {
-      trackPageView({ spaceId, postId: post.id, type: 'post' });
+      trackPageView({ spaceId, postId: post.id, type: 'post', spaceDomain: space?.domain });
     }
   }, [post?.id]);
 
