@@ -1,7 +1,7 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 
-import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
@@ -12,6 +12,7 @@ import { useUser } from 'hooks/useUser';
 
 import { ApplicationComments } from './ApplicationComments';
 import ApplicationInput from './RewardApplicationInput';
+import RewardReview from './RewardReview';
 import SubmissionInput from './RewardSubmissionInput';
 
 type Props = {
@@ -19,12 +20,12 @@ type Props = {
 };
 
 export function RewardApplicationPageComponent({ applicationId }: Props) {
-  const { application, refreshApplication } = useApplication({ applicationId });
+  const { application, refreshApplication, applicationRewardPermissions } = useApplication({
+    applicationId
+  });
   const { members } = useMembers();
   const { pages } = usePages();
   const { user } = useUser();
-
-  const { data: permissions } = useGetRewardPermissions({ rewardId: application?.bountyId });
 
   if (!application) {
     return null;
@@ -33,12 +34,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const rewardPage = pages[application.bountyId];
 
   const submitter = members.find((m) => m.id === application.createdBy);
-
-  const titlePrefix =
-    application.reward.approveSubmitters &&
-    (application.status === 'applied' || (application.status === 'rejected' && !application.submissionNodes))
-      ? 'Application'
-      : 'Submission';
 
   const expandedSubmissionStatuses: ApplicationStatus[] = ['inProgress', 'complete', 'review', 'processing', 'paid'];
 
@@ -53,9 +48,26 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
         <Grid item xs={12} display='flex' justifyContent='space-between'>
           {rewardPage && <PageTitleInput value={rewardPage?.title} readOnly onChange={() => null} />}
         </Grid>
-        <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center' }}>
-          <h3>Applicant</h3>
-          <UserDisplay user={submitter} showMiniProfile />
+        <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box display='flex' gap={2}>
+            <h3>Applicant</h3>
+            <UserDisplay user={submitter} showMiniProfile />
+          </Box>
+
+          {application.status === 'applied' && (
+            <RewardReview
+              onConfirmReview={() => null}
+              reviewType='application'
+              readOnly={!applicationRewardPermissions?.approve_applications}
+            />
+          )}
+          {(application.status === 'review' || application.status === 'inProgress') && (
+            <RewardReview
+              onConfirmReview={() => null}
+              reviewType='submission'
+              readOnly={!applicationRewardPermissions?.review}
+            />
+          )}
         </Grid>
         <Grid item xs={12}>
           <p>-------------</p>
@@ -67,7 +79,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
             <ApplicationInput
               refreshApplication={refreshApplication}
               bountyId={application.bountyId}
-              permissions={permissions}
+              permissions={applicationRewardPermissions}
             />
           </Grid>
         )}
@@ -78,7 +90,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
             expandedOnLoad={expandedSubmissionStatuses.includes(application.status)}
             refreshSubmission={refreshApplication}
             bountyId={application.bountyId}
-            permissions={permissions}
+            permissions={applicationRewardPermissions}
             hasCustomReward={!!application.reward.customReward}
           />
         </Grid>

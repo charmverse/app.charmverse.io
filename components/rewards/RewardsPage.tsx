@@ -23,6 +23,7 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { RewardsViewOptions } from './components/RewardViewOptions';
+import { useApplicationDialog } from './hooks/useApplicationDialog';
 import { useRewards } from './hooks/useRewards';
 
 export function RewardsPage({ title }: { title: string }) {
@@ -36,6 +37,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const isAdmin = useIsAdmin();
 
+  const { showApplication } = useApplicationDialog();
   const { showPage: showReward, hidePage: hideReward } = usePageDialog();
   const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
   const router = useRouter();
@@ -81,13 +83,6 @@ export function RewardsPage({ title }: { title: string }) {
       });
     }
   }, [router.query.id]);
-
-  const showApplication = useCallback(
-    (applicationId: string) => {
-      router.push(`/${currentSpace?.domain}/rewards/applications/${applicationId}`);
-    },
-    [currentSpace]
-  );
 
   const showRewardOrApplication = useCallback(
     (id: string | null, rewardId?: string) => {

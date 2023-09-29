@@ -52,8 +52,14 @@ export class RewardsApi {
     return http.POST<RewardWithUsers>(`/api/rewards/${rewardId}/mark-paid`);
   }
 
-  approveApplication(applicationId: string): Promise<Application> {
-    return http.POST<Application>(`/api/applications/${applicationId}/approve`);
+  reviewApplication({
+    decision,
+    applicationId
+  }: {
+    applicationId: string;
+    decision: ReviewDecision;
+  }): Promise<Application> {
+    return http.POST<Application>(`/api/applications/${applicationId}/v2/review`, { decision });
   }
 
   updateApplication({
@@ -82,7 +88,13 @@ export class RewardsApi {
     return http.PUT<Application>(`/api/submissions/${submissionId}`, { content: submissionContent });
   }
 
-  reviewSubmission(submissionId: string, decision: ReviewDecision): Promise<Application> {
+  reviewSubmission({
+    decision,
+    submissionId
+  }: {
+    submissionId: string;
+    decision: ReviewDecision;
+  }): Promise<Application> {
     return http.POST<Application>(`/api/submissions/${submissionId}/review`, {
       decision
     });
