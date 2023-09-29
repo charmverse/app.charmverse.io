@@ -55,7 +55,7 @@ export function plugins({ readOnly }: { readOnly: boolean }): RawPlugins {
         // toggle done
         [isMac() ? 'Ctrl-Enter' : 'Ctrl-I']: filter(
           isValidList,
-          updateNodeAttrs(schema.nodes.listItem, (attrs) => ({
+          updateNodeAttrs(schema.nodes.list_item, (attrs) => ({
             ...attrs,
             todoChecked: attrs.todoChecked == null ? false : !attrs.todoChecked
           }))
