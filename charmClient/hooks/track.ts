@@ -9,10 +9,13 @@ import { TrackApi } from '../apis/trackApi';
 const track = new TrackApi();
 
 export function trackPageView(page: Omit<PageEventMap['page_view'], 'userId'>) {
+  const fullPath = getBrowserPath();
+  const pathname = page.spaceDomain ? fullPath.replace(new RegExp(`^\\/${page.spaceDomain}`), '') : fullPath;
+
   track.trackAction('page_view', {
     ...page,
     meta: {
-      pathname: getBrowserPath()
+      pathname
     }
   });
 }
@@ -23,6 +26,7 @@ export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId'
     if (currentSpace) {
       trackPageView({
         spaceId: currentSpace.id,
+        spaceDomain: currentSpace.domain,
         ...page
       });
     }

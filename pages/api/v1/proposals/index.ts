@@ -234,7 +234,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       authors: proposal.authors.map((author) => ({
         userId: author.author?.id,
         address: author.author?.wallets[0]?.address,
-        email: author.author?.googleAccounts[0]?.email ?? author.author.verifiedEmails[0].email
+        email: author.author?.googleAccounts[0]?.email ?? author.author?.verifiedEmails[0]?.email
       })),
       reviewers: proposal.reviewers.map((reviewer) => ({
         id: reviewer.role?.id ?? (reviewer.reviewer?.id as string),

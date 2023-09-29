@@ -800,32 +800,24 @@ export async function createNotificationsFromEvent(webhookData: {
         }
       });
 
-      const previousCommentId = previousComment?.id;
-      const previousCommentAuthorId = previousComment?.createdBy;
+      if (previousComment && previousComment.createdBy !== commentAuthorId && previousComment.id !== blockCommentId) {
+        await createCardNotification({
+          type: 'block_comment.replied',
+          createdBy: commentAuthorId,
+          cardId,
+          spaceId,
+          userId: previousComment.createdBy,
+          blockCommentId
+        });
+      }
 
-      if (cardAuthorId !== commentAuthorId) {
+      if (commentAuthorId !== cardAuthorId) {
         await createCardNotification({
           type: 'block_comment.created',
           createdBy: commentAuthorId,
           cardId,
           spaceId,
           userId: cardAuthorId,
-          blockCommentId
-        });
-      }
-
-      if (
-        previousCommentId &&
-        previousCommentAuthorId &&
-        previousCommentAuthorId !== commentAuthorId &&
-        cardAuthorId !== commentAuthorId
-      ) {
-        await createCardNotification({
-          type: 'block_comment.replied',
-          createdBy: commentAuthorId,
-          cardId,
-          spaceId,
-          userId: previousCommentAuthorId,
           blockCommentId
         });
       }

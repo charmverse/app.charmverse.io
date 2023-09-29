@@ -7,11 +7,17 @@ import { v4 as uuid } from 'uuid';
 /**
  * Download page from production and load it into a space inside your local database
  *
+ * Example usage:
+ *
+ *  dotenv -e .env.production -- tsx scripts/exportData/importPageToDev.ts
+ *  ➜ Saved data to: page-backup-05-22.json
+ *  dotenv -e .env.local -- tsx scripts/exportData/importPageToDev.ts
+ *  ➜ Uploaded records
  */
 
-const originalPageId = '0c3fb05f-c701-4daa-a0d5-649915f88c2f';
-const destinationSpaceDomain = 'tame-fomo-duck';
-const destinationUserName = '0x1bd0…07f4';
+const originalPagePath = 'page-34568528710225044';
+const destinationSpaceDomain = 'criminal-brown-canid';
+const destinationUserName = '0x6652…97e2';
 
 const fileName = `./page-backup-05-22.json`;
 const pathName = path.join(process.cwd(), fileName);
@@ -21,7 +27,7 @@ type RestoreData = Awaited<ReturnType<typeof queryData>>;
 async function queryData() {
   const page = await prisma.page.findFirstOrThrow({
     where: {
-      id: originalPageId
+      path: originalPagePath
     },
     include: { diffs: true }
   });
@@ -60,8 +66,8 @@ async function importData(data: RestoreData) {
     updatedBy: user.id
   };
 
-  await prisma.$transaction([
-    prisma.page.createMany({
+  return prisma.$transaction([
+    prisma.page.create({
       // @ts-ignore
       data: pageToRestore
     }),
@@ -98,7 +104,8 @@ function download() {
 function upload() {
   return readJson()
     .then(importData)
-    .then((r) => console.log('Uploaded records'));
+    .then((r) => console.log('Uploaded records', { pageId: r[0].id, pagePath: r[0].path }));
 }
 
+//download();
 upload();

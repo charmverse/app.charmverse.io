@@ -10,7 +10,7 @@ export const notificationMetadataIncludeStatement = {
       domain: true
     }
   },
-  user: {
+  author: {
     select: {
       id: true,
       username: true,

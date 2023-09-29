@@ -7,9 +7,11 @@ import { getForumTasks } from 'lib/forums/getForumNotifications/getForumTasks';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTasksTemplate';
+import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
+import { getForumNotifications } from 'lib/notifications/getForumNotification';
+import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
-import { getProposalTasks } from 'lib/proposal/getProposalTasks';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 const notificationTaskLimiter = RateLimit(100);
@@ -88,9 +90,9 @@ export async function getNotifications(): Promise<(PendingNotifications & { unma
 
     const [discussionNotifications, voteNotifications, bountyNotifications, forumNotifications] = await Promise.all([
       getDiscussionNotifications(user.id),
-      getVoteTasks(user.id),
-      getBountyTasks(user.id),
-      getForumTasks(user.id)
+      getVoteNotifications(user.id),
+      getBountyNotifications(user.id),
+      getForumNotifications(user.id)
     ]);
 
     const totalNotifications =

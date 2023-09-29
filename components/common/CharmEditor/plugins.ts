@@ -29,6 +29,7 @@ import { plugins as linkPlugins } from './components/link/link.plugins';
 import { linkedPagePluginKeyName } from './components/linkedPage/linkedPage.constants';
 import { linkedPagePlugins } from './components/linkedPage/linkedPage.plugins';
 import * as listItem from './components/listItem/listItem';
+import { plugins as listPlugins } from './components/listItemNew/listItemPlugins';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
 import { nestedPagePlugins } from './components/nestedPage';
@@ -185,7 +186,6 @@ export function charmEditorPlugins({
   basePlugins.push(
     inlinePalettePlugins({ key: inlinePalettePluginKey }),
     bold.plugins(),
-    bulletList.plugins(),
     code.plugins(),
     codeBlock.plugins(),
     hardBreak.plugins(),
@@ -195,7 +195,9 @@ export function charmEditorPlugins({
     listItem.plugins({
       readOnly
     }),
-    orderedList.plugins(),
+    // bulletList.plugins(),
+    // orderedList.plugins(),
+    listPlugins({ readOnly }),
     columnLayout.plugins({
       key: columnsPluginKey,
       readOnly

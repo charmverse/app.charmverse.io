@@ -59,7 +59,7 @@ export function PageDialog(props: Props) {
 
   useEffect(() => {
     if (page?.id) {
-      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type });
+      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: domain });
     }
   }, [page?.id]);
 
