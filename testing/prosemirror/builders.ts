@@ -10,6 +10,7 @@ export type NodeType =
   | 'blockquote'
   | 'bold'
   | 'bookmark'
+  | 'bullet_list'
   | 'bulletList'
   | 'checkbox'
   | 'code'
@@ -43,11 +44,13 @@ export type NodeType =
   | 'italic'
   | 'label'
   | 'link'
+  | 'list_item'
   | 'listItem'
   | 'mention'
   | 'mentionSuggest'
   | 'nestedPageSuggest'
   | 'nft'
+  | 'ordered_list'
   | 'orderedList'
   | 'p'
   | 'page'
@@ -85,6 +88,9 @@ export const builders = {
   schema: defaultBuilders.schema,
   ...shortcuts
 };
+
+// add an alias to make declarations more concise
+export const _ = builders;
 
 export function jsonDoc(...args: (string | Node | object)[]) {
   return builders.doc(...args).toJSON();

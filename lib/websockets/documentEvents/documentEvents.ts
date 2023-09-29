@@ -8,6 +8,7 @@ import { archivePages } from 'lib/pages/archivePages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -287,6 +288,15 @@ export class DocumentEventHandler {
             diffs: true
           }
         });
+
+        // let page: typeof rawPage | null = null;
+
+        // try {
+        //   ({ page } = await convertAndSavePage(rawPage));
+        // } catch (error) {
+        //   log.error('Could not convert page with old lists', { pageId: rawPage.id, error });
+        //   page = rawPage;
+        // }
 
         const content = page.content || emptyDocument;
         const participants = new Map();
