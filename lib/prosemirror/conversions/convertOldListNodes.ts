@@ -101,11 +101,12 @@ export async function convertAndSavePage<
 
   if (steps.length) {
     const newVersion = version + 1;
+    const newContent = doc.toJSON();
 
     const rawDiff: ClientDiffMessage = {
       rid: 0,
       type: 'diff',
-      v: newVersion,
+      v: version, // use previous page version
       cid: 0,
       ds: steps.map((step) => step.toJSON())
     };
@@ -116,7 +117,7 @@ export async function convertAndSavePage<
           createdBy,
           data: rawDiff as any as Prisma.InputJsonObject,
           pageId,
-          version: newVersion
+          version: rawDiff.v
         }
       }),
       prisma.page.update({
@@ -124,12 +125,12 @@ export async function convertAndSavePage<
           id: pageId
         },
         data: {
-          content: doc.toJSON(),
+          content: newContent,
           version: newVersion
         }
       })
     ]);
-    page.content = doc.toJSON();
+    page.content = newContent;
     page.diffs.push(res[0]);
     page.version = newVersion;
     log.info('Updated old lists on page', { pageId, version: page.version });
