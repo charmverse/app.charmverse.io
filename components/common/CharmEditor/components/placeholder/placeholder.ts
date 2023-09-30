@@ -36,15 +36,17 @@ export function placeholderPlugin(text: string = defaultPlaceholderText) {
         // add to empty paragraph nodes, we can skip checkIsContentEmpty() since it's a little slower
         const selectedNode = state.selection.$from.parent;
         const isEmptyParagraph = selectedNode.childCount === 0 && selectedNode.type.name === 'paragraph';
-        const shouldShow = shouldShowPlaceholder(state);
-        if (isEmptyParagraph && shouldShow) {
-          const resolved = state.doc.resolve(state.selection.from);
-          return DecorationSet.create(state.doc, [
-            Decoration.node(resolved.before(), resolved.after(), {
-              class: 'charm-placeholder',
-              'data-placeholder': text
-            })
-          ]);
+        if (isEmptyParagraph) {
+          const shouldShow = shouldShowPlaceholder(state);
+          if (shouldShow) {
+            const resolved = state.doc.resolve(state.selection.from);
+            return DecorationSet.create(state.doc, [
+              Decoration.node(resolved.before(), resolved.after(), {
+                class: 'charm-placeholder',
+                'data-placeholder': text
+              })
+            ]);
+          }
         }
         return null;
       }
