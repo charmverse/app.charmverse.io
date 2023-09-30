@@ -1,5 +1,5 @@
 import type { RawPlugins } from '@bangle.dev/core';
-import { wrappingInputRule } from '@bangle.dev/pm';
+import { wrappingInputRule, chainCommands } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject, filter } from '@bangle.dev/utils';
 import { keymap } from 'prosemirror-keymap';
@@ -8,13 +8,7 @@ import { Plugin } from 'prosemirror-state';
 
 import { isMac } from 'lib/utilities/browser';
 
-import {
-  updateNodeAttrs,
-  indentCommand,
-  listItemMergeCommand,
-  backspaceKeyCommand,
-  splitListCommand
-} from './commands';
+import { updateNodeAttrs, indentCommand, listItemMergeCommand, backspaceKeyCommand, enterKeyCommand } from './commands';
 import { ListItemNodeView } from './listItemNodeView';
 import { BULLET_LIST, ORDERED_LIST, LIST_ITEM } from './nodeNames';
 import { isNodeTodo, wrappingInputRuleForTodo } from './todo';
@@ -60,7 +54,7 @@ export function plugins({ readOnly }: { readOnly: boolean }): RawPlugins {
             todoChecked: attrs.todoChecked == null ? false : !attrs.todoChecked
           }))
         ),
-        Enter: splitListCommand(),
+        Enter: enterKeyCommand(),
         Tab: indentCommand(1),
         'Shift-Tab': indentCommand(-1),
         Backspace: backspaceKeyCommand(schema.nodes[BULLET_LIST]),
