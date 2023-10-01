@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BountyNotification } from 'lib/notifications/interfaces';
 
-import { getBountyAction } from './getBountyAction';
+import { BountyActionConversionRecord, getBountyAction } from './getBountyAction';
 
 function sortBounties(bounties: BountyNotification[]) {
   bounties.sort((bountyA, bountyB) => {
@@ -113,7 +113,7 @@ export async function getBountyTasks(userId: string): Promise<{
         });
 
         if (action) {
-          const bountyTaskId = `${bounty.id}.${application.id}.${action}`;
+          const bountyTaskId = `${bounty.id}.${application.id}.${BountyActionConversionRecord[action]}`;
 
           const bountyNotification = {
             taskId: bountyTaskId,

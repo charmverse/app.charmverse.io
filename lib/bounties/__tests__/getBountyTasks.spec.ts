@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { createApplication } from 'lib/applications/actions';
 import { generateUserAndSpaceWithApiToken, generateBounty } from 'testing/setupDatabase';
 
+import { BountyActionConversionRecord } from '../getBountyAction';
 import { getBountyTasks } from '../getBountyTasks';
 
 describe('getBountyTasks', () => {
@@ -145,12 +146,12 @@ describe('getBountyTasks', () => {
         expect.objectContaining({
           status: inProgressBounty.status,
           type: 'application.accepted',
-          taskId: `${inProgressBounty.id}.${application.id}.application.accepted`
+          taskId: `${inProgressBounty.id}.${application.id}.${BountyActionConversionRecord['application.accepted']}`
         }),
         expect.objectContaining({
           status: inProgressBounty2.status,
           type: 'application.rejected',
-          taskId: `${inProgressBounty2.id}.${application2.id}.application.rejected`
+          taskId: `${inProgressBounty2.id}.${application2.id}.${BountyActionConversionRecord['application.rejected']}`
         })
       ])
     );
@@ -227,12 +228,12 @@ describe('getBountyTasks', () => {
         expect.objectContaining({
           status: inProgressBounty.status,
           type: 'application.submitted',
-          taskId: `${inProgressBounty.id}.${application.id}.application.submitted`
+          taskId: `${inProgressBounty.id}.${application.id}.${BountyActionConversionRecord['application.submitted']}`
         }),
         expect.objectContaining({
           status: inProgressBounty2.status,
           type: 'application.payment_pending',
-          taskId: `${inProgressBounty2.id}.${application2.id}.application.payment_pending`
+          taskId: `${inProgressBounty2.id}.${application2.id}.${BountyActionConversionRecord['application.payment_pending']}`
         })
       ])
     );
@@ -279,7 +280,7 @@ describe('getBountyTasks', () => {
         expect.objectContaining({
           status: inProgressBounty.status,
           type: 'suggestion.created',
-          taskId: `${inProgressBounty.id}.${application.id}.suggestion.created`
+          taskId: `${inProgressBounty.id}.${application.id}.${BountyActionConversionRecord['suggestion.created']}`
         })
       ])
     );

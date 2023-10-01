@@ -2,6 +2,23 @@ import type { Application, ApplicationStatus, Bounty, BountyNotification, Bounty
 
 import type { BountyNotificationType } from 'lib/notifications/interfaces';
 
+export const BountyActionConversionRecord: Record<BountyNotificationType, string> = {
+  'application.pending': 'application_pending',
+  'application.accepted': 'application_approved',
+  'application.rejected': 'application_rejected',
+  'application.submitted': 'work_submitted',
+  'application.approved': 'work_approved',
+  'application.payment_pending': 'payment_needed',
+  'application.payment_completed': 'payment_complete',
+  'suggestion.created': 'suggested_bounty',
+  'inline_comment.created': 'inline_comment.created',
+  'inline_comment.mention.created': 'inline_comment.mention.created',
+  'inline_comment.replied': 'inline_comment.replied',
+  'mention.created': 'mention.created'
+};
+
+export function convertBountyAction(type: BountyNotificationType) {}
+
 export function getBountyAction({
   isSpaceAdmin,
   bountyStatus,
