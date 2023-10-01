@@ -14,6 +14,8 @@ import type {
 import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import type { VoteTask } from 'lib/votes/interfaces';
 
+import type { NotificationDetails } from './useNotifications';
+
 function getCommentTypeNotificationContent({
   notificationType,
   createdBy,
@@ -67,7 +69,7 @@ function getForumContent(n: ForumTask) {
     : `New forum post "${postTitle}"`;
 }
 
-export function getForumNotificationPreviewItems(notifications: ForumTask[]) {
+export function getForumNotificationPreviewItems(notifications: ForumTask[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -75,7 +77,8 @@ export function getForumNotificationPreviewItems(notifications: ForumTask[]) {
     spaceName: n.spaceName,
     groupType: 'forum' as NotificationGroupType,
     type: NotificationType.forum,
-    href: `/${n.spaceDomain}/forum/post/${n.postPath}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: `/forum/post/${n.postPath}`,
     content: getForumContent(n),
     title: 'Forum Post'
   }));
@@ -99,7 +102,7 @@ function getDiscussionContent(n: DiscussionNotification) {
   }
 }
 
-export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
+export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]): NotificationDetails[] {
   return notifications.map((n) => {
     const type = n.type;
     const urlSearchParams = new URLSearchParams();
@@ -119,9 +122,8 @@ export function getDiscussionsNotificationPreviewItems(notifications: Discussion
       spaceName: n.spaceName,
       groupType: 'discussions' as NotificationGroupType,
       type: NotificationType.mention,
-      href: `/${n.spaceDomain}/${n.pagePath}${
-        Array.from(urlSearchParams.values()).length ? `?${urlSearchParams.toString()}` : ''
-      }`,
+      spaceDomain: n.spaceDomain,
+      pagePath: n.pagePath + (Array.from(urlSearchParams.values()).length ? `?${urlSearchParams.toString()}` : ''),
       content: getDiscussionContent(n),
       title: 'Discussion'
     };
@@ -168,7 +170,7 @@ function getBountyContent(n: BountyTask) {
     : `Bounty status ${title} updated.`;
 }
 
-export function getBountiesNotificationPreviewItems(notifications: BountyTask[]) {
+export function getBountiesNotificationPreviewItems(notifications: BountyTask[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -176,7 +178,8 @@ export function getBountiesNotificationPreviewItems(notifications: BountyTask[])
     spaceName: n.spaceName,
     groupType: 'bounties' as NotificationGroupType,
     type: NotificationType.bounty,
-    href: `/${n.spaceDomain}/${n.pagePath}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: n.pagePath,
     content: getBountyContent(n),
     title: 'Bounty'
   }));
@@ -215,7 +218,10 @@ function getProposalNotificationStatus(status: ProposalStatus) {
   }
 }
 
-export function getProposalsNotificationPreviewItems(notifications: ProposalTask[], currentUserId?: string) {
+export function getProposalsNotificationPreviewItems(
+  notifications: ProposalTask[],
+  currentUserId?: string
+): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -223,7 +229,8 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalTask
     spaceName: n.spaceName,
     groupType: 'proposals' as NotificationGroupType,
     type: NotificationType.proposal,
-    href: `/${n.spaceDomain}/${n.pagePath}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: n.pagePath,
     content: getProposalContent(n, currentUserId || ''),
     title: `Proposal: ${getProposalNotificationStatus(n.status)}`
   }));
@@ -243,7 +250,10 @@ const getVoteContent = (n: VoteTask, currentUserId: string) => {
     : `Poll "${title}" created.`;
 };
 
-export function getVoteNotificationPreviewItems(notifications: VoteTask[], currentUserId?: string) {
+export function getVoteNotificationPreviewItems(
+  notifications: VoteTask[],
+  currentUserId?: string
+): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -251,7 +261,8 @@ export function getVoteNotificationPreviewItems(notifications: VoteTask[], curre
     spaceName: n.spaceName,
     groupType: 'votes' as NotificationGroupType,
     type: NotificationType.vote,
-    href: `/${n.spaceDomain}/${n.pagePath}?voteId=${n.taskId}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: `${n.pagePath}?voteId=${n.taskId}`,
     content: getVoteContent(n, currentUserId || ''),
     title: 'New Poll'
   }));

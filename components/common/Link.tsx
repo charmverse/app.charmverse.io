@@ -38,10 +38,11 @@ const StyledMuiLink = styled(MuiLink)`
 interface Props extends Omit<LinkProps, 'href'> {
   external?: boolean;
   href?: string;
+  space?: { customDomain: string | null; domain: string };
   'data-test'?: string;
 }
 
-export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
+export default function Link({ external, href, onClick, children, color = 'primary', space, ...restProps }: Props) {
   const { space: currentSpace } = useCurrentSpace();
 
   if (!href) {
@@ -60,7 +61,7 @@ export default function Link({ external, href, onClick, children, color = 'prima
     </StyledMuiLink>
   ) : (
     <StyledMuiLink
-      href={getSubdomainPath(href, currentSpace ?? undefined)}
+      href={getSubdomainPath(href, space ?? currentSpace ?? undefined)}
       // @ts-ignore
       component={NextLink}
       onClick={onClick}

@@ -25,7 +25,8 @@ type Props = {
   unmarked?: boolean;
 };
 export function NotificationPreview({ notification, markAsRead, onClose, large, unmarked }: Props) {
-  const { groupType, type, spaceName, createdBy, taskId, href, content, title, createdAt } = notification;
+  const { groupType, type, spaceName, createdBy, taskId, spaceDomain, pagePath, content, title, createdAt } =
+    notification;
 
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
@@ -40,7 +41,8 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
     <Link
       data-test={`goto-${taskId}`}
       color='inherit'
-      href={href}
+      href={pagePath}
+      space={{ domain: spaceDomain, customDomain: null }}
       onClick={() => {
         markAsRead({ taskId, groupType, type });
         onClose();
