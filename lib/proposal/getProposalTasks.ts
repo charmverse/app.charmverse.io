@@ -2,15 +2,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { PageComment, Proposal } from '@charmverse/core/prisma-client';
 import type { ProposalWithCommentsAndUsers } from '@charmverse/core/proposals';
 
-import type { GetDiscussionNotificationsResponse, SpaceRecord } from 'lib/discussion/getDiscussionTasks';
+import type { SpaceRecord } from 'lib/discussion/getDiscussionTasks';
 import type { DiscussionPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
 import { getPropertiesFromPage } from 'lib/discussion/getPropertiesFromPage';
-import type {
-  DiscussionNotification,
-  NotificationActor,
-  NotificationsGroup,
-  ProposalNotification
-} from 'lib/notifications/interfaces';
+import type { NotificationActor, NotificationsGroup, ProposalNotification } from 'lib/notifications/interfaces';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
