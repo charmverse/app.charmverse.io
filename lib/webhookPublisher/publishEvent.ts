@@ -162,6 +162,7 @@ export async function publishBountyEvent(context: BountyEventContext) {
     }
 
     case WebhookEventNames.BountyApplicationCreated:
+    case WebhookEventNames.BountyApplicationSubmitted:
     case WebhookEventNames.BountyApplicationAccepted: {
       const application = await getApplicationEntity(context.applicationId);
       return publishWebhookEvent(context.spaceId, {

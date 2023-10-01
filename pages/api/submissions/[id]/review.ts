@@ -70,7 +70,8 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
   if (decision === 'approve') {
     trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
     await publishBountyEvent({
-      scope: WebhookEventNames.BountyCompleted,
+      scope: WebhookEventNames.BountyApplicationApproved,
+      applicationId: submissionId as string,
       bountyId: submission.bounty.id,
       spaceId,
       userId

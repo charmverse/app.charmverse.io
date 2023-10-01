@@ -14,8 +14,6 @@ import type {
   VoteNotification
 } from 'lib/notifications/interfaces';
 
-import { NotificationDetails } from './useNotifications';
-
 function getUrlSearchParamsFromNotificationType(
   notification:
     | DiscussionNotification
@@ -299,7 +297,7 @@ export function getVoteNotificationPreviewItems(notifications: VoteNotification[
     spaceName: n.spaceName,
     groupType: 'votes' as NotificationGroupType,
     type: NotificationType.vote,
-    href: `/${n.spaceDomain}/${n.pagePath}?voteId=${n.taskId}`,
+    href: `/${n.spaceDomain}/${n.pageType === 'proposal' ? 'forum/post/' : ''}${n.pagePath}?voteId=${n.taskId}`,
     content: `Polling started for "${n.title}".`,
     title: 'New Poll'
   }));

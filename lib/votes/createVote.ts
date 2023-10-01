@@ -90,7 +90,7 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
     }
   });
 
-  if (vote.context === 'inline' && pageId) {
+  if (vote.context === 'inline' && (pageId || postId)) {
     await publishVoteEvent({
       scope: WebhookEventNames.VoteCreated,
       spaceId,
