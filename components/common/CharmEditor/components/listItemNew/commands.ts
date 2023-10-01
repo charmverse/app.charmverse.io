@@ -100,6 +100,24 @@ export const backspaceKeyCommand =
     )(state, dispatch, view);
   };
 
+export const enterKeyCommand = (): Command => (state, dispatch, view) => {
+  const selectedNode = state.selection.$from.parent;
+  const isEmptyParagraph = selectedNode.childCount === 0 && selectedNode.type.name === 'paragraph';
+  const selectionStart = state.selection.$from;
+  const depth = selectionStart.depth;
+
+  // If row is empty, outdent the list item
+  if (isEmptyParagraph && depth > 2) {
+    const parentNode = selectionStart.node(depth - 1);
+    const listNode = selectionStart.node(depth - 2);
+    const isListItem = parentNode.type.name === 'list_item';
+    if (isListItem && isEmptyParagraph && listNode.attrs.indent > 0) {
+      return indentCommand(-1)(state, dispatch, view);
+    }
+  }
+  return splitListCommand()(state, dispatch, view);
+};
+
 export function removeList(): Command {
   return (state: EditorState, dispatch) => {
     const { schema, selection } = state;

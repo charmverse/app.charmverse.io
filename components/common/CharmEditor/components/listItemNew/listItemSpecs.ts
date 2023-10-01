@@ -15,7 +15,7 @@ const ListItemNodeSpec: NodeSpec = {
   // This spec does not support nested lists (e.g. `'paragraph block*'`)
   // as content because of the complexity of dealing with indentation
   // (context: https://github.com/ProseMirror/prosemirror/issues/92).
-  content: 'paragraph',
+  content: 'paragraph+',
   defining: true,
   draggable: true,
 
