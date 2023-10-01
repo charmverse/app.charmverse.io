@@ -817,7 +817,9 @@ export async function createNotificationsFromEvent(webhookData: {
           userId: previousCommentAuthorId,
           blockCommentId
         });
-      } else if (cardAuthorId !== commentAuthorId) {
+      }
+
+      if (cardAuthorId !== commentAuthorId) {
         await createCardNotification({
           type: 'block_comment.created',
           createdBy: commentAuthorId,
