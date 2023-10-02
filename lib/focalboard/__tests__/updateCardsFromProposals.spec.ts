@@ -29,7 +29,18 @@ describe('updateCardsFromProposals()', () => {
   });
 
   beforeEach(async () => {
-    await prisma.$transaction([prisma.page.deleteMany(), prisma.proposal.deleteMany()]);
+    await prisma.$transaction([
+      prisma.page.deleteMany({
+        where: {
+          spaceId: space.id
+        }
+      }),
+      prisma.proposal.deleteMany({
+        where: {
+          spaceId: space.id
+        }
+      })
+    ]);
   });
 
   it('should update cards from proposals', async () => {
