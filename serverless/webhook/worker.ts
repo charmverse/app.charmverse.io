@@ -17,7 +17,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
   // Store failed messageIDs
   const batchItemFailures: SQSBatchItemFailure[] = [];
 
-  log.debug('Webhook worker initiated');
+  log.debug('Webhook worker initiated.');
 
   // Execute messages
   await Promise.allSettled(
