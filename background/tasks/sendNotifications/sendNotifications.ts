@@ -9,7 +9,6 @@ import * as emails from 'lib/mailer/emails';
 import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTasksTemplate';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
-import { getProposalTasks } from 'lib/proposal/getProposalTasks';
 import { isUUID } from 'lib/utilities/strings';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
