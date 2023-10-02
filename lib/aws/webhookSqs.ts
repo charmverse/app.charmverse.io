@@ -1,9 +1,12 @@
+import fs from 'node:fs/promises';
+
 import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 import { getLogger } from '@charmverse/core/log';
 
 import { AWS_REGION } from 'lib/aws/config';
 import { SQS_WEBHOOK_COLLABLAND_QUEUE_NAME } from 'lib/collabland/config';
+import { sleep } from 'lib/utilities/sleep';
 import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
 
 const log = getLogger('sqs');
@@ -25,15 +28,16 @@ if (AWS_API_KEY && AWS_API_SECRET) {
 
 const client = new SQSClient(config);
 const queueUrl = SQS_WEBHOOK_COLLABLAND_QUEUE_NAME || '';
+let messageOffset = 0;
 
-export async function getNextMessage() {
+export async function getNextMessage(offset: number = messageOffset) {
   try {
     if (queueUrl) {
       // 20s polling time
-      const command = new ReceiveMessageCommand({ QueueUrl: queueUrl, MaxNumberOfMessages: 1, WaitTimeSeconds: 20 });
+      const command = new ReceiveMessageCommand({ QueueUrl: queueUrl, MaxNumberOfMessages: 10, WaitTimeSeconds: 20 });
       const res = await client.send(command);
 
-      return res?.Messages?.[0] || null;
+      return res?.Messages?.[offset] || null;
     }
 
     return null;
@@ -56,7 +60,21 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
     return;
   }
 
-  const message = await getNextMessage();
+  // await sleep(1000);
+
+  // const array = new Array(1000000).fill({ example: 'text' });
+
+  // console.log(array.length);
+
+  if (messageOffset < 20) {
+    messageOffset += 1;
+  } else {
+    messageOffset = 0;
+  }
+
+  const message = await getNextMessage(messageOffset);
+
+  console.log(`\r\n\r\nReceived message: ${message}\r\n\r\n`);
 
   if (message) {
     let msgBody: Record<string, any> | string = '';
@@ -74,7 +92,7 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
       if (result.success) {
         log.info('Message process successful:', { message: result.message, receiptHandle: message.ReceiptHandle });
         try {
-          await deleteMessage(message.ReceiptHandle || '');
+          // await deleteMessage(message.ReceiptHandle || '');
         } catch (e) {
           log.error('Could not delete message', { receiptHandle: message.ReceiptHandle, error: e });
         }
@@ -88,6 +106,20 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
     log.debug('No messages');
   }
 
+  const { rss, heapTotal, heapUsed, external } = process.memoryUsage();
+  await fs.appendFile(
+    `${__dirname}/log-v4.txt`,
+    `${JSON.stringify({ rss, heapTotal, heapUsed, external })}\r\n`,
+    'utf8'
+  );
+
   // process next message
   processMessages({ processorFn });
 }
+function tmpProcessor(message: WebhookMessage) {
+  log.info('Processing message', message);
+  return Promise.resolve({ success: true, message: 'Success' });
+}
+processMessages({ processorFn: tmpProcessor }).then(() => {
+  console.log('DONE');
+});
