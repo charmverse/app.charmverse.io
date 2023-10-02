@@ -365,7 +365,7 @@ ol li {
   padding-left: 20px;
 
   & > :not(:first-child) {
-    display: none;
+    display: none !important; /** Add !important for lists or other elements that set display **/
   }
 
   &[open] {
@@ -374,7 +374,7 @@ ol li {
     }
 
     & > :not(:first-child) {
-      display: block;
+      display: block !important;
     }
   }
 
