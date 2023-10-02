@@ -41,7 +41,7 @@ export function NotificationPreview({ notification, markAsRead, onClose, large, 
     <Link
       data-test={`goto-${taskId}`}
       color='inherit'
-      href={pagePath}
+      href={`/${pagePath}`}
       space={{ domain: spaceDomain, customDomain: null }}
       onClick={() => {
         markAsRead({ taskId, groupType, type });
