@@ -151,6 +151,6 @@ export class RewardsApi {
   }
 
   isRewardEditable(rewardId: string) {
-    return http.GET<{ editable: boolean }>(`/api/rewards/${rewardId}/is-editable`);
+    return http.GET<{ editable: boolean }>(`/api/rewards/${rewardId}/is-editable-by-applicants`);
   }
 }

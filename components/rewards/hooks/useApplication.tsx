@@ -10,14 +10,17 @@ export function useApplication({ applicationId }: { applicationId: string }) {
 
   const { data: applicationRewardPermissions } = useGetRewardPermissions({ rewardId: application?.bountyId });
 
-  const approveApplication = useCallback(async () => {
-    await charmClient.rewards.approveApplication(applicationId);
-    refreshApplication();
-  }, [refreshApplication]);
+  const approveApplication = useCallback(
+    async ({ decision }: { decision: ReviewDecision }) => {
+      await charmClient.rewards.reviewApplication({ applicationId, decision });
+      refreshApplication();
+    },
+    [refreshApplication]
+  );
 
   const reviewSubmission = useCallback(
-    async ({ reviewDecision }: { reviewDecision: ReviewDecision }) => {
-      await charmClient.rewards.reviewSubmission(applicationId, reviewDecision);
+    async ({ decision }: { decision: ReviewDecision }) => {
+      await charmClient.rewards.reviewSubmission({ submissionId: applicationId, decision });
       refreshApplication();
     },
     [refreshApplication]
