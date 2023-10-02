@@ -10,7 +10,8 @@ import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
 
 const litClient = new LitNodeClient({
-  debug: false
+  debug: false,
+  litNetwork: 'serrano' // supports zksync
 } as any);
 
 export async function evaluateTokenGateEligibility({

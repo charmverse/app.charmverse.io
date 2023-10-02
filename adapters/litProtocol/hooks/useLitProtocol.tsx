@@ -8,7 +8,8 @@ function useLitProtocol() {
     () =>
       new LitJsSdk.LitNodeClient({
         alertWhenUnauthorized: false,
-        debug: false
+        debug: false,
+        litNetwork: 'serrano' // supports zksync
       }),
     []
   );
