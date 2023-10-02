@@ -134,7 +134,9 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={subscriptionEnded ? undefined : handleClose}
+      // TODO: bring this back once we fix subscriptions
+      // onClose={subscriptionEnded ? undefined : handleClose}
+      onClose={handleClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
