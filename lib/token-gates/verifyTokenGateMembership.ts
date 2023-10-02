@@ -8,14 +8,12 @@ const log = getLogger('tg-verification');
 type TokenGateWithRoles = {
   tokenGate:
     | (TokenGate & {
-        tokenGateToRoles: (TokenGateToRole & {
-          role: Role;
-        })[];
+        tokenGateToRoles: Pick<TokenGateToRole, 'roleId'>[];
       })
     | null;
 };
 
-type UserTokenGateProp = Pick<UserTokenGate, 'id' | 'jwt' | 'grantedRoles' | 'tokenGateId'> & TokenGateWithRoles;
+export type UserTokenGateProp = Pick<UserTokenGate, 'id' | 'jwt' | 'grantedRoles' | 'tokenGateId'> & TokenGateWithRoles;
 
 type VerifyTokenGateMembershipProps = {
   userTokenGates: UserTokenGateProp[];
@@ -38,27 +36,34 @@ export async function verifyTokenGateMembership({
 
   // We want to update only invalid token gates
   const tokenGateVerificationPromises = userTokenGates.map(async (userTokenGate) => {
+    const failedVerification = { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
+
     if (!userTokenGate.jwt || !userTokenGate.tokenGate) {
-      return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
+      return failedVerification;
     }
 
-    const result = lit.verifyJwt({ jwt: userTokenGate.jwt });
-    const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
+    try {
+      const result = lit.verifyJwt({ jwt: userTokenGate.jwt });
+      const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
 
-    return {
-      id: userTokenGate.tokenGateId,
-      isVerified,
-      roleIds: userTokenGate.tokenGate.tokenGateToRoles.map((r) => r.roleId)
-    };
+      return {
+        id: userTokenGate.tokenGateId,
+        isVerified,
+        roleIds: userTokenGate.tokenGate.tokenGateToRoles.map((r) => r.roleId)
+      };
+    } catch (err) {
+      log.warn('Failed to verify token gate membership', { err, userId, spaceId, userTokenGateId: userTokenGate.id });
+      return failedVerification;
+    }
   });
 
   const tokenGateVerificationResults = await Promise.all(tokenGateVerificationPromises);
   const validTokenGates = tokenGateVerificationResults.filter((r) => r.isVerified);
   const invalidTokenGates = tokenGateVerificationResults.filter((r) => !r.isVerified);
 
-  let validRoleIds: string[] = [];
+  const validRoleIds: string[] = [];
   validTokenGates.forEach((tg) => {
-    validRoleIds = [...validRoleIds, ...tg.roleIds];
+    validRoleIds.push(...tg.roleIds);
   });
 
   const invalidSpaceRoleToRoleIds: string[] = [];

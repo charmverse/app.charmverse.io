@@ -28,79 +28,83 @@ export type UserToVerifyMembership = SpaceRole & {
   })[];
 };
 
+const maxBatchSize = 500;
+
 export async function verifyTokenGateMemberships() {
-  const userTokenGates = await prisma.userTokenGate.findMany({
-    include: {
-      tokenGate: {
-        include: {
-          tokenGateToRoles: {
-            include: {
-              role: true
-            }
-          }
+  let removedMembers = 0;
+  let removedRoles = 0;
+
+  const totalUserTokenGates = await prisma.userTokenGate.count();
+
+  let lastId: string | undefined;
+
+  for (let i = 0; i < totalUserTokenGates; i += maxBatchSize) {
+    if (totalUserTokenGates === 0) {
+      break;
+    }
+
+    const usersWithTokenGates = await prisma.user.findMany({
+      skip: 1,
+      cursor: {
+        id: lastId
+      },
+      where: {
+        // We do not want to delete admins
+        // match userId / spaceId pairs
+        userTokenGates: {
+          some: {}
         }
       },
-      space: true,
-      user: true
-    }
-  });
-
-  const spaceRoleQuery = userTokenGates.map((userTokenGate) => ({
-    userId: userTokenGate.userId,
-    spaceId: userTokenGate.spaceId
-  }));
-
-  const usersWithTokenGates = await prisma.spaceRole.findMany({
-    where: {
-      // We do not want to delete admins
-      isAdmin: false,
-      // match userId / spaceId pairs
-      OR: spaceRoleQuery
-    },
-    include: {
-      user: {
-        include: {
-          userTokenGates: {
-            include: {
-              tokenGate: {
-                include: {
-                  tokenGateToRoles: {
-                    include: {
-                      role: true
-                    }
+      select: {
+        id: true,
+        spaceRoles: {
+          where: {
+            isAdmin: false
+          },
+          select: {
+            id: true,
+            spaceId: true,
+            isAdmin: true,
+            joinedViaLink: true,
+            spaceRoleToRole: {
+              include: {
+                role: true
+              }
+            }
+          }
+        },
+        userTokenGates: {
+          include: {
+            tokenGate: {
+              include: {
+                tokenGateToRoles: {
+                  select: {
+                    roleId: true
                   }
                 }
               }
             }
           }
         }
-      },
-      spaceRoleToRole: {
-        include: {
-          role: true
-        }
       }
-    }
-  });
-
-  let removedMembers = 0;
-  let removedRoles = 0;
-
-  for (const spaceRole of usersWithTokenGates) {
-    // filter token gates related to the space
-    const spaceUserTokenGates = spaceRole.user.userTokenGates.filter((utg) => utg.spaceId === spaceRole.spaceId);
-
-    const res = await verifyTokenGateMembership({
-      userTokenGates: spaceUserTokenGates,
-      userId: spaceRole.user.id,
-      spaceId: spaceRole.spaceId,
-      userSpaceRoles: spaceRole.spaceRoleToRole,
-      canBeRemovedFromSpace: !spaceRole.joinedViaLink
     });
 
-    removedRoles += res.removedRoles;
-    if (!res.verified) {
-      removedMembers += 1;
+    for (const user of usersWithTokenGates) {
+      for (const spaceRole of user.spaceRoles) {
+        const userTokenGatesBySpace = user.userTokenGates.filter((tg) => tg.spaceId === spaceRole.spaceId);
+        const res = await verifyTokenGateMembership({
+          userTokenGates: userTokenGatesBySpace,
+          userId: user.id,
+          spaceId: spaceRole.spaceId,
+          userSpaceRoles: spaceRole.spaceRoleToRole,
+          canBeRemovedFromSpace: !spaceRole.joinedViaLink
+        });
+
+        removedRoles += res.removedRoles;
+        if (!res.verified) {
+          removedMembers += 1;
+        }
+      }
     }
   }
 

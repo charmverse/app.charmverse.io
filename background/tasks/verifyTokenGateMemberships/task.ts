@@ -14,6 +14,6 @@ export async function task() {
     count('cron.token-gate-verification.removed-members', results.removedMembers);
     count('cron.token-gate-verification.removed-member-roles', results.removedRoles);
   } catch (error: any) {
-    log.error(`Error expiring proposals: ${error.stack || error.message || error}`, { error });
+    log.error(`Error removing token gates: ${error.stack || error.message || error}`, { error });
   }
 }
