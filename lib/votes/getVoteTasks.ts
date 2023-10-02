@@ -227,7 +227,7 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
       categoryId: vote.post?.categoryId || null,
       createdAt: vote.createdAt.toISOString(),
       deadline: vote.deadline,
-      pageType: vote.page?.type === 'page' ? 'page' : 'proposal',
+      pageType: vote.page?.type === 'page' ? 'page' : 'post',
       spaceId: vote.space.id,
       title: vote.title || 'Untitled',
       type: 'new_vote',
@@ -235,7 +235,8 @@ export async function getVoteTasks(userId: string): Promise<VoteTasksGroup> {
       spaceName: vote.space.name,
       spaceDomain: vote.space.domain,
       pagePath: vote.page?.path || `forum/post/${vote.post?.path}`,
-      pageTitle: vote.page?.title || vote.post?.title || 'Untitled'
+      pageTitle: vote.page?.title || vote.post?.title || 'Untitled',
+      voteId: vote.id
     };
 
     if (markedNotificationIds.has(task.taskId)) {

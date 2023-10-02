@@ -67,14 +67,15 @@ export async function getVoteNotifications(userId: string): Promise<Notification
         createdBy: notification.notificationMetadata.author,
         pagePath: page?.path ?? post?.path ?? '',
         pageTitle: page?.title ?? post?.title ?? 'Untitled',
-        pageType: page ? 'page' : 'proposal',
+        pageType: page ? 'page' : 'post',
         categoryId: post?.categoryId ?? null,
         spaceDomain: space.domain,
         spaceName: space.name,
         spaceId: space.id,
         type: notification.type as VoteNotification['type'],
         createdAt: notification.notificationMetadata.createdAt.toISOString(),
-        deadline: notification.vote.deadline
+        deadline: notification.vote.deadline,
+        voteId: notification.vote.id
       };
 
       if (notification.notificationMetadata.seenAt) {

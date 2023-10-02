@@ -163,12 +163,13 @@ export type VoteNotification = NotificationBase & {
   status: VoteStatus;
   pagePath: string;
   pageTitle: string;
-  pageType: 'page' | 'proposal';
+  pageType: 'page' | 'post';
   categoryId: string | null;
   type: VoteNotificationType;
   title: string;
   userChoice: string[] | null;
   deadline: Date;
+  voteId: string;
 };
 
 export type BountyNotificationType =

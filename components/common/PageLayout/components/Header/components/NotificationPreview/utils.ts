@@ -297,7 +297,7 @@ export function getVoteNotificationPreviewItems(notifications: VoteNotification[
     spaceName: n.spaceName,
     groupType: 'votes' as NotificationGroupType,
     type: NotificationType.vote,
-    href: `/${n.spaceDomain}/${n.pageType === 'proposal' ? 'forum/post/' : ''}${n.pagePath}?voteId=${n.taskId}`,
+    href: `/${n.spaceDomain}/${n.pageType === 'post' ? 'forum/post/' : ''}${n.pagePath}?voteId=${n.voteId}`,
     content: `Polling started for "${n.title}".`,
     title: 'New Poll'
   }));
