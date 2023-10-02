@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -175,6 +176,7 @@ export function BountyPaymentButton({
       }
     } catch (error: any) {
       const { message, level } = getPaymentErrorMessage(error);
+      log.warn(`Error sending payment on blockchain: ${message}`, { amount, chainId, error });
       onError(message, level);
     }
   };
