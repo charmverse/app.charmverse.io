@@ -21,7 +21,6 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
   req.session.isRemote = true;
 
   await req.session.save();
-
   res.redirect('/');
 }
 
