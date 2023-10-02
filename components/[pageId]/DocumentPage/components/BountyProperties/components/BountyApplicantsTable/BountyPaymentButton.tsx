@@ -119,33 +119,17 @@ export function BountyPaymentButton({
 
     const chainToUse = getChainById(chainIdToUse);
 
-    if (!chainToUse) {
-      onError('Chain assigned to this payment is not supported.');
-      return;
-    }
-
-    const currentUserChain = chainId ? getChainById(chainId) : undefined;
-
-    if (!currentUserChain || !signer) {
-      onError(
-        'Could not detect your chain. Please make sure you are connected to a supported network and your wallet is unlocked.'
-      );
+    if (!signer) {
+      onError('Please make sure you are connected to a supported network and your wallet is unlocked.');
       return;
     }
 
     try {
-      if (chainToUse.chainId !== currentUserChain.chainId) {
-        await switchActiveNetwork(chainToUse.chainId);
+      if (chainIdToUse !== chainId) {
+        await switchActiveNetwork(chainIdToUse);
       }
 
-      if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
-        const tx = await signer.sendTransaction({
-          to: receiver,
-          value: parseEther(amount)
-        });
-
-        onSuccess(tx.hash, chainToUse.chainId);
-      } else if (isValidChainAddress(tokenSymbolOrAddress)) {
+      if (isValidChainAddress(tokenSymbolOrAddress)) {
         const tokenContract = new ethers.Contract(tokenSymbolOrAddress, ERC20ABI, signer);
 
         const paymentMethod = paymentMethods.find(
@@ -156,13 +140,13 @@ export function BountyPaymentButton({
         if (typeof tokenDecimals !== 'number') {
           try {
             const tokenInfo = await charmClient.getTokenMetaData({
-              chainId: chainToUse!.chainId as SupportedChainId,
+              chainId: chainIdToUse as SupportedChainId,
               contractAddress: tokenSymbolOrAddress
             });
             tokenDecimals = tokenInfo.decimals;
           } catch (error) {
             onError(
-              `Token information is missing. Please go to payment methods to configure this payment method using contract address ${tokenSymbolOrAddress} on ${chainToUse.chainName}`
+              `Token information is missing. Please go to payment methods to configure this payment method using contract address ${tokenSymbolOrAddress} on chain: ${chainIdToUse}`
             );
             return;
           }
@@ -182,7 +166,12 @@ export function BountyPaymentButton({
         const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
         onSuccess(tx.hash, chainToUse!.chainId);
       } else {
-        onError('Please provide a valid contract address');
+        const tx = await signer.sendTransaction({
+          to: receiver,
+          value: parseEther(amount)
+        });
+
+        onSuccess(tx.hash, chainIdToUse);
       }
     } catch (error: any) {
       const { message, level } = getPaymentErrorMessage(error);
