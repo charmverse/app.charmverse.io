@@ -39,13 +39,27 @@ export function updateIndentLevel(
   const heading = nodes[HEADING];
   const paragraph = nodes[PARAGRAPH];
 
+  function isEntireRowSelected() {
+    const node = doc.nodeAt(from - 1);
+    if (!node) {
+      return false;
+    }
+    // Subtract 2 because when inside a paragraph, the from and to will be 1 offset before and after the node
+    return node.type === paragraph && from + node.nodeSize - 2 === to;
+  }
+
+  // only toggle indent if the selection is at the beginning of the line or the entire line is selected
+  if (!isAtBeginningOfLine(state) && !isEntireRowSelected()) {
+    return { tr, docChanged: false };
+  }
+
   doc.nodesBetween(from, to, (node, pos) => {
     const nodeType = node.type;
     if (nodeType === paragraph || nodeType === heading || nodeType === blockquote) {
       // this is handled by our tabIndent plugin
       // tr = setNodeIndentMarkup(state, tr, pos, delta, view).tr;
       return false;
-    } else if (isListNode(node) && isAtBeginningOfLine(state)) {
+    } else if (isListNode(node)) {
       // List is tricky, we'll handle it later.
       listNodePoses.push(pos);
       return false;
@@ -71,6 +85,12 @@ export function updateIndentLevel(
   });
 
   return { tr, docChanged: true };
+}
+
+function isEntireLine(state: EditorState, pos: number, node: Node) {
+  const { from, to } = state.selection;
+  // the text selection inside a list item is offset by 2, so add 2 to the start and subtract 2 from the end
+  return from === pos + 2 && to === pos + node.nodeSize - 2;
 }
 
 function setListNodeIndent(
