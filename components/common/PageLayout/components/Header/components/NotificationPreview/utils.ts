@@ -25,33 +25,21 @@ function getUrlSearchParamsFromNotificationType(
   const urlSearchParams = new URLSearchParams();
   switch (notification.type) {
     case 'block_comment.created':
-    case 'block_comment.replied': {
-      urlSearchParams.set('blockCommentId', notification.blockCommentId);
-      break;
-    }
+    case 'block_comment.replied':
     case 'block_comment.mention.created': {
       urlSearchParams.set('blockCommentId', notification.blockCommentId);
-      urlSearchParams.set('mentionId', notification.mentionId);
       break;
     }
     case 'comment.created':
-    case 'comment.replied': {
-      urlSearchParams.set('commentId', notification.commentId);
-      break;
-    }
+    case 'comment.replied':
     case 'comment.mention.created': {
       urlSearchParams.set('commentId', notification.commentId);
-      urlSearchParams.set('mentionId', notification.mentionId);
       break;
     }
     case 'inline_comment.created':
-    case 'inline_comment.replied': {
-      urlSearchParams.set('inlineCommentId', notification.inlineCommentId);
-      break;
-    }
+    case 'inline_comment.replied':
     case 'inline_comment.mention.created': {
       urlSearchParams.set('inlineCommentId', notification.inlineCommentId);
-      urlSearchParams.set('mentionId', notification.mentionId);
       break;
     }
     default: {
