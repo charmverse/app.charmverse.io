@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import EastIcon from '@mui/icons-material/East';
 import { Box, Stack, Typography } from '@mui/material';
 
@@ -11,13 +12,15 @@ import { useUser } from 'hooks/useUser';
 export function BlocksExceededBanner() {
   const { user } = useUser();
   const { space } = useCurrentSpace();
-  const { spaceBlockQuota, hasPassedBlockQuota } = useSpaceSubscription();
+  const { spaceBlockQuota, spaceBlockCount, hasPassedBlockQuota } = useSpaceSubscription();
   const { onClick } = useSettingsDialog();
   const showUpgradeBanner = !!user && hasPassedBlockQuota && space?.paidTier !== 'enterprise';
 
   if (!showUpgradeBanner) {
     return null;
   }
+
+  log.warn('Show blocks exceeded banner', { spaceBlockQuota, spaceBlockCount, spaceId: space?.id });
 
   return (
     <StyledBanner errorBackground top={20} data-test='subscription-banner'>

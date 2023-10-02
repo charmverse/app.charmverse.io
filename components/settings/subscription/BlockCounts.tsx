@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import { BlocksExplanationModal } from './BlocksExplanation';
-import { useBlockCount } from './hooks/useBlockCount';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 import { UpgradeChip } from './UpgradeWrapper';
 
@@ -16,8 +15,7 @@ import { UpgradeChip } from './UpgradeWrapper';
  */
 export function BlockCounts() {
   const theme = useTheme();
-  const { spaceBlockQuota, hasPassedBlockQuota } = useSpaceSubscription();
-  const { blockCount } = useBlockCount();
+  const { spaceBlockQuota, spaceBlockCount, hasPassedBlockQuota } = useSpaceSubscription();
 
   const {
     isOpen: isExplanationModalOpen,
@@ -25,7 +23,7 @@ export function BlockCounts() {
     open: openExplanationModal
   } = usePopupState({ variant: 'popover', popupId: 'block-count-info' });
 
-  if (!blockCount) {
+  if (!spaceBlockCount) {
     return null;
   }
 
@@ -42,7 +40,7 @@ export function BlockCounts() {
       >
         Current block usage:{' '}
         <Typography variant='caption' color={hasPassedBlockQuota ? 'error' : undefined}>
-          {blockCount.count.toLocaleString()}
+          {spaceBlockCount.toLocaleString()}
         </Typography>
         {!!spaceBlockQuota && `/${spaceBlockQuota.toLocaleString()}`}
         <HelpOutlineIcon
