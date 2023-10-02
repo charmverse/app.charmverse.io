@@ -39,17 +39,16 @@ export function updateIndentLevel(
   const heading = nodes[HEADING];
   const paragraph = nodes[PARAGRAPH];
 
-  function isEntireRowSelected() {
-    const node = doc.nodeAt(from - 1);
-    if (!node) {
+  function isInsideTextNode() {
+    const textNode = doc.nodeAt(from - 1);
+    if (!textNode) {
       return false;
     }
-    // Subtract 2 because when inside a paragraph, the from and to will be 1 offset before and after the node
-    return node.type === paragraph && from + node.nodeSize - 2 === to;
+    return from + textNode.nodeSize >= to;
   }
 
   // only toggle indent if the selection is at the beginning of the line or the entire line is selected
-  if (!isAtBeginningOfLine(state) && !isEntireRowSelected()) {
+  if (!isAtBeginningOfLine(state) && isInsideTextNode()) {
     return { tr, docChanged: false };
   }
 
