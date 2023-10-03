@@ -30,9 +30,8 @@ export function RewardsPageWithProviders() {
             </ApplicationDialogProvider>
           </RewardsBoardProvider>
         </RewardBlocksProvider>
+        <PageDialogGlobal />
       </RewardsProvider>
-
-      <PageDialogGlobal />
     </PageDialogProvider>
   );
 }

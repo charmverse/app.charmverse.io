@@ -37,7 +37,7 @@ import { RewardSignupButton } from './components/RewardSignupButton';
 const RewardTypes = ['Token', 'Custom'] as const;
 type RewardType = (typeof RewardTypes)[number];
 
-export default function RewardProperties(props: {
+export function RewardProperties(props: {
   readOnly?: boolean;
   rewardId: string | null;
   pageId: string;
@@ -49,13 +49,11 @@ export default function RewardProperties(props: {
   const { rewards, mutateRewards, updateReward } = useRewards();
   const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
   const [isShowingAdvancedSettings, setIsShowingAdvancedSettings] = useState(false);
-  const rewardFromContext = rewards?.find((b) => b.id === rewardId);
   const [currentReward, setCurrentReward] = useState<(RewardCreationData & RewardWithUsers) | null>();
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(false);
   const { space } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-
   const { user } = useUser();
 
   const { data: rewardPermissions } = useSWR(rewardId ? `/rewards-${rewardId}` : null, () =>
@@ -91,6 +89,15 @@ export default function RewardProperties(props: {
       setCapSubmissions(currentReward.maxSubmissions !== null);
     }
   }, [!!currentReward]);
+
+  useEffect(() => {
+    // TODO - handle draft rewards
+    const rewardFromContext = rewards?.find((r) => r.id === rewardId);
+    setCurrentReward(rewardFromContext /* || (draftReward as BountyWithDetails) */);
+    // if (bountyFromContext && draftBounty) {
+    //   cancelDraftBounty();
+    // }
+  }, [rewardId, rewards]);
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
@@ -213,14 +220,6 @@ export default function RewardProperties(props: {
       refreshCryptoList(currentReward.chainId, currentReward.rewardToken);
     }
   }, [currentReward?.chainId, currentReward?.rewardToken]);
-
-  // TODO - FIX when we readd draft rewards
-  // useEffect(() => {
-  //   setCurrentReward(rewardFromContext || (draftReward as RewardWithUsers));
-  //   if (rewardFromContext && draftReward) {
-  //     cancelDraftReward();
-  //   }
-  // }, [draftReward, rewardFromContext]);
 
   const rewardProperties = (
     <>

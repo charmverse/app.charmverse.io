@@ -26,6 +26,7 @@ import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/in
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -33,6 +34,7 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import Rewards from 'pages/api/rewards';
 import { fontClassName } from 'theme/fonts';
 
 import BountyProperties from './components/BountyProperties';
@@ -175,6 +177,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const pageTop = getPageTop(page);
 
   const router = useRouter();
+  const isRewardsPage = router.pathname.endsWith('/rewards');
   const isSharedPage = router.pathname.startsWith('/share');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -334,7 +337,16 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         proposalPage={page}
                       />
                     )}
-                    {(draftBounty || page.bountyId) && (
+                    {(draftBounty || page.bountyId) && isRewardsPage && (
+                      <RewardProperties
+                        rewardId={page.bountyId}
+                        pageId={page.id}
+                        pagePath={page.path}
+                        readOnly={readOnly}
+                        refreshRewardPermissions={() => refreshBountyPermissions()}
+                      />
+                    )}
+                    {(draftBounty || page.bountyId) && !isRewardsPage && (
                       <BountyProperties
                         bountyId={page.bountyId}
                         pageId={page.id}
