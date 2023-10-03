@@ -171,7 +171,6 @@ function splitEmptyListItem(tr: Transaction, schema: Schema): Transaction {
   const listAttrs = { ...sourceListNode.attrs };
   if (orderedListType === sourceListNode.type) {
     listAttrs.counterReset = 'none';
-    listAttrs.following = name;
   }
 
   const insertFrom = deleteFrom + 1;

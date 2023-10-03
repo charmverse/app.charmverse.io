@@ -1,8 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { customAlphabet } from 'nanoid';
-import fs from 'node:fs/promises';
-
-import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
 
 /**
 

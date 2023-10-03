@@ -11,31 +11,14 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
+import type { NotificationActor, ProposalNotification } from 'lib/notifications/interfaces';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
-import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPermissionsClient } from 'lib/permissions/api';
 
-import type { ProposalTaskAction } from './getProposalAction';
 import { getProposalAction } from './getProposalAction';
 
-export type ProposalTask = {
-  id: string; // the id of the workspace event
-  spaceDomain: string;
-  spaceName: string;
-  pageTitle: string;
-  pagePath: string;
-  status: ProposalStatus;
-  pageId: string;
-
-  taskId: string;
-  action: ProposalTaskAction | null;
-  eventDate: Date;
-  createdAt: Date;
-  createdBy?: NotificationActor | null;
-};
-
 type PopulatedProposal = Proposal & {
-  authors: ProposalAuthor[];
+  authors: (ProposalAuthor & { author: NotificationActor })[];
   reviewers: ProposalReviewer[];
   page: Pick<Page, 'id' | 'path' | 'title' | 'deletedAt'>;
 };
@@ -50,7 +33,7 @@ const spacesHandledPerSecond = 10;
 
 const spaceFetcherRateLimit = RateLimit(spacesHandledPerSecond);
 
-type WorkspaceEventSpecial = Pick<WorkspaceEvent, 'createdAt' | 'pageId' | 'id'> & {
+type WorkspaceEventSpecial = Pick<WorkspaceEvent, 'createdAt' | 'pageId' | 'id' | 'spaceId'> & {
   actor?: User | null;
   meta: any;
 };
@@ -60,7 +43,7 @@ type WorkspaceEventSpecialWithMeta = WorkspaceEventSpecial & {
 };
 
 export async function getProposalStatusChangeTasks(userId: string, proposalChangeEvents: WorkspaceEventSpecial[]) {
-  const proposalTasks: ProposalTask[] = [];
+  const proposalTasks: ProposalNotification[] = [];
 
   // Sort the events in descending order based on their created date to help in de-duping
   proposalChangeEvents.sort((we1, we2) => (we1.createdAt > we2.createdAt ? -1 : 1));
@@ -206,7 +189,22 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
           name: true
         }
       },
-      authors: true,
+      authors: {
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              path: true,
+              avatar: true,
+              avatarTokenId: true,
+              avatarContract: true,
+              avatarChain: true,
+              deletedAt: true
+            }
+          }
+        }
+      },
       reviewers: true,
       page: {
         select: {
@@ -273,7 +271,7 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
         const category = proposal.categoryId && categoryMap.get(proposal.categoryId);
         if (
           category &&
-          ((action === 'discuss' && !category.permissions.comment_proposals) ||
+          ((action === 'start_discussion' && !category.permissions.comment_proposals) ||
             (action === 'vote' && !category.permissions.vote_proposals))
         ) {
           // Do nothing
@@ -282,19 +280,23 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
           continue;
         }
 
-        const proposalTask: ProposalTask = {
-          action,
-          id: workspaceEvent.id,
+        const proposalTask: ProposalNotification = {
+          type: action,
+          taskId: workspaceEvent.id,
           pagePath: proposal.page.path,
           pageTitle: proposal.page.title,
           spaceDomain: space.domain,
           spaceName: space.name,
           status: proposal.status,
           pageId: proposal.page.id,
-          eventDate: workspaceEvent.createdAt,
-          createdBy: workspaceEvent.actor ? mapNotificationActor(workspaceEvent.actor) : null,
-          taskId: workspaceEvent.id,
-          createdAt: workspaceEvent.createdAt
+          createdBy: workspaceEvent.actor
+            ? mapNotificationActor(workspaceEvent.actor) ?? proposal.authors[0].author
+            : proposal.authors[0].author,
+          createdAt: workspaceEvent.createdAt.toISOString(),
+          commentId: null,
+          inlineCommentId: null,
+          mentionId: null,
+          spaceId: workspaceEvent.spaceId
         };
 
         proposalTasks.push(proposalTask);

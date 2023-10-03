@@ -4,7 +4,7 @@ import { baseUrl } from 'config/constants';
 
 import { generateMarkdown } from '../generateMarkdown';
 
-describe('generateMarkdown', () => {
+describe('generateMarkdown()', () => {
   it('should generate markdown from a header', async () => {
     const h1Data = {
       type: 'doc',
@@ -67,16 +67,17 @@ describe('generateMarkdown', () => {
 
     expect(exported).toEqual(`:`);
   });
+
   it('should generate handle a bullet list', async () => {
     const inputData = {
       type: 'doc',
       content: [
         {
-          type: 'bulletList',
-          attrs: { tight: false },
+          type: 'bullet_list',
+          attrs: { indent: 0 },
           content: [
             {
-              type: 'listItem',
+              type: 'list_item',
               attrs: { track: [], todoChecked: null },
               content: [
                 {
@@ -87,7 +88,7 @@ describe('generateMarkdown', () => {
               ]
             },
             {
-              type: 'listItem',
+              type: 'list_item',
               attrs: { track: [], todoChecked: null },
               content: [
                 {
@@ -97,42 +98,42 @@ describe('generateMarkdown', () => {
                     { text: 'Second list item part 1', type: 'text' },
                     { text: 'Second list item part 2', type: 'text' }
                   ]
-                },
+                }
+              ]
+            }
+          ]
+        },
+        {
+          type: 'bullet_list',
+          attrs: { indent: 1 },
+          content: [
+            {
+              type: 'list_item',
+              attrs: { track: [], todoChecked: null },
+              content: [
                 {
-                  type: 'bulletList',
-                  attrs: { tight: false },
+                  type: 'paragraph',
+                  attrs: { track: [] },
                   content: [
                     {
-                      type: 'listItem',
-                      attrs: { track: [], todoChecked: null },
-                      content: [
-                        {
-                          type: 'paragraph',
-                          attrs: { track: [] },
-                          content: [
-                            {
-                              text: 'First nested bullet list item',
-                              type: 'text'
-                            }
-                          ]
-                        }
-                      ]
-                    },
+                      text: 'First nested bullet list item',
+                      type: 'text'
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              type: 'list_item',
+              attrs: { track: [], todoChecked: null },
+              content: [
+                {
+                  type: 'paragraph',
+                  attrs: { track: [] },
+                  content: [
                     {
-                      type: 'listItem',
-                      attrs: { track: [], todoChecked: null },
-                      content: [
-                        {
-                          type: 'paragraph',
-                          attrs: { track: [] },
-                          content: [
-                            {
-                              type: 'text',
-                              text: 'Second nested bullet list item'
-                            }
-                          ]
-                        }
-                      ]
+                      type: 'text',
+                      text: 'Second nested bullet list item'
                     }
                   ]
                 }
@@ -146,7 +147,7 @@ describe('generateMarkdown', () => {
 
     expect(exported).toEqual(
       // eslint-disable-next-line prettier/prettier
-`- First list item
+      `- First list item
 
 - Second list item part 1Second list item part 2
 
@@ -188,7 +189,6 @@ describe('generateMarkdown', () => {
               text: ':',
               type: 'text',
               marks: [
-                { type: 'emojiSuggest', attrs: { trigger: ':' } },
                 {
                   type: 'insertion',
                   attrs: {
@@ -198,22 +198,6 @@ describe('generateMarkdown', () => {
                     username: 'Admin'
                   }
                 }
-              ]
-            },
-            {
-              text: ' ',
-              type: 'text',
-              marks: [
-                {
-                  type: 'insertion',
-                  attrs: {
-                    date: '2023-07-08T01:23:00.000Z',
-                    user: '8e54b253-eeca-420d-9727-4598521d8121',
-                    approved: true,
-                    username: 'Admin'
-                  }
-                },
-                { type: 'text-color', attrs: { color: null, bgColor: null } }
               ]
             }
           ]
@@ -260,7 +244,7 @@ describe('generateMarkdown', () => {
 
     expect(exported).toEqual(
       // eslint-disable-next-line prettier/prettier
-`# Header: 
+      `# Header:
 
 [Wikipedia - Ethereum](https://en.wikipedia.org/wiki/Ethereum)
 
@@ -400,7 +384,7 @@ describe('generateMarkdown', () => {
 
     expect(exported).toEqual(
       // eslint-disable-next-line prettier/prettier
-`Content
+      `Content
 
 
 

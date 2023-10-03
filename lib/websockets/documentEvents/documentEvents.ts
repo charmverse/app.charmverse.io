@@ -14,7 +14,7 @@ import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishBountyEvent, publishDocumentEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';
@@ -453,16 +453,34 @@ export class DocumentEventHandler {
         // Don't create notifications for self mentions
         const filteredMentions = extractedMentions.filter((mention) => mention.value !== session.user.id);
 
-        if (filteredMentions.length && room.doc.type === 'page') {
+        if (filteredMentions.length) {
           await Promise.all(
             filteredMentions.map((mention) => {
-              return publishDocumentEvent({
-                documentId: room.doc.id,
-                scope: WebhookEventNames.DocumentMentionCreated,
-                spaceId: room.doc.spaceId,
-                mention,
-                userId: session.user.id
-              });
+              if (room.doc.type === 'bounty') {
+                return publishBountyEvent({
+                  bountyId: room.doc.id,
+                  scope: WebhookEventNames.BountyMentionCreated,
+                  spaceId: room.doc.spaceId,
+                  mention,
+                  userId: session.user.id
+                });
+              } else if (room.doc.type === 'proposal') {
+                return publishProposalEvent({
+                  proposalId: room.doc.id,
+                  scope: WebhookEventNames.ProposalMentionCreated,
+                  spaceId: room.doc.spaceId,
+                  mention,
+                  userId: session.user.id
+                });
+              } else {
+                return publishDocumentEvent({
+                  documentId: room.doc.id,
+                  scope: WebhookEventNames.DocumentMentionCreated,
+                  spaceId: room.doc.spaceId,
+                  mention,
+                  userId: session.user.id
+                });
+              }
             })
           );
         }

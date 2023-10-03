@@ -40,7 +40,7 @@ const StyledPageTitle = styled(TextField)`
   }
 `;
 
-const StyledReadOnlyTitle = styled(Typography)`
+export const StyledReadOnlyTitle = styled(Typography)`
   font-size: 40px;
   font-weight: 700;
 `;

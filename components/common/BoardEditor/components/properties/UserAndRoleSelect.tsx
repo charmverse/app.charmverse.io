@@ -128,7 +128,6 @@ function SelectedReviewers({
     </Tooltip>
   );
 }
-
 type Props = {
   displayType?: 'details';
   onChange: (value: GroupedOptionPopulated[]) => void;
@@ -139,6 +138,7 @@ type Props = {
   value: GroupedOption[];
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
+  wrapColumn?: boolean;
 };
 
 export function UserAndRoleSelect({
@@ -150,7 +150,8 @@ export function UserAndRoleSelect({
   showEmptyPlaceholder = true,
   variant = 'standard',
   value: inputValue,
-  'data-test': dataTest
+  'data-test': dataTest,
+  wrapColumn = true
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -241,7 +242,7 @@ export function UserAndRoleSelect({
           ) : (
             <SelectedReviewers
               readOnlyMessage={readOnlyMessage}
-              wrapColumn
+              wrapColumn={wrapColumn}
               readOnly
               value={populatedValue}
               onRemove={removeReviewer}

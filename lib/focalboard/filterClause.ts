@@ -68,6 +68,7 @@ export type DataTypeConfigs =
   | SelectDataTypeConfig
   | MiscDataTypeConfig;
 
+// @ts-ignore
 export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   updatedBy: {
     datatype: 'multi_select',

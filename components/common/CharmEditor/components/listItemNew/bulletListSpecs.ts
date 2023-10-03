@@ -1,4 +1,6 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
+import type Token from 'markdown-it/lib/token';
+import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { Node, DOMOutputSpec, NodeSpec } from 'prosemirror-model';
 
 import { ATTRIBUTE_LIST_STYLE_TYPE } from './listItemSpecs';
@@ -69,6 +71,24 @@ export function spec(): BaseRawNodeSpec {
   return {
     name: BULLET_LIST,
     type: 'node',
-    schema: BulletListNodeSpec
+    schema: BulletListNodeSpec,
+    markdown: {
+      toMarkdown(state: MarkdownSerializerState, node: Node) {
+        const indent = node.attrs.indent || 0;
+        const firstDelim = `${convertToSpaces(indent as number)}- `;
+        node.forEach((child, _, i) => {
+          state.wrapBlock(' ', firstDelim, node, () => state.render(child, node, i));
+        });
+      },
+      parseMarkdown: {
+        bullet_list: {
+          block: BULLET_LIST
+        }
+      }
+    }
   };
+}
+
+function convertToSpaces(n: number) {
+  return new Array(n + 1).join('  ');
 }

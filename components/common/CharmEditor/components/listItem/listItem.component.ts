@@ -75,31 +75,6 @@ function specFactory(): RawSpecs {
       },
       toDOM,
       parseDOM
-    },
-    markdown: {
-      toMarkdown(state: MarkdownSerializerState, node: Node) {
-        if (node.attrs.todoChecked != null) {
-          state.write(node.attrs.todoChecked ? '[x] ' : '[ ] ');
-        }
-        state.renderContent(node);
-      },
-      parseMarkdown: {
-        list_item: {
-          block: name,
-          getAttrs: (tok: Token) => {
-            let todoChecked = null;
-            const todoIsDone = tok.attrGet('isDone');
-            if (todoIsDone === 'yes') {
-              todoChecked = true;
-            } else if (todoIsDone === 'no') {
-              todoChecked = false;
-            }
-            return {
-              todoChecked
-            };
-          }
-        }
-      }
     }
   };
 }

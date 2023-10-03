@@ -98,10 +98,5 @@ export async function getDiscussionNotifications(userId: string): Promise<Notifi
     };
   }
 
-  const discussionTasksGroup = await getDiscussionTasks(userId);
-
-  return {
-    marked: discussionTasksGroup.marked.sort(sortByDate),
-    unmarked: discussionTasksGroup.unmarked.sort(sortByDate)
-  };
+  return getDiscussionTasks(userId);
 }

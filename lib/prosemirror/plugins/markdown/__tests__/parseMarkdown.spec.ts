@@ -41,7 +41,7 @@ describe('parseMarkdown()', () => {
 # My Markdown Document
 
 ## Introduction
-    
+
 This is the introduction section. You can learn more about Markdown [here](https://www.markdownguide.org/).
 
 ## Features
@@ -139,13 +139,14 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           ]
         },
         {
-          type: 'bulletList',
+          type: 'bullet_list',
           attrs: {
-            tight: true
+            indent: 0,
+            listStyleType: null
           },
           content: [
             {
-              type: 'listItem',
+              type: 'list_item',
               attrs: {
                 todoChecked: null,
                 track: []
@@ -187,7 +188,7 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
               ]
             },
             {
-              type: 'listItem',
+              type: 'list_item',
               attrs: {
                 todoChecked: null,
                 track: []
@@ -217,7 +218,7 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
               ]
             },
             {
-              type: 'listItem',
+              type: 'list_item',
               attrs: {
                 todoChecked: null,
                 track: []

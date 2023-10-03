@@ -7,6 +7,8 @@ import { getPermissionsClient } from 'lib/permissions/api';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { ProposalNotFoundError } from './errors';
 import type { ProposalWithUsersAndRubric } from './interface';
@@ -34,7 +36,9 @@ export async function updateProposalStatus({
       id: proposalId
     },
     select: {
-      archived: true
+      spaceId: true,
+      archived: true,
+      status: true
     }
   });
 
@@ -89,6 +93,16 @@ export async function updateProposalStatus({
   const snapshotProposal = snapshotProposalId ? await getSnapshotProposal(snapshotProposalId) : null;
 
   return prisma.$transaction(async (tx) => {
+    if (proposalInfo) {
+      await publishProposalEvent({
+        newStatus,
+        proposalId,
+        oldStatus: proposalInfo.status,
+        scope: WebhookEventNames.ProposalStatusChanged,
+        spaceId: proposal.spaceId,
+        userId
+      });
+    }
     const createdWorkspaceEvent = await tx.workspaceEvent.create({
       data: {
         type: 'proposal_status_change',

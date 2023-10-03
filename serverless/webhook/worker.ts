@@ -12,12 +12,13 @@ import { whiteListedWebhookEvents } from 'lib/webhookPublisher/interfaces';
 
 /**
  * SQS worker, message are executed one by one
+ * Changing comments to trigger deploy
  */
 export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> => {
   // Store failed messageIDs
   const batchItemFailures: SQSBatchItemFailure[] = [];
 
-  log.debug('Webhook worker initiated');
+  log.debug('Webhook worker initiated.');
 
   // Execute messages
   await Promise.allSettled(
