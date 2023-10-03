@@ -2,10 +2,10 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import type { BountyTask } from 'lib/bounties/getBountyTasks';
-import type { DiscussionTask } from 'lib/discussion/interfaces';
 import type { ForumTask } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
+import type { DiscussionNotification } from 'lib/notifications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import type { ProposalTask } from 'lib/proposal/getProposalStatusChangeTasks';
 import randomName from 'lib/utilities/randomName';
@@ -21,14 +21,12 @@ const handler = nc({
 const createDiscussionTask = ({
   pageTitle,
   spaceName,
-  mentionText,
-  type = 'page'
+  mentionText
 }: {
-  type?: DiscussionTask['type'];
   spaceName: string;
   mentionText: string;
   pageTitle: string;
-}): DiscussionTask => {
+}): DiscussionNotification => {
   const id = v4();
   return {
     mentionId: id,
@@ -41,17 +39,21 @@ const createDiscussionTask = ({
     spaceName,
     pageTitle,
     text: mentionText,
-    bountyId: null,
-    bountyTitle: null,
-    commentId: null,
-    type,
+    inlineCommentId: null,
+    type: 'mention.created',
     createdBy: {
+      avatarChain: 1,
+      avatarContract: null,
+      deletedAt: null,
       id: v4(),
       username: '',
       avatar: '',
       path: '',
       avatarTokenId: null
-    }
+    },
+    blockCommentId: null,
+    pageType: 'page',
+    personPropertyId: null
   };
 };
 
@@ -204,14 +206,12 @@ const templates = {
         createDiscussionTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
-          spaceName: 'CharmVerse',
-          type: 'bounty'
+          spaceName: 'CharmVerse'
         }),
         createDiscussionTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse',
-          type: 'bounty'
+          spaceName: 'CharmVerse'
         }),
         createDiscussionTask({
           mentionText: "Let's have a meeting @ghostpepper",

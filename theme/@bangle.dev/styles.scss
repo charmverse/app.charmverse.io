@@ -287,31 +287,9 @@ ol li {
   transition: background-color 150ms ease-in-out;
 }
 
-.bangle-editor li[data-bangle-is-todo] {
-  display: flex;
-  flex-direction: row;
-  position: relative;
-}
-
-.bangle-editor li[data-bangle-is-todo] > span:first-child {
-  margin-left: -1.5rem;
-}
-
-.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
-  margin-top: 0.5rem;
-  margin-right: 6px;
-  outline: none;
-}
-
 .bangle-editor > ol {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-}
-
-.bangle-editor ol {
-  list-style-type: decimal;
-  list-style-position: outside;
-  padding-left: 1.5rem;
 }
 
 .bangle-editor > p {
@@ -334,11 +312,11 @@ ol li {
 }
 
 /** Bullet List */
-.bangle-editor ul:not(.MuiList-root) {
-  list-style-type: disc;
-  list-style-position: outside;
-  padding-left: 24px;
-}
+// .bangle-editor ul:not(.MuiList-root) {
+//   list-style-type: disc;
+//   list-style-position: outside;
+//   padding-left: 24px;
+// }
 
 .bangle-editor ul,
 .bangle-editor ol {
@@ -351,7 +329,7 @@ ol li {
   padding-left: 20px;
 
   & > :not(:first-child) {
-    display: none;
+    display: none !important; /** Add !important for lists or other elements that set display **/
   }
 
   &[open] {
@@ -360,7 +338,7 @@ ol li {
     }
 
     & > :not(:first-child) {
-      display: block;
+      display: block !important;
     }
   }
 
@@ -455,19 +433,19 @@ ol li {
   position: absolute;
   width: 56px;
   height: 24px;
-  margin-top: 5px;
+  margin-top: 3px;
   // opacity: 0;
   transition: opacity 0.2s ease-in-out;
+}
 
-  .charm-drag-handle {
-    display: flex;
-    cursor: grab;
-    opacity: 0.5;
-    transition: opacity 0.2s ease-in-out;
+.charm-drag-handle {
+  display: flex;
+  cursor: grab;
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
 
-    &:hover {
-      opacity: 1;
-    }
+  &:hover {
+    opacity: 1;
   }
 }
 
@@ -618,3 +596,32 @@ ol li {
 }
 
 /** End columns **/
+
+/** Tab **/
+.charm-tab {
+  tab-size: var(--tab-width);  // should equal list item padding
+
+  &[data-indent='1'] {
+    tab-size: calc(2 * var(--tab-width));
+  }
+  &[data-indent='2'] {
+    tab-size: calc(3 * var(--tab-width));
+  }
+  &[data-indent='3'] {
+    tab-size: calc(4 * var(--tab-width));
+  }
+  &[data-indent='4'] {
+    tab-size: calc(5 * var(--tab-width));
+  }
+  &[data-indent='5'] {
+    tab-size: calc(6 * var(--tab-width));
+  }
+  &[data-indent='6'] {
+    tab-size: calc(7 * var(--tab-width));
+  }
+}
+
+/** hide tab when a user suggested to delete a list item - it should not exist yet **/
+li .insertion > .charm-tab {
+  display: none;
+}

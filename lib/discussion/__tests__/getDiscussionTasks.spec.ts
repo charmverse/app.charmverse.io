@@ -416,17 +416,17 @@ describe('getDiscussionTasks', () => {
 
     expectSome(
       newNotifications,
-      (item) => item.mentionId === discussionIds[11] && item.pageId === page2.id && item.commentId === comment2.id
+      (item) => item.mentionId === discussionIds[11] && item.pageId === page2.id && item.inlineCommentId === comment2.id
     );
 
     expectSome(
       newNotifications,
-      (item) => item.mentionId === discussionIds[8] && item.pageId === page1.id && item.commentId === comment1.id
+      (item) => item.mentionId === discussionIds[8] && item.pageId === page1.id && item.inlineCommentId === comment1.id
     );
 
-    expectSome(newNotifications, (item) => item.mentionId === discussionIds[7] && item.bountyId === bounty2.id);
+    expectSome(newNotifications, (item) => item.mentionId === discussionIds[7] && item.pageId === bounty2.id);
 
-    expectSome(newNotifications, (item) => item.mentionId === discussionIds[4] && item.bountyId === bounty1.id);
+    expectSome(newNotifications, (item) => item.mentionId === discussionIds[4] && item.pageId === bounty1.id);
 
     expectSome(newNotifications, (item) => item.mentionId === discussionIds[3] && item.pageId === page2.id);
 
@@ -475,9 +475,9 @@ describe('getDiscussionTasks', () => {
 
     const { unmarked: newNotifications } = await getDiscussionTasks(pageAuthor.id);
 
-    expectSome(newNotifications, (item) => item.commentId === commentId1 && item.pageId === page.id);
+    expectSome(newNotifications, (item) => item.inlineCommentId === commentId1 && item.pageId === page.id);
 
-    expectSome(newNotifications, (item) => item.commentId === commentId2 && item.pageId === page.id);
+    expectSome(newNotifications, (item) => item.inlineCommentId === commentId2 && item.pageId === page.id);
   });
 
   it('Should return new notifications to a page author when someone else comments', async () => {
@@ -540,9 +540,9 @@ describe('getDiscussionTasks', () => {
 
     const { unmarked: newNotifications } = await getDiscussionTasks(pageAuthor.id);
 
-    expectSome(newNotifications, (item) => item.commentId === commentId1 && item.pageId === page.id);
+    expectSome(newNotifications, (item) => item.inlineCommentId === commentId1 && item.pageId === page.id);
 
-    expectSome(newNotifications, (item) => item.commentId === commentId2 && item.pageId === page.id);
+    expectSome(newNotifications, (item) => item.inlineCommentId === commentId2 && item.pageId === page.id);
   });
 
   it('Should return just one comment with the first valid text from all the available texts', async () => {
@@ -615,7 +615,7 @@ describe('getDiscussionTasks', () => {
     expectSome(
       newNotifications,
       (item) =>
-        item.commentId === commentId &&
+        item.inlineCommentId === commentId &&
         item.pageId === page.id &&
         item.text === 'Make this change @Username dsadsadasd dsadsadsa'
     );

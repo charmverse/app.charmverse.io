@@ -8,9 +8,13 @@ import { archivePages } from 'lib/pages/archivePages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
+import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';
@@ -281,12 +285,21 @@ export class DocumentEventHandler {
         docRoom.participants.set(this.id, this);
       } else {
         log.debug('Opening new document room', { socketId: this.id, pageId, userId, connectionCount });
-        const page = await prisma.page.findUniqueOrThrow({
+        const rawPage = await prisma.page.findUniqueOrThrow({
           where: { id: pageId },
           include: {
             diffs: true
           }
         });
+
+        let page: typeof rawPage | null = null;
+
+        try {
+          ({ page } = await convertAndSavePage(rawPage));
+        } catch (error) {
+          log.error('Could not convert page with old lists', { pageId: rawPage.id, error });
+          page = rawPage;
+        }
 
         const content = page.content || emptyDocument;
         const participants = new Map();
@@ -416,6 +429,44 @@ export class DocumentEventHandler {
       if (message.ds) {
         // do some pre-processing on the diffs
         message.ds = message.ds.map(this.removeTooltipMarks);
+
+        message.ds = message.ds.map(this.removeTooltipMarks);
+
+        const extractedMentions = message.ds
+          .map((ds) => {
+            if (ds.stepType === 'replace') {
+              const extractedMentionsMap = extractMentions(
+                {
+                  type: 'doc',
+                  content: ds.slice?.content
+                },
+                session.user.name
+              );
+
+              return Array.from(extractedMentionsMap.values());
+            }
+
+            return [];
+          })
+          .flat();
+
+        // Don't create notifications for self mentions
+        const filteredMentions = extractedMentions.filter((mention) => mention.value !== session.user.id);
+
+        if (filteredMentions.length && room.doc.type === 'page') {
+          await Promise.all(
+            filteredMentions.map((mention) => {
+              return publishDocumentEvent({
+                documentId: room.doc.id,
+                scope: WebhookEventNames.DocumentMentionCreated,
+                spaceId: room.doc.spaceId,
+                mention,
+                userId: session.user.id
+              });
+            })
+          );
+        }
+
         // Go through the diffs and see if any of them are for deleting a page.
         try {
           // If its 2 then its drag and drop within the editor

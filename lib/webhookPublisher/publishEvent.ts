@@ -1,4 +1,6 @@
-import type { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
   getBountyEntity,
@@ -6,7 +8,10 @@ import {
   getCommentEntity,
   getSpaceEntity,
   getPostEntity,
-  getProposalEntity
+  getProposalEntity,
+  getDocumentEntity,
+  getInlineCommentEntity,
+  getBlockCommentEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -140,4 +145,98 @@ export async function publishUserProposalEvent(context: ProposalUserEventContext
     space,
     user
   });
+}
+
+type DocumentEventContext = (
+  | {
+      scope: WebhookEventNames.DocumentMentionCreated;
+      mention: UserMentionMetadata;
+    }
+  | {
+      scope: WebhookEventNames.DocumentInlineCommentCreated;
+      inlineCommentId: string;
+    }
+) & {
+  userId: string;
+  spaceId: string;
+  documentId: string;
+};
+
+export async function publishDocumentEvent(context: DocumentEventContext) {
+  const [space, document, user] = await Promise.all([
+    getSpaceEntity(context.spaceId),
+    getDocumentEntity(context.documentId),
+    getUserEntity(context.userId)
+  ]);
+
+  switch (context.scope) {
+    case WebhookEventNames.DocumentInlineCommentCreated: {
+      const inlineComment = await getInlineCommentEntity(context.inlineCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document,
+        inlineComment,
+        user,
+        space
+      });
+    }
+    case WebhookEventNames.DocumentMentionCreated: {
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.DocumentMentionCreated,
+        document,
+        user,
+        mention: context.mention,
+        space
+      });
+    }
+    default: {
+      return null;
+    }
+  }
+}
+
+export type CardEventContext =
+  | {
+      scope: WebhookEventNames.CardBlockCommentCreated;
+      cardId: string;
+      spaceId: string;
+      blockCommentId: string;
+    }
+  | {
+      scope: WebhookEventNames.CardPersonPropertyAssigned;
+      cardId: string;
+      spaceId: string;
+      cardProperty: CardPropertyEntity;
+      userId: string;
+    };
+
+export async function publishCardEvent(context: CardEventContext) {
+  const { scope } = context;
+  const [space, card] = await Promise.all([getSpaceEntity(context.spaceId), getDocumentEntity(context.cardId)]);
+
+  switch (scope) {
+    case WebhookEventNames.CardBlockCommentCreated: {
+      const blockComment = await getBlockCommentEntity(context.blockCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        blockComment
+      });
+    }
+    case WebhookEventNames.CardPersonPropertyAssigned: {
+      const assignedUser = await getUserEntity(context.cardProperty.value);
+      return publishWebhookEvent(context.spaceId, {
+        scope,
+        space,
+        card,
+        assignedUser,
+        personProperty: context.cardProperty,
+        user: await getUserEntity(context.userId)
+      });
+    }
+    default: {
+      return null;
+    }
+  }
 }

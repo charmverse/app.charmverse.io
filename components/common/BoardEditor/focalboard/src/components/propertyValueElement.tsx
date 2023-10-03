@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
@@ -32,6 +33,7 @@ import {
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { TextInput } from '../../../components/properties/TextInput';
 import type { Mutator } from '../mutator';
@@ -223,6 +225,28 @@ function PropertyValueElement(props: Props) {
         }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          const previousValue = propertyValue
+            ? typeof propertyValue === 'string'
+              ? [propertyValue]
+              : (propertyValue as string[])
+            : [];
+          const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+          Promise.all(
+            newUserIds.map((userId) =>
+              charmClient.createEvent({
+                spaceId: board.spaceId,
+                payload: {
+                  cardId: card.id,
+                  cardProperty: {
+                    id: propertyTemplate.id,
+                    name: propertyTemplate.name,
+                    value: userId
+                  },
+                  scope: WebhookEventNames.CardPersonPropertyAssigned
+                }
+              })
+            )
+          );
         }}
         wrapColumn={props.wrapColumn ?? false}
         showEmptyPlaceholder={showEmptyPlaceholder}

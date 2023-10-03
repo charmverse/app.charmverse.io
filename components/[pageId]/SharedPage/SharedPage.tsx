@@ -11,6 +11,7 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -24,6 +25,7 @@ export function SharedPage({ publicPage }: Props) {
   const { setCurrentPageId } = useCurrentPage();
   const { pages } = usePages();
   const [, setTitleState] = usePageTitle();
+  const { space } = useCurrentSpace();
 
   const basePageId = publicPage?.page?.id || '';
 
@@ -42,7 +44,8 @@ export function SharedPage({ publicPage }: Props) {
     trackPageView({
       type: rootPage.type,
       pageId: rootPage.id,
-      spaceId: rootPage.spaceId
+      spaceId: rootPage.spaceId,
+      spaceDomain: space?.domain
     });
 
     setTitleState(rootPage.title);

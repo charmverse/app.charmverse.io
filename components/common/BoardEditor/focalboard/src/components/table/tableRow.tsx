@@ -118,7 +118,7 @@ function TableRow(props: Props) {
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     event.preventDefault();
     setAnchorEl(event.currentTarget);
@@ -169,6 +169,14 @@ function TableRow(props: Props) {
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
+      {!props.readOnly && (
+        <Box className='icons row-actions' onClick={handleClick}>
+          <Box className='charm-drag-handle'>
+            <DragIndicatorIcon color='secondary' />
+          </Box>
+        </Box>
+      )}
+
       {/* Columns, one per property */}
       {visiblePropertyTemplates.map((template, templateIndex) => {
         if (template.id === Constants.titleColumnId) {
@@ -187,11 +195,6 @@ function TableRow(props: Props) {
               key={template.id}
               onPaste={(e) => e.stopPropagation()}
             >
-              {!props.readOnly && templateIndex === 0 && (
-                <IconButton className='icons' onClick={handleClick} size='small'>
-                  <DragIndicatorIcon color='secondary' />
-                </IconButton>
-              )}
               <div style={{ display: 'flex', width: '100%' }}>
                 <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
                   {setIsExpanded &&
@@ -243,11 +246,6 @@ function TableRow(props: Props) {
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
-            {!props.readOnly && templateIndex === 0 && (
-              <IconButton className='icons' onClick={handleClick} size='small'>
-                <DragIndicatorIcon color='secondary' />
-              </IconButton>
-            )}
             <PropertyValueElement
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}

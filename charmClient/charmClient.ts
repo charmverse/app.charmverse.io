@@ -23,6 +23,7 @@ import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
+import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -431,6 +432,10 @@ class CharmClient {
       noHeaders: true,
       skipStringifying: true
     });
+  }
+
+  createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
+    return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
   }
 }
 

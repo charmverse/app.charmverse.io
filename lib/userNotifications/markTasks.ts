@@ -8,6 +8,19 @@ export interface MarkTask {
 
 export async function markTasks(tasks: MarkTask[], userId: string) {
   const taskIds = tasks.map((userNotification) => userNotification.id);
+
+  await prisma.userNotificationMetadata.updateMany({
+    where: {
+      id: {
+        in: taskIds
+      }
+    },
+    data: {
+      seenAt: new Date(),
+      channel: 'webapp'
+    }
+  });
+
   const sentNotifications = await prisma.userNotification.findMany({
     where: {
       taskId: {

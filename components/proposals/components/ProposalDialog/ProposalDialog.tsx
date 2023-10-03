@@ -13,6 +13,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -38,6 +39,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
       setCurrentPageId(pageId);
     }
   }, [pageId]);
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
   const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(
@@ -79,7 +81,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
 
   useEffect(() => {
     if (page?.id) {
-      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type });
+      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: space?.domain });
     }
   }, [page?.id]);
 

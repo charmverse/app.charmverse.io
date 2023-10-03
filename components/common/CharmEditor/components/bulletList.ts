@@ -32,8 +32,8 @@ function specFactory(): RawSpecs {
     schema: {
       content: 'listItem+',
       group: 'block',
-      parseDOM: [{ tag: 'ul' }],
-      toDOM: (): DOMOutputSpec => ['ul', 0],
+      parseDOM: [{ tag: 'ul.old-list' }],
+      toDOM: (): DOMOutputSpec => ['ul', { class: 'old-list' }, 0],
       attrs: {
         // a style preference attribute which be used for
         // rendering output.
