@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getUserSpaceNotifications } from 'lib/notifications/spaceNotifications';
 import { getPermissionsClient } from 'lib/permissions/api';
-import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 
 import { getPostCategories } from './getPostCategories';
 

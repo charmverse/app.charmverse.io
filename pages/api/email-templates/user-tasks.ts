@@ -32,8 +32,9 @@ const createDiscussionTask = ({
 }): DiscussionNotification => {
   const id = v4();
   return {
+    marked: false,
     mentionId: id,
-    taskId: id,
+    id,
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
@@ -70,9 +71,10 @@ const createForumTask = ({
   postTitle: string;
 }): ForumNotification => {
   return {
+    marked: false,
     spaceId: v4(),
     spaceDomain: randomName(),
-    taskId: v4(),
+    id: v4(),
     type: 'created',
     spaceName,
     postId: v4(),
@@ -133,10 +135,11 @@ const createProposalTasks = ({
   status
 }: Pick<ProposalNotification, 'status' | 'spaceName' | 'pageTitle'>): ProposalNotification => {
   return {
+    marked: false,
     type: 'reviewed',
     pagePath: randomName(),
     pageTitle,
-    taskId: v4(),
+    id: v4(),
     createdAt: new Date().toISOString(),
     status,
     spaceDomain: randomName(),
@@ -166,7 +169,8 @@ const createBountyTask = ({
 }: Pick<BountyNotification, 'pageTitle' | 'spaceName' | 'status'>): BountyNotification => {
   const id = v4();
   return {
-    taskId: id,
+    marked: false,
+    id,
     type: 'application.accepted',
     pagePath: randomName(),
     pageTitle,

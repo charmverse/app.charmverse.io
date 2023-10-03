@@ -39,8 +39,8 @@ export function useNotificationModal({
 
   const markBulkAsRead = useCallback(async () => {
     const groupType = notificationDisplayType === 'all' ? undefined : unmarkedNotifications[0]?.groupType;
-    const tasksToMark = unmarkedNotifications.map((n) => ({ id: n.taskId, type: n.type }));
-    await charmClient.tasks.markTasks(tasksToMark);
+    const tasksToMark = unmarkedNotifications.map((n) => ({ id: n.id, type: n.type }));
+    await charmClient.notifications.markNotifications(tasksToMark);
 
     mutateTasks(
       (_tasks) => {

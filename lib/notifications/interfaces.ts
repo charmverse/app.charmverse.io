@@ -65,12 +65,13 @@ export type MentionNotificationType = MentionNotification['type'];
 export type BlockCommentNotificationType = BlockCommentNotification['type'];
 
 interface NotificationBase {
-  taskId: string;
+  id: string;
   spaceId: string;
   spaceDomain: string;
   spaceName: string;
   createdAt: string;
   createdBy: NotificationActor;
+  marked: boolean;
 }
 
 export type DiscussionNotificationType =

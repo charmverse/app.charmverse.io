@@ -9,16 +9,16 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .get(getTasksState)
+  .get(getNotificationsState)
   .use(requireKeys(['snoozeFor', 'snoozeMessage'], 'body'))
-  .put(updateTasksState);
+  .put(updateNotificationsState);
 
-export interface GetTasksStateResponse {
+export interface GetNotificationsStateResponse {
   snoozedFor: string | null;
   snoozedMessage: string | null;
 }
 
-async function getTasksState(req: NextApiRequest, res: NextApiResponse<GetTasksStateResponse>) {
+async function getNotificationsState(req: NextApiRequest, res: NextApiResponse<GetNotificationsStateResponse>) {
   const taskState = await prisma.userNotificationState.findUnique({
     where: {
       userId: req.session.user.id
@@ -36,7 +36,7 @@ export interface UpdateTasksState {
   snoozeFor: Date | null;
 }
 
-async function updateTasksState(req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {
+async function updateNotificationsState(req: NextApiRequest, res: NextApiResponse<{ ok: true }>) {
   const { snoozeFor, snoozeMessage } = req.body as UpdateTasksState;
   await prisma.userNotificationState.upsert({
     where: {

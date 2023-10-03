@@ -1,9 +1,9 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
+import type { SetForumCategoryNotificationInput } from 'lib/notifications/setForumCategoryNotification';
+import type { ClientUserSpaceNotifications } from 'lib/notifications/spaceNotifications';
 import type { UserCommunity } from 'lib/profile';
-import type { SetForumCategoryNotificationInput } from 'lib/userNotifications/setForumCategoryNotification';
-import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import type { UserAvatar } from 'lib/users/interfaces';
 import type { LoggedInUser } from 'models';
 

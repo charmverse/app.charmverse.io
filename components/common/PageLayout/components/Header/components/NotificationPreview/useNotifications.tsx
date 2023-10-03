@@ -15,7 +15,7 @@ import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 import type { NotificationActor, NotificationGroupType } from 'lib/notifications/interfaces';
 
-type MarkAsReadParams = { taskId: string; groupType: NotificationGroupType; type: NotificationType };
+type MarkAsReadParams = { id: string; groupType: NotificationGroupType; type: NotificationType };
 export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>;
 
 export type NotificationDetails = {
@@ -24,7 +24,7 @@ export type NotificationDetails = {
   createdBy: NotificationActor;
   groupType: NotificationGroupType;
   type: NotificationType;
-  taskId: string;
+  id: string;
   content: string;
   href: string;
   title: string;
@@ -94,16 +94,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   }, [tasks]);
 
   const markAsRead: MarkNotificationAsRead = useCallback(
-    async ({
-      taskId,
-      type,
-      groupType
-    }: {
-      taskId: string;
-      groupType: NotificationGroupType;
-      type: NotificationType;
-    }) => {
-      await charmClient.tasks.markTasks([{ id: taskId, type }]);
+    async ({ id, type, groupType }: { id: string; groupType: NotificationGroupType; type: NotificationType }) => {
+      await charmClient.notifications.markNotifications([{ id }]);
 
       mutateTasks(
         (_tasks) => {
@@ -111,7 +103,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
             return;
           }
 
-          const taskIndex = _tasks?.[groupType].unmarked.findIndex((t) => t.taskId === taskId);
+          const taskIndex = _tasks?.[groupType].unmarked.findIndex((t) => t.id === id);
           if (typeof taskIndex === 'number' && taskIndex > -1) {
             const marked = [_tasks?.[groupType].unmarked[taskIndex], ..._tasks[groupType].marked];
             const unmarkedItems = _tasks[groupType].unmarked;

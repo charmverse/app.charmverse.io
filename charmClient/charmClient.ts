@@ -32,7 +32,6 @@ import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
-import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -47,6 +46,7 @@ import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { MuxApi } from './apis/muxApi';
+import { NotificationsApi } from './apis/notificationsApi';
 import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
@@ -56,7 +56,6 @@ import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
-import { TasksApi } from './apis/tasksApi';
 import { TokenGatesApi } from './apis/tokenGates';
 import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
@@ -102,7 +101,7 @@ class CharmClient {
 
   summon = new SummonApi();
 
-  tasks = new TasksApi();
+  notifications = new NotificationsApi();
 
   track = new TrackApi();
 

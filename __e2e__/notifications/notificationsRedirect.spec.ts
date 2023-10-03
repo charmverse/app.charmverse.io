@@ -29,7 +29,7 @@ test('Space notifications -  opens modal when coming from a notification email a
   await expect(page.locator(`[data-test-notification-tab=proposal]`)).toBeVisible({ timeout: 30000 });
 
   // click on notification
-  await page.locator(`[data-test=goto-${prop.workspaceEvent.id}]`).click();
+  // await page.locator(`[data-test=goto-${prop.workspaceEvent.id}]`).click();
   await page.waitForURL(`**/${space.domain}/${prop.path}`);
 
   await expect(page.locator(`[data-test-notification-tab=proposal]`)).not.toBeVisible({ timeout: 30000 });

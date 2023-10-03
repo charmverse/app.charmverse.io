@@ -9,7 +9,7 @@ import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } 
 import { brandColorNames } from 'theme/colors';
 import { LoggedInUser } from 'models/User';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
-import { GetNotificationsResponse } from 'pages/api/tasks/list';
+import { GetNotificationsResponse } from 'pages/api/notifications/list';
 
 const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
 
@@ -116,7 +116,7 @@ export const proposalCategories: ProposalCategoryWithPermissions[] = generateDef
 
 export const proposalTemplates: ProposalWithUsers[] = [];
 
-export const userTasks: GetNotificationsResponse = {
+export const userNotifications: GetNotificationsResponse = {
   discussions: { marked: [], unmarked: [] },
   proposals: { marked: [], unmarked: [] },
   votes: { marked: [], unmarked: [] },

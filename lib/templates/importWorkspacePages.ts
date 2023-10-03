@@ -369,7 +369,7 @@ export async function generateImportWorkspacePages({
         spaceId: space.id,
         createdBy: space.createdBy,
         id: oldNewPageIdHashMap[node.id]
-      });
+      } as Prisma.BountyCreateManyInput);
       permissions.forEach(({ id, ...bountyPermission }) => {
         bountyPermissionArgs.push({
           ...bountyPermission,

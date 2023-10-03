@@ -123,7 +123,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.proposalNotifications.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
-          <ProposalTaskMjml key={proposalTask.taskId} task={proposalTask} />
+          <ProposalTaskMjml key={proposalTask.id} task={proposalTask} />
         ))}
         {totalProposalNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
         <MjmlDivider />
@@ -155,7 +155,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.bountyNotifications.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
-          <BountyTaskMjml key={proposalTask.taskId} task={proposalTask} />
+          <BountyTaskMjml key={proposalTask.id} task={proposalTask} />
         ))}
         {totalBountyNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
         <MjmlDivider />
@@ -187,7 +187,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.voteNotifications.slice(0, MAX_ITEMS_PER_TASK).map((voteTask) => (
-          <VoteTaskMjml key={voteTask.taskId} task={voteTask} />
+          <VoteTaskMjml key={voteTask.id} task={voteTask} />
         ))}
         {totalVoteNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusVoteLink} /> : null}
         <MjmlDivider />
