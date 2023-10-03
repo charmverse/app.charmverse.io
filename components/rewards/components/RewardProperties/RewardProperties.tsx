@@ -549,9 +549,8 @@ export function RewardProperties(props: {
             variant='outlined'
             onChange={async (options) => {
               const roles = options.filter((option) => option.group === 'role');
-              const members = options.filter((option) => option.group === 'user');
               await applyRewardUpdates({
-                allowedSubmitterRoles: roles.map((r) => r.id)
+                reviewers: roles
               });
               if (currentReward?.id) {
                 await refreshRewardPermissions(currentReward.id);
