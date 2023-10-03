@@ -22,11 +22,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     where: {
       OR: [
         {
-          // TODO: ask Marek why we need to support case-insensitivity for custom domains
-          customDomain: {
-            equals: domainOrCustomDomain,
-            mode: 'insensitive'
-          }
+          customDomain: domainOrCustomDomain
         },
         { domain: domainOrCustomDomain }
       ]
