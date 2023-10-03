@@ -12,8 +12,8 @@ html {
   --tab-width: 24px;
 }
 
-.ProseMirror ol:not(.old-list),
-.ProseMirror ul:not(.old-list) {
+.ProseMirror ol,
+.ProseMirror ul {
   /*
    * Use `column-span: all` and `display: flow-root` to force formatting context
    * https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
@@ -29,16 +29,6 @@ html {
 }
 
 /* bullet indentation */
-.ProseMirror li:not(.old-list > li) {
-  /* This assumes the space needed for 3 digits numbers */
-  display: block;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  zoom: 1;
-}
-
 .ProseMirror li > span > p {
   // margin: 0;
   // margin-block-end: 0;
@@ -62,7 +52,7 @@ html {
   width: var(--tab-width);
 }
 
-.ProseMirror ol:not(.old-list) {
+.ProseMirror ol {
   /* counter-reset: czi-counter;
   list-style-type: none; */
   --czi-counter-name: czi-counter-0;
@@ -72,11 +62,11 @@ html {
   counter-reset: none;
 }
 
-.ProseMirror ol:not(.old-list) > li {
+.ProseMirror ol > li {
   counter-increment: var(--czi-counter-name);
 }
 
-.ProseMirror ol:not([data-counter-reset='none']):not(.old-list) {
+.ProseMirror ol:not([data-counter-reset='none']) {
   counter-reset: var(--czi-counter-name) var(--czi-counter-reset);
 }
 
