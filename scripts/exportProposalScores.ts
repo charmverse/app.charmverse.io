@@ -37,7 +37,6 @@ const headerRows = objectUtils.typedKeys(exportedFormat);
 async function exportEvaluatedProposalScores({domain}: {domain: string}) {
 
   const proposals = await prisma.proposal.findMany({
-    take: 3,
     where: {
       evaluationType: 'rubric',
       status: {
@@ -95,7 +94,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
         return details
       } 
 
-      let baseString = `Criteria: ${criteria.title} - Average: ${rubricResults.average ?? '-'} || Total: ${rubricResults.sum ?? '-'}${newLine}`
+      let baseString = `Criteria: ${criteria.title} - Average: ${typeof rubricResults.average === 'number' ? rubricResults.average.toFixed(1) : '-'} || Total: ${rubricResults.sum ?? '-'}${newLine}`
 
       const mappedComments = rubricResults.comments.filter(comment => !!(comment?.trim())).map(comment => `*${comment}`);
 
@@ -145,7 +144,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
   allContent.push(...contentRows);
 
   // Debug JSON
-  // await writeToSameFolder({data: JSON.stringify(allContent, null, 2), fileName: 'rawdata.json'})
+  await writeToSameFolder({data: JSON.stringify(allContent, null, 2), fileName: 'rawdata.json'})
 
   const textContent = allContent.reduce((acc, row) => {
     return acc + row.join(separator) + newLine
@@ -154,7 +153,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
   return textContent;
 }
 
-exportEvaluatedProposalScores({domain: 'Example domain'}).then(async csv => {
+exportEvaluatedProposalScores({domain: 'safe-grants-program'}).then(async csv => {
 
   await writeToSameFolder({data: csv, fileName: 'exported.csv'})
 })
