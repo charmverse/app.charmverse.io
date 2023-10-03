@@ -1,5 +1,3 @@
-import type { GetServerSidePropsContext } from 'next';
-
 import { getCustomDomainFromHost } from './getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from './getSpaceDomainFromHost';
 
