@@ -12,7 +12,7 @@ describe('getPagePath', () => {
     expect(result).toEqual('/foobar/members');
   });
 
-  it('should add space domain when on a charmverse-hosted domain', () => {
+  it('should add space domain when on a CharmVerse-hosted domain', () => {
     const result = getPagePath({
       spaceDomain: 'foobar',
       path: 'members',
