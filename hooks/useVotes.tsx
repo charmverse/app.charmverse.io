@@ -7,7 +7,7 @@ import charmClient from 'charmClient';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import type { GetTasksResponse } from 'pages/api/tasks/list';
+import type { GetNotificationsResponse } from 'pages/api/tasks/list';
 
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
@@ -29,7 +29,7 @@ type IContext = {
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
 };
 
-const EMPTY_TASKS: GetTasksResponse = {
+const EMPTY_TASKS: GetNotificationsResponse = {
   bounties: { marked: [], unmarked: [] },
   votes: { marked: [], unmarked: [] },
   discussions: { marked: [], unmarked: [] },
@@ -74,15 +74,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
         return { ...prev, ...votesToAssign };
       });
-
-      // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
-      newVotes.forEach((newVote) => {
-        if (!mutatedTasks.votes.unmarked.find((vote) => vote.id === newVote.id)) {
-          mutatedTasks.votes.unmarked.push(newVote);
-        }
-      });
-      mutateTasks(mutatedTasks);
+      mutateTasks();
     });
 
     const unsubscribeFromDeletedVotes = subscribe('votes_deleted', (deletedVotes) => {
@@ -95,17 +87,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
-
-      const deletedVoteIds = deletedVotes.map((vote) => vote.id);
-
-      mutatedTasks.votes = {
-        marked: mutatedTasks.votes.marked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id)),
-        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id))
-      };
-
-      mutateTasks(mutatedTasks);
+      mutateTasks();
     });
 
     const unsubscribeFromUpdatedVotes = subscribe('votes_updated', (updatedVotes) => {
@@ -120,17 +102,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      // Remove cancelled votes from tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
-
-      const cancelledVoteIds = updatedVotes.filter((v) => v.status === 'Cancelled').map((vote) => vote.id);
-
-      mutatedTasks.votes = {
-        marked: mutatedTasks.votes.marked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id)),
-        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id))
-      };
-
-      mutateTasks(mutatedTasks);
+      mutateTasks();
     });
 
     return () => {
@@ -155,8 +127,8 @@ export function VotesProvider({ children }: { children: ReactNode }) {
           ? {
               ...tasks,
               votes: {
-                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.id !== voteId),
-                marked: tasks.votes.marked.filter((_vote) => _vote.id !== voteId)
+                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.taskId !== voteId),
+                marked: tasks.votes.marked.filter((_vote) => _vote.taskId !== voteId)
               }
             }
           : undefined;

@@ -19,6 +19,16 @@ beforeAll(() => {
   mockDOM();
 });
 
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/[domain]/',
+    query: {
+      domain: 'test-space'
+    },
+    isReady: true
+  })
+}));
+
 describe('components/cardDetail/CommentsList', () => {
   const comment1 = createCommentBlock();
   const comment2 = createCommentBlock();

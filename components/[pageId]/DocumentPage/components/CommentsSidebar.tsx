@@ -101,7 +101,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   useLayoutEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
 
-    const highlightedCommentId = router.query.commentId;
+    const highlightedCommentId = router.query.inlineCommentId;
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
       setCurrentPageActionDisplay('comments');
@@ -113,7 +113,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
       }
 
       // Remove query parameters from url
-      setUrlWithoutRerender(router.pathname, { commentId: null });
+      setUrlWithoutRerender(router.pathname, { inlineCommentId: null });
 
       requestAnimationFrame(() => {
         const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
@@ -133,7 +133,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
         }, 250);
       });
     }
-  }, [router.query.commentId]);
+  }, [router.query.inlineCommentId]);
 
   return (
     <>

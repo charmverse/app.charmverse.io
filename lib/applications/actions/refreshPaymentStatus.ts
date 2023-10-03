@@ -7,7 +7,7 @@ import type { SafeTxStatusDetails } from 'lib/gnosis/getSafeTxStatus';
 import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-export async function refreshPaymentStatus(applicationId: string) {
+export async function refreshPaymentStatus({ applicationId, userId }: { applicationId: string; userId?: string }) {
   const application = await prisma.application.findUnique({
     where: {
       id: applicationId
@@ -29,7 +29,7 @@ export async function refreshPaymentStatus(applicationId: string) {
   }
 
   const multisigTxStatuses = application.transactions.map((tx) =>
-    // is safeTxHash is not presemt, use transactionId as fallback and it will get filled
+    // is safeTxHash is not present, use transactionId as fallback and it will get filled
     getSafeTxStatus({ safeTxHash: tx.safeTxHash || tx.transactionId, chainId: Number(tx.chainId) })
   );
 
@@ -48,7 +48,10 @@ export async function refreshPaymentStatus(applicationId: string) {
       });
 
       await updateTransactions({ transactions: application.transactions, statuses });
-      await rollupBountyStatus(updatedApplication.bountyId);
+      await rollupBountyStatus({
+        bountyId: updatedApplication.bountyId,
+        userId
+      });
 
       return { application: updatedApplication, updated: true };
     }

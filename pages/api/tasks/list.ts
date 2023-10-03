@@ -1,47 +1,51 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-import type { BountyTasksGroup } from 'lib/bounties/getBountyTasks';
-import type { ForumTasksGroup } from 'lib/forums/getForumNotifications/getForumNotifications';
-import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
-import type { DiscussionNotification, NotificationsGroup } from 'lib/notifications/interfaces';
-import type { ProposalTasksGroup } from 'lib/proposal/getProposalTasks';
-import { getProposalTasks } from 'lib/proposal/getProposalTasks';
+import { getForumNotifications } from 'lib/notifications/getForumNotification';
+import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
+import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
+import type {
+  BountyNotification,
+  DiscussionNotification,
+  ForumNotification,
+  NotificationsGroup,
+  ProposalNotification,
+  VoteNotification
+} from 'lib/notifications/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { VoteTasksGroup } from 'lib/votes/getVoteTasks';
-import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getTasks);
+handler.use(requireUser).get(getNotifications);
 
-export interface GetTasksResponse {
+export interface GetNotificationsResponse {
   discussions: NotificationsGroup<DiscussionNotification>;
-  votes: VoteTasksGroup;
-  proposals: ProposalTasksGroup;
-  bounties: BountyTasksGroup;
-  forum: ForumTasksGroup;
+  votes: NotificationsGroup<VoteNotification>;
+  proposals: NotificationsGroup<ProposalNotification>;
+  bounties: NotificationsGroup<BountyNotification>;
+  forum: NotificationsGroup<ForumNotification>;
 }
 
-async function getTasks(req: NextApiRequest, res: NextApiResponse<GetTasksResponse>) {
+async function getNotifications(req: NextApiRequest, res: NextApiResponse<GetNotificationsResponse>) {
   const userId = req.session.user.id;
-  const [discussionNotifications, voteTasks, proposalTasks, bountiesTasks, forumTasks] = await Promise.all([
-    getDiscussionNotifications(userId),
-    getVoteTasks(userId),
-    getProposalTasks(userId),
-    getBountyTasks(userId),
-    getForumNotifications(userId)
-  ]);
+  const [discussionNotifications, voteNotifications, proposalNotifications, bountiesNotifications, forumNotifications] =
+    await Promise.all([
+      getDiscussionNotifications(userId),
+      getVoteNotifications(userId),
+      getProposalNotifications(userId),
+      getBountyNotifications(userId),
+      getForumNotifications(userId)
+    ]);
 
   return res.status(200).json({
-    proposals: proposalTasks,
-    votes: voteTasks,
+    proposals: proposalNotifications,
+    votes: voteNotifications,
     discussions: discussionNotifications,
-    bounties: bountiesTasks,
-    forum: forumTasks
+    bounties: bountiesNotifications,
+    forum: forumNotifications
   });
 }
 

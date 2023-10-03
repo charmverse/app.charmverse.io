@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { ProposalNotification } from 'lib/notifications/interfaces';
 import { generateProposal, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
-import type { ProposalTask } from '../getProposalStatusChangeTasks';
 import { getProposalStatusChangeTasks } from '../getProposalStatusChangeTasks';
 import { updateProposalStatus } from '../updateProposalStatus';
 
@@ -206,43 +206,43 @@ describe('getProposalStatusChangeTasks', () => {
 
     const { proposalTasks, unmarkedWorkspaceEvents } = await getProposalStatusChangeTasks(user1.id, events);
 
-    expect(proposalTasks).toEqual(
+    expect(proposalTasks.map((p) => ({ type: p.type, pagePath: p.pagePath }))).toEqual(
       expect.arrayContaining([
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'vote',
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'vote',
           pagePath: voteActiveProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'start_vote',
-          pagePath: reviewedProposal.path
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'evaluation_closed',
+          pagePath: rubricClosedProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'discuss',
-          pagePath: discussedProposal.path
-        }),
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'start_review',
-          pagePath: authoredStartReviewProposal.path
-        }),
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'review',
-          pagePath: reviewProposal.path
-        }),
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'review',
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'evaluation_active',
           pagePath: rubricReviewerProposal.path
         }),
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'evaluation_closed',
-          pagePath: rubricClosedProposal.path
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'reviewed',
+          pagePath: reviewedProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'start_discussion',
+          pagePath: discussedProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'start_review',
+          pagePath: authoredStartReviewProposal.path
+        }),
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'needs_review',
+          pagePath: reviewProposal.path
         })
       ])
     );
 
     expect(proposalTasks).toEqual(
       expect.not.arrayContaining([
-        expect.objectContaining<Partial<ProposalTask>>({
-          action: 'start_discussion',
+        expect.objectContaining<Partial<ProposalNotification>>({
+          type: 'start_discussion',
           pagePath: authoredDraftProposal.path
         })
       ])

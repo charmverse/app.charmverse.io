@@ -29,7 +29,10 @@ describe('closeOutBounty', () => {
       userId: nonAdminUser.id
     });
 
-    const updatedBounty = await closeOutBounty(bounty.id);
+    const updatedBounty = await closeOutBounty({
+      bountyId: bounty.id,
+      userId: nonAdminUser.id
+    });
 
     expect(updatedBounty.status).toBe('complete');
   });
@@ -43,7 +46,10 @@ describe('closeOutBounty', () => {
       userId: nonAdminUser.id
     });
 
-    const updatedBounty = await closeOutBounty(bounty.id);
+    const updatedBounty = await closeOutBounty({
+      bountyId: bounty.id,
+      userId: nonAdminUser.id
+    });
 
     expect(updatedBounty.applications[0].status).toBe('rejected');
   });
@@ -74,7 +80,12 @@ describe('closeOutBounty', () => {
     });
 
     const [applied, complete, paid] = await Promise.all(
-      [bountyWithApplied, bountyWithComplete, bountyWithPaid].map((bounty) => closeOutBounty(bounty.id))
+      [bountyWithApplied, bountyWithComplete, bountyWithPaid].map((bounty) =>
+        closeOutBounty({
+          bountyId: bounty.id,
+          userId: nonAdminUser.id
+        })
+      )
     );
 
     expect(applied.applications[0].status).toBe('applied');
@@ -101,8 +112,14 @@ describe('closeOutBounty', () => {
     });
 
     const [closedBountyWithInProgressBecameRejected, closedBountyWithPaid] = await Promise.all([
-      closeOutBounty(bountyWithInProgress.id),
-      closeOutBounty(bountyWithPaid.id)
+      closeOutBounty({
+        bountyId: bountyWithInProgress.id,
+        userId: nonAdminUser.id
+      }),
+      closeOutBounty({
+        bountyId: bountyWithPaid.id,
+        userId: nonAdminUser.id
+      })
     ]);
 
     const oldInProgressCount = countValidSubmissions(bountyWithInProgress.applications);
@@ -122,7 +139,10 @@ describe('closeOutBounty', () => {
 
   it('should fail if the bounty does not exist', async () => {
     try {
-      await closeOutBounty(v4());
+      await closeOutBounty({
+        bountyId: v4(),
+        userId: nonAdminUser.id
+      });
       throw new ExpectedAnError();
     } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);

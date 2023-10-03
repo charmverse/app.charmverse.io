@@ -46,7 +46,7 @@ describe('getProposalTasks', () => {
       expect.arrayContaining([
         expect.objectContaining({
           status: discussionProposal.status,
-          action: 'start_review'
+          type: 'start_review'
         })
       ])
     );
@@ -78,7 +78,7 @@ describe('getProposalTasks', () => {
       expect.arrayContaining([
         expect.objectContaining({
           status: privateDraftProposal1.status,
-          action: 'start_review'
+          type: 'start_review'
         })
       ])
     );
@@ -144,7 +144,7 @@ describe('getProposalTasks', () => {
       expect.arrayContaining([
         expect.objectContaining({
           status: reviewedProposal1.status,
-          action: 'start_vote'
+          type: 'reviewed'
         })
       ])
     );
@@ -195,11 +195,11 @@ describe('getProposalTasks', () => {
       expect.arrayContaining([
         expect.objectContaining({
           status: proposalToReviewViaRole.status,
-          action: 'review'
+          type: 'needs_review'
         }),
         expect.objectContaining({
           status: proposalToReviewViaUser.status,
-          action: 'review'
+          type: 'needs_review'
         })
       ])
     );
@@ -264,7 +264,7 @@ describe('getProposalTasks', () => {
         expect.objectContaining({
           pageId: discussionProposalVisibleCategory.page.id,
           status: discussionProposalVisibleCategory.status,
-          action: 'discuss'
+          type: 'start_discussion'
         })
       ])
     );
@@ -306,7 +306,7 @@ describe('getProposalTasks', () => {
       categoryId: visibleCategory.id
     });
 
-    const votingProposalHiddenCategory = await testUtilsProposals.generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'vote_active',
       spaceId: space.id,
       userId: author.id,
@@ -320,7 +320,7 @@ describe('getProposalTasks', () => {
       categoryId: visibleCategory.id
     });
 
-    const votingClosedProposalVisibleCategory = await testUtilsProposals.generateProposal({
+    await testUtilsProposals.generateProposal({
       proposalStatus: 'vote_closed',
       spaceId: space.id,
       userId: author.id,
@@ -336,7 +336,7 @@ describe('getProposalTasks', () => {
         expect.objectContaining({
           pageId: votingProposalVisibleCategory.page.id,
           status: votingProposalVisibleCategory.status,
-          action: 'vote'
+          type: 'vote'
         })
       ])
     );
