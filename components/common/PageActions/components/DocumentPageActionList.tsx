@@ -247,6 +247,7 @@ export function DocumentPageActionList({
         <>
           <Divider />
           <ListItemButton
+            disabled={!pagePermissions?.comment}
             onClick={() => {
               setCurrentPageActionDisplay('comments');
               onComplete();
