@@ -257,7 +257,6 @@ export function getSubdomainPath(
 ) {
   const subdomain = getSpaceDomainFromHost(host);
   const customDomain = getCustomDomainFromHost(host);
-
   // strip out domain when using full custom domain
   if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
     // remove space domain from path for custom domain
@@ -276,7 +275,7 @@ export function getSubdomainPath(
   }
 
   // if we are not using a custom domain or subdomain, make sure that the space domain exists in the URL
-  if (config && !path.startsWith(`/${config?.domain}`)) {
+  if (config && !customDomain && !path.startsWith(`/${config?.domain}`)) {
     return `/${config.domain}${path}`;
   }
   return path;

@@ -49,7 +49,6 @@ async function getDefaultPageForSpaceRaw({
   const lastPageView = await getLastPageView({ userId, spaceId });
 
   const defaultSpaceUrl = getSpaceUrl(space, host);
-
   if (lastPageView) {
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
     if (pathname) {

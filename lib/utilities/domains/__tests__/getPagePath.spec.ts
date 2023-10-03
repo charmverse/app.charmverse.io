@@ -32,9 +32,9 @@ describe('getPagePath', () => {
 
   it('should not include space domain when on a custom host domain', () => {
     const result = getPagePath({
-      spaceDomain: 'foobar',
+      spaceDomain: 'apples',
       path: 'members',
-      hostName: 'foobar.com'
+      hostName: 'work.foobar.com'
     });
     expect(result).toEqual('/members');
   });
