@@ -8,10 +8,10 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: false }), {
   blockquote: { block: 'blockquote' },
   paragraph: { block: 'paragraph' },
-  list_item: { block: 'listItem', node: 'listItem' },
-  bullet_list: { block: 'bulletList', getAttrs: (_, tokens, i) => ({ tight: listIsTight(tokens, i) }) },
+  list_item: { block: 'list_item', node: 'list_item' },
+  bullet_list: { block: 'bullet_list', getAttrs: (_, tokens, i) => ({ tight: listIsTight(tokens, i) }) },
   ordered_list: {
-    block: 'orderedList',
+    block: 'ordered_list',
     getAttrs: (tok, tokens, i) => ({
       order: +tok.attrGet('start') || 1,
       tight: listIsTight(tokens, i)

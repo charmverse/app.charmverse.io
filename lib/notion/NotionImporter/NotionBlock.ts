@@ -135,7 +135,7 @@ export class NotionBlock {
           const listItemBlock = block;
           const convertedBlock = await this.convert(block);
           const listItem = {
-            type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
+            type: block.type === 'numbered_list_item' ? 'ordered_list' : 'bullet_list',
             content: convertedBlock ? [convertedBlock] : []
           } as any;
 
@@ -285,7 +285,7 @@ export class NotionBlock {
         const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
         const listItemNode: ListItemNode = {
-          type: 'listItem',
+          type: 'list_item',
           content: [
             {
               type: 'paragraph',
