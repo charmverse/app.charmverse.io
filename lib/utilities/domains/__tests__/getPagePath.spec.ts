@@ -21,6 +21,15 @@ describe('getPagePath', () => {
     expect(result).toEqual('/foobar/members');
   });
 
+  it('should not include space domain when on a subdomain of CharmVerse domain', () => {
+    const result = getPagePath({
+      spaceDomain: 'foobar',
+      path: 'members',
+      hostName: `foobar.${getAppApexDomain()}`
+    });
+    expect(result).toEqual('/members');
+  });
+
   it('should not include space domain when on a custom host domain', () => {
     const result = getPagePath({
       spaceDomain: 'foobar',
