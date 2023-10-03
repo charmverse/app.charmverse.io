@@ -160,11 +160,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
       : {
           OR: [
             {
-              // TODO: ask Marek why we need to support case-insensitivity for custom domains
-              customDomain: {
-                equals: spaceDomain,
-                mode: 'insensitive'
-              }
+              customDomain: spaceDomain
             },
             { domain: spaceDomain }
           ]
