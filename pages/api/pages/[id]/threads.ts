@@ -26,7 +26,7 @@ async function getThreads(req: NextApiRequest, res: NextApiResponse) {
     userId: req.session?.user?.id
   });
 
-  if (computed.read !== true) {
+  if (computed.comment !== true) {
     throw new NotFoundError('Page not found');
   }
 
