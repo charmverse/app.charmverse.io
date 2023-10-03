@@ -222,6 +222,23 @@ export function PostPage({
 
   const canEdit = !!permissions?.edit_post;
 
+  useEffect(() => {
+    const commentId = router.query.commentId;
+    if (commentId && typeof window !== 'undefined' && !isValidating && postComments.length) {
+      setTimeout(() => {
+        const commentDomElement = window.document.getElementById(`post-comment-${commentId}`);
+        if (commentDomElement) {
+          requestAnimationFrame(() => {
+            commentDomElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+            setUrlWithoutRerender(router.pathname, { commentId: null });
+          });
+        }
+      }, 250);
+    }
+  }, [router.query.commentId, isValidating]);
+
   if (!permissions) {
     return <LoadingComponent />;
   } else if (!permissions.view_post) {

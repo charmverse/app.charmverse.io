@@ -1,10 +1,10 @@
 import * as http from 'adapters/http';
 import type { MarkTask } from 'lib/userNotifications/markTasks';
-import type { GetTasksResponse } from 'pages/api/tasks/list';
+import type { GetNotificationsResponse } from 'pages/api/tasks/list';
 import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/tasks/state';
 
 export class TasksApi {
-  getTasksList(): Promise<GetTasksResponse> {
+  getTasksList(): Promise<GetNotificationsResponse> {
     return http.GET('/api/tasks/list');
   }
 

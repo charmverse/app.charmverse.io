@@ -10,7 +10,7 @@ import {
 } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
-import { getForumNotifications } from '../getForumNotifications';
+import { getForumTasks } from '../getForumTasks';
 
 describe('getForumNotifications', () => {
   it('Should return new notifications from a user that replied directly to a comment', async () => {
@@ -44,7 +44,7 @@ describe('getForumNotifications', () => {
       contentText: 'Second comment'
     });
 
-    const { unmarked: newNotifications, marked: markedNotifications } = await getForumNotifications(postCommenter.id);
+    const { unmarked: newNotifications, marked: markedNotifications } = await getForumTasks(postCommenter.id);
 
     // Second comment should have a parent and be a notification
     expect(
@@ -88,9 +88,7 @@ describe('getForumNotifications', () => {
       contentText: 'Second comment'
     });
 
-    const { unmarked: newNotifications, marked: markedNotifications } = await getForumNotifications(
-      postAuthorAndSpace.user.id
-    );
+    const { unmarked: newNotifications, marked: markedNotifications } = await getForumTasks(postAuthorAndSpace.user.id);
 
     // Both comments should be unmarked
     expect(newNotifications.some((notif) => notif.commentId === topLevelComment.id && notif.postId === post.id)).toBe(
@@ -120,7 +118,7 @@ describe('getForumNotifications', () => {
       categoryId: newCategory.id
     });
 
-    const { unmarked: newNotifications } = await getForumNotifications(spaceUser.id);
+    const { unmarked: newNotifications } = await getForumTasks(spaceUser.id);
 
     expect(newNotifications.some((notif) => notif.taskId === post.id && notif.postId === post.id)).toBe(true);
 
@@ -149,7 +147,7 @@ describe('getForumNotifications', () => {
       categoryId: newCategory.id
     });
 
-    const { unmarked: newNotifications } = await getForumNotifications(spaceUser.id);
+    const { unmarked: newNotifications } = await getForumTasks(spaceUser.id);
 
     expect(newNotifications.length).toBe(0);
   });
@@ -171,7 +169,7 @@ describe('getForumNotifications', () => {
       categoryId: newCategory.id
     });
 
-    const { unmarked: newNotifications } = await getForumNotifications(spaceUser.id);
+    const { unmarked: newNotifications } = await getForumTasks(spaceUser.id);
 
     expect(newNotifications.length).toBe(0);
   });

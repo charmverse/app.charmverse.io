@@ -165,7 +165,7 @@ export function Comment({
   return (
     <Stack my={1} position='relative' ref={commentContainerRef}>
       {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
-      <StyledStack data-test={`post-comment-${comment.id}`}>
+      <StyledStack id={`post-comment-${comment.id}`} data-test={`post-comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>

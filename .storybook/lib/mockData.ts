@@ -6,10 +6,10 @@ import { createMockUser } from '../../testing/mocks/user';
 import { createMockSpace } from '../../testing/mocks/space';
 import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '../../lib/members/interfaces';
-import type { GetTasksResponse } from '../../pages/api/tasks/list';
 import { brandColorNames } from 'theme/colors';
 import { LoggedInUser } from 'models/User';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
+import { GetNotificationsResponse } from 'pages/api/tasks/list';
 
 const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
 
@@ -116,7 +116,7 @@ export const proposalCategories: ProposalCategoryWithPermissions[] = generateDef
 
 export const proposalTemplates: ProposalWithUsers[] = [];
 
-export const userTasks: GetTasksResponse = {
+export const userTasks: GetNotificationsResponse = {
   discussions: { marked: [], unmarked: [] },
   proposals: { marked: [], unmarked: [] },
   votes: { marked: [], unmarked: [] },

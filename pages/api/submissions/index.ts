@@ -61,7 +61,10 @@ async function createSubmissionController(req: NextApiRequest, res: NextApiRespo
     customReward: isTruthy(bountySpace.customReward)
   });
 
-  await rollupBountyStatus(createdSubmission.bountyId);
+  await rollupBountyStatus({
+    bountyId,
+    userId
+  });
 
   return res.status(201).json(createdSubmission);
 }

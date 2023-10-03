@@ -1,6 +1,6 @@
 import type { User, UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
 
-import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
+import type { NotificationActor } from 'lib/notifications/interfaces';
 
 export const DEFAULT_THRESHOLD = 50;
 
@@ -28,7 +28,7 @@ export interface ExtendedVote extends Vote {
 export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {
   // page?: PageMeta;
   // space: Space;
-  createdBy: NotificationActor | null;
+  createdBy: NotificationActor;
   taskId: string;
   spaceName: string;
   spaceDomain: string;

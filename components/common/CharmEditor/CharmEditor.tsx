@@ -333,6 +333,7 @@ function CharmEditor({
   useEffect(() => {
     if (editorRef.current) {
       const highlightedMentionId = router.query.mentionId;
+      const voteId = router.query.voteId as string;
       if (highlightedMentionId && typeof window !== 'undefined') {
         setTimeout(() => {
           const highlightedMentionDomElement = window.document.getElementById(`user-${highlightedMentionId}`);
@@ -342,6 +343,19 @@ function CharmEditor({
                 behavior: 'smooth'
               });
               setUrlWithoutRerender(router.pathname, { mentionId: null });
+            });
+          }
+        }, 250);
+      }
+      if (voteId && typeof window !== 'undefined') {
+        setTimeout(() => {
+          const voteDomElement = window.document.getElementById(`vote.${voteId}`);
+          if (voteDomElement) {
+            requestAnimationFrame(() => {
+              voteDomElement.scrollIntoView({
+                behavior: 'smooth'
+              });
+              setUrlWithoutRerender(router.pathname, { voteId: null });
             });
           }
         }, 250);

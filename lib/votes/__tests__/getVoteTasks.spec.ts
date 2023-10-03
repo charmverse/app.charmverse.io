@@ -79,9 +79,9 @@ describe('getVoteTasks', () => {
 
     expect(votes.unmarked).toMatchObject(
       expect.arrayContaining([
-        expect.objectContaining({ id: createdVote.id }),
-        expect.objectContaining({ id: inProgressPastDeadlineVote.id }),
-        expect.objectContaining({ id: inProgressVote.id })
+        expect.objectContaining({ taskId: createdVote.id }),
+        expect.objectContaining({ taskId: inProgressPastDeadlineVote.id }),
+        expect.objectContaining({ taskId: inProgressVote.id })
       ])
     );
   });
@@ -160,6 +160,7 @@ describe('getVoteTasks', () => {
       voteOptions: ['a', 'b'],
       status: 'InProgress',
       userVotes: ['1'],
+      context: 'inline',
       deadline: new Date(Date.now() + 24 * 60 * 60 * 1000)
     });
     const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
@@ -169,7 +170,7 @@ describe('getVoteTasks', () => {
     expect(votes.unmarked).toHaveLength(1);
 
     expect(votes.unmarked).toMatchObject(
-      expect.arrayContaining([expect.objectContaining({ id: inProgressVotableVote.id })])
+      expect.arrayContaining([expect.objectContaining({ taskId: inProgressVotableVote.id })])
     );
   });
 });
