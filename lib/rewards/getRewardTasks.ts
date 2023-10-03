@@ -1,7 +1,7 @@
 import type { BountyStatus as RewardStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationActor } from 'lib/notifications/mapNotificationActor';
+import type { NotificationActor } from 'lib/notifications/interfaces';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 
 import { getRewardAction, getRewardActor } from './getRewardAction';
