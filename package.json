@@ -234,7 +234,7 @@
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.6.0",
     "uuid": "^8.3.2",
-    "viem": "^1.10.9",
+    "viem": "1.13.2",
     "wagmi": "^1.4.1",
     "yup": "^0.32.11"
   },
@@ -338,7 +338,7 @@
     "tsconfig-paths": "^4.2.0",
     "tslib": "^2.6.2",
     "tsx": "^3.12.6",
-    "typescript": "^5.0.2",
+    "typescript": "5.2",
     "webpack": "^5.76.0"
   },
   "overrides": {
