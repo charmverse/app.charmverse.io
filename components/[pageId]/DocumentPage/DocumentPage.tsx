@@ -355,7 +355,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   </CardPropertiesWrapper>
                 </CharmEditor>
 
-                {page.type === 'proposal' && (
+                {page.type === 'proposal' && pagePermissions.comment && (
                   <Box mt='-100px'>
                     {/* add negative margin to offset height of .charm-empty-footer */}
                     <PageComments page={page} permissions={pagePermissions} />
