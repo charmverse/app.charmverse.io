@@ -12,12 +12,12 @@ import { Fragment } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
-import type { NotificationDisplayType } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
-import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import Legend from 'components/settings/Legend';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useNotifications } from 'hooks/useNotifications';
+import type { NotificationDisplayType } from 'hooks/useNotifications';
 
 import { NotificationPreview } from './NotificationPreview';
 import { useNotificationModal } from './useNotificationModal';

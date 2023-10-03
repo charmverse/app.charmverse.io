@@ -9,12 +9,9 @@ import { useMemo } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import Link from 'components/common/Link';
-import type {
-  MarkNotificationAsRead,
-  NotificationDetails
-} from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import type { MarkNotificationAsRead, NotificationDetails } from 'hooks/useNotifications';
 import type { NotificationGroupType } from 'lib/notifications/interfaces';
 
 type Props = {

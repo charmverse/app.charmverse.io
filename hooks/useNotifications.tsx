@@ -2,6 +2,8 @@ import type { NotificationType } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useState, useCallback, createContext, useContext, useMemo } from 'react';
+import type { KeyedMutator } from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import {
@@ -11,9 +13,10 @@ import {
   getProposalsNotificationPreviewItems,
   getVoteNotificationPreviewItems
 } from 'components/common/PageLayout/components/Header/components/NotificationPreview/utils';
-import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useUser } from 'hooks/useUser';
 import type { NotificationActor, NotificationGroupType } from 'lib/notifications/interfaces';
+import { userNotifications } from 'lib/notifications/utils';
+import type { GetNotificationsResponse } from 'pages/api/notifications/list';
 
 type MarkAsReadParams = { id: string; groupType: NotificationGroupType; type: NotificationType };
 export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>;
@@ -44,6 +47,8 @@ type Context = {
   openNotificationsModal: (type?: NotificationDisplayType) => void;
   closeNotificationsModal: () => void;
   isLoading: boolean;
+  notifications: GetNotificationsResponse;
+  mutateNotifications: KeyedMutator<GetNotificationsResponse>;
 };
 
 const NotificationsContext = createContext<Readonly<Context>>({
@@ -53,13 +58,29 @@ const NotificationsContext = createContext<Readonly<Context>>({
   notificationDisplayType: null,
   openNotificationsModal: () => {},
   closeNotificationsModal: () => {},
-  isLoading: false
+  isLoading: false,
+  notifications: userNotifications,
+  mutateNotifications: async () => undefined
 });
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
-  const { tasks, mutate: mutateTasks, isLoading } = useTasks();
   const { user } = useUser();
-  const currentUserId = user?.id;
+  const {
+    data: notifications = userNotifications,
+    error: serverError,
+    mutate: mutateNotifications,
+    isLoading
+  } = useSWRImmutable(
+    user ? `/notifications/list/${user.id}` : null,
+    () => charmClient.notifications.getNotifications(),
+    {
+      // 10 minutes
+      refreshInterval: 1000 * 10 * 60
+    }
+  );
+
+  const error = serverError?.message || serverError;
+
   const { query, isReady } = useRouter();
   const [notificationDisplayType, setNotificationDisplayType] = useState<NotificationDisplayType | null>(null);
 
@@ -72,45 +93,45 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   }, [isReady, query.notifications]);
 
   const unmarkedNotificationPreviews: NotificationDetails[] = useMemo(() => {
-    if (!tasks) return [];
+    if (!notifications) return [];
     return [
-      ...getVoteNotificationPreviewItems(tasks.votes.unmarked),
-      ...getProposalsNotificationPreviewItems(tasks.proposals.unmarked),
-      ...getBountiesNotificationPreviewItems(tasks.bounties.unmarked),
-      ...getDiscussionsNotificationPreviewItems(tasks.discussions.unmarked),
-      ...getForumNotificationPreviewItems(tasks.forum.unmarked)
+      ...getVoteNotificationPreviewItems(notifications.votes.unmarked),
+      ...getProposalsNotificationPreviewItems(notifications.proposals.unmarked),
+      ...getBountiesNotificationPreviewItems(notifications.bounties.unmarked),
+      ...getDiscussionsNotificationPreviewItems(notifications.discussions.unmarked),
+      ...getForumNotificationPreviewItems(notifications.forum.unmarked)
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-  }, [tasks]);
+  }, [notifications]);
 
   const markedNotificationPreviews: NotificationDetails[] = useMemo(() => {
-    if (!tasks) return [];
+    if (!notifications) return [];
     return [
-      ...getVoteNotificationPreviewItems(tasks.votes.marked),
-      ...getProposalsNotificationPreviewItems(tasks.proposals.marked),
-      ...getBountiesNotificationPreviewItems(tasks.bounties.marked),
-      ...getDiscussionsNotificationPreviewItems(tasks.discussions.marked),
-      ...getForumNotificationPreviewItems(tasks.forum.marked)
+      ...getVoteNotificationPreviewItems(notifications.votes.marked),
+      ...getProposalsNotificationPreviewItems(notifications.proposals.marked),
+      ...getBountiesNotificationPreviewItems(notifications.bounties.marked),
+      ...getDiscussionsNotificationPreviewItems(notifications.discussions.marked),
+      ...getForumNotificationPreviewItems(notifications.forum.marked)
     ].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-  }, [tasks]);
+  }, [notifications]);
 
   const markAsRead: MarkNotificationAsRead = useCallback(
     async ({ id, type, groupType }: { id: string; groupType: NotificationGroupType; type: NotificationType }) => {
       await charmClient.notifications.markNotifications([{ id }]);
 
-      mutateTasks(
-        (_tasks) => {
-          if (!_tasks) {
+      mutateNotifications(
+        (_notifications) => {
+          if (!_notifications) {
             return;
           }
 
-          const taskIndex = _tasks?.[groupType].unmarked.findIndex((t) => t.id === id);
+          const taskIndex = _notifications?.[groupType].unmarked.findIndex((t) => t.id === id);
           if (typeof taskIndex === 'number' && taskIndex > -1) {
-            const marked = [_tasks?.[groupType].unmarked[taskIndex], ..._tasks[groupType].marked];
-            const unmarkedItems = _tasks[groupType].unmarked;
+            const marked = [_notifications?.[groupType].unmarked[taskIndex], ..._notifications[groupType].marked];
+            const unmarkedItems = _notifications[groupType].unmarked;
             const unmarked = [...unmarkedItems.slice(0, taskIndex), ...unmarkedItems.slice(taskIndex + 1)];
 
             return {
-              ..._tasks,
+              ..._notifications,
               [groupType]: {
                 marked,
                 unmarked
@@ -118,7 +139,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
             };
           }
 
-          return _tasks;
+          return _notifications;
         },
         {
           revalidate: false
@@ -144,7 +165,9 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       markAsRead,
       notificationDisplayType,
       openNotificationsModal,
-      closeNotificationsModal
+      closeNotificationsModal,
+      mutateNotifications,
+      notifications
     }),
     [
       isLoading,

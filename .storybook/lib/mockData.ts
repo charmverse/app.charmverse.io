@@ -115,11 +115,3 @@ export const proposalCategories: ProposalCategoryWithPermissions[] = generateDef
 }));
 
 export const proposalTemplates: ProposalWithUsers[] = [];
-
-export const userNotifications: GetNotificationsResponse = {
-  discussions: { marked: [], unmarked: [] },
-  proposals: { marked: [], unmarked: [] },
-  votes: { marked: [], unmarked: [] },
-  bounties: { marked: [], unmarked: [] },
-  forum: { marked: [], unmarked: [] }
-};

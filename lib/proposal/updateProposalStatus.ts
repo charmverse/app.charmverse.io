@@ -23,7 +23,6 @@ export async function updateProposalStatus({
   proposalId: string;
 }): Promise<{
   proposal: ProposalWithUsersAndRubric;
-  workspaceEvent: WorkspaceEvent;
 }> {
   if (!newStatus || !ProposalStatus[newStatus]) {
     throw new InvalidInputError('Please provide a valid status');
@@ -103,18 +102,6 @@ export async function updateProposalStatus({
         userId
       });
     }
-    const createdWorkspaceEvent = await tx.workspaceEvent.create({
-      data: {
-        type: 'proposal_status_change',
-        actorId: userId,
-        pageId: proposalId,
-        spaceId: proposalInfo?.spaceId as string,
-        meta: {
-          newStatus,
-          oldStatus: proposalInfo?.status as string
-        }
-      }
-    });
     const updatedProposal = await tx.proposal.update({
       where: {
         id: proposalId
@@ -133,7 +120,6 @@ export async function updateProposalStatus({
     });
 
     return {
-      workspaceEvent: createdWorkspaceEvent,
       proposal: updatedProposal as ProposalWithUsersAndRubric
     };
   });

@@ -227,13 +227,13 @@ export default function PendingNotifications(props: PendingNotifications) {
     ) : null;
 
   return (
-    <EmailWrapper title='Your open tasks'>
+    <EmailWrapper title='Your open notifications'>
       <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
         <MjmlColumn>
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h3>{tasksRequiresYourAttention({ count: props.totalNotifications })}.</h3>
+            <h3>{notificationsRequiresYourAttention({ count: props.totalNotifications })}.</h3>
           </MjmlText>
           {proposalSection}
           {voteSection}
@@ -401,7 +401,7 @@ function ForumTask({
   );
 }
 
-export function tasksRequiresYourAttention({ count, includeName }: { count: number; includeName?: boolean }) {
+export function notificationsRequiresYourAttention({ count, includeName }: { count: number; includeName?: boolean }) {
   return `${count} ${includeName ? 'CharmVerse ' : ''}task${count > 1 ? 's' : ''} need${
     count > 1 ? '' : 's'
   } your attention`;

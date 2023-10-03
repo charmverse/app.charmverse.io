@@ -3,7 +3,7 @@ import { Box, Card, Divider, Typography } from '@mui/material';
 import { Fragment, useMemo } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useNotifications } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
+import { useNotifications } from 'hooks/useNotifications';
 
 import { NotificationPreview } from './NotificationPreview';
 

@@ -3,7 +3,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 
-export default function useTasks() {
+export default function useNotificationsState() {
   const {
     data,
     error: serverError,

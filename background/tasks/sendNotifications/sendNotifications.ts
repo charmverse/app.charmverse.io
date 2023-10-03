@@ -4,7 +4,7 @@ import { RateLimit } from 'async-sema';
 
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
-import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTasksTemplate';
+import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingNotificationsTemplate';
 import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
 import { getForumNotifications } from 'lib/notifications/getForumNotification';

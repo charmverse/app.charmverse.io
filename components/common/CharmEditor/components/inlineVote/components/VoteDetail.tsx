@@ -15,10 +15,10 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { MultiChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/MultiChoiceForm';
 import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
 import Modal from 'components/common/Modal';
-import { useTasks } from 'components/nexus/hooks/useTasks';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';
+import { useNotifications } from 'hooks/useNotifications';
 import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -64,7 +64,7 @@ export function VoteDetail({
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () =>
     charmClient.votes.getUserVotes(id)
   );
-  const { mutate: refetchTasks } = useTasks();
+  const { mutateNotifications } = useNotifications();
   const { getMemberById } = useMembers();
   const showPageContent = content && !checkIsContentEmpty(content as PageContent);
 
@@ -96,7 +96,7 @@ export function VoteDetail({
     }
     const choiceArray = typeof v === 'string' ? [v] : v;
     const userVote = await castVote(id, choiceArray);
-    refetchTasks();
+    mutateNotifications();
     mutate(
       (_userVotes) => {
         if (_userVotes) {

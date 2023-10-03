@@ -10,7 +10,6 @@ import {
   useGetProposalFlowFlags,
   useGetProposalDetails
 } from 'charmClient/hooks/proposals';
-import { useTasks } from 'components/nexus/hooks/useTasks';
 import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
@@ -18,6 +17,7 @@ import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useNotifications } from 'hooks/useNotifications';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
@@ -47,7 +47,7 @@ export function ProposalProperties({
   proposalPage
 }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
-  const { mutate: mutateTasks } = useTasks();
+  const { mutateNotifications } = useNotifications();
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { createLensPost } = useLensPublication({
@@ -109,7 +109,7 @@ export function ProposalProperties({
         refreshPagePermissions(),
         refreshProposalPermissions()
       ]);
-      mutateTasks();
+      mutateNotifications();
       mutateProposals();
     }
   }

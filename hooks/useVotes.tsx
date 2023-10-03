@@ -4,11 +4,10 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import type { GetNotificationsResponse } from 'pages/api/notifications/list';
 
+import { useNotifications } from './useNotifications';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -29,14 +28,6 @@ type IContext = {
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
 };
 
-const EMPTY_TASKS: GetNotificationsResponse = {
-  bounties: { marked: [], unmarked: [] },
-  votes: { marked: [], unmarked: [] },
-  discussions: { marked: [], unmarked: [] },
-  proposals: { marked: [], unmarked: [] },
-  forum: { marked: [], unmarked: [] }
-};
-
 const VotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
   isLoading: true,
@@ -55,7 +46,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(true);
-  const { mutate: mutateTasks, tasks: userTasks } = useTasks();
+  const { notifications, mutateNotifications } = useNotifications();
 
   const { subscribe } = useWebSocketClient();
 
@@ -74,7 +65,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
         return { ...prev, ...votesToAssign };
       });
-      mutateTasks();
+      mutateNotifications();
     });
 
     const unsubscribeFromDeletedVotes = subscribe('votes_deleted', (deletedVotes) => {
@@ -87,7 +78,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      mutateTasks();
+      mutateNotifications();
     });
 
     const unsubscribeFromUpdatedVotes = subscribe('votes_updated', (updatedVotes) => {
@@ -102,7 +93,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      mutateTasks();
+      mutateNotifications();
     });
 
     return () => {
@@ -121,14 +112,14 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   );
 
   function removeVoteFromTask(voteId: string) {
-    mutateTasks(
-      (tasks) => {
-        return tasks
+    mutateNotifications(
+      (_notifications) => {
+        return _notifications
           ? {
-              ...tasks,
+              ..._notifications,
               votes: {
-                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.id !== voteId),
-                marked: tasks.votes.marked.filter((_vote) => _vote.id !== voteId)
+                unmarked: _notifications.votes.unmarked.filter((_vote) => _vote.id !== voteId),
+                marked: _notifications.votes.marked.filter((_vote) => _vote.id !== voteId)
               }
             }
           : undefined;

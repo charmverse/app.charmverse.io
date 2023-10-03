@@ -1,11 +1,7 @@
 import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
-import type {
-  NotificationDetails,
-  NotificationDisplayType
-} from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
-import { useTasks } from 'components/nexus/hooks/useTasks';
+import { useNotifications, type NotificationDetails, type NotificationDisplayType } from 'hooks/useNotifications';
 
 export function useNotificationModal({
   marked,
@@ -16,7 +12,7 @@ export function useNotificationModal({
   unmarked: NotificationDetails[];
   notificationDisplayType: NotificationDisplayType | null;
 }) {
-  const { mutate: mutateTasks } = useTasks();
+  const { mutateNotifications } = useNotifications();
   function filterNotifications(notifications: NotificationDetails[]) {
     if (notificationDisplayType === 'all') {
       return notifications;
@@ -39,42 +35,51 @@ export function useNotificationModal({
 
   const markBulkAsRead = useCallback(async () => {
     const groupType = notificationDisplayType === 'all' ? undefined : unmarkedNotifications[0]?.groupType;
-    const tasksToMark = unmarkedNotifications.map((n) => ({ id: n.id, type: n.type }));
-    await charmClient.notifications.markNotifications(tasksToMark);
+    const notificationsToMark = unmarkedNotifications.map((n) => ({ id: n.id, type: n.type }));
+    await charmClient.notifications.markNotifications(notificationsToMark);
 
-    mutateTasks(
-      (_tasks) => {
-        if (!_tasks) {
+    mutateNotifications(
+      (_notifications) => {
+        if (!_notifications) {
           return;
         }
 
         if (notificationDisplayType === 'all') {
           return {
-            votes: { marked: [..._tasks.votes.unmarked, ..._tasks.votes.marked], unmarked: [] },
-            discussions: { marked: [..._tasks.discussions.unmarked, ..._tasks.discussions.marked], unmarked: [] },
-            proposals: { marked: [..._tasks.proposals.unmarked, ..._tasks.proposals.marked], unmarked: [] },
-            bounties: { marked: [..._tasks.bounties.unmarked, ..._tasks.bounties.marked], unmarked: [] },
-            forum: { marked: [..._tasks.forum.unmarked, ..._tasks.forum.marked], unmarked: [] }
+            votes: { marked: [..._notifications.votes.unmarked, ..._notifications.votes.marked], unmarked: [] },
+            discussions: {
+              marked: [..._notifications.discussions.unmarked, ..._notifications.discussions.marked],
+              unmarked: []
+            },
+            proposals: {
+              marked: [..._notifications.proposals.unmarked, ..._notifications.proposals.marked],
+              unmarked: []
+            },
+            bounties: {
+              marked: [..._notifications.bounties.unmarked, ..._notifications.bounties.marked],
+              unmarked: []
+            },
+            forum: { marked: [..._notifications.forum.unmarked, ..._notifications.forum.marked], unmarked: [] }
           };
         }
 
         if (groupType) {
           return {
-            ..._tasks,
+            ..._notifications,
             [groupType]: {
-              marked: [..._tasks[groupType].unmarked, ..._tasks[groupType].marked],
+              marked: [..._notifications[groupType].unmarked, ..._notifications[groupType].marked],
               unmarked: []
             }
           };
         }
 
-        return _tasks;
+        return _notifications;
       },
       {
         revalidate: false
       }
     );
-  }, [mutateTasks, notificationDisplayType, unmarkedNotifications]);
+  }, [mutateNotifications, notificationDisplayType, unmarkedNotifications]);
 
   return {
     hasUnreadNotifications,
