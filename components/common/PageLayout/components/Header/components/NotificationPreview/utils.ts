@@ -175,6 +175,7 @@ export function getDiscussionsNotificationPreviewItems(notifications: Discussion
     };
   });
 }
+
 function getBountyContent(n: BountyNotification) {
   const { createdBy, type, pageTitle: title } = n;
 
@@ -295,7 +296,7 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalNoti
   }));
 }
 
-export function getVoteNotificationPreviewItems(notifications: VoteNotification[]) {
+export function getVoteNotificationPreviewItems(notifications: VoteNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
