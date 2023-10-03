@@ -101,6 +101,7 @@ export function SharedPageLayout({ children, basePageId, basePageType }: Props) 
                 variant='text'
                 color='inherit'
                 href='/'
+                external // avoid space domain being added
               >
                 Try CharmVerse
               </Button>
