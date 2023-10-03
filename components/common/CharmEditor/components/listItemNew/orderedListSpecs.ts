@@ -1,4 +1,5 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
+import type Token from 'markdown-it/lib/token';
 import type { Node, NodeSpec } from 'prosemirror-model';
 
 import { ATTRIBUTE_INDENT, MIN_INDENT_LEVEL } from './bulletListSpecs';
@@ -33,9 +34,7 @@ const OrderedListNodeSpec: NodeSpec = {
   attrs: {
     counterReset: { default: null },
     indent: { default: MIN_INDENT_LEVEL },
-    following: { default: null },
     listStyleType: { default: null },
-    name: { default: null },
     start: { default: 1 }
   },
   group: 'block',
@@ -72,7 +71,7 @@ const OrderedListNodeSpec: NodeSpec = {
     }
   ],
   toDOM(node: Node) {
-    const { start, indent, listStyleType, counterReset, following, name, type } = node.attrs as Attrs;
+    const { start, indent, listStyleType, counterReset, following, type } = node.attrs as Attrs;
     const attrs: HtmlAttrs = {
       [ATTRIBUTE_INDENT]: indent
     };
@@ -93,9 +92,6 @@ const OrderedListNodeSpec: NodeSpec = {
       attrs.start = start;
     }
 
-    if (name) {
-      attrs.name = name;
-    }
     let htmlListStyleType = listStyleType;
 
     if (!htmlListStyleType || htmlListStyleType === 'decimal') {
@@ -116,6 +112,28 @@ export function spec(): BaseRawNodeSpec {
   return {
     name: ORDERED_LIST,
     type: 'node',
-    schema: OrderedListNodeSpec
+    schema: OrderedListNodeSpec,
+    markdown: {
+      toMarkdown(state, node) {
+        const start = node.attrs.start || 1;
+        const maxW = String(start + node.childCount - 1).length;
+        const space = state.repeat(' ', maxW + 2);
+        state.renderList(node, space, (i) => {
+          const nStr = String(start + i);
+          return `${state.repeat(' ', maxW - nStr.length) + nStr}. `;
+        });
+      },
+      parseMarkdown: {
+        ordered_list: {
+          block: ORDERED_LIST,
+          // copied from bangle.dev
+          getAttrs: (tok: Token, tokens: Token[], i: number) => {
+            return {
+              order: +(tok.attrGet('start') ?? 1)
+            };
+          }
+        }
+      }
+    }
   };
 }

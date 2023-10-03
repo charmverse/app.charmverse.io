@@ -1,4 +1,5 @@
 import type { BaseRawNodeSpec } from '@bangle.dev/core';
+import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { DOMOutputSpec, Node, NodeSpec } from 'prosemirror-model';
 
@@ -57,6 +58,32 @@ export function spec(): BaseRawNodeSpec {
   return {
     name: LIST_ITEM,
     type: 'node',
-    schema: ListItemNodeSpec
+    schema: ListItemNodeSpec,
+    markdown: {
+      toMarkdown(state: MarkdownSerializerState, node: Node) {
+        if (node.attrs.todoChecked != null) {
+          state.write(node.attrs.todoChecked ? '[x] ' : '[ ] ');
+        }
+        state.renderContent(node);
+      },
+      parseMarkdown: {
+        list_item: {
+          block: LIST_ITEM,
+          // copied from bangle.dev
+          getAttrs: (tok: Token) => {
+            let todoChecked = null;
+            const todoIsDone = tok.attrGet('isDone');
+            if (todoIsDone === 'yes') {
+              todoChecked = true;
+            } else if (todoIsDone === 'no') {
+              todoChecked = false;
+            }
+            return {
+              todoChecked
+            };
+          }
+        }
+      }
+    }
   };
 }
