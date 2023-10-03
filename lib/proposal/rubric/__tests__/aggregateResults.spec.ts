@@ -23,16 +23,16 @@ describe('aggregateResults', () => {
         },
         {
           rubricCriteriaId: secondRubricId,
-          response: { score: 10 },
+          response: { score: 12 },
           comment: firstUserComment,
           userId: firstUserId
+        },
+        {
+          rubricCriteriaId: firstRubricId,
+          response: { score: 4 },
+          comment: secondUserComment,
+          userId: secondUserId
         }
-        // {
-        //   rubricCriteriaId: firstRubricId,
-        //   response: { score: 4 },
-        //   comment: secondUserComment,
-        //   userId: secondUserId
-        // }
       ],
       criteria: [
         {
@@ -46,8 +46,9 @@ describe('aggregateResults', () => {
 
     expect(result).toMatchObject<AggregateResults>({
       allScores: {
-        average: 9,
-        sum: 18
+        // Average of all individual scores (not average of averages)
+        average: 8,
+        sum: 24
       },
       reviewersResults: {
         [firstUserId]: {
@@ -58,35 +59,35 @@ describe('aggregateResults', () => {
             },
             [secondRubricId]: {
               comment: firstUserComment,
-              score: 10
+              score: 12
             }
           },
-          average: 9,
+          average: 10,
           id: firstUserId,
-          sum: 18
+          sum: 20
+        },
+        [secondUserId]: {
+          answersMap: {
+            [firstRubricId]: {
+              comment: secondUserComment,
+              score: 4
+            }
+          },
+          average: 4,
+          id: secondUserId,
+          sum: 4
         }
-        // [secondUserId]: {
-        //   answersMap: {
-        //     [firstRubricId]: {
-        //       comment: secondUserComment,
-        //       score: 4
-        //     }
-        //   },
-        //   average: 4,
-        //   id: secondUserId,
-        //   sum: 4
-        // }
       },
       criteriaSummary: {
         [firstRubricId]: {
-          average: 8,
-          comments: [firstUserComment],
-          sum: 8
+          average: 6,
+          comments: [firstUserComment, secondUserComment],
+          sum: 12
         },
         [secondRubricId]: {
-          average: 10,
+          average: 12,
           comments: [firstUserComment],
-          sum: 10
+          sum: 12
         }
       }
     });
