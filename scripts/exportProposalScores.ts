@@ -4,7 +4,6 @@ import { aggregateResults } from "lib/proposal/rubric/aggregateResults";
 import { ProposalRubricCriteriaAnswerWithTypedResponse } from "lib/proposal/rubric/interfaces";
 import { writeToSameFolder } from "lib/utilities/file";
 import { isNumber } from "lib/utilities/numbers";
-import { q } from "msw/lib/glossary-de6278a9";
 
 type ExportedProposal = {
   proposalUrl: string,
@@ -94,9 +93,9 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
         return details
       } 
 
-      let baseString = `Criteria: ${criteria.title} - Average: ${typeof rubricResults.average === 'number' ? rubricResults.average.toFixed(1) : '-'} || Total: ${rubricResults.sum ?? '-'}${newLine}`
+      let baseString = `Criteria: ${criteria.title} - Average: ${typeof rubricResults.average === 'number' ? rubricResults.average.toFixed(1) : '-'} || Total: ${rubricResults.sum ?? '-'}${newLine}${newLine}`
 
-      const mappedComments = rubricResults.comments.filter(comment => !!(comment?.trim())).map(comment => `*${comment}`);
+      const mappedComments = rubricResults.comments.filter(comment => !!(comment?.trim())).map(comment => `*${comment.trim()}${newLine}`);
 
       if (mappedComments.length) {
         baseString += mappedComments.join(newLine) + newLine
@@ -114,7 +113,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
       category: p.category?.title ?? 'Unnamed Category',
       title: p.page?.title ?? 'Proposal',
       proposalUrl: `https://app.charmverse.io/${domain}/${p.page?.path}`,
-      rubricResults: rubricDetails
+      rubricResults: (rubricDetails?.trim()) ? rubricDetails.trim() : '-'
     }
 
     headerRows.forEach(rowKey => {
@@ -132,9 +131,9 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
           row.average = `${cellEnclosure}${rowValue}${rowValue}`
         }
       } else if (rowKey === 'total') {
-        row[rowKey] = `${cellEnclosure}${ row.total?.toString() ?? '-'}${cellEnclosure}`
+        row.total = `${cellEnclosure}${ row.total?.toString() ?? '-'}${cellEnclosure}`
       } else {
-        row[rowKey] = `${cellEnclosure}${(rowValue as string).replace(new RegExp(cellEnclosure, 'g'), "").replace(new RegExp(separator, 'g'), '')}${cellEnclosure}`
+        row[rowKey] = `${cellEnclosure}${(rowValue as string).replace(new RegExp(cellEnclosure, 'g'), "").replace(new RegExp(separator, 'g'), '').replace(/;/g, ' ')}${cellEnclosure}`
       }
     })
 
@@ -144,7 +143,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
   allContent.push(...contentRows);
 
   // Debug JSON
-  await writeToSameFolder({data: JSON.stringify(allContent, null, 2), fileName: 'rawdata.json'})
+  // await writeToSameFolder({data: JSON.stringify(allContent, null, 2), fileName: 'rawdata.json'})
 
   const textContent = allContent.reduce((acc, row) => {
     return acc + row.join(separator) + newLine
@@ -153,7 +152,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
   return textContent;
 }
 
-exportEvaluatedProposalScores({domain: 'safe-grants-program'}).then(async csv => {
+exportEvaluatedProposalScores({domain: 'example-'}).then(async csv => {
 
   await writeToSameFolder({data: csv, fileName: 'exported.csv'})
 })
