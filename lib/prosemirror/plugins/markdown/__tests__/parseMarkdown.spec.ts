@@ -141,7 +141,8 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'bullet_list',
           attrs: {
-            tight: true
+            indent: 0,
+            listStyleType: null
           },
           content: [
             {

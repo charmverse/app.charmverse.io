@@ -4,7 +4,7 @@ import { baseUrl } from 'config/constants';
 
 import { generateMarkdown } from '../generateMarkdown';
 
-describe('generateMarkdown', () => {
+describe('generateMarkdown()', () => {
   it('should generate markdown from a header', async () => {
     const h1Data = {
       type: 'doc',
@@ -189,7 +189,6 @@ describe('generateMarkdown', () => {
               text: ':',
               type: 'text',
               marks: [
-                { type: 'emojiSuggest', attrs: { trigger: ':' } },
                 {
                   type: 'insertion',
                   attrs: {
@@ -199,22 +198,6 @@ describe('generateMarkdown', () => {
                     username: 'Admin'
                   }
                 }
-              ]
-            },
-            {
-              text: ' ',
-              type: 'text',
-              marks: [
-                {
-                  type: 'insertion',
-                  attrs: {
-                    date: '2023-07-08T01:23:00.000Z',
-                    user: '8e54b253-eeca-420d-9727-4598521d8121',
-                    approved: true,
-                    username: 'Admin'
-                  }
-                },
-                { type: 'text-color', attrs: { color: null, bgColor: null } }
               ]
             }
           ]
