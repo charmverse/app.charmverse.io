@@ -24,6 +24,6 @@ function getCallerDirectory() {
 /**
  * Utility for when we need to write to the same folder as caller when executing scripts
  */
-export async function writeToSameFolder({ data, fileName }: { data: any; fileName: string }) {
+export async function writeToSameFolder({ data, fileName }: { data: string; fileName: string }) {
   await fs.writeFile(`${getCallerDirectory()}/${fileName}`, data);
 }
