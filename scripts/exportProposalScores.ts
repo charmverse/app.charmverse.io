@@ -1,6 +1,6 @@
 import { prisma } from "@charmverse/core/prisma-client";
 import { objectUtils } from "@charmverse/core/utilities";
-import { aggregateResults } from "lib/proposal/rubric/aggregateResults";
+import { AggregateResults, aggregateResults } from "lib/proposal/rubric/aggregateResults";
 import { ProposalRubricCriteriaAnswerWithTypedResponse } from "lib/proposal/rubric/interfaces";
 import { writeToSameFolder } from "lib/utilities/file";
 import { isNumber } from "lib/utilities/numbers";
@@ -79,14 +79,41 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
 
   const allContent = [headerRows.map(rowKey => exportedFormat[rowKey])]
 
-  const contentRows = proposals.map(p => {
-
+  const aggregatedResultsByProposal = proposals.reduce((acc, proposal) => {
     const results = aggregateResults({
-      answers: p.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-      criteria: p.rubricCriteria
+      answers: proposal.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+      criteria: proposal.rubricCriteria
     });
+    acc[proposal.id] = results;
+    return acc;
+  }, {} as Record<string, AggregateResults>);
 
+  const sortedProposals = proposals.sort((a, b) => {
+    const avgA = aggregatedResultsByProposal[a.id]?.allScores?.sum;
+    const avgB = aggregatedResultsByProposal[b.id]?.allScores?.sum;
+  
+    // If both are numbers, sort in descending order
+    if (avgA !== null && avgB !== null) {
+      return avgB - avgA;
+    }
+    // If avgA is null and avgB is a number, b comes first
+    else if (avgA === null && avgB !== null) {
+      return 1;
+    }
+    // If avgB is null and avgA is a number, a comes first
+    else if (avgA !== null && avgB === null) {
+      return -1;
+    }
+    // If both are null, maintain their order
+    else {
+      return 0;
+    }
+  });
+
+  const contentRows = sortedProposals.map(p => {
+    const results = aggregatedResultsByProposal[p.id]
     const rubricDetails = p.rubricCriteria.reduce((details, criteria) => {
+   
       const rubricResults = results.criteriaSummary[criteria.id];
 
       if (!criteria.title || rubricResults.sum === null) {
@@ -128,7 +155,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
             row.average = `${cellEnclosure}${ (rowValue as number).toFixed(1)}${cellEnclosure}`
           } 
         } else {
-          row.average = `${cellEnclosure}${rowValue}${rowValue}`
+          row.average = `${cellEnclosure}${rowValue}${cellEnclosure}`
         }
       } else if (rowKey === 'total') {
         row.total = `${cellEnclosure}${ row.total?.toString() ?? '-'}${cellEnclosure}`
@@ -139,6 +166,8 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
 
     return headerRows.map(rowKey => row[rowKey] as string);
   })
+
+  
 
   allContent.push(...contentRows);
 
@@ -152,7 +181,7 @@ async function exportEvaluatedProposalScores({domain}: {domain: string}) {
   return textContent;
 }
 
-exportEvaluatedProposalScores({domain: 'example-'}).then(async csv => {
+exportEvaluatedProposalScores({domain: 'example'}).then(async csv => {
 
   await writeToSameFolder({data: csv, fileName: 'exported.csv'})
 })
