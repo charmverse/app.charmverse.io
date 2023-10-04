@@ -20,7 +20,7 @@ export function updateBlock({
   }
 
   if (data.type === 'board' || data.type === 'view') {
-    return tx.proposalBlock.upsert({
+    return tx.rewardBlock.upsert({
       where: {
         id_spaceId: {
           id: data.id,
@@ -49,7 +49,7 @@ export function updateBlock({
     });
   }
 
-  return tx.proposalBlock.update({
+  return tx.rewardBlock.update({
     where: {
       id_spaceId: {
         id: data.id,

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { updateBlock } from 'lib/proposal/blocks/updateBlock';
 import type { RewardBlockUpdateInput, RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
+import { updateBlock } from 'lib/rewards/blocks/updateBlock';
 
 export async function updateBlocks({
   blocksData,
