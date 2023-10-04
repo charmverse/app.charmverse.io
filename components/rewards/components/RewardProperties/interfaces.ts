@@ -4,6 +4,6 @@ export type RewardType = (typeof RewardTypes)[number];
 
 export type RewardTokenDetails = {
   chainId: number;
-  contractAddress: string;
+  rewardToken: string;
   rewardAmount: number;
 };

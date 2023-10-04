@@ -17,8 +17,7 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
-import { ChainSelect } from 'components/rewards/components/RewardProperties/components/ChainSelect';
-import { RewardTokenSelect } from 'components/rewards/components/RewardProperties/components/RewardTokenSelect';
+import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -147,11 +146,11 @@ export function RewardProperties(props: {
     if (rewardToken) {
       await applyRewardUpdates({
         chainId: rewardToken.chainId,
-        rewardToken: rewardToken.contractAddress,
+        rewardToken: rewardToken.rewardToken,
         rewardAmount: Number(rewardToken.rewardAmount),
         customReward: null
       });
-      refreshCryptoList(rewardToken.chainId, rewardToken.contractAddress);
+      refreshCryptoList(rewardToken.chainId, rewardToken.rewardToken);
     }
   }
 
@@ -369,68 +368,10 @@ export function RewardProperties(props: {
         </Box>
 
         {rewardType === 'Token' && (
-          <>
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Chain</PropertyLabel>
-              <ChainSelect
-                readOnly={readOnly}
-                value={currentReward?.chainId}
-                onChange={(chainId) => {
-                  const newNativeCurrency = refreshCryptoList(chainId);
-                  applyRewardUpdates({
-                    chainId,
-                    rewardToken: newNativeCurrency,
-                    rewardAmount: 1,
-                    customReward: null
-                  });
-                }}
-              />
-            </Box>
-
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Token</PropertyLabel>
-              <RewardTokenSelect
-                disabled={readOnly || !isTruthy(currentReward?.chainId)}
-                readOnly={readOnly}
-                cryptoList={availableCryptos}
-                chainId={currentReward?.chainId ?? undefined}
-                defaultValue={currentReward?.rewardToken ?? undefined}
-                value={currentReward?.rewardToken ?? undefined}
-                hideBackdrop={true}
-                onChange={(newToken) => {
-                  applyRewardUpdates({
-                    rewardToken: newToken
-                  });
-                }}
-                onNewPaymentMethod={onNewPaymentMethod}
-                sx={{
-                  width: '100%'
-                }}
-              />
-            </Box>
-
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Amount</PropertyLabel>
-              <StyledFocalboardTextInput
-                data-test='reward-property-amount'
-                value={isAmountInputEmpty ? '' : currentReward?.rewardAmount ?? ''}
-                type='number'
-                size='small'
-                onChange={updateRewardAmount}
-                inputProps={{
-                  step: 0.01,
-                  style: { height: 'auto' },
-                  className: `Editable octo-propertyvalue ${isRewardAmountInvalid ? 'error' : ''}`
-                }}
-                sx={{
-                  width: '100%'
-                }}
-                required
-                disabled={readOnly}
-                placeholder='Number greater than 0'
-              />
-            </Box>
-          </>
+          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+            <PropertyLabel readOnly>Reward Token</PropertyLabel>
+            <RewardTokenProperty onChange={onRewardTokenUpdate} currentReward={currentReward} readOnly={readOnly} />
+          </Box>
         )}
 
         {rewardType === 'Custom' && (
