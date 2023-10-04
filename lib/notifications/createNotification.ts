@@ -42,7 +42,7 @@ export async function createPostNotification({
   type
 }: CreatePostNotificationInput) {
   const notificationId = v4();
-  await prisma.postNotification.create({
+  return prisma.postNotification.create({
     data: {
       type,
       id: notificationId,
@@ -103,7 +103,7 @@ export async function createProposalNotification({
   mentionId
 }: CreateProposalNotificationInput) {
   const notificationId = v4();
-  await prisma.proposalNotification.create({
+  return prisma.proposalNotification.create({
     data: {
       type,
       id: notificationId,
@@ -152,7 +152,7 @@ export async function createDocumentNotification({
   type
 }: CreateDocumentNotificationInput) {
   const notificationId = v4();
-  await prisma.documentNotification.create({
+  return prisma.documentNotification.create({
     data: {
       id: notificationId,
       type,
@@ -207,7 +207,7 @@ export async function createCardNotification({
   cardId
 }: CreateCardNotificationInput) {
   const notificationId = v4();
-  await prisma.cardNotification.create({
+  return prisma.cardNotification.create({
     data: {
       id: notificationId,
       type,
@@ -246,7 +246,7 @@ export async function createVoteNotification({
   userId: string;
 }) {
   const notificationId = v4();
-  await prisma.voteNotification.create({
+  return prisma.voteNotification.create({
     data: {
       type,
       id: notificationId,
@@ -302,7 +302,7 @@ export async function createBountyNotification({
   mentionId
 }: CreateBountyNotificationInput) {
   const notificationId = v4();
-  await prisma.bountyNotification.create({
+  return prisma.bountyNotification.create({
     data: {
       type,
       id: notificationId,

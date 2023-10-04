@@ -29,7 +29,7 @@ export async function sendUserNotifications(): Promise<number> {
 }
 
 export async function getNotifications(): Promise<PendingNotifications[]> {
-  const usersWithSafes = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       deletedAt: null,
       AND: [{ email: { not: null } }, { email: { not: '' } }, { emailNotifications: true }]
@@ -45,7 +45,7 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
   });
 
   // filter out users that have snoozed notifications
-  const activeUsersWithSafes = usersWithSafes.filter((user) => {
+  const notifiedUsers = users.filter((user) => {
     const snoozedUntil = user.notificationState?.snoozedUntil;
     return !snoozedUntil || snoozedUntil > new Date();
   });
@@ -53,7 +53,7 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
   const notifications: PendingNotifications[] = [];
 
   // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
-  for (const user of activeUsersWithSafes) {
+  for (const user of notifiedUsers) {
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
     await notificationTaskLimiter();
 
@@ -77,18 +77,20 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
       notSent: totalNotifications
     });
 
-    notifications.push({
-      user: user as PendingNotifications['user'],
-      totalNotifications,
-      discussionNotifications: discussionNotifications.unmarked,
-      voteNotifications: voteNotifications.unmarked,
-      proposalNotifications: proposalNotifications.unmarked,
-      bountyNotifications: bountyNotifications.unmarked,
-      forumNotifications: forumNotifications.unmarked
-    });
+    if (totalNotifications) {
+      notifications.push({
+        user: user as PendingNotifications['user'],
+        totalNotifications,
+        discussionNotifications: discussionNotifications.unmarked,
+        voteNotifications: voteNotifications.unmarked,
+        proposalNotifications: proposalNotifications.unmarked,
+        bountyNotifications: bountyNotifications.unmarked,
+        forumNotifications: forumNotifications.unmarked
+      });
+    }
   }
 
-  return notifications.filter((notification) => notification.totalNotifications > 0);
+  return notifications;
 }
 
 async function sendNotification(notification: PendingNotifications) {

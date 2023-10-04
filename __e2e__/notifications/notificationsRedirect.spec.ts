@@ -1,8 +1,9 @@
+import { testUtilsProposals } from '@charmverse/core/test';
 import { expect, test as base } from '@playwright/test';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
-import { generateProposal } from 'testing/setupDatabase';
+import { createProposalNotification } from 'lib/notifications/createNotification';
 
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
@@ -13,11 +14,17 @@ test('Space notifications -  opens modal when coming from a notification email a
 }) => {
   const { user: spaceUser, space } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
 
-  const prop = await generateProposal({
-    proposalStatus: 'discussion',
+  const generatedProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
-    authors: [spaceUser.id],
-    reviewers: [],
+    userId: spaceUser.id
+  });
+
+  const proposalNotification = await createProposalNotification({
+    createdBy: spaceUser.id,
+    proposalId: generatedProposal.id,
+    spaceId: space.id,
+    type: 'mention.created',
+    mentionId: v4(),
     userId: spaceUser.id
   });
 
@@ -29,8 +36,8 @@ test('Space notifications -  opens modal when coming from a notification email a
   await expect(page.locator(`[data-test-notification-tab=proposal]`)).toBeVisible({ timeout: 30000 });
 
   // click on notification
-  // await page.locator(`[data-test=goto-${prop.workspaceEvent.id}]`).click();
-  await page.waitForURL(`**/${space.domain}/${prop.path}`);
+  await page.locator(`[data-test=goto-${proposalNotification.id}]`).click();
+  await page.waitForURL(`**/${space.domain}/${generatedProposal.page.path}`);
 
   await expect(page.locator(`[data-test-notification-tab=proposal]`)).not.toBeVisible({ timeout: 30000 });
 });
