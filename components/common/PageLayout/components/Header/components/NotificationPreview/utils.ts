@@ -14,6 +14,8 @@ import type {
   VoteNotification
 } from 'lib/notifications/interfaces';
 
+import type { NotificationDetails } from './useNotifications';
+
 function getUrlSearchParamsFromNotificationType(
   notification:
     | DiscussionNotification
@@ -108,7 +110,7 @@ function getForumContent(n: ForumNotification) {
   }
 }
 
-export function getForumNotificationPreviewItems(notifications: ForumNotification[]) {
+export function getForumNotificationPreviewItems(notifications: ForumNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -116,7 +118,8 @@ export function getForumNotificationPreviewItems(notifications: ForumNotificatio
     spaceName: n.spaceName,
     groupType: 'forum' as NotificationGroupType,
     type: NotificationType.forum,
-    href: `/${n.spaceDomain}/forum/post/${n.postPath}${getUrlSearchParamsFromNotificationType(n)}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: `/forum/post/${n.postPath}${getUrlSearchParamsFromNotificationType(n)}`,
     content: getForumContent(n),
     title: 'Forum Post'
   }));
@@ -145,18 +148,32 @@ function getDiscussionContent(n: DiscussionNotification) {
   }
 }
 
-export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
-  return notifications.map((n) => ({
-    taskId: n.taskId,
-    createdAt: n.createdAt,
-    createdBy: n.createdBy,
-    spaceName: n.spaceName,
-    groupType: 'discussions' as NotificationGroupType,
-    type: NotificationType.mention,
-    href: `/${n.spaceDomain}/${n.pagePath}${getUrlSearchParamsFromNotificationType(n)}`,
-    content: getDiscussionContent(n),
-    title: 'Discussion'
-  }));
+export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]): NotificationDetails[] {
+  return notifications.map((n) => {
+    const type = n.type;
+    const urlSearchParams = new URLSearchParams();
+    if (type === 'inline_comment.created' || type === 'inline_comment.replied') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+    } else if (type === 'mention.created') {
+      urlSearchParams.set('mentionId', n.mentionId);
+    } else if (type === 'inline_comment.mention.created') {
+      urlSearchParams.set('commentId', n.inlineCommentId);
+      urlSearchParams.set('mentionId', n.mentionId);
+    }
+
+    return {
+      taskId: n.taskId,
+      createdAt: n.createdAt,
+      createdBy: n.createdBy,
+      spaceName: n.spaceName,
+      groupType: 'discussions' as NotificationGroupType,
+      type: NotificationType.mention,
+      spaceDomain: n.spaceDomain,
+      pagePath: n.pagePath + getUrlSearchParamsFromNotificationType(n),
+      content: getDiscussionContent(n),
+      title: 'Discussion'
+    };
+  });
 }
 
 function getBountyContent(n: BountyNotification) {
@@ -199,7 +216,7 @@ function getBountyContent(n: BountyNotification) {
   }
 }
 
-export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]) {
+export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -207,7 +224,8 @@ export function getBountiesNotificationPreviewItems(notifications: BountyNotific
     spaceName: n.spaceName,
     groupType: 'bounties' as NotificationGroupType,
     type: NotificationType.bounty,
-    href: `/${n.spaceDomain}/${n.pagePath}${getUrlSearchParamsFromNotificationType(n)}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: n.pagePath + getUrlSearchParamsFromNotificationType(n),
     content: getBountyContent(n),
     title: 'Bounty'
   }));
@@ -263,7 +281,7 @@ function getProposalNotificationStatus(status: ProposalStatus) {
   }
 }
 
-export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[]) {
+export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -271,13 +289,14 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalNoti
     spaceName: n.spaceName,
     groupType: 'proposals' as NotificationGroupType,
     type: NotificationType.proposal,
-    href: `/${n.spaceDomain}/${n.pagePath}${getUrlSearchParamsFromNotificationType(n)}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: n.pagePath + getUrlSearchParamsFromNotificationType(n),
     content: getProposalContent(n),
     title: `Proposal: ${getProposalNotificationStatus(n.status)}`
   }));
 }
 
-export function getVoteNotificationPreviewItems(notifications: VoteNotification[]) {
+export function getVoteNotificationPreviewItems(notifications: VoteNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -285,7 +304,8 @@ export function getVoteNotificationPreviewItems(notifications: VoteNotification[
     spaceName: n.spaceName,
     groupType: 'votes' as NotificationGroupType,
     type: NotificationType.vote,
-    href: `/${n.spaceDomain}/${n.pageType === 'post' ? 'forum/post/' : ''}${n.pagePath}?voteId=${n.voteId}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: `${n.pageType === 'post' ? 'forum/post/' : ''}${n.pagePath}?voteId=${n.voteId}`,
     content: `Polling started for "${n.title}".`,
     title: 'New Poll'
   }));

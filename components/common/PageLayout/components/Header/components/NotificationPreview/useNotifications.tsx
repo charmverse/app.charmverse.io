@@ -4,16 +4,17 @@ import type { ReactNode } from 'react';
 import { useEffect, useState, useCallback, createContext, useContext, useMemo } from 'react';
 
 import charmClient from 'charmClient';
+import { useTasks } from 'components/nexus/hooks/useTasks';
+import { useUser } from 'hooks/useUser';
+import type { NotificationGroupType, NotificationActor } from 'lib/notifications/interfaces';
+
 import {
   getBountiesNotificationPreviewItems,
   getDiscussionsNotificationPreviewItems,
   getForumNotificationPreviewItems,
   getProposalsNotificationPreviewItems,
   getVoteNotificationPreviewItems
-} from 'components/common/PageLayout/components/Header/components/NotificationPreview/utils';
-import { useTasks } from 'components/nexus/hooks/useTasks';
-import { useUser } from 'hooks/useUser';
-import type { NotificationActor, NotificationGroupType } from 'lib/notifications/interfaces';
+} from './utils';
 
 type MarkAsReadParams = { taskId: string; groupType: NotificationGroupType; type: NotificationType };
 export type MarkNotificationAsRead = (params: MarkAsReadParams) => Promise<void>;
@@ -26,7 +27,8 @@ export type NotificationDetails = {
   type: NotificationType;
   taskId: string;
   content: string;
-  href: string;
+  pagePath: string;
+  spaceDomain: string;
   title: string;
 };
 

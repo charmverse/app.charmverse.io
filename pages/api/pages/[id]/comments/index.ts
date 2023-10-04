@@ -37,8 +37,8 @@ async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse
     userId
   });
 
-  if (permissions.read !== true) {
-    throw new ActionNotPermittedError('You do not have permission to view this page');
+  if (permissions.comment !== true) {
+    throw new ActionNotPermittedError('You do not have permission to view comments this page');
   }
 
   const pageCommentsWithVotes = await listPageComments({ pageId, userId });

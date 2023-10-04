@@ -215,7 +215,7 @@ export function PostPage({
       return sortComments({
         comments: processComments({ comments: postComments, sort: commentSort }),
         sort: commentSort
-      });
+      }) as PostCommentWithVoteAndChildren[];
     }
     return [];
   }, [postComments, post, commentSort]);

@@ -22,6 +22,7 @@ import { useFavoritePages } from 'hooks/useFavoritePages';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
@@ -227,6 +228,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
 
   const { features } = useFeaturesAndMembers();
+  const isCharmverse = useIsCharmverseSpace();
 
   return (
     <SidebarContainer>
@@ -275,7 +277,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                   )}
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
-                    .filter((feat) => !feat.isHidden)
+                    .filter((feat) => !feat.isHidden || (!isCharmverse && feat.path === 'rewards'))
                     .map((feat) => {
                       if (
                         showMemberFeatures ||

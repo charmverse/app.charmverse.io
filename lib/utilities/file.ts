@@ -23,7 +23,16 @@ function getCallerDirectory() {
 
 /**
  * Utility for when we need to write to the same folder as caller when executing scripts
+ * @append Use this param to append content instead of overwriting the old file
  */
-export async function writeToSameFolder({ data, fileName }: { data: string; fileName: string }) {
-  await fs.writeFile(`${getCallerDirectory()}/${fileName}`, data);
+export async function writeToSameFolder({
+  data,
+  fileName,
+  append
+}: {
+  data: string;
+  fileName: string;
+  append?: boolean;
+}) {
+  await (append ? fs.appendFile : fs.writeFile)(`${getCallerDirectory()}/${fileName}`, data);
 }
