@@ -28,6 +28,7 @@ jobs:
         run: |
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
+          exit 1
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -284,6 +285,7 @@ jobs:
       #     projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Deploy webapp to Beanstalk
+        id: webapp_deploy
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -331,4 +333,25 @@ jobs:
           region: us-east-1
           deployment_package: deploy_websockets.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+          wait_for_deployment: false # set to false to save sweet Github 
+
+  discord_alert:
+    name: Notify discord of failure
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && failure()
+    needs: [build-test-env, chromatic, test, integration-test, deploy]
+    steps:
+      - name: If any of prev jobs failed notify discord
+        if: contains(needs.*.result, 'failure')
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_TEST_WEBHOOK }}
+          status: 'failure'
+          content: "Hey <@&1027309276454207519>"    
+          title: "Webapp merge to main workflow failed"
+          description: |
+            Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
+          color: "16515843"
+          url: "https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}"
+          username: GitHub Actions
+          avatar_url: "https://github.githubassets.com/images/modules/logos_page/Octocat.png"  

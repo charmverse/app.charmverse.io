@@ -190,7 +190,7 @@ jobs:
     needs: [ build-test-env, package-beanstalk-payload ]
     strategy:
       max-parallel: 2
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - step_name: 'Deploying prd Worker to beanstalk'
@@ -231,5 +231,26 @@ jobs:
           region: us-east-1
           deployment_package: ${{matrix.deployment_package}}
           use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: true 
+          wait_for_deployment: true
+
+  discord_alert:
+    name: Notify discord of failure
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [build-test-env, build-docker-image, package-beanstalk-payload, deploy_to_beanstalk]
+    steps:
+      - name: If any of prev jobs failed notify discord
+        if: contains(needs.*.result, 'failure')
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
+          status: 'failure'
+          content: "Hey <@&1027309276454207519>"    
+          title: "Webapp merge to main workflow failed"
+          description: |
+            Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
+          color: "16515843"
+          url: "https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}"
+          username: GitHub Actions
+          avatar_url: "https://github.githubassets.com/images/modules/logos_page/Octocat.png"
 
