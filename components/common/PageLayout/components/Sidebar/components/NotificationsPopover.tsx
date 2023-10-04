@@ -1,14 +1,15 @@
 import styled from '@emotion/styled';
-import CelebrationIcon from '@mui/icons-material/Celebration';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import PlaylistAddCheckCircleOutlinedIcon from '@mui/icons-material/PlaylistAddCheckCircleOutlined';
 import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
-import { Divider, Typography, Badge, Stack, Tooltip, Popover, Card } from '@mui/material';
+import { Divider, Typography, Badge, Stack, Tooltip, Popover, Card, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { Fragment, useMemo } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
@@ -120,43 +121,40 @@ export function NotificationsPopover({
   mutateNotifications: KeyedMutator<Notification[]>;
   isLoading: boolean;
 }) {
-  const {
-    archivedNotifications,
-    unArchivedNotifications,
-    readNotifications,
-    unreadNotifications,
-    readUnArchivedNotifications
-  } = useMemo(() => {
-    const _unArchivedNotifications: Notification[] = [];
-    const _archivedNotifications: Notification[] = [];
-    const _readNotifications: Notification[] = [];
-    const _unreadNotifications: Notification[] = [];
-    const _readUnArchivedNotifications: Notification[] = [];
-    notifications.forEach((notification) => {
-      if (notification.archived) {
-        _archivedNotifications.push(notification);
-      } else {
-        _unArchivedNotifications.push(notification);
-      }
+  const [inboxState, setInboxState] = useState<'unread' | 'unarchived'>('unarchived');
+  const [activeTab, setActiveState] = useState<'Inbox' | 'Archived'>('Inbox');
+  const { archivedNotifications, unArchivedNotifications, unreadNotifications, readUnArchivedNotifications } =
+    useMemo(() => {
+      const _unArchivedNotifications: Notification[] = [];
+      const _archivedNotifications: Notification[] = [];
+      const _readNotifications: Notification[] = [];
+      const _unreadNotifications: Notification[] = [];
+      const _readUnArchivedNotifications: Notification[] = [];
+      notifications.forEach((notification) => {
+        if (notification.archived) {
+          _archivedNotifications.push(notification);
+        } else {
+          _unArchivedNotifications.push(notification);
+        }
 
-      if (notification.read) {
-        _readNotifications.push(notification);
-      } else {
-        _unreadNotifications.push(notification);
-      }
+        if (notification.read) {
+          _readNotifications.push(notification);
+        } else {
+          _unreadNotifications.push(notification);
+        }
 
-      if (notification.read && !notification.archived) {
-        _readUnArchivedNotifications.push(notification);
-      }
-    });
-    return {
-      unArchivedNotifications: _unArchivedNotifications,
-      archivedNotifications: _archivedNotifications,
-      readNotifications: _readNotifications,
-      unreadNotifications: _unreadNotifications,
-      readUnArchivedNotifications: _readUnArchivedNotifications
-    };
-  }, [notifications]);
+        if (notification.read && !notification.archived) {
+          _readUnArchivedNotifications.push(notification);
+        }
+      });
+      return {
+        unArchivedNotifications: _unArchivedNotifications,
+        archivedNotifications: _archivedNotifications,
+        readNotifications: _readNotifications,
+        unreadNotifications: _unreadNotifications,
+        readUnArchivedNotifications: _readUnArchivedNotifications
+      };
+    }, [notifications]);
 
   const markNotifications = async (payload: MarkNotifications) => {
     await charmClient.notifications.markNotifications(payload);
@@ -187,14 +185,56 @@ export function NotificationsPopover({
 
   const markAllReadButtonDisabled = unreadNotifications.length === 0 || isLoading;
   const archiveAllButtonDisabled = readUnArchivedNotifications.length === 0 || isLoading;
+  const targetNotifications =
+    activeTab === 'Inbox'
+      ? inboxState === 'unarchived'
+        ? unArchivedNotifications
+        : unreadNotifications
+      : archivedNotifications;
 
   return (
     <MultiTabs
+      endAdornmentComponent={
+        activeTab === 'Inbox' && (
+          <Tooltip
+            title={
+              unArchivedNotifications.length === 0
+                ? ''
+                : inboxState === 'unread'
+                ? 'Show all notifications'
+                : 'Show unread notifications only'
+            }
+          >
+            <Box
+              sx={{
+                px: 1
+              }}
+            >
+              <IconButton
+                disabled={unArchivedNotifications.length === 0}
+                color={inboxState === 'unread' ? 'primary' : 'secondary'}
+                onClick={() => {
+                  setInboxState(inboxState === 'unarchived' ? 'unread' : 'unarchived');
+                }}
+              >
+                <PlaylistAddCheckCircleOutlinedIcon fontSize='small' />
+              </IconButton>
+            </Box>
+          </Tooltip>
+        )
+      }
+      activeTab={activeTab === 'Inbox' ? 0 : 1}
+      setActiveTab={(tabIndex) => {
+        setActiveState(tabIndex === 0 ? 'Inbox' : 'Archived');
+        if (tabIndex === 1 && inboxState === 'unread') {
+          setInboxState('unarchived');
+        }
+      }}
       tabs={[
         [
           'Inbox',
           <Box key='Inbox'>
-            {unArchivedNotifications.length !== 0 && (
+            {targetNotifications.length !== 0 && (
               <Stack flexDirection='row' gap={1} px={2} pt={2} pb={1}>
                 <Tooltip title={markAllReadButtonDisabled ? 'All notifications have been read as read.' : ''}>
                   <div
@@ -242,32 +282,71 @@ export function NotificationsPopover({
                 </Tooltip>
               </Stack>
             )}
-            <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
-              <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-                {unArchivedNotifications.length > 0 ? (
-                  unArchivedNotifications.map((notification) => (
-                    <Fragment key={notification.taskId}>
-                      <NotificationContent
-                        notification={notification}
-                        markNotifications={markNotifications}
-                        onClose={close}
-                      />
-                      <Divider />
-                    </Fragment>
-                  ))
-                ) : (
-                  <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
-                    <InboxOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
-                    <Typography color='secondary' fontWeight='bold' fontSize={16}>
-                      You're all caught up
-                    </Typography>
-                    <Typography fontSize={14} color='secondary' textAlign='center'>
-                      You'll be notified here for any updates.
-                    </Typography>
-                  </Stack>
-                )}
-              </Box>
-            </LoadingComponent>
+            {inboxState === 'unarchived' ? (
+              <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
+                <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+                  {targetNotifications.length > 0 ? (
+                    targetNotifications.map((notification) => (
+                      <Fragment key={notification.taskId}>
+                        <NotificationContent
+                          notification={notification}
+                          markNotifications={markNotifications}
+                          onClose={close}
+                        />
+                        <Divider />
+                      </Fragment>
+                    ))
+                  ) : (
+                    <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
+                      <InboxOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
+                      <Typography color='secondary' fontWeight='bold' fontSize={16}>
+                        You're all caught up
+                      </Typography>
+                      <Typography fontSize={14} color='secondary' textAlign='center'>
+                        You'll be notified here for any updates.
+                      </Typography>
+                    </Stack>
+                  )}
+                </Box>
+              </LoadingComponent>
+            ) : (
+              <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
+                <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+                  {targetNotifications.length > 0 ? (
+                    targetNotifications.map((notification) => (
+                      <Fragment key={notification.taskId}>
+                        <NotificationContent
+                          notification={notification}
+                          markNotifications={markNotifications}
+                          onClose={close}
+                        />
+                        <Divider />
+                      </Fragment>
+                    ))
+                  ) : (
+                    <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
+                      <CheckOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
+                      <Typography color='secondary' fontWeight='bold' fontSize={16}>
+                        You've read everything
+                      </Typography>
+                      <Typography fontSize={14} color='secondary' textAlign='center'>
+                        You have more notifications in your inbox.
+                      </Typography>
+                      <Button
+                        variant='text'
+                        color='primary'
+                        size='small'
+                        onClick={() => {
+                          setInboxState('unarchived');
+                        }}
+                      >
+                        See all
+                      </Button>
+                    </Stack>
+                  )}
+                </Box>
+              </LoadingComponent>
+            )}
           </Box>,
           {
             sx: {
