@@ -335,10 +335,11 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github 
 
+#    if: github.ref == 'refs/heads/main' && failure()
   discord_alert:
     name: Notify discord of failure
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && failure()
+    if: failure()
     needs: [build-test-env, chromatic, test, integration-test, deploy]
     steps:
       - name: If any of prev jobs failed notify discord
