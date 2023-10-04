@@ -28,7 +28,6 @@ jobs:
         run: |
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
-          exit 1
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -79,7 +78,9 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
 
-      - run: npm run typecheck
+      - run: |
+          npm run typecheck
+          exit 1
       - run: npm run lint
       - run: npm run verifydeps
 
