@@ -15,7 +15,7 @@ const store = mockStateStore([], {
 });
 
 export default {
-  title: 'common/CharmEditor/Components/Lists',
+  title: 'common/CharmEditor/Plugins/Lists',
   component: Lists,
   decorators: [
     (Story: any) => (

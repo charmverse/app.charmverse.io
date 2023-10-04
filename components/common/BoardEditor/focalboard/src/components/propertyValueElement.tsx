@@ -21,6 +21,7 @@ import {
 } from 'components/rewards/components/RewardApplicationStatusChip';
 import { RewardStatusChip } from 'components/rewards/components/RewardChip';
 import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -97,6 +98,8 @@ function PropertyValueElement(props: Props) {
           ? board.spaceId
           : undefined
     });
+
+  const isAdmin = useIsAdmin();
 
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
@@ -343,9 +346,9 @@ function PropertyValueElement(props: Props) {
 
   // Explicitly hide the value for this proposal
   if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
-    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId]) {
+    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId] && !isAdmin) {
       return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
-    } else if (syncWithPageId && !!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId]) {
+    } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
       return propertyValueElement;
     } else {
       return null;

@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import { ProposalsPageStory } from 'components/common/stories/ProposalsPage/ProposalsPageStory';
 import type { ProposalPageAndPropertiesInput } from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
@@ -19,10 +18,12 @@ import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories, spaces, userProfile } from '../../../.storybook/lib/mockData';
+import { members, proposalCategories, spaces, userProfile } from '../lib/mockData';
+
+import { ProposalsPageStory } from './ProposalsPageStory';
 
 export default {
-  title: 'common/Proposals',
+  title: 'Proposals/Views',
   component: ProposalPageComponent
 };
 
@@ -33,7 +34,8 @@ const reduxStore = mockStateStore([], {
     boards: []
   },
   comments: {
-    comments: []
+    comments: [],
+    loadedCardComments: []
   }
 });
 

@@ -1,6 +1,6 @@
 import type { StorybookConfig } from '@storybook/nextjs';
 const config: StorybookConfig = {
-  stories: ['../components/common/stories'],
+  stories: ['../stories'],
   addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions'],
   framework: {
     name: '@storybook/nextjs',
@@ -46,7 +46,7 @@ const config: StorybookConfig = {
       // Configure .svg files to be loaded with @svgr/webpack
       config.module.rules.push({
         test: /\.svg$/,
-        use: ['@svgr/webpack'],
+        use: ['@svgr/webpack']
       });
     }
 

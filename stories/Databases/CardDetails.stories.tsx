@@ -4,12 +4,11 @@ import { rest } from 'msw';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 import { Provider } from 'react-redux';
-import type { MockStoreEnhanced } from 'redux-mock-store';
 import { v4 as uuid } from 'uuid';
 
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
+import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MembersProvider } from 'hooks/useMembers';
@@ -21,15 +20,14 @@ import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 
-import { spaces } from '../../../../.storybook/lib/mockData';
+import { spaces } from '../lib/mockData';
 
 export default {
   title: 'Databases/Composites',
-  component: Table
+  component: CardDetailProperties
 };
 
 const firstUserId = uuid();
-const secondUserId = uuid();
 
 const space = spaces[0];
 
@@ -71,7 +69,7 @@ const card1 = createMockCard(board);
 card1.fields.properties = {
   [schema.text.id]: 'First',
   [schema.checkbox.id]: 'true',
-  [schema.date.id]: '{"from":1694001600000}',
+  [schema.date.id]: '{"from":"1695067400713"}',
   [schema.email.id]: 'test1@example.com',
   [schema.multiSelect.id]: [schema.multiSelect.options[0].id, schema.multiSelect.options[1].id],
   [schema.number.id]: 7223,
@@ -80,32 +78,10 @@ card1.fields.properties = {
   [schema.select.id]: schema.select.options[0].id,
   [schema.url.id]: 'https://www.google.com'
 };
-
-const card2 = createMockCard(board);
-
-card2.fields.properties = {
-  [schema.text.id]: 'Second',
-  [schema.checkbox.id]: 'false',
-  [schema.date.id]: '{"from":1694501600000}',
-  [schema.email.id]: 'test2@example.com',
-  [schema.multiSelect.id]: [schema.multiSelect.options[1].id, schema.multiSelect.options[2].id],
-  [schema.number.id]: 8345,
-  [schema.person.id]: secondUserId,
-  [schema.phone.id]: '+1 (345) 8345 345',
-  [schema.select.id]: schema.select.options[1].id,
-  [schema.url.id]: 'https://www.example.com'
-};
-
 const page1 = createMockPage({
   id: card1.id,
   type: 'card',
   title: 'Card 1'
-});
-
-const page2 = createMockPage({
-  id: card2.id,
-  type: 'card',
-  title: 'Card 2'
 });
 
 const reduxStore = mockStateStore([], {
@@ -124,12 +100,11 @@ const reduxStore = mockStateStore([], {
   cards: {
     current: '',
     cards: {
-      [card1.id]: card1,
-      [card2.id]: card2
+      [card1.id]: card1
     },
     templates: {}
   }
-}) as MockStoreEnhanced<Pick<RootState, 'boards' | 'views' | 'cards'>>;
+});
 
 function Context({ children }: { children: ReactNode }) {
   // mock the current space since it usually relies on the URL
@@ -151,11 +126,7 @@ function Context({ children }: { children: ReactNode }) {
   );
 }
 
-function voidFunction() {
-  return Promise.resolve();
-}
-
-export function DatabaseTableView() {
+export function CardPropsView() {
   // const dispatch = useAppDispatch();
 
   // useEffect(() => {
@@ -165,44 +136,28 @@ export function DatabaseTableView() {
   return (
     <Context>
       <Paper>
-        <div className='focalboard-body'>
-          <Table
+        <CardPropertiesWrapper>
+          <CardDetailProperties
             board={board}
-            showCard={voidFunction}
             readOnly={false}
-            readOnlySourceData={false}
             views={[view]}
             activeView={view}
-            addCard={voidFunction}
-            cardIdToFocusOnRender=''
-            onCardClicked={voidFunction}
-            selectedCardIds={[]}
-            visibleGroups={[]}
-            cardPages={[
-              { card: card1, page: page1 },
-              { card: card2, page: page2 }
-            ]}
+            card={card1}
+            cards={[card1]}
+            pageUpdatedAt={new Date().toISOString()}
+            pageUpdatedBy={firstUserId}
           />
-        </div>
+        </CardPropertiesWrapper>
       </Paper>
     </Context>
   );
 }
 
-DatabaseTableView.parameters = {
+CardPropsView.parameters = {
   msw: {
     handlers: {
       pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([boardPage, page1, page2]));
-      }),
-      getBlock: rest.get('/api/blocks/:pageId', (req, res, ctx) => {
-        return res(ctx.json(reduxStore.getState().cards.cards[req.params.pageId as string]));
-      }),
-      updateBlocks: rest.put('/api/blocks', async (req, res, ctx) => {
-        return res(ctx.json(req.json()));
-      }),
-      views: rest.get('/api/blocks/:pageId/views', (req, res, ctx) => {
-        return res(ctx.json([view]));
+        return res(ctx.json([boardPage, page1]));
       })
     }
   }

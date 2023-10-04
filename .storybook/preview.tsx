@@ -83,7 +83,7 @@ import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css'
 import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
 import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
-import { handlers } from './lib/mockApi';
+import { handlers } from './mockApi';
 import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 
@@ -146,7 +146,6 @@ const { publicClient } = configureChains([mainnet], [publicProvider()]);
 export const wagmiConfig = createConfig({
   publicClient
 });
-
 
 export const globalProviders = (Story, context) => {
   return (
