@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { verifyMessage } from '@ethersproject/wallet';
+import { injectedConnector } from 'connectors/config';
 import type { Signer } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
@@ -9,7 +10,7 @@ import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { useAccount, useNetwork, useSignMessage } from 'wagmi';
+import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
@@ -77,6 +78,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
   const { user, setUser, logoutUser } = useUser();
+
+  const { connectAsync } = useConnect();
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
@@ -262,6 +265,30 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     },
     [triggerDisconnectWallet]
   );
+
+  // This is a patch for Metamask connector. If entering the site with a locked wallet, further changes are not detected
+  // This method will detect changes in the account and reconnect the wallet to our wagmi stack
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.ethereum?.on && user) {
+      const handleAccountsChanged = (accounts: string[]) => {
+        const changedAccount = accounts[0];
+        if (
+          changedAccount &&
+          !account &&
+          user.wallets.some((w) => lowerCaseEqual(w.address, changedAccount)) &&
+          window.ethereum?.isMetaMask
+        ) {
+          connectAsync({ connector: injectedConnector });
+        }
+      };
+
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+
+      return () => {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      };
+    }
+  }, [user?.wallets]);
 
   const value = useMemo<IContext>(
     () => ({
