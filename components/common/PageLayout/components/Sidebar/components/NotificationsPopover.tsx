@@ -120,11 +120,18 @@ export function NotificationsPopover({
   mutateNotifications: KeyedMutator<Notification[]>;
   isLoading: boolean;
 }) {
-  const { archivedNotifications, unArchivedNotifications, unmarkedNotifications } = useMemo(() => {
+  const {
+    archivedNotifications,
+    unArchivedNotifications,
+    readNotifications,
+    unreadNotifications,
+    readUnArchivedNotifications
+  } = useMemo(() => {
     const _unArchivedNotifications: Notification[] = [];
     const _archivedNotifications: Notification[] = [];
-    const _markedNotifications: Notification[] = [];
-    const _unmarkedNotifications: Notification[] = [];
+    const _readNotifications: Notification[] = [];
+    const _unreadNotifications: Notification[] = [];
+    const _readUnArchivedNotifications: Notification[] = [];
     notifications.forEach((notification) => {
       if (notification.archived) {
         _archivedNotifications.push(notification);
@@ -133,16 +140,21 @@ export function NotificationsPopover({
       }
 
       if (notification.read) {
-        _markedNotifications.push(notification);
+        _readNotifications.push(notification);
       } else {
-        _unmarkedNotifications.push(notification);
+        _unreadNotifications.push(notification);
+      }
+
+      if (notification.read && !notification.archived) {
+        _readUnArchivedNotifications.push(notification);
       }
     });
     return {
       unArchivedNotifications: _unArchivedNotifications,
       archivedNotifications: _archivedNotifications,
-      markedNotifications: _markedNotifications,
-      unmarkedNotifications: _unmarkedNotifications
+      readNotifications: _readNotifications,
+      unreadNotifications: _unreadNotifications,
+      readUnArchivedNotifications: _readUnArchivedNotifications
     };
   }, [notifications]);
 
@@ -173,7 +185,8 @@ export function NotificationsPopover({
     );
   };
 
-  const markAllReadButtonDisabled = unmarkedNotifications.length === 0 || isLoading;
+  const markAllReadButtonDisabled = unreadNotifications.length === 0 || isLoading;
+  const archiveAllButtonDisabled = readUnArchivedNotifications.length === 0 || isLoading;
 
   return (
     <MultiTabs
@@ -181,39 +194,54 @@ export function NotificationsPopover({
         [
           'Inbox',
           <Box key='Inbox'>
-            <Stack flexDirection='row' gap={1} px={2} pt={2} pb={1}>
-              <Tooltip title={markAllReadButtonDisabled ? 'All notifications have been marked as read.' : ''}>
-                <div
-                  style={{ width: '100%' }}
-                  onClick={() => {
-                    if (!markAllReadButtonDisabled) {
-                      markNotifications({
-                        state: 'read',
-                        ids: unmarkedNotifications.map((notification) => notification.taskId)
-                      });
-                    }
-                  }}
-                >
-                  <Button
-                    variant='outlined'
-                    color={markAllReadButtonDisabled ? 'secondary' : 'primary'}
-                    fullWidth
-                    disabled={markAllReadButtonDisabled}
+            {unArchivedNotifications.length !== 0 && (
+              <Stack flexDirection='row' gap={1} px={2} pt={2} pb={1}>
+                <Tooltip title={markAllReadButtonDisabled ? 'All notifications have been read as read.' : ''}>
+                  <div
+                    style={{ width: '100%' }}
+                    onClick={() => {
+                      if (!markAllReadButtonDisabled) {
+                        markNotifications({
+                          state: 'read',
+                          ids: unreadNotifications.map((notification) => notification.taskId)
+                        });
+                      }
+                    }}
                   >
-                    Mark all as read
-                  </Button>
-                </div>
-              </Tooltip>
-              <Button
-                variant='outlined'
-                color='primary'
-                sx={{
-                  width: '100%'
-                }}
-              >
-                Archive all
-              </Button>
-            </Stack>
+                    <Button
+                      variant='outlined'
+                      color={markAllReadButtonDisabled ? 'secondary' : 'primary'}
+                      fullWidth
+                      disabled={markAllReadButtonDisabled}
+                    >
+                      Mark all as read
+                    </Button>
+                  </div>
+                </Tooltip>
+                <Tooltip title={archiveAllButtonDisabled ? 'All read notifications have been archived.' : ''}>
+                  <div
+                    style={{ width: '100%' }}
+                    onClick={() => {
+                      if (!archiveAllButtonDisabled) {
+                        markNotifications({
+                          state: 'archived',
+                          ids: readUnArchivedNotifications.map((notification) => notification.taskId)
+                        });
+                      }
+                    }}
+                  >
+                    <Button
+                      variant='outlined'
+                      color={archiveAllButtonDisabled ? 'secondary' : 'primary'}
+                      fullWidth
+                      disabled={archiveAllButtonDisabled}
+                    >
+                      {unreadNotifications.length === 0 ? 'Archive all' : 'Archive read'}
+                    </Button>
+                  </div>
+                </Tooltip>
+              </Stack>
+            )}
             <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
               <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
                 {unArchivedNotifications.length > 0 ? (
@@ -296,15 +324,14 @@ export function NotificationsPopover({
 export function NotificationContent({
   notification,
   markNotifications,
-  onClose,
-  large
+  onClose
 }: {
   notification: Notification;
   markNotifications: (payload: MarkNotifications) => Promise<void>;
   onClose: VoidFunction;
-  large?: boolean;
 }) {
   const read = notification.read;
+  const archived = notification.archived;
   const { group, spaceName, createdBy, taskId, createdAt } = notification;
   const { href, content } = getNotificationMetadata(notification);
   const { formatDate, formatTime } = useDateFormatter();
@@ -337,7 +364,6 @@ export function NotificationContent({
         display='flex'
         alignItems='center'
         justifyContent='space-between'
-        gap={2}
         pl={2}
         pr={2}
         py={1.5}
@@ -353,10 +379,10 @@ export function NotificationContent({
               color='error'
               variant='dot'
             >
-              <Avatar size={large ? 'medium' : 'small'} name={createdBy.username} avatar={createdBy.avatar} />
+              <Avatar name={createdBy.username} avatar={createdBy.avatar} />
             </Badge>
           </Box>
-          <Box overflow='hidden' display='flex' flexDirection='column' flex={1} gap={large ? 0.5 : 0}>
+          <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
             <Stack direction='row' justifyContent='space-between' width='100%'>
               <Box display='flex' pl={0.2} minWidth={0}>
                 <Box minWidth={0}>
@@ -378,37 +404,39 @@ export function NotificationContent({
                   {!isSmallScreen && notificationDate}
                 </Typography>
               </Box>
-              <Card
-                className='icons'
-                sx={{ px: 0.5, pt: 0.5, flexDirection: 'row', gap: 0.5, display: 'flex' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                }}
-              >
-                <Tooltip title={`Mark this notification as ${read ? 'unread' : 'read'}`}>
-                  <div
-                    onClick={(e) => {
-                      markNotifications({ ids: [taskId], state: read ? 'unread' : 'read' });
-                    }}
-                  >
-                    {!read ? (
-                      <CheckBoxOutlineBlankIcon fontSize='small' color='secondary' />
-                    ) : (
-                      <CheckBoxIcon fontSize='small' color='secondary' />
-                    )}
-                  </div>
-                </Tooltip>
-                <Tooltip title='Archive this notification'>
-                  <div
-                    onClick={(e) => {
-                      markNotifications({ ids: [taskId], state: 'archived' });
-                    }}
-                  >
-                    <Inventory2OutlinedIcon fontSize='small' color='secondary' />
-                  </div>
-                </Tooltip>
-              </Card>
+              {!archived && (
+                <Card
+                  className='icons'
+                  sx={{ px: 0.5, pt: 0.5, flexDirection: 'row', gap: 0.5, display: 'flex' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
+                >
+                  <Tooltip title={`Mark this notification as ${read ? 'unread' : 'read'}`}>
+                    <div
+                      onClick={(e) => {
+                        markNotifications({ ids: [taskId], state: read ? 'unread' : 'read' });
+                      }}
+                    >
+                      {!read ? (
+                        <CheckBoxOutlineBlankIcon fontSize='small' color='secondary' />
+                      ) : (
+                        <CheckBoxIcon fontSize='small' color='secondary' />
+                      )}
+                    </div>
+                  </Tooltip>
+                  <Tooltip title='Archive this notification'>
+                    <div
+                      onClick={(e) => {
+                        markNotifications({ ids: [taskId], state: 'archived' });
+                      }}
+                    >
+                      <Inventory2OutlinedIcon fontSize='small' color='secondary' />
+                    </div>
+                  </Tooltip>
+                </Card>
+              )}
             </Stack>
 
             <Typography
@@ -424,6 +452,25 @@ export function NotificationContent({
             </Typography>
           </Box>
         </Box>
+        {archived && (
+          <Button
+            sx={{
+              width: 'fit-content',
+              alignSelf: 'flex-start',
+              marginLeft: '44px'
+            }}
+            color='secondary'
+            variant='text'
+            onClick={(e: any) => {
+              e.stopPropagation();
+              e.preventDefault();
+              markNotifications({ ids: [taskId], state: 'unarchived' });
+            }}
+            size='small'
+          >
+            Unarchive
+          </Button>
+        )}
       </StyledStack>
     </Link>
   );
