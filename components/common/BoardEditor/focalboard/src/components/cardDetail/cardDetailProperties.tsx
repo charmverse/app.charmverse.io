@@ -25,8 +25,8 @@ import Calculations from '../calculations/calculations';
 type Props = {
   board: Board;
   syncWithPageId?: string | null;
-  card: Card;
-  cards: Card[];
+  card: Card<any>;
+  cards: Card<any>[];
   activeView?: BoardView;
   views: BoardView[];
   readOnly: boolean;

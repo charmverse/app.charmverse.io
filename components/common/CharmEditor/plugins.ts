@@ -34,7 +34,6 @@ import { plugins as markdownPlugins } from './components/markdown/markdown.plugi
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
 import { nestedPagePlugins } from './components/nestedPage';
 import * as nft from './components/nft/nft.plugins';
-import * as orderedList from './components/orderedList';
 import paragraph from './components/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';

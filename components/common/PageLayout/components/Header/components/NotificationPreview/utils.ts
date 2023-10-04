@@ -1,6 +1,7 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { NotificationType } from '@charmverse/core/prisma';
 
+import type { NotificationDetails } from 'hooks/useNotifications';
 import type {
   BlockCommentNotificationType,
   BountyNotification,
@@ -108,7 +109,7 @@ function getForumContent(n: ForumNotification) {
   }
 }
 
-export function getForumNotificationPreviewItems(notifications: ForumNotification[]) {
+export function getForumNotificationPreviewItems(notifications: ForumNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     id: n.id,
     createdAt: n.createdAt,
@@ -116,7 +117,8 @@ export function getForumNotificationPreviewItems(notifications: ForumNotificatio
     spaceName: n.spaceName,
     groupType: 'forum' as NotificationGroupType,
     type: NotificationType.forum,
-    href: `/${n.spaceDomain}/forum/post/${n.postPath}${getUrlSearchParamsFromNotificationType(n)}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: `/forum/post/${n.postPath}${getUrlSearchParamsFromNotificationType(n)}`,
     content: getForumContent(n),
     title: 'Forum Post'
   }));
@@ -145,9 +147,11 @@ function getDiscussionContent(n: DiscussionNotification) {
   }
 }
 
-export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]) {
+export function getDiscussionsNotificationPreviewItems(notifications: DiscussionNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     id: n.id,
+    pagePath: n.pagePath,
+    spaceDomain: n.spaceDomain,
     createdAt: n.createdAt,
     createdBy: n.createdBy,
     spaceName: n.spaceName,
@@ -199,7 +203,7 @@ function getBountyContent(n: BountyNotification) {
   }
 }
 
-export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]) {
+export function getBountiesNotificationPreviewItems(notifications: BountyNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     id: n.id,
     createdAt: n.createdAt,
@@ -207,7 +211,8 @@ export function getBountiesNotificationPreviewItems(notifications: BountyNotific
     spaceName: n.spaceName,
     groupType: 'bounties' as NotificationGroupType,
     type: NotificationType.bounty,
-    href: `/${n.spaceDomain}/${n.pagePath}${getUrlSearchParamsFromNotificationType(n)}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: n.pagePath + getUrlSearchParamsFromNotificationType(n),
     content: getBountyContent(n),
     title: 'Bounty'
   }));
@@ -263,7 +268,7 @@ function getProposalNotificationStatus(status: ProposalStatus) {
   }
 }
 
-export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[]) {
+export function getProposalsNotificationPreviewItems(notifications: ProposalNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     id: n.id,
     createdAt: n.createdAt,
@@ -271,13 +276,14 @@ export function getProposalsNotificationPreviewItems(notifications: ProposalNoti
     spaceName: n.spaceName,
     groupType: 'proposals' as NotificationGroupType,
     type: NotificationType.proposal,
-    href: `/${n.spaceDomain}/${n.pagePath}${getUrlSearchParamsFromNotificationType(n)}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: n.pagePath + getUrlSearchParamsFromNotificationType(n),
     content: getProposalContent(n),
     title: `Proposal: ${getProposalNotificationStatus(n.status)}`
   }));
 }
 
-export function getVoteNotificationPreviewItems(notifications: VoteNotification[]) {
+export function getVoteNotificationPreviewItems(notifications: VoteNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     id: n.id,
     createdAt: n.createdAt,
@@ -285,7 +291,8 @@ export function getVoteNotificationPreviewItems(notifications: VoteNotification[
     spaceName: n.spaceName,
     groupType: 'votes' as NotificationGroupType,
     type: NotificationType.vote,
-    href: `/${n.spaceDomain}/${n.pageType === 'post' ? 'forum/post/' : ''}${n.pagePath}?voteId=${n.voteId}`,
+    spaceDomain: n.spaceDomain,
+    pagePath: `${n.pageType === 'post' ? 'forum/post/' : ''}${n.pagePath}?voteId=${n.voteId}`,
     content: `Polling started for "${n.title}".`,
     title: 'New Poll'
   }));

@@ -18,7 +18,7 @@ export default function InviteLinkPageError() {
             This invite may be expired, or you might not have permission to join.
           </Typography>
         </Box>
-        <PrimaryButton fullWidth size='large' href='/'>
+        <PrimaryButton fullWidth size='large' href='/' external /* external=true avoids space domain being added */>
           Continue to CharmVerse
         </PrimaryButton>
       </Card>

@@ -52,6 +52,7 @@ import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { PublicProfileApi } from './apis/publicProfileApi';
+import { RewardsApi } from './apis/rewardsApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
@@ -116,6 +117,8 @@ class CharmClient {
   subscription = new SubscriptionApi();
 
   gnosisSafe = new GnosisSafeApi();
+
+  rewards = new RewardsApi();
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');

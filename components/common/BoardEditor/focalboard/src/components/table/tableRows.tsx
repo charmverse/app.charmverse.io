@@ -21,7 +21,7 @@ type Props = {
   selectedCardIds: string[];
   readOnly: boolean;
   cardIdToFocusOnRender: string;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string, parentId?: string) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
@@ -53,7 +53,7 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, card }) => (
+      {cardPages.map(({ page, card, subPages }) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
@@ -77,6 +77,7 @@ function TableRows(props: Props): JSX.Element {
           columnRefs={props.columnRefs}
           cardPage={page}
           readOnlyTitle={props.readOnlyTitle}
+          subPages={subPages}
         />
       ))}
 

@@ -29,7 +29,8 @@ export type NotificationDetails = {
   type: NotificationType;
   id: string;
   content: string;
-  href: string;
+  pagePath: string;
+  spaceDomain: string;
   title: string;
 };
 

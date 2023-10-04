@@ -152,6 +152,7 @@ type CreateUserAndSpaceInput = {
   isGuest?: boolean;
   onboarded?: boolean;
   spaceName?: string;
+  spaceCustomDomain?: string;
   publicBountyBoard?: boolean;
   paidTier?: SubscriptionTier;
   superApiTokenId?: string;
@@ -165,6 +166,7 @@ export async function generateUserAndSpace({
   isGuest,
   onboarded = true,
   spaceName = 'Example Space',
+  spaceCustomDomain,
   publicBountyBoard,
   superApiTokenId,
   walletAddress,
@@ -194,6 +196,7 @@ export async function generateUserAndSpace({
               name: spaceName,
               // Adding prefix avoids this being evaluated as uuid
               domain: `domain-${v4()}`,
+              customDomain: spaceCustomDomain,
               publicBountyBoard,
               notifyNewProposals,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
