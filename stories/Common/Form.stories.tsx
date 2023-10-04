@@ -11,7 +11,7 @@ import { TimezoneAutocomplete } from 'components/settings/profile/components/Tim
 import UserDescription from 'components/settings/profile/components/UserDescription';
 import type { Social } from 'lib/members/interfaces';
 
-import type { SelectOptionType } from '../form/fields/Select/interfaces';
+import type { SelectOptionType } from '../../components/common/form/fields/Select/interfaces';
 
 export default {
   title: 'common/Form',

@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import { v4 as uuid } from 'uuid';
 
+import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
@@ -21,11 +22,11 @@ import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 
-import { spaces } from '../../../../.storybook/lib/mockData';
+import { spaces } from '../../.storybook/lib/mockData';
 
 export default {
   title: 'Databases/Composites',
-  component: Table
+  component: Kanban
 };
 
 const firstUserId = uuid();
@@ -63,8 +64,6 @@ const boardPage: PageMeta = {
   updatedBy: uuid(),
   syncWithPageId: null
 };
-
-const view = createTableView({ board });
 
 const card1 = createMockCard(board);
 
@@ -107,6 +106,13 @@ const page2 = createMockPage({
   type: 'card',
   title: 'Card 2'
 });
+const view = createTableView({ board });
+
+view.fields.groupById = schema.select.id;
+view.fields.cardOrder = [card1.id, card2.id];
+view.fields.viewType = 'board';
+view.fields.visibleOptionIds = schema.select.options.map((opt) => opt.id);
+view.fields.visiblePropertyIds = [schema.select.id];
 
 const reduxStore = mockStateStore([], {
   boards: {
@@ -155,32 +161,25 @@ function voidFunction() {
   return Promise.resolve();
 }
 
-export function DatabaseTableView() {
-  // const dispatch = useAppDispatch();
-
-  // useEffect(() => {
-  //   dispatch(initialDatabaseLoad({ pageId: board.id }));
-  // }, []);
-
+export function DatabaseKanbanView() {
   return (
     <Context>
       <Paper>
         <div className='focalboard-body'>
-          <Table
+          <Kanban
             board={board}
             showCard={voidFunction}
             readOnly={false}
-            readOnlySourceData={false}
-            views={[view]}
+            cards={[card1, card2]}
+            hiddenGroups={[]}
             activeView={view}
+            groupByProperty={schema.select}
             addCard={voidFunction}
-            cardIdToFocusOnRender=''
             onCardClicked={voidFunction}
             selectedCardIds={[]}
-            visibleGroups={[]}
-            cardPages={[
-              { card: card1, page: page1 },
-              { card: card2, page: page2 }
+            visibleGroups={[
+              { cardPages: [{ card: card1, page: page1 }], cards: [card1], option: schema.select.options[0] },
+              { cardPages: [{ card: card2, page: page2 }], cards: [card2], option: schema.select.options[1] }
             ]}
           />
         </div>
@@ -189,7 +188,7 @@ export function DatabaseTableView() {
   );
 }
 
-DatabaseTableView.parameters = {
+DatabaseKanbanView.parameters = {
   msw: {
     handlers: {
       pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {

@@ -2,7 +2,6 @@ import { Paper } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 
-import { MemberDirectoryPageStory } from 'components/common/stories/MemberDirectoryPage/MemberDirectoryPageStory';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
@@ -10,7 +9,9 @@ import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { UserProvider } from 'hooks/useUser';
 
-import { spaces } from '../../../.storybook/lib/mockData';
+import { spaces } from '../../.storybook/lib/mockData';
+
+import { MemberDirectoryPageStory } from './MemberDirectoryPageStory';
 
 const space = spaces[0];
 
@@ -47,6 +48,6 @@ export function MemberDirectoryPage() {
 MemberDirectoryPage.parameters = MemberDirectoryPageStory.parameters;
 
 export default {
-  title: 'common/Member Directory',
+  title: 'Members/Views',
   component: MemberDirectoryPage
 };
