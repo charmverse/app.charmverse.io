@@ -277,7 +277,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                   )}
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
-                    .filter((feat) => !feat.isHidden || (!isCharmverse && feat.path === 'rewards'))
+                    .filter((feat) => !feat.isHidden && (feat.path !== 'rewards' || isCharmverse))
                     .map((feat) => {
                       if (
                         showMemberFeatures ||
