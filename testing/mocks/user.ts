@@ -19,7 +19,7 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
     email: 'user@charmverse.io',
     emailNewsletter: false,
     emailNotifications: false,
-    notificationPreferences: [],
+    notificationRules: [],
     identityType: 'Wallet',
     username: deterministicRandomName(id),
     path: uuid(),

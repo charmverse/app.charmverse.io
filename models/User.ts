@@ -16,7 +16,7 @@ interface NestedMemberships {
   spaceRoleToRole: (SpaceRoleToRole & { role: RoleMembership })[];
 }
 
-export interface LoggedInUser extends Omit<User, 'notificationTypes'> {
+export interface LoggedInUser extends User {
   favorites: { pageId: string; index?: number }[];
   spaceRoles: (SpaceRole & NestedMemberships)[];
   wallets: Pick<UserWallet, 'address' | 'ensname' | 'id'>[];
@@ -27,7 +27,6 @@ export interface LoggedInUser extends Omit<User, 'notificationTypes'> {
   discordUser?: DiscordUser | null;
   telegramUser?: TelegramUser | null;
   notificationState?: UserNotificationState | null;
-  notificationTypes: { exclude: string }[]; // include is the default
   isNew?: boolean;
   profile?: {
     timezone?: string | null;

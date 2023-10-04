@@ -37,13 +37,14 @@ import { generatePostCategory } from 'testing/utils/forums';
 import { generateProposalCategory } from 'testing/utils/proposals';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
+import { generateUser } from 'testing/utils/users';
 
 import { createNotificationsFromEvent } from '../createNotificationsFromEvent';
 
 describe(`Test document events and notifications`, () => {
   it(`Should create document notifications for mention.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -91,7 +92,7 @@ describe(`Test document events and notifications`, () => {
 
   it(`Should create document notifications for inline_comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -195,7 +196,7 @@ describe(`Test document events and notifications`, () => {
 describe(`Test card events and notifications`, () => {
   it(`Should create card notifications for block_comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -348,14 +349,14 @@ describe(`Test card events and notifications`, () => {
 describe(`Test forum events and notifications`, () => {
   it(`Should create post notifications for forum.post.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
     });
 
     // Doesn't have access to post category
-    const user3 = await createUserFromWallet();
+    const user3 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user3.id
@@ -471,7 +472,7 @@ describe(`Test forum events and notifications`, () => {
 
   it(`Should create post notifications for forum.comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -623,14 +624,14 @@ describe(`Test vote events and notifications`, () => {
     // the opposite is true for user 3
 
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
     });
 
     // Doesn't have access to post category
-    const user3 = await createUserFromWallet();
+    const user3 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user3.id
@@ -794,7 +795,7 @@ describe(`Test vote events and notifications`, () => {
 describe(`Test proposal events and notifications`, () => {
   it(`Should create proposal notifications for proposal.mention.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -847,7 +848,7 @@ describe(`Test proposal events and notifications`, () => {
 
   it(`Should create proposal notifications for inline_comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -953,7 +954,7 @@ describe(`Test proposal events and notifications`, () => {
 
   it(`Should create proposal notifications for proposal.comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -1093,30 +1094,30 @@ describe(`Test proposal events and notifications`, () => {
 
   it(`Should create proposal notifications for proposal.status_changed event`, async () => {
     const { space } = await generateUserAndSpaceWithApiToken();
-    const author1 = await createUserFromWallet();
+    const author1 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: author1.id
     });
-    const author2 = await createUserFromWallet();
+    const author2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: author2.id
     });
-    const reviewer = await createUserFromWallet();
+    const reviewer = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: reviewer.id
     });
 
-    const member1 = await createUserFromWallet();
+    const member1 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: member1.id
     });
 
     // Member 2 doesn't have any access to proposal category, so notifications shouldn't be created for them
-    const member2 = await createUserFromWallet();
+    const member2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: member2.id
@@ -1451,7 +1452,7 @@ describe(`Test proposal events and notifications`, () => {
 describe(`Test bounty events and notifications`, () => {
   it(`Should create bounty notifications for mention.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -1499,7 +1500,7 @@ describe(`Test bounty events and notifications`, () => {
 
   it(`Should create bounty notifications for inline_comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -1600,7 +1601,7 @@ describe(`Test bounty events and notifications`, () => {
 
   it(`Should create bounty notifications for application.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -1645,7 +1646,7 @@ describe(`Test bounty events and notifications`, () => {
 
   it(`Should create bounty notifications for application.accepted event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -1695,7 +1696,7 @@ describe(`Test bounty events and notifications`, () => {
 
   it(`Should create bounty notifications for application.rejected event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id

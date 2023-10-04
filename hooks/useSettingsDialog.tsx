@@ -12,21 +12,20 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
 type IContext = {
-  open: boolean;
-  activePath: string;
+  isOpen: boolean;
+  activePath?: SettingsPath;
   unsavedChanges: boolean;
   onClose: () => void;
-  onClick: (path?: SettingsPath, section?: string) => void;
+  openSettings: (path?: SettingsPath, section?: string) => void;
   openUpgradeSubscription: () => void;
   handleUnsavedChanges: (dataChanged: boolean) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
-  open: false,
-  activePath: '',
+  isOpen: false,
   unsavedChanges: false,
   onClose: () => {},
-  onClick: () => undefined,
+  openSettings: () => undefined,
   openUpgradeSubscription: () => null,
   handleUnsavedChanges: () => undefined
 });
@@ -34,12 +33,12 @@ export const SettingsDialogContext = createContext<Readonly<IContext>>({
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
   const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [activePath, setActivePath] = useState('');
+  const [activePath, setActivePath] = useState<SettingsPath | undefined>();
   const router = useRouter();
   const { subscriptionEnded, spaceSubscription } = useSpaceSubscription();
 
-  const onClick = (_path?: string, _section?: string) => {
-    setActivePath(_path ?? '');
+  const openSettings = (_path?: SettingsPath, _section?: string) => {
+    setActivePath(_path);
     settingsModalState.open();
     setTimeout(() => {
       if (_section) {
@@ -51,7 +50,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
 
   const onClose = () => {
     settingsModalState.close();
-    setActivePath('');
+    setActivePath(undefined);
   };
 
   const handleUnsavedChanges = (dataChanged: boolean) => {
@@ -66,7 +65,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     };
 
     if (router.query.settingTab && SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
-      onClick(router.query.settingTab as string);
+      openSettings(router.query.settingTab as SettingsPath);
       setUrlWithoutRerender(router.pathname, { settingTab: null });
     }
     // If the user clicks a link inside the modal, close the modal only
@@ -85,15 +84,15 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   }, [subscriptionEnded]);
 
   function openUpgradeSubscription() {
-    onClick('subscription');
+    openSettings('subscription');
   }
 
   const value = useMemo<IContext>(
     () => ({
-      open: settingsModalState.isOpen,
+      isOpen: settingsModalState.isOpen,
       activePath,
       unsavedChanges,
-      onClick,
+      openSettings,
       onClose,
       openUpgradeSubscription,
       handleUnsavedChanges

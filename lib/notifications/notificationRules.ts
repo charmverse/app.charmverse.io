@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { NotificationGroup } from './constants';
-import { notificationGroups } from './constants';
 
-type NotificationRule = {
+export type NotificationRule = {
   exclude: NotificationGroup;
 };
 
@@ -12,7 +11,7 @@ function isGroupEnabled(group: NotificationGroup, rules: NotificationRule[]) {
 }
 
 export async function isGroupEnabledForUser(userId: string, group: NotificationGroup) {
-  const { notificationRules } = await prisma.user.findUnique({
+  const { notificationRules } = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId
     },
@@ -21,5 +20,5 @@ export async function isGroupEnabledForUser(userId: string, group: NotificationG
     }
   });
 
-  return isGroupEnabled(group, notificationRules);
+  return isGroupEnabled(group, notificationRules as NotificationRule[]);
 }
