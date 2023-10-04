@@ -7,7 +7,7 @@ import { ProposalStatusColors } from 'components/proposals/components/ProposalSt
 import { baseUrl } from 'config/constants';
 import type {
   BountyNotification,
-  ForumNotification,
+  PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
@@ -38,7 +38,7 @@ export interface PendingNotifications {
   voteNotifications: VoteNotification[];
   proposalNotifications: ProposalNotification[];
   bountyNotifications: BountyNotification[];
-  forumNotifications: ForumNotification[];
+  forumNotifications: PostNotification[];
   // eslint-disable-next-line
   user: TemplateUser;
 }
@@ -373,7 +373,7 @@ function DiscussionNotification({
   );
 }
 
-function ForumTask({ task: { spaceName, spaceDomain, postPath, postTitle } }: { task: ForumNotification }) {
+function ForumTask({ task: { spaceName, spaceDomain, postPath, postTitle } }: { task: PostNotification }) {
   const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>

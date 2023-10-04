@@ -1,13 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { NotificationsGroup, VoteNotification } from 'lib/notifications/interfaces';
-import { notificationMetadataIncludeStatement } from 'lib/notifications/utils';
+import { notificationMetadataSelectStatement } from 'lib/notifications/utils';
 import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 import { aggregateVoteResult } from '../votes/aggregateVoteResult';
 import { calculateVoteStatus } from '../votes/calculateVoteStatus';
 
-export async function getVoteNotifications(userId: string): Promise<NotificationsGroup<VoteNotification>> {
+export async function getVoteNotifications(userId: string): Promise<VoteNotification[]> {
   const voteNotifications = await prisma.voteNotification.findMany({
     where: {
       notificationMetadata: {
@@ -19,7 +19,9 @@ export async function getVoteNotifications(userId: string): Promise<Notification
         deadline: 'desc'
       }
     },
-    include: {
+    select: {
+      id: true,
+      type: true,
       vote: {
         include: {
           page: true,
@@ -29,7 +31,7 @@ export async function getVoteNotifications(userId: string): Promise<Notification
         }
       },
       notificationMetadata: {
-        include: notificationMetadataIncludeStatement
+        select: notificationMetadataSelectStatement
       }
     }
   });
@@ -41,12 +43,7 @@ export async function getVoteNotifications(userId: string): Promise<Notification
   const pastVotes = voteNotifications.filter((item) => item.vote.deadline <= now);
   const sortedVoteNotifications = [...futureVotes, ...pastVotes];
 
-  const voteNotificationsGroup: NotificationsGroup<VoteNotification> = {
-    marked: [],
-    unmarked: []
-  };
-
-  sortedVoteNotifications.forEach((notification) => {
+  return sortedVoteNotifications.map((notification) => {
     const voteStatus = calculateVoteStatus(notification.vote);
     const page = notification.vote.page;
     const post = notification.vote.post;
@@ -74,15 +71,12 @@ export async function getVoteNotifications(userId: string): Promise<Notification
       type: notification.type as VoteNotification['type'],
       createdAt: notification.notificationMetadata.createdAt.toISOString(),
       deadline: notification.vote.deadline,
-      voteId: notification.vote.id
+      voteId: notification.vote.id,
+      archived: !!notification.notificationMetadata.archivedAt,
+      group: 'vote',
+      read: !!notification.notificationMetadata.seenAt
     };
 
-    if (notification.notificationMetadata.seenAt) {
-      voteNotificationsGroup.marked.push(voteNotification);
-    } else {
-      voteNotificationsGroup.unmarked.push(voteNotification);
-    }
+    return voteNotification;
   });
-
-  return voteNotificationsGroup;
 }

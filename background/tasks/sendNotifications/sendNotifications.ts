@@ -7,7 +7,7 @@ import * as emails from 'lib/mailer/emails';
 import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTasksTemplate';
 import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
-import { getForumNotifications } from 'lib/notifications/getForumNotifications';
+import { getPostNotifications } from 'lib/notifications/getPostNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
 import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import { isUUID } from 'lib/utilities/strings';
@@ -61,7 +61,7 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
         getDiscussionNotifications(user.id),
         getVoteNotifications(user.id),
         getBountyNotifications(user.id),
-        getForumNotifications(user.id),
+        getPostNotifications(user.id),
         getProposalNotifications(user.id)
       ]);
 

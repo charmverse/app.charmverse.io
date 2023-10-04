@@ -1,17 +1,20 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { CardNotification, NotificationsGroup } from './interfaces';
-import { notificationMetadataIncludeStatement, sortByDate } from './utils';
+import type { CardNotification } from './interfaces';
+import { notificationMetadataSelectStatement } from './utils';
 
-export async function getCardNotifications(userId: string): Promise<NotificationsGroup<CardNotification>> {
+export async function getCardNotifications(userId: string): Promise<CardNotification[]> {
   const cardNotifications = await prisma.cardNotification.findMany({
     where: {
       notificationMetadata: {
         userId
       }
     },
-    include: {
+    select: {
+      id: true,
+      type: true,
+      personPropertyId: true,
       card: {
         include: {
           page: {
@@ -25,20 +28,14 @@ export async function getCardNotifications(userId: string): Promise<Notification
         }
       },
       notificationMetadata: {
-        include: notificationMetadataIncludeStatement
+        select: notificationMetadataSelectStatement
       }
     }
   });
 
-  const cardNotificationsGroup: NotificationsGroup<CardNotification> = {
-    marked: [],
-    unmarked: []
-  };
-
-  cardNotifications.forEach((notification) => {
+  return cardNotifications.map((notification) => {
     const notificationMetadata = notification.notificationMetadata;
     const page = notification.card.page as Page;
-    const personPropertyId = 'card' in notification ? notification.personPropertyId : null;
     const cardNotification = {
       taskId: notification.id,
       createdAt: notificationMetadata.createdAt.toISOString(),
@@ -52,18 +49,12 @@ export async function getCardNotifications(userId: string): Promise<Notification
       pageType: page.type,
       text: '',
       type: notification.type,
-      personPropertyId
+      personPropertyId: notification.personPropertyId,
+      archived: !!notificationMetadata.archivedAt,
+      read: !!notificationMetadata.seenAt,
+      group: 'card'
     } as CardNotification;
 
-    if (notification.notificationMetadata.seenAt) {
-      cardNotificationsGroup.marked.push(cardNotification);
-    } else {
-      cardNotificationsGroup.unmarked.push(cardNotification);
-    }
+    return cardNotification;
   });
-
-  return {
-    marked: cardNotificationsGroup.marked.sort(sortByDate),
-    unmarked: cardNotificationsGroup.unmarked.sort(sortByDate)
-  };
 }

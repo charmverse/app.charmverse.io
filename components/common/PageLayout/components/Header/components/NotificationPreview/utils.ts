@@ -3,12 +3,15 @@ import { NotificationType } from '@charmverse/core/prisma';
 
 import type {
   BountyNotification,
+  CardNotification,
   CommentNotificationType,
   DiscussionNotification,
+  DocumentNotification,
   InlineCommentNotificationType,
+  Notification,
   NotificationActor,
   NotificationGroupType,
-  ForumNotification,
+  PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
@@ -16,12 +19,7 @@ import type {
 import type { NotificationDetails } from './useNotifications';
 
 function getUrlSearchParamsFromNotificationType(
-  notification:
-    | DiscussionNotification
-    | ForumNotification
-    | BountyNotification
-    | ProposalNotification
-    | VoteNotification
+  notification: DiscussionNotification | PostNotification | BountyNotification | ProposalNotification | VoteNotification
 ) {
   const urlSearchParams = new URLSearchParams();
   switch (notification.type) {
@@ -78,7 +76,7 @@ function getCommentTypeNotificationContent({
   }
 }
 
-function getForumContent(n: ForumNotification) {
+function getForumContent(n: PostNotification) {
   const { createdBy, postTitle, type } = n;
   switch (type) {
     case 'created': {
@@ -96,7 +94,7 @@ function getForumContent(n: ForumNotification) {
   }
 }
 
-export function getForumNotificationPreviewItems(notifications: ForumNotification[]): NotificationDetails[] {
+export function getForumNotificationPreviewItems(notifications: PostNotification[]): NotificationDetails[] {
   return notifications.map((n) => ({
     taskId: n.taskId,
     createdAt: n.createdAt,
@@ -295,4 +293,59 @@ export function getVoteNotificationPreviewItems(notifications: VoteNotification[
     content: `Polling started for "${n.title}".`,
     title: 'New Poll'
   }));
+}
+
+export function getNotificationMetadata(notification: Notification): { href: string; content: string } {
+  switch (notification.group) {
+    case 'bounty': {
+      return {
+        content: getBountyContent(notification as BountyNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'card': {
+      return {
+        content: getDiscussionContent(notification as CardNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'document': {
+      return {
+        content: getDiscussionContent(notification as DocumentNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'post': {
+      return {
+        content: getForumContent(notification as PostNotification),
+        href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`
+      };
+    }
+
+    case 'proposal': {
+      return {
+        content: getProposalContent(notification as ProposalNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'vote': {
+      return {
+        content: `Polling started for "${notification.title}".`,
+        href: `${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
+          notification.voteId
+        }`
+      };
+    }
+
+    default: {
+      return {
+        content: '',
+        href: ''
+      };
+    }
+  }
 }

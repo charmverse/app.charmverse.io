@@ -6,7 +6,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import type {
   BountyNotification,
   DiscussionNotification,
-  ForumNotification,
+  PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
@@ -59,7 +59,7 @@ const createDiscussionTask = ({
   };
 };
 
-const createForumTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): ForumNotification => {
+const createForumTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): PostNotification => {
   return {
     spaceId: v4(),
     spaceDomain: randomName(),

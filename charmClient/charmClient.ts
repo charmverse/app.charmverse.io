@@ -105,6 +105,8 @@ class CharmClient {
 
   tasks = new TasksApi();
 
+  notifications = new NotificationsApi();
+
   track = new TrackApi();
 
   permissions = new PermissionsApi();
