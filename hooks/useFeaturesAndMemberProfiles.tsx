@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import type { FeatureJson, StaticPagesType } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { MemberProfileJson } from 'lib/profile/memberProfiles';
 import { memberProfileLabels, memberProfileNames } from 'lib/profile/memberProfiles';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
@@ -21,7 +20,6 @@ type MappedFeatures = Record<
 
 export const useFeaturesAndMembers = () => {
   const { space, isLoading } = useCurrentSpace();
-  const isCharmverse = useIsCharmverseSpace();
 
   const features = useMemo(() => {
     const dbFeatures = Object.fromEntries(((space?.features || []) as FeatureJson[]).map((_feat) => [_feat.id, _feat]));
@@ -30,8 +28,7 @@ export const useFeaturesAndMembers = () => {
       STATIC_PAGES,
       'feature',
       ((space?.features || []) as FeatureJson[]).map((feat) => feat.id)
-      // hide rewards entry for spaces
-    ).filter((feat) => !(!isCharmverse && feat.feature === 'rewards'));
+    );
 
     const extendedFeatures = sortedFeatures.map(({ feature, ...restFeat }) => ({
       ...restFeat,
