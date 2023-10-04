@@ -5,7 +5,7 @@ import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories, userProfile } from '../../../../.storybook/lib/mockData';
+import { members, proposalCategories, userProfile } from '../lib/mockData';
 
 export function ProposalsPageStory() {
   return <ProposalsPageWithProviders />;

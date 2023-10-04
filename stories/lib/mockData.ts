@@ -1,17 +1,19 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
-import { ListSpaceRolesResponse } from '../../pages/api/roles/index';
-import { generateDefaultProposalCategoriesInput } from '../../lib/proposal/generateDefaultProposalCategoriesInput';
-import { createMockUser } from '../../testing/mocks/user';
-import { createMockSpace } from '../../testing/mocks/space';
-import { createMockSpaceMember } from '../../testing/mocks/spaceMember';
-import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '../../lib/members/interfaces';
-import { brandColorNames } from 'theme/colors';
-import { LoggedInUser } from 'models/User';
-import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
-import { GetNotificationsResponse } from 'pages/api/tasks/list';
 
-const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
+import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
+import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import type { LoggedInUser } from 'models/User';
+import type { GetNotificationsResponse } from 'pages/api/tasks/list';
+import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
+import { createMockSpace } from 'testing/mocks/space';
+import { createMockSpaceMember } from 'testing/mocks/spaceMember';
+import { createMockUser } from 'testing/mocks/user';
+import { brandColorNames } from 'theme/colors';
+
+import type { ListSpaceRolesResponse } from '../../pages/api/roles/index';
+
+const userProfileSeed = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10';
 
 // write a list of uuids here
 const seeds = [
@@ -54,12 +56,15 @@ export const memberProperties: MemberPropertyWithPermissions[] = memberPropertyT
 
   return {
     ...memberProperty,
-    permissions: [],
+    permissions: []
   };
 });
 
 // user profile with space role
-export const userProfile = {...createMockUser({ id: userProfileSeed}), spaceRoles: [{ spaceId: spaces[0].id, isAdmin: true }]} as LoggedInUser;
+export const userProfile = {
+  ...createMockUser({ id: userProfileSeed }),
+  spaceRoles: [{ spaceId: spaces[0].id, isAdmin: true }]
+} as LoggedInUser;
 const userSpaceMember = createMockSpaceMember(userProfile);
 export const userMemberProfile: Member = {
   ...userSpaceMember,
@@ -69,14 +74,12 @@ export const userMemberProfile: Member = {
     name: property.name,
     spaceId: property.spaceId,
     type: property.type,
-    value: createMemberPropertyValue(userSpaceMember, property.type),
-  })) as PropertyValueWithDetails[],
+    value: createMemberPropertyValue(userSpaceMember, property.type)
+  })) as PropertyValueWithDetails[]
 };
 
-
-
-export const members: Member[] = seeds.map(seed => {
-  const member = createMockSpaceMember(createMockUser({ id: seed }))
+export const members: Member[] = seeds.map((seed) => {
+  const member = createMockSpaceMember(createMockUser({ id: seed }));
 
   const memberWithProperties = {
     ...member,
@@ -86,10 +89,10 @@ export const members: Member[] = seeds.map(seed => {
       name: property.name,
       spaceId: property.spaceId,
       type: property.type,
-      value: createMemberPropertyValue(member, property.type),
-    })) as PropertyValueWithDetails[],
-  }
-  return memberWithProperties
+      value: createMemberPropertyValue(member, property.type)
+    })) as PropertyValueWithDetails[]
+  };
+  return memberWithProperties;
 });
 
 export const spaceRoles: ListSpaceRolesResponse[] = [

@@ -2,7 +2,7 @@ import { rest } from 'msw';
 
 import MemberDirectoryPage from 'components/members/MemberDirectoryPage';
 
-import { memberProperties } from '../../../../.storybook/lib/mockData';
+import { memberProperties } from '../lib/mockData';
 
 export function MemberDirectoryPageStory() {
   return <MemberDirectoryPage title='Member Directory' />;
