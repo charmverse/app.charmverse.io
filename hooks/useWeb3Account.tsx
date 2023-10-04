@@ -288,7 +288,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
       };
     }
-  }, [user]);
+  }, [user?.wallets]);
 
   const value = useMemo<IContext>(
     () => ({
