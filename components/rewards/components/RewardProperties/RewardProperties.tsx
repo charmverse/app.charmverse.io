@@ -265,23 +265,6 @@ export function RewardProperties(props: {
         </Box>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly># of Rewards Available</PropertyLabel>
-          <StyledFocalboardTextInput
-            onChange={updateRewardMaxSubmissions}
-            required
-            defaultValue={currentReward?.maxSubmissions}
-            type='number'
-            size='small'
-            inputProps={{ step: 1, min: 1, style: { height: 'auto' }, className: 'Editable octo-propertyvalue' }}
-            sx={{
-              width: '100%'
-            }}
-            disabled={readOnly}
-            placeholder='Unlimited'
-          />
-        </Box>
-
-        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
           <PropertyLabel readOnly>Due date</PropertyLabel>
 
           <DateTimePicker
@@ -360,6 +343,23 @@ export function RewardProperties(props: {
                   pagePermissions={rewardPagePermissions}
                 />
               )} */}
+        </Box>
+
+        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+          <PropertyLabel readOnly># of Rewards Available</PropertyLabel>
+          <StyledFocalboardTextInput
+            onChange={updateRewardMaxSubmissions}
+            required
+            defaultValue={currentReward?.maxSubmissions}
+            type='number'
+            size='small'
+            inputProps={{ step: 1, min: 1, style: { height: 'auto' }, className: 'Editable octo-propertyvalue' }}
+            sx={{
+              width: '100%'
+            }}
+            disabled={readOnly}
+            placeholder='Unlimited'
+          />
         </Box>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
