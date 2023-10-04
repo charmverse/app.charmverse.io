@@ -9,7 +9,7 @@ import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { UserProvider } from 'hooks/useUser';
 
-import { spaces } from '../../.storybook/lib/mockData';
+import { spaces } from '../lib/mockData';
 
 import { MemberDirectoryPageStory } from './MemberDirectoryPageStory';
 

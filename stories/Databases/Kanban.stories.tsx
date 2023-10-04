@@ -22,7 +22,7 @@ import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 
-import { spaces } from '../../.storybook/lib/mockData';
+import { spaces } from '../lib/mockData';
 
 export default {
   title: 'Databases/Composites',

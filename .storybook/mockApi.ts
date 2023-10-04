@@ -1,6 +1,7 @@
 import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
-import type { SpacePermissionFlags } from '../../lib/permissions/spaces';
+
+import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import {
   spaces,
@@ -11,7 +12,7 @@ import {
   userProfile,
   userMemberProfile,
   userTasks
-} from './mockData';
+} from 'stories/lib/mockData';
 
 // mock requests globally via msw. see : https://storybook.js.org/addons/msw-storybook-addon
 
