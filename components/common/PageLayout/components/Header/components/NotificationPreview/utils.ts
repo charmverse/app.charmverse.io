@@ -320,21 +320,21 @@ export function getNotificationMetadata(notification: Notification): { href: str
     case 'bounty': {
       return {
         content: getBountyContent(notification as BountyNotification),
-        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`
       };
     }
 
     case 'card': {
       return {
         content: getDiscussionContent(notification as CardNotification),
-        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`
       };
     }
 
     case 'document': {
       return {
         content: getDiscussionContent(notification as DocumentNotification),
-        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`
       };
     }
 
@@ -348,14 +348,14 @@ export function getNotificationMetadata(notification: Notification): { href: str
     case 'proposal': {
       return {
         content: getProposalContent(notification as ProposalNotification),
-        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`
       };
     }
 
     case 'vote': {
       return {
         content: `Polling started for "${notification.title}".`,
-        href: `${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
+        href: `/${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
           notification.voteId
         }`
       };

@@ -71,6 +71,9 @@ interface NotificationBase {
   spaceName: string;
   createdAt: string;
   createdBy: NotificationActor;
+  group: 'document' | 'card' | 'post' | 'proposal' | 'vote' | 'bounty';
+  archived: boolean;
+  read: boolean;
 }
 
 export type DocumentNotificationType = InlineCommentNotificationType | MentionNotificationType;

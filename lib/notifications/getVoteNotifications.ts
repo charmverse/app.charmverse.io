@@ -75,7 +75,10 @@ export async function getVoteNotifications(userId: string): Promise<Notification
         type: notification.type as VoteNotification['type'],
         createdAt: notification.notificationMetadata.createdAt.toISOString(),
         deadline: notification.vote.deadline,
-        voteId: notification.vote.id
+        voteId: notification.vote.id,
+        group: 'vote',
+        archived: !!notification.notificationMetadata.archived,
+        read: !!notification.notificationMetadata.seenAt
       };
 
       if (notification.notificationMetadata.seenAt) {

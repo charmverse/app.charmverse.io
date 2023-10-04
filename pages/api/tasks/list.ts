@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
-import { getForumNotifications } from 'lib/notifications/getForumNotification';
+import { getForumNotifications } from 'lib/notifications/getForumNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
 import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import type {

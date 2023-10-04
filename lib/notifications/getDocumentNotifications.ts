@@ -50,7 +50,9 @@ export async function getDocumentNotifications(userId: string): Promise<Notifica
         pageType: page.type,
         text: '',
         type: notification.type,
-        group: 'document'
+        group: 'document',
+        archived: !!notificationMetadata.archived,
+        read: !!notificationMetadata.seenAt
       } as DocumentNotification;
 
       if (notification.notificationMetadata.seenAt) {

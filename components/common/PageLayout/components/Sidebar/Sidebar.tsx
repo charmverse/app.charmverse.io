@@ -39,7 +39,7 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { NotificationsPopover } from './components/NotificationsPopover';
+import { NotificationsPopover, NotificationUpdates } from './components/NotificationsPopover';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';
@@ -135,7 +135,6 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
-  const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
 
   const { onClick } = useSettingsDialog();
   const handleModalClick = (path?: SettingsPath) => {
@@ -277,13 +276,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                       label='Invites'
                     />
                   )}
-                  <Box>
-                    <SidebarBox
-                      onClick={notificationPopupState.open}
-                      icon={<QueryBuilderOutlinedIcon color='secondary' fontSize='small' />}
-                      label='Updates'
-                    />
-                  </Box>
+                  <NotificationUpdates />
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
                     .filter((feat) => !feat.isHidden)
@@ -329,24 +322,6 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
           }}
         />
       )}
-      <Popover
-        {...bindPopover(notificationPopupState)}
-        anchorOrigin={{
-          horizontal: 'right',
-          vertical: 'bottom'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center'
-        }}
-        PaperProps={{
-          sx: {
-            width: 500
-          }
-        }}
-      >
-        <NotificationsPopover close={notificationPopupState.close} />
-      </Popover>
       <SpaceSettingsDialog />
     </SidebarContainer>
   );

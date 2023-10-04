@@ -56,7 +56,10 @@ export async function getBountyNotifications(userId: string): Promise<Notificati
         spaceId: notificationMetadata.spaceId,
         spaceName: notificationMetadata.space.name,
         status: notification.bounty.status,
-        type: notification.type
+        type: notification.type,
+        group: 'bounty',
+        archived: !!notificationMetadata.archived,
+        read: !!notificationMetadata.seenAt
       } as BountyNotification;
 
       if (notification.notificationMetadata.seenAt) {

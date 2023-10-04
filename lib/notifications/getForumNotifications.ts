@@ -39,23 +39,28 @@ export async function getForumNotifications(userId: string): Promise<Notificatio
     };
 
     postNotifications.forEach((notification) => {
+      const notificationMetadata = notification.notificationMetadata;
+
       const forumNotification = {
         taskId: notification.id,
         commentId: notification.commentId,
         commentText: notification.comment?.contentText ?? '',
-        createdAt: notification.notificationMetadata.createdAt.toISOString(),
-        createdBy: notification.notificationMetadata.author,
+        createdAt: notificationMetadata.createdAt.toISOString(),
+        createdBy: notificationMetadata.author,
         mentionId: notification.mentionId,
         postId: notification.postId,
         postPath: notification.post.path,
         postTitle: notification.post.title,
-        spaceDomain: notification.notificationMetadata.space.domain,
-        spaceId: notification.notificationMetadata.spaceId,
-        spaceName: notification.notificationMetadata.space.name,
-        type: notification.type as ForumNotification['type']
+        spaceDomain: notificationMetadata.space.domain,
+        spaceId: notificationMetadata.spaceId,
+        spaceName: notificationMetadata.space.name,
+        type: notification.type as ForumNotification['type'],
+        group: 'post',
+        archived: notificationMetadata.archived,
+        read: !!notificationMetadata.seenAt
       } as ForumNotification;
 
-      if (notification.notificationMetadata.seenAt) {
+      if (notificationMetadata.seenAt) {
         forumNotificationsGroup.marked.push(forumNotification);
       } else {
         forumNotificationsGroup.unmarked.push(forumNotification);

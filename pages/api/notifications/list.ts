@@ -5,7 +5,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getCardNotifications } from 'lib/notifications/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/getDocumentNotifications';
-import { getForumNotifications } from 'lib/notifications/getForumNotification';
+import { getForumNotifications } from 'lib/notifications/getForumNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
 import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import type { Notification } from 'lib/notifications/interfaces';
