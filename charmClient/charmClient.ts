@@ -47,6 +47,7 @@ import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { MuxApi } from './apis/muxApi';
+import { NotificationsApi } from './apis/notificationsApi';
 import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
@@ -104,6 +105,8 @@ class CharmClient {
   summon = new SummonApi();
 
   tasks = new TasksApi();
+
+  notifications = new NotificationsApi();
 
   track = new TrackApi();
 

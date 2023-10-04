@@ -4,12 +4,16 @@ import { NotificationType } from '@charmverse/core/prisma';
 import type {
   BlockCommentNotificationType,
   BountyNotification,
+  CardNotification,
   CommentNotificationType,
   DiscussionNotification,
+  DocumentNotification,
   ForumNotification,
   InlineCommentNotificationType,
+  Notification,
   NotificationActor,
   NotificationGroupType,
+  PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
@@ -309,4 +313,59 @@ export function getVoteNotificationPreviewItems(notifications: VoteNotification[
     content: `Polling started for "${n.title}".`,
     title: 'New Poll'
   }));
+}
+
+export function getNotificationMetadata(notification: Notification): { href: string; content: string } {
+  switch (notification.group) {
+    case 'bounty': {
+      return {
+        content: getBountyContent(notification as BountyNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'card': {
+      return {
+        content: getDiscussionContent(notification as CardNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'document': {
+      return {
+        content: getDiscussionContent(notification as DocumentNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'post': {
+      return {
+        content: getForumContent(notification as PostNotification),
+        href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`
+      };
+    }
+
+    case 'proposal': {
+      return {
+        content: getProposalContent(notification as ProposalNotification),
+        href: notification.pagePath + getUrlSearchParamsFromNotificationType(notification)
+      };
+    }
+
+    case 'vote': {
+      return {
+        content: `Polling started for "${notification.title}".`,
+        href: `${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
+          notification.voteId
+        }`
+      };
+    }
+
+    default: {
+      return {
+        content: '',
+        href: ''
+      };
+    }
+  }
 }

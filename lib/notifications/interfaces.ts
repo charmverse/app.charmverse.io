@@ -73,35 +73,43 @@ interface NotificationBase {
   createdBy: NotificationActor;
 }
 
-export type DiscussionNotificationType =
-  | InlineCommentNotificationType
-  | MentionNotificationType
-  | BlockCommentNotificationType
-  | 'person_assigned';
+export type DocumentNotificationType = InlineCommentNotificationType | MentionNotificationType;
 
-interface DiscussionNotificationBase extends NotificationBase {
+export type DocumentNotification = NotificationBase & {
   pageId: string;
   pagePath: string;
   pageTitle: string;
-  type: DiscussionNotificationType;
+  type: DocumentNotificationType;
   text: string;
   mentionId: null | string;
   inlineCommentId: null | string;
+  pageType: PageType;
+  group: 'document';
+} & (InlineCommentNotification | MentionNotification);
+
+export type CardNotificationType = BlockCommentNotificationType | 'person_assigned';
+
+export type CardNotification = NotificationBase & {
+  pageId: string;
+  pagePath: string;
+  pageTitle: string;
+  type: CardNotificationType;
+  text: string;
   blockCommentId: null | string;
   pageType: PageType;
   personPropertyId: null | string;
-}
-
-export type DiscussionNotification = DiscussionNotificationBase &
-  (
-    | MentionNotification
-    | InlineCommentNotification
+  group: 'card';
+} & (
     | BlockCommentNotification
     | {
         type: 'person_assigned';
         personPropertyId: string;
       }
   );
+
+export type DiscussionNotification = CardNotification | DocumentNotification;
+
+export type DiscussionNotificationType = DiscussionNotification['type'];
 
 export type ForumNotificationType = CommentNotificationType | MentionNotificationType | 'created';
 
@@ -113,6 +121,7 @@ interface ForumNotificationBase extends NotificationBase {
   commentId: null | string;
   mentionId: null | string;
   commentText: string;
+  group: 'post';
 }
 
 export type ForumNotification = ForumNotificationBase &
@@ -123,6 +132,9 @@ export type ForumNotification = ForumNotificationBase &
         type: 'created';
       }
   );
+
+export type PostNotification = ForumNotification;
+export type PostNotificationType = ForumNotificationType;
 
 export type ProposalNotificationType =
   | CommentNotificationType
@@ -145,6 +157,7 @@ export type ProposalNotification = NotificationBase & {
   commentId: string | null;
   inlineCommentId: string | null;
   mentionId: string | null;
+  group: 'proposal';
 } & (
     | CommentNotification
     | MentionNotification
@@ -170,6 +183,7 @@ export type VoteNotification = NotificationBase & {
   userChoice: string[] | null;
   deadline: Date;
   voteId: string;
+  group: 'vote';
 };
 
 export type BountyNotificationType =
@@ -193,6 +207,7 @@ export type BountyNotification = NotificationBase & {
   type: BountyNotificationType;
   inlineCommentId: string | null;
   mentionId: string | null;
+  group: 'bounty';
 } & (
     | MentionNotification
     | InlineCommentNotification
@@ -215,3 +230,11 @@ export type CreateEventPayload = {
   cardId: string;
   cardProperty: CardPropertyEntity;
 };
+
+export type Notification =
+  | DocumentNotification
+  | CardNotification
+  | PostNotification
+  | ProposalNotification
+  | VoteNotification
+  | BountyNotification;
