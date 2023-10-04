@@ -14,6 +14,7 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -119,33 +120,34 @@ export function NotificationsPopover({
   mutateNotifications: KeyedMutator<Notification[]>;
   isLoading: boolean;
 }) {
-  const { archivedNotifications, nonArchivedNotifications } = useMemo(() => {
-    const _nonArchivedNotifications: Notification[] = [];
+  const { archivedNotifications, unArchivedNotifications, unmarkedNotifications } = useMemo(() => {
+    const _unArchivedNotifications: Notification[] = [];
     const _archivedNotifications: Notification[] = [];
+    const _markedNotifications: Notification[] = [];
+    const _unmarkedNotifications: Notification[] = [];
     notifications.forEach((notification) => {
       if (notification.archived) {
         _archivedNotifications.push(notification);
       } else {
-        _nonArchivedNotifications.push(notification);
+        _unArchivedNotifications.push(notification);
+      }
+
+      if (notification.read) {
+        _markedNotifications.push(notification);
+      } else {
+        _unmarkedNotifications.push(notification);
       }
     });
     return {
-      nonArchivedNotifications: _nonArchivedNotifications,
-      archivedNotifications: _archivedNotifications
+      unArchivedNotifications: _unArchivedNotifications,
+      archivedNotifications: _archivedNotifications,
+      markedNotifications: _markedNotifications,
+      unmarkedNotifications: _unmarkedNotifications
     };
   }, [notifications]);
 
-  const updateNotificationReadState = async ({
-    taskId,
-    state
-  }: {
-    taskId: string;
-    state: MarkNotifications['state'];
-  }) => {
-    await charmClient.notifications.markNotifications({
-      ids: [taskId],
-      state
-    });
+  const markNotifications = async (payload: MarkNotifications) => {
+    await charmClient.notifications.markNotifications(payload);
 
     mutateNotifications(
       (_notifications) => {
@@ -153,8 +155,10 @@ export function NotificationsPopover({
           return;
         }
 
+        const { state } = payload;
+
         return _notifications.map((_notification) =>
-          _notification.taskId === taskId
+          payload.ids.includes(_notification.taskId)
             ? {
                 ..._notification,
                 read: state === 'read' || state === 'archived' ? true : state === 'unread' ? false : _notification.read,
@@ -169,20 +173,55 @@ export function NotificationsPopover({
     );
   };
 
+  const markAllReadButtonDisabled = unmarkedNotifications.length === 0 || isLoading;
+
   return (
     <MultiTabs
       tabs={[
         [
           'Inbox',
           <Box key='Inbox'>
+            <Stack flexDirection='row' gap={1} px={2} pt={2} pb={1}>
+              <Tooltip title={markAllReadButtonDisabled ? 'All notifications have been marked as read.' : ''}>
+                <div
+                  style={{ width: '100%' }}
+                  onClick={() => {
+                    if (!markAllReadButtonDisabled) {
+                      markNotifications({
+                        state: 'read',
+                        ids: unmarkedNotifications.map((notification) => notification.taskId)
+                      });
+                    }
+                  }}
+                >
+                  <Button
+                    variant='outlined'
+                    color={markAllReadButtonDisabled ? 'secondary' : 'primary'}
+                    fullWidth
+                    disabled={markAllReadButtonDisabled}
+                  >
+                    Mark all as read
+                  </Button>
+                </div>
+              </Tooltip>
+              <Button
+                variant='outlined'
+                color='primary'
+                sx={{
+                  width: '100%'
+                }}
+              >
+                Archive all
+              </Button>
+            </Stack>
             <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
               <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-                {nonArchivedNotifications.length > 0 ? (
-                  nonArchivedNotifications.map((notification) => (
+                {unArchivedNotifications.length > 0 ? (
+                  unArchivedNotifications.map((notification) => (
                     <Fragment key={notification.taskId}>
                       <NotificationContent
                         notification={notification}
-                        updateNotificationReadState={updateNotificationReadState}
+                        markNotifications={markNotifications}
                         onClose={close}
                       />
                       <Divider />
@@ -223,7 +262,7 @@ export function NotificationsPopover({
                     <Fragment key={notification.taskId}>
                       <NotificationContent
                         notification={notification}
-                        updateNotificationReadState={updateNotificationReadState}
+                        markNotifications={markNotifications}
                         onClose={close}
                       />
                       <Divider />
@@ -256,18 +295,12 @@ export function NotificationsPopover({
 
 export function NotificationContent({
   notification,
-  updateNotificationReadState,
+  markNotifications,
   onClose,
   large
 }: {
   notification: Notification;
-  updateNotificationReadState: ({
-    taskId,
-    state
-  }: {
-    taskId: string;
-    state: MarkNotifications['state'];
-  }) => Promise<void>;
+  markNotifications: (payload: MarkNotifications) => Promise<void>;
   onClose: VoidFunction;
   large?: boolean;
 }) {
@@ -289,7 +322,7 @@ export function NotificationContent({
       href={href}
       onClick={() => {
         if (!read) {
-          updateNotificationReadState({ taskId, state: 'read' });
+          markNotifications({ ids: [taskId], state: 'read' });
         }
         onClose();
       }}
@@ -345,13 +378,18 @@ export function NotificationContent({
                   {!isSmallScreen && notificationDate}
                 </Typography>
               </Box>
-              <Card className='icons' sx={{ px: 0.5, pt: 0.5, flexDirection: 'row', gap: 0.5, display: 'flex' }}>
+              <Card
+                className='icons'
+                sx={{ px: 0.5, pt: 0.5, flexDirection: 'row', gap: 0.5, display: 'flex' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+              >
                 <Tooltip title={`Mark this notification as ${read ? 'unread' : 'read'}`}>
                   <div
                     onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      updateNotificationReadState({ taskId, state: read ? 'unread' : 'read' });
+                      markNotifications({ ids: [taskId], state: read ? 'unread' : 'read' });
                     }}
                   >
                     {!read ? (
@@ -364,9 +402,7 @@ export function NotificationContent({
                 <Tooltip title='Archive this notification'>
                   <div
                     onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      updateNotificationReadState({ taskId, state: 'archived' });
+                      markNotifications({ ids: [taskId], state: 'archived' });
                     }}
                   >
                     <Inventory2OutlinedIcon fontSize='small' color='secondary' />
