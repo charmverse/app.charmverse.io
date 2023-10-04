@@ -2,9 +2,14 @@ import styled from '@emotion/styled';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import { Box, Divider, Typography, Badge, Stack, Tooltip } from '@mui/material';
-import { Fragment } from 'react';
+import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
+import { Divider, Typography, Badge, Stack, Tooltip, Popover, Card } from '@mui/material';
+import Box from '@mui/material/Box';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { Fragment, useMemo } from 'react';
+import type { KeyedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
@@ -18,15 +23,40 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { Notification } from 'lib/notifications/interfaces';
 import { capitalize } from 'lib/utilities/strings';
+import type { MarkNotifications } from 'pages/api/notifications/mark';
 
 import { getNotificationMetadata } from '../../Header/components/NotificationPreview/utils';
+
+import { sidebarItemStyles } from './SidebarButton';
 
 const StyledStack = styled(Stack)`
   ${hoverIconsStyle()}
 `;
 
-export function NotificationsPopover({ close }: { close: VoidFunction }) {
+const StyledSidebarBox = styled(Box)`
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  ${sidebarItemStyles}
+`;
+
+const NotificationCountBox = styled(Box)`
+  background-color: ${({ theme }) => theme.palette.error.main};
+  color: white;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20%;
+  font-weight: semi-bold;
+  font-size: 12px;
+`;
+
+export function NotificationUpdates() {
   const { user } = useUser();
+
+  const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
   const {
     data: notifications = [],
     isLoading,
@@ -40,8 +70,82 @@ export function NotificationsPopover({ close }: { close: VoidFunction }) {
     }
   );
 
-  const markAsRead = async ({ taskId }: { taskId: string }) => {
-    await charmClient.notifications.markNotifications([taskId]);
+  const unreadNotifications = notifications.filter((notification) => !notification.read);
+
+  return (
+    <Box>
+      <StyledSidebarBox onClick={notificationPopupState.open}>
+        <Stack flexDirection='row'>
+          <QueryBuilderOutlinedIcon color='secondary' fontSize='small' />
+          Updates
+        </Stack>
+        {unreadNotifications.length !== 0 && <NotificationCountBox>{unreadNotifications.length}</NotificationCountBox>}
+      </StyledSidebarBox>
+      <Popover
+        {...bindPopover(notificationPopupState)}
+        anchorOrigin={{
+          horizontal: 'right',
+          vertical: 'top'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left'
+        }}
+        PaperProps={{
+          sx: {
+            width: 500
+          }
+        }}
+      >
+        <NotificationsPopover
+          notifications={notifications}
+          mutateNotifications={mutateNotifications}
+          isLoading={isLoading}
+          close={notificationPopupState.close}
+        />
+      </Popover>
+    </Box>
+  );
+}
+
+export function NotificationsPopover({
+  close,
+  isLoading,
+  mutateNotifications,
+  notifications
+}: {
+  close: VoidFunction;
+  notifications: Notification[];
+  mutateNotifications: KeyedMutator<Notification[]>;
+  isLoading: boolean;
+}) {
+  const { archivedNotifications, nonArchivedNotifications } = useMemo(() => {
+    const _nonArchivedNotifications: Notification[] = [];
+    const _archivedNotifications: Notification[] = [];
+    notifications.forEach((notification) => {
+      if (notification.archived) {
+        _archivedNotifications.push(notification);
+      } else {
+        _nonArchivedNotifications.push(notification);
+      }
+    });
+    return {
+      nonArchivedNotifications: _nonArchivedNotifications,
+      archivedNotifications: _archivedNotifications
+    };
+  }, [notifications]);
+
+  const updateNotificationReadState = async ({
+    taskId,
+    state
+  }: {
+    taskId: string;
+    state: MarkNotifications['state'];
+  }) => {
+    await charmClient.notifications.markNotifications({
+      ids: [taskId],
+      state
+    });
 
     mutateNotifications(
       (_notifications) => {
@@ -50,7 +154,13 @@ export function NotificationsPopover({ close }: { close: VoidFunction }) {
         }
 
         return _notifications.map((_notification) =>
-          _notification.taskId === taskId ? { ..._notification, marked: true } : _notification
+          _notification.taskId === taskId
+            ? {
+                ..._notification,
+                read: state === 'read' || state === 'archived' ? true : state === 'unread' ? false : _notification.read,
+                archived: state === 'archived' ? true : state === 'unarchived' ? false : _notification.archived
+              }
+            : _notification
         );
       },
       {
@@ -65,35 +175,29 @@ export function NotificationsPopover({ close }: { close: VoidFunction }) {
         [
           'Inbox',
           <Box key='Inbox'>
-            <LoadingComponent isLoading={isLoading} label='Fetching your notifications' size={24}>
+            <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
               <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-                {notifications.length > 0 ? (
-                  notifications.map((notification) => (
+                {nonArchivedNotifications.length > 0 ? (
+                  nonArchivedNotifications.map((notification) => (
                     <Fragment key={notification.taskId}>
                       <NotificationContent
                         notification={notification}
-                        markAsRead={markAsRead}
+                        updateNotificationReadState={updateNotificationReadState}
                         onClose={close}
-                        archived
                       />
                       <Divider />
                     </Fragment>
                   ))
                 ) : (
-                  <Box
-                    display='flex'
-                    justifyContent='center'
-                    alignItems='center'
-                    flexDirection='row'
-                    height='100%'
-                    my={2}
-                    gap={1}
-                  >
-                    <Typography variant='h6' color='secondary'>
-                      You are up to date!
+                  <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
+                    <InboxOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
+                    <Typography color='secondary' fontWeight='bold' fontSize={16}>
+                      You're all caught up
                     </Typography>
-                    <CelebrationIcon color='secondary' fontSize='medium' />
-                  </Box>
+                    <Typography fontSize={14} color='secondary' textAlign='center'>
+                      You'll be notified here for any updates.
+                    </Typography>
+                  </Stack>
                 )}
               </Box>
             </LoadingComponent>
@@ -104,28 +208,71 @@ export function NotificationsPopover({ close }: { close: VoidFunction }) {
             }
           }
         ],
-        ['Archived', <Box key='Archived'>Archived</Box>]
+        [
+          'Archived',
+          <Box key='Archived'>
+            <LoadingComponent
+              isLoading={isLoading}
+              label='Fetching your archived notifications'
+              minHeight={250}
+              size={24}
+            >
+              <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+                {archivedNotifications.length > 0 ? (
+                  archivedNotifications.map((notification) => (
+                    <Fragment key={notification.taskId}>
+                      <NotificationContent
+                        notification={notification}
+                        updateNotificationReadState={updateNotificationReadState}
+                        onClose={close}
+                      />
+                      <Divider />
+                    </Fragment>
+                  ))
+                ) : (
+                  <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
+                    <InboxOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
+                    <Typography color='secondary' fontWeight='bold' fontSize={16}>
+                      No archived updates
+                    </Typography>
+                    <Typography fontSize={14} color='secondary' textAlign='center'>
+                      Any Inbox updates you archived will show up here.
+                    </Typography>
+                  </Stack>
+                )}
+              </Box>
+            </LoadingComponent>
+          </Box>,
+          {
+            sx: {
+              p: 0
+            }
+          }
+        ]
       ]}
     />
   );
 }
 
 export function NotificationContent({
-  archived,
   notification,
-  markAsRead,
+  updateNotificationReadState,
   onClose,
-  large,
-  unmarked
+  large
 }: {
   notification: Notification;
-  markAsRead: (arg: { taskId: string }) => Promise<void>;
+  updateNotificationReadState: ({
+    taskId,
+    state
+  }: {
+    taskId: string;
+    state: MarkNotifications['state'];
+  }) => Promise<void>;
   onClose: VoidFunction;
   large?: boolean;
-  unmarked?: boolean;
-  archived?: boolean;
 }) {
-  const { group, type, spaceName, createdBy, taskId, createdAt } = notification;
+  const read = notification.read;
+  const { group, spaceName, createdBy, taskId, createdAt } = notification;
   const { href, content } = getNotificationMetadata(notification);
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
@@ -141,7 +288,9 @@ export function NotificationContent({
       color='inherit'
       href={href}
       onClick={() => {
-        markAsRead({ taskId });
+        if (!read) {
+          updateNotificationReadState({ taskId, state: 'read' });
+        }
         onClose();
       }}
     >
@@ -167,7 +316,7 @@ export function NotificationContent({
                 vertical: 'top',
                 horizontal: 'left'
               }}
-              invisible={!unmarked}
+              invisible={read}
               color='error'
               variant='dot'
             >
@@ -196,18 +345,34 @@ export function NotificationContent({
                   {!isSmallScreen && notificationDate}
                 </Typography>
               </Box>
-              <Stack className='icons' flexDirection='row' gap={0.5}>
-                <Tooltip title={`Mark this notification as ${!unmarked ? 'read' : 'unread'}`}>
-                  {!unmarked ? (
-                    <CheckBoxOutlineBlankIcon fontSize='small' color='secondary' />
-                  ) : (
-                    <CheckBoxIcon fontSize='small' color='secondary' />
-                  )}
+              <Card className='icons' sx={{ px: 0.5, pt: 0.5, flexDirection: 'row', gap: 0.5, display: 'flex' }}>
+                <Tooltip title={`Mark this notification as ${read ? 'unread' : 'read'}`}>
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      updateNotificationReadState({ taskId, state: read ? 'unread' : 'read' });
+                    }}
+                  >
+                    {!read ? (
+                      <CheckBoxOutlineBlankIcon fontSize='small' color='secondary' />
+                    ) : (
+                      <CheckBoxIcon fontSize='small' color='secondary' />
+                    )}
+                  </div>
                 </Tooltip>
                 <Tooltip title='Archive this notification'>
-                  <Inventory2OutlinedIcon fontSize='small' color='secondary' />
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      updateNotificationReadState({ taskId, state: 'archived' });
+                    }}
+                  >
+                    <Inventory2OutlinedIcon fontSize='small' color='secondary' />
+                  </div>
                 </Tooltip>
-              </Stack>
+              </Card>
             </Stack>
 
             <Typography

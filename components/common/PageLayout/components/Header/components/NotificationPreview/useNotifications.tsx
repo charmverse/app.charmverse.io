@@ -105,7 +105,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       groupType: NotificationGroupType;
       type: NotificationType;
     }) => {
-      await charmClient.tasks.markTasks([{ id: taskId, type }]);
+      await charmClient.notifications.markTasks([{ id: taskId, type }]);
 
       mutateTasks(
         (_tasks) => {

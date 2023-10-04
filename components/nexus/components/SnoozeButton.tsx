@@ -62,7 +62,7 @@ export default function SnoozeButton() {
   async function removeSnoozedForDate() {
     resetState();
     setShowLoading(true);
-    await charmClient.tasks.updateTasksState({
+    await charmClient.notifications.updateTasksState({
       snoozeFor: null,
       snoozeMessage: null
     });
@@ -102,7 +102,7 @@ export default function SnoozeButton() {
     resetState();
     setShowLoading(true);
     const newSnoozedForDate = getSnoozedDate();
-    await charmClient.tasks.updateTasksState({
+    await charmClient.notifications.updateTasksState({
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage: _snoozeMessage
     });

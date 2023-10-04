@@ -10,7 +10,7 @@ export function useTasks() {
     error: serverError,
     isLoading,
     mutate
-  } = useSWRImmutable(user ? `/tasks/list/${user.id}` : null, () => charmClient.tasks.getTasksList(), {
+  } = useSWRImmutable(user ? `/notifications/list/${user.id}` : null, () => charmClient.notifications.getTasksList(), {
     // 10 minutes
     refreshInterval: 1000 * 10 * 60
   });

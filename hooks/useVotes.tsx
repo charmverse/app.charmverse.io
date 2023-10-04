@@ -7,7 +7,7 @@ import charmClient from 'charmClient';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import type { GetNotificationsResponse } from 'pages/api/tasks/list';
+import type { GetNotificationsResponse } from 'pages/api/notifications/list';
 
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
