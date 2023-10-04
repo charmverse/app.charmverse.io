@@ -256,7 +256,7 @@ export function boardWithCardsArgs({
                 {
                   id: 'd21b567d-fd35-496e-8f7c-1ee62e95d4f2',
                   color: 'propColorRed',
-                  value: 'Not started'
+                  value: 'In progress'
                 }
               ]
             },

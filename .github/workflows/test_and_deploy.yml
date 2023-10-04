@@ -78,9 +78,7 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
 
-      - run: |
-          npm run typecheck
-          exit 1
+      - run: npm run typecheck
       - run: npm run lint
       - run: npm run verifydeps
 
