@@ -23,11 +23,10 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
+import { getNotificationMetadata } from 'lib/notifications/getNotificationsMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import { capitalize } from 'lib/utilities/strings';
 import type { MarkNotifications } from 'pages/api/notifications/mark';
-
-import { getNotificationMetadata } from '../../Header/components/NotificationPreview/utils';
 
 import { sidebarItemStyles } from './SidebarButton';
 
@@ -95,7 +94,7 @@ export function NotificationUpdates() {
         }}
         PaperProps={{
           sx: {
-            width: 500
+            width: 650
           }
         }}
       >
@@ -282,7 +281,7 @@ export function NotificationsPopover({
             )}
             {inboxState === 'unarchived' ? (
               <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
-                <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+                <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
                     targetNotifications.map((notification) => (
                       <Fragment key={notification.taskId}>
@@ -309,7 +308,7 @@ export function NotificationsPopover({
               </LoadingComponent>
             ) : (
               <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
-                <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+                <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
                     targetNotifications.map((notification) => (
                       <Fragment key={notification.taskId}>
@@ -361,7 +360,7 @@ export function NotificationsPopover({
               minHeight={250}
               size={24}
             >
-              <Box maxHeight={500} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+              <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                 {archivedNotifications.length > 0 ? (
                   archivedNotifications.map((notification) => (
                     <Fragment key={notification.taskId}>
@@ -409,8 +408,8 @@ export function NotificationContent({
 }) {
   const read = notification.read;
   const archived = notification.archived;
-  const { group, spaceName, createdBy, taskId, createdAt } = notification;
-  const { href, content } = getNotificationMetadata(notification);
+  const { spaceName, createdBy, taskId, createdAt } = notification;
+  const { href, content, pageTitle } = getNotificationMetadata(notification);
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
   const todaysDate = new Date();
@@ -456,31 +455,27 @@ export function NotificationContent({
               color='error'
               variant='dot'
             >
-              <Avatar name={createdBy.username} avatar={createdBy.avatar} />
+              <Avatar size='small' name={createdBy.username} avatar={createdBy.avatar} />
             </Badge>
           </Box>
-          <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
-            <Stack direction='row' justifyContent='space-between' width='100%'>
-              <Box display='flex' pl={0.2} minWidth={0}>
-                <Box minWidth={0}>
-                  <Typography
-                    whiteSpace='nowrap'
-                    overflow='hidden'
-                    textOverflow='ellipsis'
-                    variant='subtitle2'
-                  >{`${spaceName}`}</Typography>
-                </Box>
-                &nbsp;
-                <Box whiteSpace='nowrap'>
-                  <Typography variant='subtitle2' fontWeight='bold'>
-                    {capitalize(group)}
-                  </Typography>
-                </Box>
-                &nbsp;
+          <Box overflow='hidden' display='flex' gap={0.5} flexDirection='column' flex={1}>
+            <Stack direction='row' justifyContent='space-between'>
+              <Stack direction='row' gap={1} alignItems='center'>
+                <Typography
+                  variant='subtitle1'
+                  sx={{
+                    display: '-webkit-box',
+                    overflow: 'hidden',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2
+                  }}
+                >
+                  {content}
+                </Typography>
                 <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
                   {!isSmallScreen && notificationDate}
                 </Typography>
-              </Box>
+              </Stack>
               {!archived && (
                 <Card
                   className='icons'
@@ -515,17 +510,11 @@ export function NotificationContent({
                 </Card>
               )}
             </Stack>
-
-            <Typography
-              variant='subtitle1'
-              sx={{
-                display: '-webkit-box',
-                overflow: 'hidden',
-                WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: 2
-              }}
-            >
-              {content}
+            <Typography pl={0.2} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' fontWeight='bold'>
+              {pageTitle}
+            </Typography>
+            <Typography pl={0.2} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
+              {spaceName}
             </Typography>
           </Box>
         </Box>
