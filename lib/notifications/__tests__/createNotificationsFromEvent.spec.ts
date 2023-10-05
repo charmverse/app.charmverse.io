@@ -1440,7 +1440,7 @@ describe(`Test bounty events and notifications`, () => {
 
     const applicationPendingReviewerNotification = await prisma.bountyNotification.findFirst({
       where: {
-        type: 'application.pending',
+        type: 'application.created',
         applicationId: application.id,
         bountyId: bounty.id,
         notificationMetadata: {
@@ -1490,7 +1490,7 @@ describe(`Test bounty events and notifications`, () => {
 
     const applicationAcceptedNotification = await prisma.bountyNotification.findFirst({
       where: {
-        type: 'application.accepted',
+        type: 'application.approved',
         applicationId: application.id,
         bountyId: bounty.id,
         notificationMetadata: {
@@ -1612,7 +1612,7 @@ describe(`Test bounty events and notifications`, () => {
 
     const applicationSubmittedNotification = await prisma.bountyNotification.findFirst({
       where: {
-        type: 'application.submitted',
+        type: 'submission.created',
         applicationId: application.id,
         bountyId: bounty.id,
         notificationMetadata: {
@@ -1627,6 +1627,11 @@ describe(`Test bounty events and notifications`, () => {
 
   it(`Should create bounty notifications for application.approved event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
+    const bountyReviewer = await createUserFromWallet();
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: bountyReviewer.id
+    });
     const user2 = await createUserFromWallet();
     await addUserToSpace({
       spaceId: space.id,
@@ -1641,6 +1646,10 @@ describe(`Test bounty events and notifications`, () => {
       chainId: 1,
       permissions: {
         reviewer: [
+          {
+            group: 'user',
+            id: bountyReviewer.id
+          },
           {
             group: 'user',
             id: user.id
@@ -1689,7 +1698,7 @@ describe(`Test bounty events and notifications`, () => {
 
     const applicationApprovedNotification = await prisma.bountyNotification.findFirst({
       where: {
-        type: 'application.approved',
+        type: 'submission.approved',
         applicationId: application.id,
         bountyId: bounty.id,
         notificationMetadata: {
@@ -1706,7 +1715,7 @@ describe(`Test bounty events and notifications`, () => {
         bountyId: bounty.id,
         notificationMetadata: {
           spaceId: space.id,
-          userId: user.id
+          userId: bountyReviewer.id
         }
       }
     });

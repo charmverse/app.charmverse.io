@@ -260,7 +260,7 @@ export async function publishDocumentEvent(context: DocumentEventContext) {
       });
     }
     case WebhookEventNames.DocumentCommentCreated: {
-      const comment = await getCommentEntity(context.commentId);
+      const comment = await getCommentEntity(context.commentId, true);
       if (context.documentId) {
         const document = await getDocumentEntity(context.documentId);
         return publishWebhookEvent(context.spaceId, {

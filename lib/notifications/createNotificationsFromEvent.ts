@@ -546,7 +546,7 @@ export async function createNotificationsFromEvent(webhookData: {
             bountyId,
             createdBy: application.createdBy,
             spaceId,
-            type: 'application.pending',
+            type: 'application.created',
             userId: bountyReviewerId,
             applicationId
           });
@@ -576,7 +576,7 @@ export async function createNotificationsFromEvent(webhookData: {
           bountyId,
           createdBy: application.acceptedBy,
           spaceId,
-          type: 'application.accepted',
+          type: 'application.approved',
           userId: application.createdBy,
           applicationId
         });
@@ -633,7 +633,7 @@ export async function createNotificationsFromEvent(webhookData: {
             bountyId,
             createdBy: application.createdBy,
             spaceId,
-            type: 'application.submitted',
+            type: 'submission.created',
             userId: bountyReviewerId,
             applicationId
           });
@@ -662,7 +662,7 @@ export async function createNotificationsFromEvent(webhookData: {
         bountyId,
         createdBy: userId,
         spaceId,
-        type: 'application.approved',
+        type: 'submission.approved',
         userId: application.createdBy,
         applicationId
       });

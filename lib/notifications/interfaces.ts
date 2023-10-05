@@ -129,11 +129,11 @@ export type VoteNotification = NotificationBase & {
 };
 
 export type BountyNotificationType =
-  | 'application.pending'
-  | 'application.accepted'
-  | 'application.rejected'
-  | 'application.submitted'
+  | 'application.created'
   | 'application.approved'
+  | 'application.rejected'
+  | 'submission.created'
+  | 'submission.approved'
   | 'application.payment_pending'
   | 'application.payment_completed'
   | 'suggestion.created';

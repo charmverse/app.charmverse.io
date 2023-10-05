@@ -152,7 +152,7 @@ const createBountyTask = ({
   const id = v4();
   return {
     taskId: id,
-    type: 'application.accepted',
+    type: 'application.approved',
     pagePath: randomName(),
     pageTitle,
     status,

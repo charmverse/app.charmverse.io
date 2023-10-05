@@ -166,19 +166,19 @@ function getBountyContent(n: BountyNotification) {
   const { createdBy, type, pageTitle: title } = n;
 
   switch (type) {
-    case 'application.pending': {
+    case 'application.created': {
       return `${createdBy?.username} applied for ${title} bounty.`;
     }
-    case 'application.submitted': {
+    case 'submission.created': {
       return `${createdBy?.username} applied for bounty ${title}.`;
     }
-    case 'application.accepted': {
+    case 'application.approved': {
       return `Your application for ${title} bounty was accepted.`;
     }
     case 'application.rejected': {
       return `Your application for ${title} bounty has been rejected.`;
     }
-    case 'application.approved': {
+    case 'submission.approved': {
       return `Your application for ${title} bounty was approved.`;
     }
     case 'application.payment_pending': {
