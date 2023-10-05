@@ -80,7 +80,11 @@ const notificationRuleEvents = {
         'Application accepted (Applicants only)',
         'Application rejected (Applicants only)'
       ],
-      ['Work submitted (Reviewers only)', 'Submission approved (Applicants only)', 'Payment completed (Applicants only']
+      [
+        'Work submitted (Reviewers only)',
+        'Submission approved (Applicants only)',
+        'Payment completed (Applicants only)'
+      ]
     ]
   },
   proposals: {
