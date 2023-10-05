@@ -16,7 +16,7 @@ import { ApplicationDialogProvider, useApplicationDialog } from './hooks/useAppl
 
 export function RewardsPageWithProviders() {
   const { mappedFeatures } = useFeaturesAndMembers();
-  const rewardsTitle = mappedFeatures.rewards.title;
+  const rewardsTitle = mappedFeatures.rewards?.title || 'Rewards';
   setTitle(rewardsTitle);
 
   return (
@@ -30,9 +30,8 @@ export function RewardsPageWithProviders() {
             </ApplicationDialogProvider>
           </RewardsBoardProvider>
         </RewardBlocksProvider>
+        <PageDialogGlobal />
       </RewardsProvider>
-
-      <PageDialogGlobal />
     </PageDialogProvider>
   );
 }

@@ -23,6 +23,7 @@ import type {
 // import type { RubricAnswerUpsert } from 'lib/rewards/rubric/upsertRubricAnswers';
 // import type { RubricCriteriaUpsert } from 'lib/rewards/rubric/upsertRubricCriteria';
 // import type { UpdateRewardLensPropertiesRequest } from 'lib/rewards/updateRewardLensProperties';
+import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
 import { useGET, usePOST, usePUT, useDELETE } from './helpers';
@@ -84,9 +85,9 @@ export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
 
 // // Mutative requests
 
-// export function useCreateReward() {
-//   return usePOST<Omit<CreateRewardInput, 'userId'>, PageWithReward>('/api/rewards');
-// }
+export function useCreateReward() {
+  return usePOST<RewardCreationData, RewardWithUsers>('/api/rewards');
+}
 
 // export function useUpsertRubricCriteria({ rewardId }: { rewardId: string }) {
 //   return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/rewards/${rewardId}/rubric-criteria`);

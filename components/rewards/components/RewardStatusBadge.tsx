@@ -40,7 +40,8 @@ export function RewardStatusBadge({ truncate = false, hideStatus, reward, layout
               width: '100%',
               justifyContent: 'space-between',
               gap: 1,
-              alignItems: 'center'
+              alignItems: 'center',
+              minHeight: '30px'
             }}
           >
             <RewardAmount reward={reward} truncate={truncate} />

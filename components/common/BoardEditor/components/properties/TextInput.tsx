@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import type { TextField } from '@mui/material';
 import { InputBase, Tooltip } from '@mui/material';
 import React, { forwardRef, useRef } from 'react';
 
@@ -43,6 +44,9 @@ const StyledInput = styled(InputBase)`
     -moz-appearance: textfield;
   }
 `;
+
+// Text Input from MUI with focalboard styles
+export const StyledFocalboardTextInput = StyledInput as typeof TextField;
 
 function Editable(
   {

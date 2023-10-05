@@ -24,6 +24,8 @@ export interface IInputSearchCryptoProps
   cryptoList?: (string | CryptoCurrency)[];
   chainId?: number; // allow passing this down to the 'new custom token' form
   sx?: SxProps<Theme>;
+  variant?: 'standard' | 'outlined';
+  placeholder?: string;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
@@ -38,7 +40,9 @@ export function InputSearchCrypto({
   chainId,
   sx = {},
   disabled,
-  readOnly
+  readOnly,
+  variant,
+  placeholder
 }: IInputSearchCryptoProps) {
   const [inputValue, setInputValue] = useState('');
 
@@ -78,6 +82,7 @@ export function InputSearchCrypto({
     <>
       <Autocomplete
         sx={{ minWidth: 150, ...sx }}
+        forcePopupIcon={variant !== 'standard'}
         onChange={(_, _value, reason) => {
           if (_value === ADD_NEW_CUSTOM) {
             if (reason === 'selectOption') {
@@ -136,7 +141,17 @@ export function InputSearchCrypto({
             </Box>
           );
         }}
-        renderInput={(params) => <TextField {...params} />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant={variant}
+            InputProps={{
+              ...params.InputProps,
+              ...(variant === 'standard' && { disableUnderline: true }),
+              placeholder
+            }}
+          />
+        )}
         disabled={disabled}
         readOnly={readOnly}
       />

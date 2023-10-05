@@ -26,14 +26,14 @@ export async function createBlock({
   // there should be only 1 block with properties for space
   if (type === 'board') {
     // there should be only 1 block with properties for space
-    const currentPropertiesBlock = await tx.proposalBlock.findFirst({ where: { spaceId, type } });
+    const currentPropertiesBlock = await tx.rewardBlock.findFirst({ where: { spaceId, type } });
 
     if (currentPropertiesBlock) {
       return updateBlock({ data: { ...data, id: currentPropertiesBlock.id }, userId, spaceId, tx });
     }
   }
 
-  return tx.proposalBlock.create({
+  return tx.rewardBlock.create({
     data: {
       ...data,
       spaceId,
