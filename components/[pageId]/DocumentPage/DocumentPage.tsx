@@ -27,6 +27,7 @@ import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -95,6 +96,7 @@ export interface DocumentPageProps {
 function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = false }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   const { draftBounty } = useBounties();
+  const { tempReward } = useRewards();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
@@ -336,7 +338,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         proposalPage={page}
                       />
                     )}
-                    {(draftBounty || page.bountyId) && isRewardsPage && (
+                    {(tempReward || page.bountyId) && isRewardsPage && (
                       <RewardProperties
                         rewardId={page.bountyId}
                         pageId={page.id}

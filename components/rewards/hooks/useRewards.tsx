@@ -7,6 +7,7 @@ import { useCreateReward, useGetRewards } from 'charmClient/hooks/rewards';
 import type { RewardStatusFilter } from 'components/rewards/components/RewardViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
@@ -21,6 +22,8 @@ type RewardsContextType = {
   updateReward: (input: RewardUpdate) => Promise<void>;
   refreshReward: (rewardId: string) => Promise<void>;
   createReward: (input: RewardCreationData) => Promise<RewardWithUsers | null>;
+  tempReward?: RewardCreationData | null;
+  setTempReward: (input?: RewardCreationData) => void;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
@@ -34,16 +37,20 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   isLoading: false,
   updateReward: () => Promise.resolve(),
   refreshReward: () => Promise.resolve(),
-  createReward: () => Promise.resolve(null)
+  createReward: () => Promise.resolve(null),
+  tempReward: null,
+  setTempReward: () => {}
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
   const [statusFilter, setStatusFilter] = useState<RewardStatusFilter>('all');
   const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
+  const { user } = useUser();
 
   const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
   const { trigger: createRewardTrigger } = useCreateReward();
+  const [tempRewardData, setTempRewardData] = useState<null | RewardCreationData>(null);
 
   // filter out deleted and templates
   let filteredRewards = useMemo(
@@ -119,6 +126,24 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     [createRewardTrigger, mutateRewards]
   );
 
+  const setTempReward = useCallback(
+    (data?: RewardCreationData | null) => {
+      if (!space || !user) return;
+
+      setTempRewardData(
+        data ?? {
+          chainId: 1,
+          status: 'open',
+          spaceId: space.id,
+          createdBy: user.id,
+          rewardAmount: 1,
+          rewardToken: 'ETH'
+        }
+      );
+    },
+    [space, user]
+  );
+
   const value = useMemo(
     () => ({
       rewards,
@@ -130,7 +155,9 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       updateReward,
       refreshReward,
       setRewards: mutateRewards,
-      createReward
+      createReward,
+      setTempReward,
+      tempReward: tempRewardData
     }),
     [
       rewards,
@@ -141,7 +168,9 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       loadingPages,
       updateReward,
       refreshReward,
-      createReward
+      createReward,
+      setTempReward,
+      tempRewardData
     ]
   );
 
