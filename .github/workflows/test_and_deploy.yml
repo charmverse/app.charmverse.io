@@ -20,7 +20,7 @@ env:
 jobs:
   build-test-env:
     name: Build test env
-    runs-on: ubuntu-latest
+    runs-on: cv-ubuntu-22.04-8core
     steps:
       - name: Print Triggering event context payload
         env:
@@ -63,7 +63,7 @@ jobs:
 
   test:
     name: Validate code
-    runs-on: ubuntu-latest
+    runs-on: cv-ubuntu-22.04-8core
     needs: build-test-env
     steps:
       - uses: actions/checkout@v3
@@ -84,7 +84,7 @@ jobs:
 
   integration-test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: cv-ubuntu-22.04-8core
     needs: build-test-env
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
@@ -189,7 +189,7 @@ jobs:
 
   deploy:
     name: Deploy to production
-    runs-on: ubuntu-latest
+    runs-on: cv-ubuntu-22.04-8core
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
