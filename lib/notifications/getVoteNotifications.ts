@@ -77,7 +77,7 @@ export async function getVoteNotifications(userId: string): Promise<Notification
         deadline: notification.vote.deadline,
         voteId: notification.vote.id,
         group: 'vote',
-        archived: !!notification.notificationMetadata.archived,
+        archived: !!notification.notificationMetadata.archivedAt,
         read: !!notification.notificationMetadata.seenAt
       };
 

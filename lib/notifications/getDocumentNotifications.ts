@@ -51,7 +51,7 @@ export async function getDocumentNotifications(userId: string): Promise<Notifica
         text: '',
         type: notification.type,
         group: 'document',
-        archived: !!notificationMetadata.archived,
+        archived: !!notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt
       } as DocumentNotification;
 

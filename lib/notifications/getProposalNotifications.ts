@@ -51,7 +51,7 @@ export async function getProposalNotifications(userId: string): Promise<Notifica
         mentionId: notification.mentionId,
         type: notification.type,
         group: 'proposal',
-        archived: !!notificationMetadata.archived,
+        archived: !!notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt
       } as ProposalNotification;
 

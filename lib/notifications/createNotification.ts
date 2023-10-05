@@ -15,7 +15,6 @@ import type {
   ProposalNotificationType,
   VoteNotificationType
 } from './interfaces';
-import { upgradedNotificationUserIds } from './utils';
 
 type CreatePostNotificationInput = {
   createdBy: string;
@@ -53,8 +52,7 @@ export async function createPostNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       comment: commentId
@@ -114,8 +112,7 @@ export async function createProposalNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       comment: commentId
@@ -165,8 +162,7 @@ export async function createDocumentNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       inlineComment: inlineCommentId
@@ -220,8 +216,7 @@ export async function createCardNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       blockComment: blockCommentId
@@ -260,8 +255,7 @@ export async function createVoteNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       vote: {
@@ -317,8 +311,7 @@ export async function createBountyNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       mentionId,

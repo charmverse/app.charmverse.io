@@ -56,7 +56,7 @@ export async function getForumNotifications(userId: string): Promise<Notificatio
         spaceName: notificationMetadata.space.name,
         type: notification.type as ForumNotification['type'],
         group: 'post',
-        archived: notificationMetadata.archived,
+        archived: notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt
       } as ForumNotification;
 

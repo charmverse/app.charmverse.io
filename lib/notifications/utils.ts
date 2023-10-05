@@ -27,7 +27,7 @@ export const notificationMetadataIncludeStatement = {
 export const upgradedNotificationUserIds = process.env.USER_IDS
   ? process.env.USER_IDS.split(',')
   : [
-      'f5454564-7005-4131-85e0-794bbeaa0225',
+      'c8d12a44-8169-4224-8e1a-cde231ad3257',
       'fcf8a850-c196-4b4e-81ff-16e2bd9aea85',
       '29f84e2f-eda3-45b1-a99c-77cadb896d89',
       'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835', // chris in prod

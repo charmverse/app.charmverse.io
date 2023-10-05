@@ -4,12 +4,12 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import PlaylistAddCheckCircleOutlinedIcon from '@mui/icons-material/PlaylistAddCheckCircleOutlined';
 import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
 import { Divider, Typography, Badge, Stack, Tooltip, Popover, Card, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { Fragment, useMemo, useState } from 'react';
+import { IoFilterCircleOutline } from 'react-icons/io5';
 import type { KeyedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
@@ -217,7 +217,7 @@ export function NotificationsPopover({
                   setInboxState(inboxState === 'unarchived' ? 'unread' : 'unarchived');
                 }}
               >
-                <PlaylistAddCheckCircleOutlinedIcon fontSize='small' />
+                <IoFilterCircleOutline fontSize={18} />
               </IconButton>
             </Box>
           </Tooltip>
@@ -236,9 +236,17 @@ export function NotificationsPopover({
           <Box key='Inbox'>
             {targetNotifications.length !== 0 && (
               <Stack flexDirection='row' gap={1} px={2} pt={2} pb={1}>
-                <Tooltip title={markAllReadButtonDisabled ? 'All notifications have been read as read.' : ''}>
-                  <div
-                    style={{ width: '100%' }}
+                <div
+                  style={{
+                    width: '100%'
+                  }}
+                >
+                  <Button
+                    disabledTooltip='All notifications have been read as read.'
+                    variant='outlined'
+                    color={markAllReadButtonDisabled ? 'secondary' : 'primary'}
+                    fullWidth
+                    disabled={markAllReadButtonDisabled}
                     onClick={() => {
                       if (!markAllReadButtonDisabled) {
                         markNotifications({
@@ -248,19 +256,11 @@ export function NotificationsPopover({
                       }
                     }}
                   >
-                    <Button
-                      variant='outlined'
-                      color={markAllReadButtonDisabled ? 'secondary' : 'primary'}
-                      fullWidth
-                      disabled={markAllReadButtonDisabled}
-                    >
-                      Mark all as read
-                    </Button>
-                  </div>
-                </Tooltip>
-                <Tooltip title={archiveAllButtonDisabled ? 'All read notifications have been archived.' : ''}>
-                  <div
-                    style={{ width: '100%' }}
+                    Mark all as read
+                  </Button>
+                </div>
+                <div style={{ width: '100%' }}>
+                  <Button
                     onClick={() => {
                       if (!archiveAllButtonDisabled) {
                         markNotifications({
@@ -269,17 +269,15 @@ export function NotificationsPopover({
                         });
                       }
                     }}
+                    disabledTooltip='All read notifications have been archived.'
+                    variant='outlined'
+                    color={archiveAllButtonDisabled ? 'secondary' : 'primary'}
+                    fullWidth
+                    disabled={archiveAllButtonDisabled}
                   >
-                    <Button
-                      variant='outlined'
-                      color={archiveAllButtonDisabled ? 'secondary' : 'primary'}
-                      fullWidth
-                      disabled={archiveAllButtonDisabled}
-                    >
-                      {unreadNotifications.length === 0 ? 'Archive all' : 'Archive read'}
-                    </Button>
-                  </div>
-                </Tooltip>
+                    {unreadNotifications.length === 0 ? 'Archive all' : 'Archive read'}
+                  </Button>
+                </div>
               </Stack>
             )}
             {inboxState === 'unarchived' ? (

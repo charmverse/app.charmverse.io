@@ -55,7 +55,7 @@ export async function getCardNotifications(userId: string): Promise<Notification
         blockCommentId: notification.blockCommentId,
         personPropertyId: notification.personPropertyId,
         group: 'card',
-        archived: !!notificationMetadata.archived,
+        archived: !!notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt
       } as CardNotification;
 

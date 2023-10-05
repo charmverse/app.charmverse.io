@@ -296,7 +296,10 @@ export async function getProposalStatusChangeTasks(userId: string, proposalChang
           commentId: null,
           inlineCommentId: null,
           mentionId: null,
-          spaceId: workspaceEvent.spaceId
+          spaceId: workspaceEvent.spaceId,
+          archived: false,
+          read: false,
+          group: 'proposal'
         };
 
         proposalTasks.push(proposalTask);

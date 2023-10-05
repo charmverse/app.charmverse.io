@@ -41,7 +41,7 @@ async function markNotificationsHandler(req: NextApiRequest, res: NextApiRespons
           }
         },
         data: {
-          archived: true,
+          archivedAt: new Date(),
           seenAt: new Date(),
           channel: 'webapp'
         }
@@ -57,7 +57,7 @@ async function markNotificationsHandler(req: NextApiRequest, res: NextApiRespons
           }
         },
         data: {
-          archived: false
+          archivedAt: null
         }
       });
       break;
@@ -83,7 +83,7 @@ async function markNotificationsHandler(req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  return res.status(200).json({ ok: true });
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);
