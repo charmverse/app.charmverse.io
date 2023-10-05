@@ -57,7 +57,7 @@ export async function setRewardUsers({
         await _tx.bountyPermission.createMany({
           data: users.reviewers.map((reviewer) => ({
             bountyId: rewardId,
-            permissionLevel: 'submitter',
+            permissionLevel: 'reviewer',
             roleId: reviewer.group === 'role' ? reviewer.id : undefined,
             userId: reviewer.group === 'user' ? reviewer.id : undefined
           }))

@@ -6,7 +6,7 @@ import { getBlocks } from 'lib/rewards/blocks/getBlocks';
 import { updateBlock } from 'lib/rewards/blocks/updateBlock';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-describe('proposal blocks - updateBlock', () => {
+describe('reward blocks - updateBlock', () => {
   it('Should update properties block', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
