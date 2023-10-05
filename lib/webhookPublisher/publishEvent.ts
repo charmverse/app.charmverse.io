@@ -304,35 +304,19 @@ export async function publishVoteEvent(context: VoteEventContext) {
   });
 }
 
-export type CardEventContext =
-  | {
-      scope: WebhookEventNames.CardBlockCommentCreated;
-      cardId: string;
-      spaceId: string;
-      blockCommentId: string;
-    }
-  | {
-      scope: WebhookEventNames.CardPersonPropertyAssigned;
-      cardId: string;
-      spaceId: string;
-      cardProperty: CardPropertyEntity;
-      userId: string;
-    };
+export type CardEventContext = {
+  scope: WebhookEventNames.CardPersonPropertyAssigned;
+  cardId: string;
+  spaceId: string;
+  cardProperty: CardPropertyEntity;
+  userId: string;
+};
 
 export async function publishCardEvent(context: CardEventContext) {
   const { scope } = context;
   const [space, card] = await Promise.all([getSpaceEntity(context.spaceId), getDocumentEntity(context.cardId)]);
 
   switch (scope) {
-    case WebhookEventNames.CardBlockCommentCreated: {
-      const blockComment = await getBlockCommentEntity(context.blockCommentId);
-      return publishWebhookEvent(context.spaceId, {
-        scope,
-        space,
-        card,
-        blockComment
-      });
-    }
     case WebhookEventNames.CardPersonPropertyAssigned: {
       const assignedUser = await getUserEntity(context.cardProperty.value);
       return publishWebhookEvent(context.spaceId, {

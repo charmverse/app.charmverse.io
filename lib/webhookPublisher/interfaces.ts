@@ -124,7 +124,6 @@ export enum WebhookEventNames {
   DocumentCommentCreated = 'document.comment.created',
   DocumentInlineCommentCreated = 'document.inline_comment.created',
   DocumentMentionCreated = 'document.mention.created',
-  CardBlockCommentCreated = 'card.block_comment.created',
   CardPersonPropertyAssigned = 'card.person_property.assigned',
   VoteCreated = 'vote.created'
 }
@@ -263,12 +262,6 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.VoteCreated;
         vote: VoteEntity;
-      }
-    | {
-        scope: WebhookEventNames.CardBlockCommentCreated;
-        space: SpaceEntity;
-        card: DocumentEntity;
-        blockComment: BlockCommentEntity;
       }
     | {
         scope: WebhookEventNames.CardPersonPropertyAssigned;

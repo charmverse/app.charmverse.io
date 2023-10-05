@@ -670,7 +670,7 @@ export async function createNotificationsFromEvent(webhookData: {
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
-        if (application.createdBy !== bountyReviewerId) {
+        if (userId !== bountyReviewerId) {
           await createBountyNotification({
             bountyId,
             createdBy: userId,
