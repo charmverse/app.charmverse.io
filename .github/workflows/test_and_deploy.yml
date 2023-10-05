@@ -120,7 +120,7 @@ jobs:
           - test_name: 'Server integration tests #2'
             test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 2/3'
           - test_name: 'Server integration tests #3'
-            test_command: 'npm run start:test:ci & exit 1 && npm run test:server:ci -- --shard 3/3'
+            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 3/3'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser:ci'
           - test_name: 'Browser e2e test #1'
@@ -212,6 +212,7 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
           echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
+          exit 1
 
       - name: Build app
         uses: ./.github/actions/build
@@ -277,12 +278,6 @@ jobs:
             fi
           done
 
-      # - name: Publish to Chromatic
-      #   uses: chromaui/action@v1
-      #   with:
-      #     skip: true
-      #     projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
       - name: Deploy webapp to Beanstalk
         id: webapp_deploy
         uses: einaregilsson/beanstalk-deploy@v21
@@ -339,7 +334,7 @@ jobs:
     name: Notify discord of failure
     runs-on: ubuntu-latest
     if: failure()
-    needs: [build-test-env, chromatic, test, integration-test, deploy]
+    needs: [build-test-env, test, integration-test, deploy]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
@@ -348,7 +343,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_TEST_WEBHOOK }}
           status: 'failure'
           content: "Hey <@&1027309276454207519>"    
-          title: "Webapp merge to main workflow failed"
+          title: "Webapp deploy workflow failed"
           description: |
             Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
           color: "16515843"
