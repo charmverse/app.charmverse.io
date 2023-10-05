@@ -74,20 +74,25 @@ const notificationRuleEvents = {
   bounties: {
     title: 'Bounty',
     events: [
-      ['Bounty is suggested', 'Application is submitted', 'Application is accepted', 'Application is rejected'],
-      ['Application work is submitted', 'Application work is approved', 'Application payment completed']
+      [
+        'Bounty suggested (Admins only)',
+        'Application submitted (Reviewers only)',
+        'Application accepted (Applicants only)',
+        'Application rejected (Applicants only)'
+      ],
+      ['Work submitted (Reviewers only)', 'Submission approved (Applicants only)', 'Payment completed (Applicants only']
     ]
   },
   proposals: {
     title: 'Proposals',
     events: [
-      ['Ready for feedback', 'Ready for review', 'Review completed'],
-      ['Ready for vote', 'Evaluation active', 'Evaluation completed']
+      ['Feedback ready (All members)', 'Review ready (Reviewers only)', 'Review completed (Authors only)'],
+      ['Vote ready (All members)', 'Evaluation completed (Authors only)']
     ]
   },
   polls: {
     title: 'Polls',
-    events: [['A poll is created in a page or forum post']]
+    events: [['Poll created (All members)']]
   }
 };
 export function SpaceSettings({
@@ -611,11 +616,11 @@ export function SpaceSettings({
 
 function NotificationRuleComponent({ title, events: listsOfEvents }: { title: string; events: string[][] }) {
   return (
-    <span>
+    <Box width='100%'>
       <Typography sx={{ my: 1 }}>{title}</Typography>
-      <Grid container spacing={2} sx={{ mb: 2 }}>
+      <Grid container sx={{ mb: 2, maxWidth: 600 }}>
         {listsOfEvents.map((events) => (
-          <Grid item key={events.join()}>
+          <Grid xs={12} md={6} item key={events.join()}>
             <Typography variant='caption'>
               <ul style={{ margin: 0, paddingLeft: '2em' }}>
                 {events.map((event) => (
@@ -626,7 +631,7 @@ function NotificationRuleComponent({ title, events: listsOfEvents }: { title: st
           </Grid>
         ))}
       </Grid>
-    </span>
+    </Box>
   );
 }
 
