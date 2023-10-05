@@ -10,11 +10,7 @@ export const BountyActionConversionRecord: Record<BountyNotificationType, string
   'application.approved': 'work_approved',
   'application.payment_pending': 'payment_needed',
   'application.payment_completed': 'payment_complete',
-  'suggestion.created': 'suggested_bounty',
-  'inline_comment.created': 'inline_comment.created',
-  'inline_comment.mention.created': 'inline_comment.mention.created',
-  'inline_comment.replied': 'inline_comment.replied',
-  'mention.created': 'mention.created'
+  'suggestion.created': 'suggested_bounty'
 };
 
 export function convertBountyAction(type: BountyNotificationType) {}

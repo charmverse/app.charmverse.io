@@ -455,33 +455,15 @@ export class DocumentEventHandler {
 
         if (filteredMentions.length) {
           await Promise.all(
-            filteredMentions.map((mention) => {
-              if (room.doc.type === 'bounty') {
-                return publishBountyEvent({
-                  bountyId: room.doc.id,
-                  scope: WebhookEventNames.BountyMentionCreated,
-                  spaceId: room.doc.spaceId,
-                  mention,
-                  userId: session.user.id
-                });
-              } else if (room.doc.type === 'proposal') {
-                return publishProposalEvent({
-                  proposalId: room.doc.id,
-                  scope: WebhookEventNames.ProposalMentionCreated,
-                  spaceId: room.doc.spaceId,
-                  mention,
-                  userId: session.user.id
-                });
-              } else {
-                return publishDocumentEvent({
-                  documentId: room.doc.id,
-                  scope: WebhookEventNames.DocumentMentionCreated,
-                  spaceId: room.doc.spaceId,
-                  mention,
-                  userId: session.user.id
-                });
-              }
-            })
+            filteredMentions.map((mention) =>
+              publishDocumentEvent({
+                documentId: room.doc.id,
+                scope: WebhookEventNames.DocumentMentionCreated,
+                spaceId: room.doc.spaceId,
+                mention,
+                userId: session.user.id
+              })
+            )
           );
         }
 

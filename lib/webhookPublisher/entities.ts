@@ -244,17 +244,28 @@ export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
         select: {
           domain: true
         }
+      },
+      proposal: {
+        select: {
+          authors: {
+            select: {
+              userId: true
+            }
+          }
+        }
       }
     }
   });
 
-  const author = await getUserEntity(document.createdBy);
+  const authors = document.proposal
+    ? await Promise.all(document.proposal.authors.map(({ userId }) => getUserEntity(userId)))
+    : [await getUserEntity(document.createdBy)];
 
   return {
     id,
     title: document.title,
     url: `${baseUrl}/${document.space.domain}/${document.path}`,
     type: document.type,
-    author
+    authors
   };
 }

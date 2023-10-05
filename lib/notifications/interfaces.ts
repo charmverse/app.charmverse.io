@@ -24,21 +24,6 @@ export type CommentNotification =
       commentId: string;
     };
 
-export type BlockCommentNotification =
-  | {
-      type: 'block_comment.created';
-      blockCommentId: string;
-    }
-  | {
-      type: 'block_comment.replied';
-      blockCommentId: string;
-    }
-  | {
-      type: 'block_comment.mention.created';
-      mentionId: string;
-      blockCommentId: string;
-    };
-
 export type InlineCommentNotification =
   | {
       type: 'inline_comment.created';
@@ -62,7 +47,6 @@ export type MentionNotification = {
 export type CommentNotificationType = CommentNotification['type'];
 export type InlineCommentNotificationType = InlineCommentNotification['type'];
 export type MentionNotificationType = MentionNotification['type'];
-export type BlockCommentNotificationType = BlockCommentNotification['type'];
 
 interface NotificationBase {
   taskId: string;
@@ -73,61 +57,46 @@ interface NotificationBase {
   createdBy: NotificationActor;
 }
 
-export type DiscussionNotificationType =
-  | InlineCommentNotificationType
-  | MentionNotificationType
-  | BlockCommentNotificationType
-  | 'person_assigned';
-
-interface DiscussionNotificationBase extends NotificationBase {
+export type CardNotification = NotificationBase & {
   pageId: string;
   pagePath: string;
   pageTitle: string;
-  type: DiscussionNotificationType;
+  type: 'person_assigned';
+  text: string;
+  personPropertyId: string;
+};
+
+export type CardNotificationType = CardNotification['type'];
+
+interface DocumentNotificationBase extends NotificationBase {
+  pageId: string;
+  pagePath: string;
+  pageTitle: string;
+  type: InlineCommentNotificationType | MentionNotificationType | CommentNotificationType;
   text: string;
   mentionId: null | string;
   inlineCommentId: null | string;
-  blockCommentId: null | string;
-  pageType: PageType;
-  personPropertyId: null | string;
+  commentId: null | string;
+  pageType: PageType | 'post';
 }
 
-export type DiscussionNotification = DiscussionNotificationBase &
-  (
-    | MentionNotification
-    | InlineCommentNotification
-    | BlockCommentNotification
-    | {
-        type: 'person_assigned';
-        personPropertyId: string;
-      }
-  );
+export type DocumentNotification = DocumentNotificationBase &
+  (CommentNotification | MentionNotification | InlineCommentNotification);
 
-export type ForumNotificationType = CommentNotificationType | MentionNotificationType | 'created';
+export type DocumentNotificationType = DocumentNotification['type'];
 
-interface ForumNotificationBase extends NotificationBase {
-  type: ForumNotificationType;
+export type DiscussionNotification = CardNotification | DocumentNotification;
+
+export type PostNotificationType = 'created';
+
+export interface ForumNotification extends NotificationBase {
+  type: PostNotificationType;
   postId: string;
   postPath: string;
   postTitle: string;
-  commentId: null | string;
-  mentionId: null | string;
-  commentText: string;
 }
 
-export type ForumNotification = ForumNotificationBase &
-  (
-    | CommentNotification
-    | MentionNotification
-    | {
-        type: 'created';
-      }
-  );
-
 export type ProposalNotificationType =
-  | CommentNotificationType
-  | MentionNotificationType
-  | InlineCommentNotificationType
   | 'start_review'
   | 'start_discussion'
   | 'reviewed'
@@ -142,20 +111,7 @@ export type ProposalNotification = NotificationBase & {
   status: ProposalStatus;
   pageId: string;
   type: ProposalNotificationType;
-  commentId: string | null;
-  inlineCommentId: string | null;
-  mentionId: string | null;
-} & (
-    | CommentNotification
-    | MentionNotification
-    | InlineCommentNotification
-    | {
-        type: Exclude<
-          ProposalNotificationType,
-          CommentNotificationType | MentionNotificationType | InlineCommentNotificationType
-        >;
-      }
-  );
+};
 
 export type VoteNotificationType = 'new_vote';
 
@@ -173,8 +129,6 @@ export type VoteNotification = NotificationBase & {
 };
 
 export type BountyNotificationType =
-  | MentionNotificationType
-  | InlineCommentNotificationType
   | 'application.pending'
   | 'application.accepted'
   | 'application.rejected'
@@ -191,13 +145,9 @@ export type BountyNotification = NotificationBase & {
   pageTitle: string;
   applicationId: string | null;
   type: BountyNotificationType;
-  inlineCommentId: string | null;
-  mentionId: string | null;
 } & (
-    | MentionNotification
-    | InlineCommentNotification
     | {
-        type: Exclude<BountyNotificationType, MentionNotificationType | InlineCommentNotificationType>;
+        type: Exclude<BountyNotificationType, 'suggestion.created'>;
         applicationId: string;
       }
     | {

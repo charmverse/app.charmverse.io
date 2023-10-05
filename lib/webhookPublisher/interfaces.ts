@@ -15,7 +15,7 @@ export type DocumentEntity = {
   id: string;
   title: string;
   url: string;
-  type: PageType | 'post';
+  type: PageType;
   authors: UserEntity[];
 };
 
@@ -157,11 +157,6 @@ export type WebhookEvent = WebhookEventSharedProps &
         post: PostEntity;
       }
     | {
-        scope: WebhookEventNames.ForumCommentCreated;
-        comment: CommentEntity;
-        post: PostEntity;
-      }
-    | {
         scope: WebhookEventNames.ForumCommentUpvoted;
         comment: CommentEntity;
         post: PostEntity;
@@ -197,22 +192,6 @@ export type WebhookEvent = WebhookEventSharedProps &
         newStatus: ProposalStatus;
         oldStatus: ProposalStatus | null;
         user: UserEntity;
-      }
-    | {
-        scope: WebhookEventNames.ProposalInlineCommentCreated;
-        proposal: ProposalEntity;
-        inlineComment: InlineCommentEntity;
-      }
-    | {
-        scope: WebhookEventNames.ProposalCommentCreated;
-        proposal: ProposalEntity;
-        comment: CommentEntity;
-      }
-    | {
-        user: UserEntity;
-        scope: WebhookEventNames.ProposalMentionCreated;
-        proposal: ProposalEntity;
-        mention: UserMentionMetadata;
       }
     | {
         scope: WebhookEventNames.BountyCompleted;
@@ -258,24 +237,18 @@ export type WebhookEvent = WebhookEventSharedProps &
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountyInlineCommentCreated;
-        bounty: BountyEntity;
-        inlineComment: InlineCommentEntity;
-      }
-    | {
-        user: UserEntity;
-        scope: WebhookEventNames.BountyMentionCreated;
-        bounty: BountyEntity;
-        mention: UserMentionMetadata;
-      }
-    | {
         user: UserEntity;
         scope: WebhookEventNames.DocumentMentionCreated;
         document: DocumentEntity;
         mention: UserMentionMetadata;
       }
     | {
-        user: UserEntity;
+        scope: WebhookEventNames.DocumentCommentCreated;
+        document: DocumentEntity | null;
+        post: PostEntity | null;
+        comment: CommentEntity;
+      }
+    | {
         scope: WebhookEventNames.DocumentInlineCommentCreated;
         document: DocumentEntity;
         inlineComment: InlineCommentEntity;

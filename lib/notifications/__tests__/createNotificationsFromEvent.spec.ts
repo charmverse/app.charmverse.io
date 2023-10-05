@@ -8,19 +8,16 @@ import { addComment } from 'lib/comments/addComment';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { createCardPage } from 'lib/pages/createCardPage';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { createProposal } from 'lib/proposal/createProposal';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { emptyDocument } from 'lib/prosemirror/constants';
-import { createDatabase } from 'lib/public-api/createDatabase';
 import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createVote } from 'lib/votes';
 import {
   getApplicationEntity,
-  getBlockCommentEntity,
   getBountyEntity,
   getCommentEntity,
   getDocumentEntity,
@@ -32,7 +29,7 @@ import {
   getVoteEntity
 } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { createBlock, createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { generateProposalCategory } from 'testing/utils/proposals';
 import { createRole } from 'testing/utils/roles';
@@ -142,7 +139,6 @@ describe(`Test document events and notifications`, () => {
         scope: WebhookEventNames.DocumentInlineCommentCreated,
         document: await getDocumentEntity(createdPage.id),
         space: await getSpaceEntity(space.id),
-        user: await getUserEntity(user.id),
         inlineComment: await getInlineCommentEntity(inlineComment.id)
       },
       spaceId: space.id,
@@ -189,159 +185,6 @@ describe(`Test document events and notifications`, () => {
     expect(inlineCommentCreatedNotification).toBeTruthy();
     expect(inlineCommentRepliedNotification).toBeTruthy();
     expect(inlineCommentMentionCreatedNotification).toBeTruthy();
-  });
-});
-
-describe(`Test card events and notifications`, () => {
-  it(`Should create card notifications for block_comment.created event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user2.id
-    });
-
-    const databasePage = await createDatabase({
-      createdBy: user.id,
-      spaceId: space.id,
-      title: 'Example title'
-    });
-
-    const cardPage = await createCardPage({
-      boardId: databasePage.id,
-      createdBy: user.id,
-      properties: {},
-      spaceId: space.id,
-      title: 'Example title'
-    });
-
-    const mentionId = v4();
-
-    const blockComment = await createBlock({
-      createdBy: user.id,
-      type: 'comment',
-      rootId: databasePage.id,
-      parentId: cardPage.block.id,
-      fields: {
-        content: {
-          type: 'doc',
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                { text: 'Hello World ', type: 'text' },
-                {
-                  type: 'mention',
-                  attrs: {
-                    id: mentionId,
-                    type: 'user',
-                    value: user2.id,
-                    createdAt: new Date().toISOString(),
-                    createdBy: user.id
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      },
-      spaceId: space.id
-    });
-
-    await createNotificationsFromEvent({
-      event: {
-        scope: WebhookEventNames.CardBlockCommentCreated,
-        card: await getDocumentEntity(cardPage.page.id),
-        space: await getSpaceEntity(space.id),
-        blockComment: await getBlockCommentEntity(blockComment.id)
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-
-    const blockComment2 = await createBlock({
-      createdBy: user2.id,
-      type: 'comment',
-      rootId: databasePage.id,
-      parentId: cardPage.block.id,
-      fields: {
-        content: emptyDocument
-      },
-      spaceId: space.id
-    });
-
-    await createNotificationsFromEvent({
-      event: {
-        scope: WebhookEventNames.CardBlockCommentCreated,
-        card: await getDocumentEntity(cardPage.page.id),
-        space: await getSpaceEntity(space.id),
-        blockComment: await getBlockCommentEntity(blockComment2.id)
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-
-    const blockComment3 = await createBlock({
-      createdBy: user2.id,
-      type: 'comment',
-      rootId: databasePage.id,
-      parentId: cardPage.block.id,
-      fields: {
-        content: emptyDocument
-      },
-      spaceId: space.id
-    });
-
-    await createNotificationsFromEvent({
-      event: {
-        scope: WebhookEventNames.CardBlockCommentCreated,
-        card: await getDocumentEntity(cardPage.page.id),
-        space: await getSpaceEntity(space.id),
-        blockComment: await getBlockCommentEntity(blockComment3.id)
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-
-    const blockCommentMentionCreatedNotification = await prisma.cardNotification.findFirst({
-      where: {
-        type: 'block_comment.mention.created',
-        blockCommentId: blockComment.id,
-        cardId: cardPage.block.id,
-        notificationMetadata: {
-          spaceId: space.id,
-          userId: user2.id
-        }
-      }
-    });
-
-    const blockCommentRepliedNotification = await prisma.cardNotification.findFirst({
-      where: {
-        type: 'block_comment.replied',
-        blockCommentId: blockComment2.id,
-        cardId: cardPage.block.id,
-        notificationMetadata: {
-          spaceId: space.id,
-          userId: user.id
-        }
-      }
-    });
-
-    const blockCommentCreatedNotification = await prisma.cardNotification.findFirst({
-      where: {
-        type: 'block_comment.created',
-        blockCommentId: blockComment3.id,
-        cardId: cardPage.block.id,
-        notificationMetadata: {
-          spaceId: space.id,
-          userId: user.id
-        }
-      }
-    });
-
-    expect(blockCommentMentionCreatedNotification).toBeTruthy();
-    expect(blockCommentRepliedNotification).toBeTruthy();
-    expect(blockCommentCreatedNotification).toBeTruthy();
   });
 });
 
@@ -452,7 +295,7 @@ describe(`Test forum events and notifications`, () => {
       }
     });
 
-    const postMentionCreatedNotification = await prisma.postNotification.findFirst({
+    const postMentionCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'mention.created',
         mentionId,
@@ -541,10 +384,11 @@ describe(`Test forum events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.ForumCommentCreated,
+        scope: WebhookEventNames.DocumentCommentCreated,
         comment: await getCommentEntity(postComment1.id, true),
         post: postEntity,
-        space: spaceEntity
+        space: spaceEntity,
+        document: null
       },
       spaceId: space.id,
       createdAt: new Date().toISOString()
@@ -552,10 +396,11 @@ describe(`Test forum events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.ForumCommentCreated,
+        scope: WebhookEventNames.DocumentCommentCreated,
         comment: await getCommentEntity(postComment1Reply.id, true),
         post: postEntity,
-        space: spaceEntity
+        space: spaceEntity,
+        document: null
       },
       spaceId: space.id,
       createdAt: new Date().toISOString()
@@ -563,20 +408,21 @@ describe(`Test forum events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.ForumCommentCreated,
+        scope: WebhookEventNames.DocumentCommentCreated,
         comment: await getCommentEntity(postComment2.id, true),
         post: postEntity,
-        space: spaceEntity
+        space: spaceEntity,
+        document: null
       },
       spaceId: space.id,
       createdAt: new Date().toISOString()
     });
 
-    const postCommentCreatedNotification = await prisma.postNotification.findFirst({
+    const postCommentCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'comment.created',
         postId: post.id,
-        commentId: postComment2.id,
+        postCommentId: postComment2.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -584,11 +430,11 @@ describe(`Test forum events and notifications`, () => {
       }
     });
 
-    const postCommentRepliedNotification = await prisma.postNotification.findFirst({
+    const postCommentRepliedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'comment.replied',
         postId: post.id,
-        commentId: postComment1Reply.id,
+        postCommentId: postComment1Reply.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -596,12 +442,12 @@ describe(`Test forum events and notifications`, () => {
       }
     });
 
-    const commentMentionCreatedNotification = await prisma.postNotification.findFirst({
+    const commentMentionCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'comment.mention.created',
         postId: post.id,
         mentionId,
-        commentId: postComment1Reply.id,
+        postCommentId: postComment1Reply.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -792,59 +638,6 @@ describe(`Test vote events and notifications`, () => {
 });
 
 describe(`Test proposal events and notifications`, () => {
-  it(`Should create proposal notifications for proposal.mention.created event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user2.id
-    });
-
-    const proposalCategory = await generateProposalCategory({
-      spaceId: space.id
-    });
-
-    const { proposal } = await createProposal({
-      categoryId: proposalCategory.id,
-      spaceId: space.id,
-      userId: user.id
-    });
-
-    const mentionId = v4();
-
-    await createNotificationsFromEvent({
-      event: {
-        scope: WebhookEventNames.ProposalMentionCreated,
-        proposal: await getProposalEntity(proposal.id),
-        space: await getSpaceEntity(space.id),
-        user: await getUserEntity(user.id),
-        mention: {
-          createdAt: new Date().toISOString(),
-          createdBy: user.id,
-          id: mentionId,
-          text: '',
-          value: user2.id
-        }
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-
-    const mentionCreatedProposalNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'mention.created',
-        mentionId,
-        proposalId: proposal.id,
-        notificationMetadata: {
-          spaceId: space.id,
-          userId: user2.id
-        }
-      }
-    });
-
-    expect(mentionCreatedProposalNotification).toBeTruthy();
-  });
-
   it(`Should create proposal notifications for inline_comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
     const user2 = await createUserFromWallet();
@@ -900,8 +693,8 @@ describe(`Test proposal events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.ProposalInlineCommentCreated,
-        proposal: await getProposalEntity(proposal.id),
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document: await getDocumentEntity(page.id),
         space: await getSpaceEntity(space.id),
         inlineComment: await getInlineCommentEntity(inlineComment.id)
       },
@@ -909,11 +702,11 @@ describe(`Test proposal events and notifications`, () => {
       createdAt: new Date().toISOString()
     });
 
-    const inlineCommentCreatedNotification = await prisma.proposalNotification.findFirst({
+    const inlineCommentCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.created',
         inlineCommentId: inlineComment.id,
-        proposalId: proposal.id,
+        pageId: proposal.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -921,11 +714,11 @@ describe(`Test proposal events and notifications`, () => {
       }
     });
 
-    const inlineCommentRepliedNotification = await prisma.proposalNotification.findFirst({
+    const inlineCommentRepliedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.replied',
         inlineCommentId: inlineComment.id,
-        proposalId: proposal.id,
+        pageId: proposal.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -933,12 +726,12 @@ describe(`Test proposal events and notifications`, () => {
       }
     });
 
-    const inlineCommentMentionCreatedNotification = await prisma.proposalNotification.findFirst({
+    const inlineCommentMentionCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.mention.created',
         inlineCommentId: inlineComment.id,
         mentionId,
-        proposalId: proposal.id,
+        pageId: proposal.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -1013,14 +806,15 @@ describe(`Test proposal events and notifications`, () => {
       userId: user2.id
     });
 
-    const proposalEntity = await getProposalEntity(proposal.id);
+    const documentEntity = await getDocumentEntity(page.id);
     const spaceEntity = await getSpaceEntity(space.id);
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.ProposalCommentCreated,
+        scope: WebhookEventNames.DocumentCommentCreated,
         comment: await getCommentEntity(proposalComment1.id),
-        proposal: proposalEntity,
+        document: documentEntity,
+        post: null,
         space: spaceEntity
       },
       spaceId: space.id,
@@ -1029,10 +823,11 @@ describe(`Test proposal events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.ProposalCommentCreated,
+        scope: WebhookEventNames.DocumentCommentCreated,
         comment: await getCommentEntity(proposalComment1Reply.id),
-        proposal: proposalEntity,
-        space: spaceEntity
+        space: spaceEntity,
+        document: documentEntity,
+        post: null
       },
       spaceId: space.id,
       createdAt: new Date().toISOString()
@@ -1040,20 +835,21 @@ describe(`Test proposal events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.ProposalCommentCreated,
+        scope: WebhookEventNames.DocumentCommentCreated,
         comment: await getCommentEntity(proposalComment2.id),
-        proposal: proposalEntity,
-        space: spaceEntity
+        space: spaceEntity,
+        document: documentEntity,
+        post: null
       },
       spaceId: space.id,
       createdAt: new Date().toISOString()
     });
 
-    const proposalCommentCreatedNotification = await prisma.proposalNotification.findFirst({
+    const proposalCommentCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'comment.created',
-        proposalId: proposal.id,
-        commentId: proposalComment2.id,
+        pageId: page.id,
+        pageCommentId: proposalComment2.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -1061,11 +857,11 @@ describe(`Test proposal events and notifications`, () => {
       }
     });
 
-    const proposalCommentRepliedNotification = await prisma.proposalNotification.findFirst({
+    const proposalCommentRepliedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'comment.replied',
-        proposalId: proposal.id,
-        commentId: proposalComment1Reply.id,
+        pageId: page.id,
+        pageCommentId: proposalComment1Reply.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -1073,12 +869,12 @@ describe(`Test proposal events and notifications`, () => {
       }
     });
 
-    const commentMentionCreatedNotification = await prisma.proposalNotification.findFirst({
+    const commentMentionCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'comment.mention.created',
-        proposalId: proposal.id,
+        pageId: proposal.id,
         mentionId,
-        commentId: proposalComment1Reply.id,
+        pageCommentId: proposalComment1Reply.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -1449,54 +1245,6 @@ describe(`Test proposal events and notifications`, () => {
 });
 
 describe(`Test bounty events and notifications`, () => {
-  it(`Should create bounty notifications for mention.created event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user2.id
-    });
-
-    const createdBounty = await createBounty({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const mentionId = v4();
-
-    await createNotificationsFromEvent({
-      event: {
-        scope: WebhookEventNames.BountyMentionCreated,
-        bounty: await getBountyEntity(createdBounty.id),
-        space: await getSpaceEntity(space.id),
-        user: await getUserEntity(user.id),
-        mention: {
-          createdAt: new Date().toISOString(),
-          createdBy: user.id,
-          id: mentionId,
-          text: '',
-          value: user2.id
-        }
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-
-    const mentionCreatedBountyNotification = await prisma.bountyNotification.findFirst({
-      where: {
-        type: 'mention.created',
-        mentionId,
-        bountyId: createdBounty.id,
-        notificationMetadata: {
-          spaceId: space.id,
-          userId: user2.id
-        }
-      }
-    });
-
-    expect(mentionCreatedBountyNotification).toBeTruthy();
-  });
-
   it(`Should create bounty notifications for inline_comment.created event`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
     const user2 = await createUserFromWallet();
@@ -1547,8 +1295,8 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.BountyInlineCommentCreated,
-        bounty: await getBountyEntity(bounty.id),
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document: await getDocumentEntity(bounty.page.id),
         space: await getSpaceEntity(space.id),
         inlineComment: await getInlineCommentEntity(inlineComment.id)
       },
@@ -1556,11 +1304,11 @@ describe(`Test bounty events and notifications`, () => {
       createdAt: new Date().toISOString()
     });
 
-    const inlineCommentCreatedNotification = await prisma.bountyNotification.findFirst({
+    const inlineCommentCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.created',
         inlineCommentId: inlineComment.id,
-        bountyId: bounty.id,
+        pageId: bounty.page.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -1568,11 +1316,11 @@ describe(`Test bounty events and notifications`, () => {
       }
     });
 
-    const inlineCommentRepliedNotification = await prisma.bountyNotification.findFirst({
+    const inlineCommentRepliedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.replied',
         inlineCommentId: inlineComment.id,
-        bountyId: bounty.id,
+        pageId: bounty.page.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id
@@ -1580,12 +1328,12 @@ describe(`Test bounty events and notifications`, () => {
       }
     });
 
-    const inlineCommentMentionCreatedNotification = await prisma.bountyNotification.findFirst({
+    const inlineCommentMentionCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.mention.created',
         inlineCommentId: inlineComment.id,
         mentionId,
-        bountyId: bounty.id,
+        pageId: bounty.page.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user.id

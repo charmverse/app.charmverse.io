@@ -1,25 +1,22 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-
-import type { BountyNotification, NotificationsGroup } from './interfaces';
+import type { CardNotification, NotificationsGroup } from './interfaces';
 import { notificationMetadataIncludeStatement, sortByDate } from './utils';
 
-export async function getBountyNotifications(userId: string): Promise<NotificationsGroup<BountyNotification>> {
-  const pageNotifications = await prisma.bountyNotification.findMany({
+export async function getCardNotifications(userId: string): Promise<NotificationsGroup<CardNotification>> {
+  const cardNotifications = await prisma.cardNotification.findMany({
     where: {
       notificationMetadata: {
         userId
       }
     },
     include: {
-      bounty: {
-        select: {
-          status: true,
+      card: {
+        include: {
           page: {
             select: {
-              id: true,
+              bountyId: true,
               path: true,
               type: true,
               title: true
@@ -33,17 +30,17 @@ export async function getBountyNotifications(userId: string): Promise<Notificati
     }
   });
 
-  const bountyNotificationsGroup: NotificationsGroup<BountyNotification> = {
+  const cardNotificationsGroup: NotificationsGroup<CardNotification> = {
     marked: [],
     unmarked: []
   };
 
-  pageNotifications.forEach((notification) => {
+  cardNotifications.forEach((notification) => {
     const notificationMetadata = notification.notificationMetadata;
-    const page = notification.bounty.page as Page;
-    const bountyNotification = {
+    const page = notification.card.page as Page;
+    const personPropertyId = 'card' in notification ? notification.personPropertyId : null;
+    const cardNotification = {
       taskId: notification.id,
-      applicationId: notification.applicationId,
       createdAt: notificationMetadata.createdAt.toISOString(),
       createdBy: notificationMetadata.author,
       pageId: page.id,
@@ -52,19 +49,21 @@ export async function getBountyNotifications(userId: string): Promise<Notificati
       spaceDomain: notificationMetadata.space.domain,
       spaceId: notificationMetadata.spaceId,
       spaceName: notificationMetadata.space.name,
-      status: notification.bounty.status,
-      type: notification.type
-    } as BountyNotification;
+      pageType: page.type,
+      text: '',
+      type: notification.type,
+      personPropertyId
+    } as CardNotification;
 
     if (notification.notificationMetadata.seenAt) {
-      bountyNotificationsGroup.marked.push(bountyNotification);
+      cardNotificationsGroup.marked.push(cardNotification);
     } else {
-      bountyNotificationsGroup.unmarked.push(bountyNotification);
+      cardNotificationsGroup.unmarked.push(cardNotification);
     }
   });
 
   return {
-    marked: bountyNotificationsGroup.marked.sort(sortByDate),
-    unmarked: bountyNotificationsGroup.unmarked.sort(sortByDate)
+    marked: cardNotificationsGroup.marked.sort(sortByDate),
+    unmarked: cardNotificationsGroup.unmarked.sort(sortByDate)
   };
 }

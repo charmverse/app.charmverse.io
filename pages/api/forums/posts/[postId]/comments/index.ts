@@ -10,7 +10,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/mi
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPostCommentEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -70,8 +70,8 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const postComment = await createPostComment({ postId, userId, ...body });
 
-  await publishPostCommentEvent({
-    scope: WebhookEventNames.ForumCommentCreated,
+  await publishDocumentEvent({
+    scope: WebhookEventNames.DocumentCommentCreated,
     spaceId: post.spaceId,
     commentId: postComment.id,
     postId
