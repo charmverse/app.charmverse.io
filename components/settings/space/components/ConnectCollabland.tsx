@@ -25,7 +25,7 @@ export function ConnectCollabland() {
     try {
       const { code } = await charmClient.spaces.getCollablandCode(space.id);
 
-      window.location.href = `${collablandStoreUrl}?state=${code}`;
+      window.location.href = `${collablandStoreUrl}?cv_state=${code}`;
     } catch (error) {
       showMessage('Error connecting to Collabland. Please try again.', 'error');
     }
@@ -45,7 +45,9 @@ export function ConnectCollabland() {
   }
 
   if (!isAdmin) {
-    <Typography variant='body2'>Collabland is not connected yet. Only space admins can configure this.</Typography>;
+    return (
+      <Typography variant='body2'>Collabland is not connected yet. Only space admins can configure this.</Typography>
+    );
   }
 
   return (
