@@ -556,7 +556,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.RewardApplicationAccepted: {
+    case WebhookEventNames.RewardApplicationApproved: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -612,7 +612,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.RewardApplicationSubmitted: {
+    case WebhookEventNames.RewardSubmissionCreated: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -643,7 +643,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.RewardApplicationApproved: {
+    case WebhookEventNames.RewardSubmissionApproved: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;

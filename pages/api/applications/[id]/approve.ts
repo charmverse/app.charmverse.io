@@ -56,7 +56,7 @@ async function approveUserApplication(req: NextApiRequest, res: NextApiResponse<
   await publishBountyEvent({
     applicationId: approvedApplication.id,
     bountyId: approvedApplication.bountyId,
-    scope: WebhookEventNames.RewardApplicationAccepted,
+    scope: WebhookEventNames.RewardApplicationApproved,
     spaceId: application.bounty.spaceId
   });
 

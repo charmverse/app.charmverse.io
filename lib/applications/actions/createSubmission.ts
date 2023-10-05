@@ -66,7 +66,7 @@ export async function createSubmission({
   await publishBountyEvent({
     applicationId: submission.id,
     bountyId: bounty.id,
-    scope: WebhookEventNames.RewardApplicationSubmitted,
+    scope: WebhookEventNames.RewardSubmissionCreated,
     spaceId: bounty.spaceId
   });
 

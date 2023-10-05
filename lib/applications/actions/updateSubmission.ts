@@ -57,7 +57,7 @@ export async function updateSubmission({
     await publishBountyEvent({
       applicationId: submissionId,
       bountyId: existingSubmission.bountyId,
-      scope: WebhookEventNames.RewardApplicationSubmitted,
+      scope: WebhookEventNames.RewardSubmissionCreated,
       spaceId: existingSubmission.spaceId
     });
   }

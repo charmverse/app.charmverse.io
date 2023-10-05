@@ -106,11 +106,11 @@ export enum WebhookEventNames {
   RewardCompleted = 'reward.completed',
   RewardApplicationCreated = 'reward.application.created',
   RewardApplicationRejected = 'reward.application.rejected',
-  RewardApplicationAccepted = 'reward.application.accepted',
-  RewardApplicationSubmitted = 'reward.application.submitted',
+  RewardApplicationApproved = 'reward.application.approved',
+  RewardSubmissionCreated = 'reward.submission.created',
+  RewardSubmissionApproved = 'reward.submission.approved',
   RewardApplicationPaymentCompleted = 'reward.payment.completed',
   RewardSuggestionCreated = 'reward.suggestion.created',
-  RewardApplicationApproved = 'reward.application.approved',
   ForumCommentUpvoted = 'forum.comment.upvoted',
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
@@ -203,7 +203,7 @@ export type WebhookEvent = WebhookEventSharedProps &
         application: ApplicationEntity;
       }
     | {
-        scope: WebhookEventNames.RewardApplicationAccepted;
+        scope: WebhookEventNames.RewardApplicationApproved;
         bounty: RewardEntity;
         application: ApplicationEntity;
       }
@@ -214,12 +214,12 @@ export type WebhookEvent = WebhookEventSharedProps &
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.RewardApplicationSubmitted;
+        scope: WebhookEventNames.RewardSubmissionCreated;
         bounty: RewardEntity;
         application: ApplicationEntity;
       }
     | {
-        scope: WebhookEventNames.RewardApplicationApproved;
+        scope: WebhookEventNames.RewardSubmissionApproved;
         bounty: RewardEntity;
         application: ApplicationEntity;
         user: UserEntity;

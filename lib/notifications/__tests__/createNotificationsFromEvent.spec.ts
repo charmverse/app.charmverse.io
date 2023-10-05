@@ -1479,7 +1479,7 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.RewardApplicationAccepted,
+        scope: WebhookEventNames.RewardApplicationApproved,
         bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id)
@@ -1601,7 +1601,7 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.RewardApplicationSubmitted,
+        scope: WebhookEventNames.RewardSubmissionCreated,
         bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id)
@@ -1677,7 +1677,7 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.RewardApplicationApproved,
+        scope: WebhookEventNames.RewardSubmissionApproved,
         bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id),

@@ -84,14 +84,14 @@ type BountyEventContext = {
   | {
       scope:
         | WebhookEventNames.RewardApplicationCreated
-        | WebhookEventNames.RewardApplicationAccepted
-        | WebhookEventNames.RewardApplicationSubmitted;
+        | WebhookEventNames.RewardApplicationApproved
+        | WebhookEventNames.RewardSubmissionCreated;
       applicationId: string;
     }
   | {
       scope:
         | WebhookEventNames.RewardApplicationRejected
-        | WebhookEventNames.RewardApplicationApproved
+        | WebhookEventNames.RewardSubmissionApproved
         | WebhookEventNames.RewardApplicationPaymentCompleted;
       userId: string;
       applicationId: string;
@@ -112,8 +112,8 @@ export async function publishBountyEvent(context: BountyEventContext) {
     }
 
     case WebhookEventNames.RewardApplicationCreated:
-    case WebhookEventNames.RewardApplicationSubmitted:
-    case WebhookEventNames.RewardApplicationAccepted: {
+    case WebhookEventNames.RewardSubmissionCreated:
+    case WebhookEventNames.RewardApplicationApproved: {
       const application = await getApplicationEntity(context.applicationId);
       return publishWebhookEvent(context.spaceId, {
         scope: context.scope,
@@ -124,7 +124,7 @@ export async function publishBountyEvent(context: BountyEventContext) {
     }
 
     case WebhookEventNames.RewardApplicationRejected:
-    case WebhookEventNames.RewardApplicationApproved:
+    case WebhookEventNames.RewardSubmissionApproved:
     case WebhookEventNames.RewardApplicationPaymentCompleted: {
       const [application, user] = await Promise.all([
         getApplicationEntity(context.applicationId),
