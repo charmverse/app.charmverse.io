@@ -8,8 +8,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
-import { StyledUserPropertyContainer } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
@@ -108,7 +106,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
   useEffect(() => {
     if (currentReward) {
-      refreshCryptoList(currentReward.chainId || 1);
+      refreshCryptoList(currentReward.chainId || 1, currentReward.rewardToken || undefined);
     }
 
     reset({

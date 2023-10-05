@@ -23,7 +23,7 @@ type RewardsContextType = {
   refreshReward: (rewardId: string) => Promise<void>;
   createReward: (input: RewardCreationData) => Promise<RewardWithUsers | null>;
   tempReward?: RewardCreationData | null;
-  setTempReward: (input?: RewardCreationData) => void;
+  setTempReward: (input?: RewardCreationData | null) => void;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({

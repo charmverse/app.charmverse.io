@@ -41,11 +41,8 @@ export function RewardProperties(props: {
   refreshRewardPermissions: (rewardId: string) => void;
 }) {
   const { rewardId, pageId, readOnly: parentReadOnly = false, refreshRewardPermissions } = props;
-  const [paymentMethods] = usePaymentMethods();
-  const { rewards, mutateRewards, updateReward } = useRewards();
-  const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
+  const { rewards, mutateRewards, updateReward, tempReward, setTempReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<(RewardCreationData & RewardWithUsers) | null>();
-  const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const { user } = useUser();
 
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
@@ -58,11 +55,6 @@ export function RewardProperties(props: {
     })
   );
   const { data: rewardPagePermissions, mutate: refreshPermissions } = useGetPermissions(pageId);
-
-  const isRewardAmountInvalid = useMemo(
-    () => isAmountInputEmpty || Number(currentReward?.rewardAmount) <= 0,
-    [isAmountInputEmpty, currentReward]
-  );
   const [rewardType, setRewardType] = useState<RewardType>('Token');
   // Using ref to make sure we don't keep redirecting to custom reward tab
   const { isSpaceMember } = useIsSpaceMember();
@@ -80,52 +72,23 @@ export function RewardProperties(props: {
 
   useEffect(() => {
     const rewardFromContext = rewards?.find((r) => r.id === rewardId);
-    setCurrentReward(rewardFromContext);
-  }, [rewardId, rewards]);
+    setCurrentReward(rewardFromContext || (tempReward as RewardWithUsers));
+
+    if (rewardFromContext && tempReward) {
+      setTempReward(null);
+    }
+  }, [rewardId, rewards, setTempReward, tempReward]);
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
-  // Copied from RewardApplicantsTable
-  const { data: applications, mutate: refreshSubmissions } = useSWR(
-    !rewardId ? null : `/rewards/${rewardId}/applications`,
-    () => charmClient.rewards.listApplications(rewardId as string),
-    {
-      fallbackData: []
-    }
-  );
-
-  function refreshCryptoList(chainId: number, rewardToken?: string) {
-    // Set the default chain currency
-    const selectedChain = getChainById(chainId);
-
-    if (selectedChain) {
-      const nativeCurrency = selectedChain.nativeCurrency.symbol;
-
-      const cryptosToDisplay = [nativeCurrency];
-
-      const contractAddresses = paymentMethods
-        .filter((method) => method.chainId === chainId)
-        .map((method) => {
-          return method.contractAddress;
-        })
-        .filter(isTruthy);
-      cryptosToDisplay.push(...contractAddresses);
-
-      setAvailableCryptos(cryptosToDisplay);
-      setCurrentReward((_currentReward) => ({
-        ...(_currentReward as RewardWithUsers),
-        rewardToken: rewardToken || nativeCurrency
-      }));
-    }
-    return selectedChain?.nativeCurrency.symbol;
-  }
-
-  async function onNewPaymentMethod(paymentMethod: PaymentMethod) {
-    if (paymentMethod.contractAddress) {
-      await applyRewardUpdates({ chainId: paymentMethod.chainId, rewardToken: paymentMethod.contractAddress });
-      refreshCryptoList(paymentMethod.chainId, paymentMethod.contractAddress);
-    }
-  }
+  // Copied from RewardApplicantsTable - probably not needed in this view
+  // const { data: applications, mutate: refreshSubmissions } = useSWR(
+  //   !rewardId ? null : `/rewards/${rewardId}/applications`,
+  //   () => charmClient.rewards.listApplications(rewardId as string),
+  //   {
+  //     fallbackData: []
+  //   }
+  // );
 
   async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
     setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
@@ -150,7 +113,6 @@ export function RewardProperties(props: {
         rewardAmount: Number(rewardToken.rewardAmount),
         customReward: null
       });
-      refreshCryptoList(rewardToken.chainId, rewardToken.rewardToken);
     }
   }
 
@@ -174,14 +136,6 @@ export function RewardProperties(props: {
     }
   }
 
-  const updateRewardAmount = useCallback((e: any) => {
-    setIsAmountInputEmpty(e.target.value === '');
-
-    applyRewardUpdatesDebounced({
-      rewardAmount: Number(e.target.value)
-    });
-  }, []);
-
   const updateRewardCustomReward = useCallback((e: any) => {
     applyRewardUpdatesDebounced({
       customReward: e.target.value
@@ -202,6 +156,7 @@ export function RewardProperties(props: {
     });
   }, []);
 
+  // handling tempReward
   async function confirmNewReward() {
     if (currentReward) {
       const createdReward = await charmClient.rewards.createReward(currentReward);
@@ -209,17 +164,11 @@ export function RewardProperties(props: {
     }
   }
 
-  useEffect(() => {
-    if (currentReward?.id) {
-      refreshSubmissions();
-    }
-  }, [currentReward?.id]);
-
-  useEffect(() => {
-    if (currentReward?.chainId && currentReward.rewardToken) {
-      refreshCryptoList(currentReward.chainId, currentReward.rewardToken);
-    }
-  }, [currentReward?.chainId, currentReward?.rewardToken]);
+  // useEffect(() => {
+  //   if (currentReward?.id) {
+  //     refreshSubmissions();
+  //   }
+  // }, [currentReward?.id]);
 
   if (!currentReward) {
     return null;
@@ -320,7 +269,6 @@ export function RewardProperties(props: {
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
           <PropertyLabel readOnly>Applicant Roles</PropertyLabel>
           <UserAndRoleSelect
-            type='role'
             readOnly={readOnly}
             value={allowedSubmittersValue}
             onChange={async (options) => {
