@@ -20,6 +20,7 @@ import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
@@ -53,11 +54,10 @@ import SettingsItem from './components/SettingsItem';
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  notifyDocuments: yup.boolean(),
   notifyForum: yup.boolean(),
   notifyNewProposals: yup.boolean(),
   notifyProposals: yup.boolean(),
-  notifyVotes: yup.boolean(),
+  notifyPolls: yup.boolean(),
   notifyRewards: yup.boolean(),
   domain: yup
     .string()
@@ -70,6 +70,26 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
+const notificationRuleEvents = {
+  bounties: {
+    title: 'Bounty',
+    events: [
+      ['Bounty is suggested', 'Application is submitted', 'Application is accepted', 'Application is rejected'],
+      ['Application work is submitted', 'Application work is approved', 'Application payment completed']
+    ]
+  },
+  proposals: {
+    title: 'Proposals',
+    events: [
+      ['Ready for feedback', 'Ready for review', 'Review completed'],
+      ['Ready for vote', 'Evaluation active', 'Evaluation completed']
+    ]
+  },
+  polls: {
+    title: 'Polls',
+    events: [['A poll is created in a page or forum post']]
+  }
+};
 export function SpaceSettings({
   space,
   setUnsavedChanges
@@ -259,25 +279,51 @@ export function SpaceSettings({
             </Typography>
             <Stack>
               <ToggleInput
-                name='notifyDocuments'
-                label='Documents'
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              />
-              <ToggleInput
                 name='notifyRewards'
-                label='Bounties'
+                label={
+                  <NotificationRuleComponent
+                    title={notificationRuleEvents.bounties.title}
+                    events={notificationRuleEvents.bounties.events}
+                  />
+                }
                 disabled={!isAdmin}
                 control={control}
                 setValue={setValue}
               />
-              <ToggleInput name='notifyForum' label='Forum' disabled={!isAdmin} control={control} setValue={setValue} />
-              <Grid container>
+              {/* <ToggleInput
+                name='notifyForum'
+                label={
+                  <NotificationRuleComponent
+                    title={notificationRuleEvents.forum.title}
+                    events={notificationRuleEvents.forum.events}
+                  />
+                }
+                disabled={!isAdmin}
+                control={control}
+                setValue={setValue}
+              /> */}
+              <ToggleInput
+                name='notifyProposals'
+                label={
+                  <NotificationRuleComponent
+                    title={notificationRuleEvents.proposals.title}
+                    events={notificationRuleEvents.proposals.events}
+                  />
+                }
+                disabled={!isAdmin}
+                control={control}
+                setValue={setValue}
+              />
+              {/* <Grid container>
                 <Grid item xs md={5}>
                   <ToggleInput
                     name='notifyProposals'
-                    label='Proposals'
+                    label={
+                      <NotificationRuleComponent
+                        title={notificationRuleEvents.proposals.title}
+                        events={notificationRuleEvents.proposals.events}
+                      />
+                    }
                     disabled={!isAdmin}
                     control={control}
                     setValue={setValue}
@@ -292,8 +338,19 @@ export function SpaceSettings({
                     setValue={setValue}
                   />
                 </Grid>
-              </Grid>
-              <ToggleInput name='notifyVotes' label='Polls' disabled={!isAdmin} control={control} setValue={setValue} />
+              </Grid> */}
+              <ToggleInput
+                name='notifyPolls'
+                label={
+                  <NotificationRuleComponent
+                    title={notificationRuleEvents.polls.title}
+                    events={notificationRuleEvents.polls.events}
+                  />
+                }
+                disabled={!isAdmin}
+                control={control}
+                setValue={setValue}
+              />
             </Stack>
           </Grid>
           <Grid item>
@@ -552,6 +609,27 @@ export function SpaceSettings({
   );
 }
 
+function NotificationRuleComponent({ title, events: listsOfEvents }: { title: string; events: string[][] }) {
+  return (
+    <span>
+      <Typography sx={{ my: 1 }}>{title}</Typography>
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        {listsOfEvents.map((events) => (
+          <Grid item key={events.join()}>
+            <Typography variant='caption'>
+              <ul style={{ margin: 0, paddingLeft: '2em' }}>
+                {events.map((event) => (
+                  <li key={event}>{event}</li>
+                ))}
+              </ul>
+            </Typography>
+          </Grid>
+        ))}
+      </Grid>
+    </span>
+  );
+}
+
 function ToggleInput<T extends string>({
   disabled,
   name,
@@ -561,7 +639,7 @@ function ToggleInput<T extends string>({
 }: {
   disabled?: boolean;
   name: T;
-  label: string;
+  label: ReactNode;
   control: any;
   setValue: (name: T, value: any) => void;
 }) {
@@ -572,6 +650,8 @@ function ToggleInput<T extends string>({
       render={({ field: { onChange, value } }) => {
         return (
           <FormControlLabel
+            disableTypography
+            sx={{ alignItems: 'flex-start' }}
             control={
               <Switch
                 disabled={disabled}
@@ -598,12 +678,11 @@ function _getFormValues(space: Space): FormValues {
     name: space.name,
     spaceImage: space.spaceImage,
     domain: space.domain,
-    notifyDocuments: !notificationRules.some((rule) => rule.exclude === 'documents'),
     notifyForum: !notificationRules.some((rule) => rule.exclude === 'forum'),
     notifyNewProposals: !!space.notifyNewProposals,
     notifyProposals: !notificationRules.some((rule) => rule.exclude === 'proposals'),
     notifyRewards: !notificationRules.some((rule) => rule.exclude === 'rewards'),
-    notifyVotes: !notificationRules.some((rule) => rule.exclude === 'votes')
+    notifyPolls: !notificationRules.some((rule) => rule.exclude === 'polls')
   };
 }
 
