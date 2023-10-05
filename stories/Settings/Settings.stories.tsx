@@ -1,4 +1,5 @@
 import { Paper } from '@mui/material';
+import { rest } from 'msw';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
@@ -12,9 +13,17 @@ import type { IContext as ISpacesContext } from 'hooks/useSpaces';
 import { SpacesContext } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 
-import { spaces } from '../lib/mockData';
+import { spaces as _spaces, userProfile } from '../lib/mockData';
 
+// clone spaces so we can mutate it
+const spaces = [..._spaces].map((s) => ({ ...s }));
 const space = spaces[0];
+
+space.notificationRules = [
+  {
+    exclude: 'forum'
+  }
+];
 
 function Context({ children }: { children: ReactNode }) {
   // mock the current space since it usually relies on the URL
@@ -98,4 +107,23 @@ export function billing() {
 export default {
   title: 'Settings/Views',
   component: SettingsContent
+};
+
+API.parameters = {
+  msw: {
+    handlers: {
+      spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
+        return res(ctx.json(spaces));
+      }),
+      userProfile: rest.get('/api/profile', (req, res, ctx) => {
+        const clone = { ...userProfile };
+        clone.notificationRules = [
+          {
+            exclude: 'forum'
+          }
+        ];
+        return res(ctx.json(clone));
+      })
+    }
+  }
 };

@@ -39,14 +39,11 @@ type TabPanelProps = BoxProps & {
   value: string;
 };
 
-// const spaceTabs: Record<SpaceSettingsTab['path'], ({ space }: { space: Space }) => JSX.Element> = {
-//   api: ({ space }) => <ApiSettings space={space} />,
-//   import: ({ space }) => <ImportSettings space={space} />,
-//   invites: ({ space }) => <Invites space={space} />,
-//   roles: ({ space }) => <RoleSettings space={space} />,
-//   subscription: ({ space }) => <SubscriptionSettings space={space} />,
-//   space: ({ space }) => <SpaceSettings space={space} />
-// };
+const accountTabs: Record<UserSettingsTab['path'], typeof ProfileSettings> = {
+  account: AccountSettings,
+  profile: ProfileSettings
+};
+
 const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   api: ApiSettings,
   import: ImportSettings,
@@ -54,11 +51,6 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   roles: RoleSettings,
   subscription: SubscriptionSettings,
   space: SpaceSettings
-};
-
-const accountTabs: Record<UserSettingsTab['path'], typeof ProfileSettings> = {
-  account: AccountSettings,
-  profile: ProfileSettings
 };
 
 function TabPanel(props: TabPanelProps) {
@@ -185,24 +177,22 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
             </IconButton>
           </Box>
         )}
-        {currentSpace &&
-          SETTINGS_TABS.map((tab) => {
-            const TabView = spaceTabs[tab.path];
-            return (
-              <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
-                <TabView space={currentSpace} setUnsavedChanges={setUnsavedChanges} />
-              </TabPanel>
-            );
-          })}
-        {currentSpace &&
-          ACCOUNT_TABS.map((tab) => {
-            const TabView = accountTabs[tab.path];
-            return (
-              <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
-                <TabView setUnsavedChanges={setUnsavedChanges} />
-              </TabPanel>
-            );
-          })}
+        {ACCOUNT_TABS.map((tab) => {
+          const TabView = accountTabs[tab.path];
+          return (
+            <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
+              <TabView setUnsavedChanges={setUnsavedChanges} />
+            </TabPanel>
+          );
+        })}
+        {SETTINGS_TABS.map((tab) => {
+          const TabView = spaceTabs[tab.path];
+          return (
+            <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
+              {currentSpace && <TabView space={currentSpace} setUnsavedChanges={setUnsavedChanges} />}
+            </TabPanel>
+          );
+        })}
       </Box>
       {!subscriptionEnded && (
         <Box>

@@ -260,21 +260,21 @@ export function SpaceSettings({
             <Stack>
               <ToggleInput
                 name='notifyDocuments'
-                label='Send notifications for document events'
+                label='Send notifications for Document events'
+                disabled={!isAdmin}
+                control={control}
+                setValue={setValue}
+              />
+              <ToggleInput
+                name='notifyRewards'
+                label='Send notifications for Bounty events'
                 disabled={!isAdmin}
                 control={control}
                 setValue={setValue}
               />
               <ToggleInput
                 name='notifyForum'
-                label='Send notifications for forum events'
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              />
-              <ToggleInput
-                name='notifyVotes'
-                label='Send notifications for new votes'
+                label='Send notifications for Forum events'
                 disabled={!isAdmin}
                 control={control}
                 setValue={setValue}
@@ -283,7 +283,7 @@ export function SpaceSettings({
                 <Grid item xs md={5}>
                   <ToggleInput
                     name='notifyProposals'
-                    label='Send notifications for proposals'
+                    label='Send notifications for Proposal events'
                     disabled={!isAdmin}
                     control={control}
                     setValue={setValue}
@@ -300,8 +300,8 @@ export function SpaceSettings({
                 </Grid>
               </Grid>
               <ToggleInput
-                name='notifyRewards'
-                label='Send notifications for bounties'
+                name='notifyVotes'
+                label='Send notifications for Votes'
                 disabled={!isAdmin}
                 control={control}
                 setValue={setValue}
