@@ -516,27 +516,26 @@ export function NotificationContent({
             <Typography pl={0.2} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
               {spaceName}
             </Typography>
+            {archived && (
+              <Button
+                sx={{
+                  width: 'fit-content',
+                  alignSelf: 'flex-start'
+                }}
+                color='secondary'
+                variant='text'
+                onClick={(e: any) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  markNotifications({ ids: [taskId], state: 'unarchived' });
+                }}
+                size='small'
+              >
+                Unarchive
+              </Button>
+            )}
           </Box>
         </Box>
-        {archived && (
-          <Button
-            sx={{
-              width: 'fit-content',
-              alignSelf: 'flex-start',
-              marginLeft: '44px'
-            }}
-            color='secondary'
-            variant='text'
-            onClick={(e: any) => {
-              e.stopPropagation();
-              e.preventDefault();
-              markNotifications({ ids: [taskId], state: 'unarchived' });
-            }}
-            size='small'
-          >
-            Unarchive
-          </Button>
-        )}
       </StyledStack>
     </Link>
   );
