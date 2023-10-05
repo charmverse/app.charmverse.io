@@ -45,7 +45,9 @@ export function ConnectCollabland() {
   }
 
   if (!isAdmin) {
-    <Typography variant='body2'>Collabland is not connected yet. Only space admins can configure this.</Typography>;
+    return (
+      <Typography variant='body2'>Collabland is not connected yet. Only space admins can configure this.</Typography>
+    );
   }
 
   return (
