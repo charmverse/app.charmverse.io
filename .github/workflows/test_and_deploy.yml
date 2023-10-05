@@ -191,7 +191,7 @@ jobs:
     name: Deploy to production
     runs-on: ubuntu-latest
     # Re-enable condition before merge
-    if: github.ref == 'refs/heads/main'
+#    if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
