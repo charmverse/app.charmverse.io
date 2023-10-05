@@ -246,7 +246,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
           status: 'failure'
           content: "Hey <@&1027309276454207519>"    
-          title: "Webapp merge to main workflow failed"
+          title: "Webapp: Core pkg upgrade failed"
           description: |
             Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
           color: "16515843"

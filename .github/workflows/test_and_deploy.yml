@@ -191,7 +191,7 @@ jobs:
     name: Deploy to production
     runs-on: ubuntu-latest
     # Re-enable condition before merge
-#    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
     steps:
       - uses: actions/checkout@v3
@@ -212,7 +212,6 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
           echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
-          exit 1
 
       - name: Build app
         uses: ./.github/actions/build
@@ -333,14 +332,14 @@ jobs:
   discord_alert:
     name: Notify discord of failure
     runs-on: ubuntu-latest
-    if: failure()
+    if: github.ref == 'refs/heads/main' && failure()
     needs: [build-test-env, test, integration-test, deploy]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
         uses: sarisia/actions-status-discord@v1
         with:
-          webhook: ${{ secrets.DISCORD_TEST_WEBHOOK }}
+          webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
           status: 'failure'
           content: "Hey <@&1027309276454207519>"    
           title: "Webapp deploy workflow failed"
