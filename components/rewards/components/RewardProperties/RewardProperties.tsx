@@ -269,6 +269,7 @@ export function RewardProperties(props: {
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
           <PropertyLabel readOnly>Applicant Roles</PropertyLabel>
           <UserAndRoleSelect
+            type='role'
             readOnly={readOnly}
             value={allowedSubmittersValue}
             onChange={async (options) => {
