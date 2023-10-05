@@ -15,8 +15,8 @@ export type DocumentEntity = {
   id: string;
   title: string;
   url: string;
-  type: PageType;
-  author: UserEntity;
+  type: PageType | 'post';
+  authors: UserEntity[];
 };
 
 export type SpaceEntity = {
@@ -111,9 +111,6 @@ export enum WebhookEventNames {
   BountyApplicationPaymentCompleted = 'bounty.payment.completed',
   BountySuggestionCreated = 'bounty.suggestion.created',
   BountyApplicationApproved = 'bounty.application.approved',
-  BountyInlineCommentCreated = 'bounty.inline_comment.created',
-  BountyMentionCreated = 'bounty.mention.created',
-  ForumCommentCreated = 'forum.comment.created',
   ForumCommentUpvoted = 'forum.comment.upvoted',
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
@@ -122,19 +119,17 @@ export enum WebhookEventNames {
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
-  ProposalInlineCommentCreated = 'proposal.inline_comment.created',
-  ProposalCommentCreated = 'proposal.comment.created',
-  ProposalMentionCreated = 'proposal.mention.created',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
-  DocumentMentionCreated = 'document.mention.created',
+  DocumentCommentCreated = 'document.comment.created',
   DocumentInlineCommentCreated = 'document.inline_comment.created',
+  DocumentMentionCreated = 'document.mention.created',
   CardBlockCommentCreated = 'card.block_comment.created',
   CardPersonPropertyAssigned = 'card.person_property.assigned',
   VoteCreated = 'vote.created'
 }
 
-export const whiteListedWebhookEvents = [
+export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
   'bounty.completed',
   'forum.comment.created',
   'forum.comment.upvoted',
