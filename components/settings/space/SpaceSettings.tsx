@@ -65,11 +65,16 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export function SpaceSettings({ space }: { space: Space }) {
+export function SpaceSettings({
+  space,
+  setUnsavedChanges
+}: {
+  space: Space;
+  setUnsavedChanges: (value: boolean) => void;
+}) {
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
-  const { handleUnsavedChanges } = useSettingsDialog();
   const { features: allFeatures, memberProfiles: allMemberProfiles } = useFeaturesAndMembers();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
@@ -124,9 +129,6 @@ export function SpaceSettings({ space }: { space: Space }) {
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
 
-    const updatedFeatures = isEqual(features, space.features) ? undefined : features;
-    const updatedProfiles = isEqual(memberProfiles, space.memberProfiles) ? undefined : memberProfiles;
-
     let notifyNewProposals: Date | null | undefined;
     if (!values.notifyNewProposals) {
       notifyNewProposals = null;
@@ -139,8 +141,8 @@ export function SpaceSettings({ space }: { space: Space }) {
     await updateSpace({
       id: space.id,
       notifyNewProposals,
-      features: updatedFeatures,
-      memberProfiles: updatedProfiles,
+      features,
+      memberProfiles,
       name: values.name,
       domain: values.domain,
       spaceImage: values.spaceImage
@@ -186,14 +188,14 @@ export function SpaceSettings({ space }: { space: Space }) {
   }
 
   const dataChanged = useMemo(() => {
-    return !isEqual(space.features, features) || !isEqual(space.memberProfiles, memberProfiles) || isDirty;
-  }, [space.features, space.memberProfiles, features, memberProfiles, isDirty]);
+    return !isEqual(allFeatures, features) || !isEqual(allMemberProfiles, memberProfiles) || isDirty;
+  }, [allFeatures, features, memberProfiles, isDirty]);
 
   useEffect(() => {
-    handleUnsavedChanges(dataChanged);
+    setUnsavedChanges(dataChanged);
 
     return () => {
-      handleUnsavedChanges(false);
+      setUnsavedChanges(false);
     };
   }, [dataChanged]);
 

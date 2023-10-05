@@ -51,9 +51,15 @@ function Context({ children }: { children: ReactNode }) {
 function ShowSettingsProfile({ path }: { path: SettingsPath }) {
   const [activePath, setActivePath] = useState<SettingsPath | undefined>(path);
   function onClose() {}
+  function setUnsavedChanges() {}
   return (
     <Context>
-      <SettingsContent activePath={activePath} onSelectPath={setActivePath} onClose={onClose} />
+      <SettingsContent
+        activePath={activePath}
+        onSelectPath={setActivePath}
+        onClose={onClose}
+        setUnsavedChanges={setUnsavedChanges}
+      />
     </Context>
   );
 }

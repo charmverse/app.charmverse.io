@@ -39,50 +39,27 @@ type TabPanelProps = BoxProps & {
   value: string;
 };
 
-function TabView(props: { space: Space; tab: SpaceSettingsTab | UserSettingsTab }) {
-  const { space, tab } = props;
+// const spaceTabs: Record<SpaceSettingsTab['path'], ({ space }: { space: Space }) => JSX.Element> = {
+//   api: ({ space }) => <ApiSettings space={space} />,
+//   import: ({ space }) => <ImportSettings space={space} />,
+//   invites: ({ space }) => <Invites space={space} />,
+//   roles: ({ space }) => <RoleSettings space={space} />,
+//   subscription: ({ space }) => <SubscriptionSettings space={space} />,
+//   space: ({ space }) => <SpaceSettings space={space} />
+// };
+const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
+  api: ApiSettings,
+  import: ImportSettings,
+  invites: Invites,
+  roles: RoleSettings,
+  subscription: SubscriptionSettings,
+  space: SpaceSettings
+};
 
-  const settingsTab = SETTINGS_TABS.find((settingTab) => settingTab.path === tab.path);
-  const accountsTab = ACCOUNT_TABS.find((accountTab) => accountTab.path === tab.path);
-
-  if (!settingsTab && !accountsTab) {
-    return null;
-  }
-
-  if (tab.path === 'space' && space) {
-    return <SpaceSettings space={space} />;
-  }
-
-  if (tab.path === 'roles' && space) {
-    return <RoleSettings space={space} />;
-  }
-
-  if (tab.path === 'invites' && space) {
-    return <Invites space={space} />;
-  }
-
-  if (tab.path === 'import' && space) {
-    return <ImportSettings space={space} />;
-  }
-
-  if (tab.path === 'api' && space) {
-    return <ApiSettings space={space} />;
-  }
-
-  if (tab.path === 'subscription' && space) {
-    return <SubscriptionSettings space={space} />;
-  }
-
-  if (tab.path === 'account') {
-    return <AccountSettings />;
-  }
-
-  if (tab.path === 'profile') {
-    return <ProfileSettings />;
-  }
-
-  return null;
-}
+const accountTabs: Record<UserSettingsTab['path'], typeof ProfileSettings> = {
+  account: AccountSettings,
+  profile: ProfileSettings
+};
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -104,9 +81,10 @@ type Props = {
   activePath?: SettingsPath;
   onClose: (e: SyntheticEvent) => void;
   onSelectPath: (path?: SettingsPath) => void;
+  setUnsavedChanges: (dataChanged: boolean) => void;
 };
 
-export function SettingsContent({ activePath, onClose, onSelectPath }: Props) {
+export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedChanges }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
@@ -208,17 +186,23 @@ export function SettingsContent({ activePath, onClose, onSelectPath }: Props) {
           </Box>
         )}
         {currentSpace &&
-          SETTINGS_TABS.map((tab) => (
-            <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
-              <TabView space={currentSpace} tab={tab} />
-            </TabPanel>
-          ))}
+          SETTINGS_TABS.map((tab) => {
+            const TabView = spaceTabs[tab.path];
+            return (
+              <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
+                <TabView space={currentSpace} setUnsavedChanges={setUnsavedChanges} />
+              </TabPanel>
+            );
+          })}
         {currentSpace &&
-          ACCOUNT_TABS.map((tab) => (
-            <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
-              <TabView tab={tab} space={currentSpace} />
-            </TabPanel>
-          ))}
+          ACCOUNT_TABS.map((tab) => {
+            const TabView = accountTabs[tab.path];
+            return (
+              <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
+                <TabView setUnsavedChanges={setUnsavedChanges} />
+              </TabPanel>
+            );
+          })}
       </Box>
       {!subscriptionEnded && (
         <Box>

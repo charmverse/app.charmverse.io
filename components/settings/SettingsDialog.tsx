@@ -1,6 +1,7 @@
 import type { BoxProps } from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -11,7 +12,8 @@ import { SettingsContent } from './SettingsContent';
 
 export function SpaceSettingsDialog() {
   const isMobile = useSmallScreen();
-  const { activePath, onClose, openSettings, isOpen, unsavedChanges } = useSettingsDialog();
+  const { activePath, onClose, openSettings, isOpen } = useSettingsDialog();
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
 
   const handleClose = (e: any) => {
@@ -39,7 +41,12 @@ export function SpaceSettingsDialog() {
       onClose={handleClose}
       open={isOpen}
     >
-      <SettingsContent activePath={activePath} onClose={handleClose} onSelectPath={openSettings} />
+      <SettingsContent
+        activePath={activePath}
+        onClose={handleClose}
+        onSelectPath={openSettings}
+        setUnsavedChanges={setUnsavedChanges}
+      />
       <ConfirmDeleteModal
         onClose={confirmExitPopupState.close}
         title='Unsaved changes'
