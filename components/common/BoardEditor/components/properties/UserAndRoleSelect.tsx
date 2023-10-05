@@ -139,7 +139,6 @@ type Props = {
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
   wrapColumn?: boolean;
-  type?: 'role' | 'user' | 'roleAndUser';
 };
 
 export function UserAndRoleSelect({
@@ -152,8 +151,7 @@ export function UserAndRoleSelect({
   variant = 'standard',
   value: inputValue,
   'data-test': dataTest,
-  wrapColumn = true,
-  type = 'roleAndUser'
+  wrapColumn = true
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -198,20 +196,10 @@ export function UserAndRoleSelect({
       _filteredOptions = [...mappedMembers];
     } else {
       // For bounties, allow any space member or role to be selected
-      if (type === 'role') {
-        _filteredOptions = mappedRoles;
-      }
-
-      if (type === 'user') {
-        _filteredOptions = mappedMembers;
-      }
-
-      if (type === 'roleAndUser') {
-        _filteredOptions = [...mappedMembers, ...mappedRoles];
-      }
+      _filteredOptions = [...mappedMembers, ...mappedRoles];
     }
     return _filteredOptions;
-  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
+  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId]);
 
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
@@ -239,12 +227,8 @@ export function UserAndRoleSelect({
   }
 
   function getPlaceholderLabel() {
-    if (isFreeSpace || type === 'user') {
+    if (isFreeSpace) {
       return 'Search for a person...';
-    }
-
-    if (type === 'role') {
-      return 'Search for a role...';
     }
 
     return 'Search for a person or role...';

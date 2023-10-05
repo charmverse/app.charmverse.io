@@ -34,7 +34,6 @@ import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import Rewards from 'pages/api/rewards';
 import { fontClassName } from 'theme/fonts';
 
 import BountyProperties from './components/BountyProperties';
