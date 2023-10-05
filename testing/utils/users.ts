@@ -47,6 +47,7 @@ type GenerateUserInput = {
 export function generateUser(input?: GenerateUserInput): Promise<User> {
   return prisma.user.create({
     data: {
+      notificationRules: input?.notificationRules,
       path: uid(),
       username: randomName(),
       identityType: 'RandomName',
