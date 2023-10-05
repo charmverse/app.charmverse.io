@@ -5,7 +5,7 @@ import { baseUrl } from 'config/constants';
 import type {
   ApplicationEntity,
   BlockCommentEntity,
-  BountyEntity,
+  RewardEntity,
   CommentEntity,
   DocumentEntity,
   InlineCommentEntity,
@@ -16,7 +16,7 @@ import type {
   VoteEntity
 } from './interfaces';
 
-export async function getBountyEntity(id: string): Promise<BountyEntity> {
+export async function getRewardEntity(id: string): Promise<RewardEntity> {
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {
       id
@@ -225,7 +225,7 @@ export async function getApplicationEntity(id: string): Promise<ApplicationEntit
     id,
     createdAt: application.createdAt.toISOString(),
     user: await getUserEntity(application.createdBy),
-    bounty: await getBountyEntity(application.bountyId)
+    bounty: await getRewardEntity(application.bountyId)
   };
 }
 

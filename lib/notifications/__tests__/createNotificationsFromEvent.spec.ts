@@ -18,7 +18,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { createVote } from 'lib/votes';
 import {
   getApplicationEntity,
-  getBountyEntity,
+  getRewardEntity,
   getCommentEntity,
   getDocumentEntity,
   getInlineCommentEntity,
@@ -1367,8 +1367,8 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.BountyApplicationCreated,
-        bounty: await getBountyEntity(bounty.id),
+        scope: WebhookEventNames.RewardApplicationCreated,
+        bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id)
       },
@@ -1417,8 +1417,8 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.BountyApplicationAccepted,
-        bounty: await getBountyEntity(bounty.id),
+        scope: WebhookEventNames.RewardApplicationAccepted,
+        bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id)
       },
@@ -1468,8 +1468,8 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.BountyApplicationRejected,
-        bounty: await getBountyEntity(bounty.id),
+        scope: WebhookEventNames.RewardApplicationRejected,
+        bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id),
         user: await getUserEntity(user.id)
@@ -1539,8 +1539,8 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.BountyApplicationSubmitted,
-        bounty: await getBountyEntity(bounty.id),
+        scope: WebhookEventNames.RewardApplicationSubmitted,
+        bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id)
       },
@@ -1615,8 +1615,8 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.BountyApplicationApproved,
-        bounty: await getBountyEntity(bounty.id),
+        scope: WebhookEventNames.RewardApplicationApproved,
+        bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id),
         user: await getUserEntity(user.id)
@@ -1705,8 +1705,8 @@ describe(`Test bounty events and notifications`, () => {
 
     await createNotificationsFromEvent({
       event: {
-        scope: WebhookEventNames.BountyApplicationPaymentCompleted,
-        bounty: await getBountyEntity(bounty.id),
+        scope: WebhookEventNames.RewardApplicationPaymentCompleted,
+        bounty: await getRewardEntity(bounty.id),
         space: await getSpaceEntity(space.id),
         application: await getApplicationEntity(application.id),
         user: await getUserEntity(user.id)

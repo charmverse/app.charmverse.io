@@ -190,7 +190,7 @@ export async function createBounty({
   }
 
   await publishBountyEvent({
-    scope: WebhookEventNames.BountySuggestionCreated,
+    scope: WebhookEventNames.RewardSuggestionCreated,
     bountyId,
     spaceId: space.id,
     userId: createdBy

@@ -532,7 +532,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationCreated: {
+    case WebhookEventNames.RewardApplicationCreated: {
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
       const applicationId = webhookData.event.application.id;
@@ -561,7 +561,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationAccepted: {
+    case WebhookEventNames.RewardApplicationAccepted: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -590,7 +590,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationRejected: {
+    case WebhookEventNames.RewardApplicationRejected: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -617,7 +617,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationSubmitted: {
+    case WebhookEventNames.RewardApplicationSubmitted: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -646,7 +646,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationApproved: {
+    case WebhookEventNames.RewardApplicationApproved: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -686,7 +686,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationPaymentCompleted: {
+    case WebhookEventNames.RewardApplicationPaymentCompleted: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -713,7 +713,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountySuggestionCreated: {
+    case WebhookEventNames.RewardSuggestionCreated: {
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
       const spaceAdmins = await prisma.spaceRole.findMany({

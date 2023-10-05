@@ -1,8 +1,6 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-
 import type { BountyNotification, NotificationsGroup } from './interfaces';
 import { notificationMetadataIncludeStatement, sortByDate } from './utils';
 

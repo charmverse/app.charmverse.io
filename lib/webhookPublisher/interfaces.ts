@@ -57,7 +57,7 @@ export type VoteEntity = {
   title: string;
 };
 
-export type BountyEntity = {
+export type RewardEntity = {
   createdAt: string;
   id: string;
   title: string;
@@ -73,7 +73,7 @@ export type ApplicationEntity = {
   id: string;
   createdAt: string;
   user: UserEntity;
-  bounty: BountyEntity;
+  bounty: RewardEntity;
 };
 
 export type InlineCommentEntity = {
@@ -96,21 +96,21 @@ export type CardPropertyEntity = {
 };
 
 export enum WebhookNameSpaces {
-  Bounty = 'bounty',
+  Reward = 'bounty',
   Forum = 'forum',
   user = 'user',
   Proposal = 'proposal'
 }
 
 export enum WebhookEventNames {
-  BountyCompleted = 'bounty.completed',
-  BountyApplicationCreated = 'bounty.application.created',
-  BountyApplicationRejected = 'bounty.application.rejected',
-  BountyApplicationAccepted = 'bounty.application.accepted',
-  BountyApplicationSubmitted = 'bounty.application.submitted',
-  BountyApplicationPaymentCompleted = 'bounty.payment.completed',
-  BountySuggestionCreated = 'bounty.suggestion.created',
-  BountyApplicationApproved = 'bounty.application.approved',
+  RewardCompleted = 'reward.completed',
+  RewardApplicationCreated = 'reward.application.created',
+  RewardApplicationRejected = 'reward.application.rejected',
+  RewardApplicationAccepted = 'reward.application.accepted',
+  RewardApplicationSubmitted = 'reward.application.submitted',
+  RewardApplicationPaymentCompleted = 'reward.payment.completed',
+  RewardSuggestionCreated = 'reward.suggestion.created',
+  RewardApplicationApproved = 'reward.application.approved',
   ForumCommentUpvoted = 'forum.comment.upvoted',
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
@@ -130,7 +130,7 @@ export enum WebhookEventNames {
 }
 
 export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
-  'bounty.completed',
+  'reward.completed',
   'forum.comment.created',
   'forum.comment.upvoted',
   'forum.comment.downvoted',
@@ -194,46 +194,46 @@ export type WebhookEvent = WebhookEventSharedProps &
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountyCompleted;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardCompleted;
+        bounty: RewardEntity;
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationCreated;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationCreated;
+        bounty: RewardEntity;
         application: ApplicationEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationAccepted;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationAccepted;
+        bounty: RewardEntity;
         application: ApplicationEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationRejected;
-        bounty: BountyEntity;
-        application: ApplicationEntity;
-        user: UserEntity;
-      }
-    | {
-        scope: WebhookEventNames.BountyApplicationSubmitted;
-        bounty: BountyEntity;
-        application: ApplicationEntity;
-      }
-    | {
-        scope: WebhookEventNames.BountyApplicationApproved;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationRejected;
+        bounty: RewardEntity;
         application: ApplicationEntity;
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationPaymentCompleted;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationSubmitted;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardApplicationApproved;
+        bounty: RewardEntity;
         application: ApplicationEntity;
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountySuggestionCreated;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationPaymentCompleted;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardSuggestionCreated;
+        bounty: RewardEntity;
         user: UserEntity;
       }
     | {

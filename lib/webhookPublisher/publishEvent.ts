@@ -5,7 +5,7 @@ import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
-  getBountyEntity,
+  getRewardEntity,
   getUserEntity,
   getCommentEntity,
   getSpaceEntity,
@@ -78,30 +78,30 @@ type BountyEventContext = {
   bountyId: string;
 } & (
   | {
-      scope: WebhookEventNames.BountyCompleted | WebhookEventNames.BountySuggestionCreated;
+      scope: WebhookEventNames.RewardCompleted | WebhookEventNames.RewardSuggestionCreated;
       userId: string;
     }
   | {
       scope:
-        | WebhookEventNames.BountyApplicationCreated
-        | WebhookEventNames.BountyApplicationAccepted
-        | WebhookEventNames.BountyApplicationSubmitted;
+        | WebhookEventNames.RewardApplicationCreated
+        | WebhookEventNames.RewardApplicationAccepted
+        | WebhookEventNames.RewardApplicationSubmitted;
       applicationId: string;
     }
   | {
       scope:
-        | WebhookEventNames.BountyApplicationRejected
-        | WebhookEventNames.BountyApplicationApproved
-        | WebhookEventNames.BountyApplicationPaymentCompleted;
+        | WebhookEventNames.RewardApplicationRejected
+        | WebhookEventNames.RewardApplicationApproved
+        | WebhookEventNames.RewardApplicationPaymentCompleted;
       userId: string;
       applicationId: string;
     }
 );
 
 export async function publishBountyEvent(context: BountyEventContext) {
-  const [space, bounty] = await Promise.all([getSpaceEntity(context.spaceId), getBountyEntity(context.bountyId)]);
+  const [space, bounty] = await Promise.all([getSpaceEntity(context.spaceId), getRewardEntity(context.bountyId)]);
   switch (context.scope) {
-    case WebhookEventNames.BountyCompleted: {
+    case WebhookEventNames.RewardCompleted: {
       const user = await getUserEntity(context.userId);
       return publishWebhookEvent(context.spaceId, {
         scope: context.scope,
@@ -111,9 +111,9 @@ export async function publishBountyEvent(context: BountyEventContext) {
       });
     }
 
-    case WebhookEventNames.BountyApplicationCreated:
-    case WebhookEventNames.BountyApplicationSubmitted:
-    case WebhookEventNames.BountyApplicationAccepted: {
+    case WebhookEventNames.RewardApplicationCreated:
+    case WebhookEventNames.RewardApplicationSubmitted:
+    case WebhookEventNames.RewardApplicationAccepted: {
       const application = await getApplicationEntity(context.applicationId);
       return publishWebhookEvent(context.spaceId, {
         scope: context.scope,
@@ -123,9 +123,9 @@ export async function publishBountyEvent(context: BountyEventContext) {
       });
     }
 
-    case WebhookEventNames.BountyApplicationRejected:
-    case WebhookEventNames.BountyApplicationApproved:
-    case WebhookEventNames.BountyApplicationPaymentCompleted: {
+    case WebhookEventNames.RewardApplicationRejected:
+    case WebhookEventNames.RewardApplicationApproved:
+    case WebhookEventNames.RewardApplicationPaymentCompleted: {
       const [application, user] = await Promise.all([
         getApplicationEntity(context.applicationId),
         getUserEntity(context.userId)
