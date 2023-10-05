@@ -43,16 +43,17 @@ export async function createInlineCommentNotification(
     }
   });
 
+  const shouldCreateCommentRepliedNotification =
+    previousInlineComment &&
+    previousInlineComment.id !== inlineCommentId &&
+    previousInlineComment.userId !== inlineCommentAuthorId;
+
   switch (data.scope) {
     case WebhookEventNames.BountyInlineCommentCreated: {
-      const authorId = data.bounty.author.id;
+      const bountyAuthorId = data.bounty.author.id;
       const bountyId = data.bounty.id;
 
-      if (
-        previousInlineComment &&
-        previousInlineComment?.id !== inlineCommentId &&
-        previousInlineComment.userId !== inlineCommentAuthorId
-      ) {
+      if (shouldCreateCommentRepliedNotification) {
         await createBountyNotification({
           type: 'inline_comment.replied',
           createdBy: inlineCommentAuthorId,
@@ -63,14 +64,14 @@ export async function createInlineCommentNotification(
         });
       }
 
-      if (inlineCommentAuthorId !== authorId) {
+      if (inlineCommentAuthorId !== bountyAuthorId && previousInlineComment?.userId !== bountyAuthorId) {
         await createBountyNotification({
           type: 'inline_comment.created',
           createdBy: inlineCommentAuthorId,
           inlineCommentId,
           bountyId,
           spaceId,
-          userId: authorId
+          userId: bountyAuthorId
         });
       }
 
@@ -93,24 +94,10 @@ export async function createInlineCommentNotification(
     }
 
     case WebhookEventNames.DocumentInlineCommentCreated: {
-      const authorId = data.document.author.id;
+      const documentAuthorId = data.document.author.id;
       const pageId = data.document.id;
-      if (inlineCommentAuthorId !== authorId) {
-        await createDocumentNotification({
-          type: 'inline_comment.created',
-          createdBy: inlineCommentAuthorId,
-          inlineCommentId,
-          pageId,
-          spaceId,
-          userId: authorId
-        });
-      }
 
-      if (
-        previousInlineComment &&
-        previousInlineComment?.id !== inlineCommentId &&
-        previousInlineComment.userId !== inlineCommentAuthorId
-      ) {
+      if (shouldCreateCommentRepliedNotification) {
         await createDocumentNotification({
           type: 'inline_comment.replied',
           createdBy: inlineCommentAuthorId,
@@ -118,6 +105,17 @@ export async function createInlineCommentNotification(
           pageId,
           spaceId,
           userId: previousInlineComment.userId
+        });
+      }
+
+      if (inlineCommentAuthorId !== documentAuthorId && previousInlineComment?.userId !== documentAuthorId) {
+        await createDocumentNotification({
+          type: 'inline_comment.created',
+          createdBy: inlineCommentAuthorId,
+          inlineCommentId,
+          pageId,
+          spaceId,
+          userId: documentAuthorId
         });
       }
 
@@ -139,26 +137,10 @@ export async function createInlineCommentNotification(
       break;
     }
     case WebhookEventNames.ProposalInlineCommentCreated: {
-      const authorIds = data.proposal.authors.map((author) => author.id);
+      const proposalAuthorIds = data.proposal.authors.map((author) => author.id);
       const proposalId = data.proposal.id;
-      for (const authorId of authorIds) {
-        if (inlineCommentAuthorId !== authorId) {
-          await createProposalNotification({
-            type: 'inline_comment.created',
-            createdBy: inlineCommentAuthorId,
-            inlineCommentId,
-            proposalId,
-            spaceId,
-            userId: authorId
-          });
-        }
-      }
 
-      if (
-        previousInlineComment &&
-        previousInlineComment?.id !== inlineCommentId &&
-        previousInlineComment.userId !== inlineCommentAuthorId
-      ) {
+      if (shouldCreateCommentRepliedNotification) {
         await createProposalNotification({
           type: 'inline_comment.replied',
           createdBy: inlineCommentAuthorId,
@@ -167,6 +149,19 @@ export async function createInlineCommentNotification(
           spaceId,
           userId: previousInlineComment.userId
         });
+      }
+
+      for (const proposalAuthorId of proposalAuthorIds) {
+        if (inlineCommentAuthorId !== proposalAuthorId && previousInlineComment?.userId !== proposalAuthorId) {
+          await createProposalNotification({
+            type: 'inline_comment.created',
+            createdBy: inlineCommentAuthorId,
+            inlineCommentId,
+            proposalId,
+            spaceId,
+            userId: proposalAuthorId
+          });
+        }
       }
 
       const extractedMentions = extractMentions(inlineCommentContent);
