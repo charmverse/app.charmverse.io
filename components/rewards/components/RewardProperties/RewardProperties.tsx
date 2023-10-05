@@ -1,4 +1,4 @@
-import { Box, Divider } from '@mui/material';
+import { Box, Divider, Stack } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
@@ -180,12 +180,15 @@ export function RewardProperties(props: {
           background: 'none'
         },
         '.octo-propertyname .Button': {
-          paddingLeft: 0
-        }
+          paddingLeft: '0 !important'
+        },
+        display: 'flex',
+        flex: 1,
+        mt: 0
       }}
       mt={2}
     >
-      <Box className='octo-propertylist' mt={2}>
+      <Stack className='octo-propertylist' mt={2} flex={1}>
         <Divider />
         <RewardPropertiesHeader
           reward={currentReward}
@@ -405,7 +408,7 @@ export function RewardProperties(props: {
         currentReward.status !== 'suggestion' && ( // &&!draftReward
           <RewardApplicantsTable reward={currentReward} permissions={permissions} />
         )} */}
-      </Box>
+      </Stack>
     </Box>
   );
 }

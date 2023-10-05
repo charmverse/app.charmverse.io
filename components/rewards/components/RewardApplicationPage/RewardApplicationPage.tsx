@@ -1,10 +1,14 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { Collapse, FormLabel, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import { useState } from 'react';
 
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
+import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -26,6 +30,8 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const { members } = useMembers();
   const { pages } = usePages();
   const { user } = useUser();
+
+  const [showProperties, setShowProperties] = useState(false);
 
   if (!application) {
     return null;
@@ -69,11 +75,38 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
             />
           )}
         </Grid>
-        <Grid item xs={12}>
-          <p>-------------</p>
-          <p>TODO - Add Reward properties here</p>
-          <p>-------------</p>
+
+        <Grid item xs={12} className='focalboard-body'>
+          <Stack
+            direction='row'
+            gap={1}
+            alignItems='center'
+            sx={{ cursor: 'pointer' }}
+            onClick={() => setShowProperties((v) => !v)}
+          >
+            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>Details</FormLabel>
+            <IconButton size='small'>
+              <KeyboardArrowDown
+                fontSize='small'
+                sx={{ transform: `rotate(${showProperties ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
+              />
+            </IconButton>
+          </Stack>
+          <Collapse in={showProperties} timeout='auto' unmountOnExit>
+            {rewardPage && (
+              <Stack>
+                <RewardProperties
+                  rewardId={rewardPage.bountyId}
+                  pageId={rewardPage.id}
+                  pagePath={rewardPage.path}
+                  readOnly={true}
+                  refreshRewardPermissions={() => {}}
+                />
+              </Stack>
+            )}
+          </Collapse>
         </Grid>
+
         {application.reward.approveSubmitters && (
           <Grid item xs={12}>
             <ApplicationInput
