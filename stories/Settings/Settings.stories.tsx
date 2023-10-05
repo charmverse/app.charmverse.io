@@ -7,7 +7,6 @@ import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
-import { PagesProvider } from 'hooks/usePages';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import type { IContext as ISpacesContext } from 'hooks/useSpaces';
 import { SpacesContext } from 'hooks/useSpaces';

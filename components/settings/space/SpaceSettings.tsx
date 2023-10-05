@@ -41,8 +41,8 @@ import { SpaceIntegrations } from 'components/settings/space/components/SpaceInt
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
+import type { NotificationRule } from 'lib/notifications/notificationRules';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
@@ -53,7 +53,12 @@ import SettingsItem from './components/SettingsItem';
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
+  notifyDocuments: yup.boolean(),
+  notifyForum: yup.boolean(),
   notifyNewProposals: yup.boolean(),
+  notifyProposals: yup.boolean(),
+  notifyVotes: yup.boolean(),
+  notifyRewards: yup.boolean(),
   domain: yup
     .string()
     .ensure()
@@ -253,28 +258,53 @@ export function SpaceSettings({
               Control space-wide notifications for your members.
             </Typography>
             <Stack>
-              <Controller
+              <ToggleInput
+                name='notifyDocuments'
+                label='Send notifications for document events'
+                disabled={!isAdmin}
                 control={control}
-                name='notifyNewProposals'
-                render={({ field: { onChange, value } }) => {
-                  return (
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          disabled={!isAdmin}
-                          checked={value}
-                          onChange={(event, val) => {
-                            if (val) {
-                              setValue(`notifyNewProposals`, val);
-                            }
-                            return onChange(val);
-                          }}
-                        />
-                      }
-                      label='Send notifications for new proposals'
-                    />
-                  );
-                }}
+                setValue={setValue}
+              />
+              <ToggleInput
+                name='notifyForum'
+                label='Send notifications for forum events'
+                disabled={!isAdmin}
+                control={control}
+                setValue={setValue}
+              />
+              <ToggleInput
+                name='notifyVotes'
+                label='Send notifications for new votes'
+                disabled={!isAdmin}
+                control={control}
+                setValue={setValue}
+              />
+              <Grid container>
+                <Grid item xs md={5}>
+                  <ToggleInput
+                    name='notifyProposals'
+                    label='Send notifications for proposals'
+                    disabled={!isAdmin}
+                    control={control}
+                    setValue={setValue}
+                  />
+                </Grid>
+                <Grid item xs md={6}>
+                  <ToggleInput
+                    name='notifyNewProposals'
+                    label='Send notifications for new proposals'
+                    disabled={!isAdmin}
+                    control={control}
+                    setValue={setValue}
+                  />
+                </Grid>
+              </Grid>
+              <ToggleInput
+                name='notifyRewards'
+                label='Send notifications for bounties'
+                disabled={!isAdmin}
+                control={control}
+                setValue={setValue}
               />
             </Stack>
           </Grid>
@@ -534,12 +564,58 @@ export function SpaceSettings({
   );
 }
 
+function ToggleInput<T extends string>({
+  disabled,
+  name,
+  label,
+  control,
+  setValue
+}: {
+  disabled?: boolean;
+  name: T;
+  label: string;
+  control: any;
+  setValue: (name: T, value: any) => void;
+}) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field: { onChange, value } }) => {
+        return (
+          <FormControlLabel
+            control={
+              <Switch
+                disabled={disabled}
+                checked={value}
+                onChange={(event, val) => {
+                  if (val) {
+                    setValue(name, val);
+                  }
+                  return onChange(val);
+                }}
+              />
+            }
+            label={label}
+          />
+        );
+      }}
+    />
+  );
+}
+
 function _getFormValues(space: Space): FormValues {
+  const notificationRules = space.notificationRules as NotificationRule[];
   return {
     name: space.name,
     spaceImage: space.spaceImage,
     domain: space.domain,
-    notifyNewProposals: !!space.notifyNewProposals
+    notifyDocuments: !notificationRules.some((rule) => rule.exclude === 'documents'),
+    notifyForum: !notificationRules.some((rule) => rule.exclude === 'forum'),
+    notifyNewProposals: !!space.notifyNewProposals,
+    notifyProposals: !notificationRules.some((rule) => rule.exclude === 'proposals'),
+    notifyRewards: !notificationRules.some((rule) => rule.exclude === 'rewards'),
+    notifyVotes: !notificationRules.some((rule) => rule.exclude === 'votes')
   };
 }
 
