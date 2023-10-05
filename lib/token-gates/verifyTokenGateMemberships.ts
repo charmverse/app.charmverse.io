@@ -39,9 +39,7 @@ export async function verifyTokenGateMemberships() {
             }
           }
         }
-      },
-      space: true,
-      user: true
+      }
     }
   });
 
@@ -50,7 +48,7 @@ export async function verifyTokenGateMemberships() {
     spaceId: userTokenGate.spaceId
   }));
 
-  const usersWithTokenGates = await prisma.spaceRole.findMany({
+  const spaceRolesWithGates = await prisma.spaceRole.findMany({
     where: {
       // We do not want to delete admins
       isAdmin: false,
@@ -64,29 +62,21 @@ export async function verifyTokenGateMemberships() {
             include: {
               tokenGate: {
                 include: {
-                  tokenGateToRoles: {
-                    include: {
-                      role: true
-                    }
-                  }
+                  tokenGateToRoles: true
                 }
               }
             }
           }
         }
       },
-      spaceRoleToRole: {
-        include: {
-          role: true
-        }
-      }
+      spaceRoleToRole: true
     }
   });
 
   let removedMembers = 0;
   let removedRoles = 0;
 
-  for (const spaceRole of usersWithTokenGates) {
+  for (const spaceRole of spaceRolesWithGates) {
     // filter token gates related to the space
     const spaceUserTokenGates = spaceRole.user.userTokenGates.filter((utg) => utg.spaceId === spaceRole.spaceId);
 

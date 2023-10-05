@@ -20,7 +20,7 @@ const store = mockStateStore([], {
 });
 
 export default {
-  title: 'common/CharmEditor',
+  title: 'common/CharmEditor/Views',
   component: CharmEditorComponent,
   decorators: [
     (Story: any) => (

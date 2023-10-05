@@ -288,7 +288,7 @@ const contentWithColumnsAndTables = {
 };
 
 export default {
-  title: 'common/CharmEditor/Components/Columns',
+  title: 'common/CharmEditor/Plugins/Columns',
   component: Columns,
   decorators: [
     (Story: any) => (
