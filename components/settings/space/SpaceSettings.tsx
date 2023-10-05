@@ -255,35 +255,29 @@ export function SpaceSettings({
           <Grid item>
             <FieldLabel>Notifications</FieldLabel>
             <Typography variant='caption' mb={1} component='p'>
-              Control space-wide notifications for your members.
+              Control notifications for your members.
             </Typography>
             <Stack>
               <ToggleInput
                 name='notifyDocuments'
-                label='Send notifications for Document events'
+                label='Documents'
                 disabled={!isAdmin}
                 control={control}
                 setValue={setValue}
               />
               <ToggleInput
                 name='notifyRewards'
-                label='Send notifications for Bounty events'
+                label='Bounties'
                 disabled={!isAdmin}
                 control={control}
                 setValue={setValue}
               />
-              <ToggleInput
-                name='notifyForum'
-                label='Send notifications for Forum events'
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              />
+              <ToggleInput name='notifyForum' label='Forum' disabled={!isAdmin} control={control} setValue={setValue} />
               <Grid container>
                 <Grid item xs md={5}>
                   <ToggleInput
                     name='notifyProposals'
-                    label='Send notifications for Proposal events'
+                    label='Proposals'
                     disabled={!isAdmin}
                     control={control}
                     setValue={setValue}
@@ -292,20 +286,14 @@ export function SpaceSettings({
                 <Grid item xs md={6}>
                   <ToggleInput
                     name='notifyNewProposals'
-                    label='Send notifications for new proposals'
+                    label='New proposals'
                     disabled={!isAdmin}
                     control={control}
                     setValue={setValue}
                   />
                 </Grid>
               </Grid>
-              <ToggleInput
-                name='notifyVotes'
-                label='Send notifications for Votes'
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              />
+              <ToggleInput name='notifyVotes' label='Polls' disabled={!isAdmin} control={control} setValue={setValue} />
             </Stack>
           </Grid>
           <Grid item>
