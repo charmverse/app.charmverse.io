@@ -145,10 +145,27 @@ describe(`Test document events and notifications`, () => {
       createdAt: new Date().toISOString()
     });
 
+    const inlineComment2 = await addComment({
+      threadId: thread.id,
+      userId: user2.id,
+      content: emptyDocument
+    });
+
+    await createNotificationsFromEvent({
+      event: {
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document: await getDocumentEntity(createdPage.id),
+        space: await getSpaceEntity(space.id),
+        inlineComment: await getInlineCommentEntity(inlineComment2.id)
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
     const inlineCommentCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.created',
-        inlineCommentId: inlineComment.id,
+        inlineCommentId: inlineComment2.id,
         pageId: createdPage.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -702,10 +719,27 @@ describe(`Test proposal events and notifications`, () => {
       createdAt: new Date().toISOString()
     });
 
+    const inlineComment2 = await addComment({
+      threadId: thread.id,
+      userId: user2.id,
+      content: emptyDocument
+    });
+
+    await createNotificationsFromEvent({
+      event: {
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document: await getDocumentEntity(page.id),
+        space: await getSpaceEntity(space.id),
+        inlineComment: await getInlineCommentEntity(inlineComment2.id)
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
     const inlineCommentCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.created',
-        inlineCommentId: inlineComment.id,
+        inlineCommentId: inlineComment2.id,
         pageId: proposal.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -1304,10 +1338,27 @@ describe(`Test bounty events and notifications`, () => {
       createdAt: new Date().toISOString()
     });
 
+    const inlineComment2 = await addComment({
+      threadId: thread.id,
+      userId: user2.id,
+      content: emptyDocument
+    });
+
+    await createNotificationsFromEvent({
+      event: {
+        scope: WebhookEventNames.DocumentInlineCommentCreated,
+        document: await getDocumentEntity(bounty.page.id),
+        space: await getSpaceEntity(space.id),
+        inlineComment: await getInlineCommentEntity(inlineComment2.id)
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
     const inlineCommentCreatedNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'inline_comment.created',
-        inlineCommentId: inlineComment.id,
+        inlineCommentId: inlineComment2.id,
         pageId: bounty.page.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -1356,7 +1407,18 @@ describe(`Test bounty events and notifications`, () => {
 
     const bounty = await createBounty({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      status: 'open',
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      permissions: {
+        reviewer: [
+          {
+            group: 'user',
+            id: user.id
+          }
+        ]
+      }
     });
 
     const application = await createApplication({

@@ -77,19 +77,6 @@ export async function createNotificationsFromEvent(webhookData: {
       });
       const authorIds = data.document.authors.map((author) => author.id);
       const pageId = data.document.id;
-      for (const authorId of authorIds) {
-        if (inlineCommentAuthorId !== authorId) {
-          await createDocumentNotification({
-            type: 'inline_comment.created',
-            createdBy: inlineCommentAuthorId,
-            inlineCommentId,
-            pageId,
-            spaceId,
-            userId: authorId
-          });
-        }
-      }
-
       if (
         previousInlineComment &&
         previousInlineComment?.id !== inlineCommentId &&
@@ -103,6 +90,19 @@ export async function createNotificationsFromEvent(webhookData: {
           spaceId,
           userId: previousInlineComment.userId
         });
+      }
+
+      for (const authorId of authorIds) {
+        if (inlineCommentAuthorId !== authorId && previousInlineComment?.userId !== authorId) {
+          await createDocumentNotification({
+            type: 'inline_comment.created',
+            createdBy: inlineCommentAuthorId,
+            inlineCommentId,
+            pageId,
+            spaceId,
+            userId: authorId
+          });
+        }
       }
 
       const extractedMentions = extractMentions(inlineCommentContent);
@@ -257,32 +257,29 @@ export async function createNotificationsFromEvent(webhookData: {
       const postCategoriesUsersRecords = Object.values(postCategoriesUsersRecord);
       for (const postCategoriesUserRecord of postCategoriesUsersRecords) {
         const userId = postCategoriesUserRecord.userId;
-        const userMentions = extractedMentions.filter((mention) => mention.value === userId);
         if (
+          userId !== postAuthorId &&
           postCategoriesUserRecord.visibleCategoryIds.includes(post.category.id) &&
           postCategoriesUserRecord.subscriptions[post.category.id]
         ) {
-          if (postAuthorId !== userId) {
-            await createPostNotification({
-              createdBy: postAuthorId,
-              postId,
-              spaceId,
-              userId,
-              type: 'created'
-            });
-          }
+          const userMentions = extractedMentions.filter((mention) => mention.value === userId);
+          await createPostNotification({
+            createdBy: postAuthorId,
+            postId,
+            spaceId,
+            userId,
+            type: 'created'
+          });
 
           for (const userMention of userMentions) {
-            if (postAuthorId !== userMention.value) {
-              await createDocumentNotification({
-                createdBy: post.author.id,
-                mentionId: userMention.id,
-                postId,
-                spaceId,
-                userId,
-                type: 'mention.created'
-              });
-            }
+            await createDocumentNotification({
+              createdBy: postAuthorId,
+              mentionId: userMention.id,
+              postId,
+              spaceId,
+              userId: userMention.value,
+              type: 'mention.created'
+            });
           }
         }
       }
@@ -379,6 +376,10 @@ export async function createNotificationsFromEvent(webhookData: {
       });
 
       for (const spaceRole of spaceRoles) {
+        // The user who triggered the event should not receive a notification
+        if (spaceRole.userId === userId) {
+          continue;
+        }
         // We should not send role-based notifications for free spaces
         const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
 
@@ -388,10 +389,6 @@ export async function createNotificationsFromEvent(webhookData: {
             userId
           });
         const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
-        // The user who triggered the event should not receive a notification
-        if (spaceRole.userId === userId) {
-          continue;
-        }
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
         const isReviewer = proposalReviewerIds.includes(spaceRole.userId);
@@ -439,7 +436,7 @@ export async function createNotificationsFromEvent(webhookData: {
 
     case WebhookEventNames.VoteCreated: {
       const voteId = webhookData.event.vote.id;
-      const vote = await prisma.vote.findUnique({
+      const vote = await prisma.vote.findUniqueOrThrow({
         where: {
           id: voteId,
           status: 'InProgress'
@@ -464,10 +461,6 @@ export async function createNotificationsFromEvent(webhookData: {
           author: true
         }
       });
-
-      if (!vote) {
-        break;
-      }
 
       const spaceId = vote.space.id;
       const spaceRoles = await prisma.spaceRole.findMany({
@@ -548,14 +541,16 @@ export async function createNotificationsFromEvent(webhookData: {
 
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
       for (const bountyReviewerId of bountyReviewerIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: application.createdBy,
-          spaceId,
-          type: 'application.pending',
-          userId: bountyReviewerId,
-          applicationId
-        });
+        if (application.createdBy !== bountyReviewerId) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: application.createdBy,
+            spaceId,
+            type: 'application.pending',
+            userId: bountyReviewerId,
+            applicationId
+          });
+        }
       }
 
       break;
@@ -633,14 +628,16 @@ export async function createNotificationsFromEvent(webhookData: {
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: application.createdBy,
-          spaceId,
-          type: 'application.submitted',
-          userId: bountyReviewerId,
-          applicationId
-        });
+        if (application.createdBy !== bountyReviewerId) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: application.createdBy,
+            spaceId,
+            type: 'application.submitted',
+            userId: bountyReviewerId,
+            applicationId
+          });
+        }
       }
 
       break;
@@ -673,14 +670,16 @@ export async function createNotificationsFromEvent(webhookData: {
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: userId,
-          spaceId,
-          type: 'application.payment_pending',
-          userId: bountyReviewerId,
-          applicationId
-        });
+        if (application.createdBy !== bountyReviewerId) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: userId,
+            spaceId,
+            type: 'application.payment_pending',
+            userId: bountyReviewerId,
+            applicationId
+          });
+        }
       }
 
       break;
@@ -738,13 +737,15 @@ export async function createNotificationsFromEvent(webhookData: {
       const spaceAdminUserIds = spaceAdmins.map(({ userId }) => userId);
 
       for (const spaceAdminUserId of spaceAdminUserIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: bounty.createdBy,
-          spaceId,
-          type: 'suggestion.created',
-          userId: spaceAdminUserId
-        });
+        if (spaceAdminUserId !== bounty.createdBy) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: bounty.createdBy,
+            spaceId,
+            type: 'suggestion.created',
+            userId: spaceAdminUserId
+          });
+        }
       }
 
       break;
