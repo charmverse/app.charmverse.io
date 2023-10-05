@@ -25,7 +25,7 @@ export function ConnectCollabland() {
     try {
       const { code } = await charmClient.spaces.getCollablandCode(space.id);
 
-      window.location.href = `${collablandStoreUrl}?state=${code}`;
+      window.location.href = `${collablandStoreUrl}?cv_state=${code}`;
     } catch (error) {
       showMessage('Error connecting to Collabland. Please try again.', 'error');
     }
