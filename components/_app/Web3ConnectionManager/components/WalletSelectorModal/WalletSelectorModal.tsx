@@ -9,6 +9,7 @@ import type { Connector } from 'wagmi';
 import { useAccount, useConnect } from 'wagmi';
 
 import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/useMetamaskConnect';
+import { Button } from 'components/common/Button';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
@@ -143,5 +144,14 @@ export function WalletSelectorModal() {
     <Modal open={isWalletSelectorModalOpen} onClose={closeWalletSelectorModal}>
       <WalletSelector />
     </Modal>
+  );
+}
+
+export function OpenWalletSelectorModal({ color }: { color?: string }) {
+  const { connectWallet } = useWeb3ConnectionManager();
+  return (
+    <Button variant='outlined' onClick={connectWallet} color={color}>
+      Connect Wallet
+    </Button>
   );
 }
