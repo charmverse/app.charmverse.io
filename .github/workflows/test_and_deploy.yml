@@ -40,6 +40,8 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
+        with:
+          save_cache: true
 
   chromatic:
     name: Publish to Chromatic
@@ -54,7 +56,6 @@ jobs:
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
-          save_cache: true
 
       - name: Restore app from cache
         uses: ./.github/actions/build
