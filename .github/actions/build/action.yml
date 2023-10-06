@@ -4,6 +4,9 @@ inputs:
   REACT_APP_APP_ENV:
     description: "..."
     required: false
+  save_cache:
+    description: "Whether to save the cache"
+    required: false
 
 runs:
   using: "composite"
