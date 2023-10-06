@@ -380,6 +380,8 @@ export function RewardProperties(props: {
         />
 
         {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
+
+        {/* TODO: Replace this old component with new apply flow */}
         {rewardPermissions?.work && isSpaceMember && currentReward.createdBy !== user?.id && (
           <div data-test='reward-applicant-form'>
             <RewardApplicantForm

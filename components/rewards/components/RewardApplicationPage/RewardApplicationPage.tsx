@@ -107,9 +107,10 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           </Collapse>
         </Grid>
 
-        {application.reward.approveSubmitters && (
+        {application.reward.approveSubmitters && application.status === 'applied' && (
           <Grid item xs={12}>
             <ApplicationInput
+              application={application}
               refreshApplication={refreshApplication}
               bountyId={application.bountyId}
               permissions={applicationRewardPermissions}
