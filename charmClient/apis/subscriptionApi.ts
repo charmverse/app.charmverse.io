@@ -38,6 +38,10 @@ export class SubscriptionApi {
     return http.POST<Space>(`/api/spaces/${spaceId}/switch-to-free-tier`);
   }
 
+  switchToCommunityTier(spaceId: string) {
+    return http.POST<Space>(`/api/spaces/${spaceId}/switch-to-community-tier`);
+  }
+
   validateDiscount(spaceId: string, payload: { coupon: string }) {
     return http.POST<CouponDetails | null>(`/api/spaces/${spaceId}/validate-discount`, payload);
   }
