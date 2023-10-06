@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
+import { OpenWalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import InputGeneratorText from 'components/common/form/InputGeneratorText';
@@ -27,9 +28,9 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
-import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
+import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
+import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
@@ -211,11 +212,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
       });
 
       if (!account || !web3Provider) {
-        throw new SystemError({
-          errorType: 'External service',
-          severity: 'warning',
-          message: "We couldn't detect your wallet. Please unlock your wallet and try publishing again."
-        });
+        throw new MissingWeb3AccountError();
       }
 
       if (!snapshotBlockNumber) {
@@ -440,9 +437,19 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
 
             {formError && (
               <Grid item>
-                <Alert severity={formError.severity as AlertColor}>
-                  {formError.message ?? (formError as any).error}
-                </Alert>
+                {formError instanceof MissingWeb3AccountError ? (
+                  <Alert
+                    sx={{ alignItems: 'center' }}
+                    action={!web3Provider ? <OpenWalletSelectorModal color='inherit' /> : null}
+                    severity={formError.severity as AlertColor}
+                  >
+                    We couldn't detect your wallet. Please unlock your wallet and try publishing again.
+                  </Alert>
+                ) : (
+                  <Alert severity={formError.severity as AlertColor}>
+                    {formError.message ?? (formError as any).error}
+                  </Alert>
+                )}
               </Grid>
             )}
 
