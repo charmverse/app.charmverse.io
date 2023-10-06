@@ -10,6 +10,7 @@ services:
       - '.env'
     environment:
       - NODE_ENV=production
+      - DD_RUNTIME_METRICS_ENABLED=true
     profiles:
       # services need at least one profile or else they will be started along with what is in COMPOSE_PROFILES env var
       - default_config
