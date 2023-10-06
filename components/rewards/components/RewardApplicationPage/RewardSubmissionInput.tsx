@@ -127,7 +127,7 @@ export default function SubmissionInput({
         }}
       >
         <Box display='flex' gap={0.5}>
-          <FormLabel sx={{ fontWeight: 'bold' }}>
+          <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>
             {submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
           </FormLabel>
           {!alwaysExpanded && (

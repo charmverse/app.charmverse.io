@@ -366,7 +366,9 @@ export function ProposalProperties({
           {/* Select a category */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Category</PropertyLabel>
+              <PropertyLabel readOnly highlighted>
+                Category
+              </PropertyLabel>
               <Box display='flex' flex={1}>
                 <ProposalCategorySelect
                   readOnly={readOnlyCategory}
@@ -383,7 +385,9 @@ export function ProposalProperties({
           {isNewProposal && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly>Template</PropertyLabel>
+                <PropertyLabel readOnly highlighted>
+                  Template
+                </PropertyLabel>
                 <Box display='flex' flex={1}>
                   <ProposalTemplateSelect
                     options={templateOptions}
@@ -415,7 +419,9 @@ export function ProposalProperties({
                 flexGrow: 1
               }}
             >
-              <PropertyLabel readOnly>Author</PropertyLabel>
+              <PropertyLabel readOnly highlighted>
+                Author
+              </PropertyLabel>
               <Box display='flex' flex={1}>
                 <UserSelect
                   memberIds={proposalAuthorIds}
@@ -434,7 +440,9 @@ export function ProposalProperties({
           {/* Select reviewers */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Reviewer</PropertyLabel>
+              <PropertyLabel readOnly highlighted>
+                Reviewer
+              </PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'
                 readOnlyMessage={isFromTemplate ? templateTooltip('reviewers', isAdmin) : undefined}
@@ -465,7 +473,9 @@ export function ProposalProperties({
               >
                 {lensProposalPropertyState === 'show_link' ? (
                   <>
-                    <PropertyLabel readOnly>Lens Post</PropertyLabel>
+                    <PropertyLabel readOnly highlighted>
+                      Lens Post
+                    </PropertyLabel>
                     <Link
                       href={`https://${isDevEnv ? 'testnet.' : ''}lenster.xyz/posts/${proposalLensLink}`}
                       target='_blank'
@@ -478,7 +488,9 @@ export function ProposalProperties({
                   </>
                 ) : (
                   <>
-                    <PropertyLabel readOnly>Publish to Lens</PropertyLabel>
+                    <PropertyLabel readOnly highlighted>
+                      Publish to Lens
+                    </PropertyLabel>
                     {isPublishingToLens ? (
                       <LoadingIcon size={16} />
                     ) : (
@@ -506,7 +518,9 @@ export function ProposalProperties({
           {/* Select valuation type */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Type</PropertyLabel>
+              <PropertyLabel readOnly highlighted>
+                Type
+              </PropertyLabel>
               <ProposalEvaluationTypeSelect
                 readOnly={readOnlyProposalEvaluationType}
                 readOnlyMessage={isFromTemplate ? templateTooltip('evaluation type', isAdmin) : undefined}
@@ -537,7 +551,9 @@ export function ProposalProperties({
                     Rubric criteria
                   </Typography>
                 ) : (
-                  <PropertyLabel readOnly>&nbsp;</PropertyLabel>
+                  <PropertyLabel readOnly highlighted>
+                    &nbsp;
+                  </PropertyLabel>
                 )}
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput

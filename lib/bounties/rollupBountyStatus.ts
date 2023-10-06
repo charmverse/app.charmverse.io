@@ -61,7 +61,7 @@ export async function rollupBountyStatus({
     // Function is sometimes called in a cron job, so userId is not always available
     if (userId) {
       await publishBountyEvent({
-        scope: WebhookEventNames.BountyCompleted,
+        scope: WebhookEventNames.RewardCompleted,
         bountyId: bounty.id,
         spaceId: bounty.page.spaceId,
         userId

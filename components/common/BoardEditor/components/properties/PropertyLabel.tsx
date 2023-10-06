@@ -1,3 +1,5 @@
+import styled from '@emotion/styled';
+import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import Button from '../../focalboard/src/widgets/buttons/button';
@@ -5,14 +7,19 @@ import Button from '../../focalboard/src/widgets/buttons/button';
 type PropertyLabelProps = {
   children: ReactNode;
   readOnly?: boolean;
+  highlighted?: boolean;
 };
 
-export function PropertyLabel({ children, readOnly }: PropertyLabelProps) {
+const Wrapper = styled(Box)<{ highlighted?: boolean }>`
+  color: ${({ highlighted }) => (highlighted ? 'var(--primary-text) !important' : '')};
+`;
+
+export function PropertyLabel({ children, readOnly = true, highlighted }: PropertyLabelProps) {
   if (readOnly) {
     return (
-      <div className='octo-propertyname octo-propertyname--readonly'>
+      <Wrapper className='octo-propertyname octo-propertyname--readonly' highlighted={highlighted}>
         <Button>{children}</Button>
-      </div>
+      </Wrapper>
     );
   }
   return null;

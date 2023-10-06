@@ -27,10 +27,10 @@ export function RewardsPageWithProviders() {
             <ApplicationDialogProvider>
               <RewardsPage title={rewardsTitle} />
               <ApplicationDialog />
+              <PageDialogGlobal />
             </ApplicationDialogProvider>
           </RewardsBoardProvider>
         </RewardBlocksProvider>
-        <PageDialogGlobal />
       </RewardsProvider>
     </PageDialogProvider>
   );

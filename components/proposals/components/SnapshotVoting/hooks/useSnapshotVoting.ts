@@ -85,6 +85,8 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
   };
 }
 
+type VotingDisabledReason = 'account' | 'no_vote_power' | 'vote_inactive';
+
 function getVotingDisabledStatus({
   account,
   votingPower,
@@ -93,17 +95,26 @@ function getVotingDisabledStatus({
   account?: string | null;
   votingPower: number;
   isVotingActive: boolean;
-}) {
+}): null | { reason: VotingDisabledReason; message: string } {
   if (!account) {
-    return 'You need to connect your wallet to vote on snapshot proposals.';
+    return {
+      reason: 'account',
+      message: 'You need to connect your wallet to vote on snapshot proposals.'
+    };
   }
 
   if (!votingPower) {
-    return 'You do not have voting power to vote on this proposal.';
+    return {
+      reason: 'no_vote_power',
+      message: 'You do not have voting power to vote on this proposal.'
+    };
   }
 
   if (!isVotingActive) {
-    return 'Voting is not active for this proposal.';
+    return {
+      reason: 'vote_inactive',
+      message: 'Voting is not active for this proposal.'
+    };
   }
 
   return null;

@@ -16,7 +16,7 @@ export type DocumentEntity = {
   title: string;
   url: string;
   type: PageType;
-  author: UserEntity;
+  authors: UserEntity[];
 };
 
 export type SpaceEntity = {
@@ -57,7 +57,7 @@ export type VoteEntity = {
   title: string;
 };
 
-export type BountyEntity = {
+export type RewardEntity = {
   createdAt: string;
   id: string;
   title: string;
@@ -73,7 +73,7 @@ export type ApplicationEntity = {
   id: string;
   createdAt: string;
   user: UserEntity;
-  bounty: BountyEntity;
+  bounty: RewardEntity;
 };
 
 export type InlineCommentEntity = {
@@ -96,24 +96,21 @@ export type CardPropertyEntity = {
 };
 
 export enum WebhookNameSpaces {
-  Bounty = 'bounty',
+  Reward = 'bounty',
   Forum = 'forum',
   user = 'user',
   Proposal = 'proposal'
 }
 
 export enum WebhookEventNames {
-  BountyCompleted = 'bounty.completed',
-  BountyApplicationCreated = 'bounty.application.created',
-  BountyApplicationRejected = 'bounty.application.rejected',
-  BountyApplicationAccepted = 'bounty.application.accepted',
-  BountyApplicationSubmitted = 'bounty.application.submitted',
-  BountyApplicationPaymentCompleted = 'bounty.payment.completed',
-  BountySuggestionCreated = 'bounty.suggestion.created',
-  BountyApplicationApproved = 'bounty.application.approved',
-  BountyInlineCommentCreated = 'bounty.inline_comment.created',
-  BountyMentionCreated = 'bounty.mention.created',
-  ForumCommentCreated = 'forum.comment.created',
+  RewardCompleted = 'reward.completed',
+  RewardApplicationCreated = 'reward.application.created',
+  RewardApplicationRejected = 'reward.application.rejected',
+  RewardApplicationApproved = 'reward.application.approved',
+  RewardSubmissionCreated = 'reward.submission.created',
+  RewardSubmissionApproved = 'reward.submission.approved',
+  RewardApplicationPaymentCompleted = 'reward.payment.completed',
+  RewardSuggestionCreated = 'reward.suggestion.created',
   ForumCommentUpvoted = 'forum.comment.upvoted',
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
@@ -122,20 +119,17 @@ export enum WebhookEventNames {
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
-  ProposalInlineCommentCreated = 'proposal.inline_comment.created',
-  ProposalCommentCreated = 'proposal.comment.created',
-  ProposalMentionCreated = 'proposal.mention.created',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
-  DocumentMentionCreated = 'document.mention.created',
+  DocumentCommentCreated = 'document.comment.created',
   DocumentInlineCommentCreated = 'document.inline_comment.created',
-  CardBlockCommentCreated = 'card.block_comment.created',
+  DocumentMentionCreated = 'document.mention.created',
   CardPersonPropertyAssigned = 'card.person_property.assigned',
   VoteCreated = 'vote.created'
 }
 
-export const whiteListedWebhookEvents = [
-  'bounty.completed',
+export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
+  'reward.completed',
   'forum.comment.created',
   'forum.comment.upvoted',
   'forum.comment.downvoted',
@@ -159,11 +153,6 @@ export type WebhookEvent = WebhookEventSharedProps &
   (
     | {
         scope: WebhookEventNames.ForumPostCreated;
-        post: PostEntity;
-      }
-    | {
-        scope: WebhookEventNames.ForumCommentCreated;
-        comment: CommentEntity;
         post: PostEntity;
       }
     | {
@@ -204,74 +193,47 @@ export type WebhookEvent = WebhookEventSharedProps &
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.ProposalInlineCommentCreated;
-        proposal: ProposalEntity;
-        inlineComment: InlineCommentEntity;
-      }
-    | {
-        scope: WebhookEventNames.ProposalCommentCreated;
-        proposal: ProposalEntity;
-        comment: CommentEntity;
-      }
-    | {
-        user: UserEntity;
-        scope: WebhookEventNames.ProposalMentionCreated;
-        proposal: ProposalEntity;
-        mention: UserMentionMetadata;
-      }
-    | {
-        scope: WebhookEventNames.BountyCompleted;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardCompleted;
+        bounty: RewardEntity;
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationCreated;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationCreated;
+        bounty: RewardEntity;
         application: ApplicationEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationAccepted;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationApproved;
+        bounty: RewardEntity;
         application: ApplicationEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationRejected;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationRejected;
+        bounty: RewardEntity;
         application: ApplicationEntity;
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationSubmitted;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardSubmissionCreated;
+        bounty: RewardEntity;
         application: ApplicationEntity;
       }
     | {
-        scope: WebhookEventNames.BountyApplicationApproved;
-        bounty: BountyEntity;
-        application: ApplicationEntity;
-        user: UserEntity;
-      }
-    | {
-        scope: WebhookEventNames.BountyApplicationPaymentCompleted;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardSubmissionApproved;
+        bounty: RewardEntity;
         application: ApplicationEntity;
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountySuggestionCreated;
-        bounty: BountyEntity;
+        scope: WebhookEventNames.RewardApplicationPaymentCompleted;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
         user: UserEntity;
       }
     | {
-        scope: WebhookEventNames.BountyInlineCommentCreated;
-        bounty: BountyEntity;
-        inlineComment: InlineCommentEntity;
-      }
-    | {
+        scope: WebhookEventNames.RewardSuggestionCreated;
+        bounty: RewardEntity;
         user: UserEntity;
-        scope: WebhookEventNames.BountyMentionCreated;
-        bounty: BountyEntity;
-        mention: UserMentionMetadata;
       }
     | {
         user: UserEntity;
@@ -280,7 +242,12 @@ export type WebhookEvent = WebhookEventSharedProps &
         mention: UserMentionMetadata;
       }
     | {
-        user: UserEntity;
+        scope: WebhookEventNames.DocumentCommentCreated;
+        document: DocumentEntity | null;
+        post: PostEntity | null;
+        comment: CommentEntity;
+      }
+    | {
         scope: WebhookEventNames.DocumentInlineCommentCreated;
         document: DocumentEntity;
         inlineComment: InlineCommentEntity;
@@ -295,12 +262,6 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.VoteCreated;
         vote: VoteEntity;
-      }
-    | {
-        scope: WebhookEventNames.CardBlockCommentCreated;
-        space: SpaceEntity;
-        card: DocumentEntity;
-        blockComment: BlockCommentEntity;
       }
     | {
         scope: WebhookEventNames.CardPersonPropertyAssigned;

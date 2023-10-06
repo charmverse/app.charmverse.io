@@ -56,7 +56,7 @@ export async function createApplication({
   });
 
   await publishBountyEvent({
-    scope: WebhookEventNames.BountyApplicationCreated,
+    scope: WebhookEventNames.RewardApplicationCreated,
     bountyId,
     spaceId: bounty.spaceId,
     applicationId: application.id

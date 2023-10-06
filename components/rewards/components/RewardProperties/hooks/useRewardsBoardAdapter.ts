@@ -19,16 +19,12 @@ import {
   REWARD_STATUS_BLOCK_ID,
   ASSIGNEES_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
-  DEFAULT_BLOCK_IDS,
-  DEFAULT_BOARD_BLOCK_ID,
   DUE_DATE_ID,
-  TITLE_BLOCK_ID,
   REWARDER_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
 
 export type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
 

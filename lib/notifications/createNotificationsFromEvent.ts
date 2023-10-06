@@ -12,7 +12,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createInlineCommentNotification } from './createInlineCommentNotification';
 import {
   createDocumentNotification,
   createCardNotification,
@@ -47,7 +46,184 @@ export async function createNotificationsFromEvent(webhookData: {
     }
 
     case WebhookEventNames.DocumentInlineCommentCreated: {
-      await createInlineCommentNotification(webhookData.event);
+      const data = webhookData.event;
+      const spaceId = data.space.id;
+      const inlineCommentId = data.inlineComment.id;
+      const inlineCommentAuthorId = data.inlineComment.author.id;
+      const inlineComment = await prisma.comment.findFirstOrThrow({
+        where: {
+          id: inlineCommentId
+        },
+        select: {
+          content: true,
+          threadId: true
+        }
+      });
+      const threadId = inlineComment.threadId;
+      const inlineCommentContent = inlineComment.content as PageContent;
+      const previousInlineComment = await prisma.comment.findFirst({
+        where: {
+          threadId
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        skip: 1,
+        take: 1,
+        select: {
+          id: true,
+          userId: true
+        }
+      });
+      const authorIds = data.document.authors.map((author) => author.id);
+      const pageId = data.document.id;
+      if (
+        previousInlineComment &&
+        previousInlineComment?.id !== inlineCommentId &&
+        previousInlineComment.userId !== inlineCommentAuthorId
+      ) {
+        await createDocumentNotification({
+          type: 'inline_comment.replied',
+          createdBy: inlineCommentAuthorId,
+          inlineCommentId,
+          pageId,
+          spaceId,
+          userId: previousInlineComment.userId
+        });
+      }
+
+      for (const authorId of authorIds) {
+        if (inlineCommentAuthorId !== authorId && previousInlineComment?.userId !== authorId) {
+          await createDocumentNotification({
+            type: 'inline_comment.created',
+            createdBy: inlineCommentAuthorId,
+            inlineCommentId,
+            pageId,
+            spaceId,
+            userId: authorId
+          });
+        }
+      }
+
+      const extractedMentions = extractMentions(inlineCommentContent);
+      for (const extractedMention of extractedMentions) {
+        const mentionedUserId = extractedMention.value;
+        if (mentionedUserId !== inlineCommentAuthorId) {
+          await createDocumentNotification({
+            type: 'inline_comment.mention.created',
+            createdBy: inlineCommentAuthorId,
+            inlineCommentId,
+            mentionId: extractedMention.id,
+            pageId,
+            spaceId,
+            userId: mentionedUserId
+          });
+        }
+      }
+      break;
+    }
+
+    case WebhookEventNames.DocumentCommentCreated: {
+      const spaceId = webhookData.spaceId;
+      const commentAuthorId = webhookData.event.comment.author.id;
+      const commentId = webhookData.event.comment.id;
+      const authorIds = webhookData.event.post
+        ? [webhookData.event.post.author.id]
+        : webhookData.event.document?.authors.map(({ id }) => id) ?? [];
+      const documentId = webhookData.event.document?.id;
+      const postId = webhookData.event.post?.id;
+
+      const comment = webhookData.event.post
+        ? await prisma.postComment.findFirstOrThrow({
+            where: {
+              id: commentId
+            },
+            select: {
+              parentId: true,
+              content: true
+            }
+          })
+        : await prisma.pageComment.findFirstOrThrow({
+            where: {
+              id: commentId
+            },
+            select: {
+              parentId: true,
+              content: true
+            }
+          });
+
+      // Send notification only for top-level comments
+      if (!comment.parentId) {
+        for (const authorId of authorIds) {
+          if (authorId !== commentAuthorId) {
+            await createDocumentNotification({
+              type: 'comment.created',
+              createdBy: commentAuthorId,
+              commentId,
+              pageId: documentId,
+              postId,
+              spaceId,
+              pageCommentId: documentId ? commentId : undefined,
+              postCommentId: postId ? commentId : undefined,
+              userId: authorId
+            });
+          }
+        }
+      } else {
+        const parentComment = webhookData.event.post
+          ? await prisma.postComment.findUniqueOrThrow({
+              where: {
+                id: comment.parentId
+              },
+              select: {
+                createdBy: true
+              }
+            })
+          : await prisma.pageComment.findUniqueOrThrow({
+              where: {
+                id: comment.parentId
+              },
+              select: {
+                createdBy: true
+              }
+            });
+
+        const parentCommentAuthorId = parentComment.createdBy;
+        if (parentCommentAuthorId !== commentAuthorId) {
+          await createDocumentNotification({
+            type: 'comment.replied',
+            createdBy: commentAuthorId,
+            commentId,
+            pageId: documentId,
+            postId,
+            spaceId,
+            pageCommentId: documentId ? commentId : undefined,
+            postCommentId: postId ? commentId : undefined,
+            userId: parentCommentAuthorId
+          });
+        }
+      }
+
+      const commentContent = comment.content as PageContent;
+
+      const extractedMentions = extractMentions(commentContent);
+      for (const extractedMention of extractedMentions) {
+        const mentionedUserId = extractedMention.value;
+        await createDocumentNotification({
+          type: 'comment.mention.created',
+          createdBy: commentAuthorId,
+          commentId,
+          mentionId: extractedMention.id,
+          pageId: documentId,
+          postId,
+          pageCommentId: documentId ? commentId : undefined,
+          postCommentId: postId ? commentId : undefined,
+          spaceId,
+          userId: mentionedUserId
+        });
+      }
+
       break;
     }
 
@@ -81,203 +257,32 @@ export async function createNotificationsFromEvent(webhookData: {
       const postCategoriesUsersRecords = Object.values(postCategoriesUsersRecord);
       for (const postCategoriesUserRecord of postCategoriesUsersRecords) {
         const userId = postCategoriesUserRecord.userId;
-        const userMentions = extractedMentions.filter((mention) => mention.value === userId);
         if (
+          userId !== postAuthorId &&
           postCategoriesUserRecord.visibleCategoryIds.includes(post.category.id) &&
           postCategoriesUserRecord.subscriptions[post.category.id]
         ) {
-          if (postAuthorId !== userId) {
-            await createPostNotification({
-              createdBy: postAuthorId,
-              postId,
-              spaceId,
-              userId,
-              type: 'created'
-            });
-          }
-
-          for (const userMention of userMentions) {
-            if (postAuthorId !== userMention.value) {
-              await createPostNotification({
-                createdBy: post.author.id,
-                mentionId: userMention.id,
-                postId,
-                spaceId,
-                userId,
-                type: 'mention.created'
-              });
-            }
-          }
-        }
-      }
-      break;
-    }
-
-    case WebhookEventNames.ForumCommentCreated: {
-      const spaceId = webhookData.spaceId;
-      const postComment = await prisma.postComment.findFirstOrThrow({
-        where: {
-          id: webhookData.event.comment.id
-        },
-        select: {
-          parentId: true,
-          id: true,
-          createdBy: true,
-          content: true,
-          post: {
-            select: {
-              id: true,
-              createdBy: true
-            }
-          }
-        }
-      });
-      const postAuthor = postComment.post.createdBy;
-      const postCommentContent = postComment.content as PageContent;
-      const postCommentAuthor = postComment.createdBy;
-      const postId = postComment.post.id;
-      const extractedMentions = extractMentions(postCommentContent);
-      for (const userMention of extractedMentions) {
-        if (userMention.value !== postCommentAuthor) {
+          const userMentions = extractedMentions.filter((mention) => mention.value === userId);
           await createPostNotification({
-            commentId: postComment.id,
-            createdBy: postComment.createdBy,
-            mentionId: userMention.id,
+            createdBy: postAuthorId,
             postId,
             spaceId,
-            userId: userMention.value,
-            type: 'comment.mention.created'
+            userId,
+            type: 'created'
           });
-        }
-      }
 
-      const parentId = postComment.parentId;
-      if (!parentId && postCommentAuthor !== postAuthor) {
-        await createPostNotification({
-          commentId: postComment.id,
-          createdBy: postComment.createdBy,
-          postId,
-          spaceId,
-          userId: postAuthor,
-          type: 'comment.created'
-        });
-      }
-
-      if (parentId) {
-        const parentComment = await prisma.postComment.findUniqueOrThrow({
-          where: {
-            id: parentId
-          },
-          select: {
-            createdBy: true
-          }
-        });
-        const parentCommentAuthor = parentComment.createdBy;
-        await createPostNotification({
-          commentId: postComment.id,
-          createdBy: postComment.createdBy,
-          postId,
-          spaceId,
-          userId: parentCommentAuthor,
-          type: 'comment.replied'
-        });
-      }
-
-      break;
-    }
-
-    case WebhookEventNames.ProposalMentionCreated: {
-      const mentionedUserId = webhookData.event.mention.value;
-      const mentionAuthorId = webhookData.event.user.id;
-
-      if (mentionedUserId !== mentionAuthorId) {
-        await createProposalNotification({
-          type: 'mention.created',
-          createdBy: mentionAuthorId,
-          mentionId: webhookData.event.mention.id,
-          proposalId: webhookData.event.proposal.id,
-          spaceId: webhookData.spaceId,
-          userId: mentionedUserId
-        });
-      }
-
-      break;
-    }
-
-    case WebhookEventNames.ProposalCommentCreated: {
-      const spaceId = webhookData.spaceId;
-      const commentAuthorId = webhookData.event.comment.author.id;
-      const proposalId = webhookData.event.proposal.id;
-      const commentId = webhookData.event.comment.id;
-      const proposalAuthorIds = webhookData.event.proposal.authors.map(({ id }) => id);
-
-      const pageComment = await prisma.pageComment.findFirstOrThrow({
-        where: {
-          id: commentId
-        },
-        select: {
-          parentId: true,
-          content: true
-        }
-      });
-
-      // Send notification only for top-level comments
-      if (!pageComment.parentId) {
-        for (const proposalAuthorId of proposalAuthorIds) {
-          if (proposalAuthorId !== commentAuthorId) {
-            await createProposalNotification({
-              type: 'comment.created',
-              createdBy: commentAuthorId,
-              commentId,
-              proposalId,
+          for (const userMention of userMentions) {
+            await createDocumentNotification({
+              createdBy: postAuthorId,
+              mentionId: userMention.id,
+              postId,
               spaceId,
-              userId: proposalAuthorId
+              userId: userMention.value,
+              type: 'mention.created'
             });
           }
         }
-      } else {
-        const parentComment = await prisma.pageComment.findUniqueOrThrow({
-          where: {
-            id: pageComment.parentId
-          },
-          select: {
-            createdBy: true
-          }
-        });
-        const parentCommentAuthorId = parentComment.createdBy;
-        if (parentCommentAuthorId !== commentAuthorId) {
-          await createProposalNotification({
-            type: 'comment.replied',
-            createdBy: commentAuthorId,
-            commentId,
-            proposalId,
-            spaceId,
-            userId: parentCommentAuthorId
-          });
-        }
       }
-
-      const pageCommentContent = pageComment.content as PageContent;
-
-      const extractedMentions = extractMentions(pageCommentContent);
-      for (const extractedMention of extractedMentions) {
-        const mentionedUserId = extractedMention.value;
-        await createProposalNotification({
-          type: 'comment.mention.created',
-          createdBy: commentAuthorId,
-          commentId,
-          mentionId: extractedMention.id,
-          proposalId,
-          spaceId,
-          userId: mentionedUserId
-        });
-      }
-
-      break;
-    }
-
-    case WebhookEventNames.ProposalInlineCommentCreated: {
-      await createInlineCommentNotification(webhookData.event);
       break;
     }
 
@@ -371,6 +376,10 @@ export async function createNotificationsFromEvent(webhookData: {
       });
 
       for (const spaceRole of spaceRoles) {
+        // The user who triggered the event should not receive a notification
+        if (spaceRole.userId === userId) {
+          continue;
+        }
         // We should not send role-based notifications for free spaces
         const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
 
@@ -380,10 +389,6 @@ export async function createNotificationsFromEvent(webhookData: {
             userId
           });
         const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
-        // The user who triggered the event should not receive a notification
-        if (spaceRole.userId === userId) {
-          continue;
-        }
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
         const isReviewer = proposalReviewerIds.includes(spaceRole.userId);
@@ -431,7 +436,7 @@ export async function createNotificationsFromEvent(webhookData: {
 
     case WebhookEventNames.VoteCreated: {
       const voteId = webhookData.event.vote.id;
-      const vote = await prisma.vote.findUnique({
+      const vote = await prisma.vote.findUniqueOrThrow({
         where: {
           id: voteId,
           status: 'InProgress'
@@ -456,10 +461,6 @@ export async function createNotificationsFromEvent(webhookData: {
           author: true
         }
       });
-
-      if (!vote) {
-        break;
-      }
 
       const spaceId = vote.space.id;
       const spaceRoles = await prisma.spaceRole.findMany({
@@ -524,30 +525,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyMentionCreated: {
-      const mentionedUserId = webhookData.event.mention.value;
-      const mentionAuthorId = webhookData.event.user.id;
-
-      if (mentionedUserId !== mentionAuthorId) {
-        await createBountyNotification({
-          type: 'mention.created',
-          createdBy: mentionAuthorId,
-          mentionId: webhookData.event.mention.id,
-          bountyId: webhookData.event.bounty.id,
-          spaceId: webhookData.spaceId,
-          userId: mentionedUserId
-        });
-      }
-
-      break;
-    }
-
-    case WebhookEventNames.BountyInlineCommentCreated: {
-      await createInlineCommentNotification(webhookData.event);
-      break;
-    }
-
-    case WebhookEventNames.BountyApplicationCreated: {
+    case WebhookEventNames.RewardApplicationCreated: {
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
       const applicationId = webhookData.event.application.id;
@@ -563,20 +541,22 @@ export async function createNotificationsFromEvent(webhookData: {
 
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
       for (const bountyReviewerId of bountyReviewerIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: application.createdBy,
-          spaceId,
-          type: 'application.pending',
-          userId: bountyReviewerId,
-          applicationId
-        });
+        if (application.createdBy !== bountyReviewerId) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: application.createdBy,
+            spaceId,
+            type: 'application.created',
+            userId: bountyReviewerId,
+            applicationId
+          });
+        }
       }
 
       break;
     }
 
-    case WebhookEventNames.BountyApplicationAccepted: {
+    case WebhookEventNames.RewardApplicationApproved: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -596,7 +576,7 @@ export async function createNotificationsFromEvent(webhookData: {
           bountyId,
           createdBy: application.acceptedBy,
           spaceId,
-          type: 'application.accepted',
+          type: 'application.approved',
           userId: application.createdBy,
           applicationId
         });
@@ -605,7 +585,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationRejected: {
+    case WebhookEventNames.RewardApplicationRejected: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -632,7 +612,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountyApplicationSubmitted: {
+    case WebhookEventNames.RewardSubmissionCreated: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -648,20 +628,22 @@ export async function createNotificationsFromEvent(webhookData: {
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: application.createdBy,
-          spaceId,
-          type: 'application.submitted',
-          userId: bountyReviewerId,
-          applicationId
-        });
+        if (application.createdBy !== bountyReviewerId) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: application.createdBy,
+            spaceId,
+            type: 'submission.created',
+            userId: bountyReviewerId,
+            applicationId
+          });
+        }
       }
 
       break;
     }
 
-    case WebhookEventNames.BountyApplicationApproved: {
+    case WebhookEventNames.RewardSubmissionApproved: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -680,7 +662,7 @@ export async function createNotificationsFromEvent(webhookData: {
         bountyId,
         createdBy: userId,
         spaceId,
-        type: 'application.approved',
+        type: 'submission.approved',
         userId: application.createdBy,
         applicationId
       });
@@ -688,20 +670,22 @@ export async function createNotificationsFromEvent(webhookData: {
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: userId,
-          spaceId,
-          type: 'application.payment_pending',
-          userId: bountyReviewerId,
-          applicationId
-        });
+        if (userId !== bountyReviewerId) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: userId,
+            spaceId,
+            type: 'application.payment_pending',
+            userId: bountyReviewerId,
+            applicationId
+          });
+        }
       }
 
       break;
     }
 
-    case WebhookEventNames.BountyApplicationPaymentCompleted: {
+    case WebhookEventNames.RewardApplicationPaymentCompleted: {
       const applicationId = webhookData.event.application.id;
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
@@ -728,7 +712,7 @@ export async function createNotificationsFromEvent(webhookData: {
       break;
     }
 
-    case WebhookEventNames.BountySuggestionCreated: {
+    case WebhookEventNames.RewardSuggestionCreated: {
       const bountyId = webhookData.event.bounty.id;
       const spaceId = webhookData.spaceId;
       const spaceAdmins = await prisma.spaceRole.findMany({
@@ -753,96 +737,15 @@ export async function createNotificationsFromEvent(webhookData: {
       const spaceAdminUserIds = spaceAdmins.map(({ userId }) => userId);
 
       for (const spaceAdminUserId of spaceAdminUserIds) {
-        await createBountyNotification({
-          bountyId,
-          createdBy: bounty.createdBy,
-          spaceId,
-          type: 'suggestion.created',
-          userId: spaceAdminUserId
-        });
-      }
-
-      break;
-    }
-
-    case WebhookEventNames.CardBlockCommentCreated: {
-      const spaceId = webhookData.spaceId;
-      const commentAuthorId = webhookData.event.blockComment.author.id;
-      const cardId = webhookData.event.card.id;
-      const blockCommentId = webhookData.event.blockComment.id;
-      const cardAuthorId = webhookData.event.card.author.id;
-
-      const blockComment = await prisma.block.findFirstOrThrow({
-        where: {
-          id: blockCommentId
-        },
-        select: {
-          parentId: true,
-          fields: true
+        if (spaceAdminUserId !== bounty.createdBy) {
+          await createBountyNotification({
+            bountyId,
+            createdBy: bounty.createdBy,
+            spaceId,
+            type: 'suggestion.created',
+            userId: spaceAdminUserId
+          });
         }
-      });
-
-      const blockCommentContent: PageContent = (blockComment.fields as any).content;
-
-      const previousComment = await prisma.block.findFirst({
-        where: {
-          parentId: blockComment.parentId,
-          type: 'comment'
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        skip: 1,
-        take: 1,
-        select: {
-          id: true,
-          createdBy: true
-        }
-      });
-
-      const previousCommentId = previousComment?.id;
-      const previousCommentAuthorId = previousComment?.createdBy;
-
-      if (
-        previousCommentId &&
-        previousCommentAuthorId &&
-        previousCommentAuthorId !== commentAuthorId &&
-        cardAuthorId !== commentAuthorId
-      ) {
-        await createCardNotification({
-          type: 'block_comment.replied',
-          createdBy: commentAuthorId,
-          cardId,
-          spaceId,
-          userId: previousCommentAuthorId,
-          blockCommentId
-        });
-      }
-
-      if (cardAuthorId !== commentAuthorId) {
-        await createCardNotification({
-          type: 'block_comment.created',
-          createdBy: commentAuthorId,
-          cardId,
-          spaceId,
-          userId: cardAuthorId,
-          blockCommentId
-        });
-      }
-
-      const extractedMentions = extractMentions(blockCommentContent);
-
-      for (const extractedMention of extractedMentions) {
-        const mentionedUserId = extractedMention.value;
-        await createCardNotification({
-          type: 'block_comment.mention.created',
-          createdBy: commentAuthorId,
-          cardId,
-          mentionId: extractedMention.id,
-          spaceId,
-          userId: mentionedUserId,
-          blockCommentId
-        });
       }
 
       break;
@@ -853,14 +756,16 @@ export async function createNotificationsFromEvent(webhookData: {
       const assignedUserId = webhookData.event.assignedUser.id;
       const cardId = webhookData.event.card.id;
 
-      await createCardNotification({
-        type: 'person_assigned',
-        personPropertyId: webhookData.event.personProperty.id,
-        cardId,
-        spaceId,
-        userId: assignedUserId,
-        createdBy: webhookData.event.user.id
-      });
+      if (webhookData.event.user.id !== assignedUserId) {
+        await createCardNotification({
+          type: 'person_assigned',
+          personPropertyId: webhookData.event.personProperty.id,
+          cardId,
+          spaceId,
+          userId: assignedUserId,
+          createdBy: webhookData.event.user.id
+        });
+      }
       break;
     }
 

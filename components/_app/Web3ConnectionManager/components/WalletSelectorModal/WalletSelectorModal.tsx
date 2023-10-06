@@ -9,6 +9,7 @@ import type { Connector } from 'wagmi';
 import { useAccount, useConnect } from 'wagmi';
 
 import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/useMetamaskConnect';
+import { Button } from 'components/common/Button';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
