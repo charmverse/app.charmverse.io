@@ -47,6 +47,7 @@ public/__ENV.js
 *.csv
 .vscode/vscode-chrome-debug-userdatadir/
 /depgraphs
+/scripts/*.json
 
 # debug
 npm-debug.log*
