@@ -19,11 +19,9 @@ import { spaces as _spaces, userProfile } from '../lib/mockData';
 const spaces = [..._spaces].map((s) => ({ ...s }));
 const space = spaces[0];
 
-space.notificationRules = [
-  {
-    exclude: 'forum'
-  }
-];
+space.notificationRules = {
+  rewards: false
+};
 
 function Context({ children }: { children: ReactNode }) {
   // mock the current space since it usually relies on the URL
@@ -114,16 +112,16 @@ API.parameters = {
     handlers: {
       spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
         return res(ctx.json(spaces));
-      }),
-      userProfile: rest.get('/api/profile', (req, res, ctx) => {
-        const clone = { ...userProfile };
-        clone.notificationRules = [
-          {
-            exclude: 'forum'
-          }
-        ];
-        return res(ctx.json(clone));
       })
+      // userProfile: rest.get('/api/profile', (req, res, ctx) => {
+      //   const clone = { ...userProfile };
+      //   clone.notificationRules = [
+      //     {
+      //       exclude: 'forum'
+      //     }
+      //   ];
+      //   return res(ctx.json(clone));
+      // })
     }
   }
 };

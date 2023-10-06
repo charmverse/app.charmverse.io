@@ -1,11 +1,9 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
-  FormControlLabel,
   Grid,
   Stack,
-  Switch,
   Typography,
   TextField,
   FormHelperText,
@@ -20,9 +18,8 @@ import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
@@ -43,22 +40,26 @@ import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import type { NotificationRule } from 'lib/notifications/notificationRules';
+import type { NotificationRuleOption, NotificationRules } from 'lib/notifications/notificationRules';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 
 import Avatar from './components/LargeAvatar';
+import { NotificationRulesInput } from './components/NotificationRules';
 import SettingsItem from './components/SettingsItem';
 
-const schema = yup.object({
+export type FormValues = {
+  name: string;
+  spaceImage?: string | null;
+  domain: string;
+  notificationRules: NotificationRules;
+};
+
+const schema: yup.SchemaOf<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  notifyForum: yup.boolean(),
-  notifyNewProposals: yup.boolean(),
-  notifyProposals: yup.boolean(),
-  notifyPolls: yup.boolean(),
-  notifyRewards: yup.boolean(),
+  notificationRules: yup.object(),
   domain: yup
     .string()
     .ensure()
@@ -68,37 +69,6 @@ const schema = yup.object({
     .matches(/^\S*$/, 'Space is not allowed')
 });
 
-type FormValues = yup.InferType<typeof schema>;
-
-const notificationRuleEvents = {
-  bounties: {
-    title: 'Bounty',
-    events: [
-      [
-        'Bounty suggested (Admins only)',
-        'Application submitted (Reviewers only)',
-        'Application accepted (Applicants only)',
-        'Application rejected (Applicants only)'
-      ],
-      [
-        'Work submitted (Reviewers only)',
-        'Submission approved (Applicants only)',
-        'Payment completed (Applicants only)'
-      ]
-    ]
-  },
-  proposals: {
-    title: 'Proposals',
-    events: [
-      ['Feedback ready (All members)', 'Review ready (Reviewers only)', 'Review completed (Authors only)'],
-      ['Vote ready (All members)', 'Evaluation completed (Authors only)']
-    ]
-  },
-  polls: {
-    title: 'Polls',
-    events: [['Poll created (All members)']]
-  }
-};
 export function SpaceSettings({
   space,
   setUnsavedChanges
@@ -146,7 +116,7 @@ export function SpaceSettings({
     isMutating
   } = useSWRMutation(
     `/spaces/${space.id}`,
-    (_url, { arg }: Readonly<{ arg: Partial<Space> }>) => charmClient.spaces.updateSpace(arg),
+    (_url, { arg }: Readonly<{ arg: Prisma.SpaceUpdateInput }>) => charmClient.spaces.updateSpace(arg),
     {
       onSuccess: (updatedSpace) => {
         setSpace(updatedSpace);
@@ -163,18 +133,19 @@ export function SpaceSettings({
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
 
-    let notifyNewProposals: Date | null | undefined;
-    if (!values.notifyNewProposals) {
-      notifyNewProposals = null;
-    } else if (!space.notifyNewProposals) {
-      notifyNewProposals = new Date();
+    // remove 'true' values from notificationRules
+    const notificationRules = { ...values.notificationRules };
+    for (const key in notificationRules) {
+      if (notificationRules[key as NotificationRuleOption] !== false) {
+        delete notificationRules[key as NotificationRuleOption];
+      }
     }
 
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     await updateSpace({
       id: space.id,
-      notifyNewProposals,
+      notificationRules,
       features,
       memberProfiles,
       name: values.name,
@@ -223,7 +194,7 @@ export function SpaceSettings({
 
   const dataChanged = useMemo(() => {
     return !isEqual(allFeatures, features) || !isEqual(allMemberProfiles, memberProfiles) || isDirty;
-  }, [allFeatures, features, memberProfiles, isDirty]);
+  }, [allFeatures, features, allMemberProfiles, memberProfiles, isDirty]);
 
   useEffect(() => {
     setUnsavedChanges(dataChanged);
@@ -286,81 +257,13 @@ export function SpaceSettings({
             <Typography variant='caption' mb={1} component='p'>
               Control notifications for your members.
             </Typography>
-            <Stack>
-              <ToggleInput
-                name='notifyRewards'
-                label={
-                  <NotificationRuleComponent
-                    title={notificationRuleEvents.bounties.title}
-                    events={notificationRuleEvents.bounties.events}
-                  />
-                }
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              />
-              {/* <ToggleInput
-                name='notifyForum'
-                label={
-                  <NotificationRuleComponent
-                    title={notificationRuleEvents.forum.title}
-                    events={notificationRuleEvents.forum.events}
-                  />
-                }
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              /> */}
-              <ToggleInput
-                name='notifyProposals'
-                label={
-                  <NotificationRuleComponent
-                    title={notificationRuleEvents.proposals.title}
-                    events={notificationRuleEvents.proposals.events}
-                  />
-                }
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              />
-              {/* <Grid container>
-                <Grid item xs md={5}>
-                  <ToggleInput
-                    name='notifyProposals'
-                    label={
-                      <NotificationRuleComponent
-                        title={notificationRuleEvents.proposals.title}
-                        events={notificationRuleEvents.proposals.events}
-                      />
-                    }
-                    disabled={!isAdmin}
-                    control={control}
-                    setValue={setValue}
-                  />
-                </Grid>
-                <Grid item xs md={6}>
-                  <ToggleInput
-                    name='notifyNewProposals'
-                    label='New proposals'
-                    disabled={!isAdmin}
-                    control={control}
-                    setValue={setValue}
-                  />
-                </Grid>
-              </Grid> */}
-              <ToggleInput
-                name='notifyPolls'
-                label={
-                  <NotificationRuleComponent
-                    title={notificationRuleEvents.polls.title}
-                    events={notificationRuleEvents.polls.events}
-                  />
-                }
-                disabled={!isAdmin}
-                control={control}
-                setValue={setValue}
-              />
-            </Stack>
+            <NotificationRulesInput
+              control={control}
+              isAdmin={isAdmin}
+              register={register}
+              watch={watch}
+              setValue={setValue}
+            />
           </Grid>
           <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>
@@ -617,84 +520,6 @@ export function SpaceSettings({
     </>
   );
 }
-
-function NotificationRuleComponent({ title, events: listsOfEvents }: { title: string; events: string[][] }) {
-  return (
-    <Box width='100%'>
-      <Typography sx={{ my: 1 }}>{title}</Typography>
-      <Grid container sx={{ mb: 2, maxWidth: 600 }}>
-        {listsOfEvents.map((events) => (
-          <Grid xs={12} md={6} item key={events.join()}>
-            <Typography variant='caption'>
-              <ul style={{ margin: 0, paddingLeft: '2em' }}>
-                {events.map((event) => (
-                  <li key={event}>{event}</li>
-                ))}
-              </ul>
-            </Typography>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
-}
-
-function ToggleInput<T extends string>({
-  disabled,
-  name,
-  label,
-  control,
-  setValue
-}: {
-  disabled?: boolean;
-  name: T;
-  label: ReactNode;
-  control: any;
-  setValue: (name: T, value: any) => void;
-}) {
-  return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field: { onChange, value } }) => {
-        return (
-          <FormControlLabel
-            disableTypography
-            sx={{ alignItems: 'flex-start' }}
-            control={
-              <Switch
-                disabled={disabled}
-                checked={value}
-                onChange={(event, val) => {
-                  if (val) {
-                    setValue(name, val);
-                  }
-                  return onChange(val);
-                }}
-              />
-            }
-            label={label}
-          />
-        );
-      }}
-    />
-  );
-}
-
-function _getFormValues(space: Space): FormValues {
-  const notificationRules = space.notificationRules as NotificationRule[];
-  return {
-    name: space.name,
-    spaceImage: space.spaceImage,
-    domain: space.domain,
-    notifyForum: !notificationRules.some((rule) => rule.exclude === 'forum'),
-    notifyNewProposals: !!space.notifyNewProposals,
-    notifyProposals: !notificationRules.some((rule) => rule.exclude === 'proposals'),
-    notifyRewards: !notificationRules.some((rule) => rule.exclude === 'rewards'),
-    notifyPolls: !notificationRules.some((rule) => rule.exclude === 'polls')
-  };
-}
-
 function getProfileWidgetLogo(name: MemberProfileName) {
   switch (name) {
     case 'charmverse':
@@ -710,4 +535,25 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     default:
       return '';
   }
+}
+
+function _getFormValues(space: Space): FormValues {
+  const notificationRules = { ...(space.notificationRules as any) } as NotificationRules;
+  // convert deprecated proposals notification preference
+  if (typeof notificationRules.proposals__start_discussion === 'undefined' && !space.notifyNewProposals) {
+    notificationRules.proposals__start_discussion = false;
+    notificationRules.proposals__vote = false;
+  }
+  // set all notifications to true by default. TODO: find a programmatic way to do this?
+  notificationRules.proposals ??= true;
+  notificationRules.polls ??= true;
+  notificationRules.rewards ??= true;
+  notificationRules.proposals__start_discussion ??= true;
+  notificationRules.proposals__vote ??= true;
+  return {
+    name: space.name,
+    spaceImage: space.spaceImage,
+    domain: space.domain,
+    notificationRules
+  };
 }

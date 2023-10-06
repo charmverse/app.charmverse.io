@@ -1,24 +1,53 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationGroup } from './constants';
+import type { NotificationGroup, NotificationType } from './interfaces';
 
-export type NotificationRule = {
-  exclude: NotificationGroup;
-};
+/**
+ * Example structure:
+ * {
+ *   'forum': false,
+ *   'proposals.start_discussion': false,
+ * }
+ */
+export type NotificationRuleOption = NotificationGroup | `${NotificationGroup}__${NotificationType}`;
+export type NotificationRules = { [key in NotificationRuleOption]?: boolean };
 
-function isGroupEnabled(group: NotificationGroup, rules: NotificationRule[]) {
-  return !rules.some((rule) => rule.exclude === group);
-}
-
-export async function isGroupEnabledForUser(userId: string, group: NotificationGroup) {
-  const { notificationRules } = await prisma.user.findUniqueOrThrow({
+export async function isNotificationEnabledForSpace({
+  spaceId,
+  group,
+  type
+}: {
+  spaceId: string;
+  group: NotificationGroup;
+  type?: NotificationType;
+}) {
+  const { notificationRules } = await prisma.space.findUniqueOrThrow({
     where: {
-      id: userId
+      id: spaceId
     },
     select: {
       notificationRules: true
     }
   });
 
-  return isGroupEnabled(group, notificationRules as NotificationRule[]);
+  return isNotificationEnabled({ group, type, rules: notificationRules as NotificationRules });
+}
+
+// Determine if a notification event is enabled
+function isNotificationEnabled({
+  group,
+  type,
+  rules
+}: {
+  group: NotificationGroup;
+  type?: NotificationType;
+  rules: NotificationRules;
+}) {
+  if (rules[group] === false) {
+    return false;
+  }
+  if (type && rules[`${group}__${type}`] === false) {
+    return false;
+  }
+  return true;
 }

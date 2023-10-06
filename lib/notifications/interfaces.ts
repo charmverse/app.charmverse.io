@@ -2,6 +2,9 @@ import type { BountyStatus, PageType, ProposalStatus, User, VoteStatus } from '@
 
 import type { CardPropertyEntity, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
+import type { notificationGroups } from './constants';
+
+export type NotificationGroup = (typeof notificationGroups)[number];
 export type NotificationGroupType = 'forum' | 'discussions' | 'votes' | 'proposals' | 'bounties';
 
 export type NotificationActor = Pick<
@@ -215,3 +218,5 @@ export type CreateEventPayload = {
   cardId: string;
   cardProperty: CardPropertyEntity;
 };
+
+export type NotificationType = ProposalNotificationType | ForumNotificationType | DiscussionNotificationType;

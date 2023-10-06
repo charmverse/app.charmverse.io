@@ -1,7 +1,7 @@
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationRule } from 'lib/notifications/notificationRules';
+import type { NotificationRules } from 'lib/notifications/notificationRules';
 import randomName from 'lib/utilities/randomName';
 import { uid } from 'lib/utilities/strings';
 
@@ -40,7 +40,7 @@ export function addUserWallet({ userId, address }: { userId: string; address: st
 }
 
 type GenerateUserInput = {
-  notificationRules?: NotificationRule[];
+  notificationRules?: NotificationRules;
   verifiedEmail?: string;
 };
 

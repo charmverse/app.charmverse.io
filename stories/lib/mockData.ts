@@ -39,7 +39,7 @@ export const memberPropertyTypes = [
   'join_date'
 ] as const;
 
-export const spaces = [createMockSpace()];
+export const spaces = [createMockSpace({ id: seeds[0] })];
 
 export const memberProperties: MemberPropertyWithPermissions[] = memberPropertyTypes.map((type, index) => {
   const memberProperty = createMemberProperty({

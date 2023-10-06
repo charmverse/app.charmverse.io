@@ -1,5 +1,6 @@
 import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
+import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
 
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
@@ -24,6 +25,9 @@ const spaceHandlers = {
   spaceMembers: rest.get(`/api/spaces/:spaceId/members`, (req, res, ctx) => {
     return res(ctx.json([userMemberProfile, ...members]));
   }),
+  spaceMemberProperties: rest.get(`/api/spaces/:spaceId/members/properties`, (req, res, ctx) => {
+    return res(ctx.json([]));
+  }),
   spacePermissions: rest.get(`/api/permissions/space/:spaceId/compute`, (req, res, ctx) => {
     const permissions: SpacePermissionFlags = {
       createPage: true,
@@ -42,6 +46,10 @@ const spaceHandlers = {
   }),
   spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
     return res(ctx.json(spaces));
+  }),
+  spaceBlockCount: rest.get(`/api/spaces/:spaceId/block-count`, (req, res, ctx) => {
+    const result: BlockCountInfo = { count: 1000 };
+    return res(ctx.json(result));
   })
 };
 
