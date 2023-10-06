@@ -90,7 +90,7 @@ function getCardContent(n: CardNotification) {
   const { createdBy, type } = n;
   switch (type) {
     case 'person_assigned': {
-      return createdBy?.username ? `${createdBy?.username} assigned you to  a card` : `You were assigned to a card`;
+      return createdBy?.username ? `${createdBy?.username} assigned you to a card` : `You were assigned to a card`;
     }
 
     default: {
@@ -109,7 +109,7 @@ function getDocumentContent(n: DocumentNotification) {
 }
 
 function getBountyContent(n: BountyNotification) {
-  const { createdBy, type, pageTitle: title } = n;
+  const { createdBy, type } = n;
 
   switch (type) {
     case 'application.created': {
@@ -134,9 +134,7 @@ function getBountyContent(n: BountyNotification) {
       return `You have been paid for a bounty`;
     }
     case 'suggestion.created': {
-      return createdBy?.username
-        ? `${createdBy?.username} suggested a new bounty: ${title}`
-        : `New bounty suggestion: ${title}`;
+      return createdBy?.username ? `${createdBy?.username} suggested a new bounty` : `New bounty suggestion`;
     }
     default: {
       return '';
@@ -151,8 +149,8 @@ function getProposalContent(n: ProposalNotification) {
     case 'start_review':
     case 'start_discussion': {
       return createdBy?.username
-        ? `${createdBy?.username} seeking feedback for proposal`
-        : `Feedback requested for proposal`;
+        ? `${createdBy?.username} seeking feedback for a proposal`
+        : `Feedback requested for a proposal`;
     }
     case 'reviewed': {
       return `Review completed for a proposal`;
