@@ -20,10 +20,10 @@ handler
   )
   .post(connectSpaceHandler);
 
-async function connectSpaceHandler(req: NextApiRequest, res: NextApiResponse<Promise<SpaceApiResponse>>) {
+async function connectSpaceHandler(req: NextApiRequest, res: NextApiResponse<SpaceApiResponse>) {
   const { state, discordServerId } = req.body as { state: string; discordServerId: string };
 
-  const connectedSpace = connectSpace({ state, discordServerId });
+  const connectedSpace = await connectSpace({ state, discordServerId });
 
   return res.status(201).json(connectedSpace);
 }
