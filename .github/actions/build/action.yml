@@ -15,7 +15,6 @@ runs:
     #   run: echo "$GITHUB_CONTEXT"
 
     - name: Restore build
-      if: ${{ !inputs.save_cache }}
       id: restore_build
       uses: actions/cache/restore@v3
       with:
@@ -33,7 +32,6 @@ runs:
 
     - name: Cache build
       if: inputs.save_cache
-      id: cache_build
       uses: actions/cache/save@v3
       with:
         path: |

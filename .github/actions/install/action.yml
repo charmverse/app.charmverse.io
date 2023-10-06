@@ -79,7 +79,6 @@ runs:
 
     - name: Cache dependencies
       if: inputs.save_cache
-      id: cache_node_modules
       uses: actions/cache/save@v3
       with:
         path: ./node_modules
