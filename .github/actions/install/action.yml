@@ -7,6 +7,9 @@ inputs:
   commit_core_pkg_upgrade:
     description: 'Whether commit the update to core package back to branch'
     required: false
+  save_cache:
+    description: "Whether to save the cache"
+    required: false
   use_github_core_branch:
     description: |
       Optional, core branch name to install from github.
