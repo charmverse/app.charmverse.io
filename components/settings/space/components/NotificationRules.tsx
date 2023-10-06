@@ -174,7 +174,7 @@ function NotificationRuleComponent({
         {listsOftypes.map((types) => (
           <Grid xs={12} md={6} item key={types.map((e) => e.label).join()}>
             <Typography variant='caption'>
-              <ul style={{ margin: 0, paddingLeft: 0 }}>
+              <Stack ml={1}>
                 {types.map((event) =>
                   event.type ? (
                     <Controller
@@ -214,7 +214,7 @@ function NotificationRuleComponent({
                     />
                   )
                 )}
-              </ul>
+              </Stack>
             </Typography>
           </Grid>
         ))}
