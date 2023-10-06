@@ -1,43 +1,45 @@
-import type { Application, Bounty } from '@charmverse/core/prisma';
-import { Box, Button, Stack, Tooltip } from '@mui/material';
+import type { UserPermissionFlags } from '@charmverse/core/dist/cjs/permissions';
+import type { Application, Bounty, BountyOperation } from '@charmverse/core/prisma';
+import { Box, Button, Divider, Stack, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useBounties } from 'hooks/useBounties';
 import { useUser } from 'hooks/useUser';
 import { submissionsCapReached } from 'lib/applications/shared';
 import type { AssignedBountyPermissions } from 'lib/bounties';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
 import { ApplicationComments } from '../RewardApplicantsTable/ApplicationComments';
 
 import ApplicationInput from './components/ApplicationInput';
-import SubmissionInput from './components/SubmissionInput';
+import { SubmissionInput } from './components/SubmissionInput';
 
-interface BountyApplicationFormProps {
-  permissions: AssignedBountyPermissions;
-  bounty: Bounty;
+interface RewardApplicationFormProps {
+  permissions: UserPermissionFlags<BountyOperation>;
+  reward: RewardWithUsers;
   submissions: Application[];
   refreshSubmissions: () => void;
 }
 
-export default function BountyApplicantForm(props: BountyApplicationFormProps) {
-  const { refreshSubmissions, bounty, permissions, submissions } = props;
-  const { refreshBounty } = useBounties();
+export function RewardApplicantForm(props: RewardApplicationFormProps) {
+  const { refreshSubmissions, reward, permissions, submissions } = props;
+  const { refreshReward } = useRewards();
   const { user } = useUser();
   const [showApplication, setShowApplication] = useState(false);
   const userApplication = submissions.find((s) => s.createdBy === user?.id);
 
   // Only applies if there is a submissions cap
   const capReached = submissionsCapReached({
-    bounty,
+    bounty: reward,
     submissions
   });
 
-  const canCreateApplication =
-    !userApplication && !bounty.submissionsLocked && !capReached && permissions?.userPermissions.work;
+  const canCreateApplication = !userApplication && !reward.submissionsLocked && !capReached && permissions?.work;
 
-  const newSubmissionTooltip = bounty.submissionsLocked
+  const newSubmissionTooltip = reward.submissionsLocked
     ? 'Submissions locked'
-    : !permissions?.userPermissions.work
+    : !permissions?.work
     ? 'You do not have the correct role to work on this bounty'
     : capReached
     ? 'The submissions cap has been reached. This bounty is closed to new submissions.'
@@ -45,107 +47,92 @@ export default function BountyApplicantForm(props: BountyApplicationFormProps) {
 
   async function submitApplication() {
     setShowApplication(false);
-    await refreshSubmissions();
-    await refreshBounty(bounty.id);
+    refreshSubmissions();
+    await refreshReward(reward.id);
   }
 
-  if (!userApplication && bounty.approveSubmitters) {
-    return !showApplication ? (
-      <Box display='flex' justifyContent='center' my={3}>
-        <Tooltip placement='top' title={newSubmissionTooltip} arrow>
-          <span>
-            <Button
-              disabled={!canCreateApplication}
-              onClick={() => {
-                setShowApplication(true);
-              }}
-            >
-              Apply to this bounty
-            </Button>
-          </span>
-        </Tooltip>
-      </Box>
-    ) : (
-      <ApplicationInput
-        permissions={permissions}
-        refreshSubmissions={refreshSubmissions}
-        bountyId={bounty.id}
-        mode='create'
-        onSubmit={submitApplication}
-        onCancel={() => {
-          setShowApplication(false);
-        }}
-      />
-    );
-    // Submissions cap exists and user has applied
-  } else if (userApplication && bounty.approveSubmitters) {
+  // do not show option to apply in card if user already applied
+  if (userApplication || !canCreateApplication) {
+    return null;
+  }
+
+  if (reward.approveSubmitters) {
     return (
       <>
-        <ApplicationInput
-          permissions={permissions}
-          refreshSubmissions={refreshSubmissions}
-          bountyId={bounty.id}
-          application={userApplication}
-          mode='update'
-          readOnly={userApplication?.status !== 'applied'}
-          onSubmit={() => {
-            setShowApplication(false);
-          }}
-        />
-        {userApplication?.status !== 'applied' && (
-          <SubmissionInput
-            hasCustomReward={bounty.customReward !== null}
-            bountyId={bounty.id}
-            onSubmit={submitApplication}
-            submission={userApplication}
+        {!showApplication ? (
+          <Box display='flex' justifyContent='center' my={2} mb={3}>
+            <Tooltip placement='top' title={newSubmissionTooltip} arrow>
+              <span>
+                <Button
+                  disabled={!canCreateApplication}
+                  onClick={() => {
+                    setShowApplication(true);
+                  }}
+                >
+                  Apply to this bounty
+                </Button>
+              </span>
+            </Tooltip>
+          </Box>
+        ) : (
+          <ApplicationInput
             permissions={permissions}
-            expandedOnLoad={true}
+            refreshSubmissions={refreshSubmissions}
+            bountyId={reward.id}
+            mode='create'
+            onSubmit={submitApplication}
             onCancel={() => {
               setShowApplication(false);
             }}
-            readOnly={userApplication?.status !== 'inProgress' && userApplication?.status !== 'review'}
-            alwaysExpanded
           />
         )}
-        {userApplication && userApplication.createdBy === user?.id && (
-          <Stack gap={1} mt={2}>
-            <ApplicationComments status={userApplication.status} applicationId={userApplication.id} />
-          </Stack>
-        )}
+
+        <Divider
+          sx={{
+            my: 3
+          }}
+        />
       </>
     );
-    // When we don't need to apply
-  } else if (!bounty.approveSubmitters) {
-    return !showApplication && !userApplication ? (
-      <Box display='flex' justifyContent='center' my={3}>
-        <Tooltip placement='top' title={newSubmissionTooltip} arrow>
-          <span>
-            <Button
-              disabled={!canCreateApplication}
-              onClick={() => {
-                setShowApplication(true);
-              }}
-            >
-              New submission
-            </Button>
-          </span>
-        </Tooltip>
-      </Box>
-    ) : (
-      <SubmissionInput
-        bountyId={bounty.id}
-        onSubmit={submitApplication}
-        onCancel={() => {
-          setShowApplication(false);
-        }}
-        hasCustomReward={bounty.customReward !== null}
-        readOnly={userApplication?.status === 'rejected'}
-        submission={userApplication}
-        permissions={permissions}
-        alwaysExpanded
-      />
-    );
-  } else {
-    return null;
+    // Submissions cap exists and user has applied
   }
+
+  return (
+    <>
+      {!showApplication ? (
+        <Box display='flex' justifyContent='center' my={2} mb={3}>
+          <Tooltip placement='top' title={newSubmissionTooltip} arrow>
+            <span>
+              <Button
+                disabled={!canCreateApplication}
+                onClick={() => {
+                  setShowApplication(true);
+                }}
+              >
+                New submission
+              </Button>
+            </span>
+          </Tooltip>
+        </Box>
+      ) : (
+        <SubmissionInput
+          bountyId={reward.id}
+          onSubmit={submitApplication}
+          onCancel={() => {
+            setShowApplication(false);
+          }}
+          hasCustomReward={reward.customReward !== null}
+          submission={userApplication}
+          permissions={permissions}
+          alwaysExpanded
+        />
+      )}
+
+      <Divider
+        sx={{
+          my: 3
+        }}
+      />
+    </>
+  );
 }

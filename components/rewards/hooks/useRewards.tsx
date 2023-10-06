@@ -85,7 +85,7 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     async (rewardId: string) => {
       const reward = await charmClient.rewards.getReward(rewardId);
       mutateRewards((data) => {
-        const rewardList = data ?? [];
+        const rewardList = data ? [...data] : [];
         const rewardIndex = rewardList.findIndex((p) => p.id === rewardId);
 
         if (rewardIndex >= 0) {

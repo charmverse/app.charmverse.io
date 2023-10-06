@@ -14,6 +14,7 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import { RewardApplicantForm } from 'components/rewards/components/RewardProperties/components/RewardApplicantForm/RewardApplicantForm';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
@@ -79,14 +80,13 @@ export function RewardProperties(props: {
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
-  // Copied from RewardApplicantsTable - probably not needed in this view
-  // const { data: applications, mutate: refreshSubmissions } = useSWR(
-  //   !rewardId ? null : `/rewards/${rewardId}/applications`,
-  //   () => charmClient.rewards.listApplications(rewardId as string),
-  //   {
-  //     fallbackData: []
-  //   }
-  // );
+  const { data: applications, mutate: refreshSubmissions } = useSWR(
+    !rewardId ? null : `/rewards/${rewardId}/applications`,
+    () => charmClient.rewards.listApplications(rewardId as string),
+    {
+      fallbackData: []
+    }
+  );
 
   async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
     setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
@@ -380,27 +380,16 @@ export function RewardProperties(props: {
         />
 
         {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
-
-        {/* 
-      {
-        TODO @Mo - Replace this with a way to create your own application. We could just use the application input form
-        // Reward creator cannot apply to their own reward
-        permissions && isSpaceMember && currentReward.createdBy !== user?.id && (
+        {rewardPermissions?.work && isSpaceMember && currentReward.createdBy !== user?.id && (
           <div data-test='reward-applicant-form'>
             <RewardApplicantForm
               reward={currentReward}
               submissions={applications}
-              permissions={permissions}
+              permissions={rewardPermissions}
               refreshSubmissions={refreshSubmissions}
             />
-            <Divider
-              sx={{
-                my: 3
-              }}
-            />
           </div>
-        )
-      } */}
+        )}
 
         {/*
       TODO - Fix this when we fix rewards table
