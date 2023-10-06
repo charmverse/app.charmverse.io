@@ -1,4 +1,5 @@
-import type { Application } from '@charmverse/core/prisma';
+import type { UserPermissionFlags } from '@charmverse/core/permissions';
+import type { Application, BountyOperation } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -17,6 +18,7 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { AssignedBountyPermissions } from 'lib/bounties';
 import { isValidChainAddress } from 'lib/tokens/validation';
@@ -46,13 +48,13 @@ interface Props {
   onSubmit?: (submission: Application) => void;
   onCancel?: () => void;
   readOnly?: boolean;
-  permissions: AssignedBountyPermissions;
+  permissions: UserPermissionFlags<BountyOperation>;
   expandedOnLoad?: boolean;
   alwaysExpanded?: boolean;
   hasCustomReward: boolean;
 }
 
-export default function SubmissionInput({
+export function SubmissionInput({
   permissions,
   readOnly = false,
   submission,
@@ -65,6 +67,7 @@ export default function SubmissionInput({
 }: Props) {
   const { user } = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
+  const { showMessage } = useSnackbar();
 
   const [isEditorTouched, setIsEditorTouched] = useState(false);
   const {
@@ -90,16 +93,19 @@ export default function SubmissionInput({
     try {
       if (submission) {
         // Update
-        application = await charmClient.bounties.updateSubmission({
+        application = await charmClient.rewards.updateSubmission({
           submissionId: submission.id,
-          content: values
+          submissionContent: values as any,
+          customReward: hasCustomReward
         });
       } else {
         // create
-        application = await charmClient.bounties.createSubmission({
+        application = await charmClient.rewards.createSubmission({
           bountyId,
-          submissionContent: values
+          submissionContent: values as any
         });
+
+        showMessage('Submission created successfully', 'success');
       }
       setIsEditorTouched(false);
       if (onSubmitProp) {
@@ -167,9 +173,7 @@ export default function SubmissionInput({
                 }}
                 readOnly={readOnly || submission?.status === 'complete' || submission?.status === 'paid'}
                 placeholderText={
-                  permissions.userPermissions.review
-                    ? 'No submission yet'
-                    : 'Enter the content of your submission here.'
+                  permissions.review ? 'No submission yet' : 'Enter the content of your submission here.'
                 }
                 key={`${readOnly}.${submission?.status}`}
               />
@@ -182,6 +186,7 @@ export default function SubmissionInput({
                   {...register('walletAddress')}
                   type='text'
                   fullWidth
+                  inputProps={{ style: { height: 'auto' } }}
                   error={!!errors.walletAddress}
                   helperText={errors.walletAddress?.message}
                   disabled={readOnly}

@@ -1,4 +1,5 @@
-import type { Application } from '@charmverse/core/prisma';
+import type { UserPermissionFlags } from '@charmverse/core/permissions';
+import type { Application, BountyOperation } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -16,6 +17,7 @@ import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/componen
 import Modal from 'components/common/Modal';
 import { useBounties } from 'hooks/useBounties';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
@@ -34,7 +36,7 @@ interface IApplicationFormProps {
   expandedOnLoad?: boolean;
   alwaysExpanded?: boolean;
   refreshSubmissions: VoidFunction;
-  permissions: AssignedBountyPermissions;
+  permissions: UserPermissionFlags<BountyOperation>;
 }
 
 export const schema = yup.object({
@@ -64,6 +66,7 @@ export default function ApplicationInput({
   const { refreshBounty } = useBounties();
   const [isVisible, setIsVisible] = useState(mode === 'create' || expandedOnLoad || alwaysExpanded);
   const { user } = useUser();
+  const { showMessage } = useSnackbar();
 
   const [applicationMessage, setApplicationMessage] = useLocalStorage(`${bountyId}.${user?.id}.application`, '');
   const [reviewDecision, setReviewDecision] = useState<SubmissionReview | null>(null);
@@ -83,20 +86,22 @@ export default function ApplicationInput({
 
   const applicationExample = 'Explain why you are the right person or team to work on this bounty.';
 
-  async function submitted(proposalToSave: Application) {
+  async function submitted(rewardToSave: Application) {
     if (mode === 'create') {
-      proposalToSave.bountyId = bountyId;
-      proposalToSave.status = 'applied';
-      const createdApplication = await charmClient.bounties.createApplication(proposalToSave);
+      rewardToSave.bountyId = bountyId;
+      rewardToSave.status = 'applied';
+      const createdApplication = await charmClient.rewards.createApplication(rewardToSave);
+      showMessage('Application submitted successfully', 'success');
+
       if (onSubmit) {
         onSubmit(createdApplication);
       }
       refreshBounty(bountyId);
       setApplicationMessage('');
     } else if (mode === 'update') {
-      await charmClient.bounties.updateApplication(application?.id as string, proposalToSave);
+      await charmClient.rewards.updateApplication({ applicationId: application?.id as string, update: rewardToSave });
       if (onSubmit) {
-        onSubmit(proposalToSave);
+        onSubmit(rewardToSave);
       }
       refreshBounty(bountyId);
     }
@@ -205,7 +210,7 @@ export default function ApplicationInput({
               </Grid>
             )}
 
-            {permissions.userPermissions.review && application?.id && application?.status === 'inProgress' && (
+            {permissions.review && application?.id && application?.status === 'inProgress' && (
               <Grid item display='flex' gap={1}>
                 <Button
                   color='error'

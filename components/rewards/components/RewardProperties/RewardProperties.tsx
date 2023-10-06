@@ -1,8 +1,5 @@
-import type { PaymentMethod } from '@charmverse/core/prisma';
-import { Box, Divider } from '@mui/material';
+import { Box, Divider, Stack } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import type { CryptoCurrency } from 'connectors';
-import { getChainById } from 'connectors';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
@@ -17,15 +14,17 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import { RewardApplicantForm } from 'components/rewards/components/RewardProperties/components/RewardApplicantForm/RewardApplicantForm';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
+import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
+import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -81,14 +80,13 @@ export function RewardProperties(props: {
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
-  // Copied from RewardApplicantsTable - probably not needed in this view
-  // const { data: applications, mutate: refreshSubmissions } = useSWR(
-  //   !rewardId ? null : `/rewards/${rewardId}/applications`,
-  //   () => charmClient.rewards.listApplications(rewardId as string),
-  //   {
-  //     fallbackData: []
-  //   }
-  // );
+  const { data: applications, mutate: refreshSubmissions } = useSWR(
+    !rewardId ? null : `/rewards/${rewardId}/applications`,
+    () => charmClient.rewards.listApplications(rewardId as string),
+    {
+      fallbackData: []
+    }
+  );
 
   async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
     setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
@@ -182,12 +180,15 @@ export function RewardProperties(props: {
           background: 'none'
         },
         '.octo-propertyname .Button': {
-          paddingLeft: 0
-        }
+          paddingLeft: '0 !important'
+        },
+        display: 'flex',
+        flex: 1,
+        mt: 0
       }}
       mt={2}
     >
-      <Box className='octo-propertylist' mt={2}>
+      <Stack className='octo-propertylist' mt={2} flex={1}>
         <Divider />
         <RewardPropertiesHeader
           reward={currentReward}
@@ -197,7 +198,9 @@ export function RewardProperties(props: {
         />
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly>Reviewer</PropertyLabel>
+          <PropertyLabel readOnly highlighted>
+            Reviewer
+          </PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
             value={currentReward.reviewers}
@@ -214,7 +217,9 @@ export function RewardProperties(props: {
         </Box>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly>Due date</PropertyLabel>
+          <PropertyLabel readOnly highlighted>
+            Due date
+          </PropertyLabel>
 
           <DateTimePicker
             minDate={DateTime.fromMillis(Date.now())}
@@ -249,7 +254,9 @@ export function RewardProperties(props: {
         </Box>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly>Application required</PropertyLabel>
+          <PropertyLabel readOnly highlighted>
+            Application required
+          </PropertyLabel>
 
           <SelectPreviewContainer readOnly={readOnly} displayType='details'>
             <Switch
@@ -267,7 +274,9 @@ export function RewardProperties(props: {
         </Box>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly>Applicant Roles</PropertyLabel>
+          <PropertyLabel readOnly highlighted>
+            Applicant Roles
+          </PropertyLabel>
           <UserAndRoleSelect
             type='role'
             readOnly={readOnly}
@@ -295,7 +304,9 @@ export function RewardProperties(props: {
         </Box>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly># of Rewards Available</PropertyLabel>
+          <PropertyLabel readOnly highlighted>
+            # of Rewards Available
+          </PropertyLabel>
           <StyledFocalboardTextInput
             onChange={updateRewardMaxSubmissions}
             required
@@ -312,20 +323,26 @@ export function RewardProperties(props: {
         </Box>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly>Reward Type</PropertyLabel>
+          <PropertyLabel readOnly highlighted>
+            Reward Type
+          </PropertyLabel>
           <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
         </Box>
 
         {rewardType === 'Token' && (
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Reward Token</PropertyLabel>
+            <PropertyLabel readOnly highlighted>
+              Reward Token
+            </PropertyLabel>
             <RewardTokenProperty onChange={onRewardTokenUpdate} currentReward={currentReward} readOnly={readOnly} />
           </Box>
         )}
 
         {rewardType === 'Custom' && (
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Custom Reward</PropertyLabel>
+            <PropertyLabel readOnly highlighted>
+              Custom Reward
+            </PropertyLabel>
 
             <StyledFocalboardTextInput
               onChange={updateRewardCustomReward}
@@ -345,33 +362,36 @@ export function RewardProperties(props: {
             />
           </Box>
         )}
+
+        <CustomPropertiesAdapter
+          readOnly={readOnly}
+          reward={currentReward as RewardWithUsers & RewardFieldsProp}
+          onChange={(properties: RewardPropertiesField) => {
+            applyRewardUpdates({
+              fields: { properties: properties ? { ...properties } : {} } as Reward['fields']
+            });
+          }}
+        />
+
         <Divider
           sx={{
             my: 1
           }}
         />
+
         {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
 
-        {/* 
-      {
-        TODO @Mo - Replace this with a way to create your own application. We could just use the application input form
-        // Reward creator cannot apply to their own reward
-        permissions && isSpaceMember && currentReward.createdBy !== user?.id && (
+        {/* TODO: Replace this old component with new apply flow */}
+        {rewardPermissions?.work && isSpaceMember && currentReward.createdBy !== user?.id && (
           <div data-test='reward-applicant-form'>
             <RewardApplicantForm
               reward={currentReward}
               submissions={applications}
-              permissions={permissions}
+              permissions={rewardPermissions}
               refreshSubmissions={refreshSubmissions}
             />
-            <Divider
-              sx={{
-                my: 3
-              }}
-            />
           </div>
-        )
-      } */}
+        )}
 
         {/*
       TODO - Fix this when we fix rewards table
@@ -379,7 +399,7 @@ export function RewardProperties(props: {
         currentReward.status !== 'suggestion' && ( // &&!draftReward
           <RewardApplicantsTable reward={currentReward} permissions={permissions} />
         )} */}
-      </Box>
+      </Stack>
     </Box>
   );
 }
