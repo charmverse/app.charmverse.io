@@ -55,7 +55,7 @@ export async function closeOutBounty({
   });
 
   await publishBountyEvent({
-    scope: WebhookEventNames.BountyCompleted,
+    scope: WebhookEventNames.RewardCompleted,
     bountyId: bounty.id,
     spaceId: bounty.page.spaceId,
     userId

@@ -5,11 +5,12 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { publishInlineCommentEvent } from 'lib/notifications/publishInlineCommentEvent';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadCreate, ThreadWithComments } from 'lib/threads';
 import { createThread } from 'lib/threads';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -46,10 +47,11 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
 
   const inlineCommentId = newThread.comments[0].id;
 
-  await publishInlineCommentEvent({
+  await publishDocumentEvent({
+    documentId: page.id,
+    scope: WebhookEventNames.DocumentInlineCommentCreated,
     inlineCommentId,
-    page,
-    userId
+    spaceId: page.spaceId
   });
 
   trackUserAction('page_comment_created', {

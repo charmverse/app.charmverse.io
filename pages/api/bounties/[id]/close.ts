@@ -37,7 +37,7 @@ async function closeBountyController(req: NextApiRequest, res: NextApiResponse<B
   });
 
   await publishBountyEvent({
-    scope: WebhookEventNames.BountyCompleted,
+    scope: WebhookEventNames.RewardCompleted,
     bountyId: bounty.id,
     spaceId: bounty.page.spaceId,
     userId

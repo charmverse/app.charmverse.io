@@ -52,7 +52,7 @@ async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiR
   });
 
   await publishBountyEvent({
-    scope: WebhookEventNames.BountyApplicationPaymentCompleted,
+    scope: WebhookEventNames.RewardApplicationPaymentCompleted,
     bountyId: submission.bounty.id,
     spaceId: submission.bounty.spaceId,
     userId,

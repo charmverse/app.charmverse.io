@@ -11,7 +11,7 @@ import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -71,14 +71,12 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const pageComment = await createPageComment({ pageId, userId, ...body });
 
-  if (page.type === 'proposal' && page.proposalId) {
-    await publishProposalEvent({
-      commentId: pageComment.id,
-      scope: WebhookEventNames.ProposalCommentCreated,
-      proposalId: page.proposalId,
-      spaceId: page.spaceId
-    });
-  }
+  await publishDocumentEvent({
+    documentId: pageId,
+    scope: WebhookEventNames.DocumentCommentCreated,
+    commentId: pageComment.id,
+    spaceId: page.spaceId
+  });
 
   res.status(200).json({
     ...pageComment,

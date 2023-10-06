@@ -9,7 +9,7 @@ export async function getBlocks({
   spaceId: string;
   ids?: string[];
 }): Promise<RewardBlockWithTypedFields[]> {
-  const blocks = await prisma.proposalBlock.findMany({
+  const blocks = await prisma.rewardBlock.findMany({
     where: {
       spaceId,
       id:

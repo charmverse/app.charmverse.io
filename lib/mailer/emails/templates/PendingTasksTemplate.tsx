@@ -91,7 +91,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.discussionNotifications.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
-          <DiscussionNotification key={discussionTask.mentionId} task={discussionTask} />
+          <DiscussionNotification key={discussionTask.taskId} task={discussionTask} />
         ))}
         {totalDiscussionNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
         <MjmlDivider />
@@ -219,7 +219,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.forumNotifications.slice(0, MAX_ITEMS_PER_TASK).map((forumTask) => (
-          <ForumTask key={forumTask.commentId} task={forumTask} />
+          <ForumTask key={forumTask.taskId} task={forumTask} />
         ))}
         {totalForumNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusForumLink} /> : null}
         <MjmlDivider />
@@ -373,11 +373,7 @@ function DiscussionNotification({
   );
 }
 
-function ForumTask({
-  task: { commentText, spaceName, spaceDomain, postPath, postTitle }
-}: {
-  task: ForumNotification;
-}) {
+function ForumTask({ task: { spaceName, spaceDomain, postPath, postTitle } }: { task: ForumNotification }) {
   const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>
@@ -385,7 +381,7 @@ function ForumTask({
         href={`${baseUrl}/${spaceDomain}/forum/post/${postPath}`}
         style={{ fontWeight: 'bold', marginBottom: 5, display: 'block', color: 'inherit' }}
       >
-        {commentText.length > MAX_CHAR ? `${commentText.slice(0, MAX_CHAR)}...` : commentText || 'New Post'}
+        {postTitle}
       </a>
       <div
         style={{

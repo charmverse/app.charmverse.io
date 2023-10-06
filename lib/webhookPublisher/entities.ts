@@ -5,7 +5,7 @@ import { baseUrl } from 'config/constants';
 import type {
   ApplicationEntity,
   BlockCommentEntity,
-  BountyEntity,
+  RewardEntity,
   CommentEntity,
   DocumentEntity,
   InlineCommentEntity,
@@ -16,7 +16,7 @@ import type {
   VoteEntity
 } from './interfaces';
 
-export async function getBountyEntity(id: string): Promise<BountyEntity> {
+export async function getRewardEntity(id: string): Promise<RewardEntity> {
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {
       id
@@ -225,7 +225,7 @@ export async function getApplicationEntity(id: string): Promise<ApplicationEntit
     id,
     createdAt: application.createdAt.toISOString(),
     user: await getUserEntity(application.createdBy),
-    bounty: await getBountyEntity(application.bountyId)
+    bounty: await getRewardEntity(application.bountyId)
   };
 }
 
@@ -244,17 +244,28 @@ export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
         select: {
           domain: true
         }
+      },
+      proposal: {
+        select: {
+          authors: {
+            select: {
+              userId: true
+            }
+          }
+        }
       }
     }
   });
 
-  const author = await getUserEntity(document.createdBy);
+  const authors = document.proposal
+    ? await Promise.all(document.proposal.authors.map(({ userId }) => getUserEntity(userId)))
+    : [await getUserEntity(document.createdBy)];
 
   return {
     id,
     title: document.title,
     url: `${baseUrl}/${document.space.domain}/${document.path}`,
     type: document.type,
-    author
+    authors
   };
 }

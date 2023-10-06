@@ -2,15 +2,15 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
-import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-import { getForumTasks } from 'lib/forums/getForumNotifications/getForumTasks';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTasksTemplate';
+import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
-import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
+import { getForumNotifications } from 'lib/notifications/getForumNotifications';
+import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
+import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import { isUUID } from 'lib/utilities/strings';
-import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 const notificationTaskLimiter = RateLimit(100);
 
@@ -28,26 +28,14 @@ export async function sendUserNotifications(): Promise<number> {
   return notificationsToSend.length;
 }
 
-export async function getNotifications(): Promise<(PendingNotifications & { unmarkedWorkspaceEvents: string[] })[]> {
-  // Get all the workspace events within the past day
-  const workspaceEvents = await prisma.workspaceEvent.findMany({
-    where: {
-      createdAt: {
-        lte: new Date(),
-        gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
-      },
-      type: 'proposal_status_change'
-    }
-  });
-
-  const usersWithSafes = await prisma.user.findMany({
+export async function getNotifications(): Promise<PendingNotifications[]> {
+  const userWithNotificationState = await prisma.user.findMany({
     where: {
       deletedAt: null,
       AND: [{ email: { not: null } }, { email: { not: '' } }, { emailNotifications: true }]
     },
     // select only the fields that are needed
     select: {
-      gnosisSafes: true,
       notificationState: true,
       id: true,
       username: true,
@@ -56,47 +44,31 @@ export async function getNotifications(): Promise<(PendingNotifications & { unma
   });
 
   // filter out users that have snoozed notifications
-  const activeUsersWithSafes = usersWithSafes.filter((user) => {
+  const notificationActivatedUsers = userWithNotificationState.filter((user) => {
     const snoozedUntil = user.notificationState?.snoozedUntil;
     return !snoozedUntil || snoozedUntil > new Date();
   });
 
-  const notifications: (PendingNotifications & { unmarkedWorkspaceEvents: string[] })[] = [];
+  const notifications: PendingNotifications[] = [];
 
   // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
-  for (const user of activeUsersWithSafes) {
+  for (const user of notificationActivatedUsers) {
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
     await notificationTaskLimiter();
 
-    const sentTasks = await prisma.userNotification.findMany({
-      where: {
-        taskId: {
-          in: [...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)]
-        },
-        userId: user.id
-      },
-      select: {
-        taskId: true
-      }
-    });
-
-    const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
-
-    const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
-    const { proposalTasks: proposalNotifications = [], unmarkedWorkspaceEvents = [] } =
-      workspaceEventsNotSent.length !== 0 ? await getProposalStatusChangeTasks(user.id, workspaceEventsNotSent) : {};
-
-    const [discussionNotifications, voteNotifications, bountyNotifications, forumNotifications] = await Promise.all([
-      getDiscussionNotifications(user.id),
-      getVoteTasks(user.id),
-      getBountyTasks(user.id),
-      getForumTasks(user.id)
-    ]);
+    const [discussionNotifications, voteNotifications, bountyNotifications, forumNotifications, proposalNotifications] =
+      await Promise.all([
+        getDiscussionNotifications(user.id),
+        getVoteNotifications(user.id),
+        getBountyNotifications(user.id),
+        getForumNotifications(user.id),
+        getProposalNotifications(user.id)
+      ]);
 
     const totalNotifications =
       discussionNotifications.unmarked.length +
       voteNotifications.unmarked.length +
-      proposalNotifications.length +
+      proposalNotifications.unmarked.length +
       bountyNotifications.unmarked.length +
       forumNotifications.unmarked.length;
 
@@ -109,8 +81,7 @@ export async function getNotifications(): Promise<(PendingNotifications & { unma
       totalNotifications,
       discussionNotifications: discussionNotifications.unmarked,
       voteNotifications: voteNotifications.unmarked,
-      proposalNotifications,
-      unmarkedWorkspaceEvents,
+      proposalNotifications: proposalNotifications.unmarked,
       bountyNotifications: bountyNotifications.unmarked,
       forumNotifications: forumNotifications.unmarked
     });
@@ -119,11 +90,7 @@ export async function getNotifications(): Promise<(PendingNotifications & { unma
   return notifications.filter((notification) => notification.totalNotifications > 0);
 }
 
-async function sendNotification(
-  notification: PendingNotifications & {
-    unmarkedWorkspaceEvents: string[];
-  }
-) {
+async function sendNotification(notification: PendingNotifications) {
   const notificationIds = [
     ...notification.proposalNotifications.map((proposalTask) => proposalTask.taskId),
     ...notification.discussionNotifications.map((discussionTask) => discussionTask.taskId),
@@ -144,72 +111,7 @@ async function sendNotification(
           seenAt: new Date(),
           channel: 'email'
         }
-      }),
-      ...notification.proposalNotifications.map((proposalTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: proposalTask.taskId,
-            channel: 'email',
-            type: 'proposal'
-          }
-        })
-      ),
-      ...notification.unmarkedWorkspaceEvents.map((unmarkedWorkspaceEvent) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: unmarkedWorkspaceEvent,
-            channel: 'email',
-            type: 'proposal'
-          }
-        })
-      ),
-      ...notification.voteNotifications.map((voteTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: voteTask.taskId,
-            channel: 'email',
-            type: 'vote'
-          }
-        })
-      ),
-      ...notification.discussionNotifications.map((discussionTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId:
-              discussionTask.mentionId ??
-              discussionTask.inlineCommentId ??
-              discussionTask.blockCommentId ??
-              discussionTask.taskId ??
-              '',
-            channel: 'email',
-            type: 'mention'
-          }
-        })
-      ),
-      ...notification.bountyNotifications.map((bountyTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: bountyTask.taskId,
-            channel: 'email',
-            type: 'bounty'
-          }
-        })
-      ),
-      ...notification.forumNotifications.map((forumTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: forumTask.taskId,
-            channel: 'email',
-            type: 'forum'
-          }
-        })
-      )
+      })
     ]);
   } catch (error) {
     log.error(`Error trying to save notification for user`, {
@@ -217,16 +119,8 @@ async function sendNotification(
       error,
       forumTaskIds: notification.forumNotifications.map((forumTask) => forumTask.taskId),
       proposalTaskIds: notification.proposalNotifications.map((proposalTask) => proposalTask.taskId),
-      unmarkedWorkspaceEventIds: notification.unmarkedWorkspaceEvents,
       voteTaskIds: notification.voteNotifications.map((voteTask) => voteTask.taskId),
-      discussionTaskIds: notification.discussionNotifications.map(
-        (discussionTask) =>
-          discussionTask.mentionId ??
-          discussionTask.inlineCommentId ??
-          discussionTask.blockCommentId ??
-          discussionTask.taskId ??
-          ''
-      ),
+      discussionTaskIds: notification.discussionNotifications.map((discussionTask) => discussionTask.taskId),
       bountyTaskIds: notification.bountyNotifications.map((bountyTask) => bountyTask.taskId)
     });
     return undefined;

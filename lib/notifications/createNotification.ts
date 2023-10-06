@@ -2,41 +2,27 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type {
-  BlockCommentNotification,
-  BlockCommentNotificationType,
   BountyNotificationType,
   CommentNotification,
-  CommentNotificationType,
-  ForumNotificationType,
+  DocumentNotificationType,
   InlineCommentNotification,
   InlineCommentNotificationType,
   MentionNotification,
-  MentionNotificationType,
+  PostNotificationType,
   ProposalNotificationType,
   VoteNotificationType
 } from './interfaces';
-import { upgradedNotificationUserIds } from './utils';
 
 type CreatePostNotificationInput = {
   createdBy: string;
   postId: string;
   spaceId: string;
   userId: string;
-  commentId?: string;
-  mentionId?: string;
-  type: ForumNotificationType;
-} & (
-  | {
-      type: 'created';
-    }
-  | CommentNotification
-  | MentionNotification
-);
+  type: PostNotificationType;
+};
 
 export async function createPostNotification({
   createdBy,
-  commentId,
-  mentionId,
   postId,
   spaceId,
   userId,
@@ -47,23 +33,14 @@ export async function createPostNotification({
     data: {
       type,
       id: notificationId,
-      mentionId,
       notificationMetadata: {
         create: {
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
-      comment: commentId
-        ? {
-            connect: {
-              id: commentId
-            }
-          }
-        : undefined,
       post: {
         connect: {
           id: postId
@@ -79,30 +56,14 @@ export type CreateProposalNotificationInput = {
   createdBy: string;
   spaceId: string;
   userId: string;
-  commentId?: string;
-  mentionId?: string;
-  inlineCommentId?: string;
-} & (
-  | CommentNotification
-  | InlineCommentNotification
-  | MentionNotification
-  | {
-      type: Exclude<
-        ProposalNotificationType,
-        CommentNotificationType | InlineCommentNotificationType | MentionNotificationType
-      >;
-    }
-);
+};
 
 export async function createProposalNotification({
   type,
   createdBy,
   spaceId,
   userId,
-  proposalId,
-  commentId,
-  inlineCommentId,
-  mentionId
+  proposalId
 }: CreateProposalNotificationInput) {
   const notificationId = v4();
   await prisma.proposalNotification.create({
@@ -114,19 +75,9 @@ export async function createProposalNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
-      comment: commentId
-        ? {
-            connect: {
-              id: commentId
-            }
-          }
-        : undefined,
-      inlineComment: inlineCommentId ? { connect: { id: inlineCommentId } } : undefined,
-      mentionId,
       proposal: {
         connect: {
           id: proposalId
@@ -138,12 +89,16 @@ export async function createProposalNotification({
 
 type CreateDocumentNotificationInput = {
   createdBy: string;
-  pageId: string;
+  pageId?: string;
+  postId?: string;
   spaceId: string;
   userId: string;
   mentionId?: string;
   inlineCommentId?: string;
-} & (InlineCommentNotification | MentionNotification);
+  postCommentId?: string;
+  pageCommentId?: string;
+  type: DocumentNotificationType;
+} & (CommentNotification | MentionNotification | InlineCommentNotification);
 
 export async function createDocumentNotification({
   createdBy,
@@ -151,8 +106,11 @@ export async function createDocumentNotification({
   pageId,
   inlineCommentId,
   spaceId,
+  postId,
   userId,
-  type
+  type,
+  pageCommentId,
+  postCommentId
 }: CreateDocumentNotificationInput) {
   const notificationId = v4();
   await prisma.documentNotification.create({
@@ -165,8 +123,7 @@ export async function createDocumentNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       inlineComment: inlineCommentId
@@ -176,30 +133,46 @@ export async function createDocumentNotification({
             }
           }
         : undefined,
-      page: {
-        connect: {
-          id: pageId
-        }
-      }
+      postComment: postCommentId
+        ? {
+            connect: {
+              id: postCommentId
+            }
+          }
+        : undefined,
+      pageComment: pageCommentId
+        ? {
+            connect: {
+              id: pageCommentId
+            }
+          }
+        : undefined,
+      post: postId
+        ? {
+            connect: {
+              id: postId
+            }
+          }
+        : undefined,
+      page: pageId
+        ? {
+            connect: {
+              id: pageId
+            }
+          }
+        : undefined
     }
   });
 }
 
 export type CreateCardNotificationInput = {
-  type: BlockCommentNotificationType | InlineCommentNotificationType | MentionNotificationType | 'person_assigned';
   cardId: string;
   createdBy: string;
   spaceId: string;
+  type: 'person_assigned';
   userId: string;
-  blockCommentId?: string;
-  personPropertyId?: string;
-} & (
-  | BlockCommentNotification
-  | {
-      type: 'person_assigned';
-      personPropertyId: string;
-    }
-);
+  personPropertyId: string;
+};
 
 export async function createCardNotification({
   type,
@@ -207,7 +180,6 @@ export async function createCardNotification({
   createdBy,
   spaceId,
   userId,
-  blockCommentId,
   cardId
 }: CreateCardNotificationInput) {
   const notificationId = v4();
@@ -220,17 +192,9 @@ export async function createCardNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
-      blockComment: blockCommentId
-        ? {
-            connect: {
-              id: blockCommentId
-            }
-          }
-        : undefined,
       card: { connect: { id: cardId } },
       personPropertyId
     }
@@ -260,8 +224,7 @@ export async function createVoteNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
       vote: {
@@ -279,22 +242,15 @@ type CreateBountyNotificationInput = {
   createdBy: string;
   spaceId: string;
   userId: string;
-  mentionId?: string;
-  inlineCommentId?: string;
   applicationId?: string;
 } & (
   | {
-      type: Exclude<
-        BountyNotificationType,
-        'suggestion.created' | MentionNotificationType | InlineCommentNotificationType
-      >;
+      type: Exclude<BountyNotificationType, 'suggestion.created'>;
       applicationId: string;
     }
   | {
       type: 'suggestion.created';
     }
-  | MentionNotification
-  | InlineCommentNotification
 );
 
 export async function createBountyNotification({
@@ -303,9 +259,7 @@ export async function createBountyNotification({
   spaceId,
   userId,
   bountyId,
-  applicationId,
-  inlineCommentId,
-  mentionId
+  applicationId
 }: CreateBountyNotificationInput) {
   const notificationId = v4();
   await prisma.bountyNotification.create({
@@ -317,12 +271,9 @@ export async function createBountyNotification({
           id: notificationId,
           createdBy,
           spaceId,
-          userId,
-          seenAt: upgradedNotificationUserIds.includes(userId) ? undefined : new Date()
+          userId
         }
       },
-      mentionId,
-      inlineComment: inlineCommentId ? { connect: { id: inlineCommentId } } : undefined,
       application: applicationId
         ? {
             connect: {

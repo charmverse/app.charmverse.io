@@ -2,14 +2,13 @@ import type { ProposalStatus } from '@charmverse/core/prisma';
 import { NotificationType } from '@charmverse/core/prisma';
 
 import type {
-  BlockCommentNotificationType,
   BountyNotification,
   CommentNotificationType,
   DiscussionNotification,
-  ForumNotification,
   InlineCommentNotificationType,
   NotificationActor,
   NotificationGroupType,
+  ForumNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
@@ -26,12 +25,6 @@ function getUrlSearchParamsFromNotificationType(
 ) {
   const urlSearchParams = new URLSearchParams();
   switch (notification.type) {
-    case 'block_comment.created':
-    case 'block_comment.replied':
-    case 'block_comment.mention.created': {
-      urlSearchParams.set('blockCommentId', notification.blockCommentId);
-      break;
-    }
     case 'comment.created':
     case 'comment.replied':
     case 'comment.mention.created': {
@@ -57,29 +50,22 @@ function getCommentTypeNotificationContent({
   createdBy,
   title
 }: {
-  notificationType:
-    | InlineCommentNotificationType
-    | CommentNotificationType
-    | 'mention.created'
-    | BlockCommentNotificationType;
+  notificationType: InlineCommentNotificationType | CommentNotificationType | 'mention.created';
   title: string;
   createdBy: NotificationActor | null;
 }) {
   switch (notificationType) {
     case 'inline_comment.created':
-    case 'block_comment.created':
     case 'comment.created': {
       return createdBy?.username ? `${createdBy?.username} left a comment in ${title}.` : `New comment in ${title}.`;
     }
     case 'inline_comment.replied':
-    case 'block_comment.replied':
     case 'comment.replied': {
       return createdBy?.username
         ? `${createdBy?.username} replied to your comment in ${title}.`
         : `New reply to your comment in ${title}.`;
     }
     case 'inline_comment.mention.created':
-    case 'block_comment.mention.created':
     case 'comment.mention.created':
     case 'mention.created': {
       return createdBy?.username
@@ -180,19 +166,19 @@ function getBountyContent(n: BountyNotification) {
   const { createdBy, type, pageTitle: title } = n;
 
   switch (type) {
-    case 'application.pending': {
+    case 'application.created': {
       return `${createdBy?.username} applied for ${title} bounty.`;
     }
-    case 'application.submitted': {
+    case 'submission.created': {
       return `${createdBy?.username} applied for bounty ${title}.`;
     }
-    case 'application.accepted': {
+    case 'application.approved': {
       return `Your application for ${title} bounty was accepted.`;
     }
     case 'application.rejected': {
       return `Your application for ${title} bounty has been rejected.`;
     }
-    case 'application.approved': {
+    case 'submission.approved': {
       return `Your application for ${title} bounty was approved.`;
     }
     case 'application.payment_pending': {

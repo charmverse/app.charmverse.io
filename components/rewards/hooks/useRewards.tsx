@@ -3,10 +3,12 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
-import { useGetRewards } from 'charmClient/hooks/rewards';
+import { useCreateReward, useGetRewards } from 'charmClient/hooks/rewards';
 import type { RewardStatusFilter } from 'components/rewards/components/RewardViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
+import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
 
@@ -19,6 +21,9 @@ type RewardsContextType = {
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
   refreshReward: (rewardId: string) => Promise<void>;
+  createReward: (input: RewardCreationData) => Promise<RewardWithUsers | null>;
+  tempReward?: RewardCreationData | null;
+  setTempReward: (input?: RewardCreationData | null) => void;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
@@ -31,15 +36,21 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   },
   isLoading: false,
   updateReward: () => Promise.resolve(),
-  refreshReward: () => Promise.resolve()
+  refreshReward: () => Promise.resolve(),
+  createReward: () => Promise.resolve(null),
+  tempReward: null,
+  setTempReward: () => {}
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
   const [statusFilter, setStatusFilter] = useState<RewardStatusFilter>('all');
   const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
+  const { user } = useUser();
 
   const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
+  const { trigger: createRewardTrigger } = useCreateReward();
+  const [tempRewardData, setTempRewardData] = useState<null | RewardCreationData>(null);
 
   // filter out deleted and templates
   let filteredRewards = useMemo(
@@ -74,7 +85,7 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     async (rewardId: string) => {
       const reward = await charmClient.rewards.getReward(rewardId);
       mutateRewards((data) => {
-        const rewardList = data ?? [];
+        const rewardList = data ? [...data] : [];
         const rewardIndex = rewardList.findIndex((p) => p.id === rewardId);
 
         if (rewardIndex >= 0) {
@@ -92,6 +103,47 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     [mutateRewards]
   );
 
+  const createReward = useCallback(
+    async (rewardData: RewardCreationData) => {
+      const reward = await createRewardTrigger(rewardData);
+      if (!reward) {
+        return null;
+      }
+
+      mutateRewards(
+        (data) => {
+          if (!data) {
+            return [reward];
+          }
+
+          return [...data, reward];
+        },
+        { revalidate: false }
+      );
+
+      return reward;
+    },
+    [createRewardTrigger, mutateRewards]
+  );
+
+  const setTempReward = useCallback(
+    (data?: RewardCreationData | null) => {
+      if (!space || !user) return;
+
+      setTempRewardData(
+        data ?? {
+          chainId: 1,
+          status: 'open',
+          spaceId: space.id,
+          createdBy: user.id,
+          rewardAmount: 1,
+          rewardToken: 'ETH'
+        }
+      );
+    },
+    [space, user]
+  );
+
   const value = useMemo(
     () => ({
       rewards,
@@ -102,9 +154,24 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       isLoading: isLoading || loadingPages,
       updateReward,
       refreshReward,
-      setRewards: mutateRewards
+      setRewards: mutateRewards,
+      createReward,
+      setTempReward,
+      tempReward: tempRewardData
     }),
-    [filteredRewards, isLoading, loadingPages, mutateRewards, rewards, statusFilter, updateReward, refreshReward]
+    [
+      rewards,
+      filteredRewards,
+      statusFilter,
+      mutateRewards,
+      isLoading,
+      loadingPages,
+      updateReward,
+      refreshReward,
+      createReward,
+      setTempReward,
+      tempRewardData
+    ]
   );
 
   return <RewardsContext.Provider value={value}>{children}</RewardsContext.Provider>;
