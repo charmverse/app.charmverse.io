@@ -47,7 +47,7 @@
     "db-tool": "npx prisma studio",
     "db-tool:dev": "dotenv -e .env.local -- npx prisma studio",
     "db-tool:test": "dotenv -e .env.test.local -- npx prisma studio",
-    "typecheck": "NODE_OPTIONS=\"--max_old_space_size=4096\" node_modules/typescript/bin/tsc --project tsconfig.json --noEmit",
+    "typecheck": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx tsc --project tsconfig.json --noEmit",
     "test:setup-db": "./scripts/configure-db.sh",
     "test:browser": "TZ=UTC jest --config='./jest.config.browser.ts'",
     "e2e:compile": "npx tsx esbuild.e2e.ts",
@@ -62,7 +62,7 @@
     "storybook": "storybook dev -p 6006",
     "update-core": "npm install @charmverse/core",
     "build-storybook": "storybook build",
-    "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes"
+    "chromatic:ci": "npx chromatic --only-changed --exit-zero-on-changes"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
