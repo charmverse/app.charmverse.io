@@ -34,7 +34,7 @@ runs:
 
     - name: Restore dependencies
       id: restore_node_modules
-      uses: actions/restore@v3
+      uses: actions/cache/restore@v3
       with:
         path: ./node_modules
         key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
@@ -80,7 +80,7 @@ runs:
     - name: Cache dependencies
       if: inputs.save_cache
       id: cache_node_modules
-      uses: actions/save@v3
+      uses: actions/cache/save@v3
       with:
         path: ./node_modules
         key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}

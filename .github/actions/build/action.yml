@@ -17,7 +17,7 @@ runs:
     - name: Restore build
       if: ${{ !inputs.save_cache }}
       id: restore_build
-      uses: actions/cache@v3
+      uses: actions/cache/restore@v3
       with:
         path: |
           .next
@@ -28,13 +28,13 @@ runs:
 
     - name: Build
       shell: bash
-      if: steps.cache_build.outputs.cache-hit != 'true'
+      if: steps.restore_build.outputs.cache-hit != 'true'
       run: npm run build
 
     - name: Cache build
       if: inputs.save_cache
       id: cache_build
-      uses: actions/save@v3
+      uses: actions/cache/save@v3
       with:
         path: |
           .next
