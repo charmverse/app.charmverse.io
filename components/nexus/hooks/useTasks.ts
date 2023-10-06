@@ -10,10 +10,14 @@ export function useTasks() {
     error: serverError,
     isLoading,
     mutate
-  } = useSWRImmutable(user ? `/notifications/list/${user.id}` : null, () => charmClient.notifications.getTasksList(), {
-    // 10 minutes
-    refreshInterval: 1000 * 10 * 60
-  });
+  } = useSWRImmutable(
+    user ? `/notifications/list/${user.id}` : null,
+    () => charmClient.notifications.getNotifications(),
+    {
+      // 10 minutes
+      refreshInterval: 1000 * 10 * 60
+    }
+  );
 
   const error = serverError?.message || serverError;
 

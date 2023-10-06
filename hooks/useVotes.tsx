@@ -7,7 +7,6 @@ import charmClient from 'charmClient';
 import { useTasks } from 'components/nexus/hooks/useTasks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import type { GetNotificationsResponse } from 'pages/api/notifications/list';
 
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
@@ -27,14 +26,6 @@ type IContext = {
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
-};
-
-const EMPTY_TASKS: GetNotificationsResponse = {
-  bounties: { marked: [], unmarked: [] },
-  votes: { marked: [], unmarked: [] },
-  discussions: { marked: [], unmarked: [] },
-  proposals: { marked: [], unmarked: [] },
-  forum: { marked: [], unmarked: [] }
 };
 
 const VotesContext = createContext<Readonly<IContext>>({
@@ -120,25 +111,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     }
   );
 
-  function removeVoteFromTask(voteId: string) {
-    mutateTasks(
-      (tasks) => {
-        return tasks
-          ? {
-              ...tasks,
-              votes: {
-                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.taskId !== voteId),
-                marked: tasks.votes.marked.filter((_vote) => _vote.taskId !== voteId)
-              }
-            }
-          : undefined;
-      },
-      {
-        revalidate: false
-      }
-    );
-  }
-
   async function castVote(voteId: string, choices: string[]) {
     const userVote = await charmClient.votes.castVote(voteId, choices);
 
@@ -172,7 +144,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
       return { ..._votes };
     });
-    removeVoteFromTask(voteId);
     return userVote;
   }
 
@@ -205,7 +176,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         delete _votes[voteId];
         return _votes;
       });
-      removeVoteFromTask(voteId);
     }
   }
 
@@ -214,7 +184,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     if (vote.context === 'inline') {
       await charmClient.votes.updateVote(voteId, { status: 'Cancelled' });
       setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
-      removeVoteFromTask(voteId);
     }
   }
 

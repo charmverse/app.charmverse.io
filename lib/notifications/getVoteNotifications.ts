@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationsGroup, VoteNotification } from 'lib/notifications/interfaces';
+import type { VoteNotification } from 'lib/notifications/interfaces';
 import { notificationMetadataSelectStatement } from 'lib/notifications/utils';
-import { getVoteTasks } from 'lib/votes/getVoteTasks';
 
 import { aggregateVoteResult } from '../votes/aggregateVoteResult';
 import { calculateVoteStatus } from '../votes/calculateVoteStatus';

@@ -25,8 +25,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationsMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
-import { capitalize } from 'lib/utilities/strings';
-import type { MarkNotifications } from 'pages/api/notifications/mark';
+import type { MarkNotifications } from 'lib/notifications/markNotifications';
 
 import { sidebarItemStyles } from './SidebarButton';
 

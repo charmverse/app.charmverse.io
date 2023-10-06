@@ -6,7 +6,7 @@ import { renderMJML } from './templates/utils';
 
 export function getPendingTasksEmail(props: PendingNotifications) {
   const html = renderMJML(PendingTasks(props));
-  const subject = tasksRequiresYourAttention({ count: props.totalNotifications, includeName: true });
+  const subject = tasksRequiresYourAttention({ count: props.totalUnreadNotifications, includeName: true });
 
   return { html, subject };
 }
