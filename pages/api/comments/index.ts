@@ -7,11 +7,11 @@ import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { publishInlineCommentEvent } from 'lib/notifications/publishInlineCommentEvent';
 import { getPermissionsClient } from 'lib/permissions/api';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -67,10 +67,11 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     content
   });
 
-  await publishInlineCommentEvent({
+  await publishDocumentEvent({
+    documentId: page.id,
+    scope: WebhookEventNames.DocumentInlineCommentCreated,
     inlineCommentId: createdComment.id,
-    page,
-    userId
+    spaceId: page.spaceId
   });
 
   trackUserAction('page_comment_created', {

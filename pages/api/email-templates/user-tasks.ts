@@ -32,6 +32,7 @@ const createDiscussionTask = ({
 }): DiscussionNotification => {
   const id = v4();
   return {
+    commentId: null,
     mentionId: id,
     taskId: id,
     createdAt: new Date().toISOString(),
@@ -54,21 +55,11 @@ const createDiscussionTask = ({
       path: 'username',
       avatarTokenId: null
     },
-    blockCommentId: null,
-    pageType: 'page',
-    personPropertyId: null
+    pageType: 'page'
   };
 };
 
-const createForumTask = ({
-  postTitle,
-  spaceName,
-  commentText
-}: {
-  spaceName: string;
-  commentText: string;
-  postTitle: string;
-}): ForumNotification => {
+const createForumTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): ForumNotification => {
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
@@ -78,10 +69,7 @@ const createForumTask = ({
     postId: v4(),
     postTitle,
     postPath: getPagePath(),
-    commentText,
-    commentId: v4(),
     createdAt: new Date().toISOString(),
-    mentionId: v4(),
     createdBy: {
       avatarChain: 1,
       avatarContract: null,
@@ -152,10 +140,7 @@ const createProposalTasks = ({
       avatar: '',
       path: 'username',
       avatarTokenId: null
-    },
-    commentId: null,
-    inlineCommentId: null,
-    mentionId: null
+    }
   };
 };
 
@@ -167,7 +152,7 @@ const createBountyTask = ({
   const id = v4();
   return {
     taskId: id,
-    type: 'application.accepted',
+    type: 'application.approved',
     pagePath: randomName(),
     pageTitle,
     status,
@@ -176,8 +161,6 @@ const createBountyTask = ({
     pageId: v4(),
     createdAt: new Date().toISOString(),
     applicationId: v4(),
-    inlineCommentId: null,
-    mentionId: null,
     spaceId: v4(),
     createdBy: {
       avatarChain: 1,
@@ -282,12 +265,10 @@ const templates = {
       forumNotifications: [
         createForumTask({
           postTitle: "New idea. Let's discuss!",
-          commentText: 'Great idea. Keep it up',
           spaceName: 'CharmVerse'
         }),
         createForumTask({
           postTitle: 'Start the new process.',
-          commentText: 'Let us have a meeting regarding this topic',
           spaceName: 'CharmVerse'
         })
       ]

@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { isTruthy } from 'lib/utilities/types';
+
 export async function getBountyReviewerIds(bountyId: string) {
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {
@@ -10,7 +12,8 @@ export async function getBountyReviewerIds(bountyId: string) {
       permissions: {
         select: {
           roleId: true,
-          userId: true
+          userId: true,
+          permissionLevel: true
         }
       },
       applications: {
@@ -21,35 +24,27 @@ export async function getBountyReviewerIds(bountyId: string) {
     }
   });
 
-  const spaceId = bounty.spaceId;
-
-  const bountyRoleIds = bounty.permissions.map(({ roleId }) => roleId).filter((roleId) => roleId);
-
-  const spaceRoles = await prisma.spaceRole.findMany({
+  const bountyReviewers = bounty.permissions.filter(({ permissionLevel }) => permissionLevel === 'reviewer');
+  const bountyReviewerRoleIds = bountyReviewers.map(({ roleId }) => roleId).filter(isTruthy);
+  const bountyRoleBasedReviewers = await prisma.spaceRoleToRole.findMany({
     where: {
-      spaceId
+      roleId: {
+        in: bountyReviewerRoleIds
+      }
     },
     select: {
-      userId: true,
-      id: true,
-      spaceRoleToRole: {
+      spaceRole: {
         select: {
-          role: {
-            select: {
-              id: true
-            }
-          }
+          userId: true
         }
       }
     }
   });
 
-  return spaceRoles
-    .filter((spaceRole) => {
-      const isReviewer = bounty.permissions.some((perm) =>
-        perm.roleId ? bountyRoleIds.includes(perm.roleId) : perm.userId === spaceRole.userId
-      );
-      return isReviewer;
-    })
-    .map(({ userId }) => userId);
+  const bountyReviewerUserIds = bountyReviewers.map(({ userId }) => userId).filter(isTruthy);
+  const bountyRoleBasedReviewerUserIds = bountyRoleBasedReviewers
+    .map(({ spaceRole }) => spaceRole.userId)
+    .filter(isTruthy);
+
+  return Array.from(new Set([...bountyRoleBasedReviewerUserIds, ...bountyReviewerUserIds]));
 }

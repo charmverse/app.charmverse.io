@@ -221,17 +221,6 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     ...cardPageQueries
   ]);
 
-  for (const block of newBlocks) {
-    if (block.type === 'comment') {
-      await publishCardEvent({
-        scope: WebhookEventNames.CardBlockCommentCreated,
-        blockCommentId: block.id,
-        cardId: block.parentId as string,
-        spaceId: space.id
-      });
-    }
-  }
-
   await Promise.all([
     (async () => {
       const blocksToNotify = await prisma.block.findMany({

@@ -44,33 +44,25 @@ export const BOUNTY_STATUS_ICONS: Record<BountyStatus, ReactNode> = {
 };
 
 const BOUNTY_ACTION_LABELS: Record<BountyNotification['type'], string> = {
-  'application.pending': 'Application pending',
-  'application.accepted': 'Application accepted',
+  'application.created': 'Application pending',
+  'application.approved': 'Application accepted',
   'application.rejected': 'Application rejected',
-  'application.submitted': 'Work submitted',
-  'application.approved': 'Submission approved',
+  'submission.created': 'Work submitted',
+  'submission.approved': 'Submission approved',
   'application.payment_pending': 'Payment needed',
   'application.payment_completed': 'Payment complete',
-  'suggestion.created': 'Suggested bounty',
-  'inline_comment.created': 'Inline comment created',
-  'inline_comment.mention.created': 'Inline comment mention created',
-  'inline_comment.replied': 'Inline comment replied',
-  'mention.created': 'Mention created'
+  'suggestion.created': 'Suggested bounty'
 };
 
 const BOUNTY_ACTION_ICONS: Record<BountyNotification['type'], ReactNode> = {
-  'application.pending': <ModeStandbyIcon />,
-  'application.accepted': <CheckCircleOutlineIcon />,
-  'application.rejected': <ModeStandbyIcon />,
-  'application.submitted': <CheckCircleOutlineIcon />,
+  'application.created': <ModeStandbyIcon />,
   'application.approved': <CheckCircleOutlineIcon />,
+  'application.rejected': <ModeStandbyIcon />,
+  'submission.created': <CheckCircleOutlineIcon />,
+  'submission.approved': <CheckCircleOutlineIcon />,
   'application.payment_pending': <PaidIcon />,
   'application.payment_completed': <PaidIcon />,
-  'suggestion.created': <LightbulbIcon />,
-  'inline_comment.created': <AddCommentOutlined />,
-  'inline_comment.replied': <AddCommentOutlined />,
-  'inline_comment.mention.created': <PersonOutline />,
-  'mention.created': <PersonOutline />
+  'suggestion.created': <LightbulbIcon />
 };
 
 export const BOUNTY_STATUS_COLORS: Record<BountyStatus, BrandColor> = {
@@ -82,18 +74,14 @@ export const BOUNTY_STATUS_COLORS: Record<BountyStatus, BrandColor> = {
 };
 
 export const BOUNTY_ACTION_COLORS: Record<BountyNotification['type'], BrandColor> = {
-  'application.pending': 'teal',
-  'application.accepted': 'teal',
+  'application.created': 'teal',
+  'application.approved': 'teal',
   'application.rejected': 'red',
-  'application.submitted': 'yellow',
-  'application.approved': 'yellow',
+  'submission.created': 'yellow',
+  'submission.approved': 'yellow',
   'application.payment_pending': 'pink',
   'application.payment_completed': 'gray',
-  'suggestion.created': 'purple',
-  'inline_comment.created': 'teal',
-  'inline_comment.mention.created': 'teal',
-  'inline_comment.replied': 'teal',
-  'mention.created': 'teal'
+  'suggestion.created': 'purple'
 };
 
 const isBountyStatus = (status: BountyStatus | BountyNotification['type']): status is BountyStatus =>
