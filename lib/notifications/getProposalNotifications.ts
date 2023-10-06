@@ -31,7 +31,7 @@ export async function getProposalNotifications(userId: string): Promise<Proposal
     const page = notification.proposal.page as Page;
     const proposalNotification = {
       createdAt: notification.notificationMetadata.createdAt.toISOString(),
-      taskId: notification.id,
+      id: notification.id,
       pageId: page.id,
       pagePath: page.path,
       pageTitle: page.title,

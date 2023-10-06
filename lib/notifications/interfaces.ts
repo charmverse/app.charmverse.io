@@ -49,7 +49,7 @@ export type InlineCommentNotificationType = InlineCommentNotification['type'];
 export type MentionNotificationType = MentionNotification['type'];
 
 interface NotificationBase {
-  taskId: string;
+  id: string;
   spaceId: string;
   spaceDomain: string;
   spaceName: string;

@@ -37,7 +37,7 @@ export async function getCardNotifications(userId: string): Promise<CardNotifica
     const notificationMetadata = notification.notificationMetadata;
     const page = notification.card.page as Page;
     const cardNotification = {
-      taskId: notification.id,
+      id: notification.id,
       createdAt: notificationMetadata.createdAt.toISOString(),
       createdBy: notificationMetadata.author,
       pageId: page.id,

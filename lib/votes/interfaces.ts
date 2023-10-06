@@ -29,7 +29,7 @@ export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {
   // page?: PageMeta;
   // space: Space;
   createdBy: NotificationActor;
-  taskId: string;
+  id: string;
   spaceName: string;
   spaceDomain: string;
   pagePath: string;
