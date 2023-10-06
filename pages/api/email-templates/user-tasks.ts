@@ -5,7 +5,6 @@ import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
 import type {
   BountyNotification,
-  DiscussionNotification,
   DocumentNotification,
   PostNotification,
   ProposalNotification,

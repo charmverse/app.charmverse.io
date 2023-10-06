@@ -23,7 +23,7 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
-import { getNotificationMetadata } from 'lib/notifications/getNotificationsMetadata';
+import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
 
@@ -93,7 +93,7 @@ export function NotificationUpdates() {
         }}
         PaperProps={{
           sx: {
-            width: 650
+            width: 600
           }
         }}
       >
@@ -457,7 +457,7 @@ export function NotificationContent({
               <Avatar size='small' name={createdBy.username} avatar={createdBy.avatar} />
             </Badge>
           </Box>
-          <Box overflow='hidden' display='flex' gap={0.5} flexDirection='column' flex={1}>
+          <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
             <Stack direction='row' justifyContent='space-between'>
               <Stack direction='row' gap={1} alignItems='center'>
                 <Typography
@@ -509,10 +509,10 @@ export function NotificationContent({
                 </Card>
               )}
             </Stack>
-            <Typography pl={0.2} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' fontWeight='bold'>
+            <Typography mb={0.5} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' fontWeight='bold'>
               {pageTitle}
             </Typography>
-            <Typography pl={0.2} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
+            <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
               {spaceName}
             </Typography>
             {archived && (

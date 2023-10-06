@@ -1,20 +1,18 @@
+import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
+
 import type {
   BountyNotification,
   CardNotification,
   CommentNotificationType,
-  DiscussionNotification,
   DocumentNotification,
   InlineCommentNotificationType,
   Notification,
   NotificationActor,
   PostNotification,
-  ProposalNotification,
-  VoteNotification
+  ProposalNotification
 } from 'lib/notifications/interfaces';
 
-function getUrlSearchParamsFromNotificationType(
-  notification: DiscussionNotification | PostNotification | BountyNotification | ProposalNotification | VoteNotification
-) {
+function getUrlSearchParamsFromNotificationType(notification: Notification) {
   const urlSearchParams = new URLSearchParams();
   switch (notification.type) {
     case 'comment.created':
@@ -40,29 +38,31 @@ function getUrlSearchParamsFromNotificationType(
 function getCommentTypeNotificationContent({
   notificationType,
   createdBy,
-  title
+  pageType
 }: {
   notificationType: InlineCommentNotificationType | CommentNotificationType | 'mention.created';
-  title: string;
   createdBy: NotificationActor | null;
+  pageType: PageType | 'post';
 }) {
   switch (notificationType) {
     case 'inline_comment.created':
     case 'comment.created': {
-      return createdBy?.username ? `${createdBy?.username} left a comment in ${title}` : `New comment in ${title}`;
+      return createdBy?.username
+        ? `${createdBy?.username} left a comment in a ${pageType}`
+        : `New comment in a ${pageType}`;
     }
     case 'inline_comment.replied':
     case 'comment.replied': {
       return createdBy?.username
-        ? `${createdBy?.username} replied to your comment in ${title}`
-        : `New reply to your comment in ${title}`;
+        ? `${createdBy?.username} replied to your comment in a ${pageType}`
+        : `New reply to your comment in a ${pageType}`;
     }
     case 'inline_comment.mention.created':
     case 'comment.mention.created':
     case 'mention.created': {
       return createdBy?.username
-        ? `${createdBy?.username} mentioned you in ${title}`
-        : `You were mentioned in ${title}`;
+        ? `${createdBy?.username} mentioned you in a ${pageType}`
+        : `You were mentioned in a ${pageType}`;
     }
     default: {
       return '';
@@ -70,45 +70,42 @@ function getCommentTypeNotificationContent({
   }
 }
 
-function getForumContent(n: PostNotification) {
-  const { createdBy, postTitle, type } = n;
+function getPostContent(n: PostNotification) {
+  const { createdBy, type } = n;
   switch (type) {
     case 'created': {
-      return createdBy?.username
-        ? `${createdBy?.username} created "${postTitle}"`
-        : `New forum post "${postTitle}" created`;
+      return createdBy?.username ? `${createdBy?.username} created a new forum post` : `New forum post created`;
     }
     default: {
       return getCommentTypeNotificationContent({
         createdBy,
         notificationType: type,
-        title: postTitle
+        pageType: 'post'
       });
     }
   }
 }
 
-function getDiscussionContent(n: DiscussionNotification) {
-  const { type, createdBy, pageTitle } = n;
+function getCardContent(n: CardNotification) {
+  const { createdBy, type } = n;
   switch (type) {
-    case 'mention.created': {
-      return createdBy?.username
-        ? `${createdBy?.username} mentioned you in ${pageTitle}`
-        : `You were mentioned in ${pageTitle}`;
-    }
     case 'person_assigned': {
-      return createdBy?.username
-        ? `${createdBy?.username} assigned you to ${pageTitle}`
-        : `You were assigned to ${pageTitle}`;
+      return createdBy?.username ? `${createdBy?.username} assigned you to  a card` : `You were assigned to a card`;
     }
+
     default: {
-      return getCommentTypeNotificationContent({
-        createdBy,
-        notificationType: type,
-        title: pageTitle
-      });
+      return '';
     }
   }
+}
+
+function getDocumentContent(n: DocumentNotification) {
+  const { type, createdBy, pageType } = n;
+  return getCommentTypeNotificationContent({
+    createdBy,
+    notificationType: type,
+    pageType
+  });
 }
 
 function getBountyContent(n: BountyNotification) {
@@ -116,25 +113,25 @@ function getBountyContent(n: BountyNotification) {
 
   switch (type) {
     case 'application.created': {
-      return `${createdBy?.username} applied for ${title} bounty.`;
+      return `${createdBy?.username} applied for a bounty`;
     }
     case 'submission.created': {
-      return `${createdBy?.username} applied for bounty ${title}.`;
+      return `${createdBy?.username} applied for a bounty`;
     }
     case 'application.approved': {
-      return `Your application for ${title} bounty was accepted.`;
+      return `Your application for a bounty was accepted`;
     }
     case 'application.rejected': {
-      return `Your application for ${title} bounty has been rejected`;
+      return `Your application for a bounty has been rejected`;
     }
     case 'submission.approved': {
-      return `Your application for ${title} bounty was approved.`;
+      return `Your application for a bounty was approved`;
     }
     case 'application.payment_pending': {
-      return `Payment required for ${title}`;
+      return `Payment required for a bounty`;
     }
     case 'application.payment_completed': {
-      return `You have been paid for ${title}`;
+      return `You have been paid for a bounty`;
     }
     case 'suggestion.created': {
       return createdBy?.username
@@ -142,11 +139,7 @@ function getBountyContent(n: BountyNotification) {
         : `New bounty suggestion: ${title}`;
     }
     default: {
-      return getCommentTypeNotificationContent({
-        createdBy,
-        notificationType: type,
-        title
-      });
+      return '';
     }
   }
 }
@@ -158,30 +151,26 @@ function getProposalContent(n: ProposalNotification) {
     case 'start_review':
     case 'start_discussion': {
       return createdBy?.username
-        ? `${createdBy?.username} seeking feedback for ${title}`
-        : `Feedback requested for ${title}`;
+        ? `${createdBy?.username} seeking feedback for proposal`
+        : `Feedback requested for proposal`;
     }
     case 'reviewed': {
-      return `Review completed for ${title}`;
+      return `Review completed for a proposal`;
     }
     case 'vote': {
-      return `Voting started for ${title}`;
+      return `Voting started for a proposal`;
     }
     case 'needs_review': {
-      return `Review required for ${title}`;
+      return `Review required for a proposal`;
     }
     case 'evaluation_active': {
-      return `Evaluation started for ${title}`;
+      return `Evaluation started for a proposal`;
     }
     case 'evaluation_closed': {
-      return `Evaluation completed for ${title}`;
+      return `Evaluation completed for a proposal`;
     }
     default: {
-      return getCommentTypeNotificationContent({
-        createdBy,
-        notificationType: type,
-        title
-      });
+      return '';
     }
   }
 }
@@ -202,7 +191,7 @@ export function getNotificationMetadata(notification: Notification): {
 
     case 'card': {
       return {
-        content: getDiscussionContent(notification as CardNotification),
+        content: getCardContent(notification as CardNotification),
         href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };
@@ -210,7 +199,7 @@ export function getNotificationMetadata(notification: Notification): {
 
     case 'document': {
       return {
-        content: getDiscussionContent(notification as DocumentNotification),
+        content: getDocumentContent(notification as DocumentNotification),
         href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };
@@ -218,7 +207,7 @@ export function getNotificationMetadata(notification: Notification): {
 
     case 'post': {
       return {
-        content: getForumContent(notification as PostNotification),
+        content: getPostContent(notification as PostNotification),
         href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.postTitle
       };

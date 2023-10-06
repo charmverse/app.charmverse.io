@@ -90,8 +90,6 @@ export type DocumentNotification = DocumentNotificationBase &
 
 export type DocumentNotificationType = DocumentNotification['type'];
 
-export type DiscussionNotification = CardNotification | DocumentNotification;
-
 export type PostNotificationType = 'created';
 
 export interface PostNotification extends NotificationBase {
