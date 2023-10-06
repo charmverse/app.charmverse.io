@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { usePropertiesMutator } from 'components/proposals/components/ProposalProperties/hooks/usePropertiesMutator';
-import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
+import { useProposalsBoardAdapter } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFieldsProp, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 
@@ -14,13 +14,14 @@ type Props = {
 
 export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props) {
   const { user } = useUser();
-  const { boardCustomProperties, card, cards, activeView, views, proposalPage, setBoardProposal } = useProposalsBoard();
+  // TODO - use value from context instead of raw hook
+  const { boardCustomProperties, card, cards, activeView, views, proposalPage, setBoardProposal } =
+    useProposalsBoardAdapter();
   const mutator = usePropertiesMutator({ proposal, onChange });
 
   useEffect(() => {
     setBoardProposal(proposal);
-    return () => setBoardProposal(null);
-  }, [proposal, setBoardProposal]);
+  }, [proposal]);
 
   return (
     <CardDetailProperties
