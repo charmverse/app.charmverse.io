@@ -3,12 +3,14 @@ services:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}", "version": "${IMGTAG}"}]'
+      com.datadoghq.tags.env: '${SERVICE_ENV:-tst}'
       com.datadoghq.tags.service: '${SERVICE_NAME}'
       com.datadoghq.tags.version: '${IMGTAG}'
     env_file:
       - '.env'
     environment:
       - NODE_ENV=production
+      - DD_RUNTIME_METRICS_ENABLED=true
     profiles:
       # services need at least one profile or else they will be started along with what is in COMPOSE_PROFILES env var
       - default_config
