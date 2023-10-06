@@ -1,14 +1,15 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
-import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
 import { Divider, Typography, Badge, Stack, Tooltip, Popover, Card, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { Fragment, useMemo, useState } from 'react';
+import { FiInbox } from 'react-icons/fi';
 import { IoFilterCircleOutline } from 'react-icons/io5';
 import type { KeyedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -119,6 +120,7 @@ export function NotificationsPopover({
   mutateNotifications: KeyedMutator<Notification[]>;
   isLoading: boolean;
 }) {
+  const theme = useTheme();
   const [inboxState, setInboxState] = useState<'unread' | 'unarchived'>('unarchived');
   const [activeTab, setActiveState] = useState<'Inbox' | 'Archived'>('Inbox');
   const { archivedNotifications, unArchivedNotifications, unreadNotifications, readUnArchivedNotifications } =
@@ -294,7 +296,7 @@ export function NotificationsPopover({
                     ))
                   ) : (
                     <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
-                      <InboxOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
+                      <FiInbox style={{ fontSize: 48, color: theme.palette.secondary.light }} />
                       <Typography color='secondary' fontWeight='bold' fontSize={16}>
                         You're all caught up
                       </Typography>
@@ -373,7 +375,7 @@ export function NotificationsPopover({
                   ))
                 ) : (
                   <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
-                    <InboxOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
+                    <FiInbox style={{ fontSize: 48, color: theme.palette.secondary.light }} />
                     <Typography color='secondary' fontWeight='bold' fontSize={16}>
                       No archived updates
                     </Typography>
@@ -407,7 +409,7 @@ export function NotificationContent({
 }) {
   const read = notification.read;
   const archived = notification.archived;
-  const { spaceName, createdBy, taskId, createdAt } = notification;
+  const { spaceName, spaceDomain, createdBy, taskId, createdAt } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
@@ -422,6 +424,7 @@ export function NotificationContent({
       data-test={`goto-${taskId}`}
       color='inherit'
       href={href}
+      space={{ domain: spaceDomain, customDomain: null }}
       onClick={() => {
         if (!read) {
           markNotifications({ ids: [taskId], state: 'read' });
@@ -439,8 +442,8 @@ export function NotificationContent({
         display='flex'
         alignItems='center'
         justifyContent='space-between'
-        pl={2}
-        pr={2}
+        pl={3}
+        pr={3}
         py={1.5}
       >
         <Box display='flex' justifyContent='space-between' width='100%'>
