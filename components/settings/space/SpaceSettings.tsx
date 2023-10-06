@@ -145,7 +145,7 @@ export function SpaceSettings({
     const newDomain = space.domain !== values.domain;
     await updateSpace({
       id: space.id,
-      notificationRules,
+      notificationRules: notificationRules as Prisma.InputJsonValue,
       features,
       memberProfiles,
       name: values.name,

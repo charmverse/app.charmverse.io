@@ -38,8 +38,8 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       domain,
       name: updates.name,
       spaceImage: updates.spaceImage,
-      notifyNewProposals: updates.notifyNewProposals,
       hiddenFeatures: updates.hiddenFeatures,
+      notificationRules: updates.notificationRules,
       features: updates.features,
       memberProfiles: updates.memberProfiles
     }
