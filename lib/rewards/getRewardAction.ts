@@ -1,45 +1,4 @@
-import type {
-  Application,
-  ApplicationStatus,
-  Bounty as Reward,
-  BountyStatus as RewardStatus
-} from '@charmverse/core/prisma';
-
-import type { RewardTask } from './getRewardTasks';
-
-export function getRewardAction({
-  isSpaceAdmin,
-  rewardStatus,
-  applicationStatus,
-  isApplicant,
-  isReviewer
-}: {
-  isSpaceAdmin: boolean;
-  rewardStatus: RewardStatus;
-  applicationStatus?: ApplicationStatus;
-  isApplicant: boolean;
-  isReviewer: boolean;
-}): RewardTask['action'] | null {
-  if (applicationStatus === 'applied' && isReviewer) {
-    return 'application_pending';
-  } else if (applicationStatus === 'inProgress' && isApplicant) {
-    return 'application_approved';
-  } else if (applicationStatus === 'rejected' && isApplicant) {
-    return 'application_rejected';
-  } else if (applicationStatus === 'review' && isReviewer) {
-    return 'work_submitted';
-  } else if (applicationStatus === 'complete' && isApplicant) {
-    return 'work_approved';
-  } else if (applicationStatus === 'complete' && isReviewer) {
-    return 'payment_needed';
-  } else if (applicationStatus === 'paid' && isApplicant) {
-    return 'payment_complete';
-  } else if (rewardStatus === 'suggestion' && isSpaceAdmin) {
-    return 'suggested_reward';
-  }
-
-  return null;
-}
+import type { Application, Bounty as Reward } from '@charmverse/core/prisma';
 
 export function getRewardActor({
   reward,

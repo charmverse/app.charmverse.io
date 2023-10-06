@@ -21,7 +21,6 @@ import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/compo
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
-import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
@@ -188,38 +187,36 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
         <ReactDndProvider>
           <DataProviders>
             <SettingsDialogProvider>
-              <NotificationsProvider>
-                <LocalizationProvider>
-                  <FocalBoardProvider>
-                    <NotionProvider>
-                      <IntlProvider>
-                        <PageHead {...pageProps} />
+              <LocalizationProvider>
+                <FocalBoardProvider>
+                  <NotionProvider>
+                    <IntlProvider>
+                      <PageHead {...pageProps} />
 
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
 
-                            {getLayout(<Component {...pageProps} />)}
+                          {getLayout(<Component {...pageProps} />)}
 
-                            <GlobalComponents />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </IntlProvider>
-                    </NotionProvider>
-                  </FocalBoardProvider>
-                </LocalizationProvider>
-              </NotificationsProvider>
+                          <GlobalComponents />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </IntlProvider>
+                  </NotionProvider>
+                </FocalBoardProvider>
+              </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
         </ReactDndProvider>

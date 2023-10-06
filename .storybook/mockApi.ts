@@ -1,7 +1,7 @@
 import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
 
-import type { SpacePermissionFlags } from 'lib/permissions/spaces';
+import type { SpacePermissionFlags } from '../lib/permissions/spaces';
 
 import {
   spaces,
@@ -11,8 +11,7 @@ import {
   proposalTemplates,
   userProfile,
   userMemberProfile,
-  userTasks
-} from 'stories/lib/mockData';
+} from '../stories/lib/mockData';
 
 // mock requests globally via msw. see : https://storybook.js.org/addons/msw-storybook-addon
 
@@ -96,8 +95,8 @@ const userHandlers = {
   userProfile: rest.get(`/api/profile`, (req, res, ctx) => {
     return res(ctx.json(userProfile));
   }),
-  tasksList: rest.get(`/api/tasks/list`, (req, res, ctx) => {
-    return res(ctx.json(userTasks));
+  notificationsList: rest.get(`/api/notifications/list`, (req, res, ctx) => {
+    return res(ctx.json([]));
   })
 };
 

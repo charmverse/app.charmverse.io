@@ -1,17 +1,20 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BountyNotification, NotificationsGroup } from './interfaces';
-import { notificationMetadataIncludeStatement, sortByDate } from './utils';
+import type { BountyNotification } from './interfaces';
+import { notificationMetadataSelectStatement } from './utils';
 
-export async function getBountyNotifications(userId: string): Promise<NotificationsGroup<BountyNotification>> {
-  const pageNotifications = await prisma.bountyNotification.findMany({
+export async function getBountyNotifications(userId: string): Promise<BountyNotification[]> {
+  const bountyNotifications = await prisma.bountyNotification.findMany({
     where: {
       notificationMetadata: {
         userId
       }
     },
-    include: {
+    select: {
+      id: true,
+      type: true,
+      applicationId: true,
       bounty: {
         select: {
           status: true,
@@ -26,17 +29,12 @@ export async function getBountyNotifications(userId: string): Promise<Notificati
         }
       },
       notificationMetadata: {
-        include: notificationMetadataIncludeStatement
+        select: notificationMetadataSelectStatement
       }
     }
   });
 
-  const bountyNotificationsGroup: NotificationsGroup<BountyNotification> = {
-    marked: [],
-    unmarked: []
-  };
-
-  pageNotifications.forEach((notification) => {
+  return bountyNotifications.map((notification) => {
     const notificationMetadata = notification.notificationMetadata;
     const page = notification.bounty.page as Page;
     const bountyNotification = {
@@ -51,18 +49,12 @@ export async function getBountyNotifications(userId: string): Promise<Notificati
       spaceId: notificationMetadata.spaceId,
       spaceName: notificationMetadata.space.name,
       status: notification.bounty.status,
-      type: notification.type
+      type: notification.type,
+      archived: !!notificationMetadata.archivedAt,
+      read: !!notificationMetadata.seenAt,
+      group: 'bounty'
     } as BountyNotification;
 
-    if (notification.notificationMetadata.seenAt) {
-      bountyNotificationsGroup.marked.push(bountyNotification);
-    } else {
-      bountyNotificationsGroup.unmarked.push(bountyNotification);
-    }
+    return bountyNotification;
   });
-
-  return {
-    marked: bountyNotificationsGroup.marked.sort(sortByDate),
-    unmarked: bountyNotificationsGroup.unmarked.sort(sortByDate)
-  };
 }

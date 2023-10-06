@@ -1,17 +1,19 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationsGroup, ProposalNotification } from 'lib/notifications/interfaces';
-import { notificationMetadataIncludeStatement, sortByDate } from 'lib/notifications/utils';
+import type { ProposalNotification } from 'lib/notifications/interfaces';
+import { notificationMetadataSelectStatement } from 'lib/notifications/utils';
 
-export async function getProposalNotifications(userId: string): Promise<NotificationsGroup<ProposalNotification>> {
+export async function getProposalNotifications(userId: string): Promise<ProposalNotification[]> {
   const proposalNotifications = await prisma.proposalNotification.findMany({
     where: {
       notificationMetadata: {
         userId
       }
     },
-    include: {
+    select: {
+      id: true,
+      type: true,
       proposal: {
         include: {
           authors: true,
@@ -20,17 +22,12 @@ export async function getProposalNotifications(userId: string): Promise<Notifica
         }
       },
       notificationMetadata: {
-        include: notificationMetadataIncludeStatement
+        select: notificationMetadataSelectStatement
       }
     }
   });
 
-  const proposalNotificationsGroup: NotificationsGroup<ProposalNotification> = {
-    marked: [],
-    unmarked: []
-  };
-
-  proposalNotifications.forEach((notification) => {
+  return proposalNotifications.map((notification) => {
     const page = notification.proposal.page as Page;
     const proposalNotification = {
       createdAt: notification.notificationMetadata.createdAt.toISOString(),
@@ -43,18 +40,12 @@ export async function getProposalNotifications(userId: string): Promise<Notifica
       spaceDomain: notification.notificationMetadata.space.domain,
       spaceName: notification.notificationMetadata.space.name,
       spaceId: notification.notificationMetadata.space.id,
-      type: notification.type
+      type: notification.type,
+      archived: !!notification.notificationMetadata.archivedAt,
+      read: !!notification.notificationMetadata.seenAt,
+      group: 'proposal'
     } as ProposalNotification;
 
-    if (notification.notificationMetadata.seenAt) {
-      proposalNotificationsGroup.marked.push(proposalNotification);
-    } else {
-      proposalNotificationsGroup.unmarked.push(proposalNotification);
-    }
+    return proposalNotification;
   });
-
-  return {
-    marked: proposalNotificationsGroup.marked.sort(sortByDate),
-    unmarked: proposalNotificationsGroup.unmarked.sort(sortByDate)
-  };
 }

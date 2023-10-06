@@ -2,7 +2,11 @@ export function sortByDate<T extends { createdAt: string | Date }>(a: T, b: T): 
   return a.createdAt > b.createdAt ? -1 : 1;
 }
 
-export const notificationMetadataIncludeStatement = {
+export const notificationMetadataSelectStatement = {
+  seenAt: true,
+  archivedAt: true,
+  spaceId: true,
+  createdAt: true,
   space: {
     select: {
       id: true,

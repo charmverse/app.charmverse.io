@@ -4,7 +4,11 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 
 export default function useTasks() {
-  const { data, error: serverError, mutate } = useSWR('/tasks/state', () => charmClient.tasks.getTasksState());
+  const {
+    data,
+    error: serverError,
+    mutate
+  } = useSWR('/tasks/state', () => charmClient.notifications.getNotificationsState());
   const error = serverError?.message || serverError;
 
   const snoozedForDate = data?.snoozedFor ? DateTime.fromJSDate(new Date(data.snoozedFor)) : null;

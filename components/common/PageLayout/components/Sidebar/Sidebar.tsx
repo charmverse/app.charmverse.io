@@ -2,14 +2,16 @@ import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
+import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import type { BoxProps } from '@mui/material';
+import { Popover } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -38,6 +40,7 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
+import { NotificationsPopover, NotificationUpdates } from './components/NotificationsPopover';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';
@@ -275,6 +278,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                       label='Invites'
                     />
                   )}
+                  <NotificationUpdates />
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
                     .filter((feat) => !feat.isHidden && (feat.path !== 'rewards' || isCharmverse))

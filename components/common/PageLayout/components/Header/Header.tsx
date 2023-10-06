@@ -18,7 +18,6 @@ import { useUser } from 'hooks/useUser';
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
 import { DocumentParticipants } from './components/DocumentParticipants';
 import EditingModeToggle from './components/EditingModeToggle';
-import { NotificationButton } from './components/NotificationPreview/NotificationButton';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
 import ShareButton from './components/ShareButton';
@@ -97,8 +96,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           )}
 
           <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
-
-          {user && <NotificationButton />}
         </Box>
       </Box>
     </StyledToolbar>

@@ -6,8 +6,9 @@ import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTasksTemplate';
 import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
-import { getDiscussionNotifications } from 'lib/notifications/getDiscussionNotifications';
-import { getForumNotifications } from 'lib/notifications/getForumNotifications';
+import { getCardNotifications } from 'lib/notifications/getCardNotifications';
+import { getDocumentNotifications } from 'lib/notifications/getDocumentNotifications';
+import { getPostNotifications } from 'lib/notifications/getPostNotifications';
 import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
 import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import { isUUID } from 'lib/utilities/strings';
@@ -20,7 +21,7 @@ export async function sendUserNotifications(): Promise<number> {
   for (const notification of notificationsToSend) {
     log.info('Debug: send notification to user', {
       userId: notification.user.id,
-      tasks: notification.totalNotifications
+      tasks: notification.totalUnreadNotifications
     });
     await sendNotification(notification);
   }
@@ -56,44 +57,61 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
     await notificationTaskLimiter();
 
-    const [discussionNotifications, voteNotifications, bountyNotifications, forumNotifications, proposalNotifications] =
-      await Promise.all([
-        getDiscussionNotifications(user.id),
-        getVoteNotifications(user.id),
-        getBountyNotifications(user.id),
-        getForumNotifications(user.id),
-        getProposalNotifications(user.id)
-      ]);
+    const [
+      documentNotifications,
+      cardNotifications,
+      voteNotifications,
+      bountyNotifications,
+      forumNotifications,
+      proposalNotifications
+    ] = await Promise.all([
+      getDocumentNotifications(user.id),
+      getCardNotifications(user.id),
+      getVoteNotifications(user.id),
+      getBountyNotifications(user.id),
+      getPostNotifications(user.id),
+      getProposalNotifications(user.id)
+    ]);
 
-    const totalNotifications =
-      discussionNotifications.unmarked.length +
-      voteNotifications.unmarked.length +
-      proposalNotifications.unmarked.length +
-      bountyNotifications.unmarked.length +
-      forumNotifications.unmarked.length;
+    const unreadDocumentNotifications = documentNotifications.filter((notification) => !notification.read);
+    const unreadCardNotifications = cardNotifications.filter((notification) => !notification.read);
+    const unreadVoteNotifications = voteNotifications.filter((notification) => !notification.read);
+    const unreadBountyNotifications = bountyNotifications.filter((notification) => !notification.read);
+    const unreadForumNotifications = forumNotifications.filter((notification) => !notification.read);
+    const unreadProposalNotifications = proposalNotifications.filter((notification) => !notification.read);
+
+    const totalUnreadNotifications =
+      unreadDocumentNotifications.length +
+      unreadCardNotifications.length +
+      unreadVoteNotifications.length +
+      unreadBountyNotifications.length +
+      unreadForumNotifications.length +
+      unreadProposalNotifications.length;
 
     log.debug('Found tasks for notification', {
-      notSent: totalNotifications
+      notSent: totalUnreadNotifications
     });
 
     notifications.push({
       user: user as PendingNotifications['user'],
-      totalNotifications,
-      discussionNotifications: discussionNotifications.unmarked,
-      voteNotifications: voteNotifications.unmarked,
-      proposalNotifications: proposalNotifications.unmarked,
-      bountyNotifications: bountyNotifications.unmarked,
-      forumNotifications: forumNotifications.unmarked
+      totalUnreadNotifications,
+      documentNotifications: unreadDocumentNotifications,
+      cardNotifications: unreadCardNotifications,
+      voteNotifications: unreadVoteNotifications,
+      bountyNotifications: unreadBountyNotifications,
+      forumNotifications: unreadForumNotifications,
+      proposalNotifications: unreadProposalNotifications
     });
   }
 
-  return notifications.filter((notification) => notification.totalNotifications > 0);
+  return notifications.filter((notification) => notification.totalUnreadNotifications > 0);
 }
 
 async function sendNotification(notification: PendingNotifications) {
   const notificationIds = [
     ...notification.proposalNotifications.map((proposalTask) => proposalTask.taskId),
-    ...notification.discussionNotifications.map((discussionTask) => discussionTask.taskId),
+    ...notification.documentNotifications.map((discussionTask) => discussionTask.taskId),
+    ...notification.cardNotifications.map((cardTask) => cardTask.taskId),
     ...notification.voteNotifications.map((voteTask) => voteTask.taskId),
     ...notification.bountyNotifications.map((bountyTask) => bountyTask.taskId),
     ...notification.forumNotifications.map((forumTask) => forumTask.taskId)
@@ -120,7 +138,7 @@ async function sendNotification(notification: PendingNotifications) {
       forumTaskIds: notification.forumNotifications.map((forumTask) => forumTask.taskId),
       proposalTaskIds: notification.proposalNotifications.map((proposalTask) => proposalTask.taskId),
       voteTaskIds: notification.voteNotifications.map((voteTask) => voteTask.taskId),
-      discussionTaskIds: notification.discussionNotifications.map((discussionTask) => discussionTask.taskId),
+      discussionTaskIds: notification.documentNotifications.map((discussionTask) => discussionTask.taskId),
       bountyTaskIds: notification.bountyNotifications.map((bountyTask) => bountyTask.taskId)
     });
     return undefined;
