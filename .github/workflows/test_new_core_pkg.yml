@@ -24,6 +24,8 @@ jobs:
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          cache_key_prefix: "testCore-node-modules"
+          save_cache: true
 
       - name: Build app
         uses: ./.github/actions/build
@@ -71,6 +73,7 @@ jobs:
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          cache_key_prefix: "testCore-node-modules"
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset

@@ -29,12 +29,13 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
-      - name: Install dependencies
+      - name: Install dependencies and save cache for future main build
         id: install_dependencies
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
+          save_cache: true
 
       - name: Calculate Build ID
         id: get_build_id
