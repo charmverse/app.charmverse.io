@@ -1,4 +1,4 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
@@ -62,6 +62,12 @@ describe('updateProSubscription', () => {
     const userId = user.id;
 
     await expect(updateToFreeTier(spaceId, userId)).resolves.not.toThrow();
+  });
+
+  it(`Should fail to update the space if it is on the Enterprise plan`, async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace({ spacePaidTier: 'enterprise' });
+
+    await expect(updateToFreeTier(space.id, user.id)).rejects.toBeInstanceOf(InvalidInputError);
   });
 
   it(`Should fail if the space does not exist`, async () => {
