@@ -13,7 +13,7 @@ describe('paginatedPrismaTask', () => {
     });
 
     const records = 100;
-    const batchSize = 10;
+    const batchSize = 20;
 
     const array = Array.from({ length: records }, (_, i) => i.toString());
 
@@ -34,7 +34,8 @@ describe('paginatedPrismaTask', () => {
       batchSize,
       queryOptions: {
         select: {
-          id: true
+          id: true,
+          title: true
         }
       },
       callback: async (results: Post[]) => {
@@ -42,8 +43,8 @@ describe('paginatedPrismaTask', () => {
       }
     });
 
-    console.log(paginatedTaskResults);
+    expect(paginatedTaskResults).toHaveLength(records / batchSize);
 
-    expect(paginatedTaskResults).toHaveLength(batchSize);
+    expect(paginatedTaskResults.flat()).toHaveLength(records);
   });
 });

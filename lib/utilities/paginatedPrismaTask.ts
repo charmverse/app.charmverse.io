@@ -3,7 +3,7 @@ import { PrismaClient } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError } from './errors';
 
-type PrismaModel = Extract<Uncapitalize<Prisma.ModelName>, 'block' | 'page' | 'post'>;
+type PrismaModel = Extract<Uncapitalize<Prisma.ModelName>, 'block' | 'page' | 'post' | 'proposal'>;
 
 type PrismaArgs<M extends PrismaModel> = Pick<
   M extends 'block'
@@ -12,6 +12,8 @@ type PrismaArgs<M extends PrismaModel> = Pick<
     ? Prisma.PageFindManyArgs
     : M extends 'post'
     ? Prisma.PostFindManyArgs
+    : M extends 'proposal'
+    ? Prisma.ProposalFindManyArgs
     : never,
   'select' | 'where' | 'include'
 >;
@@ -49,7 +51,10 @@ export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R
       ...(queryOptions as Prisma.PageFindManyArgs),
       cursor: cursor ? { id: cursor } : undefined,
       take: batchSize,
-      skip: cursor ? 1 : undefined
+      skip: cursor ? 1 : undefined,
+      orderBy: {
+        id: 'asc'
+      }
     });
 
     if (results.length === 0) break;
