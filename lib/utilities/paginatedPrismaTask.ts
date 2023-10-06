@@ -18,7 +18,7 @@ type PrismaArgs<M extends PrismaModel> = Pick<
   'select' | 'where' | 'include'
 >;
 
-type BatchProcessor<R> = (records: any[]) => Promise<R>;
+type BatchProcessor<R> = (records: any[]) => R | Promise<R>;
 
 type PaginatedTask<M extends PrismaModel, R> = {
   model: M;

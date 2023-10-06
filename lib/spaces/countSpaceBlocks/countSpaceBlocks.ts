@@ -1,16 +1,19 @@
+import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import { countBlocks } from 'lib/prosemirror/countBlocks';
+import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
-import type { BlockCountInfo } from './getSpaceBlockCount';
+import type { BlockCountInfo } from '../getSpaceBlockCount';
+
+const batchSize = 500;
 
 // a function that queries the database for the number of blocks, proposals, pages, and bounties in a space
 export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
   const [
-    boardBlocks,
     views,
     blockComments,
-    allPages,
     posts,
     postComments,
     inlineComments,
@@ -130,10 +133,6 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
     }
   );
 
-  const documentBlocks = allPages
-    .map((page) => countBlocks(page.content, { pageId: page.id, spaceId }))
-    .reduce((a, b) => a + b, 0);
-
   const boardDescriptionBlocks = boardBlocks
     .map((board) => countBlocks((board.fields as any)?.description, { blockId: board.id, spaceId }))
     .reduce((a, b) => a + b, 0);
@@ -146,7 +145,7 @@ export async function countSpaceBlocks({ spaceId }: { spaceId: string }) {
 
   const counts = {
     boards: boards.length,
-    boardDescriptionBlocks,
+    boardDescriptionBlocks: databaseBlockDescriptionCounts,
     bounties: bounties.length,
     cards: cards.length,
     comments,
