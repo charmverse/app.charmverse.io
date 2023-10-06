@@ -36,6 +36,7 @@ jobs:
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          save_cache: true
 
       - name: Build app
         uses: ./.github/actions/build
@@ -53,6 +54,7 @@ jobs:
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          save_cache: true
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -183,7 +185,7 @@ jobs:
         uses: ./.github/actions/build
 
       - name: Run ${{matrix.test_name}}
-        env: 
+        env:
           REACT_APP_APP_ENV: 'test'
         run: ${{matrix.test_command}}
 
@@ -326,9 +328,9 @@ jobs:
           region: us-east-1
           deployment_package: deploy_websockets.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github 
+          wait_for_deployment: false # set to false to save sweet Github
 
-#    if: github.ref == 'refs/heads/main' && failure()
+  #    if: github.ref == 'refs/heads/main' && failure()
   discord_alert:
     name: Notify discord of failure
     runs-on: ubuntu-latest
@@ -341,11 +343,11 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
           status: 'failure'
-          content: "Hey <@&1027309276454207519>"    
-          title: "Webapp deploy workflow failed"
+          content: 'Hey <@&1027309276454207519>'
+          title: 'Webapp deploy workflow failed'
           description: |
             Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
-          color: "16515843"
-          url: "https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}"
+          color: '16515843'
+          url: 'https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}'
           username: GitHub Actions
-          avatar_url: "https://github.githubassets.com/images/modules/logos_page/Octocat.png"  
+          avatar_url: 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
