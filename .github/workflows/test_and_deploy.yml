@@ -49,10 +49,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
+      # - name: Restore dependencies from cache
+      #   uses: ./.github/actions/install
+      #   with:
+      #     core_pkg_version: ${{ inputs.core_pkg_version }}
+
+      - run: npm ci
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -70,11 +72,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-          no_cache: true
+      # - name: Restore dependencies from cache
+      #   uses: ./.github/actions/install
+      #   with:
+      #     core_pkg_version: ${{ inputs.core_pkg_version }}
+      #     no_cache: true
 
       - name: Restore app from cache
         uses: ./.github/actions/build
