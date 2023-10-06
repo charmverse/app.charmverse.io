@@ -5,8 +5,8 @@ import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
 import type {
   BountyNotification,
-  DiscussionNotification,
-  ForumNotification,
+  DocumentNotification,
+  PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
@@ -21,7 +21,7 @@ const handler = nc({
   onNoMatch
 });
 
-const createDiscussionTask = ({
+const createDocumentTask = ({
   pageTitle,
   spaceName,
   mentionText
@@ -29,7 +29,7 @@ const createDiscussionTask = ({
   spaceName: string;
   mentionText: string;
   pageTitle: string;
-}): DiscussionNotification => {
+}): DocumentNotification => {
   const id = v4();
   return {
     commentId: null,
@@ -55,11 +55,14 @@ const createDiscussionTask = ({
       path: 'username',
       avatarTokenId: null
     },
-    pageType: 'page'
+    pageType: 'page',
+    archived: false,
+    group: 'document',
+    read: false
   };
 };
 
-const createForumTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): ForumNotification => {
+const createPostTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): PostNotification => {
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
@@ -79,7 +82,10 @@ const createForumTask = ({ postTitle, spaceName }: { spaceName: string; postTitl
       avatar: '',
       path: 'username',
       avatarTokenId: null
-    }
+    },
+    archived: false,
+    group: 'post',
+    read: false
   };
 };
 
@@ -140,7 +146,10 @@ const createProposalTasks = ({
       avatar: '',
       path: 'username',
       avatarTokenId: null
-    }
+    },
+    archived: false,
+    group: 'proposal',
+    read: false
   };
 };
 
@@ -171,7 +180,10 @@ const createBountyTask = ({
       avatar: '',
       path: 'username',
       avatarTokenId: null
-    }
+    },
+    archived: false,
+    group: 'bounty',
+    read: false
   };
 };
 
@@ -183,7 +195,7 @@ const templates = {
         email: '<userEmail>',
         username: 'ghostpepper'
       },
-      totalNotifications: 6,
+      totalUnreadNotifications: 6,
       bountyNotifications: [
         createBountyTask({
           pageTitle: 'Create a new protocol',
@@ -203,33 +215,34 @@ const templates = {
           status: 'draft'
         })
       ],
-      discussionNotifications: [
-        createDiscussionTask({
+      cardNotifications: [],
+      documentNotifications: [
+        createDocumentTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: "Let's have a meeting @ghostpepper",
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'Take a look at this @ghostpepper',
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'We are facing issues @ghostpepper',
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
@@ -263,11 +276,11 @@ const templates = {
         })
       ],
       forumNotifications: [
-        createForumTask({
+        createPostTask({
           postTitle: "New idea. Let's discuss!",
           spaceName: 'CharmVerse'
         }),
-        createForumTask({
+        createPostTask({
           postTitle: 'Start the new process.',
           spaceName: 'CharmVerse'
         })

@@ -4,7 +4,6 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import type { LoggedInUser } from 'models/User';
-import type { GetNotificationsResponse } from 'pages/api/tasks/list';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 import { createMockSpace } from 'testing/mocks/space';
 import { createMockSpaceMember } from 'testing/mocks/spaceMember';
@@ -118,11 +117,3 @@ export const proposalCategories: ProposalCategoryWithPermissions[] = generateDef
 }));
 
 export const proposalTemplates: ProposalWithUsers[] = [];
-
-export const userTasks: GetNotificationsResponse = {
-  discussions: { marked: [], unmarked: [] },
-  proposals: { marked: [], unmarked: [] },
-  votes: { marked: [], unmarked: [] },
-  bounties: { marked: [], unmarked: [] },
-  forum: { marked: [], unmarked: [] }
-};

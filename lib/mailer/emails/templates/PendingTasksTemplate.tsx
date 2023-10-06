@@ -5,13 +5,14 @@ import { MjmlColumn, MjmlDivider, MjmlSection, MjmlText } from 'mjml-react';
 import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/components/BountyStatusBadge';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
 import { baseUrl } from 'config/constants';
+import { DocumentNotification } from 'lib/notifications/interfaces';
 import type {
   BountyNotification,
-  ForumNotification,
+  CardNotification,
+  PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
-import { DiscussionNotification } from 'lib/notifications/interfaces';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { colors, greyColor2 } from 'theme/colors';
 
@@ -33,12 +34,14 @@ const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', mar
 const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px', marginBottom: '5px' };
 
 export interface PendingNotifications {
-  discussionNotifications: DiscussionNotification[];
-  totalNotifications: number;
+  // eslint-disable-next-line
+  cardNotifications: CardNotification[];
+  documentNotifications: DocumentNotification[];
+  totalUnreadNotifications: number;
   voteNotifications: VoteNotification[];
   proposalNotifications: ProposalNotification[];
   bountyNotifications: BountyNotification[];
-  forumNotifications: ForumNotification[];
+  forumNotifications: PostNotification[];
   // eslint-disable-next-line
   user: TemplateUser;
 }
@@ -54,20 +57,20 @@ function ViewAllText({ href }: { href: string }) {
 }
 
 export default function PendingNotifications(props: PendingNotifications) {
-  const totalDiscussionNotifications = props.discussionNotifications.length;
+  const totalDocumentNotifications = props.documentNotifications.length;
   const totalVoteNotifications = props.voteNotifications.length;
   const totalProposalNotifications = props.proposalNotifications.length;
   const totalBountyNotifications = props.bountyNotifications.length;
   const totalForumNotifications = props.forumNotifications.length;
 
-  const nexusDiscussionLink = `${baseUrl}/?notifications=discussion`;
+  const nexusDocumentLink = `${baseUrl}/?notifications=document`;
   const nexusVoteLink = `${baseUrl}/?notifications=vote`;
   const nexusProposalLink = `${baseUrl}/?notifications=proposal`;
   const nexusBountyLink = `${baseUrl}/?notifications=bounty`;
   const nexusForumLink = `${baseUrl}/?notifications=forum`;
 
-  const discussionSection =
-    totalDiscussionNotifications > 0 ? (
+  const documentSection =
+    totalDocumentNotifications > 0 ? (
       <>
         <MjmlText>
           <div
@@ -76,24 +79,24 @@ export default function PendingNotifications(props: PendingNotifications) {
             }}
           >
             <a
-              href={nexusDiscussionLink}
+              href={nexusDocumentLink}
               style={{
                 marginRight: 15
               }}
             >
               <span style={h2Style}>
-                {totalDiscussionNotifications} Page Comment{totalDiscussionNotifications > 1 ? 's' : ''}
+                {totalDocumentNotifications} Page Comment{totalDocumentNotifications > 1 ? 's' : ''}
               </span>
             </a>
-            <a href={nexusDiscussionLink} style={buttonStyle}>
+            <a href={nexusDocumentLink} style={buttonStyle}>
               View
             </a>
           </div>
         </MjmlText>
-        {props.discussionNotifications.slice(0, MAX_ITEMS_PER_TASK).map((discussionTask) => (
-          <DiscussionNotification key={discussionTask.taskId} task={discussionTask} />
+        {props.documentNotifications.slice(0, MAX_ITEMS_PER_TASK).map((documentTask) => (
+          <DocumentNotification key={documentTask.taskId} task={documentTask} />
         ))}
-        {totalDiscussionNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDiscussionLink} /> : null}
+        {totalDocumentNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDocumentLink} /> : null}
         <MjmlDivider />
       </>
     ) : null;
@@ -233,12 +236,12 @@ export default function PendingNotifications(props: PendingNotifications) {
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h3>{tasksRequiresYourAttention({ count: props.totalNotifications })}.</h3>
+            <h3>{tasksRequiresYourAttention({ count: props.totalUnreadNotifications })}.</h3>
           </MjmlText>
           {proposalSection}
           {voteSection}
           {bountySection}
-          {discussionSection}
+          {documentSection}
           {forumSection}
         </MjmlColumn>
       </MjmlSection>
@@ -345,10 +348,10 @@ function BountyTaskMjml({ task }: { task: BountyNotification }) {
   );
 }
 
-function DiscussionNotification({
+function DocumentNotification({
   task: { text, spaceName, pageTitle, pagePath, spaceDomain }
 }: {
-  task: DiscussionNotification;
+  task: DocumentNotification;
 }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
   return (
@@ -373,7 +376,7 @@ function DiscussionNotification({
   );
 }
 
-function ForumTask({ task: { spaceName, spaceDomain, postPath, postTitle } }: { task: ForumNotification }) {
+function ForumTask({ task: { spaceName, spaceDomain, postPath, postTitle } }: { task: PostNotification }) {
   const pageWorkspaceTitle = `${postTitle || 'Untitled'} | ${spaceName}`;
   return (
     <MjmlText>

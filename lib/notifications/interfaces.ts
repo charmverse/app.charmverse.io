@@ -58,6 +58,9 @@ interface NotificationBase {
   spaceName: string;
   createdAt: string;
   createdBy: NotificationActor;
+  read: boolean;
+  archived: boolean;
+  group: 'card' | 'document' | 'post' | 'proposal' | 'vote' | 'bounty';
 }
 
 export type CardNotification = NotificationBase & {
@@ -67,6 +70,7 @@ export type CardNotification = NotificationBase & {
   type: 'person_assigned';
   text: string;
   personPropertyId: string;
+  group: 'card';
 };
 
 export type CardNotificationType = CardNotification['type'];
@@ -81,6 +85,7 @@ interface DocumentNotificationBase extends NotificationBase {
   inlineCommentId: null | string;
   commentId: null | string;
   pageType: PageType | 'post';
+  group: 'document';
 }
 
 export type DocumentNotification = DocumentNotificationBase &
@@ -88,15 +93,14 @@ export type DocumentNotification = DocumentNotificationBase &
 
 export type DocumentNotificationType = DocumentNotification['type'];
 
-export type DiscussionNotification = CardNotification | DocumentNotification;
-
 export type PostNotificationType = 'created';
 
-export interface ForumNotification extends NotificationBase {
+export interface PostNotification extends NotificationBase {
   type: PostNotificationType;
   postId: string;
   postPath: string;
   postTitle: string;
+  group: 'post';
 }
 
 export type ProposalNotificationType =
@@ -114,6 +118,7 @@ export type ProposalNotification = NotificationBase & {
   status: ProposalStatus;
   pageId: string;
   type: ProposalNotificationType;
+  group: 'proposal';
 };
 
 export type VoteNotificationType = 'new_vote';
@@ -129,6 +134,7 @@ export type VoteNotification = NotificationBase & {
   userChoice: string[] | null;
   deadline: Date;
   voteId: string;
+  group: 'vote';
 };
 
 export type BountyNotificationType =
@@ -148,6 +154,7 @@ export type BountyNotification = NotificationBase & {
   pageTitle: string;
   applicationId: string | null;
   type: BountyNotificationType;
+  group: 'bounty';
 } & (
     | {
         type: Exclude<BountyNotificationType, 'suggestion.created'>;
@@ -169,4 +176,18 @@ export type CreateEventPayload = {
   cardProperty: CardPropertyEntity;
 };
 
-export type NotificationType = ProposalNotificationType | ForumNotificationType | DiscussionNotificationType;
+export type NotificationType =
+  | BountyNotificationType
+  | CardNotificationType
+  | DocumentNotificationType
+  | PostNotificationType
+  | ProposalNotificationType
+  | VoteNotificationType;
+
+export type Notification =
+  | DocumentNotification
+  | CardNotification
+  | PostNotification
+  | ProposalNotification
+  | VoteNotification
+  | BountyNotification;

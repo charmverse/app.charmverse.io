@@ -1,17 +1,21 @@
 import type { Page, Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { DocumentNotification, NotificationsGroup } from './interfaces';
-import { notificationMetadataIncludeStatement, sortByDate } from './utils';
+import { isTruthy } from 'lib/utilities/types';
 
-export async function getDocumentNotifications(userId: string): Promise<NotificationsGroup<DocumentNotification>> {
+import type { DocumentNotification, NotificationsGroup } from './interfaces';
+import { notificationMetadataSelectStatement, sortByDate } from './utils';
+
+export async function getDocumentNotifications(userId: string): Promise<DocumentNotification[]> {
   const documentNotifications = await prisma.documentNotification.findMany({
     where: {
       notificationMetadata: {
         userId
       }
     },
-    include: {
+    select: {
+      id: true,
+      type: true,
       page: {
         select: {
           id: true,
@@ -28,22 +32,22 @@ export async function getDocumentNotifications(userId: string): Promise<Notifica
         }
       },
       notificationMetadata: {
-        include: notificationMetadataIncludeStatement
+        select: notificationMetadataSelectStatement
       }
     }
   });
 
-  const documentNotificationsGroup: NotificationsGroup<DocumentNotification> = {
-    marked: [],
-    unmarked: []
-  };
-
-  documentNotifications.forEach((notification) => {
-    const notificationMetadata = notification.notificationMetadata;
-    const page = notification.post ? { ...notification.post, type: 'post' } : notification.page;
-    const inlineCommentId = 'inlineCommentId' in notification ? notification.inlineCommentId : null;
-    const mentionId = 'mentionId' in notification ? notification.mentionId : null;
-    if (page) {
+  return documentNotifications
+    .map((notification) => {
+      const notificationMetadata = notification.notificationMetadata;
+      const page = (notification.post ? { ...notification.post, type: 'post' } : notification.page) as {
+        type: string;
+        id: string;
+        path: string;
+        title: string;
+      };
+      const inlineCommentId = 'inlineCommentId' in notification ? notification.inlineCommentId : null;
+      const mentionId = 'mentionId' in notification ? notification.mentionId : null;
       const documentNotification = {
         taskId: notification.id,
         inlineCommentId,
@@ -58,19 +62,13 @@ export async function getDocumentNotifications(userId: string): Promise<Notifica
         spaceName: notificationMetadata.space.name,
         pageType: page.type,
         text: '',
-        type: notification.type
+        type: notification.type,
+        archived: !!notificationMetadata.archivedAt,
+        read: !!notificationMetadata.seenAt,
+        group: 'document'
       } as DocumentNotification;
 
-      if (notification.notificationMetadata.seenAt) {
-        documentNotificationsGroup.marked.push(documentNotification);
-      } else {
-        documentNotificationsGroup.unmarked.push(documentNotification);
-      }
-    }
-  });
-
-  return {
-    marked: documentNotificationsGroup.marked.sort(sortByDate),
-    unmarked: documentNotificationsGroup.unmarked.sort(sortByDate)
-  };
+      return documentNotification;
+    })
+    .filter(isTruthy);
 }
