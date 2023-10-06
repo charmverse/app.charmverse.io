@@ -1,4 +1,4 @@
-import type { Page } from '@charmverse/core/prisma-client';
+import type { Page, Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DocumentNotification, NotificationsGroup } from './interfaces';
@@ -14,9 +14,16 @@ export async function getDocumentNotifications(userId: string): Promise<Notifica
     include: {
       page: {
         select: {
-          bountyId: true,
+          id: true,
           path: true,
           type: true,
+          title: true
+        }
+      },
+      post: {
+        select: {
+          id: true,
+          path: true,
           title: true
         }
       },
@@ -33,30 +40,32 @@ export async function getDocumentNotifications(userId: string): Promise<Notifica
 
   documentNotifications.forEach((notification) => {
     const notificationMetadata = notification.notificationMetadata;
-    const page = notification.page as Page;
+    const page = notification.post ? { ...notification.post, type: 'post' } : notification.page;
     const inlineCommentId = 'inlineCommentId' in notification ? notification.inlineCommentId : null;
     const mentionId = 'mentionId' in notification ? notification.mentionId : null;
-    const documentNotification = {
-      taskId: notification.id,
-      inlineCommentId,
-      mentionId,
-      createdAt: notificationMetadata.createdAt.toISOString(),
-      createdBy: notificationMetadata.author,
-      pageId: page.id,
-      pagePath: page.path,
-      pageTitle: page.title || 'Untitled',
-      spaceDomain: notificationMetadata.space.domain,
-      spaceId: notificationMetadata.spaceId,
-      spaceName: notificationMetadata.space.name,
-      pageType: page.type,
-      text: '',
-      type: notification.type
-    } as DocumentNotification;
+    if (page) {
+      const documentNotification = {
+        taskId: notification.id,
+        inlineCommentId,
+        mentionId,
+        createdAt: notificationMetadata.createdAt.toISOString(),
+        createdBy: notificationMetadata.author,
+        pageId: page.id,
+        pagePath: page.path,
+        pageTitle: page.title || 'Untitled',
+        spaceDomain: notificationMetadata.space.domain,
+        spaceId: notificationMetadata.spaceId,
+        spaceName: notificationMetadata.space.name,
+        pageType: page.type,
+        text: '',
+        type: notification.type
+      } as DocumentNotification;
 
-    if (notification.notificationMetadata.seenAt) {
-      documentNotificationsGroup.marked.push(documentNotification);
-    } else {
-      documentNotificationsGroup.unmarked.push(documentNotification);
+      if (notification.notificationMetadata.seenAt) {
+        documentNotificationsGroup.marked.push(documentNotification);
+      } else {
+        documentNotificationsGroup.unmarked.push(documentNotification);
+      }
     }
   });
 

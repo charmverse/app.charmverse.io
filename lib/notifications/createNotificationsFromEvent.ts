@@ -756,14 +756,16 @@ export async function createNotificationsFromEvent(webhookData: {
       const assignedUserId = webhookData.event.assignedUser.id;
       const cardId = webhookData.event.card.id;
 
-      await createCardNotification({
-        type: 'person_assigned',
-        personPropertyId: webhookData.event.personProperty.id,
-        cardId,
-        spaceId,
-        userId: assignedUserId,
-        createdBy: webhookData.event.user.id
-      });
+      if (webhookData.event.user.id !== assignedUserId) {
+        await createCardNotification({
+          type: 'person_assigned',
+          personPropertyId: webhookData.event.personProperty.id,
+          cardId,
+          spaceId,
+          userId: assignedUserId,
+          createdBy: webhookData.event.user.id
+        });
+      }
       break;
     }
 
