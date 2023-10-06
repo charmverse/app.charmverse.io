@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
-import { OpenWalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
+import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import InputGeneratorText from 'components/common/form/InputGeneratorText';
@@ -440,7 +440,7 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
                 {formError instanceof MissingWeb3AccountError ? (
                   <Alert
                     sx={{ alignItems: 'center' }}
-                    action={!web3Provider ? <OpenWalletSelectorModal color='inherit' /> : null}
+                    action={!web3Provider ? <OpenWalletSelectorButton color='inherit' /> : null}
                     severity={formError.severity as AlertColor}
                   >
                     We couldn't detect your wallet. Please unlock your wallet and try publishing again.

@@ -146,12 +146,3 @@ export function WalletSelectorModal() {
     </Modal>
   );
 }
-
-export function OpenWalletSelectorModal({ color }: { color?: string }) {
-  const { connectWallet } = useWeb3ConnectionManager();
-  return (
-    <Button variant='outlined' onClick={connectWallet} color={color}>
-      Connect Wallet
-    </Button>
-  );
-}
