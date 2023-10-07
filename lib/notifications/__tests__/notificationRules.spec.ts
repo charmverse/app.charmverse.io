@@ -4,7 +4,7 @@ describe('Notification Rules: isGroupEnabledForUser()', () => {
   it('Returns true', () => {});
   it('Returns false', async () => {
     const user = await generateUser({
-      notificationRules: { rewards: false }
+      // notificationRules: { rewards: false }
     });
   });
 });

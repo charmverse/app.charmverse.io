@@ -40,14 +40,12 @@ export function addUserWallet({ userId, address }: { userId: string; address: st
 }
 
 type GenerateUserInput = {
-  notificationRules?: NotificationRules;
   verifiedEmail?: string;
 };
 
 export function generateUser(input?: GenerateUserInput): Promise<User> {
   return prisma.user.create({
     data: {
-      notificationRules: input?.notificationRules,
       path: uid(),
       username: randomName(),
       identityType: 'RandomName',
