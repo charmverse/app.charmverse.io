@@ -168,7 +168,7 @@ export function NotificationsPopover({
         const { state } = payload;
 
         return _notifications.map((_notification) =>
-          payload.ids.includes(_notification.taskId)
+          payload.ids.includes(_notification.id)
             ? {
                 ..._notification,
                 read: state === 'read' || state === 'archived' ? true : state === 'unread' ? false : _notification.read,
@@ -251,7 +251,7 @@ export function NotificationsPopover({
                       if (!markAllReadButtonDisabled) {
                         markNotifications({
                           state: 'read',
-                          ids: unreadNotifications.map((notification) => notification.taskId)
+                          ids: unreadNotifications.map((notification) => notification.id)
                         });
                       }
                     }}
@@ -265,7 +265,7 @@ export function NotificationsPopover({
                       if (!archiveAllButtonDisabled) {
                         markNotifications({
                           state: 'archived',
-                          ids: readUnArchivedNotifications.map((notification) => notification.taskId)
+                          ids: readUnArchivedNotifications.map((notification) => notification.id)
                         });
                       }
                     }}
@@ -285,7 +285,7 @@ export function NotificationsPopover({
                 <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
                     targetNotifications.map((notification) => (
-                      <Fragment key={notification.taskId}>
+                      <Fragment key={notification.id}>
                         <NotificationContent
                           notification={notification}
                           markNotifications={markNotifications}
@@ -312,7 +312,7 @@ export function NotificationsPopover({
                 <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
                     targetNotifications.map((notification) => (
-                      <Fragment key={notification.taskId}>
+                      <Fragment key={notification.id}>
                         <NotificationContent
                           notification={notification}
                           markNotifications={markNotifications}
@@ -364,7 +364,7 @@ export function NotificationsPopover({
               <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                 {archivedNotifications.length > 0 ? (
                   archivedNotifications.map((notification) => (
-                    <Fragment key={notification.taskId}>
+                    <Fragment key={notification.id}>
                       <NotificationContent
                         notification={notification}
                         markNotifications={markNotifications}
@@ -409,7 +409,7 @@ export function NotificationContent({
 }) {
   const read = notification.read;
   const archived = notification.archived;
-  const { spaceName, spaceDomain, createdBy, taskId, createdAt } = notification;
+  const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
@@ -421,13 +421,13 @@ export function NotificationContent({
 
   return (
     <Link
-      data-test={`goto-${taskId}`}
+      data-test={`goto-${id}`}
       color='inherit'
       href={href}
       space={{ domain: spaceDomain, customDomain: null }}
       onClick={() => {
         if (!read) {
-          markNotifications({ ids: [taskId], state: 'read' });
+          markNotifications({ ids: [id], state: 'read' });
         }
         onClose();
       }}
@@ -490,7 +490,7 @@ export function NotificationContent({
                   <Tooltip title={`Mark this notification as ${read ? 'unread' : 'read'}`}>
                     <div
                       onClick={(e) => {
-                        markNotifications({ ids: [taskId], state: read ? 'unread' : 'read' });
+                        markNotifications({ ids: [id], state: read ? 'unread' : 'read' });
                       }}
                     >
                       {!read ? (
@@ -503,7 +503,7 @@ export function NotificationContent({
                   <Tooltip title='Archive this notification'>
                     <div
                       onClick={(e) => {
-                        markNotifications({ ids: [taskId], state: 'archived' });
+                        markNotifications({ ids: [id], state: 'archived' });
                       }}
                     >
                       <Inventory2OutlinedIcon fontSize='small' color='secondary' />
@@ -529,7 +529,7 @@ export function NotificationContent({
                 onClick={(e: any) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  markNotifications({ ids: [taskId], state: 'unarchived' });
+                  markNotifications({ ids: [id], state: 'unarchived' });
                 }}
                 size='small'
               >

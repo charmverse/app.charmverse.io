@@ -33,7 +33,7 @@ export const buttonStyle = {
 const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
 const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px', marginBottom: '5px' };
 
-export interface PendingNotifications {
+export interface PendingNotificationsData {
   // eslint-disable-next-line
   cardNotifications: CardNotification[];
   documentNotifications: DocumentNotification[];
@@ -56,7 +56,7 @@ function ViewAllText({ href }: { href: string }) {
   );
 }
 
-export default function PendingNotifications(props: PendingNotifications) {
+export default function PendingNotifications(props: PendingNotificationsData) {
   const totalDocumentNotifications = props.documentNotifications.length;
   const totalVoteNotifications = props.voteNotifications.length;
   const totalProposalNotifications = props.proposalNotifications.length;
@@ -94,7 +94,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.documentNotifications.slice(0, MAX_ITEMS_PER_TASK).map((documentTask) => (
-          <DocumentNotification key={documentTask.taskId} task={documentTask} />
+          <DocumentNotification key={documentTask.id} task={documentTask} />
         ))}
         {totalDocumentNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusDocumentLink} /> : null}
         <MjmlDivider />
@@ -126,7 +126,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.proposalNotifications.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
-          <ProposalTaskMjml key={proposalTask.taskId} task={proposalTask} />
+          <ProposalTaskMjml key={proposalTask.id} task={proposalTask} />
         ))}
         {totalProposalNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
         <MjmlDivider />
@@ -158,7 +158,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.bountyNotifications.slice(0, MAX_ITEMS_PER_TASK).map((proposalTask) => (
-          <BountyTaskMjml key={proposalTask.taskId} task={proposalTask} />
+          <BountyTaskMjml key={proposalTask.id} task={proposalTask} />
         ))}
         {totalBountyNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusProposalLink} /> : null}
         <MjmlDivider />
@@ -190,7 +190,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.voteNotifications.slice(0, MAX_ITEMS_PER_TASK).map((voteTask) => (
-          <VoteTaskMjml key={voteTask.taskId} task={voteTask} />
+          <VoteTaskMjml key={voteTask.id} task={voteTask} />
         ))}
         {totalVoteNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusVoteLink} /> : null}
         <MjmlDivider />
@@ -222,7 +222,7 @@ export default function PendingNotifications(props: PendingNotifications) {
           </div>
         </MjmlText>
         {props.forumNotifications.slice(0, MAX_ITEMS_PER_TASK).map((forumTask) => (
-          <ForumTask key={forumTask.taskId} task={forumTask} />
+          <ForumTask key={forumTask.id} task={forumTask} />
         ))}
         {totalForumNotifications > MAX_ITEMS_PER_TASK ? <ViewAllText href={nexusForumLink} /> : null}
         <MjmlDivider />
@@ -230,13 +230,13 @@ export default function PendingNotifications(props: PendingNotifications) {
     ) : null;
 
   return (
-    <EmailWrapper title='Your open tasks'>
+    <EmailWrapper title='Your open notifications'>
       <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
         <MjmlColumn>
           <Header />
 
           <MjmlText paddingBottom={0} paddingTop={0}>
-            <h3>{tasksRequiresYourAttention({ count: props.totalUnreadNotifications })}.</h3>
+            <h3>{notificationsRequiresYourAttention({ count: props.totalUnreadNotifications })}.</h3>
           </MjmlText>
           {proposalSection}
           {voteSection}
@@ -400,8 +400,8 @@ function ForumTask({ task: { spaceName, spaceDomain, postPath, postTitle } }: { 
   );
 }
 
-export function tasksRequiresYourAttention({ count, includeName }: { count: number; includeName?: boolean }) {
-  return `${count} ${includeName ? 'CharmVerse ' : ''}task${count > 1 ? 's' : ''} need${
+export function notificationsRequiresYourAttention({ count, includeName }: { count: number; includeName?: boolean }) {
+  return `${count} ${includeName ? 'CharmVerse ' : ''}notification${count > 1 ? 's' : ''} need${
     count > 1 ? '' : 's'
   } your attention`;
 }

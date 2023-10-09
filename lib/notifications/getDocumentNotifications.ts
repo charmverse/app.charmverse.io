@@ -49,7 +49,7 @@ export async function getDocumentNotifications(userId: string): Promise<Document
       const inlineCommentId = 'inlineCommentId' in notification ? notification.inlineCommentId : null;
       const mentionId = 'mentionId' in notification ? notification.mentionId : null;
       const documentNotification = {
-        taskId: notification.id,
+        id: notification.id,
         inlineCommentId,
         mentionId,
         createdAt: notificationMetadata.createdAt.toISOString(),

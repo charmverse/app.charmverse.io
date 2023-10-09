@@ -3,10 +3,10 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
 
-export function useTasks() {
+export function useNotifications() {
   const { user } = useUser();
   const {
-    data: tasks,
+    data: notifications,
     error: serverError,
     isLoading,
     mutate
@@ -21,5 +21,5 @@ export function useTasks() {
 
   const error = serverError?.message || serverError;
 
-  return { tasks, mutate, error, isLoading };
+  return { notifications, mutate, error, isLoading };
 }
