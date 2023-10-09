@@ -110,7 +110,6 @@ async function getDefaultPageForSpaceRaw({
   const sortedPages = pageTree.sortNodes(topLevelPages as PageMeta[]);
 
   const firstPage = sortedPages[0];
-
   if (firstPage) {
     return `${defaultSpaceUrl}/${firstPage.path}`;
   } else {
