@@ -1,4 +1,4 @@
-import { countSpaceBlocks } from 'lib/spaces/countSpaceBlocks/countSpaceBlocks';
+import { countSpaceBlocks } from 'lib/spaces/countSpaceBlocks/countAllSpaceBlocks';
 import { prisma } from '@charmverse/core/prisma-client';
 import { writeFileSync } from 'fs';
 

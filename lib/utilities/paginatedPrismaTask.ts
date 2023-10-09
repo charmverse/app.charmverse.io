@@ -20,19 +20,35 @@ type PrismaArgs<M extends PrismaModel> = Pick<
 
 type BatchProcessor<R> = (records: any[]) => R | Promise<R>;
 
-type PaginatedTask<M extends PrismaModel, R> = {
+/**
+ * @param batchSize - Number of records to fetch at a time
+ */
+type PaginatedTask<M extends PrismaModel, R, V> = {
   model: M;
   queryOptions: PrismaArgs<M>;
-  batchSize: number;
+  batchSize?: number;
   callback: BatchProcessor<R>;
+  reducer?: (values: R[]) => V;
 };
 
-export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R = unknown>({
-  batchSize,
+const defaultBatchSize = 500;
+
+/**
+ * @param callback - Run this function on each set of results
+ * @param reducer - Optional aggregation function to run on the results of the callback
+ */
+export async function paginatedPrismaTask<M extends PrismaModel, R>(
+  args: Omit<PaginatedTask<M, R, any>, 'reducer'>
+): Promise<R[]>;
+export async function paginatedPrismaTask<M extends PrismaModel, R, V>(args: PaginatedTask<M, R, V>): Promise<V>;
+export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R = unknown, V = unknown>({
+  batchSize = defaultBatchSize,
   callback,
   model,
-  queryOptions
-}: PaginatedTask<M, R>): Promise<R[]> {
+  queryOptions,
+  reducer
+}: PaginatedTask<M, R, V>): Promise<R[] | V> {
+  // Assume processBatches is a functi
   if (queryOptions.select && queryOptions.include) {
     throw new InvalidInputError(`Cannot provide select AND include. Pick one or none`);
   } else if (queryOptions.select && !queryOptions.select.id) {
@@ -68,5 +84,8 @@ export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R
     if (results.length < batchSize) break;
   }
 
+  if (reducer) {
+    return reducer(allProcessedResults);
+  }
   return allProcessedResults;
 }

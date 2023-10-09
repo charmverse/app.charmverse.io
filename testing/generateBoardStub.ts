@@ -1,7 +1,7 @@
 import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { BoardFields, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
@@ -9,7 +9,7 @@ import { typedKeys } from 'lib/utilities/objects';
 import { pageContentStub } from './generatePageStub';
 
 export type CustomBoardProps = {
-  propertyTemplates: IPropertyTemplate[];
+  propertyTemplates: (Omit<IPropertyTemplate, 'options'> & { options?: IPropertyOption[] | undefined })[];
   cardPropertyValues: Record<string, any>;
 };
 
