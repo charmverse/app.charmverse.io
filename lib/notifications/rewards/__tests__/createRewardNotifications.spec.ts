@@ -6,15 +6,16 @@ import { createBounty } from 'lib/bounties';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getApplicationEntity, getRewardEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
+import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 import { createRewardNotifications } from '../createRewardNotifications';
 
 describe(`Test reward events and notifications`, () => {
   it(`Should create bounty notifications for application.created event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
@@ -70,7 +71,7 @@ describe(`Test reward events and notifications`, () => {
   });
 
   it(`Should create bounty notifications for application.accepted event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
@@ -120,7 +121,7 @@ describe(`Test reward events and notifications`, () => {
   });
 
   it(`Should create bounty notifications for application.rejected event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
@@ -172,7 +173,7 @@ describe(`Test reward events and notifications`, () => {
   });
 
   it(`Should create bounty notifications for application.submitted event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
     await addUserToSpace({
       spaceId: space.id,
@@ -242,7 +243,7 @@ describe(`Test reward events and notifications`, () => {
   });
 
   it(`Should create bounty notifications for application.approved event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const bountyReviewer = await createUserFromWallet();
     await addUserToSpace({
       spaceId: space.id,
@@ -341,7 +342,7 @@ describe(`Test reward events and notifications`, () => {
   });
 
   it(`Should create bounty notifications for application.payment_completed event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
     await addUserToSpace({
       spaceId: space.id,
@@ -415,5 +416,65 @@ describe(`Test reward events and notifications`, () => {
     });
 
     expect(applicationPaymentCompletedNotification).toBeTruthy();
+  });
+
+  it(`Should not create notifications if they are disabled`, async () => {
+    const { space, user } = await generateUserAndSpace({
+      spaceNotificationToggles: {
+        rewards: false
+      }
+    });
+    const user2 = await generateUser();
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: user2.id
+    });
+
+    const bounty = await createBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      rewardAmount: 1,
+      rewardToken: 'ETH',
+      permissions: {
+        reviewer: [
+          {
+            group: 'user',
+            id: user.id
+          }
+        ]
+      }
+    });
+
+    const application = await createApplication({
+      bountyId: bounty.id,
+      message: 'Hello World',
+      userId: user2.id
+    });
+
+    await createNotificationsFromEvent({
+      event: {
+        scope: WebhookEventNames.RewardApplicationCreated,
+        bounty: await getRewardEntity(bounty.id),
+        space: await getSpaceEntity(space.id),
+        application: await getApplicationEntity(application.id)
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
+    const notifications = await prisma.bountyNotification.findMany({
+      where: {
+        type: 'application.created',
+        applicationId: application.id,
+        bountyId: bounty.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: user.id
+        }
+      }
+    });
+
+    expect(notifications).toHaveLength(0);
   });
 });
