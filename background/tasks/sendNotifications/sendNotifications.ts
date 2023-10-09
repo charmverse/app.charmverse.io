@@ -5,12 +5,12 @@ import { RateLimit } from 'async-sema';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import type { PendingNotificationsData } from 'lib/mailer/emails/templates/PendingNotificationsTemplate';
-import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
-import { getCardNotifications } from 'lib/notifications/getCardNotifications';
-import { getDocumentNotifications } from 'lib/notifications/getDocumentNotifications';
-import { getPostNotifications } from 'lib/notifications/getPostNotifications';
-import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
-import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
+import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
+import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
+import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
+import { getVoteNotifications } from 'lib/notifications/polls/getPollNotifications';
+import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
+import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
 import { isUUID } from 'lib/utilities/strings';
 
 const notificationNotificationLimiter = RateLimit(100);

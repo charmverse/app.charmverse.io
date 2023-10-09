@@ -21,6 +21,11 @@ export async function isNotificationEnabledForSpace({
   group: NotificationGroup;
   type?: NotificationType;
 }) {
+  const notificationToggles = await getNotificationToggles({ spaceId });
+  return isNotificationEnabled({ group, type, rules: notificationToggles });
+}
+
+export async function getNotificationToggles({ spaceId }: { spaceId: string }) {
   const { notificationToggles } = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -29,12 +34,11 @@ export async function isNotificationEnabledForSpace({
       notificationToggles: true
     }
   });
-
-  return isNotificationEnabled({ group, type, rules: notificationToggles as NotificationToggles });
+  return notificationToggles as NotificationToggles;
 }
 
 // Determine if a notification event is enabled
-function isNotificationEnabled({
+export function isNotificationEnabled({
   group,
   type,
   rules

@@ -3,8 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTruthy } from 'lib/utilities/types';
 
-import type { DocumentNotification, NotificationsGroup } from './interfaces';
-import { notificationMetadataSelectStatement, sortByDate } from './utils';
+import type { DocumentNotification, NotificationsGroup } from '../interfaces';
+import { notificationMetadataSelectStatement, sortByDate } from '../utils';
 
 export async function getDocumentNotifications(userId: string): Promise<DocumentNotification[]> {
   const documentNotifications = await prisma.documentNotification.findMany({

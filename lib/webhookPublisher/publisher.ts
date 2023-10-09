@@ -73,11 +73,13 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       webhookURL: webhookPayload.webhookURL
     });
   } catch (e) {
-    log.error('Error while publishing webhook event. Error occurred', {
-      queueUrl: SQS_QUEUE_NAME,
-      error: e,
-      scope: event.scope,
-      spaceId
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      log.error('Error while publishing webhook event. Error occurred', {
+        queueUrl: SQS_QUEUE_NAME,
+        error: e,
+        scope: event.scope,
+        spaceId
+      });
+    }
   }
 }
