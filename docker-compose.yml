@@ -10,7 +10,6 @@ services:
       - '.env'
     environment:
       - NODE_ENV=production
-      - DD_RUNTIME_METRICS_ENABLED=true
     profiles:
       # services need at least one profile or else they will be started along with what is in COMPOSE_PROFILES env var
       - default_config
@@ -132,6 +131,9 @@ services:
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/log:/host/var/log:ro
+    ports:
+      - '8125:8125/udp'
+      - '8126:8126/tcp'
     env_file:
       - '.env'
     environment:
@@ -143,6 +145,7 @@ services:
       DD_APM_NON_LOCAL_TRAFFIC: 'true'
       DD_ENV: '${SERVICE_ENV:-tst}'
       DD_SERVICE: '${SERVICE_NAME}'
+      DD_USE_DOGSTATSD: 'true'
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
       DD_EC2_PREFER_IMDSV2: 'true'
     profiles:
