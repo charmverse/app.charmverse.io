@@ -8,7 +8,7 @@ import type { PendingNotificationsData } from 'lib/mailer/emails/templates/Pendi
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
 import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
-import { getVoteNotifications } from 'lib/notifications/polls/getPollNotifications';
+import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
 import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
 import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
 import { isUUID } from 'lib/utilities/strings';
@@ -67,7 +67,7 @@ export async function getNotifications(): Promise<PendingNotificationsData[]> {
     ] = await Promise.all([
       getDocumentNotifications(user.id),
       getCardNotifications(user.id),
-      getVoteNotifications(user.id),
+      getPollNotifications(user.id),
       getBountyNotifications(user.id),
       getPostNotifications(user.id),
       getProposalNotifications(user.id)
