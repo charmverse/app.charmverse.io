@@ -19,7 +19,7 @@ import { spaces as _spaces, userProfile } from '../lib/mockData';
 const spaces = [..._spaces].map((s) => ({ ...s }));
 const space = spaces[0];
 
-space.notificationRules = {
+space.notificationToggles = {
   rewards: false
 };
 
@@ -115,7 +115,7 @@ API.parameters = {
       })
       // userProfile: rest.get('/api/profile', (req, res, ctx) => {
       //   const clone = { ...userProfile };
-      //   clone.notificationRules = [
+      //   clone.notificationToggles = [
       //     {
       //       exclude: 'forum'
       //     }

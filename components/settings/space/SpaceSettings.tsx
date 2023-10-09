@@ -40,26 +40,26 @@ import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import type { NotificationRuleOption, NotificationRules } from 'lib/notifications/notificationRules';
+import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/isNotificationEnabledForSpace';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 
 import Avatar from './components/LargeAvatar';
-import { NotificationRulesInput } from './components/NotificationRules';
+import { NotificationTogglesInput } from './components/NotificationToggles';
 import SettingsItem from './components/SettingsItem';
 
 export type FormValues = {
   name: string;
   spaceImage?: string | null;
   domain: string;
-  notificationRules: NotificationRules;
+  notificationToggles: NotificationToggles;
 };
 
 const schema: yup.SchemaOf<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  notificationRules: yup.object(),
+  notificationToggles: yup.object(),
   domain: yup
     .string()
     .ensure()
@@ -133,11 +133,11 @@ export function SpaceSettings({
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
 
-    // remove 'true' values from notificationRules
-    const notificationRules = { ...values.notificationRules };
-    for (const key in notificationRules) {
-      if (notificationRules[key as NotificationRuleOption] !== false) {
-        delete notificationRules[key as NotificationRuleOption];
+    // remove 'true' values from notificationToggles
+    const notificationToggles = { ...values.notificationToggles };
+    for (const key in notificationToggles) {
+      if (notificationToggles[key as NotificationToggleOption] !== false) {
+        delete notificationToggles[key as NotificationToggleOption];
       }
     }
 
@@ -145,7 +145,7 @@ export function SpaceSettings({
     const newDomain = space.domain !== values.domain;
     await updateSpace({
       id: space.id,
-      notificationRules: notificationRules as Prisma.InputJsonValue,
+      notificationToggles: notificationToggles as Prisma.InputJsonValue,
       features,
       memberProfiles,
       name: values.name,
@@ -257,7 +257,7 @@ export function SpaceSettings({
             <Typography variant='caption' mb={1} component='p'>
               Control notifications for your members.
             </Typography>
-            <NotificationRulesInput
+            <NotificationTogglesInput
               control={control}
               isAdmin={isAdmin}
               register={register}
@@ -538,22 +538,22 @@ function getProfileWidgetLogo(name: MemberProfileName) {
 }
 
 function _getFormValues(space: Space): FormValues {
-  const notificationRules = { ...(space.notificationRules as any) } as NotificationRules;
+  const notificationToggles = { ...(space.notificationToggles as any) } as NotificationToggles;
   // convert deprecated proposals notification preference
-  if (typeof notificationRules.proposals__start_discussion === 'undefined' && !space.notifyNewProposals) {
-    notificationRules.proposals__start_discussion = false;
-    notificationRules.proposals__vote = false;
+  if (typeof notificationToggles.proposals__start_discussion === 'undefined' && !space.notifyNewProposals) {
+    notificationToggles.proposals__start_discussion = false;
+    notificationToggles.proposals__vote = false;
   }
   // set all notifications to true by default. TODO: find a programmatic way to do this?
-  notificationRules.proposals ??= true;
-  notificationRules.polls ??= true;
-  notificationRules.rewards ??= true;
-  notificationRules.proposals__start_discussion ??= true;
-  notificationRules.proposals__vote ??= true;
+  notificationToggles.proposals ??= true;
+  notificationToggles.polls ??= true;
+  notificationToggles.rewards ??= true;
+  notificationToggles.proposals__start_discussion ??= true;
+  notificationToggles.proposals__vote ??= true;
   return {
     name: space.name,
     spaceImage: space.spaceImage,
     domain: space.domain,
-    notificationRules
+    notificationToggles
   };
 }

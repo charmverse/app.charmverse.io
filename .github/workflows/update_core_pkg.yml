@@ -35,6 +35,7 @@ jobs:
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
+          save_cache: true
 
       - name: Calculate Build ID
         id: get_build_id

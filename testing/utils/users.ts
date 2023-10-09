@@ -1,7 +1,7 @@
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { NotificationRules } from 'lib/notifications/notificationRules';
+import type { NotificationToggles } from 'lib/notifications/isNotificationEnabledForSpace';
 import randomName from 'lib/utilities/randomName';
 import { uid } from 'lib/utilities/strings';
 

@@ -3,14 +3,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NotificationGroup, NotificationType } from './interfaces';
 
 /**
- * Example structure:
+ * @example NotificationToggles
  * {
  *   'forum': false,
- *   'proposals.start_discussion': false,
+ *   'proposals__start_discussion': false,
  * }
  */
-export type NotificationRuleOption = NotificationGroup | `${NotificationGroup}__${NotificationType}`;
-export type NotificationRules = { [key in NotificationRuleOption]?: boolean };
+export type NotificationToggleOption = NotificationGroup | `${NotificationGroup}__${NotificationType}`;
+export type NotificationToggles = { [key in NotificationToggleOption]?: boolean };
 
 export async function isNotificationEnabledForSpace({
   spaceId,
@@ -21,16 +21,16 @@ export async function isNotificationEnabledForSpace({
   group: NotificationGroup;
   type?: NotificationType;
 }) {
-  const { notificationRules } = await prisma.space.findUniqueOrThrow({
+  const { notificationToggles } = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
     },
     select: {
-      notificationRules: true
+      notificationToggles: true
     }
   });
 
-  return isNotificationEnabled({ group, type, rules: notificationRules as NotificationRules });
+  return isNotificationEnabled({ group, type, rules: notificationToggles as NotificationToggles });
 }
 
 // Determine if a notification event is enabled
@@ -41,7 +41,7 @@ function isNotificationEnabled({
 }: {
   group: NotificationGroup;
   type?: NotificationType;
-  rules: NotificationRules;
+  rules: NotificationToggles;
 }) {
   if (rules[group] === false) {
     return false;

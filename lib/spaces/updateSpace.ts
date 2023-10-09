@@ -16,7 +16,7 @@ export type UpdateableSpaceFields = Partial<
     | 'spaceImage'
     | 'features'
     | 'memberProfiles'
-    | 'notificationRules'
+    | 'notificationToggles'
   >
 >;
 
@@ -46,7 +46,7 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       name: updates.name,
       spaceImage: updates.spaceImage,
       hiddenFeatures: updates.hiddenFeatures,
-      notificationRules: updates.notificationRules as any,
+      notificationToggles: updates.notificationToggles as any,
       features: updates.features,
       memberProfiles: updates.memberProfiles
     }

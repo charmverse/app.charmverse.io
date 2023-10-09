@@ -5,11 +5,11 @@ import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import type { NotificationGroup } from 'lib/notifications/interfaces';
-import type { NotificationRuleOption } from 'lib/notifications/notificationRules';
+import type { NotificationToggleOption } from 'lib/notifications/isNotificationEnabledForSpace';
 
 import type { FormValues } from '../SpaceSettings';
 
-type NotificationType = { label: string; type?: NotificationRuleOption };
+type NotificationType = { label: string; type?: NotificationToggleOption };
 
 type ConfigurableGroups = Extract<NotificationGroup, 'rewards' | 'proposals' | 'polls'>;
 
@@ -51,7 +51,7 @@ const notifications: Record<ConfigurableGroups, { title: string; types: Notifica
   }
 };
 
-export function NotificationRulesInput({
+export function NotificationTogglesInput({
   isAdmin,
   control,
   watch,
@@ -62,18 +62,18 @@ export function NotificationRulesInput({
   control: Control<FormValues>;
   watch: () => FormValues;
   register: UseFormRegister<FormValues>;
-  setValue: (name: `notificationRules.${NotificationRuleOption}`, value: any) => void;
+  setValue: (name: `notificationToggles.${NotificationToggleOption}`, value: any) => void;
 }) {
   const formValues = watch();
   // console.log(formValues);
   return (
     <Stack>
       <ToggleInput
-        name='notificationRules.rewards'
+        name='notificationToggles.rewards'
         label={
           <NotificationRuleComponent
             control={control}
-            enabled={formValues.notificationRules?.rewards}
+            enabled={formValues.notificationToggles?.rewards}
             title={notifications.rewards.title}
             types={notifications.rewards.types}
           />
@@ -83,11 +83,11 @@ export function NotificationRulesInput({
         setValue={setValue}
       />
       <ToggleInput
-        name='notificationRules.proposals'
+        name='notificationToggles.proposals'
         label={
           <NotificationRuleComponent
             control={control}
-            enabled={formValues.notificationRules?.proposals}
+            enabled={formValues.notificationToggles?.proposals}
             title={notifications.proposals.title}
             types={notifications.proposals.types}
           />
@@ -97,11 +97,11 @@ export function NotificationRulesInput({
         setValue={setValue}
       />
       <ToggleInput
-        name='notificationRules.polls'
+        name='notificationToggles.polls'
         label={
           <NotificationRuleComponent
             control={control}
-            enabled={formValues.notificationRules?.polls}
+            enabled={formValues.notificationToggles?.polls}
             title={notifications.polls.title}
             types={notifications.polls.types}
           />
@@ -122,10 +122,10 @@ function ToggleInput({
   setValue
 }: {
   disabled?: boolean;
-  name: `notificationRules.${NotificationRuleOption}`;
+  name: `notificationToggles.${NotificationToggleOption}`;
   label: ReactNode;
   control: any;
-  setValue: (name: `notificationRules.${NotificationRuleOption}`, value: any) => void;
+  setValue: (name: `notificationToggles.${NotificationToggleOption}`, value: any) => void;
 }) {
   return (
     <Controller
@@ -180,7 +180,7 @@ function NotificationRuleComponent({
                     <Controller
                       key={event.label}
                       control={control}
-                      name={`notificationRules.${event.type}`}
+                      name={`notificationToggles.${event.type}`}
                       defaultValue={false}
                       render={({ field: { onChange, value } }) => (
                         <FormControlLabel
