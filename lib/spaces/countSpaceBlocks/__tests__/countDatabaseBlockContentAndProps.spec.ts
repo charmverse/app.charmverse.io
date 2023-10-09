@@ -6,10 +6,10 @@ import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
-import type { DatabaseBlocksCount } from '../countSpaceDatabaseBlockContentAndProps';
-import { countSpaceDatabaseBlockContentAndProps } from '../countSpaceDatabaseBlockContentAndProps';
+import type { DatabaseBlocksCount } from '../countDatabaseBlockContentAndProps';
+import { countDatabaseBlockContentAndProps } from '../countDatabaseBlockContentAndProps';
 
-describe('countSpaceDatabaseBlockContentAndProps', () => {
+describe('countDatabaseBlockContentAndProps', () => {
   const selectSchema = generateSchema({ type: 'select', options: ['Blue', 'Green', 'Red'] });
   const multiSelectSchema = generateSchema({ type: 'multiSelect', options: ['Blue', 'Green', 'Red'] });
   const numberSchema = generateSchema({ type: 'number' });
@@ -46,7 +46,7 @@ describe('countSpaceDatabaseBlockContentAndProps', () => {
       }
     });
 
-    const count = await countSpaceDatabaseBlockContentAndProps({ spaceId: space.id });
+    const count = await countDatabaseBlockContentAndProps({ spaceId: space.id });
     expect(count).toMatchObject<DatabaseBlocksCount>({
       total: 13,
       details: {
@@ -101,7 +101,7 @@ describe('countSpaceDatabaseBlockContentAndProps', () => {
       }
     });
 
-    const count = await countSpaceDatabaseBlockContentAndProps({ spaceId: space.id });
+    const count = await countDatabaseBlockContentAndProps({ spaceId: space.id });
     expect(count).toMatchObject<DatabaseBlocksCount>({
       total: 16,
       details: {
@@ -118,7 +118,7 @@ describe('countSpaceDatabaseBlockContentAndProps', () => {
     const { space } = await testUtilsUser.generateUserAndSpace();
 
     // Assuming that a new space has no databases, views, or cards
-    const count = await countSpaceDatabaseBlockContentAndProps({ spaceId: space.id });
+    const count = await countDatabaseBlockContentAndProps({ spaceId: space.id });
     expect(count.total).toBe(0);
   });
 });

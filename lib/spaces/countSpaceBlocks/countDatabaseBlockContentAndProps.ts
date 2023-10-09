@@ -17,9 +17,7 @@ export type DetailedDatabaseBlocksCount = {
 
 export type DatabaseBlocksCount = GenericBlocksCount<DetailedDatabaseBlocksCount>;
 
-export async function countSpaceDatabaseBlockContentAndProps({
-  spaceId
-}: BlocksCountQuery): Promise<DatabaseBlocksCount> {
+export async function countDatabaseBlockContentAndProps({ spaceId }: BlocksCountQuery): Promise<DatabaseBlocksCount> {
   const detailedCount: DatabaseBlocksCount = {
     total: 0,
     details: {

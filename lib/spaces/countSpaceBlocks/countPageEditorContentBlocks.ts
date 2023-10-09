@@ -1,13 +1,18 @@
 import type { Page } from '@charmverse/core/prisma';
 
 import { countBlocks } from 'lib/prosemirror/countBlocks';
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
+import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
-export async function countSpacePageContent({ spaceId }: { spaceId: string }): Promise<number> {
+import type { BlocksCountQuery } from './interfaces';
+
+export async function countPageEditorContentBlocks({
+  spaceId,
+  batchSize = defaultPaginatedPrismaTaskBatchSize
+}: BlocksCountQuery): Promise<number> {
   const documentBlocks = (
     await paginatedPrismaTask({
       model: 'page',
-      batchSize: 500,
+      batchSize,
       queryOptions: {
         where: {
           spaceId

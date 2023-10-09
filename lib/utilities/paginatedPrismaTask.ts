@@ -32,7 +32,7 @@ type PaginatedTask<M extends PrismaModel, R, V> = {
   reducer?: (values: any[]) => V;
 };
 
-const defaultBatchSize = 500;
+export const defaultPaginatedPrismaTaskBatchSize = 500;
 
 /**
  * @param callback - Run this function on each set of results
@@ -43,7 +43,7 @@ export async function paginatedPrismaTask<M extends PrismaModel, R>(
 ): Promise<R[]>;
 export async function paginatedPrismaTask<M extends PrismaModel, R, V>(args: PaginatedTask<M, R, V>): Promise<V>;
 export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R = unknown, V = unknown>({
-  batchSize = defaultBatchSize,
+  batchSize = defaultPaginatedPrismaTaskBatchSize,
   callback,
   model,
   queryOptions,

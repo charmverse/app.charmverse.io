@@ -2,7 +2,7 @@ import type { Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { countBlocks } from 'lib/prosemirror/countBlocks';
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
+import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 
@@ -16,7 +16,10 @@ export type DetailedForumBlocksCount = {
 type CountSubset = Pick<DetailedForumBlocksCount, 'posts' | 'postContentBlocks'>;
 
 export type ForumBlocksCount = GenericBlocksCount<DetailedForumBlocksCount>;
-export async function countForumBlocks({ spaceId, batchSize }: BlocksCountQuery): Promise<ForumBlocksCount> {
+export async function countForumBlocks({
+  spaceId,
+  batchSize = defaultPaginatedPrismaTaskBatchSize
+}: BlocksCountQuery): Promise<ForumBlocksCount> {
   const counts: ForumBlocksCount = {
     total: 0,
     details: {

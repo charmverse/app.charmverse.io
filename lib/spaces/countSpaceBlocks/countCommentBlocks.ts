@@ -1,11 +1,5 @@
-import { count } from 'console';
-
-import type { Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import _sum from 'lodash/sum';
-
-import { countBlocks } from 'lib/prosemirror/countBlocks';
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 
@@ -17,7 +11,7 @@ export type DetailedCommentBlocksCount = {
   applicationComment: number;
 };
 export type CommentBlocksCount = GenericBlocksCount<DetailedCommentBlocksCount>;
-export async function countCommentBlocks({ spaceId, batchSize }: BlocksCountQuery): Promise<CommentBlocksCount> {
+export async function countCommentBlocks({ spaceId }: BlocksCountQuery): Promise<CommentBlocksCount> {
   const counts: CommentBlocksCount = {
     total: 0,
     details: {
