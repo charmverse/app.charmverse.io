@@ -3,7 +3,7 @@ import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { createCardNotifications } from './cards/createCardNotifications';
 import { createDocumentNotifications } from './documents/createDocumentNotifications';
 import { createForumNotifications } from './forum/createForumNotifications';
-import { getNotificationToggles, isNotificationEnabled } from './isNotificationEnabledForSpace';
+import { getNotificationToggles, isNotificationEnabled } from './notificationToggles';
 import { createPollNotifications } from './polls/createPollNotifications';
 import { createProposalNotifications } from './proposals/createProposalNotifications';
 import { createRewardNotifications } from './rewards/createRewardNotifications';

@@ -6,8 +6,7 @@ import { getProposalAction } from 'lib/proposal/getProposalAction';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import type { NotificationToggles } from '../isNotificationEnabledForSpace';
-import { isNotificationEnabledForSpace } from '../isNotificationEnabledForSpace';
+import type { NotificationToggles } from '../notificationToggles';
 import { createProposalNotification } from '../saveNotification';
 
 export async function createProposalNotifications(webhookData: {
@@ -15,15 +14,6 @@ export async function createProposalNotifications(webhookData: {
   event: WebhookEvent;
   spaceId: string;
 }) {
-  const isEnabled = await isNotificationEnabledForSpace({
-    spaceId: webhookData.spaceId,
-    group: 'proposals'
-  });
-
-  if (!isEnabled) {
-    return;
-  }
-
   switch (webhookData.event.scope) {
     case WebhookEventNames.ProposalStatusChanged: {
       const userId = webhookData.event.user.id;
@@ -117,7 +107,6 @@ export async function createProposalNotifications(webhookData: {
         resourceId: spaceId,
         resourceIdType: 'space'
       });
-
       for (const spaceRole of spaceRoles) {
         // The user who triggered the event should not receive a notification
         if (spaceRole.userId === userId) {
@@ -125,7 +114,6 @@ export async function createProposalNotifications(webhookData: {
         }
         // We should not send role-based notifications for free spaces
         const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
-
         const accessibleProposalCategories =
           await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
             spaceId,

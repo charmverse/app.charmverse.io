@@ -5,7 +5,7 @@ import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import type { NotificationGroup } from 'lib/notifications/interfaces';
-import type { NotificationToggleOption } from 'lib/notifications/isNotificationEnabledForSpace';
+import type { NotificationToggleOption } from 'lib/notifications/notificationToggles';
 
 import type { FormValues } from '../SpaceSettings';
 

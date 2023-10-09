@@ -6,16 +6,17 @@ import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { assignRole } from 'lib/roles';
 import { getProposalEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
+import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 import { createProposalNotifications } from '../createProposalNotifications';
 
 describe(`Test proposal events and notifications`, () => {
   it(`Should create proposal notifications for proposal.status_changed event`, async () => {
-    const { space } = await generateUserAndSpaceWithApiToken();
+    const { space } = await generateUserAndSpace();
     const author1 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
@@ -369,4 +370,112 @@ describe(`Test proposal events and notifications`, () => {
     expect(proposalVoteActiveStatusChangedMember1Notification).toBeTruthy();
     expect(proposalVoteActiveStatusChangedMember2Notification).toBeTruthy();
   });
+
+  it('Should not create notifications when they are disabled', async () => {
+    const { space } = await createDiscussionNotifications({
+      spaceNotificationToggles: {
+        proposals: false
+      }
+    });
+    const notifications = await prisma.proposalNotification.findMany({
+      where: {
+        notificationMetadata: {
+          spaceId: space.id
+        }
+      }
+    });
+    expect(notifications).toHaveLength(0);
+  });
+
+  it('Should not create new notifications when they are disabled', async () => {
+    const { space } = await createDiscussionNotifications({
+      spaceNotificationToggles: {
+        proposals__start_discussion: false
+      }
+    });
+    const notifications = await prisma.proposalNotification.findMany({
+      where: {
+        notificationMetadata: {
+          spaceId: space.id
+        }
+      }
+    });
+    expect(notifications).toHaveLength(0);
+  });
 });
+
+async function createDiscussionNotifications(input: Parameters<typeof generateUserAndSpace>[0]) {
+  const { space } = await generateUserAndSpace(input);
+  const author1 = await generateUser();
+  await addUserToSpace({
+    spaceId: space.id,
+    userId: author1.id
+  });
+  const reviewer = await generateUser();
+  await addUserToSpace({
+    spaceId: space.id,
+    userId: reviewer.id
+  });
+
+  const role = await createRole({
+    spaceId: space.id,
+    name: 'Post Moderators'
+  });
+
+  const proposalCategory = await testUtilsProposals.generateProposalCategory({
+    spaceId: space.id,
+    proposalCategoryPermissions: [
+      {
+        permissionLevel: 'full_access',
+        assignee: { group: 'role', id: role.id }
+      }
+    ]
+  });
+
+  await Promise.all(
+    [author1.id, reviewer.id].map((userId) =>
+      assignRole({
+        roleId: role.id,
+        userId
+      })
+    )
+  );
+
+  const { proposal } = await createProposal({
+    categoryId: proposalCategory.id,
+    spaceId: space.id,
+    userId: author1.id,
+    authors: [author1.id],
+    reviewers: [
+      {
+        group: 'user',
+        id: reviewer.id
+      }
+    ]
+  });
+
+  const spaceEntity = await getSpaceEntity(space.id);
+  const proposalEntity = await getProposalEntity(proposal.id);
+
+  // Move to discussion status
+
+  await updateProposalStatus({
+    newStatus: 'discussion',
+    proposalId: proposal.id,
+    userId: author1.id
+  });
+
+  await createNotificationsFromEvent({
+    event: {
+      scope: WebhookEventNames.ProposalStatusChanged,
+      proposal: proposalEntity,
+      newStatus: 'discussion',
+      oldStatus: 'draft',
+      space: spaceEntity,
+      user: await getUserEntity(author1.id)
+    },
+    spaceId: space.id,
+    createdAt: new Date().toISOString()
+  });
+  return { space };
+}

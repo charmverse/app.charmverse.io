@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
@@ -8,12 +7,13 @@ import { assignRole } from 'lib/roles';
 import { createVote } from 'lib/votes';
 import { getSpaceEntity, getVoteEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
+import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 import { createPollNotifications } from '../createPollNotifications';
 
 describe(`Test vote events and notifications`, () => {
@@ -23,7 +23,7 @@ describe(`Test vote events and notifications`, () => {
     // user 2 will not be able to access the page since he doesn't have access to the page category
     // the opposite is true for user 3
 
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
@@ -39,12 +39,16 @@ describe(`Test vote events and notifications`, () => {
 
     const page = await createPage({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          userId: user3.id,
+          permissionLevel: 'full_access'
+        }
+      ]
     });
 
     const postCategory = await generatePostCategory({ spaceId: space.id });
-
-    const mentionId = v4();
 
     const post = await createForumPost({
       categoryId: postCategory.id,
@@ -108,17 +112,6 @@ describe(`Test vote events and notifications`, () => {
       type: 'Approval',
       voteOptions: [],
       postId: post.id
-    });
-
-    await premiumPermissionsApiClient.pages.upsertPagePermission({
-      pageId: page.id,
-      permission: {
-        assignee: {
-          group: 'user',
-          id: user3.id
-        },
-        permissionLevel: 'full_access'
-      }
     });
 
     await createPollNotifications({
@@ -189,5 +182,64 @@ describe(`Test vote events and notifications`, () => {
     expect(newPageUser2VoteNotification).toBeFalsy();
     expect(newPostVoteNotification).toBeTruthy();
     expect(newPostUser3VoteNotification).toBeFalsy();
+  });
+
+  it('Should not trigger notifications when they are disabled', async () => {
+    const { space, user } = await generateUserAndSpace({
+      spaceNotificationToggles: {
+        polls: false
+      }
+    });
+    const user2 = await generateUser();
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: user2.id
+    });
+
+    const page = await createPage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          userId: user2.id,
+          permissionLevel: 'full_access'
+        }
+      ]
+    });
+
+    const pageVote = await createVote({
+      content: emptyDocument,
+      contentText: '',
+      context: 'inline',
+      createdBy: user.id,
+      deadline: new Date(),
+      maxChoices: 3,
+      spaceId: space.id,
+      threshold: 2,
+      title: 'Vote',
+      type: 'Approval',
+      voteOptions: [],
+      pageId: page.id
+    });
+
+    await createNotificationsFromEvent({
+      event: {
+        scope: WebhookEventNames.VoteCreated,
+        space: await getSpaceEntity(space.id),
+        vote: await getVoteEntity(pageVote.id)
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
+    const notifications = await prisma.voteNotification.findMany({
+      where: {
+        notificationMetadata: {
+          spaceId: space.id
+        }
+      }
+    });
+
+    expect(notifications).toHaveLength(0);
   });
 });

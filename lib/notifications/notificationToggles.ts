@@ -12,19 +12,6 @@ import type { NotificationGroup, NotificationType } from './interfaces';
 export type NotificationToggleOption = NotificationGroup | `${NotificationGroup}__${NotificationType}`;
 export type NotificationToggles = { [key in NotificationToggleOption]?: boolean };
 
-export async function isNotificationEnabledForSpace({
-  spaceId,
-  group,
-  type
-}: {
-  spaceId: string;
-  group: NotificationGroup;
-  type?: NotificationType;
-}) {
-  const notificationToggles = await getNotificationToggles({ spaceId });
-  return isNotificationEnabled({ group, type, rules: notificationToggles });
-}
-
 export async function getNotificationToggles({ spaceId }: { spaceId: string }) {
   const { notificationToggles } = await prisma.space.findUniqueOrThrow({
     where: {
