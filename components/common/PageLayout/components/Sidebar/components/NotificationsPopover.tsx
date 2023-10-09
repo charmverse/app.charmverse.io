@@ -76,7 +76,7 @@ export function NotificationUpdates() {
   return (
     <Box>
       <StyledSidebarBox onClick={notificationPopupState.open}>
-        <Stack flexDirection='row'>
+        <Stack flexDirection='row' alignItems='center'>
           <QueryBuilderOutlinedIcon color='secondary' fontSize='small' />
           Updates
         </Stack>
