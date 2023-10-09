@@ -28,7 +28,8 @@ type PaginatedTask<M extends PrismaModel, R, V> = {
   queryOptions: PrismaArgs<M>;
   batchSize?: number;
   callback: BatchProcessor<R>;
-  reducer?: (values: R[]) => V;
+  // Reducer input based on return type of callback
+  reducer?: (values: any[]) => V;
 };
 
 const defaultBatchSize = 500;

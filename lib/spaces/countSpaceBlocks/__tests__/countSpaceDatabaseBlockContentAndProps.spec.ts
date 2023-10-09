@@ -6,7 +6,7 @@ import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
-import type { DatabaseBlocksCount, DetailedDatabaseBlocksCount } from '../countSpaceDatabaseBlockContentAndProps';
+import type { DatabaseBlocksCount } from '../countSpaceDatabaseBlockContentAndProps';
 import { countSpaceDatabaseBlockContentAndProps } from '../countSpaceDatabaseBlockContentAndProps';
 
 describe('countSpaceDatabaseBlockContentAndProps', () => {
@@ -55,8 +55,7 @@ describe('countSpaceDatabaseBlockContentAndProps', () => {
         databaseDescriptions: 0,
         databaseProperties: 7,
         // 2 cards with 1 value each
-        databaseRowPropValues: 4,
-        databaseTopLevelComments: 0
+        databaseRowPropValues: 4
       }
     });
   });
@@ -110,8 +109,7 @@ describe('countSpaceDatabaseBlockContentAndProps', () => {
         databaseDescriptions: 1,
         databaseProperties: 7,
         // 2 cards with 3 non empty values each for which there is a schema
-        databaseRowPropValues: 6,
-        databaseTopLevelComments: 0
+        databaseRowPropValues: 6
       }
     });
   });

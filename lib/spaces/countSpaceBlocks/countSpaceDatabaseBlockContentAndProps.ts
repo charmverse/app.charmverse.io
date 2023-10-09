@@ -13,7 +13,6 @@ export type DetailedDatabaseBlocksCount = {
   databaseDescriptions: number;
   databaseProperties: number;
   databaseRowPropValues: number;
-  databaseTopLevelComments: number;
 };
 
 export type DatabaseBlocksCount = GenericBlocksCount<DetailedDatabaseBlocksCount>;
@@ -27,15 +26,11 @@ export async function countSpaceDatabaseBlockContentAndProps({
       databaseViews: 0,
       databaseDescriptions: 0,
       databaseProperties: 0,
-      databaseRowPropValues: 0,
-      databaseTopLevelComments: 0
+      databaseRowPropValues: 0
     }
   };
 
-  // 1 - Count views & comments
-  detailedCount.details.databaseTopLevelComments = await prisma.block.count({
-    where: { spaceId, type: 'comment' }
-  });
+  // 1 - Count views
   detailedCount.details.databaseViews = await prisma.block.count({
     where: { spaceId, type: 'view' }
   });
