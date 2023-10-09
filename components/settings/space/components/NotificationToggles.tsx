@@ -26,6 +26,7 @@ const notifications: Record<ConfigurableGroups, { title: string; types: Notifica
       [
         { label: 'Work submitted (Reviewers only)' },
         { label: 'Submission approved (Applicants only)' },
+        { label: 'Payment needed (Reviewers only)' },
         { label: 'Payment completed (Applicants only)' }
       ]
     ]
