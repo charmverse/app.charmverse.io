@@ -184,7 +184,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     voteTask = {
       ...vote,
       createdBy: mapNotificationActor(voteAuthor) as User,
-      taskId: vote.id,
+      id: vote.id,
       spaceName: space.name,
       spaceDomain: space.domain,
       pagePath: existingPage.path,
@@ -194,7 +194,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     voteTask = {
       ...vote,
       createdBy: mapNotificationActor(voteAuthor) as User,
-      taskId: vote.id,
+      id: vote.id,
       spaceName: space.name,
       spaceDomain: space.domain,
       pagePath: `forum/post/${existingPost.path}`,

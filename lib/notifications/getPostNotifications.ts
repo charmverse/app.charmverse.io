@@ -29,7 +29,7 @@ export async function getPostNotifications(userId: string): Promise<PostNotifica
 
   return postNotifications.map((notification) => {
     const postNotification = {
-      taskId: notification.id,
+      id: notification.id,
       createdAt: notification.notificationMetadata.createdAt.toISOString(),
       createdBy: notification.notificationMetadata.author,
       postId: notification.postId,

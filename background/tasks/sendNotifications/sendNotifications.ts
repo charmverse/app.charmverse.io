@@ -4,7 +4,7 @@ import { RateLimit } from 'async-sema';
 
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
-import type { PendingNotifications } from 'lib/mailer/emails/templates/PendingTasksTemplate';
+import type { PendingNotificationsData } from 'lib/mailer/emails/templates/PendingNotificationsTemplate';
 import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
 import { getCardNotifications } from 'lib/notifications/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/getDocumentNotifications';
@@ -13,7 +13,7 @@ import { getProposalNotifications } from 'lib/notifications/getProposalNotificat
 import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
 import { isUUID } from 'lib/utilities/strings';
 
-const notificationTaskLimiter = RateLimit(100);
+const notificationNotificationLimiter = RateLimit(100);
 
 export async function sendUserNotifications(): Promise<number> {
   const notificationsToSend = await getNotifications();
@@ -21,7 +21,7 @@ export async function sendUserNotifications(): Promise<number> {
   for (const notification of notificationsToSend) {
     log.info('Debug: send notification to user', {
       userId: notification.user.id,
-      tasks: notification.totalUnreadNotifications
+      notifications: notification.totalUnreadNotifications
     });
     await sendNotification(notification);
   }
@@ -29,7 +29,7 @@ export async function sendUserNotifications(): Promise<number> {
   return notificationsToSend.length;
 }
 
-export async function getNotifications(): Promise<PendingNotifications[]> {
+export async function getNotifications(): Promise<PendingNotificationsData[]> {
   const userWithNotificationState = await prisma.user.findMany({
     where: {
       deletedAt: null,
@@ -50,12 +50,12 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
     return !snoozedUntil || snoozedUntil > new Date();
   });
 
-  const notifications: PendingNotifications[] = [];
+  const notifications: PendingNotificationsData[] = [];
 
   // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
   for (const user of notificationActivatedUsers) {
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
-    await notificationTaskLimiter();
+    await notificationNotificationLimiter();
 
     const [
       documentNotifications,
@@ -93,7 +93,7 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
     });
 
     notifications.push({
-      user: user as PendingNotifications['user'],
+      user: user as PendingNotificationsData['user'],
       totalUnreadNotifications,
       documentNotifications: unreadDocumentNotifications,
       cardNotifications: unreadCardNotifications,
@@ -107,14 +107,14 @@ export async function getNotifications(): Promise<PendingNotifications[]> {
   return notifications.filter((notification) => notification.totalUnreadNotifications > 0);
 }
 
-async function sendNotification(notification: PendingNotifications) {
+async function sendNotification(notification: PendingNotificationsData) {
   const notificationIds = [
-    ...notification.proposalNotifications.map((proposalTask) => proposalTask.taskId),
-    ...notification.documentNotifications.map((discussionTask) => discussionTask.taskId),
-    ...notification.cardNotifications.map((cardTask) => cardTask.taskId),
-    ...notification.voteNotifications.map((voteTask) => voteTask.taskId),
-    ...notification.bountyNotifications.map((bountyTask) => bountyTask.taskId),
-    ...notification.forumNotifications.map((forumTask) => forumTask.taskId)
+    ...notification.proposalNotifications.map((proposalNotification) => proposalNotification.id),
+    ...notification.documentNotifications.map((discussionNotification) => discussionNotification.id),
+    ...notification.cardNotifications.map((cardNotification) => cardNotification.id),
+    ...notification.voteNotifications.map((voteNotification) => voteNotification.id),
+    ...notification.bountyNotifications.map((bountyNotification) => bountyNotification.id),
+    ...notification.forumNotifications.map((forumNotification) => forumNotification.id)
   ].filter((nid) => isUUID(nid));
 
   try {
@@ -135,16 +135,20 @@ async function sendNotification(notification: PendingNotifications) {
     log.error(`Error trying to save notification for user`, {
       userId: notification.user.id,
       error,
-      forumTaskIds: notification.forumNotifications.map((forumTask) => forumTask.taskId),
-      proposalTaskIds: notification.proposalNotifications.map((proposalTask) => proposalTask.taskId),
-      voteTaskIds: notification.voteNotifications.map((voteTask) => voteTask.taskId),
-      discussionTaskIds: notification.documentNotifications.map((discussionTask) => discussionTask.taskId),
-      bountyTaskIds: notification.bountyNotifications.map((bountyTask) => bountyTask.taskId)
+      forumNotificationIds: notification.forumNotifications.map((forumNotification) => forumNotification.id),
+      proposalNotificationIds: notification.proposalNotifications.map(
+        (proposalNotification) => proposalNotification.id
+      ),
+      voteNotificationIds: notification.voteNotifications.map((voteNotification) => voteNotification.id),
+      discussionNotificationIds: notification.documentNotifications.map(
+        (discussionNotification) => discussionNotification.id
+      ),
+      bountyNotificationIds: notification.bountyNotifications.map((bountyNotification) => bountyNotification.id)
     });
     return undefined;
   }
 
-  const template = emails.getPendingTasksEmail(notification);
+  const template = emails.getPendingNotificationsEmail(notification);
   const result = await mailer.sendEmail({
     to: {
       displayName: notification.user.username,

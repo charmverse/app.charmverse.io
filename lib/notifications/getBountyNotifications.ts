@@ -38,7 +38,7 @@ export async function getBountyNotifications(userId: string): Promise<BountyNoti
     const notificationMetadata = notification.notificationMetadata;
     const page = notification.bounty.page as Page;
     const bountyNotification = {
-      taskId: notification.id,
+      id: notification.id,
       applicationId: notification.applicationId,
       createdAt: notificationMetadata.createdAt.toISOString(),
       createdBy: notificationMetadata.author,

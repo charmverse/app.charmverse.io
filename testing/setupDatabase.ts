@@ -967,7 +967,7 @@ export async function generateProposal({
   proposalStatus: ProposalStatus;
   evaluationType?: ProposalEvaluationType;
   title?: string;
-}): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
+}): Promise<PageWithProposal> {
   const proposalId = v4();
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
@@ -1050,22 +1050,7 @@ export async function generateProposal({
     }
   });
 
-  const workspaceEvent = await prisma.workspaceEvent.create({
-    data: {
-      type: 'proposal_status_change',
-      meta: {
-        newStatus: proposalStatus
-      },
-      actorId: userId,
-      pageId: proposalId,
-      spaceId
-    }
-  });
-
-  return {
-    ...result,
-    workspaceEvent
-  };
+  return result;
 }
 
 /**
@@ -1126,23 +1111,6 @@ export async function generateBoard({
   return prisma
     .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
     .then((result) => result[0] as Page);
-}
-
-export async function generateWorkspaceEvents({
-  actorId,
-  spaceId,
-  meta,
-  pageId
-}: Pick<WorkspaceEvent, 'actorId' | 'meta' | 'pageId' | 'spaceId'>) {
-  return prisma.workspaceEvent.create({
-    data: {
-      type: 'proposal_status_change',
-      actorId,
-      spaceId,
-      meta: meta ?? undefined,
-      pageId
-    }
-  });
 }
 
 export async function generateForumComment({

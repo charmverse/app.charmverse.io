@@ -55,7 +55,7 @@ export async function getVoteNotifications(userId: string): Promise<VoteNotifica
     });
 
     const voteNotification: VoteNotification = {
-      taskId: notification.id,
+      id: notification.id,
       userChoice,
       title: notification.vote.title,
       status: voteStatus,

@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useTasks } from 'components/nexus/hooks/useTasks';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
 
@@ -46,7 +46,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(true);
-  const { mutate: mutateTasks, tasks: userTasks } = useTasks();
+  const { mutate: mutateNotifications } = useNotifications();
 
   const { subscribe } = useWebSocketClient();
 
@@ -65,7 +65,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
         return { ...prev, ...votesToAssign };
       });
-      mutateTasks();
+      mutateNotifications();
     });
 
     const unsubscribeFromDeletedVotes = subscribe('votes_deleted', (deletedVotes) => {
@@ -78,7 +78,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      mutateTasks();
+      mutateNotifications();
     });
 
     const unsubscribeFromUpdatedVotes = subscribe('votes_updated', (updatedVotes) => {
@@ -93,7 +93,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      mutateTasks();
+      mutateNotifications();
     });
 
     return () => {

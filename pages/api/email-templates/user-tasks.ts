@@ -34,7 +34,7 @@ const createDocumentTask = ({
   return {
     commentId: null,
     mentionId: id,
-    taskId: id,
+    id,
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
@@ -66,7 +66,7 @@ const createPostTask = ({ postTitle, spaceName }: { spaceName: string; postTitle
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
-    taskId: v4(),
+    id: v4(),
     type: 'created',
     spaceName,
     postId: v4(),
@@ -89,7 +89,7 @@ const createPostTask = ({ postTitle, spaceName }: { spaceName: string; postTitle
   };
 };
 
-const createVoteTasks = ({
+const createVoteNotifications = ({
   voteTitle,
   deadline,
   pageTitle,
@@ -121,7 +121,7 @@ const createVoteTasks = ({
   } as any;
 };
 
-const createProposalTasks = ({
+const createProposalNotifications = ({
   pageTitle,
   spaceName,
   status
@@ -130,7 +130,7 @@ const createProposalTasks = ({
     type: 'reviewed',
     pagePath: randomName(),
     pageTitle,
-    taskId: v4(),
+    id: v4(),
     createdAt: new Date().toISOString(),
     status,
     spaceDomain: randomName(),
@@ -160,7 +160,7 @@ const createBountyTask = ({
 }: Pick<BountyNotification, 'pageTitle' | 'spaceName' | 'status'>): BountyNotification => {
   const id = v4();
   return {
-    taskId: id,
+    id,
     type: 'application.approved',
     pagePath: randomName(),
     pageTitle,
@@ -188,8 +188,8 @@ const createBountyTask = ({
 };
 
 const templates = {
-  'Notify the user about tasks': () => {
-    return emails.getPendingTasksEmail({
+  'Notify the user about notifications': () => {
+    return emails.getPendingNotificationsEmail({
       user: {
         id: '<userId>',
         email: '<userEmail>',
@@ -204,12 +204,12 @@ const templates = {
         })
       ],
       proposalNotifications: [
-        createProposalTasks({
+        createProposalNotifications({
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
           spaceName: 'Uniswap',
           status: 'discussion'
         }),
-        createProposalTasks({
+        createProposalNotifications({
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
           status: 'draft'
@@ -249,26 +249,26 @@ const templates = {
         })
       ],
       voteNotifications: [
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
           pageTitle: 'This is a really really long vote title',
           spaceName: 'This is a really really long space name',
           voteTitle:
             'Should we add this section? I think it can be a great addition but need all of your votes to decide'
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 26 * 60 * 60 * 1000),
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse',
           voteTitle: 'Should we format the text?'
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 32 * 60 * 60 * 1000),
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse',
           voteTitle: "Let's vote"
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 52 * 60 * 60 * 1000),
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse Demo',

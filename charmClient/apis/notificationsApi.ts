@@ -1,18 +1,18 @@
 import * as http from 'adapters/http';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
-import type { GetTasksStateResponse, UpdateTasksState } from 'pages/api/notifications/state';
+import type { GetNotificationsStateResponse, UpdateNotificationsState } from 'pages/api/notifications/state';
 
 export class NotificationsApi {
   getNotifications(): Promise<Notification[]> {
     return http.GET('/api/notifications/list');
   }
 
-  getNotificationsState(): Promise<GetTasksStateResponse> {
+  getNotificationsState(): Promise<GetNotificationsStateResponse> {
     return http.GET('/api/notifications/state');
   }
 
-  updateNotificationsState(payload: UpdateTasksState) {
+  updateNotificationsState(payload: UpdateNotificationsState) {
     return http.PUT('/api/notifications/state', payload);
   }
 
