@@ -6,8 +6,9 @@ import type { Card } from 'lib/focalboard/card';
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
+import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
+
 export type DetailedDatabaseBlocksCount = {
-  total: number;
   databaseViews: number;
   databaseDescriptions: number;
   databaseProperties: number;
@@ -15,25 +16,27 @@ export type DetailedDatabaseBlocksCount = {
   databaseTopLevelComments: number;
 };
 
+export type DatabaseBlocksCount = GenericBlocksCount<DetailedDatabaseBlocksCount>;
+
 export async function countSpaceDatabaseBlockContentAndProps({
   spaceId
-}: {
-  spaceId: string;
-}): Promise<DetailedDatabaseBlocksCount> {
-  const detailedCount: DetailedDatabaseBlocksCount = {
+}: BlocksCountQuery): Promise<DatabaseBlocksCount> {
+  const detailedCount: DatabaseBlocksCount = {
     total: 0,
-    databaseViews: 0,
-    databaseDescriptions: 0,
-    databaseProperties: 0,
-    databaseRowPropValues: 0,
-    databaseTopLevelComments: 0
+    details: {
+      databaseViews: 0,
+      databaseDescriptions: 0,
+      databaseProperties: 0,
+      databaseRowPropValues: 0,
+      databaseTopLevelComments: 0
+    }
   };
 
   // 1 - Count views & comments
-  detailedCount.databaseTopLevelComments = await prisma.block.count({
+  detailedCount.details.databaseTopLevelComments = await prisma.block.count({
     where: { spaceId, type: 'comment' }
   });
-  detailedCount.databaseViews = await prisma.block.count({
+  detailedCount.details.databaseViews = await prisma.block.count({
     where: { spaceId, type: 'view' }
   });
 
@@ -53,7 +56,7 @@ export async function countSpaceDatabaseBlockContentAndProps({
     .map((board) => countBlocks((board.fields as any)?.description, { blockId: board.id, spaceId }))
     .reduce((a, b) => a + b, 0);
 
-  detailedCount.databaseDescriptions = databaseBlockDescriptionCounts;
+  detailedCount.details.databaseDescriptions = databaseBlockDescriptionCounts;
 
   // 3 - Get schemas for each database block and sum up
   let totalProperties = 0;
@@ -69,7 +72,7 @@ export async function countSpaceDatabaseBlockContentAndProps({
     return acc;
   }, {} as Record<string, Record<string, IPropertyTemplate>>);
 
-  detailedCount.databaseProperties = totalProperties;
+  detailedCount.details.databaseProperties = totalProperties;
 
   const cardPropValues = await paginatedPrismaTask({
     batchSize: 2,
@@ -107,11 +110,11 @@ export async function countSpaceDatabaseBlockContentAndProps({
     }
   });
 
-  detailedCount.databaseRowPropValues = cardPropValues;
+  detailedCount.details.databaseRowPropValues = cardPropValues;
 
   // Summing up all counts
 
-  detailedCount.total = _sum(Object.values(detailedCount));
+  detailedCount.total = _sum(Object.values(detailedCount.details));
 
   return detailedCount;
 }

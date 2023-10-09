@@ -7,11 +7,13 @@ import {
   testUtilsProposals,
   testUtilsUser
 } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
+import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 
-import { countSpaceBlocks, countSpaceBlocksAndSave } from '../countSpaceBlocks';
+import { countSpaceBlocks, countSpaceBlocksAndSave } from '../countAllSpaceBlocks';
 
 const pageContent = {
   ...emptyDocument,
@@ -66,11 +68,33 @@ describe('countSpaceBlocks - count blocks', () => {
   it('should count each database, database view and database card / row as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
+    const selectSchema = generateSchema({ type: 'select', options: ['Blue', 'Green', 'Red'] });
+    const multiSelectSchema = generateSchema({ type: 'multiSelect', options: ['Blue', 'Green', 'Red'] });
+    const numberSchema = generateSchema({ type: 'number' });
+    const textSchema = generateSchema({ type: 'text' });
+    const dateSchema = generateSchema({ type: 'date' });
+    const checkboxSchema = generateSchema({ type: 'checkbox' });
+    const urlSchema = generateSchema({ type: 'url' });
+
     const board = await generateBoard({
       spaceId: space.id,
       createdBy: user.id,
       cardCount: 2,
-      views: 2
+      views: 2,
+      customProps: {
+        cardPropertyValues: {
+          [selectSchema.id]: 'Blue'
+        },
+        propertyTemplates: [
+          selectSchema,
+          multiSelectSchema,
+          numberSchema,
+          textSchema,
+          dateSchema,
+          checkboxSchema,
+          urlSchema
+        ]
+      }
     });
 
     const { total, counts } = await countSpaceBlocks({ spaceId: space.id });

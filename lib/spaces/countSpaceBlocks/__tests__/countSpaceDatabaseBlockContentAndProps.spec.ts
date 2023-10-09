@@ -6,7 +6,7 @@ import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
-import type { DetailedDatabaseBlocksCount } from '../countSpaceDatabaseBlockContentAndProps';
+import type { DatabaseBlocksCount, DetailedDatabaseBlocksCount } from '../countSpaceDatabaseBlockContentAndProps';
 import { countSpaceDatabaseBlockContentAndProps } from '../countSpaceDatabaseBlockContentAndProps';
 
 describe('countSpaceDatabaseBlockContentAndProps', () => {
@@ -47,15 +47,17 @@ describe('countSpaceDatabaseBlockContentAndProps', () => {
     });
 
     const count = await countSpaceDatabaseBlockContentAndProps({ spaceId: space.id });
-    expect(count).toMatchObject<DetailedDatabaseBlocksCount>({
+    expect(count).toMatchObject<DatabaseBlocksCount>({
       total: 13,
-      // 2 cards + 2 views + 1 database
-      databaseViews: 2,
-      databaseDescriptions: 0,
-      databaseProperties: 7,
-      // 2 cards with 1 value each
-      databaseRowPropValues: 4,
-      databaseTopLevelComments: 0
+      details: {
+        // 2 cards + 2 views + 1 database
+        databaseViews: 2,
+        databaseDescriptions: 0,
+        databaseProperties: 7,
+        // 2 cards with 1 value each
+        databaseRowPropValues: 4,
+        databaseTopLevelComments: 0
+      }
     });
   });
 
@@ -101,14 +103,16 @@ describe('countSpaceDatabaseBlockContentAndProps', () => {
     });
 
     const count = await countSpaceDatabaseBlockContentAndProps({ spaceId: space.id });
-    expect(count).toMatchObject<DetailedDatabaseBlocksCount>({
+    expect(count).toMatchObject<DatabaseBlocksCount>({
       total: 16,
-      databaseViews: 2,
-      databaseDescriptions: 1,
-      databaseProperties: 7,
-      // 2 cards with 3 non empty values each for which there is a schema
-      databaseRowPropValues: 6,
-      databaseTopLevelComments: 0
+      details: {
+        databaseViews: 2,
+        databaseDescriptions: 1,
+        databaseProperties: 7,
+        // 2 cards with 3 non empty values each for which there is a schema
+        databaseRowPropValues: 6,
+        databaseTopLevelComments: 0
+      }
     });
   });
 
