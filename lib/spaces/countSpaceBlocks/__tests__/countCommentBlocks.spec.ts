@@ -532,4 +532,75 @@ describe('countCommentBlocks', () => {
       }
     });
   });
+
+  it('should ignore post comments if the post is marked as deleted or the comment is marked as deleted', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const postCategory = await testUtilsForum.generatePostCategory({
+      spaceId: space.id
+    });
+
+    const deletedPost = await testUtilsForum.generateForumPost({
+      spaceId: space.id,
+      userId: user.id,
+      categoryId: postCategory.id,
+      deletedAt: new Date()
+    });
+
+    const deletedPostComments = await prisma.postComment.createMany({
+      data: [
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          contentText: '',
+          createdBy: user.id,
+          postId: deletedPost.id
+        },
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          contentText: '',
+          createdBy: user.id,
+          postId: deletedPost.id
+        }
+      ]
+    });
+
+    const post = await testUtilsForum.generateForumPost({
+      spaceId: space.id,
+      userId: user.id,
+      categoryId: postCategory.id
+    });
+
+    const postComments = await prisma.postComment.createMany({
+      data: [
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          contentText: '',
+          createdBy: user.id,
+          postId: post.id,
+          deletedAt: new Date()
+        },
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          contentText: '',
+          createdBy: user.id,
+          postId: post.id
+        }
+      ]
+    });
+    const counts = await countCommentBlocks({
+      spaceId: space.id
+    });
+
+    // Modify the expected counts based on the generated comments
+    expect(counts).toMatchObject<CommentBlocksCount>({
+      total: 1,
+      details: {
+        applicationComment: 0,
+        blockComment: 0,
+        comment: 0,
+        pageComments: 0,
+        postComment: 1
+      }
+    });
+  });
 });
