@@ -13,10 +13,8 @@ export type DetailedForumBlocksCount = {
   postContentBlocks: number;
 };
 
-// Used internally in the function
-type CountSubset = Pick<DetailedForumBlocksCount, 'posts' | 'postContentBlocks'>;
-
 export type ForumBlocksCount = GenericBlocksCount<DetailedForumBlocksCount>;
+
 export async function countForumBlocks({
   spaceId,
   batchSize = defaultPaginatedPrismaTaskBatchSize
@@ -49,26 +47,13 @@ export async function countForumBlocks({
         content: true
       }
     },
-    callback: (posts: Pick<Post, 'content' | 'id'>[]) => {
-      return posts.reduce(
-        (acc, post) => {
-          acc.posts += 1;
-          acc.postContentBlocks += countBlocks(post.content, { blockId: post.id, spaceId });
-          return acc;
-        },
-        { posts: 0, postContentBlocks: 0 } as CountSubset
-      );
+    mapper: (post: Pick<Post, 'content' | 'id'>) => {
+      return countBlocks(post.content, { blockId: post.id, spaceId });
     },
-    reducer: (countsList: CountSubset[]) => {
-      return countsList.reduce(
-        (acc, curr) => {
-          acc.posts += curr.posts;
-          acc.postContentBlocks += curr.postContentBlocks;
-          return acc;
-        },
-        { posts: 0, postContentBlocks: 0 } as CountSubset
-      );
-    }
+    onSuccess: (countsList: number[]) => ({
+      posts: countsList.length,
+      postContentBlocks: _sum(countsList)
+    })
   });
 
   counts.details = {

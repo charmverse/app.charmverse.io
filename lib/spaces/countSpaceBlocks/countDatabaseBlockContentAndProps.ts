@@ -83,24 +83,20 @@ export async function countDatabaseBlockContentAndProps({ spaceId }: BlocksCount
         fields: true
       }
     },
-    reducer: _sum,
-    callback: (cards: Pick<Card, 'fields' | 'rootId'>[]) => {
-      return cards.reduce((acc, card) => {
-        const cardProps = Object.entries(card.fields.properties ?? {});
-        const cardPropCounts: number = cardProps.reduce((cardPropAcc, [propId, propValue]) => {
-          const matchingSchema = databaseSchemas[card.rootId]?.[propId];
-          if (
-            // Edge case for number type fields
-            (!propValue && propValue !== 0) ||
-            (Array.isArray(propValue) && !propValue.length) ||
-            !matchingSchema
-          ) {
-            return cardPropAcc;
-          }
-          return cardPropAcc + 1;
-        }, 0);
-
-        return acc + cardPropCounts;
+    onSuccess: _sum,
+    mapper: (card: Pick<Card, 'fields' | 'rootId'>) => {
+      const cardProps = Object.entries(card.fields.properties ?? {});
+      return cardProps.reduce((cardPropAcc, [propId, propValue]) => {
+        const matchingSchema = databaseSchemas[card.rootId]?.[propId];
+        if (
+          // Edge case for number type fields
+          (!propValue && propValue !== 0) ||
+          (Array.isArray(propValue) && !propValue.length) ||
+          !matchingSchema
+        ) {
+          return cardPropAcc;
+        }
+        return cardPropAcc + 1;
       }, 0);
     }
   });

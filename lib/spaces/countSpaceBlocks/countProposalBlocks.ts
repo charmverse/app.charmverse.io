@@ -81,19 +81,15 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
         fields: true
       }
     },
-    reducer: _sum,
-    callback: (proposals: Pick<Proposal, 'fields'>[]) => {
-      return proposals.reduce((acc, proposal) => {
-        const proposalProps = Object.entries((proposal.fields as CardFields)?.properties ?? {});
-        const proposalPropCounts: number = proposalProps.reduce((proposalPropAcc, [propId, propValue]) => {
-          const matchingSchema = proposalSchema[propId];
-          if ((!propValue && propValue !== 0) || (Array.isArray(propValue) && !propValue.length) || !matchingSchema) {
-            return proposalPropAcc;
-          }
-          return proposalPropAcc + 1;
-        }, 0);
-
-        return acc + proposalPropCounts;
+    onSuccess: _sum,
+    mapper: (proposal: Pick<Proposal, 'fields'>) => {
+      const proposalProps = Object.entries((proposal.fields as CardFields)?.properties ?? {});
+      return proposalProps.reduce((proposalPropAcc, [propId, propValue]) => {
+        const matchingSchema = proposalSchema[propId];
+        if ((!propValue && propValue !== 0) || (Array.isArray(propValue) && !propValue.length) || !matchingSchema) {
+          return proposalPropAcc;
+        }
+        return proposalPropAcc + 1;
       }, 0);
     }
   });

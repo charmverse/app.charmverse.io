@@ -47,21 +47,18 @@ export async function countMemberProperties({ spaceId }: BlocksCountQuery): Prom
         value: true
       }
     },
-    callback: (values: Pick<MemberPropertyValue, 'value' | 'id'>[]) => {
-      const valuesCount = values.reduce((acc, { value, id }) => {
-        try {
-          if ((!value && value !== 0) || (Array.isArray(value) && value.length === 0)) {
-            return acc;
-          }
-        } catch (err) {
-          log.error('Error evaluating member property value', { memberPropertyValueId: id });
-          return acc;
+    mapper: ({ value, id }: Pick<MemberPropertyValue, 'value' | 'id'>) => {
+      try {
+        if ((!value && value !== 0) || (Array.isArray(value) && value.length === 0)) {
+          return 0;
         }
-        return acc + 1;
-      }, 0);
-      return valuesCount;
+      } catch (err) {
+        log.error('Error evaluating member property value', { memberPropertyValueId: id });
+        return 0;
+      }
+      return 1;
     },
-    reducer: _sum
+    onSuccess: _sum
   });
 
   memberPropertyCounts.details.memberPropertyValues = memberPropertyValues;

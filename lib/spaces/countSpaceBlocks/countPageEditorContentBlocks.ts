@@ -1,4 +1,5 @@
 import type { Page } from '@charmverse/core/prisma';
+import _sum from 'lodash/sum';
 
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
@@ -9,25 +10,24 @@ export async function countPageEditorContentBlocks({
   spaceId,
   batchSize = defaultPaginatedPrismaTaskBatchSize
 }: BlocksCountQuery): Promise<number> {
-  const documentBlocks = (
-    await paginatedPrismaTask({
-      model: 'page',
-      batchSize,
-      queryOptions: {
-        where: {
-          spaceId,
-          deletedAt: null
-        },
-        select: {
-          id: true,
-          content: true
-        }
+  const documentBlocks = await paginatedPrismaTask({
+    model: 'page',
+    batchSize,
+    queryOptions: {
+      where: {
+        spaceId,
+        deletedAt: null
       },
-      callback: (pages: Pick<Page, 'content' | 'id'>[]) => {
-        return pages.map((page) => countBlocks(page.content, { pageId: page.id, spaceId })).reduce((a, b) => a + b, 0);
+      select: {
+        id: true,
+        content: true
       }
-    })
-  ).reduce((a, b) => a + b, 0);
+    },
+    onSuccess: _sum,
+    mapper: (page: Pick<Page, 'content' | 'id'>) => {
+      return countBlocks(page.content, { pageId: page.id, spaceId });
+    }
+  });
 
   return documentBlocks;
 }
