@@ -157,6 +157,14 @@ describe('countProposalBlocks', () => {
 
     // Assuming that a new space has no proposals, views, or categories
     const count = await countProposalBlocks({ spaceId: space.id });
-    expect(count.total).toBe(0);
+    expect(count).toMatchObject<ProposalBlocksCount>({
+      total: 0,
+      details: {
+        proposalViews: 0,
+        proposalProperties: 0,
+        proposalPropertyValues: 0,
+        proposalCategories: 0
+      }
+    });
   });
 });

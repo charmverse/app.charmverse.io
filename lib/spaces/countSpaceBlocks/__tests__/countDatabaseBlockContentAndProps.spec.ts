@@ -50,17 +50,15 @@ describe('countDatabaseBlockContentAndProps', () => {
     expect(count).toMatchObject<DatabaseBlocksCount>({
       total: 13,
       details: {
-        // 2 cards + 2 views + 1 database
         databaseViews: 2,
         databaseDescriptions: 0,
         databaseProperties: 7,
-        // 2 cards with 1 value each
         databaseRowPropValues: 4
       }
     });
   });
 
-  it('should count only the properties for which there is a value, and ignore values without a corresponding property', async () => {
+  it('should count only the properties and database descriptions for which there is a value, and ignore values without a corresponding property', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     const board = await generateBoard({
@@ -152,11 +150,9 @@ describe('countDatabaseBlockContentAndProps', () => {
     expect(count).toMatchObject<DatabaseBlocksCount>({
       total: 13,
       details: {
-        // 2 cards + 2 views + 1 database
         databaseViews: 2,
         databaseDescriptions: 0,
         databaseProperties: 7,
-        // 2 cards with 1 value each
         databaseRowPropValues: 4
       }
     });
@@ -167,6 +163,14 @@ describe('countDatabaseBlockContentAndProps', () => {
 
     // Assuming that a new space has no databases, views, or cards
     const count = await countDatabaseBlockContentAndProps({ spaceId: space.id });
-    expect(count.total).toBe(0);
+    expect(count).toMatchObject<DatabaseBlocksCount>({
+      total: 0,
+      details: {
+        databaseViews: 0,
+        databaseDescriptions: 0,
+        databaseProperties: 0,
+        databaseRowPropValues: 0
+      }
+    });
   });
 });

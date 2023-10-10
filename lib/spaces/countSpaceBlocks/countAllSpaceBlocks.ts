@@ -49,7 +49,13 @@ export async function countSpaceBlocks({
   const proposalBlocksCount = await countProposalBlocks({ spaceId, batchSize });
 
   const total =
-    commentsCount.total + forumCount.total + pageEditorContentCount + databaseBlockPropsCount.total + pagesCount.total;
+    commentsCount.total +
+    forumCount.total +
+    pageEditorContentCount +
+    databaseBlockPropsCount.total +
+    pagesCount.total +
+    memberPropertiesCount.total +
+    proposalBlocksCount.total;
 
   return {
     total,

@@ -1,5 +1,6 @@
 import type { Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import _sum from 'lodash/sum';
 
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
@@ -74,6 +75,8 @@ export async function countForumBlocks({
     ...counts.details,
     ...postsAndContentCount
   };
+
+  counts.total = _sum(Object.values(counts.details));
 
   return counts;
 }

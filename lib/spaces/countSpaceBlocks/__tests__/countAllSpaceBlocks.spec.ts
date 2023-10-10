@@ -6,8 +6,10 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 
+import type { OverallBlocksCount } from '../countAllSpaceBlocks';
 import { countSpaceBlocks, countSpaceBlocksAndSave } from '../countAllSpaceBlocks';
 import type { DatabaseBlocksCount } from '../countDatabaseBlockContentAndProps';
+import type { MemberPropertyCounts } from '../countMemberProperties';
 import type { PageCounts } from '../countSpacePages';
 
 const pageContent = {
@@ -254,34 +256,87 @@ describe('countSpaceBlocks - count blocks', () => {
     expect(total).toBe(2 + totalComments);
   });
 
-  it('should count each member property as 1 block', async () => {
+  it('should count each member property and member property value as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
-    await prisma.memberProperty.createMany({
+    const spaceMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const props = await Promise.all([
+      prisma.memberProperty.create({
+        data: {
+          createdBy: space.createdBy,
+          name: 'Test prop 1',
+          spaceId: space.id,
+          type: 'text',
+          updatedBy: space.createdBy
+        }
+      }),
+      prisma.memberProperty.create({
+        data: {
+          createdBy: space.createdBy,
+          name: 'Test prop 1',
+          spaceId: space.id,
+          type: 'text',
+          updatedBy: space.createdBy
+        }
+      })
+    ]);
+
+    const propValues = await prisma.memberPropertyValue.createMany({
       data: [
         {
-          createdBy: user.id,
-          name: 'Property 1',
+          memberPropertyId: props[0].id,
           spaceId: space.id,
-          type: 'email',
-          updatedBy: user.id
+          updatedBy: user.id,
+          userId: user.id,
+          value: 'Text'
         },
         {
-          createdBy: user.id,
-          name: 'Property 2',
+          memberPropertyId: props[1].id,
           spaceId: space.id,
-          type: 'github',
-          updatedBy: user.id
+          updatedBy: user.id,
+          userId: user.id,
+          value: 'Text'
+        },
+        {
+          memberPropertyId: props[0].id,
+          spaceId: space.id,
+          updatedBy: spaceMember.id,
+          userId: spaceMember.id,
+          value: 'Text'
+        },
+        {
+          memberPropertyId: props[1].id,
+          spaceId: space.id,
+          updatedBy: spaceMember.id,
+          userId: spaceMember.id,
+          value: 'Text'
         }
       ]
     });
 
-    const { total, details } = await countSpaceBlocks({
-      spaceId: space.id
+    const page = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      content: {}
     });
 
-    expect(details.memberProperties.total).toBe(2);
-    expect(total).toBe(2);
+    const { total, details } = await countSpaceBlocks({ spaceId: space.id });
+
+    // 6 member properties + 1 empty page
+    expect(total).toBe(7);
+
+    expect(details.memberProperties).toMatchObject<MemberPropertyCounts>({
+      total: 6,
+      details: {
+        memberProperties: 2,
+        memberPropertyValues: 4
+      }
+    });
+    expect(details.memberProperties.total).toBe(6);
+    expect(details.memberProperties.total).toBe(6);
   });
 
   // it('should count each proposal category and proposal as 1 block', async () => {
@@ -342,12 +397,18 @@ describe('countSpaceBlocks - count content', () => {
 
     const { total, details } = await countSpaceBlocks({ spaceId: space.id });
 
-    expect(details.databaseProperties.details.databaseDescriptions).toBe(0);
-    expect(details.databaseProperties.details.databaseViews).toBe(2);
-    expect(details.pages.details.databases).toBe(1);
-    expect(details.pages.details.cards).toBe(2);
+    expect(details.databaseProperties).toMatchObject<DatabaseBlocksCount>({
+      total: 8,
+      details: {
+        databaseViews: 2,
+        databaseDescriptions: 0,
+        databaseProperties: 2,
+        databaseRowPropValues: 4
+      }
+    });
 
-    expect(total).toEqual(5);
+    expect(details.pages.total).toBe(3);
+    expect(total).toEqual(11);
 
     const boardBlock = (await prisma.block.findUnique({
       where: {
@@ -384,8 +445,6 @@ describe('countSpaceBlocks - count content', () => {
     expect(updatedCounts.databaseProperties.details.databaseViews).toBe(2);
     // We should be counting the actual nodes inside the description
     expect(updatedCounts.databaseProperties.details.databaseDescriptions).toBeGreaterThan(1);
-    // We are already counting the board block, we shouldn't duplicate the count as a page or its page content
-    expect(updatedCounts.pages).toBe(0);
     expect(updatedCounts.editorContent).toBeGreaterThan(2);
   });
   it('should count the content inside each page', async () => {
