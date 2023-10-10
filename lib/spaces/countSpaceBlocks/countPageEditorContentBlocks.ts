@@ -15,7 +15,8 @@ export async function countPageEditorContentBlocks({
       batchSize,
       queryOptions: {
         where: {
-          spaceId
+          spaceId,
+          deletedAt: null
         },
         select: {
           id: true,

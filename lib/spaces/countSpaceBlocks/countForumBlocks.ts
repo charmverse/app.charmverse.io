@@ -40,7 +40,8 @@ export async function countForumBlocks({
     batchSize,
     queryOptions: {
       where: {
-        spaceId
+        spaceId,
+        deletedAt: null
       },
       select: {
         id: true,
