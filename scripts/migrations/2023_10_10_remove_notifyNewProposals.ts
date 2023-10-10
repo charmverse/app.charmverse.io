@@ -4,9 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 async function migrateSpaces() {
   const r = await prisma.space.updateMany({
     where: {
-      notifyNewProposals: {
-        not: null
-      }
+      notifyNewProposals: null
     },
     data: {
       notificationToggles: {
