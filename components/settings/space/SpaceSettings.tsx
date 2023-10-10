@@ -146,7 +146,6 @@ export function SpaceSettings({
     await updateSpace({
       id: space.id,
       notificationToggles: notificationToggles as Prisma.InputJsonValue,
-      notifyNewProposals: null,
       features,
       memberProfiles,
       name: values.name,
@@ -540,11 +539,6 @@ function getProfileWidgetLogo(name: MemberProfileName) {
 
 function _getFormValues(space: Space): FormValues {
   const notificationToggles = { ...(space.notificationToggles as any) } as NotificationToggles;
-  // convert deprecated proposals notification preference
-  if (typeof notificationToggles.proposals__start_discussion === 'undefined' && !space.notifyNewProposals) {
-    notificationToggles.proposals__start_discussion = false;
-    notificationToggles.proposals__vote = false;
-  }
   // set all notifications to true by default. TODO: find a programmatic way to do this?
   notificationToggles.proposals ??= true;
   notificationToggles.polls ??= true;
