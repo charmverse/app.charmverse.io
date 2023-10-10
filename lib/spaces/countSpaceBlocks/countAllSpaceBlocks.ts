@@ -12,6 +12,7 @@ import type { ForumBlocksCount } from './countForumBlocks';
 import { countForumBlocks } from './countForumBlocks';
 import { countMemberProperties, type MemberPropertyCounts } from './countMemberProperties';
 import { countPageEditorContentBlocks } from './countPageEditorContentBlocks';
+import { countProposalBlocks, type ProposalBlocksCount } from './countProposalBlocks';
 import type { PageCounts } from './countSpacePages';
 import { countSpacePages } from './countSpacePages';
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
@@ -25,6 +26,7 @@ type SpaceBlockDetails = {
   pages: PageCounts;
   databaseProperties: DatabaseBlocksCount;
   memberProperties: MemberPropertyCounts;
+  proposals: ProposalBlocksCount;
 };
 
 export type OverallBlocksCount = GenericBlocksCount<SpaceBlockDetails>;
@@ -44,6 +46,7 @@ export async function countSpaceBlocks({
   const databaseBlockPropsCount = await countDatabaseBlockContentAndProps({ spaceId, batchSize });
   const pagesCount = await countSpacePages({ spaceId, batchSize });
   const memberPropertiesCount = await countMemberProperties({ spaceId, batchSize });
+  const proposalBlocksCount = await countProposalBlocks({ spaceId, batchSize });
 
   const total =
     commentsCount.total + forumCount.total + pageEditorContentCount + databaseBlockPropsCount.total + pagesCount.total;
@@ -56,7 +59,8 @@ export async function countSpaceBlocks({
       editorContent: pageEditorContentCount,
       pages: pagesCount,
       databaseProperties: databaseBlockPropsCount,
-      memberProperties: memberPropertiesCount
+      memberProperties: memberPropertiesCount,
+      proposals: proposalBlocksCount
     }
   };
 }

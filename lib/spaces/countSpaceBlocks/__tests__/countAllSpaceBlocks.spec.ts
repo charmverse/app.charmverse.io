@@ -7,6 +7,8 @@ import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 
 import { countSpaceBlocks, countSpaceBlocksAndSave } from '../countAllSpaceBlocks';
+import type { DatabaseBlocksCount } from '../countDatabaseBlockContentAndProps';
+import type { PageCounts } from '../countSpacePages';
 
 const pageContent = {
   ...emptyDocument,
@@ -90,13 +92,29 @@ describe('countSpaceBlocks - count blocks', () => {
       }
     });
 
-    const { total, details } = await countSpaceBlocks({ spaceId: space.id });
+    const { details, total } = await countSpaceBlocks({ spaceId: space.id });
+    expect(details.databaseProperties).toMatchObject<DatabaseBlocksCount>({
+      total: 11,
+      details: {
+        databaseDescriptions: 0,
+        databaseProperties: 7,
+        databaseViews: 2,
+        databaseRowPropValues: 2
+      }
+    });
 
-    expect(details.pages.details.databases).toBe(1);
-    expect(details.databaseProperties.details.databaseViews).toBe(2);
-    expect(details.pages.details.cards).toBe(2);
+    expect(details.pages).toMatchObject<PageCounts>({
+      total: 3,
+      details: {
+        cards: 2,
+        databases: 1,
+        documents: 0,
+        proposals: 0,
+        rewards: 0
+      }
+    });
 
-    expect(total).toEqual(5);
+    expect(total).toEqual(14);
   });
 
   it('should count each document page as 1 block', async () => {
