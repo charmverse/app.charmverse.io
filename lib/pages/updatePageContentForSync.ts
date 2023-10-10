@@ -8,7 +8,6 @@ import { replaceStep } from 'prosemirror-transform';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { writeToSameFolder } from 'lib/utilities/file';
 import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 export function recurseDocument(content: PageContent, cb: (node: PageContent) => void) {
@@ -118,15 +117,17 @@ export async function updatePageContentForSync(
           from: doc.content.size,
           stepType: 'replace',
           slice: {
-            content: childPagesNotInDocument.map((childPage) => ({
-              type: 'page',
-              attrs: {
-                id: childPage.id,
-                path: childPage.path,
-                type: childPage.type,
-                track: []
-              }
-            }))
+            content: childPagesNotInDocument
+              .sort((page1, page2) => (page1.id > page2.id ? 1 : -1))
+              .map((childPage) => ({
+                type: 'page',
+                attrs: {
+                  id: childPage.id,
+                  path: childPage.path,
+                  type: childPage.type,
+                  track: []
+                }
+              }))
           },
           to: doc.content.size
         };

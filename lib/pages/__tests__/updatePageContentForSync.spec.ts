@@ -165,26 +165,17 @@ describe('updatePageContentForSync', () => {
               to: 55,
               from: 55,
               slice: {
-                content: [
-                  {
+                content: [childPage2, childPage3]
+                  .sort((page1, page2) => (page1.id > page2.id ? 1 : -1))
+                  .map((childPage) => ({
                     type: 'page',
                     attrs: {
-                      id: childPage2.id,
-                      path: childPage2.path,
+                      id: childPage.id,
+                      path: childPage.path,
                       type: 'page',
                       track: []
                     }
-                  },
-                  {
-                    type: 'page',
-                    attrs: {
-                      id: childPage3.id,
-                      path: childPage3.path,
-                      type: 'page',
-                      track: []
-                    }
-                  }
-                ]
+                  }))
               },
               stepType: 'replace'
             }
