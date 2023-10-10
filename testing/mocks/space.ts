@@ -18,6 +18,7 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     customDomain: null,
     discordServerId: null,
     defaultVotingDuration: null,
+    notificationToggles: {},
     origin: null,
     paidTier: 'community',
     snapshotDomain: null,

@@ -35,7 +35,7 @@ const StyledBox = styled(Box)`
 function MemberDirectoryGalleryCard({ member }: { member: Member }) {
   const { getDisplayProperties } = useMemberProperties();
   const { formatDate } = useDateFormatter();
-  const { onClick: openSettings } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
   const visibleProperties = getDisplayProperties('gallery');
   const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
     record[prop.type] = prop;

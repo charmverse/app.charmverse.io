@@ -38,7 +38,7 @@ function InputSearchRoleBase({
   ...props
 }: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
   const { roles } = useRoles();
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
   const defaultRole =
     typeof defaultValue === 'string'
       ? roles?.find((role) => {
@@ -54,7 +54,7 @@ function InputSearchRoleBase({
     return (
       <Alert severity='info'>
         There are no roles in this space. Space admins can create roles in{' '}
-        <Link href='#' onClick={() => onClick(`roles`)}>
+        <Link href='#' onClick={() => openSettings(`roles`)}>
           Space Settings
         </Link>
         .

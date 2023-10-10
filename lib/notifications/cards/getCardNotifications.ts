@@ -1,11 +1,11 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BountyNotification } from './interfaces';
-import { notificationMetadataSelectStatement } from './utils';
+import type { CardNotification } from '../interfaces';
+import { notificationMetadataSelectStatement } from '../utils';
 
-export async function getBountyNotifications(userId: string): Promise<BountyNotification[]> {
-  const bountyNotifications = await prisma.bountyNotification.findMany({
+export async function getCardNotifications(userId: string): Promise<CardNotification[]> {
+  const cardNotifications = await prisma.cardNotification.findMany({
     where: {
       notificationMetadata: {
         userId
@@ -14,13 +14,12 @@ export async function getBountyNotifications(userId: string): Promise<BountyNoti
     select: {
       id: true,
       type: true,
-      applicationId: true,
-      bounty: {
-        select: {
-          status: true,
+      personPropertyId: true,
+      card: {
+        include: {
           page: {
             select: {
-              id: true,
+              bountyId: true,
               path: true,
               type: true,
               title: true
@@ -34,12 +33,11 @@ export async function getBountyNotifications(userId: string): Promise<BountyNoti
     }
   });
 
-  return bountyNotifications.map((notification) => {
+  return cardNotifications.map((notification) => {
     const notificationMetadata = notification.notificationMetadata;
-    const page = notification.bounty.page as Page;
-    const bountyNotification = {
+    const page = notification.card.page as Page;
+    const cardNotification = {
       id: notification.id,
-      applicationId: notification.applicationId,
       createdAt: notificationMetadata.createdAt.toISOString(),
       createdBy: notificationMetadata.author,
       pageId: page.id,
@@ -48,13 +46,15 @@ export async function getBountyNotifications(userId: string): Promise<BountyNoti
       spaceDomain: notificationMetadata.space.domain,
       spaceId: notificationMetadata.spaceId,
       spaceName: notificationMetadata.space.name,
-      status: notification.bounty.status,
+      pageType: page.type,
+      text: '',
       type: notification.type,
+      personPropertyId: notification.personPropertyId,
       archived: !!notificationMetadata.archivedAt,
       read: !!notificationMetadata.seenAt,
-      group: 'bounty'
-    } as BountyNotification;
+      group: 'card'
+    } as CardNotification;
 
-    return bountyNotification;
+    return cardNotification;
   });
 }

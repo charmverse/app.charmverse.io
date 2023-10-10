@@ -10,7 +10,7 @@ import { useUser } from './useUser';
 /**
  * @memberSpaces - Subset of spaces where user is not a guest (ie. they are normal member or admin)
  */
-type IContext = {
+export type IContext = {
   spaces: Space[];
   memberSpaces: Space[];
   setSpace: (space: Space) => void;

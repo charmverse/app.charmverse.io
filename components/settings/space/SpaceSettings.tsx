@@ -2,10 +2,8 @@ import type { Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
-  FormControlLabel,
   Grid,
   Stack,
-  Switch,
   Typography,
   TextField,
   FormHelperText,
@@ -21,7 +19,7 @@ import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
@@ -41,19 +39,27 @@ import { SpaceIntegrations } from 'components/settings/space/components/SpaceInt
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaces } from 'hooks/useSpaces';
+import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 
 import Avatar from './components/LargeAvatar';
+import { NotificationTogglesInput } from './components/NotificationToggles';
 import SettingsItem from './components/SettingsItem';
 
-const schema = yup.object({
+export type FormValues = {
+  name: string;
+  spaceImage?: string | null;
+  domain: string;
+  notificationToggles: NotificationToggles;
+};
+
+const schema: yup.SchemaOf<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(true),
-  notifyNewProposals: yup.boolean(),
+  notificationToggles: yup.object(),
   domain: yup
     .string()
     .ensure()
@@ -63,13 +69,16 @@ const schema = yup.object({
     .matches(/^\S*$/, 'Space is not allowed')
 });
 
-type FormValues = yup.InferType<typeof schema>;
-
-export function SpaceSettings({ space }: { space: Space }) {
+export function SpaceSettings({
+  space,
+  setUnsavedChanges
+}: {
+  space: Space;
+  setUnsavedChanges: (value: boolean) => void;
+}) {
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
-  const { handleUnsavedChanges } = useSettingsDialog();
   const { features: allFeatures, memberProfiles: allMemberProfiles } = useFeaturesAndMembers();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
@@ -107,7 +116,7 @@ export function SpaceSettings({ space }: { space: Space }) {
     isMutating
   } = useSWRMutation(
     `/spaces/${space.id}`,
-    (_url, { arg }: Readonly<{ arg: Partial<Prisma.SpaceUpdateInput> }>) => charmClient.spaces.updateSpace(arg),
+    (_url, { arg }: Readonly<{ arg: Prisma.SpaceUpdateInput }>) => charmClient.spaces.updateSpace(arg),
     {
       onSuccess: (updatedSpace) => {
         setSpace(updatedSpace);
@@ -124,23 +133,22 @@ export function SpaceSettings({ space }: { space: Space }) {
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
 
-    const updatedFeatures = isEqual(features, space.features) ? undefined : features;
-    const updatedProfiles = isEqual(memberProfiles, space.memberProfiles) ? undefined : memberProfiles;
-
-    let notifyNewProposals: Date | null | undefined;
-    if (!values.notifyNewProposals) {
-      notifyNewProposals = null;
-    } else if (!space.notifyNewProposals) {
-      notifyNewProposals = new Date();
+    // remove 'true' values from notificationToggles
+    const notificationToggles = { ...values.notificationToggles };
+    for (const key in notificationToggles) {
+      if (notificationToggles[key as NotificationToggleOption] !== false) {
+        delete notificationToggles[key as NotificationToggleOption];
+      }
     }
 
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
     await updateSpace({
       id: space.id,
-      notifyNewProposals,
-      features: updatedFeatures,
-      memberProfiles: updatedProfiles,
+      notificationToggles: notificationToggles as Prisma.InputJsonValue,
+      notifyNewProposals: null,
+      features,
+      memberProfiles,
       name: values.name,
       domain: values.domain,
       spaceImage: values.spaceImage
@@ -186,14 +194,14 @@ export function SpaceSettings({ space }: { space: Space }) {
   }
 
   const dataChanged = useMemo(() => {
-    return !isEqual(space.features, features) || !isEqual(space.memberProfiles, memberProfiles) || isDirty;
-  }, [space.features, space.memberProfiles, features, memberProfiles, isDirty]);
+    return !isEqual(allFeatures, features) || !isEqual(allMemberProfiles, memberProfiles) || isDirty;
+  }, [allFeatures, features, allMemberProfiles, memberProfiles, isDirty]);
 
   useEffect(() => {
-    handleUnsavedChanges(dataChanged);
+    setUnsavedChanges(dataChanged);
 
     return () => {
-      handleUnsavedChanges(false);
+      setUnsavedChanges(false);
     };
   }, [dataChanged]);
 
@@ -248,33 +256,15 @@ export function SpaceSettings({ space }: { space: Space }) {
           <Grid item>
             <FieldLabel>Notifications</FieldLabel>
             <Typography variant='caption' mb={1} component='p'>
-              Control space-wide notifications for your members.
+              Control notifications for your members.
             </Typography>
-            <Stack>
-              <Controller
-                control={control}
-                name='notifyNewProposals'
-                render={({ field: { onChange, value } }) => {
-                  return (
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          disabled={!isAdmin}
-                          checked={value}
-                          onChange={(event, val) => {
-                            if (val) {
-                              setValue(`notifyNewProposals`, val);
-                            }
-                            return onChange(val);
-                          }}
-                        />
-                      }
-                      label='Send notifications for new proposals'
-                    />
-                  );
-                }}
-              />
-            </Stack>
+            <NotificationTogglesInput
+              control={control}
+              isAdmin={isAdmin}
+              register={register}
+              watch={watch}
+              setValue={setValue}
+            />
           </Grid>
           <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>
@@ -531,16 +521,6 @@ export function SpaceSettings({ space }: { space: Space }) {
     </>
   );
 }
-
-function _getFormValues(space: Space): FormValues {
-  return {
-    name: space.name,
-    spaceImage: space.spaceImage,
-    domain: space.domain,
-    notifyNewProposals: !!space.notifyNewProposals
-  };
-}
-
 function getProfileWidgetLogo(name: MemberProfileName) {
   switch (name) {
     case 'charmverse':
@@ -556,4 +536,25 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     default:
       return '';
   }
+}
+
+function _getFormValues(space: Space): FormValues {
+  const notificationToggles = { ...(space.notificationToggles as any) } as NotificationToggles;
+  // convert deprecated proposals notification preference
+  if (typeof notificationToggles.proposals__start_discussion === 'undefined' && !space.notifyNewProposals) {
+    notificationToggles.proposals__start_discussion = false;
+    notificationToggles.proposals__vote = false;
+  }
+  // set all notifications to true by default. TODO: find a programmatic way to do this?
+  notificationToggles.proposals ??= true;
+  notificationToggles.polls ??= true;
+  notificationToggles.rewards ??= true;
+  notificationToggles.proposals__start_discussion ??= true;
+  notificationToggles.proposals__vote ??= true;
+  return {
+    name: space.name,
+    spaceImage: space.spaceImage,
+    domain: space.domain,
+    notificationToggles
+  };
 }

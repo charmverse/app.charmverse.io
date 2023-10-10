@@ -1,7 +1,9 @@
 import { Paper } from '@mui/material';
+import { rest } from 'msw';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 
+import MemberDirectoryComponent from 'components/members/MemberDirectoryPage';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
@@ -9,9 +11,7 @@ import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { UserProvider } from 'hooks/useUser';
 
-import { spaces } from '../lib/mockData';
-
-import { MemberDirectoryPageStory } from './MemberDirectoryPageStory';
+import { spaces, memberProperties } from '../lib/mockData';
 
 const space = spaces[0];
 
@@ -40,12 +40,20 @@ function Context({ children }: { children: ReactNode }) {
 export function MemberDirectoryPage() {
   return (
     <Context>
-      <MemberDirectoryPageStory />
+      <MemberDirectoryComponent title='Member Directory' />
     </Context>
   );
 }
 
-MemberDirectoryPage.parameters = MemberDirectoryPageStory.parameters;
+MemberDirectoryPage.parameters = {
+  msw: {
+    handlers: {
+      getMemberProperties: rest.get('/api/spaces/:spaceId/members/properties', (req, res, ctx) => {
+        return res(ctx.json(memberProperties));
+      })
+    }
+  }
+};
 
 export default {
   title: 'Members/Views',
