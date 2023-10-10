@@ -157,14 +157,6 @@ export async function createProposalNotifications(
           continue;
         }
 
-        if (toggles?.proposals__start_discussion === false && action === 'start_discussion') {
-          continue;
-        }
-
-        if (toggles?.proposals__vote === false && action === 'vote') {
-          continue;
-        }
-
         await createProposalNotification({
           createdBy: userId,
           proposalId,
