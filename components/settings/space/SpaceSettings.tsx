@@ -146,6 +146,7 @@ export function SpaceSettings({
     await updateSpace({
       id: space.id,
       notificationToggles: notificationToggles as Prisma.InputJsonValue,
+      notifyNewProposals: null,
       features,
       memberProfiles,
       name: values.name,
