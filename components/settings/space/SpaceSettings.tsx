@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -107,7 +107,7 @@ export function SpaceSettings({ space }: { space: Space }) {
     isMutating
   } = useSWRMutation(
     `/spaces/${space.id}`,
-    (_url, { arg }: Readonly<{ arg: Partial<Space> }>) => charmClient.spaces.updateSpace(arg),
+    (_url, { arg }: Readonly<{ arg: Partial<Prisma.SpaceUpdateInput> }>) => charmClient.spaces.updateSpace(arg),
     {
       onSuccess: (updatedSpace) => {
         setSpace(updatedSpace);
