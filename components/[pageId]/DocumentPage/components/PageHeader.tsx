@@ -5,7 +5,7 @@ import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItemButton, Menu, Stack } from '@mui/material';
+import { ClickAwayListener, ListItemButton, Menu, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -161,22 +161,23 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
           </div>
         )}
         {subMenuAnchorEl && (
-          <div>
-            <Menu
-              anchorEl={subMenuAnchorEl}
-              open={Boolean(subMenuAnchorEl)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            >
-              <CustomEmojiPicker
-                onUpdate={(emoji) => {
-                  setSubMenuAnchorEl(null);
-                  closeMenu();
-                  updatePageIcon(emoji);
-                }}
-              />
-            </Menu>
-          </div>
+          <Menu
+            anchorEl={subMenuAnchorEl}
+            open={Boolean(subMenuAnchorEl)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            onClick={() => {
+              setSubMenuAnchorEl(null);
+            }}
+          >
+            <CustomEmojiPicker
+              onUpdate={(emoji) => {
+                setSubMenuAnchorEl(null);
+                closeMenu();
+                updatePageIcon(emoji);
+              }}
+            />
+          </Menu>
         )}
         <Controls className='page-controls'>
           {!readOnly && !icon && (
