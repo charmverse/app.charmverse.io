@@ -398,6 +398,16 @@ export function NotificationsPopover({
   );
 }
 
+const ContextBorder = styled.div`
+  width: 3px;
+  border-radius: 3px;
+  margin-left: 2px;
+  margin-right: 8px;
+  background: rgba(255, 212, 0, 0.8);
+  flex-shrink: 0;
+  padding-bottom: 2px;
+`;
+
 export function NotificationContent({
   notification,
   markNotifications,
@@ -411,6 +421,7 @@ export function NotificationContent({
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
+  const notificationText = notification.group === 'document' ? notification.text : null;
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
   const todaysDate = new Date();
@@ -518,6 +529,22 @@ export function NotificationContent({
             <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
               {spaceName}
             </Typography>
+            {notificationText && (
+              <Box my={1} display='flex'>
+                <ContextBorder />
+                <Typography
+                  sx={{
+                    wordBreak: 'break-all',
+                    textAlign: 'justify'
+                  }}
+                  fontSize={14}
+                  fontWeight={600}
+                  color='secondary'
+                >
+                  {notificationText}
+                </Typography>
+              </Box>
+            )}
             {archived && (
               <Button
                 sx={{

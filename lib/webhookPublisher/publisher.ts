@@ -3,6 +3,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
+import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;
@@ -65,7 +66,16 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
     }
 
     // Add the message to the queue
-    await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+    if (event.scope === 'document.mention.created') {
+      setTimeout(() => {
+        addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+        createNotificationsFromEvent(webhookPayload);
+      }, 5000);
+    } else {
+      await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+      await createNotificationsFromEvent(webhookPayload);
+    }
+
     log.debug(`Sent webhook event to SQS: "${event.scope}"`, {
       spaceId,
       queueUrl: SQS_QUEUE_NAME,

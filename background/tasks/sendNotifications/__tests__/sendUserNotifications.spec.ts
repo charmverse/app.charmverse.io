@@ -24,7 +24,8 @@ describe('sendNotification()', () => {
       spaceId: space.id,
       type: 'mention.created',
       mentionId: v4(),
-      userId: user.id
+      userId: user.id,
+      text: 'Test'
     });
 
     const notificationsNo = await sendUserNotifications();
@@ -49,7 +50,8 @@ describe('sendNotification()', () => {
       spaceId: space.id,
       type: 'mention.created',
       mentionId: v4(),
-      userId: user.id
+      userId: user.id,
+      text: 'Test'
     });
 
     await updateUserProfile(user.id, { emailNotifications: false });

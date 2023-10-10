@@ -1,5 +1,6 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
+import { DOMParser, DOMSerializer } from 'prosemirror-model';
 
 import { getBountyReviewerIds } from 'lib/bounties/getBountyReviewerIds';
 import { getPostCategoriesUsersRecord } from 'lib/forums/categories/getPostCategoriesUsersRecord';
@@ -21,6 +22,26 @@ import {
   createVoteNotification
 } from './createNotification';
 
+function convertDocumentToText(content: PageContent) {
+  let text = '';
+
+  function recurse(node: PageContent) {
+    if (node.content) {
+      node.content.forEach((childNode) => {
+        recurse(childNode);
+      });
+    }
+
+    if (node.text) {
+      text += node.text;
+    }
+  }
+
+  recurse(content);
+
+  return text;
+}
+
 export async function createNotificationsFromEvent(webhookData: {
   createdAt: string;
   event: WebhookEvent;
@@ -30,15 +51,31 @@ export async function createNotificationsFromEvent(webhookData: {
     case WebhookEventNames.DocumentMentionCreated: {
       const mentionedUserId = webhookData.event.mention.value;
       const mentionAuthorId = webhookData.event.user.id;
+      const mentionId = webhookData.event.mention.id;
+      const documentId = webhookData.event.document.id;
 
-      if (mentionedUserId !== mentionAuthorId) {
+      const document = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: documentId
+        },
+        select: {
+          content: true
+        }
+      });
+
+      const documentContent = document.content as PageContent;
+      const extractedMentions = extractMentions(documentContent);
+      const targetMention = extractedMentions.find((mention) => mention.id === mentionId);
+
+      if (mentionedUserId !== mentionAuthorId && targetMention) {
         await createDocumentNotification({
           type: 'mention.created',
           createdBy: mentionAuthorId,
           mentionId: webhookData.event.mention.id,
           pageId: webhookData.event.document.id,
           spaceId: webhookData.spaceId,
-          userId: mentionedUserId
+          userId: mentionedUserId,
+          text: targetMention.text
         });
       }
 
@@ -75,6 +112,8 @@ export async function createNotificationsFromEvent(webhookData: {
           userId: true
         }
       });
+      const inlineCommentText = convertDocumentToText(inlineComment.content as PageContent);
+
       const authorIds = data.document.authors.map((author) => author.id);
       const pageId = data.document.id;
       if (
@@ -88,7 +127,8 @@ export async function createNotificationsFromEvent(webhookData: {
           inlineCommentId,
           pageId,
           spaceId,
-          userId: previousInlineComment.userId
+          userId: previousInlineComment.userId,
+          text: inlineCommentText
         });
       }
 
@@ -100,7 +140,8 @@ export async function createNotificationsFromEvent(webhookData: {
             inlineCommentId,
             pageId,
             spaceId,
-            userId: authorId
+            userId: authorId,
+            text: inlineCommentText
           });
         }
       }
@@ -116,7 +157,8 @@ export async function createNotificationsFromEvent(webhookData: {
             mentionId: extractedMention.id,
             pageId,
             spaceId,
-            userId: mentionedUserId
+            userId: mentionedUserId,
+            text: extractedMention.text
           });
         }
       }
@@ -140,7 +182,8 @@ export async function createNotificationsFromEvent(webhookData: {
             },
             select: {
               parentId: true,
-              content: true
+              content: true,
+              contentText: true
             }
           })
         : await prisma.pageComment.findFirstOrThrow({
@@ -149,7 +192,8 @@ export async function createNotificationsFromEvent(webhookData: {
             },
             select: {
               parentId: true,
-              content: true
+              content: true,
+              contentText: true
             }
           });
 
@@ -166,7 +210,8 @@ export async function createNotificationsFromEvent(webhookData: {
               spaceId,
               pageCommentId: documentId ? commentId : undefined,
               postCommentId: postId ? commentId : undefined,
-              userId: authorId
+              userId: authorId,
+              text: comment.contentText
             });
           }
         }
@@ -200,7 +245,8 @@ export async function createNotificationsFromEvent(webhookData: {
             spaceId,
             pageCommentId: documentId ? commentId : undefined,
             postCommentId: postId ? commentId : undefined,
-            userId: parentCommentAuthorId
+            userId: parentCommentAuthorId,
+            text: comment.contentText
           });
         }
       }
@@ -220,7 +266,8 @@ export async function createNotificationsFromEvent(webhookData: {
           pageCommentId: documentId ? commentId : undefined,
           postCommentId: postId ? commentId : undefined,
           spaceId,
-          userId: mentionedUserId
+          userId: mentionedUserId,
+          text: extractedMention.text
         });
       }
 
@@ -278,7 +325,8 @@ export async function createNotificationsFromEvent(webhookData: {
               postId,
               spaceId,
               userId: userMention.value,
-              type: 'mention.created'
+              type: 'mention.created',
+              text: userMention.text
             });
           }
         }

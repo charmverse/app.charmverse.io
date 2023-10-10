@@ -6,7 +6,6 @@ import type {
   CommentNotification,
   DocumentNotificationType,
   InlineCommentNotification,
-  InlineCommentNotificationType,
   MentionNotification,
   PostNotificationType,
   ProposalNotificationType,
@@ -98,6 +97,7 @@ type CreateDocumentNotificationInput = {
   postCommentId?: string;
   pageCommentId?: string;
   type: DocumentNotificationType;
+  text: string;
 } & (CommentNotification | MentionNotification | InlineCommentNotification);
 
 export async function createDocumentNotification({
@@ -108,6 +108,7 @@ export async function createDocumentNotification({
   spaceId,
   postId,
   userId,
+  text,
   type,
   pageCommentId,
   postCommentId
@@ -126,6 +127,7 @@ export async function createDocumentNotification({
           userId
         }
       },
+      text,
       inlineComment: inlineCommentId
         ? {
             connect: {
