@@ -83,9 +83,8 @@ export async function createProposalNotifications(
       });
 
       const notificationToggles = space.notificationToggles as NotificationToggles;
-      const notifyNewProposals =
-        Boolean(space.notifyNewProposals) || notificationToggles.proposals__start_discussion !== false;
-      const notifyNewVotes = Boolean(space.notifyNewProposals) || notificationToggles.proposals__vote !== false;
+      const notifyNewProposals = notificationToggles.proposals__start_discussion !== false;
+      const notifyNewVotes = notificationToggles.proposals__vote !== false;
 
       const spaceRoles = await prisma.spaceRole.findMany({
         where: {
