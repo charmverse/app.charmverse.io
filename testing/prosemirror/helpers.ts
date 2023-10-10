@@ -8,5 +8,5 @@ export function setSelectionNear(view: EditorView, pos: number) {
 }
 
 export function expectNodesAreEqual(a: Node, b: Node) {
-  expect(JSON.stringify(a.toJSON(), null, 2)).toEqual(JSON.stringify(b.toJSON(), null, 2));
+  expect(a.toString()).toEqual(b.toString());
 }
