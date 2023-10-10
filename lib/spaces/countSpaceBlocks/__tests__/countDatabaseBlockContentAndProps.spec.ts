@@ -28,7 +28,7 @@ describe('countDatabaseBlockContentAndProps', () => {
     urlSchema
   ];
 
-  it('should count each database view, comment and valid properties and values as 1 block', async () => {
+  it('should count each database view and valid properties and values as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     const board = await generateBoard({
