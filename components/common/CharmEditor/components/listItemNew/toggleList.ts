@@ -712,6 +712,7 @@ export function joinToPreviousListItem(type?: NodeType): Command {
     const isGapCursorShown = state.selection instanceof GapCursorSelection;
     const $cutPos = isGapCursorShown ? state.doc.resolve($from.pos + 1) : $from;
     const $cut = findCutBefore($cutPos);
+
     if (!$cut) {
       return false;
     }
@@ -751,18 +752,6 @@ export function joinToPreviousListItem(type?: NodeType): Command {
               true
             )
           );
-        }
-
-        // find out if there's now another list following and join them
-        // as in, [list, p, list] => [list with p, list], and we want [joined list]
-        const $postCut = tr.doc.resolve(tr.mapping.map($cut.pos + $cut.nodeAfter.nodeSize));
-        if (
-          $postCut.nodeBefore &&
-          $postCut.nodeAfter &&
-          $postCut.nodeBefore.type === $postCut.nodeAfter.type &&
-          [bulletList, orderedList].indexOf($postCut.nodeBefore.type) > -1
-        ) {
-          tr = tr.join($postCut.pos);
         }
 
         if (dispatch) {
