@@ -20,7 +20,7 @@ const supportedChains = RPCList.map((rpc) => wagmiChainList.find((ch) => ch.id =
 
 const { chains, publicClient } = configureChains(supportedChains, [publicProvider()]);
 
-export const injectedConnector = new InjectedConnector({
+const injectedConnector = new InjectedConnector({
   chains,
   options: {
     name: 'Injected',
@@ -28,14 +28,14 @@ export const injectedConnector = new InjectedConnector({
   }
 });
 
-export const coinbaseWalletConnector = new CoinbaseWalletConnector({
+const coinbaseWalletConnector = new CoinbaseWalletConnector({
   chains,
   options: {
     appName: 'CharmVerse.io'
   }
 });
 
-export const walletConnectConnector = new WalletConnectConnector({
+const walletConnectConnector = new WalletConnectConnector({
   chains,
   options: {
     projectId: env('WALLETCONNECT_PROJECTID')
