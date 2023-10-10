@@ -71,7 +71,10 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
     model: 'proposal',
     queryOptions: {
       where: {
-        spaceId
+        spaceId,
+        page: {
+          deletedAt: null
+        }
       },
       select: {
         id: true,
