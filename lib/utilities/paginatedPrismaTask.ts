@@ -1,5 +1,5 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
-import { PrismaClient } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError } from './errors';
 
@@ -60,8 +60,6 @@ export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R
   } else if (queryOptions.select && !queryOptions.select.id) {
     throw new InvalidInputError(`Query options for ${model} must select at least id or include additional records`);
   }
-
-  const prisma = new PrismaClient();
 
   let cursor: string | undefined;
 
