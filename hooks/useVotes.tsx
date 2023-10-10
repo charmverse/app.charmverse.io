@@ -4,10 +4,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useTasks } from 'components/nexus/hooks/useTasks';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import type { GetNotificationsResponse } from 'pages/api/tasks/list';
 
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
@@ -29,14 +28,6 @@ type IContext = {
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
 };
 
-const EMPTY_TASKS: GetNotificationsResponse = {
-  bounties: { marked: [], unmarked: [] },
-  votes: { marked: [], unmarked: [] },
-  discussions: { marked: [], unmarked: [] },
-  proposals: { marked: [], unmarked: [] },
-  forum: { marked: [], unmarked: [] }
-};
-
 const VotesContext = createContext<Readonly<IContext>>({
   isValidating: true,
   isLoading: true,
@@ -55,7 +46,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(true);
-  const { mutate: mutateTasks, tasks: userTasks } = useTasks();
+  const { mutate: mutateNotifications } = useNotifications();
 
   const { subscribe } = useWebSocketClient();
 
@@ -74,7 +65,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
         return { ...prev, ...votesToAssign };
       });
-      mutateTasks();
+      mutateNotifications();
     });
 
     const unsubscribeFromDeletedVotes = subscribe('votes_deleted', (deletedVotes) => {
@@ -87,7 +78,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      mutateTasks();
+      mutateNotifications();
     });
 
     const unsubscribeFromUpdatedVotes = subscribe('votes_updated', (updatedVotes) => {
@@ -102,7 +93,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      mutateTasks();
+      mutateNotifications();
     });
 
     return () => {
@@ -119,25 +110,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       revalidateOnFocus: false
     }
   );
-
-  function removeVoteFromTask(voteId: string) {
-    mutateTasks(
-      (tasks) => {
-        return tasks
-          ? {
-              ...tasks,
-              votes: {
-                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.taskId !== voteId),
-                marked: tasks.votes.marked.filter((_vote) => _vote.taskId !== voteId)
-              }
-            }
-          : undefined;
-      },
-      {
-        revalidate: false
-      }
-    );
-  }
 
   async function castVote(voteId: string, choices: string[]) {
     const userVote = await charmClient.votes.castVote(voteId, choices);
@@ -172,7 +144,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
       return { ..._votes };
     });
-    removeVoteFromTask(voteId);
     return userVote;
   }
 
@@ -205,7 +176,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         delete _votes[voteId];
         return _votes;
       });
-      removeVoteFromTask(voteId);
     }
   }
 
@@ -214,7 +184,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     if (vote.context === 'inline') {
       await charmClient.votes.updateVote(voteId, { status: 'Cancelled' });
       setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
-      removeVoteFromTask(voteId);
     }
   }
 

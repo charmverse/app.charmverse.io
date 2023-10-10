@@ -1,12 +1,12 @@
 import type { PageInviteEmailProps } from './templates/PageInviteEmail';
 import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
-import type { PendingNotifications } from './templates/PendingTasksTemplate';
-import PendingTasks, { tasksRequiresYourAttention } from './templates/PendingTasksTemplate';
+import type { PendingNotificationsData } from './templates/PendingNotificationsTemplate';
+import PendingNotifications, { notificationsRequiresYourAttention } from './templates/PendingNotificationsTemplate';
 import { renderMJML } from './templates/utils';
 
-export function getPendingTasksEmail(props: PendingNotifications) {
-  const html = renderMJML(PendingTasks(props));
-  const subject = tasksRequiresYourAttention({ count: props.totalNotifications, includeName: true });
+export function getPendingNotificationsEmail(props: PendingNotificationsData) {
+  const html = renderMJML(PendingNotifications(props));
+  const subject = notificationsRequiresYourAttention({ count: props.totalUnreadNotifications, includeName: true });
 
   return { html, subject };
 }

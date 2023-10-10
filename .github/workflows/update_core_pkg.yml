@@ -35,6 +35,7 @@ jobs:
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
+          save_cache: true
 
       - name: Calculate Build ID
         id: get_build_id
@@ -232,6 +233,7 @@ jobs:
           deployment_package: ${{matrix.deployment_package}}
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: true
+          wait_for_environment_recovery: 120
 
   discord_alert:
     name: Notify discord of failure

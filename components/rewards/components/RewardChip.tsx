@@ -9,7 +9,7 @@ import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
 import type { ReactNode } from 'react';
 
-import type { RewardTaskAction } from 'lib/rewards/getRewardTasks';
+import type { BountyNotificationType } from 'lib/notifications/interfaces';
 import type { BrandColor } from 'theme/colors';
 
 export const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
@@ -20,26 +20,26 @@ export const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
   paid: 'Paid'
 };
 
-const REWARD_ACTION_LABELS: Record<RewardTaskAction, string> = {
-  application_pending: 'Application pending',
-  application_approved: 'Application approved',
-  application_rejected: 'Application rejected',
-  work_submitted: 'Work submitted',
-  work_approved: 'Work approved',
-  payment_needed: 'Payment needed',
-  payment_complete: 'Payment complete',
-  suggested_reward: 'Suggested reward'
+const REWARD_ACTION_LABELS: Record<BountyNotificationType, string> = {
+  'application.created': 'Application pending',
+  'application.approved': 'Application approved',
+  'application.rejected': 'Application rejected',
+  'submission.created': 'Work submitted',
+  'submission.approved': 'Work approved',
+  'application.payment_pending': 'Payment needed',
+  'application.payment_completed': 'Payment complete',
+  'suggestion.created': 'Suggested reward'
 };
 
-const REWARD_ACTION_ICONS: Record<RewardTaskAction, ReactNode> = {
-  application_pending: <ModeStandbyIcon />,
-  application_approved: <CheckCircleOutlineIcon />,
-  application_rejected: <ModeStandbyIcon />,
-  work_submitted: <CheckCircleOutlineIcon />,
-  work_approved: <CheckCircleOutlineIcon />,
-  payment_needed: <PaidIcon />,
-  payment_complete: <PaidIcon />,
-  suggested_reward: <LightbulbIcon />
+const REWARD_ACTION_ICONS: Record<BountyNotificationType, ReactNode> = {
+  'application.created': <ModeStandbyIcon />,
+  'application.approved': <CheckCircleOutlineIcon />,
+  'application.rejected': <ModeStandbyIcon />,
+  'submission.created': <CheckCircleOutlineIcon />,
+  'submission.approved': <CheckCircleOutlineIcon />,
+  'application.payment_pending': <PaidIcon />,
+  'application.payment_completed': <PaidIcon />,
+  'suggestion.created': <LightbulbIcon />
 };
 
 export const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
@@ -50,23 +50,23 @@ export const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
   paid: 'green'
 };
 
-export const REWARD_ACTION_COLORS: Record<RewardTaskAction, BrandColor> = {
-  application_pending: 'teal',
-  application_approved: 'teal',
-  application_rejected: 'red',
-  work_submitted: 'yellow',
-  work_approved: 'yellow',
-  payment_needed: 'pink',
-  payment_complete: 'gray',
-  suggested_reward: 'purple'
+export const REWARD_ACTION_COLORS: Record<BountyNotificationType, BrandColor> = {
+  'application.created': 'teal',
+  'application.approved': 'teal',
+  'application.rejected': 'red',
+  'submission.created': 'yellow',
+  'submission.approved': 'yellow',
+  'application.payment_pending': 'pink',
+  'application.payment_completed': 'gray',
+  'suggestion.created': 'purple'
 };
 
-const isRewardStatus = (status: RewardStatus | RewardTaskAction): status is RewardStatus =>
+const isRewardStatus = (status: RewardStatus | BountyNotificationType): status is RewardStatus =>
   status in REWARD_STATUS_LABELS;
-const isRewardAction = (status: RewardStatus | RewardTaskAction): status is RewardTaskAction =>
+const isRewardAction = (status: RewardStatus | BountyNotificationType): status is BountyNotificationType =>
   status in REWARD_ACTION_LABELS;
 
-const StyledRewardStatusChip = styled(Chip)<{ status: RewardStatus | RewardTaskAction }>`
+const StyledRewardStatusChip = styled(Chip)<{ status: RewardStatus | BountyNotificationType }>`
   background-color: ${({ status, theme }) => {
     if (isRewardStatus(status)) {
       return theme.palette[REWARD_STATUS_COLORS[status]].main;
@@ -122,7 +122,7 @@ export function RewardStatusNexusChip({
   size = 'small'
 }: {
   size?: ChipProps['size'];
-  action: RewardTaskAction;
+  action: BountyNotificationType;
 }) {
   return (
     <StyledRewardStatusChip

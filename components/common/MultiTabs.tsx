@@ -43,6 +43,7 @@ type MultiTabsProps = {
   // allow for controlled tab
   activeTab?: number;
   setActiveTab?: (tabIndex: number) => void;
+  endAdornmentComponent?: React.ReactNode;
 };
 
 export default function MultiTabs(props: MultiTabsProps) {
@@ -61,7 +62,16 @@ export default function MultiTabs(props: MultiTabsProps) {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
         <Tabs
           indicatorColor={disabled ? 'secondary' : 'primary'}
           value={value}
@@ -80,6 +90,7 @@ export default function MultiTabs(props: MultiTabsProps) {
             />
           ))}
         </Tabs>
+        {props.endAdornmentComponent}
       </Box>
       {tabs.map(([tabLabel, tabComponent, _props], tabIndex) => {
         const sxProps = _props?.sx ?? ({} as SxProps);

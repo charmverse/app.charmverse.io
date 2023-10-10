@@ -5,8 +5,8 @@ import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
 import type {
   BountyNotification,
-  DiscussionNotification,
-  ForumNotification,
+  DocumentNotification,
+  PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
@@ -21,7 +21,7 @@ const handler = nc({
   onNoMatch
 });
 
-const createDiscussionTask = ({
+const createDocumentTask = ({
   pageTitle,
   spaceName,
   mentionText
@@ -29,12 +29,12 @@ const createDiscussionTask = ({
   spaceName: string;
   mentionText: string;
   pageTitle: string;
-}): DiscussionNotification => {
+}): DocumentNotification => {
   const id = v4();
   return {
     commentId: null,
     mentionId: id,
-    taskId: id,
+    id,
     createdAt: new Date().toISOString(),
     pageId: v4(),
     spaceId: v4(),
@@ -55,15 +55,18 @@ const createDiscussionTask = ({
       path: 'username',
       avatarTokenId: null
     },
-    pageType: 'page'
+    pageType: 'page',
+    archived: false,
+    group: 'document',
+    read: false
   };
 };
 
-const createForumTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): ForumNotification => {
+const createPostTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): PostNotification => {
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
-    taskId: v4(),
+    id: v4(),
     type: 'created',
     spaceName,
     postId: v4(),
@@ -79,11 +82,14 @@ const createForumTask = ({ postTitle, spaceName }: { spaceName: string; postTitl
       avatar: '',
       path: 'username',
       avatarTokenId: null
-    }
+    },
+    archived: false,
+    group: 'post',
+    read: false
   };
 };
 
-const createVoteTasks = ({
+const createVoteNotifications = ({
   voteTitle,
   deadline,
   pageTitle,
@@ -115,7 +121,7 @@ const createVoteTasks = ({
   } as any;
 };
 
-const createProposalTasks = ({
+const createProposalNotifications = ({
   pageTitle,
   spaceName,
   status
@@ -124,7 +130,7 @@ const createProposalTasks = ({
     type: 'reviewed',
     pagePath: randomName(),
     pageTitle,
-    taskId: v4(),
+    id: v4(),
     createdAt: new Date().toISOString(),
     status,
     spaceDomain: randomName(),
@@ -140,7 +146,10 @@ const createProposalTasks = ({
       avatar: '',
       path: 'username',
       avatarTokenId: null
-    }
+    },
+    archived: false,
+    group: 'proposal',
+    read: false
   };
 };
 
@@ -151,7 +160,7 @@ const createBountyTask = ({
 }: Pick<BountyNotification, 'pageTitle' | 'spaceName' | 'status'>): BountyNotification => {
   const id = v4();
   return {
-    taskId: id,
+    id,
     type: 'application.approved',
     pagePath: randomName(),
     pageTitle,
@@ -171,19 +180,22 @@ const createBountyTask = ({
       avatar: '',
       path: 'username',
       avatarTokenId: null
-    }
+    },
+    archived: false,
+    group: 'bounty',
+    read: false
   };
 };
 
 const templates = {
-  'Notify the user about tasks': () => {
-    return emails.getPendingTasksEmail({
+  'Notify the user about notifications': () => {
+    return emails.getPendingNotificationsEmail({
       user: {
         id: '<userId>',
         email: '<userEmail>',
         username: 'ghostpepper'
       },
-      totalNotifications: 6,
+      totalUnreadNotifications: 6,
       bountyNotifications: [
         createBountyTask({
           pageTitle: 'Create a new protocol',
@@ -192,70 +204,71 @@ const templates = {
         })
       ],
       proposalNotifications: [
-        createProposalTasks({
+        createProposalNotifications({
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
           spaceName: 'Uniswap',
           status: 'discussion'
         }),
-        createProposalTasks({
+        createProposalNotifications({
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
           status: 'draft'
         })
       ],
-      discussionNotifications: [
-        createDiscussionTask({
+      cardNotifications: [],
+      documentNotifications: [
+        createDocumentTask({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: "Let's have a meeting @ghostpepper",
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'Take a look at this @ghostpepper',
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createDiscussionTask({
+        createDocumentTask({
           mentionText: 'We are facing issues @ghostpepper',
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         })
       ],
       voteNotifications: [
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
           pageTitle: 'This is a really really long vote title',
           spaceName: 'This is a really really long space name',
           voteTitle:
             'Should we add this section? I think it can be a great addition but need all of your votes to decide'
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 26 * 60 * 60 * 1000),
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse',
           voteTitle: 'Should we format the text?'
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 32 * 60 * 60 * 1000),
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse',
           voteTitle: "Let's vote"
         }),
-        createVoteTasks({
+        createVoteNotifications({
           deadline: new Date(Date.now() + 52 * 60 * 60 * 1000),
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse Demo',
@@ -263,11 +276,11 @@ const templates = {
         })
       ],
       forumNotifications: [
-        createForumTask({
+        createPostTask({
           postTitle: "New idea. Let's discuss!",
           spaceName: 'CharmVerse'
         }),
-        createForumTask({
+        createPostTask({
           postTitle: 'Start the new process.',
           spaceName: 'CharmVerse'
         })

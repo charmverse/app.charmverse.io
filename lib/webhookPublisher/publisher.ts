@@ -3,6 +3,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
+import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;
@@ -73,11 +74,13 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       webhookURL: webhookPayload.webhookURL
     });
   } catch (e) {
-    log.error('Error while publishing webhook event. Error occurred', {
-      queueUrl: SQS_QUEUE_NAME,
-      error: e,
-      scope: event.scope,
-      spaceId
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      log.error('Error while publishing webhook event. Error occurred', {
+        queueUrl: SQS_QUEUE_NAME,
+        error: e,
+        scope: event.scope,
+        spaceId
+      });
+    }
   }
 }

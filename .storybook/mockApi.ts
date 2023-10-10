@@ -1,7 +1,8 @@
 import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
+import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
 
-import type { SpacePermissionFlags } from 'lib/permissions/spaces';
+import type { SpacePermissionFlags } from '../lib/permissions/spaces';
 
 import {
   spaces,
@@ -11,8 +12,7 @@ import {
   proposalTemplates,
   userProfile,
   userMemberProfile,
-  userTasks
-} from 'stories/lib/mockData';
+} from '../stories/lib/mockData';
 
 // mock requests globally via msw. see : https://storybook.js.org/addons/msw-storybook-addon
 
@@ -23,6 +23,9 @@ const spaceHandlers = {
   }),
   spaceMembers: rest.get(`/api/spaces/:spaceId/members`, (req, res, ctx) => {
     return res(ctx.json([userMemberProfile, ...members]));
+  }),
+  spaceMemberProperties: rest.get(`/api/spaces/:spaceId/members/properties`, (req, res, ctx) => {
+    return res(ctx.json([]));
   }),
   spacePermissions: rest.get(`/api/permissions/space/:spaceId/compute`, (req, res, ctx) => {
     const permissions: SpacePermissionFlags = {
@@ -42,6 +45,10 @@ const spaceHandlers = {
   }),
   spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
     return res(ctx.json(spaces));
+  }),
+  spaceBlockCount: rest.get(`/api/spaces/:spaceId/block-count`, (req, res, ctx) => {
+    const result: BlockCountInfo = { count: 1000 };
+    return res(ctx.json(result));
   })
 };
 
@@ -96,8 +103,8 @@ const userHandlers = {
   userProfile: rest.get(`/api/profile`, (req, res, ctx) => {
     return res(ctx.json(userProfile));
   }),
-  tasksList: rest.get(`/api/tasks/list`, (req, res, ctx) => {
-    return res(ctx.json(userTasks));
+  notificationsList: rest.get(`/api/notifications/list`, (req, res, ctx) => {
+    return res(ctx.json([]));
   })
 };
 

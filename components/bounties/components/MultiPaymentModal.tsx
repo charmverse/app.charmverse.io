@@ -38,7 +38,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
   const { chainId, signer } = useWeb3Account();
   const { data: userGnosisSafes } = useMultiWalletSigs();
   const { importSafes } = useImportSafes();
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
 
   const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
     useMultiBountyPayment({
@@ -142,7 +142,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
                         <ListItemText>{safeInfo?.name || safeInfo.address}</ListItemText>
                         <ListItemIcon>
                           <Tooltip title='Manage your wallet'>
-                            <IconButton onClick={() => onClick('account', 'multisig-section')} size='small'>
+                            <IconButton onClick={() => openSettings('account', 'multisig-section')} size='small'>
                               <OpenInNewIcon fontSize='small' />
                             </IconButton>
                           </Tooltip>

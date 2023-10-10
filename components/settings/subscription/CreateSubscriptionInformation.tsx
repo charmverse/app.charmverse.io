@@ -42,14 +42,13 @@ export function CreateSubscriptionInformation({
   spaceId
 }: {
   onUpgrade: () => void;
-
   pendingPayment?: boolean;
   spaceId: string;
 }) {
   const { refetchSpaceSubscription, paidTier } = useSpaceSubscription();
   const { isFreeSpace } = useIsFreeSpace();
   const { showMessage } = useSnackbar();
-  const { refreshCurrentSpace } = useCurrentSpace();
+  const { refreshCurrentSpace, space } = useCurrentSpace();
 
   const { trigger: switchToFreePlan, isMutating: isSwitchToFreeLoading } = useSWRMutation(
     `spaces/${spaceId}/switch-to-free-tier`,
@@ -62,6 +61,21 @@ export function CreateSubscriptionInformation({
       },
       onError(err) {
         showMessage(err?.message ?? 'The switch to free tier could not be made. Please try again later.', 'error');
+      }
+    }
+  );
+
+  const { trigger: switchToCommunityPlan, isMutating: isSwitchToCommunityLoading } = useSWRMutation(
+    `spaces/${spaceId}/switch-to-community-tier`,
+    () => charmClient.subscription.switchToCommunityTier(spaceId),
+    {
+      onSuccess() {
+        refetchSpaceSubscription();
+        refreshCurrentSpace();
+        showMessage('You have successfully switch to community tier!', 'success');
+      },
+      onError(err) {
+        showMessage(err?.message ?? 'The switch to community tier could not be made. Please try again later.', 'error');
       }
     }
   );
@@ -146,9 +160,19 @@ export function CreateSubscriptionInformation({
           <MobileIconContainer>
             <CommunityIcon width='150px' height='150px' />
           </MobileIconContainer>
-          <Button onClick={onUpgrade} disabled={pendingPayment}>
-            {pendingPayment ? 'Payment pending' : 'Get more blocks'}
-          </Button>
+          {space?.paidTier === 'community' ? (
+            <Button onClick={onUpgrade} disabled={pendingPayment}>
+              {pendingPayment ? 'Payment pending' : 'Get more blocks'}
+            </Button>
+          ) : (
+            <Button
+              variant='outlined'
+              onClick={switchToCommunityPlan}
+              disabled={pendingPayment || isSwitchToCommunityLoading}
+            >
+              Switch to community
+            </Button>
+          )}
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>

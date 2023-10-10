@@ -12,26 +12,22 @@ export type ProposalTaskAction =
 export function getProposalAction({
   isAuthor,
   currentStatus,
-  isReviewer,
-  notifyNewEvents
+  isReviewer
 }: {
   currentStatus: ProposalStatus;
   isAuthor: boolean;
   isReviewer: boolean;
-  notifyNewEvents: boolean;
 }): ProposalTaskAction | null {
   if (currentStatus === 'discussion') {
     if (isAuthor) {
       return 'start_review';
     }
-    if (notifyNewEvents) {
-      return 'start_discussion';
-    }
+    return 'start_discussion';
   } else if (currentStatus === 'reviewed') {
     if (isAuthor) {
       return 'reviewed';
     }
-  } else if (currentStatus === 'vote_active' && notifyNewEvents) {
+  } else if (currentStatus === 'vote_active') {
     return 'vote';
   } else if (currentStatus === 'review') {
     if (isReviewer) {

@@ -252,7 +252,7 @@ export function fullyDecodeURI(uri: string) {
 // strip out custom or domain depending on the host
 export function getSubdomainPath(
   path: string,
-  config?: { domain: string; customDomain: string | null },
+  config?: { domain: string; customDomain?: string | null },
   host?: string
 ) {
   const subdomain = getSpaceDomainFromHost(host);
@@ -273,9 +273,8 @@ export function getSubdomainPath(
   if (subdomain) {
     return path.replace(new RegExp(`^\\/${subdomain}`), '');
   }
-
   // if we are not using a custom domain or subdomain, make sure that the space domain exists in the URL
-  if (config && !customDomain && !path.startsWith(`/${config?.domain}`)) {
+  if (config && !customDomain && !path.startsWith(`/${config?.domain}/`)) {
     return `/${config.domain}${path}`;
   }
   return path;

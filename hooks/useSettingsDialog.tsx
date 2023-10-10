@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -6,40 +5,32 @@ import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
 import type { ACCOUNT_TABS } from 'components/settings/config';
 import { SETTINGS_TABS } from 'components/settings/config';
-import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
 type IContext = {
-  open: boolean;
-  activePath: string;
-  unsavedChanges: boolean;
+  isOpen: boolean;
+  activePath?: SettingsPath;
   onClose: () => void;
-  onClick: (path?: SettingsPath, section?: string) => void;
+  openSettings: (path?: SettingsPath, section?: string) => void;
   openUpgradeSubscription: () => void;
-  handleUnsavedChanges: (dataChanged: boolean) => void;
 };
 
 export const SettingsDialogContext = createContext<Readonly<IContext>>({
-  open: false,
-  activePath: '',
-  unsavedChanges: false,
+  isOpen: false,
   onClose: () => {},
-  onClick: () => undefined,
-  openUpgradeSubscription: () => null,
-  handleUnsavedChanges: () => undefined
+  openSettings: () => undefined,
+  openUpgradeSubscription: () => null
 });
 
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [activePath, setActivePath] = useState('');
+  const [activePath, setActivePath] = useState<SettingsPath | undefined>();
   const router = useRouter();
-  const { subscriptionEnded, spaceSubscription } = useSpaceSubscription();
 
-  const onClick = (_path?: string, _section?: string) => {
-    setActivePath(_path ?? '');
+  function openSettings(_path?: SettingsPath, _section?: string) {
+    setActivePath(_path);
     settingsModalState.open();
     setTimeout(() => {
       if (_section) {
@@ -47,16 +38,16 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
         domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 300);
-  };
+  }
 
-  const onClose = () => {
+  function onClose() {
     settingsModalState.close();
-    setActivePath('');
-  };
+    setActivePath(undefined);
+  }
 
-  const handleUnsavedChanges = (dataChanged: boolean) => {
-    setUnsavedChanges(dataChanged);
-  };
+  function openUpgradeSubscription() {
+    openSettings('subscription');
+  }
 
   useEffect(() => {
     const close = () => {
@@ -66,7 +57,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     };
 
     if (router.query.settingTab && SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
-      onClick(router.query.settingTab as string);
+      openSettings(router.query.settingTab as SettingsPath);
       setUrlWithoutRerender(router.pathname, { settingTab: null });
     }
     // If the user clicks a link inside the modal, close the modal only
@@ -77,28 +68,15 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     };
   }, [router]);
 
-  useEffect(() => {
-    if (subscriptionEnded) {
-      log.warn('Open upgrade subscription modal since subscription has ended', spaceSubscription);
-      // openUpgradeSubscription();
-    }
-  }, [subscriptionEnded]);
-
-  function openUpgradeSubscription() {
-    onClick('subscription');
-  }
-
   const value = useMemo<IContext>(
     () => ({
-      open: settingsModalState.isOpen,
+      isOpen: settingsModalState.isOpen,
       activePath,
-      unsavedChanges,
-      onClick,
+      openSettings,
       onClose,
-      openUpgradeSubscription,
-      handleUnsavedChanges
+      openUpgradeSubscription
     }),
-    [activePath, settingsModalState.isOpen, unsavedChanges]
+    [activePath, settingsModalState.isOpen]
   );
 
   return <SettingsDialogContext.Provider value={value}>{children}</SettingsDialogContext.Provider>;

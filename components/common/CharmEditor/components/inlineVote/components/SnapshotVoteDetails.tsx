@@ -2,6 +2,7 @@ import PublishIcon from '@mui/icons-material/ElectricBolt';
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 
+import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
 import { useSnapshotVoting } from 'components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting';
@@ -99,7 +100,19 @@ export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
         <Box display='flex' flexDirection='column' gap={1}>
           {isVotingActive ? (
             <Box>
-              <Stack mb={1}>{votingDisabledStatus && <Alert severity='warning'>{votingDisabledStatus}</Alert>}</Stack>
+              <Stack mb={1}>
+                {votingDisabledStatus && (
+                  <Alert
+                    sx={{ alignItems: 'center' }}
+                    severity='warning'
+                    action={
+                      votingDisabledStatus.reason === 'account' ? <OpenWalletSelectorButton color='inherit' /> : null
+                    }
+                  >
+                    {votingDisabledStatus.message}
+                  </Alert>
+                )}
+              </Stack>
               <SnapshotVotingForm
                 snapshotProposal={snapshotProposal}
                 votingPower={votingPower}
