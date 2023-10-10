@@ -14,7 +14,11 @@ export interface UserMentionMetadata {
  * @param content Page content as raw json
  * @returns An array of mention ids
  */
-export function extractMentions(content: PageContent, username?: string) {
+export function extractMentions(content: PageContent | null, username?: string) {
+  if (!content) {
+    return [];
+  }
+
   const mentions: Map<string, UserMentionMetadata> = new Map();
 
   function recurse(node: PageContent, parentNode: PageContent | null) {

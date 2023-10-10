@@ -66,7 +66,8 @@ export async function createForumNotifications(webhookData: {
               postId,
               spaceId,
               userId: userMention.value,
-              type: 'mention.created'
+              type: 'mention.created',
+              text: userMention.text
             });
           }
         }

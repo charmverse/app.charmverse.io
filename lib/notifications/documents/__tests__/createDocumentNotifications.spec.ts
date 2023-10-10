@@ -8,6 +8,7 @@ import { createNotificationsFromEvent } from 'lib/notifications/createNotificati
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { createProposal } from 'lib/proposal/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { createThread } from 'lib/threads';
 import { createUserFromWallet } from 'lib/users/createUser';
 import {
@@ -19,6 +20,7 @@ import {
   getUserEntity
 } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { builders } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { generateProposalCategory } from 'testing/utils/proposals';
@@ -35,13 +37,23 @@ describe(`Test document events and notifications`, () => {
       spaceId: space.id,
       userId: user2.id
     });
+    const mentionId = v4();
 
     const createdPage = await createPage({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      content: builders
+        .doc(
+          builders.mention({
+            type: 'user',
+            value: user2.id,
+            id: mentionId,
+            createdAt: new Date().toISOString(),
+            createdBy: user.id
+          })
+        )
+        .toJSON()
     });
-
-    const mentionId = v4();
 
     await createDocumentNotifications({
       event: {
