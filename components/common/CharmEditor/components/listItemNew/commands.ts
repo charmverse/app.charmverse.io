@@ -89,14 +89,15 @@ export function toggleBulletList(): Command {
 export const backspaceKeyCommand =
   (type: NodeType): Command =>
   (state, dispatch, view) => {
-    return chainCommands()(state, dispatch, view);
-    // if we're at the start of a list item, we need to either backspace
-    // directly to an empty list item above, or outdent this node
-    // removeList()
+    return chainCommands(
+      // if we're at the start of a list item, we need to either backspace
+      // directly to an empty list item above, or outdent this node
+      removeList(),
 
-    // if we're just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
-    // the text to the previous list item, if one exists
-    // filter([isEmptySelectionAtStart, canToJoinToPreviousListItem], joinToPreviousListItem(type))
+      // if we're just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
+      // the text to the previous list item, if one exists
+      filter([isEmptySelectionAtStart, canToJoinToPreviousListItem], joinToPreviousListItem(type))
+    )(state, dispatch, view);
   };
 
 export const enterKeyCommand = (): Command => (state, dispatch, view) => {

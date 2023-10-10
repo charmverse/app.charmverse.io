@@ -8,7 +8,7 @@ import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
 import {
-  // backspaceKeyCommand,
+  backspaceKeyCommand,
   enterKeyCommand,
   indentList,
   moveEdgeListItem,
@@ -86,29 +86,29 @@ function pluginsFactory({ keybindings = defaultKeys, nodeView = true, readOnly =
     const type = getTypeFromSchema(schema);
 
     return [
-      // keybindings &&
-      //   keymap({
-      //     [keybindings.toggleDone]: filter(
-      //       isValidList,
-      //       updateNodeAttrs(schema.nodes.listItem, (attrs) => ({
-      //         ...attrs,
-      //         todoChecked: attrs.todoChecked == null ? false : !attrs.todoChecked
-      //       }))
-      //     ),
+      keybindings &&
+        keymap({
+          [keybindings.toggleDone]: filter(
+            isValidList,
+            updateNodeAttrs(schema.nodes.listItem, (attrs) => ({
+              ...attrs,
+              todoChecked: attrs.todoChecked == null ? false : !attrs.todoChecked
+            }))
+          ),
 
-      //     Backspace: backspaceKeyCommand(type),
-      //     Enter: enterKeyCommand(type),
-      //     ...createObject([
-      //       [keybindings.indent, filter(isValidList, indentListItem())],
-      //       [keybindings.outdent, filter(isValidList, outdentListItem())],
-      //       [keybindings.moveUp, filter(isValidList, moveListItemUp())],
-      //       [keybindings.moveDown, filter(isValidList, moveListItemDown())],
-      //       [keybindings.emptyCut, filter(isValidList, cutEmptyCommand(type))],
-      //       [keybindings.emptyCopy, filter(isValidList, copyEmptyCommand(type))],
-      //       [keybindings.insertEmptyListAbove, insertEmptySiblingListAbove()],
-      //       [keybindings.insertEmptyListBelow, insertEmptySiblingListBelow()]
-      //     ])
-      //   }),
+          // Backspace: backspaceKeyCommand(type),
+          Enter: enterKeyCommand(type),
+          ...createObject([
+            [keybindings.indent, filter(isValidList, indentListItem())],
+            [keybindings.outdent, filter(isValidList, outdentListItem())],
+            [keybindings.moveUp, filter(isValidList, moveListItemUp())],
+            [keybindings.moveDown, filter(isValidList, moveListItemDown())],
+            [keybindings.emptyCut, filter(isValidList, cutEmptyCommand(type))],
+            [keybindings.emptyCopy, filter(isValidList, copyEmptyCommand(type))],
+            [keybindings.insertEmptyListAbove, insertEmptySiblingListAbove()],
+            [keybindings.insertEmptyListBelow, insertEmptySiblingListBelow()]
+          ])
+        }),
 
       nodeView && listItemNodeViewPlugin(name, readOnly)
     ];
