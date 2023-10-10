@@ -1,16 +1,18 @@
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
+import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
+import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItemButton } from '@mui/material';
+import { ListItemButton, Menu, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
-import { memo } from 'react';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import { memo, useCallback, useState } from 'react';
 
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
-import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
-import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utilities/random';
@@ -71,6 +73,18 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
   }
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [subMenuAnchorEl, setSubMenuAnchorEl] = useState<null | HTMLElement>(null);
+
+  const showMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
+
+  function closeMenu() {
+    setAnchorEl(null);
+  }
 
   function updatePageIcon(_icon: string | null) {
     setPage({ icon: _icon });
@@ -88,41 +102,81 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
     <>
       <EditorHeader className='font-family-default'>
         {icon && (
-          <MenuWrapper>
-            <EmojiIcon size='large' icon={icon} />
-            {
-              // Menu wrapper requires 2 children to show, so we provide an empty div in readonly case
-              readOnly ? (
-                <div></div>
-              ) : (
-                <Menu>
-                  <Menu.Text
-                    id='random'
-                    icon={<EmojiEmotionsOutlinedIcon />}
-                    name='Random'
-                    onClick={() => {
-                      updatePageIcon(BlockIcons.shared.randomIcon());
-                    }}
-                  />
-                  <Menu.SubMenu id='pick' icon={<EmojiEmotionsOutlinedIcon />} name='Pick icon'>
-                    <CustomEmojiPicker
-                      onUpdate={(emoji) => {
-                        updatePageIcon(emoji);
-                      }}
-                    />
-                  </Menu.SubMenu>
-                  <Menu.Text
-                    id='remove'
-                    icon={<DeleteOutlineOutlinedIcon />}
-                    name='Remove icon'
-                    onClick={() => {
-                      updatePageIcon(null);
-                    }}
-                  />
-                </Menu>
-              )
-            }
-          </MenuWrapper>
+          <div>
+            <EmojiIcon size='large' icon={icon} onClick={showMenu} />
+
+            {readOnly ? (
+              <div />
+            ) : (
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={closeMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              >
+                <ListItemButton
+                  dense
+                  disabled={readOnly}
+                  onClick={() => {
+                    updatePageIcon(BlockIcons.shared.randomIcon());
+                    closeMenu();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CasinoOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText>Random</ListItemText>
+                </ListItemButton>
+
+                <ListItemButton
+                  dense
+                  disabled={readOnly}
+                  onClick={(e) => {
+                    setSubMenuAnchorEl(e.currentTarget);
+                  }}
+                >
+                  <ListItemIcon>
+                    <EmojiEmotionsOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText>Pick icon</ListItemText>
+                  <ArrowDropDownOutlinedIcon sx={{ ml: 3 }} />
+                </ListItemButton>
+
+                <ListItemButton
+                  dense
+                  disabled={readOnly}
+                  onClick={() => {
+                    updatePageIcon(null);
+                    closeMenu();
+                  }}
+                >
+                  <ListItemIcon>
+                    <DeleteOutlineOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText>Remove icon</ListItemText>
+                </ListItemButton>
+              </Menu>
+            )}
+          </div>
+        )}
+        {subMenuAnchorEl && (
+          <div>
+            <Menu
+              anchorEl={subMenuAnchorEl}
+              open={Boolean(subMenuAnchorEl)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              <CustomEmojiPicker
+                onUpdate={(emoji) => {
+                  setSubMenuAnchorEl(null);
+                  closeMenu();
+                  updatePageIcon(emoji);
+                }}
+              />
+            </Menu>
+          </div>
         )}
         <Controls className='page-controls'>
           {!readOnly && !icon && (
