@@ -224,4 +224,157 @@ describe('countCommentBlocks', () => {
       }
     });
   });
+
+  it('should ignore application comments if they are marked as deleted, or if the linked reward is marked as deleted', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    // Generate application comments
+
+    const deletedReward = await generateBountyWithSingleApplication({
+      applicationStatus: 'inProgress',
+      bountyCap: null,
+      spaceId: space.id,
+      userId: user.id,
+      deletedAt: new Date()
+    });
+
+    await prisma.applicationComment.createMany({
+      data: [
+        {
+          applicationId: deletedReward.applications[0].id,
+          content: {}, // Assuming the content structure is irrelevant for this test,
+          contentText: 'Example text',
+          createdBy: user.id
+        },
+        {
+          applicationId: deletedReward.applications[0].id,
+          content: {}, // Assuming the content structure is irrelevant for this test,
+          contentText: 'Example text',
+          createdBy: user.id
+        }
+      ]
+    });
+
+    const reward = await generateBountyWithSingleApplication({
+      applicationStatus: 'inProgress',
+      bountyCap: null,
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    await prisma.applicationComment.createMany({
+      data: [
+        {
+          applicationId: reward.applications[0].id,
+          content: {}, // Assuming the content structure is irrelevant for this test,
+          contentText: 'Example text',
+          createdBy: user.id,
+          deletedAt: new Date()
+        },
+        {
+          applicationId: reward.applications[0].id,
+          content: {}, // Assuming the content structure is irrelevant for this test,
+          contentText: 'Example text',
+          createdBy: user.id
+        }
+      ]
+    });
+    const counts = await countCommentBlocks({ spaceId: space.id, batchSize: 2 });
+
+    // Modify the expected counts based on the generated comments
+    expect(counts).toMatchObject<CommentBlocksCount>({
+      total: 1,
+      details: {
+        applicationComment: 1,
+        blockComment: 0,
+        comment: 0,
+        pageComments: 0,
+        postComment: 0
+      }
+    });
+  });
+
+  it('should ignore block comments if they are marked as deleted, or if the linked block is marked as deleted', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    // Generate application commconst database = await generateBoard({ createdBy: user.id, spaceId: space.id });
+
+    const deletedDatabase = await generateBoard({ createdBy: user.id, spaceId: space.id, deletedAt: new Date() });
+
+    const ignoredBlockComments = await prisma.block.createMany({
+      data: [
+        {
+          createdBy: user.id,
+          parentId: deletedDatabase.id,
+          rootId: deletedDatabase.id,
+          fields: {},
+          spaceId: space.id,
+          title: 'Ignored 1',
+          schema: 1,
+          type: 'comment',
+          updatedBy: user.id,
+          id: uuid()
+        },
+        {
+          createdBy: user.id,
+          parentId: deletedDatabase.id,
+          rootId: deletedDatabase.id,
+          fields: {},
+          spaceId: space.id,
+          title: 'Ignored 2',
+          schema: 1,
+          type: 'comment',
+          updatedBy: user.id,
+          id: uuid()
+        }
+      ]
+    });
+    const database = await generateBoard({ createdBy: user.id, spaceId: space.id });
+
+    const blockComments = await prisma.block.createMany({
+      data: [
+        {
+          createdBy: user.id,
+          parentId: database.id,
+          rootId: database.id,
+          fields: {},
+          spaceId: space.id,
+          title: 'Included',
+          schema: 1,
+          type: 'comment',
+          updatedBy: user.id,
+          id: uuid()
+        },
+        {
+          createdBy: user.id,
+          deletedAt: new Date(),
+          parentId: database.id,
+          rootId: database.id,
+          fields: {},
+          spaceId: space.id,
+          title: 'Ignored 3',
+          schema: 1,
+          type: 'comment',
+          updatedBy: user.id,
+          id: uuid()
+        }
+      ]
+    });
+
+    const counts = await countCommentBlocks({
+      spaceId: space.id
+    });
+
+    // Modify the expected counts based on the generated comments
+    expect(counts).toMatchObject<CommentBlocksCount>({
+      total: 1,
+      details: {
+        applicationComment: 0,
+        blockComment: 1,
+        comment: 0,
+        pageComments: 0,
+        postComment: 0
+      }
+    });
+  });
 });

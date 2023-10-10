@@ -35,7 +35,8 @@ export function boardWithCardsArgs({
   boardTitle,
   viewType,
   linkedSourceId,
-  customProps
+  customProps,
+  deletedAt = null
 }: {
   createdBy: string;
   spaceId: string;
@@ -49,6 +50,7 @@ export function boardWithCardsArgs({
   boardTitle?: string;
   linkedSourceId?: string;
   customProps?: CustomBoardProps;
+  deletedAt?: null | Date;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
@@ -58,7 +60,7 @@ export function boardWithCardsArgs({
 
   const rootBoardNode = {
     id: boardId,
-    deletedAt: null,
+    deletedAt,
     createdAt: '2022-08-25T17:19:03.909Z',
     createdBy,
     updatedAt: '2022-08-26T09:22:28.912Z',
@@ -84,7 +86,7 @@ export function boardWithCardsArgs({
     children: [
       {
         id: cardIds[0],
-        deletedAt: null,
+        deletedAt,
         createdAt: '2022-08-25T17:19:05.413Z',
         createdBy,
         updatedAt: '2022-08-26T09:56:33.994Z',
@@ -122,7 +124,7 @@ export function boardWithCardsArgs({
         blocks: {
           card: {
             id: cardIds[0],
-            deletedAt: null,
+            deletedAt,
             createdAt: '2022-08-25T17:19:05.413Z',
             createdBy,
             updatedAt: '2022-08-25T17:31:37.646Z',
@@ -146,7 +148,7 @@ export function boardWithCardsArgs({
       },
       {
         id: cardIds[1],
-        deletedAt: null,
+        deletedAt,
         createdAt: '2022-08-25T17:19:05.413Z',
         createdBy,
         updatedAt: '2022-09-14T14:13:05.326Z',
@@ -192,7 +194,7 @@ export function boardWithCardsArgs({
         blocks: {
           card: {
             id: cardIds[1],
-            deletedAt: null,
+            deletedAt,
             createdAt: '2022-08-25T17:19:05.413Z',
             createdBy,
             updatedAt: '2022-08-25T17:21:39.462Z',
@@ -220,7 +222,7 @@ export function boardWithCardsArgs({
     blocks: {
       board: {
         id: boardId,
-        deletedAt: null,
+        deletedAt,
         createdAt: '2022-08-25T17:19:05.413Z',
         createdBy,
         updatedAt: '2022-08-25T17:26:01.401Z',
@@ -295,7 +297,7 @@ export function boardWithCardsArgs({
   for (let i = 0; i < views; i++) {
     rootBoardNode.blocks.views.push({
       id: v4(),
-      deletedAt: null,
+      deletedAt,
       createdAt: new Date(),
       createdBy,
       updatedAt: new Date(),

@@ -425,7 +425,8 @@ export async function generateBountyWithSingleApplication({
   bountyStatus,
   bountyTitle = 'Bounty',
   bountyDescription = 'Bounty description',
-  customReward
+  customReward,
+  deletedAt
 }: {
   customReward?: string;
   applicationStatus: ApplicationStatus;
@@ -437,6 +438,7 @@ export async function generateBountyWithSingleApplication({
   reviewer?: string;
   bountyTitle?: string;
   bountyDescription?: string;
+  deletedAt?: null | Date;
 }): Promise<BountyWithDetails> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -456,6 +458,7 @@ export async function generateBountyWithSingleApplication({
           path: `bounty-${randomUUID()}`,
           type: 'bounty',
           updatedBy: userId,
+          deletedAt,
           space: { connect: { id: spaceId } },
           author: { connect: { id: userId } },
           contentText: bountyDescription,
@@ -1085,7 +1088,8 @@ export async function generateBoard({
   viewDataSource,
   boardPageType,
   linkedSourceId,
-  customProps
+  customProps,
+  deletedAt
 }: {
   createdBy: string;
   spaceId: string;
@@ -1099,6 +1103,7 @@ export async function generateBoard({
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   linkedSourceId?: string;
   customProps?: CustomBoardProps;
+  deletedAt?: null | Date;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1112,7 +1117,8 @@ export async function generateBoard({
     boardPageType,
     viewType,
     linkedSourceId,
-    customProps
+    customProps,
+    deletedAt
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

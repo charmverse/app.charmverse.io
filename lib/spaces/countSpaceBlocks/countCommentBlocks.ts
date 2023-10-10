@@ -26,37 +26,67 @@ export async function countCommentBlocks({ spaceId }: BlocksCountQuery): Promise
   counts.details.applicationComment = await prisma.applicationComment.count({
     where: {
       application: {
-        spaceId
-      }
+        spaceId,
+        bounty: {
+          page: {
+            deletedAt: null
+          }
+        }
+      },
+      deletedAt: null
+    }
+  });
+
+  const deletedBlocks = await prisma.block.findMany({
+    where: {
+      spaceId,
+      deletedAt: null
+    },
+    select: {
+      id: true
     }
   });
 
   counts.details.blockComment = await prisma.block.count({
     where: {
       spaceId,
-      type: 'comment'
+      type: 'comment',
+      deletedAt: null,
+      parentId: {
+        notIn: deletedBlocks.map((b) => b.id)
+      },
+      rootId: {
+        notIn: deletedBlocks.map((b) => b.id)
+      }
     }
   });
 
   counts.details.comment = await prisma.comment.count({
     where: {
-      spaceId
+      spaceId,
+      page: {
+        deletedAt: null
+      }
     }
   });
 
   counts.details.pageComments = await prisma.pageComment.count({
     where: {
       page: {
-        spaceId
-      }
+        spaceId,
+        deletedAt: null
+      },
+      deletedAt: null
     }
   });
 
   counts.details.postComment = await prisma.postComment.count({
     where: {
       post: {
-        spaceId
-      }
+        spaceId,
+        deletedAt: null
+      },
+      deletedAt: null
     }
   });
 
