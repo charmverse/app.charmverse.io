@@ -1,3 +1,4 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import _sum from 'lodash/sum';
 
@@ -25,9 +26,14 @@ export async function countSpacePages({ spaceId }: BlocksCountQuery): Promise<Pa
     }
   };
 
+  const baseQuery: Prisma.PageWhereInput = {
+    spaceId,
+    deletedAt: null
+  };
+
   pageCounts.details.documents = await prisma.page.count({
     where: {
-      spaceId,
+      ...baseQuery,
       type: {
         in: ['page', 'page_template']
       }
@@ -36,7 +42,7 @@ export async function countSpacePages({ spaceId }: BlocksCountQuery): Promise<Pa
 
   pageCounts.details.rewards = await prisma.page.count({
     where: {
-      spaceId,
+      ...baseQuery,
       type: {
         in: ['bounty', 'bounty_template']
       }
@@ -45,7 +51,7 @@ export async function countSpacePages({ spaceId }: BlocksCountQuery): Promise<Pa
 
   pageCounts.details.proposals = await prisma.page.count({
     where: {
-      spaceId,
+      ...baseQuery,
       type: {
         in: ['proposal', 'proposal_template']
       }
@@ -54,7 +60,7 @@ export async function countSpacePages({ spaceId }: BlocksCountQuery): Promise<Pa
 
   pageCounts.details.databases = await prisma.page.count({
     where: {
-      spaceId,
+      ...baseQuery,
       type: {
         in: ['board', 'board_template', 'linked_board', 'inline_board', 'inline_linked_board']
       }
@@ -63,7 +69,7 @@ export async function countSpacePages({ spaceId }: BlocksCountQuery): Promise<Pa
 
   pageCounts.details.cards = await prisma.page.count({
     where: {
-      spaceId,
+      ...baseQuery,
       type: {
         in: ['card', 'card_template']
       }
