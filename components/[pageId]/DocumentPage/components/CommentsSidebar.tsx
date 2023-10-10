@@ -1,4 +1,5 @@
 import { useEditorViewContext } from '@bangle.dev/react';
+import { isEmptyDocument } from '@bangle.dev/utils';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -78,7 +79,10 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   }
 
   const view = useEditorViewContext();
-  const extractedThreadIds = extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
+  // view.state.doc stays the same (empty content) even when the document content changes
+  const extractedThreadIds = isEmptyDocument(view.state.doc)
+    ? new Set(Object.keys(threads))
+    : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
 
   // Making sure the position sort doesn't filter out comments that are not in the view
   const inlineThreadsIds = Array.from(
@@ -97,7 +101,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   useLayoutEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
 
-    const highlightedCommentId = router.query.commentId;
+    const highlightedCommentId = router.query.inlineCommentId;
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
       setCurrentPageActionDisplay('comments');
@@ -109,7 +113,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
       }
 
       // Remove query parameters from url
-      setUrlWithoutRerender(router.pathname, { commentId: null });
+      setUrlWithoutRerender(router.pathname, { inlineCommentId: null });
 
       requestAnimationFrame(() => {
         const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
@@ -129,7 +133,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
         }, 250);
       });
     }
-  }, [router.query.commentId]);
+  }, [router.query.inlineCommentId]);
 
   return (
     <>

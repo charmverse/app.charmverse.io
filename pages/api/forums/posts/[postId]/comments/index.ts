@@ -9,6 +9,8 @@ import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -67,6 +69,13 @@ async function createPostCommentHandler(req: NextApiRequest, res: NextApiRespons
   }
 
   const postComment = await createPostComment({ postId, userId, ...body });
+
+  await publishDocumentEvent({
+    scope: WebhookEventNames.DocumentCommentCreated,
+    spaceId: post.spaceId,
+    commentId: postComment.id,
+    postId
+  });
 
   res.status(200).json({
     ...postComment,

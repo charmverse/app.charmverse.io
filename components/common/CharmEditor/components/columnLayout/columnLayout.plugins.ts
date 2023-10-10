@@ -17,17 +17,6 @@ export function plugins({ key, readOnly }: { key: PluginKey; readOnly: boolean }
     return [
       keymap(
         createObject([
-          // 'Shift-Tab': undentListItem,
-          [
-            'Tab',
-            filter(isColumnBlock, (state, dispatch) => {
-              // if (dispatch) {
-              //   dispatch(state.tr.replaceSelectionWith(state.schema.nodes.tabIndent.create()).scrollIntoView());
-              // }
-              return false;
-            })
-          ],
-          // 'Shift-Tab': undentListItem,
           ['Mod-Enter', filter(isColumnBlock, exitColumn)],
           ['Enter', filter(isColumnBlock, chainCommands(newlineInCode, createParagraphNear, splitBlock))]
         ])

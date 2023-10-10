@@ -1,18 +1,26 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import type { ApplicationStatus } from '@charmverse/core/prisma-client';
+import CollapseIcon from '@mui/icons-material/ArrowDropDown';
+import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import {
+  REWARD_APPLICATION_STATUS_COLORS,
+  RewardApplicationStatusIcon
+} from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
+import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { TextInput } from '../../../../components/properties/TextInput';
@@ -23,6 +31,11 @@ import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import PropertyValueElement from '../propertyValueElement';
 
+export type CardPageWithCustomIcon = CardPage & {
+  customIcon?: ReactElement | null;
+  subPages?: CardPageWithCustomIcon[];
+};
+
 type Props = {
   hasContent?: boolean;
   board: Board;
@@ -32,7 +45,7 @@ type Props = {
   pageTitle: string;
   isSelected: boolean;
   focusOnMount: boolean;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string, parentId?: string) => void;
   readOnly: boolean;
   offset: number;
   pageUpdatedAt: string;
@@ -45,6 +58,9 @@ type Props = {
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
   readOnlyTitle?: boolean;
+  isExpanded?: boolean | null;
+  setIsExpanded?: (expanded: boolean) => void;
+  indentTitle?: number;
 };
 
 export const columnWidth = (
@@ -72,7 +88,10 @@ function TableRow(props: Props) {
     pageUpdatedAt,
     pageUpdatedBy,
     saveTitle,
-    onDeleteCard
+    onDeleteCard,
+    setIsExpanded,
+    isExpanded,
+    indentTitle
   } = props;
   const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
@@ -99,7 +118,7 @@ function TableRow(props: Props) {
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     event.preventDefault();
     setAnchorEl(event.currentTarget);
@@ -150,6 +169,14 @@ function TableRow(props: Props) {
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
+      {!props.readOnly && (
+        <Box className='icons row-actions' onClick={handleClick}>
+          <Box className='charm-drag-handle'>
+            <DragIndicatorIcon color='secondary' />
+          </Box>
+        </Box>
+      )}
+
       {/* Columns, one per property */}
       {visiblePropertyTemplates.map((template, templateIndex) => {
         if (template.id === Constants.titleColumnId) {
@@ -168,19 +195,35 @@ function TableRow(props: Props) {
               key={template.id}
               onPaste={(e) => e.stopPropagation()}
             >
-              {!props.readOnly && templateIndex === 0 && (
-                <IconButton className='icons' onClick={handleClick} size='small'>
-                  <DragIndicatorIcon color='secondary' />
-                </IconButton>
-              )}
               <div style={{ display: 'flex', width: '100%' }}>
                 <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
-                  <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
+                  {setIsExpanded &&
+                    (isExpanded ? (
+                      <CollapseIcon onClick={() => setIsExpanded(false)} />
+                    ) : isExpanded === false ? (
+                      <ExpandIcon onClick={() => setIsExpanded(true)} />
+                    ) : (
+                      <span style={{ paddingRight: '24px' }}></span>
+                    ))}
+
+                  {indentTitle && <div style={{ paddingRight: `${indentTitle}px` }}></div>}
+                  {card.customIconType === 'applicationStatus' && card.fields.properties[REWARD_STATUS_BLOCK_ID] && (
+                    <RewardApplicationStatusIcon
+                      status={card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus}
+                    />
+                  )}
+                  {card.customIconType !== 'applicationStatus' && (
+                    <PageIcon
+                      isEditorEmpty={!hasContent}
+                      pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
+                      icon={pageIcon}
+                    />
+                  )}
                   <TextInput {...commonProps} multiline={wrapColumn} />
                 </div>
 
                 <div className='open-button' data-test={`database-row-open-${card.id}`}>
-                  <Button onClick={() => props.showCard(props.card.id || '')}>
+                  <Button onClick={() => props.showCard(props.card.id || '', props.card.parentId)}>
                     <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                   </Button>
                 </div>
@@ -203,11 +246,6 @@ function TableRow(props: Props) {
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
-            {!props.readOnly && templateIndex === 0 && (
-              <IconButton className='icons' onClick={handleClick} size='small'>
-                <DragIndicatorIcon color='secondary' />
-              </IconButton>
-            )}
             <PropertyValueElement
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
@@ -238,4 +276,37 @@ function TableRow(props: Props) {
   );
 }
 
-export default memo(TableRow);
+export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { subPages?: CardPage[] }) {
+  const [isExpanded, setIsExpanded] = useState<boolean | null>(props.subPages?.length ? false : null);
+
+  useEffect(() => {
+    setIsExpanded((v) => {
+      if (v === null && props.subPages?.length) {
+        return false;
+      }
+
+      return v;
+    });
+  }, [props.subPages?.length]);
+
+  return (
+    <>
+      <TableRow {...props} isExpanded={isExpanded} setIsExpanded={props.subPages ? setIsExpanded : undefined} />
+      {isExpanded &&
+        props.subPages?.map((subPage) => (
+          <ExpandableTableRow
+            key={subPage.card.id}
+            {...props}
+            pageTitle={subPage.page.title}
+            pageUpdatedAt={subPage.page.updatedAt.toISOString()}
+            card={subPage.card}
+            cardPage={subPage.page}
+            subPages={subPage.subPages}
+            indentTitle={48}
+          />
+        ))}
+    </>
+  );
+}
+
+export default memo(ExpandableTableRow);

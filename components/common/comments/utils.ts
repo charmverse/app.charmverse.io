@@ -1,5 +1,5 @@
 import type { CommentSortType } from 'components/common/comments/CommentSort';
-import type { GenericCommentWithVote, CommentWithChildren, GenericCommentVote } from 'lib/comments';
+import type { GenericCommentWithVote, CommentWithChildren, GenericCommentVote, GenericComment } from 'lib/comments';
 
 export function processComments<T>({
   comments,
@@ -43,13 +43,15 @@ export function sortComments<T>({
   comments,
   sort
 }: {
-  comments: GenericCommentWithVote<T>[];
+  comments: GenericCommentWithVote<T>[] | GenericComment<T>[];
   sort: CommentSortType;
-}): GenericCommentWithVote<T>[] {
+}): GenericCommentWithVote<T>[] | GenericComment<T>[] {
   if (sort === 'latest') {
     return comments.sort((c1, c2) => (c1.createdAt > c2.createdAt ? -1 : 1));
   } else if (sort === 'top') {
-    return comments.sort((c1, c2) => (c1.upvotes - c1.downvotes > c2.upvotes - c2.downvotes ? -1 : 1));
+    return (comments as GenericCommentWithVote<T>[]).sort((c1, c2) =>
+      c1.upvotes - c1.downvotes > c2.upvotes - c2.downvotes ? -1 : 1
+    );
   }
 
   return comments;

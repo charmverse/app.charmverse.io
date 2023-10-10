@@ -51,7 +51,7 @@ function Comment(props: Props) {
           </MenuWrapper>
         )}
       </div>
-      <Box ml={3}>
+      <Box ml={3} data-test={`card-comment-content-${comment.id}`} id={`card-comment-content-${comment.id}`}>
         {comment.fields.content ? (
           <InlineCharmEditor content={comment.fields.content} readOnly style={{ fontSize: '14px' }} />
         ) : (

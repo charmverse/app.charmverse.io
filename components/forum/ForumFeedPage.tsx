@@ -33,7 +33,7 @@ export function ForumPage() {
   const { space: currentSpace } = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
   const { createPost, showPost } = usePostDialog();
-  const { categories, isCategoriesLoaded, getPostableCategories } = useForumCategories();
+  const { categories, isLoading: isCategoriesLoading, getPostableCategories } = useForumCategories();
   const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
 
@@ -67,7 +67,7 @@ export function ForumPage() {
     setCurrentCategory(category ?? null);
 
     // User tried to navigate to a category they cannot access or does not exist, redirect them to forum home
-    if (category === undefined && isCategoriesLoaded && currentSpace) {
+    if (category === undefined && !isCategoriesLoading && currentSpace) {
       router.push(`/${currentSpace.domain}/forum`);
     } else if (category && currentSpace) {
       charmClient.track.trackAction('main_feed_filtered', {
@@ -186,7 +186,7 @@ export function ForumPage() {
             disabledTooltip={disabledCreatePostTooltip}
             onClick={showNewPostPopup}
           />
-          {!isCategoriesLoaded ? (
+          {isCategoriesLoading ? (
             <PostSkeleton />
           ) : (
             <ForumPostList search={search} categoryId={currentCategory?.id} sort={sort} />

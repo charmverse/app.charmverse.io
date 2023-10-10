@@ -35,6 +35,20 @@ export class CdkDeployStack extends Stack {
     // Make sure that Elastic Beanstalk app exists before creating an app version
     appVersionProps.addDependency(ebApp);
 
+    const healthReportingSystemConfig = {
+      Rules: {
+        Environment: {
+          Application: {
+            ApplicationRequests4xx: { Enabled: false }
+          },
+          ELB: {
+            ELBRequests4xx: { Enabled: false }
+          }
+        }
+      },
+      Version: 1
+    }
+
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
       {
@@ -51,6 +65,16 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'LoadBalancerType',
         value: 'application'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:healthreporting:system',
+        optionName: 'SystemType',
+        value: 'enhanced'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:healthreporting:system',
+        optionName: 'ConfigDocument',
+        value: JSON.stringify(healthReportingSystemConfig)
       },
       {
         namespace: 'aws:elbv2:listener:443',

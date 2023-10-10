@@ -3,6 +3,7 @@ services:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}", "version": "${IMGTAG}"}]'
+      com.datadoghq.tags.env: '${SERVICE_ENV:-tst}'
       com.datadoghq.tags.service: '${SERVICE_NAME}'
       com.datadoghq.tags.version: '${IMGTAG}'
     env_file:
@@ -29,7 +30,7 @@ services:
       - '80:3000'
     command: ['npm', 'run', 'cron:staging']
     environment:
-      - NEXT_PUBLIC_APP_ENV=staging
+      - REACT_APP_APP_ENV=staging
     profiles:
       - stg-cron
 
@@ -42,7 +43,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env -- node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     # environment:
     #   - FORCE_SUBDOMAINS=true
@@ -58,10 +59,10 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     environment:
-      - NEXT_PUBLIC_APP_ENV=staging
+      - REACT_APP_APP_ENV=staging
       - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-webapp
@@ -82,7 +83,7 @@ services:
     ports:
       - '3002:3000'
     environment:
-      - NEXT_PUBLIC_APP_ENV=staging
+      - REACT_APP_APP_ENV=staging
     profiles:
       - stg-sockets
       - stg-webapp
@@ -130,6 +131,9 @@ services:
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/log:/host/var/log:ro
+    ports:
+      - '8125:8125/udp'
+      - '8126:8126/tcp'
     env_file:
       - '.env'
     environment:
@@ -141,6 +145,7 @@ services:
       DD_APM_NON_LOCAL_TRAFFIC: 'true'
       DD_ENV: '${SERVICE_ENV:-tst}'
       DD_SERVICE: '${SERVICE_NAME}'
+      DD_USE_DOGSTATSD: 'true'
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
       DD_EC2_PREFER_IMDSV2: 'true'
     profiles:

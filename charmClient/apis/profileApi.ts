@@ -20,7 +20,7 @@ export class ProfileApi {
     return http.PUT('/api/profile/items', data);
   }
 
-  getOrgs(userId: string) {
+  getSpaces(userId: string) {
     return http.GET<UserCommunity[]>(`/api/profile/orgs/${userId}`);
   }
 

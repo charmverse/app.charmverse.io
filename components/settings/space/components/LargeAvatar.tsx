@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import AvatarWithIcons from 'components/common/AvatarWithIcons';
-import { NftAvatarGalleryPopup } from 'components/common/UserProfile/components/NftAvatarGallery/NftAvatarGalleryPopup';
+import { NftAvatarGalleryPopup } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/CollectionWidget/NftAvatarGallery/NftAvatarGalleryPopup';
 import { AvatarEditMenu } from 'components/settings/space/components/AvatarEditMenu';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { NFTData } from 'lib/blockchain/getNFTs';

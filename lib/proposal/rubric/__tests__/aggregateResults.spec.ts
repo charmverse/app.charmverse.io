@@ -6,8 +6,10 @@ const firstUserId = '1';
 const secondUserId = '2';
 
 const firstRubricId = '11';
+const firstUserComment = 'This looks good!';
 
 const secondRubricId = '22';
+const secondUserComment = 'Not bad, could be improved';
 
 describe('aggregateResults', () => {
   it('should aggregate results and return data in proper shape', async () => {
@@ -15,26 +17,78 @@ describe('aggregateResults', () => {
       answers: [
         {
           rubricCriteriaId: firstRubricId,
-          response: { score: 7 },
-          comment: 'my opinion',
+          response: { score: 8 },
+          comment: firstUserComment,
           userId: firstUserId
+        },
+        {
+          rubricCriteriaId: secondRubricId,
+          response: { score: 12 },
+          comment: firstUserComment,
+          userId: firstUserId
+        },
+        {
+          rubricCriteriaId: firstRubricId,
+          response: { score: 4 },
+          comment: secondUserComment,
+          userId: secondUserId
         }
       ],
       criteria: [
         {
           id: firstRubricId
+        },
+        {
+          id: secondRubricId
         }
       ]
     });
 
-    expect(result.criteriaSummary[firstRubricId].average).toEqual(7);
-    expect(result.criteriaSummary[firstRubricId].sum).toEqual(7);
-    expect(result.reviewersResults[firstUserId].average).toEqual(7);
-    expect(result.reviewersResults[firstUserId].id).toEqual(firstUserId);
-    expect(result.reviewersResults[firstUserId].answersMap).toMatchObject({
-      11: {
-        score: 7,
-        comment: 'my opinion'
+    expect(result).toMatchObject<AggregateResults>({
+      allScores: {
+        // Average of all individual scores (not average of averages)
+        average: 8,
+        sum: 24
+      },
+      reviewersResults: {
+        [firstUserId]: {
+          answersMap: {
+            [firstRubricId]: {
+              comment: firstUserComment,
+              score: 8
+            },
+            [secondRubricId]: {
+              comment: firstUserComment,
+              score: 12
+            }
+          },
+          average: 10,
+          id: firstUserId,
+          sum: 20
+        },
+        [secondUserId]: {
+          answersMap: {
+            [firstRubricId]: {
+              comment: secondUserComment,
+              score: 4
+            }
+          },
+          average: 4,
+          id: secondUserId,
+          sum: 4
+        }
+      },
+      criteriaSummary: {
+        [firstRubricId]: {
+          average: 6,
+          comments: [firstUserComment, secondUserComment],
+          sum: 12
+        },
+        [secondRubricId]: {
+          average: 12,
+          comments: [firstUserComment],
+          sum: 12
+        }
       }
     });
   });
@@ -184,7 +238,7 @@ describe('aggregateResults', () => {
     ).toMatchObject<AggregateResults>({
       allScores: { average: null, sum: null },
       criteriaSummary: {
-        '1': { average: null, sum: null }
+        '1': { average: null, sum: null, comments: [] }
       },
       reviewersResults: {}
     });

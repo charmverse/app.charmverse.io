@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { log } from '@charmverse/core/log';
 import { getNotifications } from '../background/tasks/sendNotifications/sendNotifications';
 

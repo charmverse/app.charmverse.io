@@ -2,10 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { BountyStatus } from '@charmverse/core/prisma';
 import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
-import { useOnBountyCardClose } from 'components/bounties/hooks/useOnBountyCardClose';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { usePages } from 'hooks/usePages';
 import type { BountyWithDetails } from 'lib/bounties';
@@ -22,10 +19,8 @@ interface Props {
 
 export function BountiesKanbanView({ bounties, publicMode }: Props) {
   const { deletePage, pages } = usePages();
-  const { showPage } = usePageDialog();
   const { setBounties } = useBounties();
   const router = useRouter();
-  const { onClose } = useOnBountyCardClose();
 
   function onClickDelete(pageId: string) {
     setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== pageId));
@@ -52,17 +47,6 @@ export function BountiesKanbanView({ bounties, publicMode }: Props) {
       query: { ...router.query, bountyId }
     });
   }
-
-  useEffect(() => {
-    if (router.isReady && typeof router.query.bountyId === 'string') {
-      showPage({
-        bountyId: router.query.bountyId,
-        readOnly: publicMode,
-        onClose
-      });
-    }
-  }, [router.isReady, router.query.bountyId]);
-
   return (
     <div className='Kanban'>
       {/* include ViewHeader to include the horizontal line */}

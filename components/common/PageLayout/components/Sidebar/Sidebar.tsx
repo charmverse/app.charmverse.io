@@ -2,14 +2,16 @@ import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
+import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import type { BoxProps } from '@mui/material';
+import { Popover } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -22,12 +24,13 @@ import { useFavoritePages } from 'hooks/useFavoritePages';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 
@@ -37,6 +40,7 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
+import { NotificationsPopover, NotificationUpdates } from './components/NotificationsPopover';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';
@@ -128,7 +132,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const { logoutWallet } = useWeb3AuthSig();
+  const { logoutWallet } = useWeb3Account();
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
@@ -196,6 +200,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
           />
           <SidebarLink
             active={false}
+            external
             href={charmverseDiscordInvite}
             icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
             label='Support & Feedback'
@@ -226,6 +231,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
 
   const { features } = useFeaturesAndMembers();
+  const isCharmverse = useIsCharmverseSpace();
 
   return (
     <SidebarContainer>
@@ -272,9 +278,10 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                       label='Invites'
                     />
                   )}
+                  <NotificationUpdates />
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
-                    .filter((feat) => !feat.isHidden)
+                    .filter((feat) => !feat.isHidden && (feat.path !== 'rewards' || isCharmverse))
                     .map((feat) => {
                       if (
                         showMemberFeatures ||

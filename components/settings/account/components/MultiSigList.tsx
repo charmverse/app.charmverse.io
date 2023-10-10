@@ -26,8 +26,8 @@ import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import { useImportSafes } from 'hooks/useImportSafes';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import useGnosisSigner from 'hooks/useWeb3Signer';
-import { shortenHex } from 'lib/utilities/strings';
+import { useWeb3Account } from 'hooks/useWeb3Account';
+import { shortenHex } from 'lib/utilities/blockchain';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -41,14 +41,14 @@ export function MultiSigList() {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { importSafes, isLoadingSafes } = useImportSafes();
 
-  const gnosisSigner = useGnosisSigner();
+  const { signer } = useWeb3Account();
 
   useEffect(() => {
-    if (gnosisSigner) {
+    if (signer) {
       // We need this to run every time a user opens the account section in the settings modal
-      importSafes(gnosisSigner);
+      importSafes(signer);
     }
-  }, [gnosisSigner]);
+  }, [signer]);
 
   // sort the rows to prevent random order
   const sortedSafes = safeData?.sort((a, b) => (a.address < b.address ? -1 : 1)) || [];
@@ -65,10 +65,10 @@ export function MultiSigList() {
         </Box>
       </Legend>
 
-      {sortedSafes.length === 0 && !gnosisSigner && (
+      {sortedSafes.length === 0 && !signer && (
         <Typography>Please unlock your wallet and ensure it is connected to your account.</Typography>
       )}
-      {sortedSafes.length === 0 && gnosisSigner && !isLoadingSafes && <Typography>No safes found</Typography>}
+      {sortedSafes.length === 0 && signer && !isLoadingSafes && <Typography>No safes found</Typography>}
       {sortedSafes.length > 0 && (
         <Table size='small' aria-label='multisig table'>
           <TableHead>

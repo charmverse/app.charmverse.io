@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import type { PageWithProposal } from 'lib/pages';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace, createProposalWithUsers, createVote } from 'testing/setupDatabase';
+import { createProposalWithUsers, createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;

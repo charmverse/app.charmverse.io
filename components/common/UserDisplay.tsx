@@ -5,8 +5,8 @@ import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
-import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
-import useENSName from 'hooks/useENSName';
+import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useENSName } from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 /**
@@ -89,7 +89,7 @@ interface UserDisplayProps extends StyleProps {
 }
 
 function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayProps) {
-  const { showUserProfile } = useUserProfile();
+  const { showUserId } = useMemberDialog();
 
   if (!user) {
     // strip out invalid names
@@ -110,7 +110,7 @@ function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayPro
         showMiniProfile
           ? () => {
               if (showMiniProfile) {
-                showUserProfile(user.id);
+                showUserId(user.id);
               }
             }
           : undefined

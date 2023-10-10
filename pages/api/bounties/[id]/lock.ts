@@ -29,10 +29,11 @@ async function closeSubmissionsController(req: NextApiRequest, res: NextApiRespo
     throw new UnauthorisedActionError('You cannot close submissions for this bounty.');
   }
 
-  const bountyWithClosedSubmissions = await lockApplicationAndSubmissions(
-    bountyId as string,
-    !req.query.lock || req.query.lock === 'true'
-  );
+  const bountyWithClosedSubmissions = await lockApplicationAndSubmissions({
+    bountyId: bountyId as string,
+    lock: !req.query.lock || req.query.lock === 'true',
+    userId
+  });
 
   return res.status(200).json(bountyWithClosedSubmissions);
 }

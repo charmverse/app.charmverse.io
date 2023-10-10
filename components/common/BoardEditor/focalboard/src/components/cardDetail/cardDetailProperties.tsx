@@ -25,8 +25,8 @@ import Calculations from '../calculations/calculations';
 type Props = {
   board: Board;
   syncWithPageId?: string | null;
-  card: Card;
-  cards: Card[];
+  card: Card<any>;
+  cards: Card<any>[];
   activeView?: BoardView;
   views: BoardView[];
   readOnly: boolean;
@@ -247,7 +247,7 @@ function CardDetailProperties(props: Props) {
   );
 
   return (
-    <div className='octo-propertylist'>
+    <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields.cardProperties.map((propertyTemplate) => {
         return (
           <CardDetailProperty

@@ -1,7 +1,6 @@
 import { ethereumTypesConfig } from './chainComponents/ethereum/ethereumTypesConfig';
-import { solanaTypesConfig } from './chainComponents/solana/solanaTypesConfig';
 
-import { utils, Wordlist, constants } from 'ethers';
+import { isAddress } from 'viem';
 
 type LitChainConfig = {
   value: string;
@@ -21,7 +20,7 @@ export const chainConfig = {
     abbreviation: 'eth',
     nativeToken: 'ETH',
     types: ethereumTypesConfig,
-    addressValidator: (walletAddress: string) => utils.isAddress(walletAddress)
+    addressValidator: (walletAddress: string) => isAddress(walletAddress)
   },
   polygon: {
     value: 'polygon',

@@ -100,7 +100,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         {isLoadingSpaceSubscription ? (
           <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
-        ) : spaceSubscription && spaceSubscription.status !== 'free_trial' ? (
+        ) : spaceSubscription && !!spaceSubscription.status ? (
           <SubscriptionInformation
             minimumBlockQuota={minimumBlockQuota}
             space={space}
@@ -110,7 +110,6 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         ) : (
           <CreateSubscriptionInformation
             pendingPayment={pendingPayment || false}
-            spaceSubscription={spaceSubscription}
             onUpgrade={handleShowCheckoutForm}
             spaceId={space.id}
           />

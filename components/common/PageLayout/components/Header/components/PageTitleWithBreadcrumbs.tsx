@@ -4,6 +4,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
+import { useGetApplication } from 'charmClient/hooks/rewards';
 import Link from 'components/common/Link';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -157,6 +158,39 @@ function BountyPageTitle({ basePath, baseTitle }: { basePath: string; baseTitle:
   );
 }
 
+function RewardsPageTitle({
+  basePath,
+  baseTitle,
+  applicationId
+}: {
+  basePath: string;
+  baseTitle: string;
+  applicationId?: string;
+}) {
+  const [pageTitle] = usePageTitle();
+  const { pages } = usePages();
+  const { data: application } = useGetApplication({ applicationId });
+
+  const rewardPage = application ? pages[application.bountyId] : undefined;
+
+  return (
+    <PageTitle>
+      <BreadCrumb>
+        <Link href={`${basePath}/rewards`}>{baseTitle}</Link>
+      </BreadCrumb>
+      {pageTitle && !applicationId ? pageTitle : null}
+      {rewardPage && (
+        <>
+          <BreadCrumb>
+            <Link href={`${basePath}/${rewardPage.path}`}>{rewardPage.title}</Link>
+          </BreadCrumb>
+          {applicationId && 'Application'}
+        </>
+      )}
+    </PageTitle>
+  );
+}
+
 function PublicBountyPageTitle() {
   const { space } = useCurrentSpace();
   return (
@@ -182,9 +216,15 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  } else if (pageType === 'bounty') {
-    const baseTitle = mappedFeatures.bounties.title;
-    return <BountyPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;
+  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/rewards/')) {
+    const baseTitle = mappedFeatures.rewards.title;
+    return (
+      <RewardsPageTitle
+        basePath={`/${router.query.domain}`}
+        baseTitle={baseTitle}
+        applicationId={router.query.applicationId as string}
+      />
+    );
   } else if (pageType === 'proposal') {
     const baseTitle = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;

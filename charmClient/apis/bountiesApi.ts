@@ -11,10 +11,10 @@ import type {
 } from 'lib/applications/interfaces';
 import type {
   AssignedBountyPermissions,
-  BountyCreationData,
   BountyUpdate,
   SuggestionAction,
-  BountyWithDetails
+  BountyWithDetails,
+  BountyCreationData
 } from 'lib/bounties';
 import type { Resource } from 'lib/permissions/interfaces';
 import type { TransactionCreationData } from 'lib/transactions/interface';

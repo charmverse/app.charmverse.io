@@ -9,11 +9,12 @@ import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import { getChainById } from 'connectors';
-import { utils } from 'ethers';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
+import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
+import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import InputGeneratorText from 'components/common/form/InputGeneratorText';
@@ -23,13 +24,13 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
-import { ExternalServiceError, SystemError, UnknownError } from 'lib/utilities/errors';
+import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
+import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
@@ -50,7 +51,7 @@ const MIN_VOTING_OPTIONS = 2;
  * https://github.com/snapshot-labs/snapshot-sequencer/blob/24fba742c89790c7d955c520b4d36c96e883a3e9/src/writer/proposal.ts#L83C29-L83C29
  */
 export function PublishingForm({ onSubmit, pageId }: Props) {
-  const { account, library } = useWeb3AuthSig();
+  const { account, provider: web3Provider } = useWeb3Account();
 
   const { space } = useCurrentSpace();
   const { members } = useMembers();
@@ -210,12 +211,8 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
         generatorOptions: { members }
       });
 
-      if (!account) {
-        throw new SystemError({
-          errorType: 'External service',
-          severity: 'warning',
-          message: "We couldn't detect your wallet. Please unlock your wallet and try publishing again."
-        });
+      if (!account || !web3Provider) {
+        throw new MissingWeb3AccountError();
       }
 
       if (!snapshotBlockNumber) {
@@ -251,8 +248,8 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
       }
 
       const receipt: SnapshotReceipt = (await client.proposal(
-        library,
-        utils.getAddress(account as string),
+        web3Provider,
+        getAddress(account as string),
         proposalParams
       )) as SnapshotReceipt;
 
@@ -440,9 +437,19 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
 
             {formError && (
               <Grid item>
-                <Alert severity={formError.severity as AlertColor}>
-                  {formError.message ?? (formError as any).error}
-                </Alert>
+                {formError instanceof MissingWeb3AccountError ? (
+                  <Alert
+                    sx={{ alignItems: 'center' }}
+                    action={!web3Provider ? <OpenWalletSelectorButton color='inherit' /> : null}
+                    severity={formError.severity as AlertColor}
+                  >
+                    We couldn't detect your wallet. Please unlock your wallet and try publishing again.
+                  </Alert>
+                ) : (
+                  <Alert severity={formError.severity as AlertColor}>
+                    {formError.message ?? (formError as any).error}
+                  </Alert>
+                )}
               </Grid>
             )}
 

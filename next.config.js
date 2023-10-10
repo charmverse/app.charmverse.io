@@ -11,7 +11,7 @@ const config = {
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
-    dirs: ['pages', 'components', 'lib', 'background', 'serverless'],
+    dirs: ['pages', 'components', 'lib', 'background', 'serverless', 'stories'],
     ignoreDuringBuilds: skipCodeChecks
   },
   // types are tested separately from the build
@@ -45,7 +45,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
-  assetPrefix: process.env.NEXT_PUBLIC_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
+  assetPrefix: process.env.REACT_APP_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async redirects() {
     return [

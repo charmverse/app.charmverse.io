@@ -24,7 +24,6 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { BountyWithDetails } from 'lib/bounties';
@@ -42,6 +41,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
@@ -66,7 +66,7 @@ export async function generateSpaceUser({
       username: 'Username',
       wallets: {
         create: {
-          address: Wallet.createRandom().address
+          address: randomETHWalletAddress()
         }
       },
       spaceRoles: {
@@ -152,6 +152,7 @@ type CreateUserAndSpaceInput = {
   isGuest?: boolean;
   onboarded?: boolean;
   spaceName?: string;
+  spaceCustomDomain?: string;
   publicBountyBoard?: boolean;
   paidTier?: SubscriptionTier;
   superApiTokenId?: string;
@@ -165,6 +166,7 @@ export async function generateUserAndSpace({
   isGuest,
   onboarded = true,
   spaceName = 'Example Space',
+  spaceCustomDomain,
   publicBountyBoard,
   superApiTokenId,
   walletAddress,
@@ -194,6 +196,7 @@ export async function generateUserAndSpace({
               name: spaceName,
               // Adding prefix avoids this being evaluated as uuid
               domain: `domain-${v4()}`,
+              customDomain: spaceCustomDomain,
               publicBountyBoard,
               notifyNewProposals,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
@@ -657,7 +660,8 @@ export function createPage(
         : undefined,
       parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
-      boardId: options.boardId ?? null
+      boardId: options.boardId ?? null,
+      additionalPaths: options.additionalPaths
     },
     include: {
       permissions: {
@@ -963,7 +967,7 @@ export async function generateProposal({
   proposalStatus: ProposalStatus;
   evaluationType?: ProposalEvaluationType;
   title?: string;
-}): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
+}): Promise<PageWithProposal> {
   const proposalId = v4();
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
@@ -1046,22 +1050,7 @@ export async function generateProposal({
     }
   });
 
-  const workspaceEvent = await prisma.workspaceEvent.create({
-    data: {
-      type: 'proposal_status_change',
-      meta: {
-        newStatus: proposalStatus
-      },
-      actorId: userId,
-      pageId: proposalId,
-      spaceId
-    }
-  });
-
-  return {
-    ...result,
-    workspaceEvent
-  };
+  return result;
 }
 
 /**
@@ -1122,23 +1111,6 @@ export async function generateBoard({
   return prisma
     .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
     .then((result) => result[0] as Page);
-}
-
-export async function generateWorkspaceEvents({
-  actorId,
-  spaceId,
-  meta,
-  pageId
-}: Pick<WorkspaceEvent, 'actorId' | 'meta' | 'pageId' | 'spaceId'>) {
-  return prisma.workspaceEvent.create({
-    data: {
-      type: 'proposal_status_change',
-      actorId,
-      spaceId,
-      meta: meta ?? undefined,
-      pageId
-    }
-  });
 }
 
 export async function generateForumComment({

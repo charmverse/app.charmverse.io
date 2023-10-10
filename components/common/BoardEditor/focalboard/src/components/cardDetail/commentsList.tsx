@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from 'components/common/Avatar';
@@ -6,6 +7,7 @@ import { Button } from 'components/common/Button';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import type { CommentBlock } from '../../blocks/commentBlock';
 import { createCommentBlock } from '../../blocks/commentBlock';
@@ -25,6 +27,7 @@ const CommentsList = React.memo((props: Props) => {
   const { user } = useUser();
   const { getMemberById } = useMembers();
   const [editorKey, setEditorKey] = useState(0); // a key to allow us to reset charmeditor contents
+  const router = useRouter();
 
   const onSendClicked = (newComment: CommentBlock['fields']) => {
     const { rootId, cardId } = props;
@@ -43,6 +46,23 @@ const CommentsList = React.memo((props: Props) => {
   };
 
   const { comments } = props;
+
+  useEffect(() => {
+    const blockCommentId = router.query.blockCommentId;
+    if (blockCommentId && typeof window !== 'undefined') {
+      setTimeout(() => {
+        const blockCommentDomElement = window.document.getElementById(`card-comment-content-${blockCommentId}`);
+        if (blockCommentDomElement) {
+          requestAnimationFrame(() => {
+            blockCommentDomElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+            setUrlWithoutRerender(router.pathname, { blockCommentId: null });
+          });
+        }
+      }, 250);
+    }
+  }, [router.query.blockCommentId]);
 
   return (
     <div className='CommentsList'>

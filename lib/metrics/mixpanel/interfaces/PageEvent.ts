@@ -26,6 +26,7 @@ type ViewPageEvent = PageEvent & {
   postId?: string;
   meta?: { pathname: string };
   type: PageType | 'post' | StaticPageType;
+  spaceDomain?: string;
 };
 
 export interface PageEventMap {

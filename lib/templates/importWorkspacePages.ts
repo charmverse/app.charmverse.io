@@ -11,7 +11,7 @@ import { v4, validate } from 'uuid';
 import type { BountyWithDetails } from 'lib/bounties';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPagePath } from 'lib/pages/utils';
+import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
@@ -26,6 +26,7 @@ type WorkspaceImportOptions = {
   parentId?: string | null;
   updateTitle?: boolean;
   includePermissions?: boolean;
+  resetPaths?: boolean;
 };
 
 type UpdateRefs = {
@@ -59,7 +60,7 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
           extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id, originalId: attrs.pollId });
           attrs.pollId = newPollId;
         }
-      } else if (node.type === 'page') {
+      } else if (node.type === 'page' || node.type === 'linkedPage') {
         const attrs = node.attrs as { id: string };
         const oldPageId = attrs.id;
         let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
@@ -117,7 +118,8 @@ export async function generateImportWorkspacePages({
   exportName,
   parentId: rootParentId,
   updateTitle,
-  includePermissions
+  includePermissions,
+  resetPaths
 }: WorkspaceImportOptions): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
@@ -293,6 +295,18 @@ export async function generateImportWorkspacePages({
       }
     };
 
+    if (resetPaths) {
+      const newPath = generatePagePathFromPathAndTitle({
+        existingPagePath: newPageContent.data.path,
+        title: newPageContent.data.title as string
+      });
+
+      newPageContent.data.path = newPath;
+    }
+
+    // Always reset additional paths
+    newPageContent.data.additionalPaths = [];
+
     if (node.type.match('card')) {
       const cardBlock = node.blocks?.card;
 
@@ -352,6 +366,7 @@ export async function generateImportWorkspacePages({
       const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
       bountyArgs.push({
         ...bounty,
+        fields: (bounty.fields as any) || undefined,
         spaceId: space.id,
         createdBy: space.createdBy,
         id: oldNewPageIdHashMap[node.id]
@@ -469,7 +484,8 @@ export async function importWorkspacePages({
   exportName,
   parentId,
   updateTitle,
-  includePermissions
+  includePermissions,
+  resetPaths
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
@@ -487,7 +503,8 @@ export async function importWorkspacePages({
     exportName,
     parentId,
     updateTitle,
-    includePermissions
+    includePermissions,
+    resetPaths
   });
 
   const pagesToCreate = pageArgs.length;

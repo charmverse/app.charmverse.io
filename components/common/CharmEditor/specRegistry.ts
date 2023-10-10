@@ -22,7 +22,12 @@ import * as inlineDatabase from './components/inlineDatabase';
 import { spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import { spec as linkSpec } from './components/link/link.specs';
+import { linkedPageSpec } from './components/linkedPage/linkedPage.specs';
 import * as listItem from './components/listItem/listItem';
+import { spec as bulletListItemSpec } from './components/listItemNew/bulletListSpecs';
+import { spec as listItemSpec } from './components/listItemNew/listItemSpecs';
+import { spec as markSpec } from './components/listItemNew/markSpec';
+import { spec as orderedListItemSpec } from './components/listItemNew/orderedListSpecs';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
 import * as nft from './components/nft/nft.specs';
@@ -57,13 +62,17 @@ export const specRegistry = new SpecRegistry([
   mentionSpecs(), // NO
   inlineVote.spec(),
   bold.spec(), // OK
-  bulletList.spec(), // OK
   hardBreakSpec(), // OK
   horizontalRule.spec(), // OK
   italic.spec(), // OK
   linkSpec(), // OK
+  bulletList.spec(), // OK
+  bulletListItemSpec(), // Note that bullets should appear first, so drag/drop and copy/paste prefers bullet lists, since the type is not carried over
   listItem.spec(), // OK
   orderedList.spec(), // OK
+  orderedListItemSpec(),
+  listItemSpec(),
+  markSpec(),
   strike.spec(), // OK
   underline.spec(), // OK
   emoji.specs(), // OK
@@ -79,6 +88,7 @@ export const specRegistry = new SpecRegistry([
   image.spec(), // OK
   columnLayout.spec(), // NO
   nestedPageSpec(), // NO
+  linkedPageSpec(),
   quote.spec(), // OK
   tabIndent.spec(),
   tableSpec(), // OK - only for text content

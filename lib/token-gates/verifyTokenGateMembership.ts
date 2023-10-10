@@ -8,9 +8,7 @@ const log = getLogger('tg-verification');
 type TokenGateWithRoles = {
   tokenGate:
     | (TokenGate & {
-        tokenGateToRoles: (TokenGateToRole & {
-          role: Role;
-        })[];
+        tokenGateToRoles: TokenGateToRole[];
       })
     | null;
 };
@@ -22,7 +20,7 @@ type VerifyTokenGateMembershipProps = {
   userId: string;
   spaceId: string;
   canBeRemovedFromSpace: boolean;
-  userSpaceRoles?: (SpaceRoleToRole & { role: Role })[];
+  userSpaceRoles?: SpaceRoleToRole[];
 };
 
 export async function verifyTokenGateMembership({

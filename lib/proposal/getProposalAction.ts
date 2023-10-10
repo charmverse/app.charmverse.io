@@ -1,12 +1,12 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 
 export type ProposalTaskAction =
+  | 'reviewed'
+  | 'needs_review'
   | 'start_discussion'
-  | 'start_vote'
-  | 'review'
-  | 'discuss'
   | 'vote'
   | 'start_review'
+  | 'evaluation_active'
   | 'evaluation_closed';
 
 export function getProposalAction({
@@ -25,20 +25,20 @@ export function getProposalAction({
       return 'start_review';
     }
     if (notifyNewEvents) {
-      return 'discuss';
+      return 'start_discussion';
     }
   } else if (currentStatus === 'reviewed') {
     if (isAuthor) {
-      return 'start_vote';
+      return 'reviewed';
     }
   } else if (currentStatus === 'vote_active' && notifyNewEvents) {
     return 'vote';
   } else if (currentStatus === 'review') {
     if (isReviewer) {
-      return 'review';
+      return 'needs_review';
     }
   } else if (currentStatus === 'evaluation_active' && isReviewer) {
-    return 'review';
+    return 'evaluation_active';
   } else if (currentStatus === 'evaluation_closed' && isAuthor) {
     return 'evaluation_closed';
   }

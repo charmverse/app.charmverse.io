@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -51,7 +52,7 @@ const StyledBox = styled(Box)`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly, props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {

@@ -35,6 +35,7 @@ const globalCSS = css`
     --z-index-fab: 1050;
     --z-index-speedDial: 1050;
     --z-index-appBar: 1100;
+    --z-index-pageBar: 1150;
     --z-index-drawer: 1200;
     --z-index-modal: 1300;
     --z-index-snackbar: 1400;

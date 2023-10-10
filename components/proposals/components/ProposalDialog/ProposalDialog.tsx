@@ -5,6 +5,7 @@ import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
@@ -12,6 +13,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -37,6 +39,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
       setCurrentPageId(pageId);
     }
   }, [pageId]);
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
   const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(
@@ -75,6 +78,12 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
       publishToLens: !!user?.publishToLensDefault
     }));
   }, [user?.id]);
+
+  useEffect(() => {
+    if (page?.id) {
+      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: space?.domain });
+    }
+  }, [page?.id]);
 
   function close() {
     onClose();

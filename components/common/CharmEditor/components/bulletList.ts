@@ -3,7 +3,6 @@ import type { Command, DOMOutputSpec, EditorState, Node, Schema } from '@bangle.
 import { chainCommands, keymap, wrappingInputRule } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
-import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
 import { toggleList } from './listItem/commands';
@@ -32,8 +31,8 @@ function specFactory(): RawSpecs {
     schema: {
       content: 'listItem+',
       group: 'block',
-      parseDOM: [{ tag: 'ul' }],
-      toDOM: (): DOMOutputSpec => ['ul', 0],
+      parseDOM: [{ tag: 'ul.old-list' }],
+      toDOM: (): DOMOutputSpec => ['ul', { class: 'old-list' }, 0],
       attrs: {
         // a style preference attribute which be used for
         // rendering output.
@@ -47,14 +46,6 @@ function specFactory(): RawSpecs {
     markdown: {
       toMarkdown(state: MarkdownSerializerState, node: Node) {
         state.renderList(node, '  ', () => '- ');
-      },
-      parseMarkdown: {
-        bullet_list: {
-          block: name,
-          getAttrs: (_: any, tokens: Token[], i: number) => {
-            return { tight: listIsTight(tokens, i) };
-          }
-        }
       }
     }
   };

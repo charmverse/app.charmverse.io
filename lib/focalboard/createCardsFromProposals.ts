@@ -64,8 +64,7 @@ export async function createCardsFromProposals({
           status: true,
           evaluationType: true
         }
-      },
-      workspaceEvents: true
+      }
     }
   });
 
@@ -156,9 +155,7 @@ export async function createCardsFromProposals({
   });
 
   for (const pageProposal of pageProposals) {
-    const createdAt = pageProposal.workspaceEvents.find(
-      (event) => event.type === 'proposal_status_change' && (event.meta as any).newStatus === 'discussion'
-    )?.createdAt;
+    const createdAt = pageProposal.createdAt;
 
     let properties: Record<string, BoardPropertyValue> = {};
 

@@ -8,7 +8,7 @@ import { NodeSelection } from 'prosemirror-state';
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
 // TODO: Support disclosures somehow. BUt if we use 'disclosureDetails', then you cant drag/drop the toggle. There is no 'container' for the hidden contents
-const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList'];
+const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList', 'bullet_list', 'ordered_list'];
 
 // inspiration for this plugin: https://discuss.prosemirror.net/t/creating-a-wrapper-for-all-blocks/3310/9
 // helpful links:
@@ -80,10 +80,6 @@ export function plugins({ key }: { key: PluginKey }) {
         // handle when nodes have negative margin
         if (left < 0) {
           left = 0;
-        }
-        // Hack: subtract the left padding from UL/OL tags - TODO: find a better way to add list padding without putting it on OL/UL tags
-        if (rowNode.nodeName === 'LI') {
-          left -= 24;
         }
         tooltipDOM.style.top = `${top}px`;
         tooltipDOM.style.left = `${left}px`;

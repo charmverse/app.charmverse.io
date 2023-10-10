@@ -1,6 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Divider, Typography, Box, Stack } from '@mui/material';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
@@ -16,6 +17,7 @@ import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 type Props = {
   page: PageWithContent;
@@ -25,6 +27,7 @@ type Props = {
 export function PageComments({ page, permissions }: Props) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
+  const router = useRouter();
   const {
     comments,
     commentSort,
@@ -74,6 +77,23 @@ export function PageComments({ page, permissions }: Props) {
       syncPageComments();
     }
   }, [page.id, proposal?.lensPostLink]);
+
+  useEffect(() => {
+    const commentId = router.query.commentId;
+    if (commentId && typeof window !== 'undefined' && !isLoadingComments && comments.length) {
+      setTimeout(() => {
+        const commentDomElement = window.document.getElementById(`post-comment-${commentId}`);
+        if (commentDomElement) {
+          requestAnimationFrame(() => {
+            commentDomElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+            setUrlWithoutRerender(router.pathname, { commentId: null });
+          });
+        }
+      }, 250);
+    }
+  }, [router.query.commentId, isLoadingComments]);
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
 

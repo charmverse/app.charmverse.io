@@ -31,7 +31,6 @@ import { Invites } from './invites/Invites';
 import ProfileSettings from './profile/ProfileSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
-import { useBlockCount } from './subscription/hooks/useBlockCount';
 import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
 import { SubscriptionSettings } from './subscription/SubscriptionSettings';
 import { UpgradeChip } from './subscription/UpgradeWrapper';
@@ -109,13 +108,9 @@ export function SpaceSettingsDialog() {
   const { activePath, onClose, onClick, open, unsavedChanges } = useSettingsDialog();
   const { memberSpaces } = useSpaces();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
-  const { spaceSubscription, subscriptionEnded } = useSpaceSubscription();
-  const { blockCount } = useBlockCount();
+  const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-
-  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
-  const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
 
   const handleClose = (e: any) => {
     if (unsavedChanges) {
@@ -139,7 +134,9 @@ export function SpaceSettingsDialog() {
           borderRadius: (theme) => theme.spacing(1)
         }
       }}
-      onClose={subscriptionEnded ? undefined : handleClose}
+      // TODO: bring this back once we fix subscriptions
+      // onClose={subscriptionEnded ? undefined : handleClose}
+      onClose={handleClose}
       open={open}
     >
       <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
@@ -182,7 +179,7 @@ export function SpaceSettingsDialog() {
                 active={activePath === tab.path}
                 section={tab.path}
               >
-                {tab.path === 'subscription' && passedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
+                {tab.path === 'subscription' && hasPassedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
                   <UpgradeChip forceDisplay upgradeContext='upgrade' />
                 ) : null}
               </SidebarLink>

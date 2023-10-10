@@ -67,9 +67,9 @@ export interface CastProposalVoteRequestBody {
  *          type: string
  *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
  *        choices:
-            type: array
-            items:
-              type: string
+ *          type: array
+ *          items:
+ *            type: string
  *          example: ['Abstain']
  *        createdAt:
  *          type: string
@@ -93,7 +93,7 @@ export interface CastProposalVoteResponseBody {
  * /proposals/vote:
  *   post:
  *     summary: Cast a vote on a proposal.
- *     description: Cast a vote on a proposal with active voting.
+ *     description: Cast a vote on a proposal with active voting. You can retrieve available options from the proposal object.
  *     tags:
  *       - 'Partner API'
  *     requestBody:

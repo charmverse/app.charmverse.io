@@ -154,8 +154,17 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     throw new NotFoundError('Space domain is required');
   }
 
-  const space = await prisma.space.findUnique({
-    where: page ? { id: page.spaceId } : { domain: spaceDomain }
+  const space = await prisma.space.findFirst({
+    where: page
+      ? { id: page.spaceId }
+      : {
+          OR: [
+            {
+              customDomain: spaceDomain
+            },
+            { domain: spaceDomain }
+          ]
+        }
   });
 
   if (!space) {
@@ -163,13 +172,24 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   }
 
   if (pagePath && !page) {
+    const trimmedPath = pagePath.trim();
+
     page = await prisma.page.findFirst({
       where: {
         deletedAt: null,
         space: {
-          domain: spaceDomain
+          id: space.id
         },
-        path: pagePath.trim()
+        OR: [
+          {
+            path: trimmedPath
+          },
+          {
+            additionalPaths: {
+              has: trimmedPath
+            }
+          }
+        ]
       }
     });
   }

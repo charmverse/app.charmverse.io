@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -35,7 +36,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [activePath, setActivePath] = useState('');
   const router = useRouter();
-  const { subscriptionEnded } = useSpaceSubscription();
+  const { subscriptionEnded, spaceSubscription } = useSpaceSubscription();
 
   const onClick = (_path?: string, _section?: string) => {
     setActivePath(_path ?? '');
@@ -78,7 +79,8 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (subscriptionEnded) {
-      openUpgradeSubscription();
+      log.warn('Open upgrade subscription modal since subscription has ended', spaceSubscription);
+      // openUpgradeSubscription();
     }
   }, [subscriptionEnded]);
 

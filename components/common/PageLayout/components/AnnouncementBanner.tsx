@@ -1,47 +1,68 @@
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
-import { Box, IconButton, Stack } from '@mui/material';
-import { useState, type ReactNode } from 'react';
+import { Box, IconButton, Stack, Typography } from '@mui/material';
+import { type ReactNode, useMemo } from 'react';
+import { toHex } from 'viem';
 
 import { StyledBanner } from 'components/common/Banners/Banner';
 import { Button } from 'components/common/Button';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 
 export function AnnouncementBanner({
   children,
-  hideClose,
-  errorBackground
+  forceShow,
+  errorBackground,
+  actionLabel,
+  actionHref,
+  onActionClick,
+  spaceId,
+  bannerId,
+  expiryDate
 }: {
-  children: ReactNode;
-  hideClose?: boolean;
+  forceShow?: boolean;
   errorBackground?: boolean;
+  children: string | ReactNode;
+  actionLabel: string;
+  actionHref?: string;
+  spaceId?: string;
+  bannerId?: string;
+  onActionClick?: () => void;
+  expiryDate?: string;
 }) {
-  const [showAnnouncementBar, setShowAnnouncementBar] = useState(true);
-  const { onClick } = useSettingsDialog();
+  const id = useMemo(() => toHex(`${bannerId || children?.toString() || ''}/${spaceId || ''}`), [children]);
 
-  if (!showAnnouncementBar) {
+  const [showAnnouncement, setShowAnnouncement] = useLocalStorage(id, true);
+
+  const isExpired = expiryDate && new Date(expiryDate) < new Date();
+
+  if ((!showAnnouncement && !forceShow) || isExpired) {
     return null;
   }
 
   return (
-    <StyledBanner errorBackground={errorBackground} top={20} data-test='subscription-banner'>
+    <StyledBanner errorBackground={errorBackground} top={20}>
       <Box pr={3} display='flex' alignItems='center'>
-        {children}
-        <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
-          <Button
-            endIcon={<EastIcon />}
-            sx={{ ml: 1, pb: 0, pt: 0, fontWeight: 600 }}
-            color={errorBackground ? 'white' : 'primary'}
-            onClick={() => onClick('subscription')}
-            variant='outlined'
-          >
-            UPGRADE
-          </Button>
-        </Stack>
+        {typeof children === 'string' ? <Typography>{children}</Typography> : children}
+        {actionLabel && (actionHref || onActionClick) && (
+          <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
+            <Button
+              endIcon={<EastIcon />}
+              sx={{ ml: 1, pb: 0, pt: 0, fontWeight: 600 }}
+              color={errorBackground ? 'white' : 'primary'}
+              href={actionHref}
+              onClick={onActionClick}
+              variant='outlined'
+              external
+              target='_blank'
+            >
+              {actionLabel}
+            </Button>
+          </Stack>
+        )}
       </Box>
-      {!hideClose && (
+      {!forceShow && (
         <IconButton
-          onClick={() => setShowAnnouncementBar(false)}
+          onClick={() => setShowAnnouncement(false)}
           size='small'
           sx={{
             position: 'absolute',

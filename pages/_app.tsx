@@ -1,10 +1,8 @@
+import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
-import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -16,16 +14,17 @@ import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
+import type { OpenGraphProps } from 'components/_app/OpenGraphData';
+import { OpenGraphData } from 'components/_app/OpenGraphData';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
-import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
+import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
@@ -44,7 +43,7 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
-import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
+import { Web3AccountProvider } from 'hooks/useWeb3Account';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
@@ -89,6 +88,9 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
 import 'lib/lit-protocol-modal/index.css';
 import 'lib/lit-protocol-modal/reusableComponents/litChainSelector/LitChainSelector.css';
 import 'lib/lit-protocol-modal/reusableComponents/litCheckbox/LitCheckbox.css';
@@ -121,10 +123,14 @@ import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
+import { WagmiProvider } from '../components/_app/WagmiProvider';
 
-const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
+};
+
+export type GlobalPageProps = {
+  openGraphData: OpenGraphProps;
 };
 
 type AppPropsWithLayout = AppProps & {
@@ -147,9 +153,12 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
-    if (!isOldBuild && data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
+    if (!isOldBuild && data.buildId !== env('BUILD_ID')) {
       setIsOldBuild(true);
-      log.info('Requested user to refresh their browser to get new version');
+      log.info('Requested user to refresh their browser to get new version', {
+        oldVersion: env('BUILD_ID'),
+        newVersion: data.buildId
+      });
     }
   }, 180000);
 
@@ -178,38 +187,36 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
         <ReactDndProvider>
           <DataProviders>
             <SettingsDialogProvider>
-              <NotificationsProvider>
-                <LocalizationProvider>
-                  <FocalBoardProvider>
-                    <NotionProvider>
-                      <IntlProvider>
-                        <PageHead />
+              <LocalizationProvider>
+                <FocalBoardProvider>
+                  <NotionProvider>
+                    <IntlProvider>
+                      <PageHead {...pageProps} />
 
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
 
-                            {getLayout(<Component {...pageProps} />)}
+                          {getLayout(<Component {...pageProps} />)}
 
-                            <GlobalComponents />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </IntlProvider>
-                    </NotionProvider>
-                  </FocalBoardProvider>
-                </LocalizationProvider>
-              </NotificationsProvider>
+                          <GlobalComponents />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </IntlProvider>
+                  </NotionProvider>
+                </FocalBoardProvider>
+              </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
         </ReactDndProvider>
@@ -229,7 +236,7 @@ function DataProviders({ children }: { children: ReactNode }) {
     >
       <UserProvider>
         <DiscordProvider>
-          <Web3ReactProvider getLibrary={getLibrary}>
+          <WagmiProvider>
             <Web3ConnectionManager>
               <WalletSelectorModal />
               <Web3AccountProvider>
@@ -258,14 +265,14 @@ function DataProviders({ children }: { children: ReactNode }) {
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>
-          </Web3ReactProvider>
+          </WagmiProvider>
         </DiscordProvider>
       </UserProvider>
     </SWRConfig>
   );
 }
 
-function PageHead() {
+function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 
@@ -276,6 +283,8 @@ function PageHead() {
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}
       <meta name='google-site-verification' content='AhWgWbPVQIsHKmPNTkUSI-hN38XbkpCIrt40-4IgaiM' />
+
+      <OpenGraphData {...openGraphData} />
     </Head>
   );
 }

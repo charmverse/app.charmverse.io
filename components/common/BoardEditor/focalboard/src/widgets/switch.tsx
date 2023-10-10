@@ -1,3 +1,5 @@
+import type { SxProps, Theme } from '@mui/material';
+import { Box } from '@mui/material';
 import React from 'react';
 
 type Props = {
@@ -5,23 +7,24 @@ type Props = {
   isOn: boolean;
   readOnly?: boolean;
   disabled?: boolean;
+  sx?: SxProps<Theme>;
 };
 
 // Switch is an on-off style switch / checkbox
 function Switch(props: Props): JSX.Element {
   const className = props.isOn ? 'Switch on' : 'Switch';
   return (
-    <div
+    <Box
+      sx={props.sx}
       className={[className, props.disabled ? 'disabled' : ''].join(' ')}
       onClick={() => {
         if (!props.readOnly) {
           props.onChanged(!props.isOn);
         }
       }}
-      style={{}}
     >
       <div className='octo-switch-inner' />
-    </div>
+    </Box>
   );
 }
 

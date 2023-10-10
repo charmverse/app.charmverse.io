@@ -1,8 +1,9 @@
-import { v4 as uuid } from 'uuid';
+import { testUtilsPages } from '@charmverse/core/test';
+import { v4 } from 'uuid';
 
-import { createApplication } from 'lib/applications/actions';
+import { createDocumentNotification } from 'lib/notifications/createNotification';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
-import { generateBounty, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { sendUserNotifications } from '../sendNotifications';
 
@@ -12,42 +13,18 @@ describe('sendNotification()', () => {
       email: `${Math.random()}@charmversetest.io`
     });
 
-    await generateProposal({
-      proposalStatus: 'discussion',
-      spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
-      userId: user.id
-    });
-
-    const inProgressBounty = await generateBounty({
-      id: uuid(),
-      spaceId: space.id,
+    const page = await testUtilsPages.generatePage({
       createdBy: user.id,
-      status: 'inProgress',
-      approveSubmitters: false,
-      title: 'My new bounty',
-      bountyPermissions: {
-        submitter: [
-          {
-            group: 'space',
-            id: space.id
-          }
-        ]
-      },
-      pagePermissions: [
-        {
-          userId: user.id,
-          permissionLevel: 'full_access'
-        }
-      ]
+      spaceId: space.id
     });
 
-    await createApplication({
-      bountyId: inProgressBounty.id,
-      message: 'My application message',
-      userId: user.id,
-      status: 'inProgress'
+    await createDocumentNotification({
+      createdBy: user.id,
+      pageId: page.id,
+      spaceId: space.id,
+      type: 'mention.created',
+      mentionId: v4(),
+      userId: user.id
     });
 
     const notificationsNo = await sendUserNotifications();
@@ -61,11 +38,17 @@ describe('sendNotification()', () => {
       email: `${Math.random()}@charmversetest.io`
     });
 
-    await generateProposal({
-      proposalStatus: 'discussion',
+    const page = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await createDocumentNotification({
+      createdBy: user.id,
+      pageId: page.id,
       spaceId: space.id,
-      authors: [user.id],
-      reviewers: [],
+      type: 'mention.created',
+      mentionId: v4(),
       userId: user.id
     });
 
