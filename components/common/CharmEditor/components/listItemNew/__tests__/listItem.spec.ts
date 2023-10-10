@@ -71,7 +71,7 @@ describe('List items', () => {
     expectNodesAreEqual(editor.view.state.doc, after);
   });
 
-  test('Backspace in-between lists should not change the indent of children', () => {
+  test('Backspace in-between lists should not merge lists', () => {
     const before = _.doc(
       _.bullet_list({ indent: 0 }, _.list_item(_.p('Apple'))),
       _.p(''),
@@ -90,7 +90,7 @@ describe('List items', () => {
     expectNodesAreEqual(editor.view.state.doc, after);
   });
 
-  test('Backspace in-between lists should not change the indent of children', () => {
+  test('Backspace in-between lists should not merge lists unless the indent is the same', () => {
     const before = _.doc(
       _.bullet_list({ indent: 0 }, _.list_item(_.p('Apple'))),
       _.p(''),
