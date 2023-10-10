@@ -1,5 +1,4 @@
-import type { Node } from '@bangle.dev/pm';
-import { Step } from '@bangle.dev/pm';
+import { Step, type Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
