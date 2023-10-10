@@ -24,7 +24,6 @@ export const createMockSpace = (space?: Partial<Space>): Space => {
     snapshotDomain: null,
     spaceImage: null,
     defaultPostCategoryId: null,
-    notifyNewProposals: null,
     requireProposalTemplate: null,
     defaultPagePermissionGroup: null,
     defaultPublicPages: null,
