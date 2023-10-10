@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsForum, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsForum, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
 import { generateBoard, generateBountyWithSingleApplication } from 'testing/setupDatabase';
@@ -225,7 +225,7 @@ describe('countCommentBlocks', () => {
     });
   });
 
-  it('should ignore application comments if they are marked as deleted, or if the linked reward is marked as deleted', async () => {
+  it('should ignore application comments if they are marked as deleted, or if the page for the linked reward is marked as deleted', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     // Generate application comments
@@ -372,6 +372,161 @@ describe('countCommentBlocks', () => {
         applicationComment: 0,
         blockComment: 1,
         comment: 0,
+        pageComments: 0,
+        postComment: 0
+      }
+    });
+  });
+
+  it('should ignore page comments if the page is marked as deleted or if the comment is marked as deleted', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const deletedPage = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      deletedAt: new Date()
+    });
+
+    await prisma.pageComment.createMany({
+      data: [
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          createdBy: user.id,
+          pageId: deletedPage.id,
+          contentText: ''
+        },
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          createdBy: user.id,
+          pageId: deletedPage.id,
+          contentText: ''
+        }
+      ]
+    });
+
+    const page = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await prisma.pageComment.createMany({
+      data: [
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          createdBy: user.id,
+          pageId: page.id,
+          contentText: ''
+        },
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          createdBy: user.id,
+          pageId: page.id,
+          contentText: '',
+          deletedAt: new Date()
+        }
+      ]
+    });
+
+    const counts = await countCommentBlocks({
+      spaceId: space.id
+    });
+
+    // Modify the expected counts based on the generated comments
+    expect(counts).toMatchObject<CommentBlocksCount>({
+      total: 1,
+      details: {
+        applicationComment: 0,
+        blockComment: 0,
+        comment: 0,
+        pageComments: 1,
+        postComment: 0
+      }
+    });
+  });
+
+  it('should ignore inline comments if the page is marked as deleted', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const deletedPage = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      deletedAt: new Date()
+    });
+
+    const deletedPageInlineThread = await prisma.thread.create({
+      data: {
+        context: 'uid marker in prosemirror doc',
+        resolved: false,
+        page: { connect: { id: deletedPage.id } },
+        space: { connect: { id: space.id } },
+        user: { connect: { id: user.id } }
+      }
+    });
+
+    await prisma.comment.createMany({
+      data: [
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          threadId: deletedPageInlineThread.id,
+          userId: user.id,
+          pageId: deletedPage.id,
+          spaceId: space.id
+        },
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          threadId: deletedPageInlineThread.id,
+          userId: user.id,
+          pageId: deletedPage.id,
+          spaceId: space.id
+        },
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          threadId: deletedPageInlineThread.id,
+          userId: user.id,
+          pageId: deletedPage.id,
+          spaceId: space.id
+        }
+      ]
+    });
+
+    const page = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const inlineThread = await prisma.thread.create({
+      data: {
+        context: 'uid marker in prosemirror doc',
+        resolved: false,
+        page: { connect: { id: page.id } },
+        space: { connect: { id: space.id } },
+        user: { connect: { id: user.id } }
+      }
+    });
+
+    await prisma.comment.createMany({
+      data: [
+        {
+          content: stubProsemirrorDoc({ text: 'Example text' }),
+          threadId: inlineThread.id,
+          userId: user.id,
+          pageId: page.id,
+          spaceId: space.id
+        }
+      ]
+    });
+
+    const counts = await countCommentBlocks({
+      spaceId: space.id
+    });
+
+    // Modify the expected counts based on the generated comments
+    expect(counts).toMatchObject<CommentBlocksCount>({
+      total: 1,
+      details: {
+        applicationComment: 0,
+        blockComment: 0,
+        comment: 1,
         pageComments: 0,
         postComment: 0
       }

@@ -40,7 +40,9 @@ export async function countCommentBlocks({ spaceId }: BlocksCountQuery): Promise
   const deletedBlocks = await prisma.block.findMany({
     where: {
       spaceId,
-      deletedAt: null
+      deletedAt: {
+        not: null
+      }
     },
     select: {
       id: true
