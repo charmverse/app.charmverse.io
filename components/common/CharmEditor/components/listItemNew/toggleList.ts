@@ -754,6 +754,19 @@ export function joinToPreviousListItem(type?: NodeType): Command {
           );
         }
 
+        // find out if there's now another list following and join them
+        // as in, [list, p, list] => [list with p, list], and we want [joined list] *but only if the indent are the same*
+        const $postCut = tr.doc.resolve(tr.mapping.map($cut.pos + $cut.nodeAfter.nodeSize));
+        if (
+          $postCut.nodeBefore &&
+          $postCut.nodeAfter &&
+          $postCut.nodeBefore.type === $postCut.nodeAfter.type &&
+          [bulletList, orderedList].indexOf($postCut.nodeBefore.type) > -1 &&
+          $postCut.nodeBefore.attrs.indent === $postCut.nodeAfter.attrs.indent
+        ) {
+          tr = tr.join($postCut.pos);
+        }
+
         if (dispatch) {
           dispatch(tr.scrollIntoView());
         }

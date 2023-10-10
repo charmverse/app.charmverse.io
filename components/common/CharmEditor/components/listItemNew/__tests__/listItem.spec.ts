@@ -89,4 +89,19 @@ describe('List items', () => {
     sendKeyToPm(editor.view, 'Backspace');
     expectNodesAreEqual(editor.view.state.doc, after);
   });
+
+  test('Backspace in-between lists should not change the indent of children', () => {
+    const before = _.doc(
+      _.bullet_list({ indent: 0 }, _.list_item(_.p('Apple'))),
+      _.p(''),
+      _.bullet_list({ indent: 0 }, _.list_item(_.p('Banana'))),
+      _.p('')
+    );
+
+    const after = _.doc(_.bullet_list({ indent: 0 }, _.list_item(_.p('Apple')), _.list_item(_.p('Banana'))), _.p(''));
+    const editor = testEditor(before);
+    setSelectionNear(editor.view, 9);
+    sendKeyToPm(editor.view, 'Backspace');
+    expectNodesAreEqual(editor.view.state.doc, after);
+  });
 });
