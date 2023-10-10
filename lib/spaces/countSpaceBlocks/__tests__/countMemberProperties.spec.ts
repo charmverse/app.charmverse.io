@@ -4,7 +4,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 import type { MemberPropertyCounts } from '../countMemberProperties';
 import { countMemberProperties } from '../countMemberProperties';
 
-describe('countSpacePages', () => {
+describe('countMemberProperties', () => {
   it('should return the correct total count of member properties and member property values', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
