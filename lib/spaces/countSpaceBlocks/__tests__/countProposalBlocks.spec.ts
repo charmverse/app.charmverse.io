@@ -27,10 +27,12 @@ describe('countProposalBlocks', () => {
     urlSchema
   ];
 
-  it('should count each proposal view, proposal categories, proposal properties, and proposal property values as 1 block', async () => {
+  it('should count each rubric criteria, rubric criteria answer, proposal view, proposal categories, proposal properties, proposal property values as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace({
       customProposalProperties: propertyTemplates
     });
+
+    const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
     // Generating two proposal categories
     const proposalCategory1 = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
@@ -49,11 +51,62 @@ describe('countProposalBlocks', () => {
     const proposal2 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
+      evaluationType: 'rubric',
       categoryId: proposalCategory2.id,
       customProperties: {
         [numberSchema.id]: 8,
         [urlSchema.id]: 'www.example.com'
       }
+    });
+
+    const rubricCriteria = await Promise.all([
+      prisma.proposalRubricCriteria.create({
+        data: {
+          parameters: [],
+          proposalId: proposal2.id,
+          title: 'First Criteria',
+          type: 'range',
+          description: ''
+        }
+      }),
+      prisma.proposalRubricCriteria.create({
+        data: {
+          parameters: [],
+          proposalId: proposal2.id,
+          title: 'Second Criteria',
+          type: 'range',
+          description: ''
+        }
+      })
+    ]);
+
+    const rubricAnswers = await prisma.proposalRubricCriteriaAnswer.createMany({
+      data: [
+        {
+          proposalId: proposal2.id,
+          response: {},
+          rubricCriteriaId: rubricCriteria[0].id,
+          userId: user.id
+        },
+        {
+          proposalId: proposal2.id,
+          response: {},
+          rubricCriteriaId: rubricCriteria[1].id,
+          userId: user.id
+        },
+        {
+          proposalId: proposal2.id,
+          response: {},
+          rubricCriteriaId: rubricCriteria[0].id,
+          userId: spaceMember.id
+        },
+        {
+          proposalId: proposal2.id,
+          response: {},
+          rubricCriteriaId: rubricCriteria[1].id,
+          userId: spaceMember.id
+        }
+      ]
     });
 
     await prisma.proposalBlock.create({
@@ -74,17 +127,19 @@ describe('countProposalBlocks', () => {
     });
     const count = await countProposalBlocks({ spaceId: space.id });
     expect(count).toMatchObject<ProposalBlocksCount>({
-      total: 14,
+      total: 20,
       details: {
         proposalViews: 1,
         proposalProperties: 7,
         proposalPropertyValues: 4,
-        proposalCategories: 2
+        proposalCategories: 2,
+        proposalRubricAnswers: 4,
+        proposalRubrics: 2
       }
     });
   });
 
-  it('should ignore deleted proposals', async () => {
+  it('should ignore any properties or rubrics related to deleted proposals', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace({
       customProposalProperties: propertyTemplates
     });
@@ -124,6 +179,44 @@ describe('countProposalBlocks', () => {
       }
     });
 
+    const deletedProposalRubricCriteria = await Promise.all([
+      prisma.proposalRubricCriteria.create({
+        data: {
+          parameters: [],
+          proposalId: deletedProposal.id,
+          title: 'First Criteria',
+          type: 'range',
+          description: ''
+        }
+      }),
+      prisma.proposalRubricCriteria.create({
+        data: {
+          parameters: [],
+          proposalId: deletedProposal.id,
+          title: 'Second Criteria',
+          type: 'range',
+          description: ''
+        }
+      })
+    ]);
+
+    const rubricAnswers = await prisma.proposalRubricCriteriaAnswer.createMany({
+      data: [
+        {
+          proposalId: deletedProposal.id,
+          response: {},
+          rubricCriteriaId: deletedProposalRubricCriteria[0].id,
+          userId: user.id
+        },
+        {
+          proposalId: deletedProposal.id,
+          response: {},
+          rubricCriteriaId: deletedProposalRubricCriteria[1].id,
+          userId: user.id
+        }
+      ]
+    });
+
     await prisma.proposalBlock.create({
       data: {
         type: 'view',
@@ -147,7 +240,9 @@ describe('countProposalBlocks', () => {
         proposalViews: 1,
         proposalProperties: 7,
         proposalPropertyValues: 4,
-        proposalCategories: 2
+        proposalCategories: 2,
+        proposalRubricAnswers: 0,
+        proposalRubrics: 0
       }
     });
   });
@@ -163,7 +258,9 @@ describe('countProposalBlocks', () => {
         proposalViews: 0,
         proposalProperties: 0,
         proposalPropertyValues: 0,
-        proposalCategories: 0
+        proposalCategories: 0,
+        proposalRubricAnswers: 0,
+        proposalRubrics: 0
       }
     });
   });

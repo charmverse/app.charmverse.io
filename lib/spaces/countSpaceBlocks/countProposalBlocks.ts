@@ -12,7 +12,9 @@ export type DetailedProposalBlocksCount = {
   proposalViews: number;
   proposalProperties: number;
   proposalPropertyValues: number;
-  proposalCategories: number; // added this line
+  proposalCategories: number;
+  proposalRubrics: number;
+  proposalRubricAnswers: number;
 };
 
 export type ProposalBlocksCount = GenericBlocksCount<DetailedProposalBlocksCount>;
@@ -24,7 +26,9 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
       proposalViews: 0,
       proposalProperties: 0,
       proposalPropertyValues: 0,
-      proposalCategories: 0 // added this line
+      proposalCategories: 0,
+      proposalRubrics: 0,
+      proposalRubricAnswers: 0
     }
   };
 
@@ -65,7 +69,30 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
 
   detailedCount.details.proposalProperties = Object.keys(proposalSchema).length;
 
-  // 3 - Count proposal property values
+  // 3 - Handle rubrics
+  detailedCount.details.proposalRubrics = await prisma.proposalRubricCriteria.count({
+    where: {
+      proposal: {
+        page: {
+          deletedAt: null
+        },
+        spaceId
+      }
+    }
+  });
+
+  detailedCount.details.proposalRubricAnswers = await prisma.proposalRubricCriteriaAnswer.count({
+    where: {
+      proposal: {
+        page: {
+          deletedAt: null
+        },
+        spaceId
+      }
+    }
+  });
+
+  // 4 - Count proposal property values
   const proposalPropertyValues = await paginatedPrismaTask({
     batchSize,
     model: 'proposal',
