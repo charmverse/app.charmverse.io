@@ -2,13 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getBountyNotifications } from 'lib/notifications/getBountyNotifications';
-import { getCardNotifications } from 'lib/notifications/getCardNotifications';
-import { getDocumentNotifications } from 'lib/notifications/getDocumentNotifications';
-import { getPostNotifications } from 'lib/notifications/getPostNotifications';
-import { getProposalNotifications } from 'lib/notifications/getProposalNotifications';
-import { getVoteNotifications } from 'lib/notifications/getVoteNotifications';
+import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
+import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
+import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
 import type { Notification } from 'lib/notifications/interfaces';
+import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
+import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
+import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
 import { sortByDate } from 'lib/notifications/utils';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -22,7 +22,7 @@ async function getNotifications(req: NextApiRequest, res: NextApiResponse<Notifi
     await Promise.all([
       getDocumentNotifications(userId),
       getCardNotifications(userId),
-      getVoteNotifications(userId),
+      getPollNotifications(userId),
       getProposalNotifications(userId),
       getBountyNotifications(userId),
       getPostNotifications(userId)

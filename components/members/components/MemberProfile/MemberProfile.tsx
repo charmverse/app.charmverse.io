@@ -31,7 +31,7 @@ export function MemberProfile({
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { onClick: openSettings } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
   if (!space) {
     return null;
   }

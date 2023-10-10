@@ -3,8 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { fancyTrim } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { DocumentNotification } from './interfaces';
-import { notificationMetadataSelectStatement } from './utils';
+import type { DocumentNotification } from '../interfaces';
+import { notificationMetadataSelectStatement } from '../utils';
 
 const MAX_DOCUMENT_NOTIFICATION_TEXT_LENGTH = 100;
 

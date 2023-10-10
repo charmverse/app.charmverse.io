@@ -48,7 +48,7 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
   const { getDisplayProperties } = useMemberProperties();
   const visibleProperties = getDisplayProperties('table');
   const { showUserId } = useMemberDialog();
-  const { onClick: openSettings } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {

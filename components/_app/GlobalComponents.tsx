@@ -22,7 +22,7 @@ export function GlobalComponents() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setPages } = usePages();
-  const { onClick: openSettingsModal, open: isSettingsDialogOpen } = useSettingsDialog();
+  const { openSettings, isOpen: isSettingsDialogOpen } = useSettingsDialog();
   // Register logs to Datadog
   useDatadogLogger();
 
@@ -66,13 +66,13 @@ export function GlobalComponents() {
 
     if (!isSettingsDialogOpen && router.isReady) {
       if (account) {
-        openSettingsModal('account');
+        openSettings('account');
       }
       if (subscription) {
-        openSettingsModal('subscription');
+        openSettings('subscription');
       }
     }
-  }, [isSettingsDialogOpen, router.isReady, openSettingsModal, router.query.account, router.query.subscription]);
+  }, [isSettingsDialogOpen, router.isReady, openSettings, router.query.account, router.query.subscription]);
 
   return (
     <>

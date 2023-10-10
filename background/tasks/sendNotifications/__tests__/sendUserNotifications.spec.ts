@@ -1,7 +1,7 @@
 import { testUtilsPages } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { createDocumentNotification } from 'lib/notifications/createNotification';
+import { createDocumentNotification } from 'lib/notifications/saveNotification';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

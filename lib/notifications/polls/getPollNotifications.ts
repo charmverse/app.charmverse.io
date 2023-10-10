@@ -3,10 +3,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { VoteNotification } from 'lib/notifications/interfaces';
 import { notificationMetadataSelectStatement } from 'lib/notifications/utils';
 
-import { aggregateVoteResult } from '../votes/aggregateVoteResult';
-import { calculateVoteStatus } from '../votes/calculateVoteStatus';
+import { aggregateVoteResult } from '../../votes/aggregateVoteResult';
+import { calculateVoteStatus } from '../../votes/calculateVoteStatus';
 
-export async function getVoteNotifications(userId: string): Promise<VoteNotification[]> {
+export async function getPollNotifications(userId: string): Promise<VoteNotification[]> {
   const voteNotifications = await prisma.voteNotification.findMany({
     where: {
       notificationMetadata: {

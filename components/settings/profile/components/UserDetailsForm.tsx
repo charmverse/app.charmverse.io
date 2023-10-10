@@ -19,7 +19,6 @@ import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityT
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
@@ -129,11 +128,13 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
     </>
   );
 }
-export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>) {
+export function UserDetailsFormWithSave({
+  user,
+  setUnsavedChanges
+}: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
   const [form, setForm] = useState<EditableFields>({});
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
-  const { handleUnsavedChanges } = useSettingsDialog();
   const { trigger: updateUserDetails } = useSWRMutation(
     '/api/profile/details',
     (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
@@ -155,10 +156,10 @@ export function UserDetailsFormWithSave({ user }: Pick<UserDetailsProps, 'user'>
   }
 
   useEffect(() => {
-    handleUnsavedChanges(!isFormClean);
+    setUnsavedChanges(!isFormClean);
 
     return () => {
-      handleUnsavedChanges(false);
+      setUnsavedChanges(false);
     };
   }, [isFormClean]);
 
