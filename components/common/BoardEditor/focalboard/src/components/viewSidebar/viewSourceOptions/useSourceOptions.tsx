@@ -16,6 +16,7 @@ import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createNewDataSource } from 'lib/focalboard/createNewDataSource';
 import { createTableView } from 'lib/focalboard/tableView';
 
+import { Constants } from '../../../constants';
 import mutator from '../../../mutator';
 import { getBoards } from '../../../store/boards';
 import { initialDatabaseLoad } from '../../../store/databaseBlocksLoad';
@@ -163,8 +164,17 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     if (!rootBoardPage || !rootBoardPage.type.match('board')) {
       throw new Error('No board page type exists');
     }
-
-    const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType } };
+    const boardBlockUpdate: Board = {
+      ...rootBoard,
+      fields: {
+        ...rootBoard.fields,
+        cardProperties: [
+          ...(rootBoard.fields.cardProperties ?? []),
+          { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] }
+        ],
+        sourceType
+      }
+    };
 
     await mutator.updateBlock(boardBlockUpdate, rootBoard, 'Update board datasource');
     const { view } = await createNewDataSource({
