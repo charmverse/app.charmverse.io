@@ -74,6 +74,7 @@ export function NotificationTogglesInput({
         label={
           <NotificationRuleComponent
             control={control}
+            disabled={!isAdmin}
             enabled={formValues.notificationToggles?.rewards}
             title={notifications.rewards.title}
             types={notifications.rewards.types}
@@ -88,6 +89,7 @@ export function NotificationTogglesInput({
         label={
           <NotificationRuleComponent
             control={control}
+            disabled={!isAdmin}
             enabled={formValues.notificationToggles?.proposals}
             title={notifications.proposals.title}
             types={notifications.proposals.types}
@@ -102,6 +104,7 @@ export function NotificationTogglesInput({
         label={
           <NotificationRuleComponent
             control={control}
+            disabled={!isAdmin}
             enabled={formValues.notificationToggles?.polls}
             title={notifications.polls.title}
             types={notifications.polls.types}
@@ -161,8 +164,10 @@ function NotificationRuleComponent({
   control,
   enabled,
   title,
+  disabled,
   types: listsOftypes
 }: {
+  disabled: boolean;
   control: any;
   enabled?: boolean;
   title: string;
@@ -190,7 +195,7 @@ function NotificationRuleComponent({
                             <Checkbox
                               checked={value}
                               onChange={onChange}
-                              disabled={!enabled}
+                              disabled={disabled}
                               sx={{ p: 1, '& .MuiSvgIcon-root': { fontSize: 12 } }}
                             />
                           }

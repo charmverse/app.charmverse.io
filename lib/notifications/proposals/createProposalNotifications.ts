@@ -9,11 +9,14 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import type { NotificationToggles } from '../notificationToggles';
 import { createProposalNotification } from '../saveNotification';
 
-export async function createProposalNotifications(webhookData: {
-  createdAt: string;
-  event: WebhookEvent;
-  spaceId: string;
-}) {
+export async function createProposalNotifications(
+  webhookData: {
+    createdAt: string;
+    event: WebhookEvent;
+    spaceId: string;
+  },
+  toggles?: NotificationToggles
+) {
   switch (webhookData.event.scope) {
     case WebhookEventNames.ProposalStatusChanged: {
       const userId = webhookData.event.user.id;
@@ -151,6 +154,14 @@ export async function createProposalNotifications(webhookData: {
           ((action === 'start_discussion' && !categoryPermission.permissions.comment_proposals) ||
             (action === 'vote' && !categoryPermission.permissions.vote_proposals))
         ) {
+          continue;
+        }
+
+        if (toggles?.proposals__start_discussion === false && action === 'start_discussion') {
+          continue;
+        }
+
+        if (toggles?.proposals__vote === false && action === 'vote') {
           continue;
         }
 
