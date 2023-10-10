@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 
 // Script 2 - Migrate spaces
