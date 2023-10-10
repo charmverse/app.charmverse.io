@@ -1,6 +1,7 @@
 import { OverallBlocksCount, countSpaceBlocks } from 'lib/spaces/countSpaceBlocks/countAllSpaceBlocks';
 import { prisma } from '@charmverse/core/prisma-client';
 import { writeToSameFolder } from 'lib/utilities/file';
+import type { Space } from '@charmverse/core/prisma'
 
 let record: OverallBlocksCount =  {
   "total": 11,
@@ -69,7 +70,7 @@ function camelToTitle(camelCase: string): string {
 }
 
 function generateHeaders(record: OverallBlocksCount): string {
-  const headers: string[] = ['Total'];
+  const headers: string[] = ['Space', 'Total'];
   for (const categoryKey in record.details) {
     const category = (record.details as any)[categoryKey];
     headers.push(`${camelToTitle(categoryKey)} (Total)`);
@@ -82,8 +83,8 @@ function generateHeaders(record: OverallBlocksCount): string {
   return headers.join(',') + '\n';
 }
 
-function generateRow(record: OverallBlocksCount): string {
-  const dataRow: (string | number)[] = [record.total];
+function generateRow(record: OverallBlocksCount, space: Pick<Space, 'domain'>): string {
+  const dataRow: (string | number)[] = [space.domain, record.total];
   for (const categoryKey in record.details) {
     const category = (record.details as any)[categoryKey];
     if (categoryKey === 'editorContent') {
@@ -111,7 +112,7 @@ async function init() {
 
   for (let space of spaces) {
     const data = await countSpaceBlocks({ spaceId: space.id });
-    csv += generateRow(data)
+    csv += generateRow(data, space)
   }
   const fileName = `space-data-${new Date().toISOString()}.csv`;
   await writeToSameFolder({data: csv, fileName})
