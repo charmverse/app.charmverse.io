@@ -44,6 +44,7 @@ export type NodeType =
   | 'italic'
   | 'label'
   | 'link'
+  | 'linkedPage'
   | 'list_item'
   | 'listItem'
   | 'mention'
@@ -70,8 +71,7 @@ export type NodeType =
   | 'tooltip-marker'
   | 'tweet'
   | 'video'
-  | 'underline'
-  | 'linkedPage';
+  | 'underline';
 
 const defaultBuilders = makeBuilders(specRegistry.schema) as any as Record<NodeType, Builder> & {
   schema: { nodes: Record<NodeType, any> };
