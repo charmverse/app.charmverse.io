@@ -114,6 +114,54 @@ describe('countDatabaseBlockContentAndProps', () => {
     });
   });
 
+  it('should ignore blocks that are marked as deleted', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const deletedBoard = await generateBoard({
+      spaceId: space.id,
+      createdBy: user.id,
+      cardCount: 2,
+      views: 2,
+      deletedAt: new Date(),
+      customProps: {
+        cardPropertyValues: {
+          [selectSchema.id]: 'Blue',
+          [numberSchema.id]: 27,
+          [multiSelectSchema.id]: []
+        },
+        propertyTemplates
+      }
+    });
+
+    const board = await generateBoard({
+      spaceId: space.id,
+      createdBy: user.id,
+      cardCount: 2,
+      views: 2,
+      customProps: {
+        cardPropertyValues: {
+          [selectSchema.id]: 'Blue',
+          [numberSchema.id]: 27,
+          [multiSelectSchema.id]: []
+        },
+        propertyTemplates
+      }
+    });
+
+    const count = await countDatabaseBlockContentAndProps({ spaceId: space.id });
+    expect(count).toMatchObject<DatabaseBlocksCount>({
+      total: 13,
+      details: {
+        // 2 cards + 2 views + 1 database
+        databaseViews: 2,
+        databaseDescriptions: 0,
+        databaseProperties: 7,
+        // 2 cards with 1 value each
+        databaseRowPropValues: 4
+      }
+    });
+  });
+
   it('should return 0 when there are no databases, views, or cards', async () => {
     const { space } = await testUtilsUser.generateUserAndSpace();
 

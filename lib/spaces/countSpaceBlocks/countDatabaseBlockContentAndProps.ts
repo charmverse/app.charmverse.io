@@ -30,13 +30,14 @@ export async function countDatabaseBlockContentAndProps({ spaceId }: BlocksCount
 
   // 1 - Count views
   detailedCount.details.databaseViews = await prisma.block.count({
-    where: { spaceId, type: 'view' }
+    where: { spaceId, type: 'view', deletedAt: null }
   });
 
   const databaseBlockRecords = await prisma.block.findMany({
     where: {
       type: 'board',
-      spaceId
+      spaceId,
+      deletedAt: null
     },
     select: {
       id: true,
@@ -73,7 +74,8 @@ export async function countDatabaseBlockContentAndProps({ spaceId }: BlocksCount
     queryOptions: {
       where: {
         spaceId,
-        type: 'card'
+        type: 'card',
+        deletedAt: null
       },
       select: {
         id: true,
