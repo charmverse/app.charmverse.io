@@ -23,18 +23,18 @@ type PrismaArgs<M extends PrismaModel> = Pick<
   'select' | 'where' | 'include'
 >;
 
-type BatchProcessor<R> = (records: any[]) => R | Promise<R>;
-
 /**
+ * @param mapper - A synchronous or async function to run per each record returned
+ * @param onSuccess - Optional rollup of the array of mapped results. If not provided, you will get the array of mapped records
  * @param batchSize - Number of records to fetch at a time
  */
 type PaginatedTask<M extends PrismaModel, R, V> = {
   model: M;
   queryOptions: PrismaArgs<M>;
   batchSize?: number;
-  callback: BatchProcessor<R>;
+  mapper: (record: any) => R;
   // Reducer input based on return type of callback
-  reducer?: (values: any[]) => V;
+  onSuccess?: (values: Awaited<R>[]) => V;
 };
 
 export const defaultPaginatedPrismaTaskBatchSize = 500;
@@ -44,16 +44,16 @@ export const defaultPaginatedPrismaTaskBatchSize = 500;
  * @param reducer - Optional aggregation function to run on the results of the callback
  */
 export async function paginatedPrismaTask<M extends PrismaModel, R>(
-  args: Omit<PaginatedTask<M, R, any>, 'reducer'>
-): Promise<R[]>;
+  args: Omit<PaginatedTask<M, R, any>, 'onSuccess'>
+): Promise<Awaited<R>[]>;
 export async function paginatedPrismaTask<M extends PrismaModel, R, V>(args: PaginatedTask<M, R, V>): Promise<V>;
 export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R = unknown, V = unknown>({
   batchSize = defaultPaginatedPrismaTaskBatchSize,
-  callback,
+  mapper,
   model,
   queryOptions,
-  reducer
-}: PaginatedTask<M, R, V>): Promise<R[] | V> {
+  onSuccess
+}: PaginatedTask<M, R, V>): Promise<Awaited<R>[] | V> {
   // Assume processBatches is a functi
   if (queryOptions.select && queryOptions.include) {
     throw new InvalidInputError(`Cannot provide select AND include. Pick one or none`);
@@ -65,7 +65,7 @@ export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R
 
   let cursor: string | undefined;
 
-  const allProcessedResults: R[] = [];
+  const allProcessedResults: Awaited<R>[] = [];
 
   while (true) {
     // Typecast model to page to get a good example of how to use the PrismaClient, since generic is tricky
@@ -81,17 +81,18 @@ export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R
 
     if (results.length === 0) break;
 
-    const processedResults = await callback(results as any);
-
-    allProcessedResults.push(processedResults);
+    for (const result of results) {
+      const mapped = await mapper(result);
+      allProcessedResults.push(mapped);
+    }
 
     cursor = results[results.length - 1].id;
 
     if (results.length < batchSize) break;
   }
 
-  if (reducer) {
-    return reducer(allProcessedResults);
+  if (onSuccess) {
+    return onSuccess(allProcessedResults);
   }
-  return allProcessedResults;
+  return allProcessedResults as Awaited<R>[];
 }
