@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { PostNotification } from './interfaces';
-import { notificationMetadataSelectStatement } from './utils';
+import type { PostNotification } from '../interfaces';
+import { notificationMetadataSelectStatement } from '../utils';
 
 export async function getPostNotifications(userId: string): Promise<PostNotification[]> {
   const postNotifications = await prisma.postNotification.findMany({

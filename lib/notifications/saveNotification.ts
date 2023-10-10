@@ -6,7 +6,6 @@ import type {
   CommentNotification,
   DocumentNotificationType,
   InlineCommentNotification,
-  InlineCommentNotificationType,
   MentionNotification,
   PostNotificationType,
   ProposalNotificationType,
