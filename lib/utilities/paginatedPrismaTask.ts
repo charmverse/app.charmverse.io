@@ -3,7 +3,10 @@ import { PrismaClient } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError } from './errors';
 
-type PrismaModel = Extract<Uncapitalize<Prisma.ModelName>, 'block' | 'page' | 'post' | 'proposal'>;
+type PrismaModel = Extract<
+  Uncapitalize<Prisma.ModelName>,
+  'block' | 'page' | 'post' | 'proposal' | 'memberPropertyValue'
+>;
 
 type PrismaArgs<M extends PrismaModel> = Pick<
   M extends 'block'
@@ -14,6 +17,8 @@ type PrismaArgs<M extends PrismaModel> = Pick<
     ? Prisma.PostFindManyArgs
     : M extends 'proposal'
     ? Prisma.ProposalFindManyArgs
+    : M extends 'memberPropertyValue'
+    ? Prisma.MemberPropertyValueFindManyArgs
     : never,
   'select' | 'where' | 'include'
 >;

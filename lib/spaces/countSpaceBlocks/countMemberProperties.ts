@@ -1,10 +1,15 @@
+import { log } from '@charmverse/core/log';
+import type { MemberPropertyValue } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import _sum from 'lodash/sum';
+
+import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 
 export type MemberPropertyCountDetails = {
-  properties: number;
+  memberProperties: number;
+  memberPropertyValues: number;
 };
 
 export type MemberPropertyCounts = GenericBlocksCount<MemberPropertyCountDetails>;
@@ -13,15 +18,53 @@ export async function countMemberProperties({ spaceId }: BlocksCountQuery): Prom
   const memberPropertyCounts: MemberPropertyCounts = {
     total: 0,
     details: {
-      properties: 0
+      memberProperties: 0,
+      memberPropertyValues: 0
     }
   };
 
-  memberPropertyCounts.details.properties = await prisma.memberProperty.count({
+  memberPropertyCounts.details.memberProperties = await prisma.memberProperty.count({
     where: {
       spaceId
     }
   });
+
+  const memberPropertyValues = await paginatedPrismaTask({
+    model: 'memberPropertyValue',
+    queryOptions: {
+      where: {
+        spaceId,
+        user: {
+          spaceRoles: {
+            some: {
+              spaceId
+            }
+          }
+        }
+      },
+      select: {
+        id: true,
+        value: true
+      }
+    },
+    callback: (values: Pick<MemberPropertyValue, 'value' | 'id'>[]) => {
+      const valuesCount = values.reduce((acc, { value, id }) => {
+        try {
+          if ((!value && value !== 0) || (Array.isArray(value) && value.length === 0)) {
+            return acc;
+          }
+        } catch (err) {
+          log.error('Error evaluating member property value', { memberPropertyValueId: id });
+          return acc;
+        }
+        return acc + 1;
+      }, 0);
+      return valuesCount;
+    },
+    reducer: _sum
+  });
+
+  memberPropertyCounts.details.memberPropertyValues = memberPropertyValues;
 
   memberPropertyCounts.total = _sum(Object.values(memberPropertyCounts.details));
 
