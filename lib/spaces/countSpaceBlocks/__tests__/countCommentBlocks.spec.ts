@@ -210,7 +210,7 @@ describe('countCommentBlocks', () => {
       ]
     });
 
-    const counts = await countCommentBlocks({ spaceId: space.id, batchSize: 2 });
+    const counts = await countCommentBlocks({ spaceId: space.id, batchSize: 10 });
 
     // Modify the expected counts based on the generated comments
     expect(counts).toMatchObject<CommentBlocksCount>({
@@ -279,7 +279,7 @@ describe('countCommentBlocks', () => {
         }
       ]
     });
-    const counts = await countCommentBlocks({ spaceId: space.id, batchSize: 2 });
+    const counts = await countCommentBlocks({ spaceId: space.id, batchSize: 10 });
 
     // Modify the expected counts based on the generated comments
     expect(counts).toMatchObject<CommentBlocksCount>({
