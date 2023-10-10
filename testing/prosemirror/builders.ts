@@ -70,7 +70,8 @@ export type NodeType =
   | 'tooltip-marker'
   | 'tweet'
   | 'video'
-  | 'underline';
+  | 'underline'
+  | 'linkedPage';
 
 const defaultBuilders = makeBuilders(specRegistry.schema) as any as Record<NodeType, Builder> & {
   schema: { nodes: Record<NodeType, any> };
