@@ -82,10 +82,6 @@ export async function createProposalNotifications(
         }
       });
 
-      const notificationToggles = space.notificationToggles as NotificationToggles;
-      const notifyNewProposals = notificationToggles.proposals__start_discussion !== false;
-      const notifyNewVotes = notificationToggles.proposals__vote !== false;
-
       const spaceRoles = await prisma.spaceRole.findMany({
         where: {
           spaceId
@@ -137,12 +133,16 @@ export async function createProposalNotifications(
         const action = getProposalAction({
           currentStatus: proposal.status,
           isAuthor,
-          isReviewer: isReviewer || isReviewerRole,
-          notifyNewProposals,
-          notifyNewVotes
+          isReviewer: isReviewer || isReviewerRole
         });
 
         if (!action) {
+          continue;
+        }
+
+        // check notification preferences
+        const notificationToggles = space.notificationToggles as NotificationToggles;
+        if (notificationToggles[`proposals__${action}`] === false) {
           continue;
         }
 
