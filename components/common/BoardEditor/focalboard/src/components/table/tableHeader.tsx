@@ -219,7 +219,7 @@ function TableHeader(props: Props): JSX.Element {
           </ListItemIcon>
           <Typography variant='subtitle1'>Insert right</Typography>
         </MenuItem>
-        {templateId !== Constants.titleColumnId && [
+        {[
           <Divider key='divider' />,
           <MenuItem
             key='hide'
@@ -233,30 +233,34 @@ function TableHeader(props: Props): JSX.Element {
             </ListItemIcon>
             <Typography variant='subtitle1'>Hide in view</Typography>
           </MenuItem>,
-          <MenuItem
-            key='duplicate'
-            disabled={proposalPropertyTypesList.includes(type as any)}
-            onClick={() => {
-              mutator.duplicatePropertyTemplate(board, activeView, templateId);
-            }}
-          >
-            <ListItemIcon>
-              <ContentCopyOutlinedIcon fontSize='small' />
-            </ListItemIcon>
-            <Typography variant='subtitle1'>Duplicate</Typography>
-          </MenuItem>,
-          <MenuItem
-            key='delete'
-            disabled={proposalPropertyTypesList.includes(type as any)}
-            onClick={() => {
-              mutator.deleteProperty(board, views, cards, templateId);
-            }}
-          >
-            <ListItemIcon>
-              <DeleteOutlinedIcon fontSize='small' />
-            </ListItemIcon>
-            <Typography variant='subtitle1'>Delete</Typography>
-          </MenuItem>
+          ...(templateId !== Constants.titleColumnId
+            ? [
+                <MenuItem
+                  key='duplicate'
+                  disabled={proposalPropertyTypesList.includes(type as any)}
+                  onClick={() => {
+                    mutator.duplicatePropertyTemplate(board, activeView, templateId);
+                  }}
+                >
+                  <ListItemIcon>
+                    <ContentCopyOutlinedIcon fontSize='small' />
+                  </ListItemIcon>
+                  <Typography variant='subtitle1'>Duplicate</Typography>
+                </MenuItem>,
+                <MenuItem
+                  key='delete'
+                  disabled={proposalPropertyTypesList.includes(type as any)}
+                  onClick={() => {
+                    mutator.deleteProperty(board, views, cards, templateId);
+                  }}
+                >
+                  <ListItemIcon>
+                    <DeleteOutlinedIcon fontSize='small' />
+                  </ListItemIcon>
+                  <Typography variant='subtitle1'>Delete</Typography>
+                </MenuItem>
+              ]
+            : [])
         ]}
         <Divider />
         <MenuItem

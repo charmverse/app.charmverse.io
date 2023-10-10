@@ -3,7 +3,7 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { IconButton, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent, ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';

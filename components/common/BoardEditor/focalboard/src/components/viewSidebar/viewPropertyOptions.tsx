@@ -74,34 +74,28 @@ function PropertyOptions(props: LayoutOptionsProps) {
   const { properties, view } = props;
 
   const { visiblePropertyIds } = view.fields;
-  const titlePropertyIndex = visiblePropertyIds.indexOf(Constants.titleColumnId);
-  const visiblePropertyIdsWithTitle =
-    titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds;
 
   const propertiesWithTitle = properties.find((property) => property.id === Constants.titleColumnId)
     ? properties
     : [titleProperty, ...properties];
 
   const { hiddenProperties, visibleProperties } = useMemo(() => {
-    const propertyIds = properties.map((property) => property.id);
-    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>(
+    const propertyIds = propertiesWithTitle.map((property) => property.id);
+    const _propertiesRecord = propertiesWithTitle.reduce<Record<string, IPropertyTemplate>>(
       (__propertiesRecord, property) => {
         __propertiesRecord[property.id] = property;
         return __propertiesRecord;
       },
-      {
-        // Always include __title column as its not present by default
-        [Constants.titleColumnId]: titleProperty
-      }
+      {}
     );
 
-    const _visibleProperties = visiblePropertyIdsWithTitle
+    const _visibleProperties = visiblePropertyIds
       .map((visiblePropertyId) => _propertiesRecord[visiblePropertyId])
       // Hot fix - not sure why these dont always exist, maybe the property was deleted?
       .filter(Boolean);
 
     const _hiddenProperties = propertyIds
-      .filter((propertyId) => !visiblePropertyIdsWithTitle.includes(propertyId))
+      .filter((propertyId) => !visiblePropertyIds.includes(propertyId))
       .map((propertyId) => _propertiesRecord[propertyId])
       .sort((p1, p2) => {
         return p1.name > p2.name ? 1 : -1;
@@ -112,50 +106,50 @@ function PropertyOptions(props: LayoutOptionsProps) {
       visibleProperties: _visibleProperties,
       hiddenProperties: _hiddenProperties
     };
-  }, [visiblePropertyIdsWithTitle, properties]);
+  }, [visiblePropertyIds, propertiesWithTitle]);
 
   const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
-    const isDestinationPropertyVisible = visiblePropertyIdsWithTitle.includes(destinationProperty.id);
-    const isSourcePropertyVisible = visiblePropertyIdsWithTitle.includes(sourceProperty.id);
+    const isDestinationPropertyVisible = visiblePropertyIds.includes(destinationProperty.id);
+    const isSourcePropertyVisible = visiblePropertyIds.includes(sourceProperty.id);
 
     if (!isDestinationPropertyVisible) {
       mutator.changeViewVisibleProperties(
         view.id,
-        visiblePropertyIdsWithTitle,
-        visiblePropertyIdsWithTitle.filter((visiblePropertyId) => visiblePropertyId !== sourceProperty.id)
+        visiblePropertyIds,
+        visiblePropertyIds.filter((visiblePropertyId) => visiblePropertyId !== sourceProperty.id)
       );
     } else {
-      const destIndex = visiblePropertyIdsWithTitle.indexOf(destinationProperty.id);
-      const srcIndex = visiblePropertyIdsWithTitle.indexOf(sourceProperty.id);
-      const oldPropertyIds = [...visiblePropertyIdsWithTitle];
+      const destIndex = visiblePropertyIds.indexOf(destinationProperty.id);
+      const srcIndex = visiblePropertyIds.indexOf(sourceProperty.id);
+      const oldPropertyIds = [...visiblePropertyIds];
 
       if (isSourcePropertyVisible) {
-        visiblePropertyIdsWithTitle.splice(destIndex, 0, visiblePropertyIdsWithTitle.splice(srcIndex, 1)[0]);
+        visiblePropertyIds.splice(destIndex, 0, visiblePropertyIds.splice(srcIndex, 1)[0]);
       } else {
-        visiblePropertyIdsWithTitle.splice(destIndex, 0, sourceProperty.id);
+        visiblePropertyIds.splice(destIndex, 0, sourceProperty.id);
       }
-      mutator.changeViewVisibleProperties(view.id, oldPropertyIds, visiblePropertyIdsWithTitle);
+      mutator.changeViewVisibleProperties(view.id, oldPropertyIds, visiblePropertyIds);
     }
   };
 
   const toggleVisibility = (propertyId: string) => {
     let newVisiblePropertyIds = [];
-    if (visiblePropertyIdsWithTitle.includes(propertyId)) {
-      newVisiblePropertyIds = visiblePropertyIdsWithTitle.filter((o: string) => o !== propertyId);
+    if (visiblePropertyIds.includes(propertyId)) {
+      newVisiblePropertyIds = visiblePropertyIds.filter((o: string) => o !== propertyId);
     } else {
-      newVisiblePropertyIds = [...visiblePropertyIdsWithTitle, propertyId];
+      newVisiblePropertyIds = [...visiblePropertyIds, propertyId];
     }
-    mutator.changeViewVisibleProperties(view.id, visiblePropertyIdsWithTitle, newVisiblePropertyIds);
+    mutator.changeViewVisibleProperties(view.id, visiblePropertyIds, newVisiblePropertyIds);
   };
 
   const hideAllProperties = () => {
-    mutator.changeViewVisibleProperties(view.id, visiblePropertyIdsWithTitle, [Constants.titleColumnId]);
+    mutator.changeViewVisibleProperties(view.id, visiblePropertyIds, []);
   };
 
   const showAllProperties = () => {
     mutator.changeViewVisibleProperties(
       view.id,
-      visiblePropertyIdsWithTitle,
+      visiblePropertyIds,
       propertiesWithTitle.map((property) => property.id)
     );
   };
@@ -176,7 +170,6 @@ function PropertyOptions(props: LayoutOptionsProps) {
             {visibleProperties.map((property) => (
               <PropertyMenuItem
                 onDrop={onDrop}
-                visibilityToggleDisabled={property.id === Constants.titleColumnId}
                 isVisible
                 property={property}
                 toggleVisibility={toggleVisibility}
