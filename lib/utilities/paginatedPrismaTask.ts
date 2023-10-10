@@ -52,8 +52,10 @@ export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R
   mapper,
   model,
   queryOptions,
-  onSuccess
-}: PaginatedTask<M, R, V>): Promise<Awaited<R>[] | V> {
+  onSuccess,
+  resultCache = [],
+  cursor
+}: PaginatedTask<M, R, V> & { resultCache?: Awaited<R>[]; cursor?: string }): Promise<Awaited<R>[] | V> {
   // Assume processBatches is a functi
   if (queryOptions.select && queryOptions.include) {
     throw new InvalidInputError(`Cannot provide select AND include. Pick one or none`);
@@ -61,36 +63,37 @@ export async function paginatedPrismaTask<M extends PrismaModel = PrismaModel, R
     throw new InvalidInputError(`Query options for ${model} must select at least id or include additional records`);
   }
 
-  let cursor: string | undefined;
-
-  const allProcessedResults: Awaited<R>[] = [];
-
-  while (true) {
-    // Typecast model to page to get a good example of how to use the PrismaClient, since generic is tricky
-    const results = await prisma[model as 'page'].findMany({
-      ...(queryOptions as Prisma.PageFindManyArgs),
-      cursor: cursor ? { id: cursor } : undefined,
-      take: batchSize,
-      skip: cursor ? 1 : undefined,
-      orderBy: {
-        id: 'asc'
-      }
-    });
-
-    if (results.length === 0) break;
-
-    for (const result of results) {
-      const mapped = await mapper(result);
-      allProcessedResults.push(mapped);
+  // Typecast model to page to get a good example of how to use the PrismaClient, since generic is tricky
+  const results = await prisma[model as 'page'].findMany({
+    ...(queryOptions as Prisma.PageFindManyArgs),
+    cursor: cursor ? { id: cursor } : undefined,
+    take: batchSize,
+    skip: cursor ? 1 : undefined,
+    orderBy: {
+      id: 'asc'
     }
+  });
 
-    cursor = results[results.length - 1].id;
+  for (const result of results) {
+    const mapped = await mapper(result);
+    resultCache.push(mapped);
+  }
 
-    if (results.length < batchSize) break;
+  if (results.length === batchSize) {
+    return paginatedPrismaTask({
+      mapper,
+      model,
+      queryOptions,
+      batchSize,
+      // @ts-ignore - We dont want the cache to be visible externally
+      resultCache,
+      cursor: results[results.length - 1]?.id,
+      onSuccess
+    });
   }
 
   if (onSuccess) {
-    return onSuccess(allProcessedResults);
+    return onSuccess(resultCache);
   }
-  return allProcessedResults as Awaited<R>[];
+  return resultCache as Awaited<R>[];
 }
