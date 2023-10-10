@@ -39,7 +39,7 @@ function IdentityModal(props: IdentityModalProps) {
 
   const { setUser, user } = useUser();
 
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
 
   const [generatedName, setGeneratedName] = useState(
     user?.identityType === 'RandomName' && identityType === 'RandomName' ? user.username : randomName()
@@ -122,7 +122,7 @@ function IdentityModal(props: IdentityModalProps) {
         endIcon={<NavigateNextIcon />}
         onClick={() => {
           close();
-          onClick('account');
+          openSettings('account');
         }}
       >
         Manage identities
