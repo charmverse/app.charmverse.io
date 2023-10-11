@@ -12,6 +12,7 @@ import type {
   VoteNotification
 } from 'lib/notifications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
+import { createDocumentWithText } from 'lib/prosemirror/constants';
 import randomName from 'lib/utilities/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 
@@ -43,7 +44,7 @@ const createDocumentNotification = ({
     pagePath: getPagePath(),
     spaceName,
     pageTitle,
-    text: mentionText,
+    content: createDocumentWithText(mentionText),
     inlineCommentId: null,
     type: 'mention.created',
     createdBy: {

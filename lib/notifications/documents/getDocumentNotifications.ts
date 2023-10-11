@@ -5,8 +5,8 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { DocumentNotification, NotificationsGroup } from '../interfaces';
-import { notificationMetadataSelectStatement, sortByDate } from '../utils';
+import type { DocumentNotification } from '../interfaces';
+import { notificationMetadataSelectStatement } from '../utils';
 
 export async function getDocumentNotifications(userId: string): Promise<DocumentNotification[]> {
   const documentNotifications = await prisma.documentNotification.findMany({
@@ -18,6 +18,7 @@ export async function getDocumentNotifications(userId: string): Promise<Document
     select: {
       id: true,
       type: true,
+      content: true,
       page: {
         select: {
           id: true,
@@ -88,12 +89,7 @@ export async function getDocumentNotifications(userId: string): Promise<Document
         spaceId: notificationMetadata.spaceId,
         spaceName: notificationMetadata.space.name,
         pageType: page.type,
-        text: notification.inlineComment?.content
-          ? getNodeFromJson(notification.inlineComment.content).textContent
-          : notification.mentionId
-          ? extractMentions(page.content).find((mention) => mention.id === notification.mentionId)?.text ||
-            `@${notificationMetadata.user.username}`
-          : notification.pageComment?.contentText || notification.postComment?.contentText || '',
+        content: notification.content,
         type: notification.type,
         archived: !!notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt,
