@@ -36,6 +36,10 @@ constructs:
     worker:
       # Function responsible for handle messages in the queue
       handler: serverless/handler.webhookWorker
+      environment:
+        DATABASE_URL: ${env:DATABASE_URL}
+        PERMISSIONS_API_URL: ${env:PERMISSIONS_API_URL}
+
     extensions:
       queue:
         Properties:
