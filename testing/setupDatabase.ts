@@ -200,7 +200,6 @@ export async function generateUserAndSpace({
               domain: `domain-${v4()}`,
               customDomain: spaceCustomDomain,
               publicBountyBoard,
-              notifyNewProposals: null,
               notificationToggles: spaceNotificationToggles,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
             }
