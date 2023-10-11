@@ -2,13 +2,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
+import { emptyDocument } from 'lib/prosemirror/constants';
 import { builders as _ } from 'testing/prosemirror/builders';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { updatePageContentForSync } from '../updatePageContentForSync';
 
 describe('updatePageContentForSync', () => {
-  it(`Should update page content by converting linked page nodes and adding nested pages`, async () => {
+  it(`Should update page content and diffs by converting linked page nodes and adding missing nested pages`, async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
     const childPage1Id = v4();
     const childPage1Path = `page-${v4()}`;
@@ -74,7 +75,7 @@ describe('updatePageContentForSync', () => {
       parentId: parentPage.id
     });
 
-    await updatePageContentForSync({ PAGE_SIZE: 2 });
+    await updatePageContentForSync({ PAGE_SIZE: 2, spaceId: space.id });
 
     const updatedParentPage = await prisma.page.findUniqueOrThrow({
       where: {
@@ -214,5 +215,109 @@ describe('updatePageContentForSync', () => {
         version: 2
       }
     ]);
+  });
+
+  it(`Should not update page content or add diffs if all the linked page nodes are correct and there are no missing nested pages`, async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const parentPage = await testUtilsPages.generatePage({
+      spaceId: space.id,
+      createdBy: user.id,
+      content: emptyDocument
+    });
+
+    const childPage1 = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parentPage.id
+    });
+
+    const childPage2 = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parentPage.id
+    });
+
+    const childPage3 = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      parentId: parentPage.id
+    });
+
+    const linkedPage1 = await testUtilsPages.generatePage({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    const linkedPage2 = await testUtilsPages.generatePage({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    const pageContent = _.doc(
+      _.paragraph('Paragraph 1'),
+      _.page({
+        id: childPage1.id,
+        type: 'page',
+        path: childPage1.path
+      }),
+      _.paragraph('Paragraph 2'),
+      _.linkedPage({
+        id: linkedPage1.id,
+        type: 'page',
+        path: linkedPage1.path
+      }),
+      _.paragraph('Paragraph 3'),
+      _.linkedPage({
+        id: linkedPage2.id,
+        type: 'page',
+        path: linkedPage2.path
+      }),
+      _.linkedPage({
+        id: linkedPage2.id,
+        type: 'page',
+        path: linkedPage2.path
+      }),
+      _.paragraph('Paragraph 4'),
+      _.page({
+        id: childPage2.id,
+        type: 'page',
+        path: childPage2.path
+      }),
+      _.page({
+        id: childPage3.id,
+        type: 'page',
+        path: childPage3.path
+      })
+    ).toJSON();
+
+    await prisma.page.update({
+      where: {
+        id: parentPage.id
+      },
+      data: {
+        content: pageContent
+      }
+    });
+
+    await updatePageContentForSync({ PAGE_SIZE: 2, spaceId: space.id });
+
+    const updatedParentPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true,
+        diffs: true,
+        version: true
+      }
+    });
+
+    const pageDiffs = updatedParentPage.diffs;
+
+    expect(pageDiffs.length).toEqual(0);
+
+    expect(updatedParentPage.content).toEqual(pageContent);
+
+    expect(updatedParentPage.version).toEqual(1);
   });
 });

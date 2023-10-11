@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
-import { prisma } from '@charmverse/core/prisma-client';
+import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { Fragment, Slice } from 'prosemirror-model';
 import { replaceStep } from 'prosemirror-transform';
 
@@ -26,22 +26,30 @@ export function recurseDocument(content: PageContent, cb: (node: PageContent) =>
 }
 
 export async function updatePageContentForSync(
-  config: { PAGE_SIZE: number } = {
+  config: { PAGE_SIZE: number; spaceId?: string } = {
     PAGE_SIZE: 100
   }
 ) {
-  const { PAGE_SIZE } = config;
+  const { PAGE_SIZE, spaceId } = config;
+  const pageWhereInput: Prisma.PageWhereInput = {
+    content: {
+      not: Prisma.DbNull
+    },
+    spaceId,
+    type: {
+      notIn: ['board', 'board_template', 'inline_board', 'inline_linked_board', 'linked_board']
+    }
+  };
+
   let completedPages = 0;
-  const totalPages = await prisma.page.count({});
+  const totalPages = await prisma.page.count({
+    where: pageWhereInput
+  });
   let skip = 0;
 
   while (skip < totalPages) {
     const pages = await prisma.page.findMany({
-      where: {
-        content: {
-          not: undefined
-        }
-      },
+      where: pageWhereInput,
       select: {
         id: true,
         version: true,
@@ -110,7 +118,9 @@ export async function updatePageContentForSync(
           }
         });
 
-        doc = applyStepsToNode(linkedPageConversionSteps, doc);
+        if (linkedPageConversionSteps.length) {
+          doc = applyStepsToNode(linkedPageConversionSteps, doc);
+        }
 
         const childPagesNotInDocument = childPages.filter((childPage) => !nestedPageIds.has(childPage.id));
         const nestedPageAppendStep: ProsemirrorJSONStep | null =
@@ -140,18 +150,20 @@ export async function updatePageContentForSync(
         const newContent = doc.toJSON();
 
         const pageDiffs = [
-          {
-            createdBy,
-            data: {
-              rid: 0,
-              type: 'diff',
-              v: version,
-              cid: 0,
-              ds: linkedPageConversionSteps
-            },
-            pageId: id,
-            version
-          },
+          linkedPageConversionSteps.length
+            ? {
+                createdBy,
+                data: {
+                  rid: 0,
+                  type: 'diff',
+                  v: version,
+                  cid: 0,
+                  ds: linkedPageConversionSteps
+                },
+                pageId: id,
+                version
+              }
+            : null,
           nestedPageAppendStep
             ? {
                 createdBy,
@@ -168,26 +180,29 @@ export async function updatePageContentForSync(
             : null
         ].filter(isTruthy);
 
-        const finalVersion = version + pageDiffs.length;
-
-        await prisma.$transaction([
-          prisma.pageDiff.createMany({
-            data: pageDiffs
-          }),
-          prisma.page.update({
-            where: {
-              id
-            },
-            data: {
-              content: newContent,
-              version: finalVersion
-            }
-          })
-        ]);
+        if (linkedPageConversionSteps.length || nestedPageAppendStep) {
+          const finalVersion = version + pageDiffs.length;
+          await prisma.$transaction(
+            [
+              prisma.pageDiff.createMany({
+                data: pageDiffs
+              }),
+              prisma.page.update({
+                where: {
+                  id
+                },
+                data: {
+                  content: newContent,
+                  version: finalVersion
+                }
+              })
+            ].filter(isTruthy)
+          );
+        }
         completedPages += 1;
         log.info(`Complete updating page [${completedPages}/${totalPages}]: ${page.id}`);
       } catch (error) {
-        log.error(`Failed to update page ${page.id}`, { error });
+        log.error(`Failed to update page ${page.id}`, { error, skip });
       }
     }
 
