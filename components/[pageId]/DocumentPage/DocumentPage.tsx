@@ -217,7 +217,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
           <PageDeleteBanner pageType={page.type} pageId={page.id} />
         </StyledBannerContainer>
       )}
-      {true && (
+      {connectionError && (
         <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
           <PageConnectionBanner />
         </StyledBannerContainer>

@@ -11,6 +11,7 @@ import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
@@ -32,6 +33,7 @@ export function PageDialog(props: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
   const { setCurrentPageId } = useCurrentPage();
+  const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
   const { updatePage } = usePages();
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
@@ -73,8 +75,27 @@ export function PageDialog(props: Props) {
     }
     return () => {
       setCurrentPageId('');
+      resetPageProps();
     };
   }, [page?.id]);
+
+  // set page attributes of the primary charm editor
+  useEffect(() => {
+    if (!page) {
+      // wait for pages loaded for permissions to be correct
+      return;
+    }
+    if (!editMode) {
+      if (page.permissionFlags.edit_content) {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'editing' });
+      } else {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'viewing' });
+      }
+    } else {
+      // pass editMode thru to fix hot-reloading which resets the prop
+      setPageProps({ permissions: page.permissionFlags, editMode });
+    }
+  }, [page?.permissionFlags.edit_content]);
 
   const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {

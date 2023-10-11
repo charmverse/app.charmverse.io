@@ -9,8 +9,10 @@ import { Button } from 'components/common/Button';
 import { useCharmEditor, EDIT_MODE_CONFIG } from 'hooks/useCharmEditor';
 import type { EditMode } from 'hooks/useCharmEditor';
 
+const availableModes = Object.entries(EDIT_MODE_CONFIG);
+
 function EditModeToggle() {
-  const { availableEditModes, permissions, editMode, setPageProps } = useCharmEditor();
+  const { permissions, editMode, setPageProps } = useCharmEditor();
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   function setMode(mode: EditMode) {
@@ -20,11 +22,6 @@ function EditModeToggle() {
   if (!editMode) {
     return null;
   }
-
-  const availableModes = availableEditModes.map((mode) => {
-    return [mode, EDIT_MODE_CONFIG[mode]] as const;
-  });
-
   const _permissions = permissions || ({} as PagePermissionFlags);
 
   return (
@@ -60,7 +57,7 @@ function EditModeToggle() {
                 dense
                 onClick={() => {
                   if (_permissions[permission]) {
-                    setMode(mode);
+                    setMode(mode as EditMode);
                   }
                   popupState.close();
                 }}
