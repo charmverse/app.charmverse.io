@@ -67,14 +67,12 @@ export function NewApplication({ setFormInputs, formInputs, contentUpdated, setC
     // });
   }
   return (
-    <ScrollableWindow>
-      <div className={`document-print-container ${fontClassName}`}>
-        <StyledContainer data-test='page-charmeditor' fullWidth={isSmallScreen}>
-          <Box minHeight={450}>
-            <ApplicationInput bountyId='' refreshApplication={() => null} />
-          </Box>
-        </StyledContainer>
-      </div>
-    </ScrollableWindow>
+    <div className={`document-print-container ${fontClassName}`}>
+      <StyledContainer data-test='page-charmeditor' fullWidth={isSmallScreen}>
+        <Box minHeight={450}>
+          <ApplicationInput bountyId='' refreshApplication={() => null} />
+        </Box>
+      </StyledContainer>
+    </div>
   );
 }

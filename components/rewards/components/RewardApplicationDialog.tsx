@@ -94,6 +94,7 @@ export function ApplicationDialog() {
               href={relativePath}
               variant='text'
               startIcon={<OpenInFullIcon fontSize='small' />}
+              sx={{ px: 1.5 }}
             >
               Open as Page
             </Button>

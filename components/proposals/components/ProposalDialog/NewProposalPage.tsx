@@ -151,8 +151,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
   }
 
   return (
-    <ScrollableWindow>
-      <div className={`document-print-container ${fontClassName}`}>
+    <div className={`document-print-container ${fontClassName}`}>
+      <Box display='flex' flexDirection='column'>
         {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
@@ -225,7 +225,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
             </Button>
           </Stack>
         </StyledContainer>
-      </div>
-    </ScrollableWindow>
+      </Box>
+    </div>
   );
 }
