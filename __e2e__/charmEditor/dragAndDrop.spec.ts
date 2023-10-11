@@ -94,8 +94,9 @@ test('Drag and drop a nested page node over a linked page node in the CharmEdito
     }
   });
 
-  await documentPage.page.waitForTimeout(2500);
-
+  await documentPage.page.waitForTimeout(1000);
+  await documentPage.page.reload();
+  await documentPage.page.waitForTimeout(1000);
   const documentText = await documentPage.getDocumentText();
   expect(documentText).toBe(`${linkedPage.title}${nestedPage.title}`);
 
