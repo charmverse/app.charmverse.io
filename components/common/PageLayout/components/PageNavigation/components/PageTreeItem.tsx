@@ -214,7 +214,7 @@ interface PageLinkProps {
 }
 
 export function PageLink({
-  showPicker = !isTouchScreen(),
+  showPicker = true,
   children,
   href,
   isEmptyContent,
