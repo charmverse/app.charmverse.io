@@ -33,7 +33,9 @@ jobs:
           secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
 
           cat .ebstalk.apps.env/serverless.env | while read -r line; do
+            echo "out $line"
             if [[ $line =~ $secrets_pattern ]]; then  
+                echo "in $line"
                 env_var_name=${BASH_REMATCH[1]}
                 secret_name=${BASH_REMATCH[2]}
                 secret_json_key=${BASH_REMATCH[3]}
