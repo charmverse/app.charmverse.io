@@ -24,6 +24,10 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
       - name: populate env file
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
         run: |
           sed -i 's/prd/stg/g' .ebstalk.apps.env/serverless.env
           secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
