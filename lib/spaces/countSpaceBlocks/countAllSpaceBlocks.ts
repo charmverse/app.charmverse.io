@@ -40,13 +40,23 @@ export async function countSpaceBlocks({
     throw new InvalidInputError(`Invalid spaceId: ${spaceId}`);
   }
 
-  const commentsCount = await countCommentBlocks({ spaceId, batchSize });
-  const forumCount = await countForumBlocks({ spaceId, batchSize });
-  const pageEditorContentCount = await countPageEditorContentBlocks({ spaceId, batchSize });
-  const databaseBlockPropsCount = await countDatabaseBlockContentAndProps({ spaceId, batchSize });
-  const pagesCount = await countSpacePages({ spaceId, batchSize });
-  const memberPropertiesCount = await countMemberProperties({ spaceId, batchSize });
-  const proposalBlocksCount = await countProposalBlocks({ spaceId, batchSize });
+  const [
+    commentsCount,
+    forumCount,
+    pageEditorContentCount,
+    databaseBlockPropsCount,
+    pagesCount,
+    memberPropertiesCount,
+    proposalBlocksCount
+  ] = await Promise.all([
+    countCommentBlocks({ spaceId, batchSize }),
+    countForumBlocks({ spaceId, batchSize }),
+    countPageEditorContentBlocks({ spaceId, batchSize }),
+    countDatabaseBlockContentAndProps({ spaceId, batchSize }),
+    countSpacePages({ spaceId, batchSize }),
+    countMemberProperties({ spaceId, batchSize }),
+    countProposalBlocks({ spaceId, batchSize })
+  ]);
 
   const total =
     commentsCount.total +
