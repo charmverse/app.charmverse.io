@@ -65,7 +65,6 @@ describe(`Test document events and notifications`, () => {
           createdAt: new Date().toISOString(),
           createdBy: user.id,
           id: mentionId,
-          text: '',
           value: user2.id,
           parentNode: null
         }

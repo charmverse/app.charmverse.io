@@ -14,6 +14,7 @@ import type {
   VoteNotification
 } from 'lib/notifications/interfaces';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { colors, greyColor2 } from 'theme/colors';
 
 import { EmailWrapper, Feedback, Footer, Header } from './components';
@@ -349,11 +350,12 @@ function BountyTaskMjml({ task }: { task: BountyNotification }) {
 }
 
 function DocumentNotification({
-  task: { text, spaceName, pageTitle, pagePath, spaceDomain }
+  task: { content, spaceName, pageTitle, pagePath, spaceDomain }
 }: {
   task: DocumentNotification;
 }) {
   const pageWorkspaceTitle = `${pageTitle || 'Untitled'} | ${spaceName}`;
+  const text = getNodeFromJson(content).textContent || '';
   return (
     <MjmlText>
       <a
