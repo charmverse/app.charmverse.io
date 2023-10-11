@@ -25,8 +25,11 @@ export const StyledIconButton = styled(IconButton)`
   svg {
     font-size: 16px;
   }
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      background-color: ${({ theme }) => theme.palette.action.hover};
+    }
   }
   ${({ theme }) => `
     ${theme.breakpoints.down('md')} {
