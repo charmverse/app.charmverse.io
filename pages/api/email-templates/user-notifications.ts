@@ -5,6 +5,7 @@ import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
 import type {
   BountyNotification,
+  CardNotification,
   DocumentNotification,
   PostNotification,
   ProposalNotification,
@@ -58,6 +59,41 @@ const createDocumentNotification = ({
     pageType: 'page',
     archived: false,
     group: 'document',
+    read: false
+  };
+};
+
+const createCardNotification = ({
+  pageTitle,
+  spaceName
+}: {
+  spaceName: string;
+  pageTitle: string;
+}): CardNotification => {
+  const id = v4();
+  return {
+    id,
+    createdAt: new Date().toISOString(),
+    pageId: v4(),
+    spaceId: v4(),
+    spaceDomain: randomName(),
+    pagePath: getPagePath(),
+    spaceName,
+    pageTitle,
+    type: 'person_assigned',
+    createdBy: {
+      avatarChain: 1,
+      avatarContract: null,
+      deletedAt: null,
+      id: v4(),
+      username: 'username',
+      avatar: '',
+      path: 'username',
+      avatarTokenId: null
+    },
+    personPropertyId: v4(),
+    archived: false,
+    group: 'card',
     read: false
   };
 };
@@ -221,7 +257,12 @@ const templates = {
           status: 'draft'
         })
       ],
-      cardNotifications: [],
+      cardNotifications: [
+        createCardNotification({
+          pageTitle: 'Product Road Map',
+          spaceName: 'CharmVerse'
+        })
+      ],
       documentNotifications: [
         createDocumentNotification({
           mentionText: 'Hey there, please respond to this message.',
