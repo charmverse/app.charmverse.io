@@ -59,82 +59,76 @@ interface PageTreeItemProps {
 
 export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => prop !== 'isActive' })<{
   isActive?: boolean;
-}>(({ isActive, theme }) => {
-  const isTouch = isTouchScreen();
-  return {
-    position: 'relative',
-    backgroundColor: isActive ? theme.palette.action.focus : 'unset',
-    marginLeft: 3,
-    marginRight: 3,
-    // unset margin on child tree items
-    '.MuiTreeItem-root': {
-      marginLeft: 0,
-      marginRight: 0
-    },
+}>(({ isActive, theme }) => ({
+  position: 'relative',
+  backgroundColor: isActive ? theme.palette.action.focus : 'unset',
+  marginLeft: 3,
+  marginRight: 3,
+  // unset margin on child tree items
+  '.MuiTreeItem-root': {
+    marginLeft: 0,
+    marginRight: 0
+  },
 
-    [`& .${treeItemClasses.content}`]: {
-      color: theme.palette.text.secondary,
-      marginBottom: 1,
-      // paddingRight: theme.spacing(1),
-      // fontWeight: theme.typography.fontWeightMedium,
+  [`& .${treeItemClasses.content}`]: {
+    color: theme.palette.text.secondary,
+    marginBottom: 1,
+    '.MuiTypography-root': {
+      fontWeight: 500
+    },
+    '&.Mui-expanded': {
+      fontWeight: theme.typography.fontWeightRegular
+    },
+    '&.Mui-selected:hover': {
+      backgroundColor: theme.palette.action.hover
+    },
+    '&.Mui-selected:hover::after': {
+      content: '""',
+      left: 0,
+      top: 0,
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: theme.palette.action.hover,
+      pointerEvents: 'none'
+    },
+    '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
+      backgroundColor: theme.palette.action.selected,
+      color: theme.palette.text.primary,
       '.MuiTypography-root': {
-        fontWeight: 500
-      },
-      '&.Mui-expanded': {
-        fontWeight: theme.typography.fontWeightRegular
-      },
-      ...(isTouch ? { '&:hover': false } : {}),
-      '&.Mui-selected:hover': {
-        backgroundColor: theme.palette.action.hover
-      },
-      '&.Mui-selected:hover::after': {
-        content: '""',
-        left: 0,
-        top: 0,
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        backgroundColor: theme.palette.action.hover,
-        pointerEvents: 'none'
-      },
-      '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
-        backgroundColor: theme.palette.action.selected,
-        color: theme.palette.text.primary,
-        '.MuiTypography-root': {
-          fontWeight: 700
-        }
-      },
-      [`& .${treeItemClasses.label}`]: {
-        fontWeight: 'inherit',
-        paddingLeft: 0,
-        color: 'inherit'
-      },
-      [`& .${treeItemClasses.iconContainer}`]: {
-        marginRight: 0,
-        width: '24px'
-      },
-      [`& .${treeItemClasses.iconContainer} svg`]: {
-        color: greyColor2
-      },
-      [`& .${treeItemClasses.iconContainer} svg.MuiSvgIcon-fontSizeLarge`]: {
-        fontSize: 24
+        fontWeight: 700
       }
     },
-    [`& .${treeItemClasses.group}`]: {
-      marginLeft: 0,
-      [`& .${treeItemClasses.content}`]: {
-        paddingLeft: theme.spacing(3)
-      },
-      // add increasing indentation to children of children
-      [`& .${treeItemClasses.group} .${treeItemClasses.content}`]: {
-        paddingLeft: `calc(${theme.spacing(3)} + 16px)`
-      },
-      [`& .${treeItemClasses.group} .${treeItemClasses.group} .${treeItemClasses.content}`]: {
-        paddingLeft: `calc(${theme.spacing(3)} + 32px)`
-      }
+    [`& .${treeItemClasses.label}`]: {
+      fontWeight: 'inherit',
+      paddingLeft: 0,
+      color: 'inherit'
+    },
+    [`& .${treeItemClasses.iconContainer}`]: {
+      marginRight: 0,
+      width: '24px'
+    },
+    [`& .${treeItemClasses.iconContainer} svg`]: {
+      color: greyColor2
+    },
+    [`& .${treeItemClasses.iconContainer} svg.MuiSvgIcon-fontSizeLarge`]: {
+      fontSize: 24
     }
-  };
-});
+  },
+  [`& .${treeItemClasses.group}`]: {
+    marginLeft: 0,
+    [`& .${treeItemClasses.content}`]: {
+      paddingLeft: theme.spacing(3)
+    },
+    // add increasing indentation to children of children
+    [`& .${treeItemClasses.group} .${treeItemClasses.content}`]: {
+      paddingLeft: `calc(${theme.spacing(3)} + 16px)`
+    },
+    [`& .${treeItemClasses.group} .${treeItemClasses.group} .${treeItemClasses.content}`]: {
+      paddingLeft: `calc(${theme.spacing(3)} + 32px)`
+    }
+  }
+}));
 
 const AdjacentDropZone = styled.div`
   position: absolute;
@@ -302,14 +296,15 @@ function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) 
   );
 }
 
-const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean }>(
-  ({ isAdjacent, className, ...props }, ref) => (
-    <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
-      <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
-      {isAdjacent && <AdjacentDropZone />}
-    </div>
-  )
-);
+const TreeItemComponent = React.forwardRef<
+  React.Ref<HTMLDivElement>,
+  TreeItemContentProps & { isAdjacent?: boolean; hasSelectedChildView?: boolean }
+>(({ isAdjacent, ...props }, ref) => (
+  <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
+    <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
+    {isAdjacent && <AdjacentDropZone />}
+  </div>
+));
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
@@ -341,11 +336,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     setAnchorEl(null);
   }
 
-  const ContentProps = useMemo(
-    () => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }),
-    [isAdjacent, hasSelectedChildView]
-  );
-
+  const ContentProps = useMemo(() => ({ isAdjacent, hasSelectedChildView }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
@@ -387,6 +378,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         nodeId={pageId}
         // @ts-ignore
         ContentComponent={TreeItemComponent}
+        // @ts-ignore
         ContentProps={ContentProps}
         TransitionProps={TransitionProps}
         ref={ref}
