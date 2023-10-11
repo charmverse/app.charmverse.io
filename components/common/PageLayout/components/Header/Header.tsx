@@ -77,7 +77,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
         </div>
 
-        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.25}>
+        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
           {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
 

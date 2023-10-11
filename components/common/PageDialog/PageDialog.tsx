@@ -133,7 +133,7 @@ export function PageDialog(props: Props) {
             Open as Page
           </Button>
           {page && (
-            <Box display='flex' alignItems='center'>
+            <Box display='flex' alignItems='center' gap={0.5}>
               <DocumentHeaderElements headerHeight={0} page={page} />
             </Box>
           )}
