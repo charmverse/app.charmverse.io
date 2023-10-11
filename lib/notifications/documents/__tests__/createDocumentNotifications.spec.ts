@@ -66,7 +66,8 @@ describe(`Test document events and notifications`, () => {
           createdBy: user.id,
           id: mentionId,
           text: '',
-          value: user2.id
+          value: user2.id,
+          parentNode: null
         }
       },
       spaceId: space.id,

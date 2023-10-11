@@ -1,12 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { fancyTrim } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { DocumentNotification } from '../interfaces';
 import { notificationMetadataSelectStatement } from '../utils';
-
-const MAX_DOCUMENT_NOTIFICATION_TEXT_LENGTH = 100;
 
 export async function getDocumentNotifications(userId: string): Promise<DocumentNotification[]> {
   const documentNotifications = await prisma.documentNotification.findMany({
@@ -18,7 +15,7 @@ export async function getDocumentNotifications(userId: string): Promise<Document
     select: {
       id: true,
       type: true,
-      text: true,
+      content: true,
       page: {
         select: {
           id: true,
@@ -64,7 +61,7 @@ export async function getDocumentNotifications(userId: string): Promise<Document
         spaceId: notificationMetadata.spaceId,
         spaceName: notificationMetadata.space.name,
         pageType: page.type,
-        text: fancyTrim(notification.text ?? '', MAX_DOCUMENT_NOTIFICATION_TEXT_LENGTH),
+        content: notification.content,
         type: notification.type,
         archived: !!notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt,

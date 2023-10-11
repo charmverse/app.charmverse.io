@@ -17,6 +17,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
+import { InlineCharmEditor } from 'components/common/CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -421,7 +422,7 @@ export function NotificationContent({
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
-  const notificationText = notification.group === 'document' ? notification.text : null;
+  const notificationContent = notification.group === 'document' ? notification.content : null;
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
   const todaysDate = new Date();
@@ -529,7 +530,7 @@ export function NotificationContent({
             <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
               {spaceName}
             </Typography>
-            {notificationText && (
+            {notificationContent && (
               <Box my={1} display='flex'>
                 <ContextBorder />
                 <Typography
@@ -541,7 +542,7 @@ export function NotificationContent({
                   fontWeight={600}
                   color='secondary'
                 >
-                  {notificationText}
+                  <InlineCharmEditor readOnly content={notificationContent} noPadding />
                 </Typography>
               </Box>
             )}

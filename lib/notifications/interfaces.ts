@@ -1,5 +1,6 @@
 import type { BountyStatus, PageType, ProposalStatus, User, VoteStatus } from '@charmverse/core/prisma-client';
 
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { CardPropertyEntity, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import type { notificationGroups } from './constants';
@@ -80,7 +81,7 @@ interface DocumentNotificationBase extends NotificationBase {
   pagePath: string;
   pageTitle: string;
   type: InlineCommentNotificationType | MentionNotificationType | CommentNotificationType;
-  text: string;
+  content: PageContent | null;
   mentionId: null | string;
   inlineCommentId: null | string;
   commentId: null | string;

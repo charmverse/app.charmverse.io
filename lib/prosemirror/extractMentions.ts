@@ -7,6 +7,7 @@ export interface UserMentionMetadata {
   createdBy: string;
   text: string;
   value: string;
+  parentNode: PageContent | null;
 }
 
 /**
@@ -56,7 +57,8 @@ export function extractMentions(content: PageContent | null, username?: string) 
         text,
         createdAt: node.attrs.createdAt,
         createdBy: node.attrs.createdBy,
-        value: node.attrs.value
+        value: node.attrs.value,
+        parentNode
       });
     }
   }

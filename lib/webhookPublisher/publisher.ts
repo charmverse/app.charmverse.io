@@ -69,7 +69,7 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
     if (event.scope === 'document.mention.created') {
       setTimeout(() => {
         addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
-      }, 30000);
+      }, 15000);
     } else {
       await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
     }

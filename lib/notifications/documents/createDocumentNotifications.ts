@@ -41,7 +41,7 @@ export async function createDocumentNotifications(webhookData: {
           pageId: webhookData.event.document.id,
           spaceId: webhookData.spaceId,
           userId: mentionedUserId,
-          text: targetMention.text
+          content: targetMention.parentNode
         });
       }
 
@@ -78,7 +78,6 @@ export async function createDocumentNotifications(webhookData: {
           userId: true
         }
       });
-      const contentNodeText = getNodeFromJson(inlineCommentContent).toString();
       const authorIds = data.document.authors.map((author) => author.id);
       const pageId = data.document.id;
       if (
@@ -93,7 +92,7 @@ export async function createDocumentNotifications(webhookData: {
           pageId,
           spaceId,
           userId: previousInlineComment.userId,
-          text: contentNodeText
+          content: inlineCommentContent
         });
       }
 
@@ -106,7 +105,7 @@ export async function createDocumentNotifications(webhookData: {
             pageId,
             spaceId,
             userId: authorId,
-            text: contentNodeText
+            content: inlineCommentContent
           });
         }
       }
@@ -123,7 +122,7 @@ export async function createDocumentNotifications(webhookData: {
             pageId,
             spaceId,
             userId: mentionedUserId,
-            text: extractedMention.text
+            content: extractedMention.parentNode
           });
         }
       }
@@ -176,7 +175,7 @@ export async function createDocumentNotifications(webhookData: {
               pageCommentId: documentId ? commentId : undefined,
               postCommentId: postId ? commentId : undefined,
               userId: authorId,
-              text: contentNodeText
+              content: comment.content
             });
           }
         }
@@ -211,7 +210,7 @@ export async function createDocumentNotifications(webhookData: {
             pageCommentId: documentId ? commentId : undefined,
             postCommentId: postId ? commentId : undefined,
             userId: parentCommentAuthorId,
-            text: contentNodeText
+            content: comment.content
           });
         }
       }
@@ -232,7 +231,7 @@ export async function createDocumentNotifications(webhookData: {
           postCommentId: postId ? commentId : undefined,
           spaceId,
           userId: mentionedUserId,
-          text: extractedMention.text
+          content: extractedMention.parentNode
         });
       }
 
