@@ -75,7 +75,7 @@ describe('updatePageContentForSync', () => {
       parentId: parentPage.id
     });
 
-    await updatePageContentForSync({ PAGE_SIZE: 2, spaceId: space.id });
+    await updatePageContentForSync({ spaceId: space.id });
 
     const updatedParentPage = await prisma.page.findUniqueOrThrow({
       where: {
@@ -299,7 +299,7 @@ describe('updatePageContentForSync', () => {
       }
     });
 
-    await updatePageContentForSync({ PAGE_SIZE: 2, spaceId: space.id });
+    await updatePageContentForSync({ pagesRetrievedPerQuery: 2, spaceId: space.id });
 
     const updatedParentPage = await prisma.page.findUniqueOrThrow({
       where: {

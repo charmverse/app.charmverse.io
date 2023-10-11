@@ -1,14 +1,13 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
-import { Prisma, prisma } from '@charmverse/core/prisma-client';
+import { PageDiff, Prisma, prisma } from '@charmverse/core/prisma-client';
 import { Fragment, Slice } from 'prosemirror-model';
 import { replaceStep } from 'prosemirror-transform';
 
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isTruthy } from 'lib/utilities/types';
 import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 export function recurseDocument(content: PageContent, cb: (node: PageContent) => void) {
@@ -155,40 +154,41 @@ export async function updatePageContentForSync(
             version: true
           }
         });
-        const version = parentPage.version;
-        const pageDiffs = [
-          linkedPageConversionSteps.length
-            ? {
-                createdBy,
-                data: {
-                  rid: 0,
-                  type: 'diff',
-                  v: version,
-                  cid: 0,
-                  ds: linkedPageConversionSteps
-                },
-                pageId: id,
-                version
-              }
-            : null,
-          nestedPageAppendStep
-            ? {
-                createdBy,
-                data: {
-                  rid: 0,
-                  type: 'diff',
-                  v: version + 1,
-                  cid: 0,
-                  ds: [nestedPageAppendStep]
-                },
-                pageId: id,
-                version: version + 1
-              }
-            : null
-        ].filter(isTruthy);
+        let version = parentPage.version;
+        const pageDiffs: Prisma.PageDiffCreateManyInput[] = [];
+        if (linkedPageConversionSteps.length) {
+          pageDiffs.push({
+            createdBy,
+            data: {
+              rid: 0,
+              type: 'diff',
+              v: version,
+              cid: 0,
+              ds: linkedPageConversionSteps
+            },
+            pageId: id,
+            version
+          });
+          version += 1;
+        }
 
-        if (linkedPageConversionSteps.length || nestedPageAppendStep) {
-          const finalVersion = version + pageDiffs.length;
+        if (nestedPageAppendStep) {
+          pageDiffs.push({
+            createdBy,
+            data: {
+              rid: 0,
+              type: 'diff',
+              v: version,
+              cid: 0,
+              ds: [nestedPageAppendStep]
+            },
+            pageId: id,
+            version
+          });
+          version += 1;
+        }
+
+        if (pageDiffs.length) {
           await prisma.$transaction([
             prisma.pageDiff.createMany({
               data: pageDiffs
@@ -199,7 +199,7 @@ export async function updatePageContentForSync(
               },
               data: {
                 content: newContent,
-                version: finalVersion
+                version
               }
             })
           ]);
