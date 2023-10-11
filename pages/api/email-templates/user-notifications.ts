@@ -21,7 +21,7 @@ const handler = nc({
   onNoMatch
 });
 
-const createDocumentTask = ({
+const createDocumentNotification = ({
   pageTitle,
   spaceName,
   mentionText
@@ -62,7 +62,13 @@ const createDocumentTask = ({
   };
 };
 
-const createPostTask = ({ postTitle, spaceName }: { spaceName: string; postTitle: string }): PostNotification => {
+const createPostNotification = ({
+  postTitle,
+  spaceName
+}: {
+  spaceName: string;
+  postTitle: string;
+}): PostNotification => {
   return {
     spaceId: v4(),
     spaceDomain: randomName(),
@@ -89,7 +95,7 @@ const createPostTask = ({ postTitle, spaceName }: { spaceName: string; postTitle
   };
 };
 
-const createVoteNotifications = ({
+const createVoteNotification = ({
   voteTitle,
   deadline,
   pageTitle,
@@ -121,7 +127,7 @@ const createVoteNotifications = ({
   } as any;
 };
 
-const createProposalNotifications = ({
+const createProposalNotification = ({
   pageTitle,
   spaceName,
   status
@@ -153,7 +159,7 @@ const createProposalNotifications = ({
   };
 };
 
-const createBountyTask = ({
+const createBountyNotification = ({
   pageTitle,
   spaceName,
   status
@@ -197,19 +203,19 @@ const templates = {
       },
       totalUnreadNotifications: 6,
       bountyNotifications: [
-        createBountyTask({
+        createBountyNotification({
           pageTitle: 'Create a new protocol',
           spaceName: 'Uniswap',
           status: 'open'
         })
       ],
       proposalNotifications: [
-        createProposalNotifications({
+        createProposalNotification({
           pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
           spaceName: 'Uniswap',
           status: 'discussion'
         }),
-        createProposalNotifications({
+        createProposalNotification({
           pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
           spaceName: 'Curve Finance',
           status: 'draft'
@@ -217,58 +223,58 @@ const templates = {
       ],
       cardNotifications: [],
       documentNotifications: [
-        createDocumentTask({
+        createDocumentNotification({
           mentionText: 'Hey there, please respond to this message.',
           pageTitle: 'Attention please',
           spaceName: 'CharmVerse'
         }),
-        createDocumentTask({
+        createDocumentNotification({
           mentionText: 'cc @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createDocumentTask({
+        createDocumentNotification({
           mentionText: "Let's have a meeting @ghostpepper",
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         }),
-        createDocumentTask({
+        createDocumentNotification({
           mentionText: 'Take a look at this @ghostpepper',
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse'
         }),
-        createDocumentTask({
+        createDocumentNotification({
           mentionText: 'We should discuss about this @ghostpepper',
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse'
         }),
-        createDocumentTask({
+        createDocumentNotification({
           mentionText: 'We are facing issues @ghostpepper',
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse'
         })
       ],
       voteNotifications: [
-        createVoteNotifications({
+        createVoteNotification({
           deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
           pageTitle: 'This is a really really long vote title',
           spaceName: 'This is a really really long space name',
           voteTitle:
             'Should we add this section? I think it can be a great addition but need all of your votes to decide'
         }),
-        createVoteNotifications({
+        createVoteNotification({
           deadline: new Date(Date.now() + 26 * 60 * 60 * 1000),
           pageTitle: 'Product Discussion',
           spaceName: 'CharmVerse',
           voteTitle: 'Should we format the text?'
         }),
-        createVoteNotifications({
+        createVoteNotification({
           deadline: new Date(Date.now() + 32 * 60 * 60 * 1000),
           pageTitle: 'Task Board',
           spaceName: 'CharmVerse',
           voteTitle: "Let's vote"
         }),
-        createVoteNotifications({
+        createVoteNotification({
           deadline: new Date(Date.now() + 52 * 60 * 60 * 1000),
           pageTitle: 'Product Road Map',
           spaceName: 'CharmVerse Demo',
@@ -276,11 +282,11 @@ const templates = {
         })
       ],
       forumNotifications: [
-        createPostTask({
+        createPostNotification({
           postTitle: "New idea. Let's discuss!",
           spaceName: 'CharmVerse'
         }),
-        createPostTask({
+        createPostNotification({
           postTitle: 'Start the new process.',
           spaceName: 'CharmVerse'
         })
