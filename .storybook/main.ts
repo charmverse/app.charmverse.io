@@ -15,8 +15,7 @@ const config: StorybookConfig = {
    */
   env: (config) => ({
     ...config,
-    IS_STORYBOOK: 'true',
-    STORYBOOK_IS_STORYBOOK: 'true'
+    IS_STORYBOOK: 'true'
   }),
   staticDirs: [
     '../public',
