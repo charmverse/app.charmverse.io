@@ -4,7 +4,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
-import { useGetApplication } from 'charmClient/hooks/rewards';
+import { useGetApplication, useGetReward } from 'charmClient/hooks/rewards';
 import Link from 'components/common/Link';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -168,10 +168,8 @@ function RewardsPageTitle({
   applicationId?: string;
 }) {
   const [pageTitle] = usePageTitle();
-  const { pages } = usePages();
   const { data: application } = useGetApplication({ applicationId });
-
-  const rewardPage = application ? pages[application.bountyId] : undefined;
+  const { data: rewardWithPageMeta } = useGetReward({ rewardId: application?.reward.id });
 
   return (
     <PageTitle>
@@ -179,10 +177,10 @@ function RewardsPageTitle({
         <Link href={`${basePath}/rewards`}>{baseTitle}</Link>
       </BreadCrumb>
       {pageTitle && !applicationId ? pageTitle : null}
-      {rewardPage && (
+      {rewardWithPageMeta && (
         <>
           <BreadCrumb>
-            <Link href={`${basePath}/${rewardPage.path}`}>{rewardPage.title}</Link>
+            <Link href={`${basePath}/${rewardWithPageMeta.page.path}`}>{rewardWithPageMeta.page.title}</Link>
           </BreadCrumb>
           {applicationId && 'Application'}
         </>

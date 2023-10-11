@@ -24,7 +24,7 @@ import type {
 // import type { RubricCriteriaUpsert } from 'lib/rewards/rubric/upsertRubricCriteria';
 // import type { UpdateRewardLensPropertiesRequest } from 'lib/rewards/updateRewardLensProperties';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
 import { useGET, usePOST, usePUT, useDELETE } from './helpers';
 
@@ -73,6 +73,10 @@ export function useGetApplication({ applicationId }: { applicationId?: string })
 
 export function useGetApplicationComments({ applicationId }: { applicationId?: string }) {
   return useGET<ApplicationComment[]>(applicationId ? `/api/applications/${applicationId}/comments/v2` : null);
+}
+
+export function useGetReward({ rewardId }: { rewardId?: string }) {
+  return useGET<RewardWithUsersAndPageMeta>(rewardId ? `/api/rewards/${rewardId}` : null);
 }
 
 export function useGetRewards({ spaceId }: { spaceId?: string }) {

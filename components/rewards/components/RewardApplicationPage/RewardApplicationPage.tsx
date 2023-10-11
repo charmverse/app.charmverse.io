@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
 
+import { useGetReward } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
@@ -27,17 +28,16 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const { application, refreshApplication, applicationRewardPermissions } = useApplication({
     applicationId
   });
+  const { data: reward } = useGetReward({ rewardId: application?.bountyId });
   const { members } = useMembers();
   const { pages } = usePages();
   const { user } = useUser();
 
   const [showProperties, setShowProperties] = useState(false);
 
-  if (!application) {
+  if (!application || !reward) {
     return null;
   }
-
-  const rewardPage = pages[application.bountyId];
 
   const submitter = members.find((m) => m.id === application.createdBy);
 
@@ -52,7 +52,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
       {/** TODO - Use more elegant layout */}
       <Grid container px='10%' gap={2}>
         <Grid item xs={12} display='flex' justifyContent='space-between'>
-          {rewardPage && <PageTitleInput value={rewardPage?.title} readOnly onChange={() => null} />}
+          <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
         </Grid>
         <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box display='flex' gap={2}>
@@ -76,7 +76,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           )}
         </Grid>
 
-        <Grid item xs={12} className='focalboard-body'>
+        <Grid item xs={12} className='focalboard-body' flexDirection='column'>
           <Stack
             direction='row'
             gap={1}
@@ -93,17 +93,13 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
             </IconButton>
           </Stack>
           <Collapse in={showProperties} timeout='auto' unmountOnExit>
-            {rewardPage && (
-              <Stack>
-                <RewardProperties
-                  rewardId={rewardPage.bountyId}
-                  pageId={rewardPage.id}
-                  pagePath={rewardPage.path}
-                  readOnly={true}
-                  refreshRewardPermissions={() => {}}
-                />
-              </Stack>
-            )}
+            <RewardProperties
+              rewardId={reward.id}
+              pageId={reward.page.id}
+              pagePath={reward.page.path}
+              readOnly={true}
+              refreshRewardPermissions={() => {}}
+            />
           </Collapse>
         </Grid>
 

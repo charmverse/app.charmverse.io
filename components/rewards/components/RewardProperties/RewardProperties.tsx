@@ -8,6 +8,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetPermissions } from 'charmClient/hooks/permissions';
+import { useGetReward } from 'charmClient/hooks/rewards';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
@@ -44,6 +45,16 @@ export function RewardProperties(props: {
   const [currentReward, setCurrentReward] = useState<(RewardCreationData & RewardWithUsers) | null>();
   const { user } = useUser();
 
+  const { data: initialReward } = useGetReward({
+    rewardId: rewardId as string
+  });
+
+  useEffect(() => {
+    if (!currentReward && initialReward) {
+      setCurrentReward(initialReward);
+    }
+  }, [initialReward]);
+
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   /* TODO @Mo - permissions */
@@ -68,15 +79,6 @@ export function RewardProperties(props: {
       setRewardType('Custom');
     }
   }, [currentReward?.customReward]);
-
-  useEffect(() => {
-    const rewardFromContext = rewards?.find((r) => r.id === rewardId);
-    setCurrentReward(rewardFromContext || (tempReward as RewardWithUsers));
-
-    if (rewardFromContext && tempReward) {
-      setTempReward(null);
-    }
-  }, [rewardId, rewards, setTempReward, tempReward]);
 
   const readOnly = parentReadOnly || !isSpaceMember;
 
