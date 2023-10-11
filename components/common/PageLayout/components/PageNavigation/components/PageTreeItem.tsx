@@ -24,7 +24,6 @@ import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
-import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
@@ -36,6 +35,10 @@ import AddNewCard from '../../AddNewCard';
 import NewPageMenu, { StyledIconButton } from '../../NewPageMenu';
 import { PageIcon } from '../../PageIcon';
 import PageTitle from '../../PageTitle';
+
+import TreeItemContent from './TreeItemContent';
+
+// disable hover UX on ios which converts first click to a hover event
 
 interface PageTreeItemProps {
   addSubPage: (page: Partial<Page>) => void;
@@ -56,78 +59,101 @@ interface PageTreeItemProps {
 
 export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => prop !== 'isActive' })<{
   isActive?: boolean;
-}>(({ isActive, theme }) => ({
-  position: 'relative',
-  backgroundColor: isActive ? theme.palette.action.focus : 'unset',
-  marginLeft: 3,
-  marginRight: 3,
-  // unset margin on child tree items
-  '.MuiTreeItem-root': {
-    marginLeft: 0,
-    marginRight: 0
-  },
+}>(({ isActive, theme }) => {
+  const isTouch = isTouchScreen();
+  return {
+    position: 'relative',
+    backgroundColor: isActive ? theme.palette.action.focus : 'unset',
+    marginLeft: 3,
+    marginRight: 3,
+    // unset margin on child tree items
+    '.MuiTreeItem-root': {
+      marginLeft: 0,
+      marginRight: 0
+    },
+    // '&:hover': null,
+    // '&:hover': {
+    //   backgroundColor: theme.palette.action.hover,
+    //   // Reset on touch devices, it doesn't add specificity
+    //   '@media (hover: none)': {
+    //     backgroundColor: 'transparent'
+    //   }
+    // },
 
-  [`& .${treeItemClasses.content}`]: {
-    color: theme.palette.text.secondary,
-    marginBottom: 1,
-    // paddingRight: theme.spacing(1),
-    // fontWeight: theme.typography.fontWeightMedium,
-    '.MuiTypography-root': {
-      fontWeight: 500
-    },
-    '&.Mui-expanded': {
-      fontWeight: theme.typography.fontWeightRegular
-    },
-    '&.Mui-selected:hover': {
-      backgroundColor: theme.palette.action.hover
-    },
-    '&.Mui-selected:hover::after': {
-      content: '""',
-      left: 0,
-      top: 0,
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      backgroundColor: theme.palette.action.hover,
-      pointerEvents: 'none'
-    },
-    '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
-      backgroundColor: theme.palette.action.selected,
-      color: theme.palette.text.primary,
+    [`& .${treeItemClasses.content}`]: {
+      color: theme.palette.text.secondary,
+      marginBottom: 1,
+      // paddingRight: theme.spacing(1),
+      // fontWeight: theme.typography.fontWeightMedium,
       '.MuiTypography-root': {
-        fontWeight: 700
+        fontWeight: 500
+      },
+      '&.Mui-expanded': {
+        fontWeight: theme.typography.fontWeightRegular
+      },
+      '&:hover': {
+        backgroundColor: 'blue',
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: 'transparent'
+        }
+      },
+      '&.Mui-selected:hover': null,
+      // ...(isTouch
+      //   ? {
+      //       '&.Mui-selected:hover': {
+      //         backgroundColor: theme.palette.action.hover
+      //       },
+      //       '&.Mui-selected:hover::after': {
+      //         content: '""',
+      //         left: 0,
+      //         top: 0,
+      //         position: 'absolute',
+      //         width: '100%',
+      //         height: '100%',
+      //         backgroundColor: theme.palette.action.hover,
+      //         pointerEvents: 'none'
+      //       }
+      //     }
+      //   : {}),
+      '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
+        backgroundColor: theme.palette.action.selected,
+        color: theme.palette.text.primary,
+        '.MuiTypography-root': {
+          fontWeight: 700
+        }
+      },
+      [`& .${treeItemClasses.label}`]: {
+        fontWeight: 'inherit',
+        paddingLeft: 0,
+        color: 'inherit'
+      },
+      [`& .${treeItemClasses.iconContainer}`]: {
+        marginRight: 0,
+        width: '24px'
+      },
+      [`& .${treeItemClasses.iconContainer} svg`]: {
+        color: greyColor2
+      },
+      [`& .${treeItemClasses.iconContainer} svg.MuiSvgIcon-fontSizeLarge`]: {
+        fontSize: 24
       }
     },
-    [`& .${treeItemClasses.label}`]: {
-      fontWeight: 'inherit',
-      paddingLeft: 0,
-      color: 'inherit'
-    },
-    [`& .${treeItemClasses.iconContainer}`]: {
-      marginRight: 0,
-      width: '24px'
-    },
-    [`& .${treeItemClasses.iconContainer} svg`]: {
-      color: greyColor2
-    },
-    [`& .${treeItemClasses.iconContainer} svg.MuiSvgIcon-fontSizeLarge`]: {
-      fontSize: 24
+    [`& .${treeItemClasses.group}`]: {
+      marginLeft: 0,
+      [`& .${treeItemClasses.content}`]: {
+        paddingLeft: theme.spacing(3)
+      },
+      // add increasing indentation to children of children
+      [`& .${treeItemClasses.group} .${treeItemClasses.content}`]: {
+        paddingLeft: `calc(${theme.spacing(3)} + 16px)`
+      },
+      [`& .${treeItemClasses.group} .${treeItemClasses.group} .${treeItemClasses.content}`]: {
+        paddingLeft: `calc(${theme.spacing(3)} + 32px)`
+      }
     }
-  },
-  [`& .${treeItemClasses.group}`]: {
-    marginLeft: 0,
-    [`& .${treeItemClasses.content}`]: {
-      paddingLeft: theme.spacing(3)
-    },
-    // add increasing indentation to children of children
-    [`& .${treeItemClasses.group} .${treeItemClasses.content}`]: {
-      paddingLeft: `calc(${theme.spacing(3)} + 16px)`
-    },
-    [`& .${treeItemClasses.group} .${treeItemClasses.group} .${treeItemClasses.content}`]: {
-      paddingLeft: `calc(${theme.spacing(3)} + 32px)`
-    }
-  }
-}));
+  };
+});
 
 const AdjacentDropZone = styled.div`
   position: absolute;

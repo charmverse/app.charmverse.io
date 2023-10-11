@@ -37,9 +37,6 @@ const StyledButton = styled(Button)(
   justify-content: flex-start;
   padding: ${fullWidth ? theme.spacing(0.3, 5, 0.3, 2) : theme.spacing(0.5, 1)};
 
-  &:hover: {
-    backgroundColor: ${theme.palette.action.hover};
-  }
   ${theme.breakpoints.up('lg')} {
     padding-right: ${fullWidth ? theme.spacing(2) : 0};
   }
