@@ -11,6 +11,9 @@ export function CustomEmojiPicker({ onUpdate }: { onUpdate: (icon: string) => vo
   const [imageLink, setImageLink] = useState('');
   return (
     <MultiTabs
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
       tabPanelSx={{
         p: 1
       }}
