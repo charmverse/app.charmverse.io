@@ -46,7 +46,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
-export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} top={top || 0} />)<{
+export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} />)<{
   top: number;
   fullWidth?: boolean;
 }>`
@@ -225,7 +225,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
       {page?.convertedProposalId && <ProposalBanner type='page' proposalId={page.convertedProposalId} />}
       <div ref={printRef} className={`document-print-container ${fontClassName}`}>
         <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
-          <div ref={containerRef}>
+          <Box display='flex' ref={containerRef}>
             <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
             {/* temporary? disable editing of page meta data when in suggestion mode */}
             {page.headerImage && (
@@ -368,7 +368,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                 </Box>
               )}
             </Container>
-          </div>
+          </Box>
         </ScrollContainer>
       </div>
     </>
