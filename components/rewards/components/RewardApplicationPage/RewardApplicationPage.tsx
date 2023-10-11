@@ -1,6 +1,6 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Collapse, Divider, FormLabel, IconButton, Stack, Typography } from '@mui/material';
+import { Collapse, Divider, FormLabel, IconButton, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
@@ -27,9 +27,10 @@ type Props = {
 };
 
 export function RewardApplicationPageComponent({ applicationId }: Props) {
-  const { application, refreshApplication, applicationRewardPermissions, updateApplication } = useApplication({
-    applicationId
-  });
+  const { application, refreshApplication, applicationRewardPermissions, updateApplication, updateSubmission } =
+    useApplication({
+      applicationId
+    });
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
 
   const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
@@ -125,9 +126,17 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           <Grid item xs={12}>
             <ApplicationInput
               application={application}
-              refreshApplication={refreshApplication}
-              bountyId={application.bountyId}
-              permissions={applicationRewardPermissions}
+              rewardId={application.reward.id}
+              expandedOnLoad
+              readOnly={application.createdBy !== user?.id}
+              onSubmit={(updatedApplication) =>
+                updateApplication({
+                  applicationId: application.id,
+                  update: {
+                    message: updatedApplication
+                  }
+                })
+              }
             />
           </Grid>
         )}
@@ -139,6 +148,13 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
               readOnly={readonlySubmission}
               expandedOnLoad
               refreshSubmission={refreshApplication}
+              onSubmit={(submission) =>
+                updateSubmission({
+                  customReward: false,
+                  submissionContent: submission.submissionNodes ? JSON.parse(submission.submissionNodes) : null,
+                  submissionId: application.id
+                })
+              }
               bountyId={application.bountyId}
               permissions={applicationRewardPermissions}
               hasCustomReward={!!application.reward.customReward}
