@@ -16,6 +16,13 @@ handler.post(createCard);
  *     description: Create a new card with a title and any set of values from the custom properties in your database.
  *     tags:
  *      - 'Space API'
+ *     parameters:
+ *      - name: databaseIdOrPath
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: ID or path of the database to create a card in
  *     requestBody:
  *       content:
  *          application/json:

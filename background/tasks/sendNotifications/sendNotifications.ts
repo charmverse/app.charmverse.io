@@ -2,48 +2,41 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { RateLimit } from 'async-sema';
 
-import { getBountyTasks } from 'lib/bounties/getBountyTasks';
-import { getDiscussionTasks } from 'lib/discussion/getDiscussionTasks';
-import { getForumNotifications } from 'lib/forums/getForumNotifications/getForumNotifications';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
-import type { PendingTasksProps } from 'lib/mailer/emails/templates/PendingTasksTemplate';
-import { getProposalStatusChangeTasks } from 'lib/proposal/getProposalStatusChangeTasks';
-import { getVoteTasks } from 'lib/votes/getVoteTasks';
+import type { PendingNotificationsData } from 'lib/mailer/emails/templates/PendingNotificationsTemplate';
+import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
+import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
+import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
+import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
+import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
+import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
+import { isUUID } from 'lib/utilities/strings';
 
-const notificationTaskLimiter = RateLimit(100);
+const notificationNotificationLimiter = RateLimit(100);
 
 export async function sendUserNotifications(): Promise<number> {
   const notificationsToSend = await getNotifications();
 
   for (const notification of notificationsToSend) {
-    log.info('Debug: send notification to user', { userId: notification.user.id, tasks: notification.totalTasks });
+    log.info('Debug: send notification to user', {
+      userId: notification.user.id,
+      notifications: notification.totalUnreadNotifications
+    });
     await sendNotification(notification);
   }
 
   return notificationsToSend.length;
 }
 
-export async function getNotifications(): Promise<(PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[]> {
-  // Get all the workspace events within the past day
-  const workspaceEvents = await prisma.workspaceEvent.findMany({
-    where: {
-      createdAt: {
-        lte: new Date(),
-        gte: new Date(Date.now() - 1000 * 60 * 60 * 24)
-      },
-      type: 'proposal_status_change'
-    }
-  });
-
-  const usersWithSafes = await prisma.user.findMany({
+export async function getNotifications(): Promise<PendingNotificationsData[]> {
+  const userWithNotificationState = await prisma.user.findMany({
     where: {
       deletedAt: null,
       AND: [{ email: { not: null } }, { email: { not: '' } }, { emailNotifications: true }]
     },
     // select only the fields that are needed
     select: {
-      gnosisSafes: true,
       notificationState: true,
       id: true,
       username: true,
@@ -52,160 +45,110 @@ export async function getNotifications(): Promise<(PendingTasksProps & { unmarke
   });
 
   // filter out users that have snoozed notifications
-  const activeUsersWithSafes = usersWithSafes.filter((user) => {
+  const notificationActivatedUsers = userWithNotificationState.filter((user) => {
     const snoozedUntil = user.notificationState?.snoozedUntil;
     return !snoozedUntil || snoozedUntil > new Date();
   });
 
-  const notifications: (PendingTasksProps & { unmarkedWorkspaceEvents: string[] })[] = [];
+  const notifications: PendingNotificationsData[] = [];
 
   // Because we have a large number of queries in parallel we need to avoid Promise.all and chain them one by one
-  for (const user of activeUsersWithSafes) {
+  for (const user of notificationActivatedUsers) {
     // Since we will be calling permissions API, we want to ensure we don't flood it with requests
-    await notificationTaskLimiter();
+    await notificationNotificationLimiter();
 
-    const discussionTasks = await getDiscussionTasks(user.id);
-    const voteTasks = await getVoteTasks(user.id);
-    const bountyTasks = await getBountyTasks(user.id);
-    const forumTasks = await getForumNotifications(user.id);
+    const [
+      documentNotifications,
+      cardNotifications,
+      voteNotifications,
+      bountyNotifications,
+      forumNotifications,
+      proposalNotifications
+    ] = await Promise.all([
+      getDocumentNotifications(user.id),
+      getCardNotifications(user.id),
+      getPollNotifications(user.id),
+      getBountyNotifications(user.id),
+      getPostNotifications(user.id),
+      getProposalNotifications(user.id)
+    ]);
 
-    const sentTasks = await prisma.userNotification.findMany({
-      where: {
-        taskId: {
-          in: [...workspaceEvents.map((workspaceEvent) => workspaceEvent.id)]
-        },
-        userId: user.id
-      },
-      select: {
-        taskId: true
-      }
-    });
+    const unreadDocumentNotifications = documentNotifications.filter((notification) => !notification.read);
+    const unreadCardNotifications = cardNotifications.filter((notification) => !notification.read);
+    const unreadVoteNotifications = voteNotifications.filter((notification) => !notification.read);
+    const unreadBountyNotifications = bountyNotifications.filter((notification) => !notification.read);
+    const unreadForumNotifications = forumNotifications.filter((notification) => !notification.read);
+    const unreadProposalNotifications = proposalNotifications.filter((notification) => !notification.read);
 
-    const sentTaskIds = new Set(sentTasks.map((sentTask) => sentTask.taskId));
-
-    const voteTasksNotSent = voteTasks.unmarked;
-    const workspaceEventsNotSent = workspaceEvents.filter((workspaceEvent) => !sentTaskIds.has(workspaceEvent.id));
-    const { proposalTasks = [], unmarkedWorkspaceEvents = [] } =
-      workspaceEventsNotSent.length !== 0 ? await getProposalStatusChangeTasks(user.id, workspaceEventsNotSent) : {};
-
-    const totalTasks =
-      discussionTasks.unmarked.length +
-      voteTasksNotSent.length +
-      proposalTasks.length +
-      bountyTasks.unmarked.length +
-      forumTasks.unmarked.length;
+    const totalUnreadNotifications =
+      unreadDocumentNotifications.length +
+      unreadCardNotifications.length +
+      unreadVoteNotifications.length +
+      unreadBountyNotifications.length +
+      unreadForumNotifications.length +
+      unreadProposalNotifications.length;
 
     log.debug('Found tasks for notification', {
-      notSent:
-        voteTasksNotSent.length +
-        discussionTasks.unmarked.length +
-        proposalTasks.length +
-        bountyTasks.unmarked.length +
-        forumTasks.unmarked.length
+      notSent: totalUnreadNotifications
     });
 
     notifications.push({
-      user: user as PendingTasksProps['user'],
-      totalTasks,
-      // Get only the unmarked discussion tasks
-      discussionTasks: discussionTasks.unmarked,
-      voteTasks: voteTasksNotSent,
-      proposalTasks,
-      unmarkedWorkspaceEvents,
-      bountyTasks: bountyTasks.unmarked,
-      forumTasks: forumTasks.unmarked
+      user: user as PendingNotificationsData['user'],
+      totalUnreadNotifications,
+      documentNotifications: unreadDocumentNotifications,
+      cardNotifications: unreadCardNotifications,
+      voteNotifications: unreadVoteNotifications,
+      bountyNotifications: unreadBountyNotifications,
+      forumNotifications: unreadForumNotifications,
+      proposalNotifications: unreadProposalNotifications
     });
   }
 
-  return notifications.filter((notification) => notification.totalTasks > 0);
+  return notifications.filter((notification) => notification.totalUnreadNotifications > 0);
 }
 
-async function sendNotification(
-  notification: PendingTasksProps & {
-    unmarkedWorkspaceEvents: string[];
-  }
-) {
+async function sendNotification(notification: PendingNotificationsData) {
+  const notificationIds = [
+    ...notification.proposalNotifications.map((proposalNotification) => proposalNotification.id),
+    ...notification.documentNotifications.map((discussionNotification) => discussionNotification.id),
+    ...notification.cardNotifications.map((cardNotification) => cardNotification.id),
+    ...notification.voteNotifications.map((voteNotification) => voteNotification.id),
+    ...notification.bountyNotifications.map((bountyNotification) => bountyNotification.id),
+    ...notification.forumNotifications.map((forumNotification) => forumNotification.id)
+  ].filter((nid) => isUUID(nid));
+
   try {
-    // remember that we sent these tasks
     await prisma.$transaction([
-      ...notification.proposalTasks.map((proposalTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: proposalTask.id,
-            channel: 'email',
-            type: 'proposal'
+      prisma.userNotificationMetadata.updateMany({
+        where: {
+          id: {
+            in: notificationIds
           }
-        })
-      ),
-      ...notification.unmarkedWorkspaceEvents.map((unmarkedWorkspaceEvent) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: unmarkedWorkspaceEvent,
-            channel: 'email',
-            type: 'proposal'
-          }
-        })
-      ),
-      ...notification.voteTasks.map((voteTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: voteTask.id,
-            channel: 'email',
-            type: 'vote'
-          }
-        })
-      ),
-      ...notification.discussionTasks.map((discussionTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? '',
-            channel: 'email',
-            type: 'mention'
-          }
-        })
-      ),
-      ...notification.bountyTasks.map((bountyTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: bountyTask.id,
-            channel: 'email',
-            type: 'bounty'
-          }
-        })
-      ),
-      ...notification.forumTasks.map((forumTask) =>
-        prisma.userNotification.create({
-          data: {
-            userId: notification.user.id,
-            taskId: forumTask.taskId,
-            channel: 'email',
-            type: 'forum'
-          }
-        })
-      )
+        },
+        data: {
+          seenAt: new Date(),
+          channel: 'email'
+        }
+      })
     ]);
   } catch (error) {
     log.error(`Error trying to save notification for user`, {
       userId: notification.user.id,
       error,
-      forumTaskIds: notification.forumTasks.map((forumTask) => forumTask.taskId),
-      proposalTaskIds: notification.proposalTasks.map((proposalTask) => proposalTask.id),
-      unmarkedWorkspaceEventIds: notification.unmarkedWorkspaceEvents,
-      voteTaskIds: notification.voteTasks.map((voteTask) => voteTask.id),
-      discussionTaskIds: notification.discussionTasks.map(
-        (discussionTask) => discussionTask.mentionId ?? discussionTask.commentId ?? discussionTask.taskId ?? ''
+      forumNotificationIds: notification.forumNotifications.map((forumNotification) => forumNotification.id),
+      proposalNotificationIds: notification.proposalNotifications.map(
+        (proposalNotification) => proposalNotification.id
       ),
-      bountyTaskIds: notification.bountyTasks.map((bountyTask) => bountyTask.id)
+      voteNotificationIds: notification.voteNotifications.map((voteNotification) => voteNotification.id),
+      discussionNotificationIds: notification.documentNotifications.map(
+        (discussionNotification) => discussionNotification.id
+      ),
+      bountyNotificationIds: notification.bountyNotifications.map((bountyNotification) => bountyNotification.id)
     });
     return undefined;
   }
 
-  const template = emails.getPendingTasksEmail(notification);
+  const template = emails.getPendingNotificationsEmail(notification);
   const result = await mailer.sendEmail({
     to: {
       displayName: notification.user.username,

@@ -22,12 +22,12 @@ handler
   .post(createApplicationController);
 
 async function getApplications(req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {
-  const bountyId = req.query.bountyId as string;
+  const resourceId = (req.query.bountyId || req.query.rewardId) as string;
   const { id: userId } = req.session.user;
 
   const bounty = await prisma.bounty.findUnique({
     where: {
-      id: bountyId
+      id: resourceId
     },
     select: {
       spaceId: true
@@ -35,7 +35,7 @@ async function getApplications(req: NextApiRequest, res: NextApiResponse<Applica
   });
 
   if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${bountyId} not found`);
+    throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);
   }
 
   const { error } = await hasAccessToSpace({
@@ -50,7 +50,7 @@ async function getApplications(req: NextApiRequest, res: NextApiResponse<Applica
 
   const applicationsOrSubmissions = await prisma.application.findMany({
     where: {
-      bountyId
+      bountyId: resourceId
     },
     include: {
       transactions: true

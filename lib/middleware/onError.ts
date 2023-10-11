@@ -12,7 +12,7 @@ const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severit
 export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
-  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+  if (err.code === 'P2025') {
     return res.status(404).json(new DataNotFoundError(`Data not found`));
   }
 

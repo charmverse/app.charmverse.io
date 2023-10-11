@@ -37,7 +37,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
 
     const templateId = uuid();
 
-    const { page, workspaceEvent, proposal } = await createProposal({
+    const { page, proposal } = await createProposal({
       pageProps: {
         contentText: '',
         title: pageTitle,
@@ -85,12 +85,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
             roleId: null
           }
         ]
-      })
-    );
-
-    expect(workspaceEvent).toMatchObject(
-      expect.objectContaining({
-        type: 'proposal_status_change'
       })
     );
   });

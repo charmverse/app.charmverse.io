@@ -1,13 +1,14 @@
+import { log } from '@charmverse/core/log';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors';
-import { ethers, utils } from 'ethers';
-import log from 'loglevel';
+import { ethers } from 'ethers';
+import { getAddress } from 'viem';
 
 import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
 
@@ -21,7 +22,7 @@ export type GnosisPaymentProps = {
 };
 
 export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
-  const { account, chainId: connectedChainId, signer } = useWeb3AuthSig();
+  const { account, chainId: connectedChainId, signer } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
@@ -54,7 +55,7 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       signerOrProvider: signer
     });
 
-    const senderAddress = utils.getAddress(account);
+    const senderAddress = getAddress(account);
 
     const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
     if (chainId === 5001 || chainId === 5000) {

@@ -51,6 +51,9 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
 import 'react-resizable/css/styles.css';
@@ -80,7 +83,7 @@ import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css'
 import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
 import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
-import { handlers } from './lib/mockApi';
+import { handlers } from './mockApi';
 import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 
@@ -131,7 +134,6 @@ export const globalTypes = {
   }
 };
 
-
 export const withMuiTheme = (Story, context) => {
   return (
     <AppThemeProvider forceTheme={context.globals.theme}>
@@ -144,7 +146,6 @@ const { publicClient } = configureChains([mainnet], [publicProvider()]);
 export const wagmiConfig = createConfig({
   publicClient
 });
-
 
 export const globalProviders = (Story, context) => {
   return (

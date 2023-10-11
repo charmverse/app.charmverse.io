@@ -23,6 +23,7 @@ import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
+import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -46,16 +47,17 @@ import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { MuxApi } from './apis/muxApi';
+import { NotificationsApi } from './apis/notificationsApi';
 import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { PublicProfileApi } from './apis/publicProfileApi';
+import { RewardsApi } from './apis/rewardsApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
-import { TasksApi } from './apis/tasksApi';
 import { TokenGatesApi } from './apis/tokenGates';
 import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
@@ -101,7 +103,7 @@ class CharmClient {
 
   summon = new SummonApi();
 
-  tasks = new TasksApi();
+  notifications = new NotificationsApi();
 
   track = new TrackApi();
 
@@ -116,6 +118,8 @@ class CharmClient {
   subscription = new SubscriptionApi();
 
   gnosisSafe = new GnosisSafeApi();
+
+  rewards = new RewardsApi();
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
@@ -266,6 +270,13 @@ class CharmClient {
   getViews({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
       .GET<Block[]>(`/api/blocks/${pageId}/views`)
+      .then((blocks) => blocks.map(blockToFBBlock))
+      .then((blocks) => fixBlocks(blocks));
+  }
+
+  getComments({ pageId }: { pageId: string }): Promise<FBBlock[]> {
+    return http
+      .GET<Block[]>(`/api/blocks/${pageId}/comments`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
@@ -421,6 +432,10 @@ class CharmClient {
       noHeaders: true,
       skipStringifying: true
     });
+  }
+
+  createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
+    return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
   }
 }
 

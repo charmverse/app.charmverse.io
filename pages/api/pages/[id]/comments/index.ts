@@ -10,6 +10,8 @@ import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -35,8 +37,8 @@ async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse
     userId
   });
 
-  if (permissions.read !== true) {
-    throw new ActionNotPermittedError('You do not have permission to view this page');
+  if (permissions.comment !== true) {
+    throw new ActionNotPermittedError('You do not have permission to view comments this page');
   }
 
   const pageCommentsWithVotes = await listPageComments({ pageId, userId });
@@ -51,7 +53,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   const page = await prisma.page.findUnique({
     where: { id: pageId },
-    select: { spaceId: true }
+    select: { spaceId: true, type: true, proposalId: true }
   });
 
   if (!page) {
@@ -68,6 +70,13 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
   }
 
   const pageComment = await createPageComment({ pageId, userId, ...body });
+
+  await publishDocumentEvent({
+    documentId: pageId,
+    scope: WebhookEventNames.DocumentCommentCreated,
+    commentId: pageComment.id,
+    spaceId: page.spaceId
+  });
 
   res.status(200).json({
     ...pageComment,

@@ -31,21 +31,14 @@ export async function provisionSuperApiKey(name: string, token?: string): Promis
  * assigns superApiToken so follow-on endpoints can use it
  */
 export async function requireSuperApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
-  const apiKey = getAPIKeyFromRequest(req);
+  const detectedApiKey = getAPIKeyFromRequest(req);
 
-  let superApiToken: SuperApiToken | null = null;
-  if (apiKey) {
-    const apiTokenData = await getVerifiedSuperApiToken(apiKey);
-    superApiToken = apiTokenData?.superApiKey || null;
+  const superApiTokenData = detectedApiKey ? await getVerifiedSuperApiToken(detectedApiKey) : null;
 
-    if (apiTokenData) {
-      req.authorizedSpaceId = apiTokenData.authorizedSpace?.id || '';
-      req.spaceIdRange = apiTokenData.spaceIdRange;
-    }
-  }
-
-  if (superApiToken) {
-    req.superApiToken = superApiToken;
+  if (superApiTokenData) {
+    req.superApiToken = superApiTokenData.superApiKey;
+    req.spaceIdRange = superApiTokenData.spaceIdRange;
+    req.authorizedSpaceId = superApiTokenData.authorizedSpace?.id || '';
   } else {
     throw new InvalidApiKeyError();
   }

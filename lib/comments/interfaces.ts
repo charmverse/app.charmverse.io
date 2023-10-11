@@ -27,7 +27,7 @@ export type GenericComment<T = object> = T & {
 };
 
 export type GenericCommentWithVote<T = object> = GenericComment<T> & GenericCommentVote;
-export type CommentWithChildren<T = object> = GenericCommentWithVote<T> & {
+export type CommentWithChildren<T = object> = (GenericComment<T> | GenericCommentWithVote<T>) & {
   children: CommentWithChildren<T>[];
 };
 

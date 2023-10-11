@@ -23,9 +23,9 @@ import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { shortenHex } from 'lib/utilities/strings';
+import { shortenHex } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
@@ -63,7 +63,7 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
 }
 
 export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
+  const { account, walletAuthSignature, sign } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();

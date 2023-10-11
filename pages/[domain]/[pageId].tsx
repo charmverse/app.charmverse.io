@@ -16,6 +16,7 @@ import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getPagePath } from 'lib/utilities/domains/getPagePath';
 import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
@@ -66,11 +67,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       }
     });
 
-    if (page) {
+    if (page && typeof domain === 'string') {
       if (page.path !== pagePath) {
         return {
           redirect: {
-            destination: `/${domain}/${page.path}`,
+            destination: getPagePath({
+              hostName: ctx.req.headers.host,
+              path: page.path,
+              spaceDomain: domain
+            }),
             permanent: false
           }
         };

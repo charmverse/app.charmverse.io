@@ -1,10 +1,10 @@
 import type { PageNode } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
-import { Wallet } from 'ethers';
 import { v4 } from 'uuid';
 
 import type { SubmissionContent } from 'lib/applications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
+import { randomETHWalletAddress as _randomETHWalletAddress } from 'lib/utilities/blockchain';
 
 export function generatePageToCreateStub({
   userId,
@@ -67,7 +67,7 @@ export function generateSubmissionContent(): SubmissionContent {
  * Generate a random lowercase wallet address
  */
 export function randomETHWalletAddress() {
-  return Wallet.createRandom().address.toLowerCase();
+  return _randomETHWalletAddress().toLowerCase();
 }
 export function randomDomain() {
   return `test-${v4()}.nft`;

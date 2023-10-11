@@ -41,7 +41,7 @@ describe('updateProposalStatus', () => {
       proposalStatus: 'review'
     });
 
-    const { proposal: updatedProposal } = await updateProposalStatus({
+    const updatedProposal = await updateProposalStatus({
       proposalId: proposal?.id as string,
       newStatus: 'reviewed',
       userId: reviewer.id
@@ -60,7 +60,7 @@ describe('updateProposalStatus', () => {
       proposalStatus: 'review'
     });
 
-    const { proposal } = await updateProposalStatus({
+    const proposal = await updateProposalStatus({
       proposalId: pageWithProposal.proposal?.id as string,
       newStatus: 'discussion',
       userId: user.id
@@ -142,7 +142,7 @@ describe('updateProposalStatus', () => {
       }
     });
 
-    const { proposal } = await updateProposalStatus({
+    const proposal = await updateProposalStatus({
       proposalId: pageWithProposal.proposalId as string,
       newStatus: 'vote_active',
       userId: user.id

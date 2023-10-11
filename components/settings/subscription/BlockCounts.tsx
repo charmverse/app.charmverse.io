@@ -4,11 +4,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getTimeDifference } from 'lib/utilities/dates';
-
 import { BlocksExplanationModal } from './BlocksExplanation';
-import { useBlockCount } from './hooks/useBlockCount';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 import { UpgradeChip } from './UpgradeWrapper';
 
@@ -19,9 +15,7 @@ import { UpgradeChip } from './UpgradeWrapper';
  */
 export function BlockCounts() {
   const theme = useTheme();
-  const { spaceSubscription } = useSpaceSubscription();
-  const { space } = useCurrentSpace();
-  const { blockCount } = useBlockCount();
+  const { spaceBlockQuota, spaceBlockCount, hasPassedBlockQuota } = useSpaceSubscription();
 
   const {
     isOpen: isExplanationModalOpen,
@@ -29,16 +23,13 @@ export function BlockCounts() {
     open: openExplanationModal
   } = usePopupState({ variant: 'popover', popupId: 'block-count-info' });
 
-  if (!blockCount) {
+  if (!spaceBlockCount) {
     return null;
   }
 
-  const blockQuota = (spaceSubscription?.blockQuota ?? space?.blockQuota ?? 0) * 1000;
-  const passedBlockQuota = !!blockQuota && blockCount.count > blockQuota;
-
   return (
     <Box width='100%' display='block' justifyContent='space-between' alignItems='center'>
-      {passedBlockQuota && <UpgradeChip forceDisplay />}
+      {hasPassedBlockQuota && <UpgradeChip forceDisplay />}
       <Typography
         variant='caption'
         display='flex'
@@ -48,10 +39,10 @@ export function BlockCounts() {
         }}
       >
         Current block usage:{' '}
-        <Typography variant='caption' color={passedBlockQuota ? 'error' : undefined}>
-          {blockCount.count.toLocaleString()}
+        <Typography variant='caption' color={hasPassedBlockQuota ? 'error' : undefined}>
+          {spaceBlockCount.toLocaleString()}
         </Typography>
-        {!!blockQuota && `/${blockQuota.toLocaleString()}`}
+        {!!spaceBlockQuota && `/${spaceBlockQuota.toLocaleString()}`}
         <HelpOutlineIcon
           onClick={openExplanationModal}
           color={theme.palette.background.default as any}
@@ -59,19 +50,6 @@ export function BlockCounts() {
           sx={{ ml: 1, cursor: 'pointer' }}
         />
       </Typography>
-      {spaceSubscription?.status === 'free_trial' && spaceSubscription.expiresOn && (
-        <Typography
-          variant='caption'
-          color='secondary'
-          sx={{
-            display: 'inline-flex',
-            width: '100%',
-            whiteSpace: 'break-spaces'
-          }}
-        >
-          Free trial: Community Edition - {getTimeDifference(new Date(spaceSubscription.expiresOn), 'day')} days left
-        </Typography>
-      )}
 
       <BlocksExplanationModal open={isExplanationModalOpen} onClose={closeExplanationModal} />
     </Box>

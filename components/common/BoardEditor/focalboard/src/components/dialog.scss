@@ -59,13 +59,6 @@
       max-width: 975px;
     }
 
-    @media not screen and (max-width: 975px) {
-      .hideOnWidescreen {
-        /* Hide elements on larger screens */
-        display: none !important;
-      }
-    }
-
     > * {
       flex-shrink: 0;
       overflow-x: hidden;

@@ -46,6 +46,8 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
     case 'text':
       return <SubjectIcon fontSize='small' {...props} />;
     case 'updatedBy':
+    case 'proposalReviewer':
+    case 'proposalAuthor':
       return <PersonIcon fontSize='small' {...props} />;
     case 'updatedTime':
       return <AccessTimeIcon fontSize='small' {...props} />;

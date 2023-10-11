@@ -16,12 +16,12 @@ import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
-import { useUserProfile } from 'components/common/UserProfile/hooks/useUserProfile';
+import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isDevEnv } from 'config/constants';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { CommentPermissions, CommentWithChildren } from 'lib/comments';
+import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -81,7 +81,7 @@ export function Comment({
   });
   const commentContainerRef = useRef<HTMLElement | null>(null);
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
-  const { showUserProfile } = useUserProfile();
+  const { showUserId } = useMemberDialog();
   const { commentId } = router.query as { commentId: string | null };
   async function saveCommentContent() {
     await handleUpdateComment({
@@ -165,7 +165,7 @@ export function Comment({
   return (
     <Stack my={1} position='relative' ref={commentContainerRef}>
       {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
-      <StyledStack data-test={`post-comment-${comment.id}`}>
+      <StyledStack id={`post-comment-${comment.id}`} data-test={`post-comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
@@ -175,7 +175,7 @@ export function Comment({
               mr={1}
               onClick={() => {
                 if (commentUser) {
-                  showUserProfile(commentUser.id);
+                  showUserId(commentUser.id);
                 }
               }}
             >
@@ -251,7 +251,9 @@ export function Comment({
           )}
           {!comment.deletedAt && !replyingDisabled && (
             <Stack flexDirection='row' alignItems='center' gap={1}>
-              {handleVoteComment && <CommentVote permissions={permissions} votes={comment} onVote={voteComment} />}
+              {handleVoteComment && (
+                <CommentVote permissions={permissions} votes={comment as GenericCommentWithVote} onVote={voteComment} />
+              )}
               <Tooltip title={!permissions?.add_comment ? 'You do not have permissions to add a comment' : ''}>
                 <Typography
                   sx={{

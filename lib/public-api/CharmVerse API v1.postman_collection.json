@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d8be7920-bf3b-4d86-a37b-c4348fcddf03",
+		"_postman_id": "c1819e70-133b-472a-b7b7-48827971fb93",
 		"name": "CharmVerse API v1",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "3087129"
@@ -31,6 +31,100 @@
 							"key": "",
 							"value": null,
 							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get proposal comments",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}/comments",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"proposals",
+						"{{PROPOSAL_OR_PATH}}",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get proposal",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"proposals",
+						"{{PROPOSAL_OR_PATH}}"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Compute user permissions for a proposal",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}/compute-permissions?userId=873d7393-8625-4e7c-b19b-f7d32c2157b8",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"proposals",
+						"{{PROPOSAL_OR_PATH}}",
+						"compute-permissions"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "873d7393-8625-4e7c-b19b-f7d32c2157b8"
 						}
 					]
 				}

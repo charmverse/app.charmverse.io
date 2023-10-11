@@ -21,7 +21,7 @@ import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
-import { useUserDetails } from 'components/u/components/UserDetails/hooks/useUserDetails';
+import { useUserDetails } from 'components/settings/profile/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -37,8 +37,11 @@ const StyledButton = styled(Button)(
   justify-content: flex-start;
   padding: ${fullWidth ? theme.spacing(0.3, 5, 0.3, 2) : theme.spacing(0.5, 1)};
 
-  &:hover: {
-    backgroundColor: ${theme.palette.action.hover};
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover: {
+      backgroundColor: ${theme.palette.action.hover};
+    }
   }
   ${theme.breakpoints.up('lg')} {
     padding-right: ${fullWidth ? theme.spacing(2) : 0};

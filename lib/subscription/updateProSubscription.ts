@@ -42,10 +42,6 @@ export async function updateProSubscription({
     throw new InvalidStateError(`Can't update the subscription of a deleted customer ${stripeCustomer.id}`);
   }
 
-  if (stripeSubscription?.status !== 'active') {
-    throw new InvalidStateError(`Subscription ${stripeSubscription.id} is not active`);
-  }
-
   if (billingEmail) {
     await stripeClient.customers.update(stripeCustomer.id, {
       email: billingEmail

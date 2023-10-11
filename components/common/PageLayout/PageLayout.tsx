@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Tooltip, Box, Typography } from '@mui/material';
+import { Tooltip, Box } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
 import * as React from 'react';
@@ -9,9 +9,9 @@ import { useMemo, useState } from 'react';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
+import { AnnouncementBanner } from 'components/common/PageLayout/components/AnnouncementBanner';
+import { BlocksExceededBanner } from 'components/common/PageLayout/components/BlocksExceededBanner';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
-import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCount';
-import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -21,7 +21,6 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
 
-import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { AppBar } from './components/AppBar';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, HeaderSpacer } from './components/Header/Header';
@@ -125,8 +124,7 @@ function PageLayout({ children }: PageLayoutProps) {
   });
   const { user } = useUser();
   const { space } = useCurrentSpace();
-  const { spaceSubscription } = useSpaceSubscription();
-  const { blockCount } = useBlockCount();
+
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 
   const { accessChecked, publicPage } = useSharedPage();
@@ -163,10 +161,6 @@ function PageLayout({ children }: PageLayoutProps) {
     [handleDrawerClose, !!user, isMobile]
   );
 
-  const blockQuota = (spaceSubscription?.blockQuota || 0) * 1000;
-  const passedBlockQuota = (blockCount?.count || 0) > blockQuota;
-  const showUpgradeBanner = spaceSubscription && !!user && passedBlockQuota && space?.paidTier !== 'enterprise';
-
   if (!accessChecked) {
     return (
       <Box display='flex' height='100%' alignSelf='stretch' justifyContent='center' flex={1}>
@@ -196,14 +190,14 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
-                    {showUpgradeBanner && (
-                      <AnnouncementBanner hideClose={true} errorBackground>
-                        <Typography>
-                          This space has passed the block limit of{' '}
-                          <Typography component='span'>{blockQuota.toLocaleString()}</Typography>
-                        </Typography>
-                      </AnnouncementBanner>
-                    )}
+                    <BlocksExceededBanner />
+                    <AnnouncementBanner
+                      actionLabel='Learn more'
+                      actionHref='https://x.com/CharmVerse/status/1705253749826929118?s=20'
+                      expiryDate='2023-09-29'
+                    >
+                      No more free trials! Everyone gets 30k blocks on us.
+                    </AnnouncementBanner>
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer

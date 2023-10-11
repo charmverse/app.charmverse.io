@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { count } from 'lib/metrics';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { onError, onNoMatch } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { requireApiKey } from 'lib/middleware/requireApiKey';
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 import { requireApiPageKey } from 'lib/middleware/requireApiPageKey';
@@ -15,7 +15,10 @@ export function defaultHandler() {
 }
 
 export function apiHandler() {
-  return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch }).use(requireApiKey).use(logApiRequest);
+  return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch })
+    .use(requireApiKey)
+    .use(secureSpaceApiRequest)
+    .use(logApiRequest);
 }
 
 export function apiPageKeyHandler() {
@@ -23,7 +26,10 @@ export function apiPageKeyHandler() {
 }
 
 export function superApiHandler() {
-  return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch }).use(requireSuperApiKey).use(logApiRequest);
+  return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch })
+    .use(requireSuperApiKey)
+    .use(securePartnerSpaceApiRequest)
+    .use(logApiRequest);
 }
 export async function logApiRequest(req: NextApiRequestWithApiPageKey, res: NextApiResponse, next: VoidFunction) {
   // Get a sanitised url to avoid leaking keys
@@ -60,5 +66,21 @@ export async function logApiRequest(req: NextApiRequestWithApiPageKey, res: Next
 
   count(`public-api.${path}.${req.method?.toLowerCase()}`, 1);
 
+  next();
+}
+
+function secureSpaceApiRequest(req: NextApiRequest, res: NextApiResponse, next: VoidFunction) {
+  if (!req.authorizedSpaceId) {
+    throw new ActionNotPermittedError('No authorised space ID found');
+  }
+  next();
+}
+
+function securePartnerSpaceApiRequest(req: NextApiRequest, res: NextApiResponse, next: VoidFunction) {
+  const spaceId = (req.query.spaceId ?? req.body.spaceId) as string;
+
+  if (!req.spaceIdRange || !req.spaceIdRange.length || (spaceId && !req.spaceIdRange.includes(spaceId))) {
+    throw new ActionNotPermittedError('No matching space ID found for partner API key');
+  }
   next();
 }

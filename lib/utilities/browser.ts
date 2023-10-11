@@ -226,15 +226,37 @@ export function highlightDomElement(domElement: HTMLElement, postHighlight?: () 
   }, 1000);
 }
 
+// decode the path to handle special characters
+export function getBrowserPath() {
+  return decodeURIComponent(window.location.pathname + window.location.search);
+}
+
+// determine if a URL has encoded characters (ex: '/civil-lime-planarian/%E5%A0%B1%%85%AC%E3')
+function isEncoded(uri: string) {
+  uri = uri || '';
+  try {
+    const decoded = decodeURIComponent(uri);
+    return decoded !== uri;
+  } catch (error) {
+    return false;
+  }
+}
+
+export function fullyDecodeURI(uri: string) {
+  while (isEncoded(uri)) {
+    uri = decodeURIComponent(uri);
+  }
+
+  return uri;
+}
 // strip out custom or domain depending on the host
 export function getSubdomainPath(
   path: string,
-  config?: { domain: string; customDomain: string | null },
+  config?: { domain: string; customDomain?: string | null },
   host?: string
 ) {
   const subdomain = getSpaceDomainFromHost(host);
   const customDomain = getCustomDomainFromHost(host);
-
   // strip out domain when using full custom domain
   if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
     // remove space domain from path for custom domain
@@ -251,9 +273,8 @@ export function getSubdomainPath(
   if (subdomain) {
     return path.replace(new RegExp(`^\\/${subdomain}`), '');
   }
-
   // if we are not using a custom domain or subdomain, make sure that the space domain exists in the URL
-  if (config && !path.startsWith(`/${config?.domain}`)) {
+  if (config && !customDomain && !path.startsWith(`/${config?.domain}/`)) {
     return `/${config.domain}${path}`;
   }
   return path;

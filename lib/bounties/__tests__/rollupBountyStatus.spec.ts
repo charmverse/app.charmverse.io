@@ -19,7 +19,9 @@ beforeAll(async () => {
 describe('rollupBountyStatus', () => {
   it('should fail if the bounty does not exist', async () => {
     try {
-      await rollupBountyStatus(v4());
+      await rollupBountyStatus({
+        bountyId: v4()
+      });
       throw new ExpectedAnError();
     } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
@@ -35,7 +37,7 @@ describe('rollupBountyStatus', () => {
       bountyStatus: 'open'
     });
 
-    const bountyAfterRollup = await rollupBountyStatus(bounty.id);
+    const bountyAfterRollup = await rollupBountyStatus({ bountyId: bounty.id });
 
     expect(bountyAfterRollup.status).toBe('open');
   });
@@ -49,7 +51,7 @@ describe('rollupBountyStatus', () => {
       bountyStatus: 'open'
     });
 
-    const bountyAfterRollup = await rollupBountyStatus(bounty.id);
+    const bountyAfterRollup = await rollupBountyStatus({ bountyId: bounty.id });
 
     expect(bountyAfterRollup.status).toBe('open');
   });
@@ -63,7 +65,7 @@ describe('rollupBountyStatus', () => {
       bountyStatus: 'open'
     });
 
-    const bountyAfterRollup = await rollupBountyStatus(bounty.id);
+    const bountyAfterRollup = await rollupBountyStatus({ bountyId: bounty.id });
 
     expect(bountyAfterRollup.status).toBe('open');
   });
@@ -77,7 +79,7 @@ describe('rollupBountyStatus', () => {
       bountyStatus: 'open'
     });
 
-    const bountyAfterRollup = await rollupBountyStatus(bounty.id);
+    const bountyAfterRollup = await rollupBountyStatus({ bountyId: bounty.id });
 
     expect(bountyAfterRollup.status).toBe('open');
   });
@@ -91,7 +93,7 @@ describe('rollupBountyStatus', () => {
       bountyStatus: 'open'
     });
 
-    const bountyAfterRollup = await rollupBountyStatus(bounty.id);
+    const bountyAfterRollup = await rollupBountyStatus({ bountyId: bounty.id });
 
     expect(bountyAfterRollup.status).toBe('open');
   });
@@ -105,7 +107,7 @@ describe('rollupBountyStatus', () => {
       bountyStatus: 'suggestion'
     });
 
-    const bountyAfterRollup = await rollupBountyStatus(bounty.id);
+    const bountyAfterRollup = await rollupBountyStatus({ bountyId: bounty.id });
 
     expect(bountyAfterRollup.status).toBe('suggestion');
   });

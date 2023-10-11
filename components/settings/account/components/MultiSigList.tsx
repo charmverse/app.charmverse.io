@@ -26,8 +26,8 @@ import Link from 'components/common/Link';
 import Legend from 'components/settings/Legend';
 import { useImportSafes } from 'hooks/useImportSafes';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import { shortenHex } from 'lib/utilities/strings';
+import { useWeb3Account } from 'hooks/useWeb3Account';
+import { shortenHex } from 'lib/utilities/blockchain';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;
@@ -41,7 +41,7 @@ export function MultiSigList() {
   const { data: safeData, mutate } = useMultiWalletSigs();
   const { importSafes, isLoadingSafes } = useImportSafes();
 
-  const { signer } = useWeb3AuthSig();
+  const { signer } = useWeb3Account();
 
   useEffect(() => {
     if (signer) {

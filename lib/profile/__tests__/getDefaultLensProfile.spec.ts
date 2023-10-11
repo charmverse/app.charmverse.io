@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { Wallet } from 'ethers';
 
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { lensClient } from '../../lens/lensClient';
@@ -28,7 +28,7 @@ describe('getDefaultLensProfile', () => {
   });
 
   it(`Should return null if no connected wallets have a default lens profile attached`, async () => {
-    const generated = await generateUserAndSpaceWithApiToken({ walletAddress: Wallet.createRandom().address });
+    const generated = await generateUserAndSpaceWithApiToken({ walletAddress: randomETHWalletAddress() });
     const user = generated.user;
 
     const defaultLensProfile = await getDefaultLensProfile(user.id);
@@ -36,8 +36,8 @@ describe('getDefaultLensProfile', () => {
   });
 
   it(`Should return default lens profile for user's wallet`, async () => {
-    const firstWallet = Wallet.createRandom().address;
-    const secondWallet = Wallet.createRandom().address;
+    const firstWallet = randomETHWalletAddress();
+    const secondWallet = randomETHWalletAddress();
     const generated = await generateUserAndSpaceWithApiToken({ walletAddress: firstWallet });
     const user = generated.user;
 

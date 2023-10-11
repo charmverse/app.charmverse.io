@@ -5,10 +5,11 @@ import type Stripe from 'stripe';
 
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 
+import { DeprecatedFreeTrial } from './constants';
 import type { SubscriptionPeriod, SubscriptionStatusType } from './constants';
 import type { CouponDetails } from './getCouponDetails';
 
-function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusType {
+function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusType | typeof DeprecatedFreeTrial {
   const { status, trial_end } = subscription;
 
   if (subscription.cancel_at_period_end) {
@@ -18,7 +19,7 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
     // Stripe value is in seconds
     (trial_end && 1000) > Date.now()
   ) {
-    return 'free_trial';
+    return DeprecatedFreeTrial;
   }
 
   switch (status) {
@@ -33,7 +34,7 @@ function mapStripeStatus(subscription: Stripe.Subscription): SubscriptionStatusT
     // It has 0 days left and the user is obliged to take an action to downgrade or pay for another one.
     case 'paused':
     case 'trialing':
-      return 'free_trial';
+      return DeprecatedFreeTrial;
     case 'unpaid':
       return 'unpaid';
     case 'incomplete':
@@ -59,7 +60,7 @@ export type PaymentMethod = {
  */
 export type SubscriptionFieldsFromStripe = {
   period: SubscriptionPeriod;
-  status: SubscriptionStatusType;
+  status: SubscriptionStatusType | typeof DeprecatedFreeTrial;
   blockQuota: number;
   priceInCents: number;
   billingEmail?: string | null;
@@ -104,12 +105,7 @@ export function mapStripeFields({
     : null;
 
   const status = mapStripeStatus(subscription);
-  const expiryDate =
-    status === 'cancel_at_end'
-      ? subscription.current_period_end
-      : status === 'free_trial'
-      ? subscription.trial_end
-      : null;
+  const expiryDate = status === 'cancel_at_end' ? subscription.current_period_end : null;
 
   const discount = subscription.discount;
   const fields: SubscriptionFieldsFromStripe = {

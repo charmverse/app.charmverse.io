@@ -25,7 +25,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { BountyWithDetails } from 'lib/bounties';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -35,10 +35,10 @@ import MultiPaymentButton from './MultiPaymentButton';
 export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] }) {
   const [selectedApplicationIds, setSelectedApplicationIds] = useState<string[]>([]);
   const popupState = usePopupState({ variant: 'popover', popupId: 'multi-payment-modal' });
-  const { chainId, signer } = useWeb3AuthSig();
+  const { chainId, signer } = useWeb3Account();
   const { data: userGnosisSafes } = useMultiWalletSigs();
   const { importSafes } = useImportSafes();
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
 
   const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
     useMultiBountyPayment({
@@ -142,7 +142,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
                         <ListItemText>{safeInfo?.name || safeInfo.address}</ListItemText>
                         <ListItemIcon>
                           <Tooltip title='Manage your wallet'>
-                            <IconButton onClick={() => onClick('account', 'multisig-section')} size='small'>
+                            <IconButton onClick={() => openSettings('account', 'multisig-section')} size='small'>
                               <OpenInNewIcon fontSize='small' />
                             </IconButton>
                           </Tooltip>

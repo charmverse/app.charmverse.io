@@ -21,8 +21,6 @@ jobs:
   build-test-env:
     name: Build test env
     runs-on: ubuntu-latest
-    outputs:
-      build_id: ${{ steps.get_build_id.outputs.build_id }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -34,22 +32,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Calculate Build ID
-        id: get_build_id
-        run: |
-          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
-          echo "build_id=$build_id" >> $GITHUB_OUTPUT
-
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          save_cache: true
 
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          save_cache: true
 
   chromatic:
     name: Publish to Chromatic
@@ -67,25 +59,15 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test:
-    name: Tests
+    name: Validate code
     runs-on: ubuntu-latest
     needs: build-test-env
-    strategy:
-      max-parallel: 5
-      fail-fast: false
-      matrix:
-        include:
-          - test_name: 'Type check, lint, and verify dependencies'
-            test_command: 'npm run typecheck && npm run lint && npm run verifydeps'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -98,12 +80,10 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
-      - name: Run ${{matrix.test_name}}
-        run: ${{matrix.test_command}}
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run verifydeps
 
   integration-test:
     name: Tests
@@ -126,7 +106,7 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     strategy:
-      max-parallel: 8
+      max-parallel: 10
       fail-fast: false
       matrix:
         include:
@@ -204,18 +184,15 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_APP_ENV: 'test'
-          NEXT_PUBLIC_BUILD_ID: ${{ needs.build-test-env.outputs.build_id }}
 
       - name: Run ${{matrix.test_name}}
+        env:
+          REACT_APP_APP_ENV: 'test'
         run: ${{matrix.test_command}}
 
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
@@ -232,34 +209,17 @@ jobs:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
-      - name: Calculate Build ID
+      - name: Calculate Build ID and add to env file
         id: get_build_id
         run: |
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
+          echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
 
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'production'
-          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
-          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
-          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY }}
-          NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
-          NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
-          NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
-          NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
-          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          REACT_APP_APP_ENV: 'production'
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -310,7 +270,7 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
           changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})
-          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig)+'
+          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig|components/common/CharmEditor/components)+'
           for file in $changed_files; do
             echo "evaluating $file:"
             if [[ $file =~ $websocket_src_file_pattern ]]; then
@@ -320,13 +280,8 @@ jobs:
             fi
           done
 
-      # - name: Publish to Chromatic
-      #   uses: chromaui/action@v1
-      #   with:
-      #     skip: true
-      #     projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
       - name: Deploy webapp to Beanstalk
+        id: webapp_deploy
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -374,4 +329,26 @@ jobs:
           region: us-east-1
           deployment_package: deploy_websockets.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
+          wait_for_deployment: false # set to false to save sweet Github
+
+  #    if: github.ref == 'refs/heads/main' && failure()
+  discord_alert:
+    name: Notify discord of failure
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && failure()
+    needs: [build-test-env, test, integration-test, deploy]
+    steps:
+      - name: If any of prev jobs failed notify discord
+        if: contains(needs.*.result, 'failure')
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
+          status: 'failure'
+          content: 'Hey <@&1027309276454207519>'
+          title: 'Webapp deploy workflow failed'
+          description: |
+            Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
+          color: '16515843'
+          url: 'https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}'
+          username: GitHub Actions
+          avatar_url: 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'

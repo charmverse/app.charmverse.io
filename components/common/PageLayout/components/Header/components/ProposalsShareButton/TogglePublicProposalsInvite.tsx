@@ -19,7 +19,7 @@ type Props = {
 export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
   const isAdmin = useIsAdmin();
 
-  const { onClick: openSpaceSettings } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
 
   const {
     isOpen,
@@ -56,10 +56,7 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
             Show public invite link{' '}
             {publicInviteExists && showOpenSettingsLink && (
               <Tooltip title='Customise link roles in the settings'>
-                <SettingsIcon
-                  onClick={() => openSpaceSettings('invites')}
-                  sx={{ fontSize: 14, margin: 'auto', ml: 0.5 }}
-                />
+                <SettingsIcon onClick={() => openSettings('invites')} sx={{ fontSize: 14, margin: 'auto', ml: 0.5 }} />
               </Tooltip>
             )}
           </Typography>

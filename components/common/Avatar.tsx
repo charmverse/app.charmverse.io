@@ -51,6 +51,16 @@ const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, Reac
     rounded: { borderRadius: '0.825rem' },
     circular: null,
     square: null
+  },
+  medium: {
+    rounded: { borderRadius: '8px' },
+    circular: null,
+    square: null
+  },
+  small: {
+    rounded: { borderRadius: '4px' },
+    circular: null,
+    square: null
   }
 };
 

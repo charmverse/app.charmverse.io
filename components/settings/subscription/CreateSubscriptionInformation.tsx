@@ -8,9 +8,9 @@ import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { subscriptionDetails } from 'lib/subscription/constants';
-import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import CommunityIcon from 'public/images/subscriptions/community.svg';
 import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
 import FreeIcon from 'public/images/subscriptions/free.svg';
@@ -38,18 +38,17 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
 
 export function CreateSubscriptionInformation({
   onUpgrade,
-  spaceSubscription,
   pendingPayment,
   spaceId
 }: {
   onUpgrade: () => void;
-  spaceSubscription?: SpaceSubscriptionWithStripeData | null;
   pendingPayment?: boolean;
   spaceId: string;
 }) {
-  const { refetchSpaceSubscription, freeTrialEnds } = useSpaceSubscription();
+  const { refetchSpaceSubscription, paidTier } = useSpaceSubscription();
+  const { isFreeSpace } = useIsFreeSpace();
   const { showMessage } = useSnackbar();
-  const { space, refreshCurrentSpace } = useCurrentSpace();
+  const { refreshCurrentSpace, space } = useCurrentSpace();
 
   const { trigger: switchToFreePlan, isMutating: isSwitchToFreeLoading } = useSWRMutation(
     `spaces/${spaceId}/switch-to-free-tier`,
@@ -66,18 +65,26 @@ export function CreateSubscriptionInformation({
     }
   );
 
+  const { trigger: switchToCommunityPlan, isMutating: isSwitchToCommunityLoading } = useSWRMutation(
+    `spaces/${spaceId}/switch-to-community-tier`,
+    () => charmClient.subscription.switchToCommunityTier(spaceId),
+    {
+      onSuccess() {
+        refetchSpaceSubscription();
+        refreshCurrentSpace();
+        showMessage('You have successfully switch to community tier!', 'success');
+      },
+      onError(err) {
+        showMessage(err?.message ?? 'The switch to community tier could not be made. Please try again later.', 'error');
+      }
+    }
+  );
+
   const {
     isOpen: isConfirmDowngradeDialogOpen,
     close: closeConfirmFreeTierDowngradeDialog,
     open: openConfirmFreeTierDowngradeDialog
   } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
-
-  const freeTrialLabel =
-    spaceSubscription?.status === 'free_trial'
-      ? freeTrialEnds > 0
-        ? `Free trial - ${freeTrialEnds} days left`
-        : `Free trial finished`
-      : '';
 
   useTrackPageView({ type: 'billing/marketing' });
 
@@ -94,13 +101,13 @@ export function CreateSubscriptionInformation({
             </Box>
           </DesktopIconContainer>
           <Typography variant='h6' mb={1}>
-            Free Plan
+            Public Goods
           </Typography>
-          {spaceSubscription?.status === 'free_trial' ? null : <Chip size='small' label='Current Plan' />}
+          {isFreeSpace ? <Chip size='small' label='Current Plan' /> : null}
           <MobileIconContainer>
             <FreeIcon width='140px' height='140px' />
           </MobileIconContainer>
-          {spaceSubscription?.status === 'free_trial' && (
+          {!isFreeSpace && (
             <>
               <Button
                 fullWidth
@@ -108,7 +115,7 @@ export function CreateSubscriptionInformation({
                 onClick={openConfirmFreeTierDowngradeDialog}
                 disabled={pendingPayment || isSwitchToFreeLoading}
               >
-                Switch to free
+                Switch to Public Goods
               </Button>
               <ConfirmFreeDowngradeModal
                 isOpen={isConfirmDowngradeDialogOpen}
@@ -141,20 +148,31 @@ export function CreateSubscriptionInformation({
               <CommunityIcon width='100px' height='100px' />
             </DesktopIconContainer>
             <Typography variant='h6' mb={1}>
-              Community Edition
+              Community
             </Typography>
-            {spaceSubscription?.status === 'free_trial' ? (
-              <Chip size='small' color={freeTrialEnds > 0 ? 'green' : 'orange'} label={freeTrialLabel} />
-            ) : (
-              <Chip size='small' label='Recommended Plan' variant='outlined' />
-            )}
+
+            <Chip
+              size='small'
+              label={paidTier === 'community' ? 'Current Plan' : 'Recommended Plan'}
+              variant='outlined'
+            />
           </div>
           <MobileIconContainer>
             <CommunityIcon width='150px' height='150px' />
           </MobileIconContainer>
-          <Button onClick={onUpgrade} disabled={pendingPayment}>
-            {pendingPayment ? 'Payment pending' : 'Upgrade $10/month'}
-          </Button>
+          {space?.paidTier === 'community' ? (
+            <Button onClick={onUpgrade} disabled={pendingPayment}>
+              {pendingPayment ? 'Payment pending' : 'Get more blocks'}
+            </Button>
+          ) : (
+            <Button
+              variant='outlined'
+              onClick={switchToCommunityPlan}
+              disabled={pendingPayment || isSwitchToCommunityLoading}
+            >
+              Switch to community
+            </Button>
+          )}
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
@@ -178,7 +196,7 @@ export function CreateSubscriptionInformation({
               <EnterpriseIcon width='90px' height='90px' />
             </DesktopIconContainer>
             <Typography variant='h6' mb={1}>
-              Enterprise Edition
+              Enterprise
             </Typography>
             <MobileIconContainer>
               <EnterpriseIcon width='150px' height='150px' />

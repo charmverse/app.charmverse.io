@@ -104,11 +104,11 @@ const testDoc = {
     },
     { type: 'paragraph' },
     {
-      type: 'orderedList',
+      type: 'ordered_list',
       attrs: { order: 1, tight: false },
       content: [
         {
-          type: 'listItem',
+          type: 'list_item',
           attrs: { todoChecked: null },
           content: [
             {

@@ -47,6 +47,14 @@ export function linkedPageSpec(): RawSpecs {
         }
       }
     },
-    suggestTooltip.spec({ markName: linkedPageSuggestMarkName })
+    suggestTooltip.spec({ markName: linkedPageSuggestMarkName }),
+    // add temporary stub to support old mark name
+    {
+      name: 'nestedPageSuggest',
+      type: 'mark',
+      schema: {
+        toDOM: () => ['span']
+      }
+    }
   ];
 }

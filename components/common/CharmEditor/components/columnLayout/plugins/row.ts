@@ -26,25 +26,27 @@ export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: str
 
             let index = 0;
 
-            // iterate the children of this node, which are 'columnBlock' type
-            view.state.doc.nodesBetween(startPos, startPos + node.nodeSize, (child, pos) => {
-              if (child.type.name === 'columnBlock' && columnUpdates[index]) {
-                columnUpdates[index].pos = pos;
-                index += 1;
-              }
-              if (child.type.name === 'columnLayout') {
-                // descend into the columnBlock nodes
-                return true;
-              }
-              return false;
-            });
-            const tr = view.state.tr;
-            columnUpdates.forEach((update) => {
-              if (update.pos > -1) {
-                tr.setNodeMarkup(update.pos, undefined, { size: update.size });
-              }
-            });
-            view.dispatch(tr);
+            if (startPos) {
+              // iterate the children of this node, which are 'columnBlock' type
+              view.state.doc.nodesBetween(startPos, startPos + node.nodeSize, (child, pos) => {
+                if (child.type.name === 'columnBlock' && columnUpdates[index]) {
+                  columnUpdates[index].pos = pos;
+                  index += 1;
+                }
+                if (child.type.name === 'columnLayout') {
+                  // descend into the columnBlock nodes
+                  return true;
+                }
+                return false;
+              });
+              const tr = view.state.tr;
+              columnUpdates.forEach((update) => {
+                if (update.pos > -1) {
+                  tr.setNodeMarkup(update.pos, undefined, { size: update.size });
+                }
+              });
+              view.dispatch(tr);
+            }
           }
 
           // trigger this after child nodes are rendered

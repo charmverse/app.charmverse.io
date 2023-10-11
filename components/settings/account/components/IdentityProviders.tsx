@@ -30,23 +30,25 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
+import { shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
-import { lowerCaseEqual, shortWalletAddress } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
+
+import { useIdentityTypes } from '../hooks/useIdentityTypes';
 
 import IdentityProviderItem from './IdentityProviderItem';
 import { NewIdentityModal } from './NewIdentityModal';
 import { TelegramLoginIframe } from './TelegramLoginIframe';
-import { useIdentityTypes } from './useIdentityTypes';
 
 export function IdentityProviders() {
   const { isConnectingIdentity } = useWeb3ConnectionManager();
-  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3AuthSig();
+  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();

@@ -7,7 +7,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { StaticPageType, PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
-import { getSubdomainPath, getSpaceUrl } from 'lib/utilities/browser';
+import { getSubdomainPath, getSpaceUrl, fullyDecodeURI } from 'lib/utilities/browser';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
@@ -20,8 +20,23 @@ const staticPagesToDirect: { [key in StaticPageType]?: string } = {
 
 const pageTypes = Object.keys(PageType).concat('post', ...Object.keys(staticPagesToDirect));
 
-// get default page when we have a space domain
 export async function getDefaultPageForSpace({
+  space,
+  host,
+  userId
+}: {
+  space: Pick<Space, 'id' | 'domain' | 'customDomain'>;
+  host?: string;
+  userId: string;
+}) {
+  const defaultPage = await getDefaultPageForSpaceRaw({ space, host, userId });
+  // encode to handle Japanese characters
+  // call fullyDecodeURI to handle cases where we saved the pathname with encoded characters
+  return encodeURI(fullyDecodeURI(defaultPage));
+}
+
+// get default page when we have a space domain
+async function getDefaultPageForSpaceRaw({
   space,
   host,
   userId
@@ -34,7 +49,6 @@ export async function getDefaultPageForSpace({
   const lastPageView = await getLastPageView({ userId, spaceId });
 
   const defaultSpaceUrl = getSpaceUrl(space, host);
-
   if (lastPageView) {
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
     if (pathname) {
@@ -96,7 +110,6 @@ export async function getDefaultPageForSpace({
   const sortedPages = pageTree.sortNodes(topLevelPages as PageMeta[]);
 
   const firstPage = sortedPages[0];
-
   if (firstPage) {
     return `${defaultSpaceUrl}/${firstPage.path}`;
   } else {

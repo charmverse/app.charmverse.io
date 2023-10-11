@@ -1,5 +1,5 @@
+import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
-import log from 'loglevel';
 import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
@@ -35,7 +35,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       trackPageView({
         type: page.type,
         pageId: page.id,
-        spaceId: page.spaceId
+        spaceId: page.spaceId,
+        spaceDomain: currentSpace?.domain
       });
       setCurrentPageId(page.id);
     }

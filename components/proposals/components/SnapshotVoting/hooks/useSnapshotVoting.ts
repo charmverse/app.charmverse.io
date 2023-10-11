@@ -1,8 +1,8 @@
-import { utils } from 'ethers';
 import useSWR from 'swr';
+import { getAddress } from 'viem';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getUserProposalVotes } from 'lib/snapshot/getVotes';
@@ -14,7 +14,7 @@ import { sleep } from 'lib/utilities/sleep';
 export type CastVote = (vote: VoteChoice) => Promise<void>;
 
 export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: string }) {
-  const { account, provider } = useWeb3AuthSig();
+  const { account, provider } = useWeb3Account();
   const { space } = useCurrentSpace();
   const snapshotSpaceDomain = space?.snapshotDomain;
 
@@ -58,7 +58,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
       app: 'my-app'
     };
 
-    await client.vote(provider, utils.getAddress(account as string), vote);
+    await client.vote(provider, getAddress(account as string), vote);
     // we need this delay for vote to be propagated to the graph
     await sleep(5000);
     // workaround - fetch one more time with delay, sometimes it takes more time to get updated value
@@ -85,6 +85,8 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
   };
 }
 
+type VotingDisabledReason = 'account' | 'no_vote_power' | 'vote_inactive';
+
 function getVotingDisabledStatus({
   account,
   votingPower,
@@ -93,17 +95,26 @@ function getVotingDisabledStatus({
   account?: string | null;
   votingPower: number;
   isVotingActive: boolean;
-}) {
+}): null | { reason: VotingDisabledReason; message: string } {
   if (!account) {
-    return 'You need to connect your wallet to vote on snapshot proposals.';
+    return {
+      reason: 'account',
+      message: 'You need to connect your wallet to vote on snapshot proposals.'
+    };
   }
 
   if (!votingPower) {
-    return 'You do not have voting power to vote on this proposal.';
+    return {
+      reason: 'no_vote_power',
+      message: 'You do not have voting power to vote on this proposal.'
+    };
   }
 
   if (!isVotingActive) {
-    return 'Voting is not active for this proposal.';
+    return {
+      reason: 'vote_inactive',
+      message: 'Voting is not active for this proposal.'
+    };
   }
 
   return null;
