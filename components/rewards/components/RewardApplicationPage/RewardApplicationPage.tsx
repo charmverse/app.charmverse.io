@@ -1,18 +1,21 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Collapse, FormLabel, IconButton, Stack } from '@mui/material';
+import { Collapse, Divider, FormLabel, IconButton, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { CharmEditor } from 'components/common/CharmEditor';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useMembers } from 'hooks/useMembers';
+import { usePage } from 'hooks/usePage';
 import { useUser } from 'hooks/useUser';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { ApplicationComments } from './ApplicationComments';
 import ApplicationInput from './RewardApplicationInput';
@@ -28,6 +31,9 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
     applicationId
   });
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
+
+  const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
+
   const { members } = useMembers();
   const { user } = useUser();
 
@@ -70,13 +76,25 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
             </IconButton>
           </Stack>
           <Collapse in={showProperties} timeout='auto' unmountOnExit>
-            <RewardProperties
-              rewardId={reward.id}
-              pageId={reward.page.id}
-              pagePath={reward.page.path}
-              readOnly={true}
-              refreshRewardPermissions={() => {}}
-            />
+            <Stack>
+              <RewardProperties
+                rewardId={reward.id}
+                pageId={reward.page.id}
+                pagePath={reward.page.path}
+                readOnly={true}
+                refreshRewardPermissions={() => {}}
+              />
+              {rewardPageContent && (
+                <>
+                  <CharmEditor
+                    pageId={rewardPageContent.id}
+                    readOnly
+                    content={rewardPageContent.content as PageContent}
+                  />
+                  <Divider sx={{ mt: 2 }} />
+                </>
+              )}
+            </Stack>
           </Collapse>
         </Grid>
 
