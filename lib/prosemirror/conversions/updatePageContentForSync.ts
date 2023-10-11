@@ -26,11 +26,11 @@ export function recurseDocument(content: PageContent, cb: (node: PageContent) =>
 }
 
 export async function updatePageContentForSync(
-  config: { PAGE_SIZE: number; spaceId?: string } = {
-    PAGE_SIZE: 100
+  config: { pagesRetrievedPerQuery?: number; spaceId?: string } = {
+    pagesRetrievedPerQuery: 100
   }
 ) {
-  const { PAGE_SIZE, spaceId } = config;
+  const { pagesRetrievedPerQuery = 100, spaceId } = config;
   const pageWhereInput: Prisma.PageWhereInput = {
     content: {
       not: Prisma.DbNull
@@ -52,7 +52,6 @@ export async function updatePageContentForSync(
       where: pageWhereInput,
       select: {
         id: true,
-        version: true,
         createdBy: true,
         content: true
       },
@@ -60,11 +59,11 @@ export async function updatePageContentForSync(
         createdAt: 'asc'
       },
       skip,
-      take: PAGE_SIZE
+      take: pagesRetrievedPerQuery
     });
 
     for (const page of pages) {
-      const { createdBy, id, version } = page;
+      const { createdBy, id } = page;
       try {
         const childPages = await prisma.page.findMany({
           where: {
@@ -148,7 +147,15 @@ export async function updatePageContentForSync(
         }
 
         const newContent = doc.toJSON();
-
+        const parentPage = await prisma.page.findUniqueOrThrow({
+          where: {
+            id: page.id
+          },
+          select: {
+            version: true
+          }
+        });
+        const version = parentPage.version;
         const pageDiffs = [
           linkedPageConversionSteps.length
             ? {
@@ -182,30 +189,29 @@ export async function updatePageContentForSync(
 
         if (linkedPageConversionSteps.length || nestedPageAppendStep) {
           const finalVersion = version + pageDiffs.length;
-          await prisma.$transaction(
-            [
-              prisma.pageDiff.createMany({
-                data: pageDiffs
-              }),
-              prisma.page.update({
-                where: {
-                  id
-                },
-                data: {
-                  content: newContent,
-                  version: finalVersion
-                }
-              })
-            ].filter(isTruthy)
-          );
+          await prisma.$transaction([
+            prisma.pageDiff.createMany({
+              data: pageDiffs
+            }),
+            prisma.page.update({
+              where: {
+                id
+              },
+              data: {
+                content: newContent,
+                version: finalVersion
+              }
+            })
+          ]);
         }
         completedPages += 1;
         log.info(`Complete updating page [${completedPages}/${totalPages}]: ${page.id}`);
       } catch (error) {
         log.error(`Failed to update page ${page.id}`, { error, skip });
+        throw new Error();
       }
     }
 
-    skip += PAGE_SIZE;
+    skip += pagesRetrievedPerQuery;
   }
 }
