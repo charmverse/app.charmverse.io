@@ -24,6 +24,12 @@ const Toolbar = styled(Box)`
   }
 `;
 
+const Content = styled.div`
+  overflow-x: hidden;
+  flex-grow: 1;
+  -webkit-overflow-scrolling: touch;
+`;
+
 function FBDialog(props: Props) {
   const { toolbar, toolsMenu, fullWidth = false } = props;
 
@@ -50,7 +56,7 @@ function FBDialog(props: Props) {
                 </IconButton>
               )}
             </Toolbar>
-            <div className='content'>{props.children}</div>
+            <Content>{props.children}</Content>
           </div>
         </div>
       </div>

@@ -152,78 +152,80 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated, set
 
   return (
     <div className={`document-print-container ${fontClassName}`}>
-      {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-      <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
-        <Box minHeight={450}>
-          <CharmEditor
-            placeholderText={
-              readOnlyEditor
-                ? `You must select a proposal template to begin writing`
-                : `Describe the proposal. Type '/' to see the list of available commands`
-            }
-            content={formInputs.content as PageContent}
-            autoFocus={false}
-            style={{
-              color: readOnlyEditor ? `var(--secondary-text)` : 'inherit'
-            }}
-            enableVoting={false}
-            containerWidth={containerWidth}
-            pageType='proposal'
-            disableNestedPages
-            onContentChange={updateProposalContent}
-            focusOnInit
-            isContentControlled
-            insideModal
-            readOnly={readOnlyEditor}
-            key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
-          >
-            {/* temporary? disable editing of page title when in suggestion mode */}
-            <PageHeader
-              headerImage={formInputs.headerImage}
-              icon={formInputs.icon}
-              readOnly={false}
-              updatedAt={new Date().toString()}
-              title={formInputs.title || ''}
-              // readOnly={readOnly || !!enableSuggestingMode}
-              setPage={(updatedPage) => {
-                setFormInputs(updatedPage);
+      <Box display='flex' flexDirection='column'>
+        {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
+        <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+          <Box minHeight={450}>
+            <CharmEditor
+              placeholderText={
+                readOnlyEditor
+                  ? `You must select a proposal template to begin writing`
+                  : `Describe the proposal. Type '/' to see the list of available commands`
+              }
+              content={formInputs.content as PageContent}
+              autoFocus={false}
+              style={{
+                color: readOnlyEditor ? `var(--secondary-text)` : 'inherit'
               }}
-            />
-            <div className='focalboard-body font-family-default'>
-              <div className='CardDetail content'>
-                <ProposalProperties
-                  isFromTemplate={isFromTemplateSource}
-                  readOnlyRubricCriteria={isFromTemplateSource}
-                  readOnlyReviewers={readOnlyReviewers}
-                  readOnlyProposalEvaluationType={isFromTemplateSource}
-                  proposalStatus='draft'
-                  proposalFormInputs={formInputs}
-                  showStatus={true}
-                  title=''
-                  setProposalFormInputs={setFormInputs}
-                  onChangeRubricCriteria={(rubricCriteria) => {
-                    setFormInputs({
-                      ...formInputs,
-                      rubricCriteria
-                    });
-                  }}
-                />
+              enableVoting={false}
+              containerWidth={containerWidth}
+              pageType='proposal'
+              disableNestedPages
+              onContentChange={updateProposalContent}
+              focusOnInit
+              isContentControlled
+              insideModal
+              readOnly={readOnlyEditor}
+              key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
+            >
+              {/* temporary? disable editing of page title when in suggestion mode */}
+              <PageHeader
+                headerImage={formInputs.headerImage}
+                icon={formInputs.icon}
+                readOnly={false}
+                updatedAt={new Date().toString()}
+                title={formInputs.title || ''}
+                // readOnly={readOnly || !!enableSuggestingMode}
+                setPage={(updatedPage) => {
+                  setFormInputs(updatedPage);
+                }}
+              />
+              <div className='focalboard-body font-family-default'>
+                <div className='CardDetail content'>
+                  <ProposalProperties
+                    isFromTemplate={isFromTemplateSource}
+                    readOnlyRubricCriteria={isFromTemplateSource}
+                    readOnlyReviewers={readOnlyReviewers}
+                    readOnlyProposalEvaluationType={isFromTemplateSource}
+                    proposalStatus='draft'
+                    proposalFormInputs={formInputs}
+                    showStatus={true}
+                    title=''
+                    setProposalFormInputs={setFormInputs}
+                    onChangeRubricCriteria={(rubricCriteria) => {
+                      setFormInputs({
+                        ...formInputs,
+                        rubricCriteria
+                      });
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          </CharmEditor>
-        </Box>
-        <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
-          <Button
-            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
-            disabledTooltip={disabledTooltip}
-            onClick={createProposal}
-            loading={isCreatingProposal}
-            data-test='create-proposal-button'
-          >
-            Create
-          </Button>
-        </Stack>
-      </StyledContainer>
+            </CharmEditor>
+          </Box>
+          <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
+            <Button
+              disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+              disabledTooltip={disabledTooltip}
+              onClick={createProposal}
+              loading={isCreatingProposal}
+              data-test='create-proposal-button'
+            >
+              Create
+            </Button>
+          </Stack>
+        </StyledContainer>
+      </Box>
     </div>
   );
 }

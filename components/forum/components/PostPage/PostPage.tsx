@@ -17,7 +17,6 @@ import { CommentSort } from 'components/common/comments/CommentSort';
 import { processComments, sortComments } from 'components/common/comments/utils';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
 import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
