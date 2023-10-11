@@ -1,6 +1,6 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Collapse, Divider, FormLabel, IconButton, Stack } from '@mui/material';
+import { Collapse, Divider, FormLabel, IconButton, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
@@ -27,7 +27,7 @@ type Props = {
 };
 
 export function RewardApplicationPageComponent({ applicationId }: Props) {
-  const { application, refreshApplication, applicationRewardPermissions } = useApplication({
+  const { application, refreshApplication, applicationRewardPermissions, updateApplication } = useApplication({
     applicationId
   });
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
@@ -67,7 +67,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
             sx={{ cursor: 'pointer' }}
             onClick={() => setShowProperties((v) => !v)}
           >
-            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>Details</FormLabel>
+            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>Reward Details</FormLabel>
             <IconButton size='small'>
               <KeyboardArrowDown
                 fontSize='small'
@@ -100,10 +100,11 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
 
         <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box display='flex' gap={2}>
-            <h3>Applicant</h3>
+            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>Applicant</FormLabel>
             <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
           </Box>
 
+          {/** This section contaisn all possible reviewer actions */}
           {application.status === 'applied' && (
             <RewardReview
               onConfirmReview={() => null}
@@ -120,7 +121,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           )}
         </Grid>
 
-        {application.reward.approveSubmitters && application.status === 'applied' && (
+        {application.reward.approveSubmitters && (
           <Grid item xs={12}>
             <ApplicationInput
               application={application}
@@ -130,17 +131,20 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
             />
           </Grid>
         )}
-        <Grid item xs={12}>
-          <SubmissionInput
-            submission={application}
-            readOnly={readonlySubmission}
-            expandedOnLoad={expandedSubmissionStatuses.includes(application.status)}
-            refreshSubmission={refreshApplication}
-            bountyId={application.bountyId}
-            permissions={applicationRewardPermissions}
-            hasCustomReward={!!application.reward.customReward}
-          />
-        </Grid>
+
+        {application.status !== 'applied' && (
+          <Grid item xs={12}>
+            <SubmissionInput
+              submission={application}
+              readOnly={readonlySubmission}
+              expandedOnLoad
+              refreshSubmission={refreshApplication}
+              bountyId={application.bountyId}
+              permissions={applicationRewardPermissions}
+              hasCustomReward={!!application.reward.customReward}
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <ApplicationComments applicationId={application.id} status={application.status} />
         </Grid>
