@@ -6,8 +6,8 @@ import { LimitReachedError, UndesirableOperationError } from 'lib/utilities/erro
 import { ExpectedAnError } from 'testing/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import { approveApplication } from '../approveApplication';
 import { createApplication } from '../createApplication';
+import { approveApplication } from '../reviewApplication';
 
 let user: User;
 let space: Space;

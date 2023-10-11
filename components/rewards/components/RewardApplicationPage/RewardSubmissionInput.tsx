@@ -43,8 +43,7 @@ type FormValues = yup.InferType<ReturnType<typeof schema>>;
 interface Props {
   submission?: Application;
   bountyId: string;
-  onSubmit?: (submission: Application) => void;
-  onCancel?: () => void;
+  onSubmit?: (content: Partial<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>) => void;
   readOnly?: boolean;
   permissions?: BountyPermissionFlags;
   expandedOnLoad?: boolean;
@@ -61,9 +60,7 @@ export default function SubmissionInput({
   bountyId,
   alwaysExpanded,
   expandedOnLoad,
-  hasCustomReward,
-  onCancel = () => null,
-  refreshSubmission
+  hasCustomReward
 }: Props) {
   const { user } = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
@@ -105,7 +102,7 @@ export default function SubmissionInput({
       }
       setIsEditorTouched(false);
       if (onSubmitProp) {
-        onSubmitProp(application);
+        onSubmitProp(values);
       }
     } catch (err: any) {
       setFormError(err);
@@ -193,17 +190,6 @@ export default function SubmissionInput({
 
             {!readOnly && (
               <Grid item display='flex' gap={1} justifyContent='flex-end'>
-                {!submission?.submission && !alwaysExpanded && (
-                  <Button
-                    onClick={() => {
-                      onCancel();
-                    }}
-                    variant='outlined'
-                    color='secondary'
-                  >
-                    Cancel
-                  </Button>
-                )}
                 <Button disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched} type='submit'>
                   {submission?.submission ? 'Update' : 'Submit'}
                 </Button>

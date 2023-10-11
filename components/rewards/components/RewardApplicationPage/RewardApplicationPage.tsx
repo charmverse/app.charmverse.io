@@ -27,10 +27,17 @@ type Props = {
 };
 
 export function RewardApplicationPageComponent({ applicationId }: Props) {
-  const { application, refreshApplication, applicationRewardPermissions, updateApplication, updateSubmission } =
-    useApplication({
-      applicationId
-    });
+  const {
+    application,
+    refreshApplication,
+    applicationRewardPermissions,
+    updateApplication,
+    updateSubmission,
+    reviewSubmission,
+    reviewApplication
+  } = useApplication({
+    applicationId
+  });
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
 
   const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
@@ -45,8 +52,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   }
 
   const submitter = members.find((m) => m.id === application.createdBy);
-
-  const expandedSubmissionStatuses: ApplicationStatus[] = ['inProgress', 'complete', 'review', 'processing', 'paid'];
 
   const readonlySubmission =
     user?.id !== application.createdBy ||
@@ -108,21 +113,21 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           {/** This section contaisn all possible reviewer actions */}
           {application.status === 'applied' && (
             <RewardReview
-              onConfirmReview={() => null}
+              onConfirmReview={(decision) => reviewApplication({ decision })}
               reviewType='application'
               readOnly={!applicationRewardPermissions?.approve_applications}
             />
           )}
           {(application.status === 'review' || application.status === 'inProgress') && (
             <RewardReview
-              onConfirmReview={() => null}
+              onConfirmReview={(decision) => reviewSubmission({ decision })}
               reviewType='submission'
               readOnly={!applicationRewardPermissions?.review}
             />
           )}
         </Grid>
 
-        {application.reward.approveSubmitters && (
+        {application.reward.approveSubmitters && application.status === 'applied' && (
           <Grid item xs={12}>
             <ApplicationInput
               application={application}

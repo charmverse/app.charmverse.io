@@ -16,11 +16,6 @@ export interface ApplicationUpdateData {
   message: string;
 }
 
-export interface ApplicationActionRequest {
-  userId: string;
-  applicationOrApplicationId: string | Application;
-}
-
 export type ReviewDecision = 'approve' | 'reject';
 
 export interface SubmissionReview {

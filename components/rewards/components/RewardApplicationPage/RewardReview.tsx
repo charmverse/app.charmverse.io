@@ -1,25 +1,10 @@
-import type { Application } from '@charmverse/core/prisma';
-import { yupResolver } from '@hookform/resolvers/yup';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Collapse, FormLabel, IconButton, Stack, Typography } from '@mui/material';
-import Alert from '@mui/material/Alert';
+import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import type * as yup from 'yup';
 
-import charmClient from 'charmClient';
-import { BountyApplicantStatus } from 'components/[pageId]/DocumentPage/components/BountyProperties/components/BountyApplicantStatus';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { useBounties } from 'hooks/useBounties';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { useUser } from 'hooks/useUser';
-import type { ReviewDecision, SubmissionReview } from 'lib/applications/interfaces';
-import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
-import type { AssignedBountyPermissions, BountyPermissionFlags } from 'lib/bounties';
+import type { ReviewDecision } from 'lib/applications/interfaces';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -36,7 +21,6 @@ export default function RewardReview({ onConfirmReview, reviewType, readOnly }: 
   function cancel() {
     setReviewDecision(null);
   }
-
   return (
     <Box my={1} gap={1}>
       <Grid item display='flex' gap={1}>
@@ -64,7 +48,7 @@ export default function RewardReview({ onConfirmReview, reviewType, readOnly }: 
               </Button>
             )}
             {reviewDecision === 'approve' && (
-              <Button color='success' onClick={() => onConfirmReview('reject')}>
+              <Button color='success' onClick={() => onConfirmReview('approve')}>
                 Approve
               </Button>
             )}

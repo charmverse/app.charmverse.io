@@ -1,15 +1,13 @@
-import { log } from '@charmverse/core/log';
 import type { Application } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { approveApplication } from 'lib/applications/actions';
-import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
+import type { ReviewDecision } from 'lib/applications/actions';
+import { reviewApplication } from 'lib/applications/actions';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
-import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
@@ -21,7 +19,7 @@ handler
   .post(reviewUserApplication);
 
 async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<Application>) {
-  const { id: applicationId } = req.query;
+  const { id: applicationId, decision } = req.query as { id: string; decision: ReviewDecision };
   const { id: userId } = req.session.user;
 
   const application = await prisma.application.findUnique({
@@ -71,14 +69,13 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
     }
   });
 
-  const approvedApplication = await approveApplication({
+  const reviewedApplication = await reviewApplication({
     applicationOrApplicationId: applicationId as string,
-    userId
+    userId,
+    decision
   });
 
-  await rollupRewardStatus({ rewardId: approvedApplication.bountyId });
-
-  trackUserAction('bounty_application_accepted', {
+  trackUserAction('bounty_application_rejected', {
     userId,
     spaceId: application.bounty.spaceId,
     rewardAmount: application.bounty.rewardAmount,
@@ -88,7 +85,7 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
     customReward: application.bounty.customReward
   });
 
-  return res.status(200).json(approvedApplication);
+  return res.status(200).json(reviewedApplication);
 }
 
 export default withSessionRoute(handler);
