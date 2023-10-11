@@ -68,7 +68,6 @@ export type CardNotification = NotificationBase & {
   pagePath: string;
   pageTitle: string;
   type: 'person_assigned';
-  text: string;
   personPropertyId: string;
   group: 'card';
 };
