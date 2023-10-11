@@ -8,6 +8,7 @@ import { replaceStep } from 'prosemirror-transform';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 export function recurseDocument(content: PageContent, cb: (node: PageContent) => void) {
@@ -25,20 +26,18 @@ export function recurseDocument(content: PageContent, cb: (node: PageContent) =>
 }
 
 export async function updatePageContentForSync(
-  config: { PAGE_SIZE?: number } = {
+  config: { PAGE_SIZE: number } = {
     PAGE_SIZE: 100
   }
 ) {
   const { PAGE_SIZE } = config;
-  let cursor: string | undefined;
   let completedPages = 0;
   const totalPages = await prisma.page.count({});
+  let skip = 0;
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
+  while (skip < totalPages) {
     const pages = await prisma.page.findMany({
       where: {
-        id: cursor ? { gt: cursor } : undefined,
         content: {
           not: undefined
         }
@@ -50,14 +49,11 @@ export async function updatePageContentForSync(
         content: true
       },
       orderBy: {
-        id: 'asc'
+        createdAt: 'asc'
       },
+      skip,
       take: PAGE_SIZE
     });
-
-    if (pages.length === 0) {
-      break;
-    }
 
     for (const page of pages) {
       const { createdBy, id, version } = page;
@@ -72,6 +68,9 @@ export async function updatePageContentForSync(
             createdAt: true,
             path: true,
             type: true
+          },
+          orderBy: {
+            createdAt: 'asc'
           }
         });
 
@@ -112,27 +111,31 @@ export async function updatePageContentForSync(
         });
 
         doc = applyStepsToNode(linkedPageConversionSteps, doc);
-        const childPagesNotInDocument = childPages.filter((childPage) => !nestedPageIds.has(childPage.id));
-        const nestedPageAppendStep: ProsemirrorJSONStep = {
-          from: doc.content.size,
-          stepType: 'replace',
-          slice: {
-            content: childPagesNotInDocument
-              .sort((page1, page2) => (page1.id > page2.id ? 1 : -1))
-              .map((childPage) => ({
-                type: 'page',
-                attrs: {
-                  id: childPage.id,
-                  path: childPage.path,
-                  type: childPage.type,
-                  track: []
-                }
-              }))
-          },
-          to: doc.content.size
-        };
 
-        doc = applyStepsToNode([nestedPageAppendStep], doc);
+        const childPagesNotInDocument = childPages.filter((childPage) => !nestedPageIds.has(childPage.id));
+        const nestedPageAppendStep: ProsemirrorJSONStep | null =
+          childPagesNotInDocument.length === 0
+            ? null
+            : {
+                from: doc.content.size,
+                stepType: 'replace',
+                slice: {
+                  content: childPagesNotInDocument.map((childPage) => ({
+                    type: 'page',
+                    attrs: {
+                      id: childPage.id,
+                      path: childPage.path,
+                      type: childPage.type,
+                      track: []
+                    }
+                  }))
+                },
+                to: doc.content.size
+              };
+
+        if (nestedPageAppendStep) {
+          doc = applyStepsToNode([nestedPageAppendStep], doc);
+        }
 
         const newContent = doc.toJSON();
 
@@ -149,19 +152,21 @@ export async function updatePageContentForSync(
             pageId: id,
             version
           },
-          {
-            createdBy,
-            data: {
-              rid: 0,
-              type: 'diff',
-              v: version + 1,
-              cid: 0,
-              ds: [nestedPageAppendStep]
-            },
-            pageId: id,
-            version: version + 1
-          }
-        ];
+          nestedPageAppendStep
+            ? {
+                createdBy,
+                data: {
+                  rid: 0,
+                  type: 'diff',
+                  v: version + 1,
+                  cid: 0,
+                  ds: [nestedPageAppendStep]
+                },
+                pageId: id,
+                version: version + 1
+              }
+            : null
+        ].filter(isTruthy);
 
         const finalVersion = version + pageDiffs.length;
 
@@ -186,6 +191,6 @@ export async function updatePageContentForSync(
       }
     }
 
-    cursor = pages[pages.length - 1].id;
+    skip += PAGE_SIZE;
   }
 }

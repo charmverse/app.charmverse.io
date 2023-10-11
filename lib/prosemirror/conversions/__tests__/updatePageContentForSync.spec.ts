@@ -36,6 +36,11 @@ describe('updatePageContentForSync', () => {
         path: linkedPage1.path
       }),
       _.paragraph('Paragraph 3'),
+      _.page({
+        id: linkedPage2.id,
+        type: 'page',
+        path: linkedPage2.path
+      }),
       _.linkedPage({
         id: linkedPage2.id,
         type: 'page',
@@ -69,7 +74,7 @@ describe('updatePageContentForSync', () => {
       parentId: parentPage.id
     });
 
-    await updatePageContentForSync();
+    await updatePageContentForSync({ PAGE_SIZE: 2 });
 
     const updatedParentPage = await prisma.page.findUniqueOrThrow({
       where: {
@@ -110,6 +115,11 @@ describe('updatePageContentForSync', () => {
           path: linkedPage2.path,
           type: linkedPage2.type
         }),
+        _.linkedPage({
+          id: linkedPage2.id,
+          path: linkedPage2.path,
+          type: linkedPage2.type
+        }),
         _.paragraph('Paragraph 4'),
         _.page({
           id: childPage2.id,
@@ -132,8 +142,8 @@ describe('updatePageContentForSync', () => {
           v: 1,
           ds: [
             {
-              to: 28,
               from: 27,
+              to: 28,
               slice: {
                 content: [
                   {
@@ -141,6 +151,24 @@ describe('updatePageContentForSync', () => {
                     attrs: {
                       id: linkedPage1.id,
                       path: linkedPage1.path,
+                      type: 'page',
+                      track: []
+                    }
+                  }
+                ]
+              },
+              stepType: 'replace'
+            },
+            {
+              from: 41,
+              to: 42,
+              slice: {
+                content: [
+                  {
+                    type: 'linkedPage',
+                    attrs: {
+                      id: linkedPage2.id,
+                      path: linkedPage2.path,
                       type: 'page',
                       track: []
                     }
@@ -162,20 +190,18 @@ describe('updatePageContentForSync', () => {
           v: 2,
           ds: [
             {
-              to: 55,
-              from: 55,
+              to: 56,
+              from: 56,
               slice: {
-                content: [childPage2, childPage3]
-                  .sort((page1, page2) => (page1.id > page2.id ? 1 : -1))
-                  .map((childPage) => ({
+                content: [childPage2, childPage3].map((childPage) => ({
+                  type: 'page',
+                  attrs: {
+                    id: childPage.id,
+                    path: childPage.path,
                     type: 'page',
-                    attrs: {
-                      id: childPage.id,
-                      path: childPage.path,
-                      type: 'page',
-                      track: []
-                    }
-                  }))
+                    track: []
+                  }
+                }))
               },
               stepType: 'replace'
             }
