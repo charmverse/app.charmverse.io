@@ -2,7 +2,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { extractMentionFromId, extractMentions } from 'lib/prosemirror/extractMentions';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -156,8 +155,6 @@ export async function createDocumentNotifications(webhookData: {
               content: true
             }
           });
-
-      const contentNodeText = getNodeFromJson(comment.content).toString();
 
       // Send notification only for top-level comments
       if (!comment.parentId) {
