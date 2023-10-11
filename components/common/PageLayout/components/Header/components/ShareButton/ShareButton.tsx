@@ -1,7 +1,7 @@
 import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { memo } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -27,9 +27,10 @@ export function ShareButton({ headerHeight, pageId }: Props) {
             color='secondary'
             variant='text'
             size='small'
-            onClick={() => {
-              popupState.open();
-            }}
+            {...bindTrigger(popupState)}
+            // onClick={() => {
+            //   popupState.open();
+            // }}
           >
             Share
           </Button>
@@ -50,7 +51,7 @@ export function ShareButton({ headerHeight, pageId }: Props) {
           horizontal: 'right',
           vertical: 'bottom'
         }}
-        anchorReference='none'
+        // anchorReference='none'
         transformOrigin={{
           vertical: 'top',
           horizontal: 'center'
