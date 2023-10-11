@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { extractMentions } from 'lib/prosemirror/extractMentions';
+import { extractMentionFromId, extractMentions } from 'lib/prosemirror/extractMentions';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
@@ -30,9 +30,7 @@ export async function createDocumentNotifications(webhookData: {
         }
       });
       const documentContent = document.content as PageContent;
-      const extractedMentions = extractMentions(documentContent);
-      const targetMention = extractedMentions.find((mention) => mention.id === mentionId);
-
+      const targetMention = extractMentionFromId(documentContent, mentionId);
       if (mentionedUserId !== mentionAuthorId && targetMention) {
         await createDocumentNotification({
           type: 'mention.created',

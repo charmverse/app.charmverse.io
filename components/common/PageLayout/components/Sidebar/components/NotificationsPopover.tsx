@@ -17,7 +17,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
-import { InlineCharmEditor } from 'components/common/CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
+import { CharmEditor } from 'components/common/CharmEditor';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -399,16 +399,6 @@ export function NotificationsPopover({
   );
 }
 
-const ContextBorder = styled.div`
-  width: 3px;
-  border-radius: 3px;
-  margin-left: 2px;
-  margin-right: 8px;
-  background: rgba(255, 212, 0, 0.8);
-  flex-shrink: 0;
-  padding-bottom: 2px;
-`;
-
 export function NotificationContent({
   notification,
   markNotifications,
@@ -428,7 +418,6 @@ export function NotificationContent({
   const todaysDate = new Date();
   const isDateEqual = date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
   const notificationDate = isDateEqual ? `Today at ${formatTime(createdAt)}` : formatDate(createdAt);
-
   const isSmallScreen = useSmallScreen();
 
   return (
@@ -531,20 +520,17 @@ export function NotificationContent({
               {spaceName}
             </Typography>
             {notificationContent && (
-              <Box my={1} display='flex'>
-                <ContextBorder />
-                <Typography
-                  sx={{
-                    wordBreak: 'break-all',
-                    textAlign: 'justify'
-                  }}
-                  fontSize={14}
-                  fontWeight={600}
-                  color='secondary'
-                >
-                  <InlineCharmEditor readOnly content={notificationContent} noPadding />
-                </Typography>
-              </Box>
+              <CharmEditor
+                isContentControlled
+                disableRowHandles
+                content={notificationContent}
+                readOnly
+                style={{
+                  left: 0,
+                  padding: 0,
+                  fontSize: '14px'
+                }}
+              />
             )}
             {archived && (
               <Button
