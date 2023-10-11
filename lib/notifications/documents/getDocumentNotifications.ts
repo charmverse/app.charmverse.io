@@ -1,4 +1,3 @@
-import type { Page, Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { extractMentions } from 'lib/prosemirror/extractMentions';
@@ -28,6 +27,8 @@ export async function getDocumentNotifications(userId: string): Promise<Document
           title: true
         }
       },
+      inlineCommentId: true,
+      mentionId: true,
       post: {
         select: {
           id: true,
@@ -52,7 +53,14 @@ export async function getDocumentNotifications(userId: string): Promise<Document
         }
       },
       notificationMetadata: {
-        select: notificationMetadataSelectStatement
+        select: {
+          ...notificationMetadataSelectStatement,
+          user: {
+            select: {
+              username: true
+            }
+          }
+        }
       }
     }
   });
@@ -67,12 +75,10 @@ export async function getDocumentNotifications(userId: string): Promise<Document
         title: string;
         content: PageContent;
       };
-      const inlineCommentId = 'inlineCommentId' in notification ? notification.inlineCommentId : null;
-      const mentionId = 'mentionId' in notification ? notification.mentionId : null;
       const documentNotification = {
         id: notification.id,
-        inlineCommentId,
-        mentionId,
+        inlineCommentId: notification.inlineCommentId,
+        mentionId: notification.mentionId,
         createdAt: notificationMetadata.createdAt.toISOString(),
         createdBy: notificationMetadata.author,
         pageId: page.id,
@@ -84,8 +90,9 @@ export async function getDocumentNotifications(userId: string): Promise<Document
         pageType: page.type,
         text: notification.inlineComment?.content
           ? getNodeFromJson(notification.inlineComment.content).textContent
-          : mentionId
-          ? extractMentions(page.content).find((mention) => mention.id === mentionId)?.text || ''
+          : notification.mentionId
+          ? extractMentions(page.content).find((mention) => mention.id === notification.mentionId)?.text ||
+            `@${notificationMetadata.user.username}`
           : notification.pageComment?.contentText || notification.postComment?.contentText || '',
         type: notification.type,
         archived: !!notificationMetadata.archivedAt,
