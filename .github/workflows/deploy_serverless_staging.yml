@@ -56,7 +56,7 @@ jobs:
                     echo "$secret_name or $secret_json_key not found."
                     secret_value="SECRET_NOT_FOUND"
                 }
-                echo "$env_var_name=\"$secret_value\"" >> serverless/.env
+                echo "$env_var_name=\"$secret_value\"" >> .env
             fi
           done
       - name: serverless deploy ${{ matrix.function_name }}
