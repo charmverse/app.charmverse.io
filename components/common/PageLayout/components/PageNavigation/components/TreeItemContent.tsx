@@ -7,6 +7,8 @@ import { alpha } from '@mui/material/styles';
 import clsx from 'clsx';
 import { forwardRef, useCallback, memo, useEffect, useMemo } from 'react';
 
+// Styles were copied from https://github.com/mui/mui-x/blob/803b14e6908c597f61d3a93618ae5bfa4f94b55f/packages/x-tree-view/src/TreeItem/TreeItem.tsx#L51
+// We needed to override so we could completely remove the :hover CSS for iOS
 const StyledTreeItemContent = styled.div(({ theme }) => ({
   padding: '0 8px',
   width: '100%',
@@ -66,6 +68,7 @@ const StyledTreeItemContent = styled.div(({ theme }) => ({
     // ...theme.typography.body1
   }
 }));
+
 const TreeItemContent = forwardRef<HTMLDivElement, TreeItemContentProps>((props, ref) => {
   const {
     classes,
