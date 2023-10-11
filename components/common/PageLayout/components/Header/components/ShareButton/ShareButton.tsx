@@ -13,7 +13,7 @@ type Props = {
   pageId: string;
 };
 
-function ShareButton({ headerHeight, pageId }: Props) {
+export function ShareButton({ headerHeight, pageId }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
 
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -68,5 +68,3 @@ function ShareButton({ headerHeight, pageId }: Props) {
     </>
   );
 }
-
-export default memo(ShareButton);

@@ -5,7 +5,6 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
@@ -18,17 +17,17 @@ import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
+import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
 
 interface Props {
   pageId?: string;
   onClose: () => void;
   readOnly?: boolean;
-  toolbar?: ReactNode;
   hideToolsMenu?: boolean;
 }
 
 export function PageDialog(props: Props) {
-  const { hideToolsMenu = false, pageId, toolbar, readOnly } = props;
+  const { hideToolsMenu = false, pageId, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
@@ -108,10 +107,15 @@ export function PageDialog(props: Props) {
             onClick={close}
             variant='text'
             startIcon={<OpenInFullIcon fontSize='small' />}
+            sx={{ px: 1.5 }}
           >
             Open as Page
           </Button>
-          {toolbar}
+          {page && (
+            <Box display='flex' alignItems='center'>
+              <DocumentHeaderElements headerHeight={0} page={page} />
+            </Box>
+          )}
         </Box>
       }
       onClose={close}
