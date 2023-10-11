@@ -91,31 +91,20 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
       '&.Mui-expanded': {
         fontWeight: theme.typography.fontWeightRegular
       },
-      '&:hover': {
-        backgroundColor: 'blue',
-        // Reset on touch devices, it doesn't add specificity
-        '@media (hover: none)': {
-          backgroundColor: 'transparent'
-        }
+      ...(isTouch ? { '&:hover': false } : {}),
+      '&.Mui-selected:hover': {
+        backgroundColor: theme.palette.action.hover
       },
-      '&.Mui-selected:hover': null,
-      // ...(isTouch
-      //   ? {
-      //       '&.Mui-selected:hover': {
-      //         backgroundColor: theme.palette.action.hover
-      //       },
-      //       '&.Mui-selected:hover::after': {
-      //         content: '""',
-      //         left: 0,
-      //         top: 0,
-      //         position: 'absolute',
-      //         width: '100%',
-      //         height: '100%',
-      //         backgroundColor: theme.palette.action.hover,
-      //         pointerEvents: 'none'
-      //       }
-      //     }
-      //   : {}),
+      '&.Mui-selected:hover::after': {
+        content: '""',
+        left: 0,
+        top: 0,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: theme.palette.action.hover,
+        pointerEvents: 'none'
+      },
       '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
         backgroundColor: theme.palette.action.selected,
         color: theme.palette.text.primary,
