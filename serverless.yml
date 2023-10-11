@@ -20,6 +20,7 @@ plugins:
 
 custom:
   esbuild:
+    external: ["canvas"]
     watch:
       pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
   scriptHooks:
