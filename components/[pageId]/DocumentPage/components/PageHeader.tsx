@@ -97,6 +97,44 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
   );
 }
 
+function PageControls({
+  headerImage,
+  setPage,
+  icon,
+  readOnly,
+  addPageHeader,
+  endAdornmentComponent
+}: {
+  endAdornmentComponent?: React.ReactNode;
+  headerImage: string | null;
+  setPage: (p: PageHeaderValues) => void;
+  icon?: string | null;
+  readOnly: boolean;
+  addPageHeader: ListItemButtonProps['onClick'];
+}) {
+  function addPageIcon() {
+    const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
+    setPage({ icon: _icon });
+  }
+  return (
+    <Controls className='page-controls'>
+      {!readOnly && !icon && (
+        <PageControlItem onClick={addPageIcon}>
+          <EmojiEmotionsOutlinedIcon fontSize='small' sx={{ marginRight: 1 }} />
+          Add icon
+        </PageControlItem>
+      )}
+      {!readOnly && !headerImage && (
+        <PageControlItem onClick={addPageHeader}>
+          <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
+          Add cover
+        </PageControlItem>
+      )}
+      {endAdornmentComponent}
+    </Controls>
+  );
+}
+
 export function PageHeaderControls({
   headerImage,
   setPage,
@@ -125,36 +163,22 @@ export function PageHeaderControls({
     event.stopPropagation();
   }, []);
 
-  function addPageIcon() {
-    const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
-    setPage({ icon: _icon });
-  }
-
   function closeMenu() {
     setAnchorEl(null);
   }
 
-  const controls = (
-    <Controls className='page-controls'>
-      {!readOnly && !icon && (
-        <PageControlItem onClick={addPageIcon}>
-          <EmojiEmotionsOutlinedIcon fontSize='small' sx={{ marginRight: 1 }} />
-          Add icon
-        </PageControlItem>
-      )}
-      {!readOnly && !headerImage && (
-        <PageControlItem onClick={addPageHeader}>
-          <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
-          Add cover
-        </PageControlItem>
-      )}
-      {endAdornmentComponent}
-    </Controls>
-  );
-
   return (
     <EditorHeader className='font-family-default' pageType={pageType}>
-      {controlsPosition === 'top' ? controls : null}
+      {controlsPosition === 'top' ? (
+        <PageControls
+          addPageHeader={addPageHeader}
+          headerImage={headerImage}
+          readOnly={readOnly}
+          setPage={setPage}
+          endAdornmentComponent={endAdornmentComponent}
+          icon={icon}
+        />
+      ) : null}
       {icon && (
         <div>
           <EmojiIcon size='large' icon={icon} onClick={showMenu} />
@@ -214,7 +238,16 @@ export function PageHeaderControls({
           )}
         </div>
       )}
-      {controlsPosition === 'bottom' ? controls : null}
+      {controlsPosition === 'bottom' ? (
+        <PageControls
+          addPageHeader={addPageHeader}
+          headerImage={headerImage}
+          readOnly={readOnly}
+          setPage={setPage}
+          endAdornmentComponent={endAdornmentComponent}
+          icon={icon}
+        />
+      ) : null}
       {subMenuAnchorEl && (
         <Menu
           anchorEl={subMenuAnchorEl}
