@@ -6,7 +6,7 @@
 // import type { RewardWithUsers, ListRewardsRequest } from '@charmverse/core/rewards';
 
 // import type { PageWithReward } from 'lib/pages';
-import type { ApplicationComment, PageComment } from '@charmverse/core/prisma-client';
+import type { Application, ApplicationComment, PageComment } from '@charmverse/core/prisma-client';
 import { ex } from '@fullcalendar/core/internal-common';
 
 import type { ApplicationWithReward } from 'lib/applications/interfaces';
@@ -77,6 +77,10 @@ export function useGetApplicationComments({ applicationId }: { applicationId?: s
 
 export function useGetReward({ rewardId }: { rewardId?: string }) {
   return useGET<RewardWithUsersAndPageMeta>(rewardId ? `/api/rewards/${rewardId}` : null);
+}
+
+export function useGetRewardApplications({ rewardId }: { rewardId?: string }) {
+  return useGET<Application[]>(rewardId ? `/api/rewards/${rewardId}/applications` : null);
 }
 
 export function useGetRewards({ spaceId }: { spaceId?: string }) {

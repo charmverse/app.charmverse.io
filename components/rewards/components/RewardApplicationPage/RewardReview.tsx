@@ -21,6 +21,7 @@ export default function RewardReview({ onConfirmReview, reviewType, readOnly }: 
   function cancel() {
     setReviewDecision(null);
   }
+
   return (
     <Box my={1} gap={1}>
       <Grid item display='flex' gap={1}>

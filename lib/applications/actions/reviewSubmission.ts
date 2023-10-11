@@ -26,8 +26,8 @@ export async function reviewSubmission({ submissionId, decision, userId }: Submi
     throw new UndesirableOperationError('You cannot review your own submission');
   }
 
-  if (submission.status !== 'review' && decision === 'approve') {
-    throw new WrongStateError('Submissions must be in review for you to approve them');
+  if (submission.status !== 'inProgress' && submission.status !== 'review') {
+    throw new WrongStateError('Submissions must be in progress or in review for you to approve or reject them');
   }
 
   const correspondingSubmissionStatus = submissionStatusAfterDecision[decision];

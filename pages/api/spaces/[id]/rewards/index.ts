@@ -6,7 +6,6 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
 import { rewardWithUsersInclude } from 'lib/rewards/getReward';

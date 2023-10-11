@@ -1,7 +1,4 @@
 import type { Application, ApplicationStatus } from '@charmverse/core/prisma-client';
-
-import type { ApplicationMeta } from './interfaces';
-
 /**
  * When applications have a submission limit, we only want to count against this if it has become a completed submission
  * This allows us to have a limit of 3, but have 10 people racing to make a submission

@@ -1,7 +1,9 @@
+import type { Bounty as Reward } from '@charmverse/core/prisma-client';
 import { Box, Tooltip } from '@mui/material';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useBounties } from 'hooks/useBounties';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';
@@ -9,35 +11,35 @@ import type { BountyWithDetails } from 'lib/bounties';
 import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
 
-import { BountyPaymentButton } from './BountyPaymentButton';
+import { RewardPaymentButton } from './RewardPaymentButton';
 
 interface Props {
-  bounty: BountyWithDetails;
+  reward: Reward;
   submission: ApplicationWithTransactions;
   isExpanded: boolean;
   expandRow: () => void;
-  refreshSubmissions: () => void;
+  refreshApplication: () => void;
 }
 
 export default function BountyApplicantActions({
-  refreshSubmissions,
-  bounty,
+  reward,
   isExpanded,
   submission,
-  expandRow
+  expandRow,
+  refreshApplication
 }: Props) {
-  const { refreshBounty } = useBounties();
+  const { refreshReward } = useRewards();
   const { showMessage } = useSnackbar();
 
   async function recordTransaction(transactionId: string, chainId: number) {
     try {
-      await charmClient.bounties.recordTransaction({
+      await charmClient.rewards.recordTransaction({
         applicationId: submission.id,
         chainId: chainId.toString(),
         transactionId
       });
-      await charmClient.bounties.markSubmissionAsPaid(submission.id);
-      await refreshBounty(bounty.id);
+      await charmClient.rewards.markSubmissionAsPaid(submission.id);
+      refreshReward(reward.id);
     } catch (err: any) {
       showMessage(err.message || err, 'error');
     }
@@ -45,8 +47,8 @@ export default function BountyApplicantActions({
 
   async function markSubmissionAsPaid() {
     await charmClient.bounties.markSubmissionAsPaid(submission.id);
-    await refreshBounty(bounty.id);
-    await refreshSubmissions();
+    refreshReward(reward.id);
+    refreshApplication();
   }
 
   return (
@@ -64,19 +66,19 @@ export default function BountyApplicantActions({
       )}
 
       {submission.status === 'complete' &&
-        isTruthy(bounty.rewardAmount) &&
-        isTruthy(bounty.rewardToken) &&
-        isTruthy(bounty.chainId) && (
+        isTruthy(reward.rewardAmount) &&
+        isTruthy(reward.rewardToken) &&
+        isTruthy(reward.chainId) && (
           <Box>
             {submission.walletAddress ? (
-              <BountyPaymentButton
+              <RewardPaymentButton
                 onSuccess={recordTransaction}
                 onError={(errorMessage, level) => showMessage(errorMessage, level || 'error')}
                 receiver={submission.walletAddress}
-                amount={eToNumber(bounty.rewardAmount)}
-                tokenSymbolOrAddress={bounty.rewardToken}
-                chainIdToUse={bounty.chainId}
-                bounty={bounty}
+                amount={eToNumber(reward.rewardAmount)}
+                tokenSymbolOrAddress={reward.rewardToken}
+                chainIdToUse={reward.chainId}
+                reward={reward}
               />
             ) : (
               <Tooltip title='Applicant must provide a wallet address'>
@@ -88,7 +90,7 @@ export default function BountyApplicantActions({
           </Box>
         )}
 
-      {submission.status === 'complete' && isTruthy(bounty.customReward) && (
+      {submission.status === 'complete' && isTruthy(reward.customReward) && (
         <Button color='primary' size='small' onClick={markSubmissionAsPaid}>
           Mark paid
         </Button>

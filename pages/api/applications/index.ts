@@ -1,4 +1,4 @@
-import type { Application } from '@charmverse/core/prisma';
+import type { Application, ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -50,7 +50,9 @@ async function getApplications(req: NextApiRequest, res: NextApiResponse<Applica
 
   const applicationsOrSubmissions = await prisma.application.findMany({
     where: {
-      bountyId: resourceId
+      bountyId: resourceId,
+      // Optional breakdown by status
+      status: req.query.status as ApplicationStatus | undefined
     },
     include: {
       transactions: true

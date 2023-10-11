@@ -1,7 +1,7 @@
 import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Divider, Menu, MenuItem } from '@mui/material';
+import { Divider, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import ERC20ABI from 'abis/ERC20.json';
@@ -13,6 +13,7 @@ import useSWR from 'swr';
 import { parseEther, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
+import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -20,8 +21,8 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import type { BountyWithDetails } from 'lib/bounties';
 import { getSafesForAddress } from 'lib/gnosis';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { shortenHex } from 'lib/utilities/blockchain';
 
@@ -32,23 +33,23 @@ interface Props {
   chainIdToUse: number;
   onSuccess?: (txId: string, chainId: number) => void;
   onError?: (err: string, severity?: AlertColor) => void;
-  bounty: BountyWithDetails;
+  reward: RewardWithUsers;
 }
 
 function SafeMenuItem({
   label,
   safeInfo,
-  bounty,
+  reward,
   onClick,
   onError = () => {}
 }: {
   safeInfo: UserGnosisSafe;
   label: string;
-  bounty: BountyWithDetails;
+  reward: RewardWithUsers;
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
 }) {
-  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ bounties: [bounty] });
+  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ rewards: [reward] });
 
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
@@ -75,9 +76,9 @@ function SafeMenuItem({
   );
 }
 
-export function BountyPaymentButton({
+export function RewardPaymentButton({
   receiver,
-  bounty,
+  reward,
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
@@ -125,7 +126,6 @@ export function BountyPaymentButton({
     }
 
     const currentUserChain = chainId ? getChainById(chainId) : undefined;
-
     if (!currentUserChain || !signer) {
       onError(
         'Could not detect your chain. Please make sure you are connected to a supported network and your wallet is unlocked.'
@@ -141,7 +141,8 @@ export function BountyPaymentButton({
       if (chainToUse.nativeCurrency.symbol === tokenSymbolOrAddress) {
         const tx = await signer.sendTransaction({
           to: receiver,
-          value: parseEther(amount)
+          value: parseEther(amount),
+          chainId
         });
 
         onSuccess(tx.hash, chainToUse.chainId);
@@ -192,6 +193,16 @@ export function BountyPaymentButton({
 
   const hasSafes = Boolean(safeInfos?.length);
 
+  if (!account || !chainId || !signer) {
+    return (
+      <div>
+        <Tooltip title='Your wallet must be unlocked to pay for this reward'>
+          <OpenWalletSelectorButton label='Unlock Wallet' />
+        </Tooltip>
+      </div>
+    );
+  }
+
   return (
     <>
       <Button
@@ -231,7 +242,7 @@ export function BountyPaymentButton({
             .map((safeInfo) => (
               <SafeMenuItem
                 key={safeInfo.address}
-                bounty={bounty}
+                reward={reward}
                 label={safeDataRecord[safeInfo.address]?.name || shortenHex(safeInfo.address)}
                 onClick={() => {
                   handleClose();

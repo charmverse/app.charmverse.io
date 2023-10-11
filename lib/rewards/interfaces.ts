@@ -3,7 +3,10 @@ import type { Bounty, User, Application, BountyStatus, Page } from '@charmverse/
 
 export type RewardReviewer = TargetPermissionGroup<'role' | 'user'>;
 
-export type ApplicationMeta = Pick<Application, 'status' | 'id' | 'createdBy' | 'createdAt' | 'updatedAt'>;
+export type ApplicationMeta = Pick<
+  Application,
+  'status' | 'id' | 'createdBy' | 'createdAt' | 'updatedAt' | 'walletAddress'
+>;
 
 export type RewardStatus = BountyStatus;
 

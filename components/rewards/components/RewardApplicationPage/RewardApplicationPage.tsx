@@ -14,8 +14,11 @@ import { RewardProperties } from 'components/rewards/components/RewardProperties
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+import { RewardPaymentButton } from '../RewardProperties/components/RewardApplicantsTable/RewardPaymentButton';
 
 import { ApplicationComments } from './ApplicationComments';
 import ApplicationInput from './RewardApplicationInput';
@@ -44,6 +47,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
 
   const { members } = useMembers();
   const { user } = useUser();
+  const { showMessage } = useSnackbar();
 
   const [showProperties, setShowProperties] = useState(false);
 
@@ -123,6 +127,17 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
               onConfirmReview={(decision) => reviewSubmission({ decision })}
               reviewType='submission'
               readOnly={!applicationRewardPermissions?.review}
+            />
+          )}
+          {application.status === 'complete' && reward.rewardAmount && (
+            <RewardPaymentButton
+              amount={String(reward.rewardAmount)}
+              chainIdToUse={reward.chainId as number}
+              receiver={application.walletAddress as string}
+              reward={reward}
+              tokenSymbolOrAddress={reward.rewardToken as string}
+              onSuccess={() => refreshApplication()}
+              onError={(message) => showMessage(message, 'warning')}
             />
           )}
         </Grid>

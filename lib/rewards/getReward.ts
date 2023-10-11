@@ -14,7 +14,8 @@ export function rewardWithUsersInclude() {
         createdBy: true,
         status: true,
         createdAt: true,
-        updatedAt: true
+        updatedAt: true,
+        walletAddress: true
       }
     },
     permissions: {

@@ -15,34 +15,20 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys(['decision']))
+  .use(requireKeys(['decision'], 'body'))
   .post(reviewUserApplication);
 
 async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<Application>) {
-  const { id: applicationId, decision } = req.query as { id: string; decision: ReviewDecision };
+  const { id: applicationId } = req.query as { id: string; decision: ReviewDecision };
   const { id: userId } = req.session.user;
 
-  const application = await prisma.application.findUnique({
+  const application = await prisma.application.findUniqueOrThrow({
     where: {
       id: applicationId as string
     },
     select: {
       id: true,
-      bountyId: true,
-      bounty: {
-        select: {
-          page: {
-            select: {
-              id: true
-            }
-          },
-          spaceId: true,
-          id: true,
-          customReward: true,
-          rewardAmount: true,
-          rewardToken: true
-        }
-      }
+      bountyId: true
     }
   });
 
@@ -60,29 +46,33 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
     throw new UnauthorisedActionError('You do not have the permission to approve applications for this bounty');
   }
 
-  await prisma.application.update({
-    where: {
-      id: application.id
-    },
-    data: {
-      status: req.body.decision === true ? 'inProgress' : 'rejected'
-    }
-  });
-
   const reviewedApplication = await reviewApplication({
     applicationOrApplicationId: applicationId as string,
     userId,
-    decision
+    decision: req.body.decision
+  });
+
+  const rewardData = await prisma.bounty.findUniqueOrThrow({
+    where: {
+      id: application.bountyId
+    },
+    select: {
+      spaceId: true,
+      id: true,
+      customReward: true,
+      rewardAmount: true,
+      rewardToken: true
+    }
   });
 
   trackUserAction('bounty_application_rejected', {
     userId,
-    spaceId: application.bounty.spaceId,
-    rewardAmount: application.bounty.rewardAmount,
-    pageId: application.bounty?.page?.id || '',
-    rewardToken: application.bounty.rewardToken,
-    resourceId: application.bountyId,
-    customReward: application.bounty.customReward
+    spaceId: rewardData.spaceId,
+    rewardAmount: rewardData.rewardAmount,
+    pageId: rewardData.id || '',
+    rewardToken: rewardData.rewardToken,
+    resourceId: rewardData.id,
+    customReward: rewardData.customReward
   });
 
   return res.status(200).json(reviewedApplication);
