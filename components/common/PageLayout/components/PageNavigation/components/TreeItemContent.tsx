@@ -49,10 +49,10 @@ const TreeItemContent = forwardRef<HTMLDivElement, TreeItemContentProps>((props,
   const newClassName = useMemo(
     () =>
       clsx(className, classes.root, {
-        // [classes.expanded]: expanded,
-        // [classes.selected]: selected,
-        // [classes.focused]: focused,
-        // [classes.disabled]: disabled
+        [classes.expanded]: expanded,
+        [classes.selected]: selected,
+        [classes.focused]: focused,
+        [classes.disabled]: disabled
       }),
     [className, expanded, selected, focused, disabled]
   );

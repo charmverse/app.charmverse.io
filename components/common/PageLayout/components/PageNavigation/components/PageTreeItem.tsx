@@ -71,14 +71,6 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
       marginLeft: 0,
       marginRight: 0
     },
-    // '&:hover': null,
-    // '&:hover': {
-    //   backgroundColor: theme.palette.action.hover,
-    //   // Reset on touch devices, it doesn't add specificity
-    //   '@media (hover: none)': {
-    //     backgroundColor: 'transparent'
-    //   }
-    // },
 
     [`& .${treeItemClasses.content}`]: {
       color: theme.palette.text.secondary,
