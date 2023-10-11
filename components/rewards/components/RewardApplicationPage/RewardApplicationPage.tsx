@@ -1,6 +1,6 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import { Collapse, FormLabel, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { KeyboardArrowDown } from '@mui/icons-material';
+import { Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
@@ -12,7 +12,6 @@ import UserDisplay from 'components/common/UserDisplay';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 
 import { ApplicationComments } from './ApplicationComments';
@@ -30,7 +29,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   });
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
   const { members } = useMembers();
-  const { pages } = usePages();
   const { user } = useUser();
 
   const [showProperties, setShowProperties] = useState(false);
@@ -53,27 +51,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
       <Grid container px='10%' gap={2}>
         <Grid item xs={12} display='flex' justifyContent='space-between'>
           <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
-        </Grid>
-        <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box display='flex' gap={2}>
-            <h3>Applicant</h3>
-            <UserDisplay user={submitter} showMiniProfile />
-          </Box>
-
-          {application.status === 'applied' && (
-            <RewardReview
-              onConfirmReview={() => null}
-              reviewType='application'
-              readOnly={!applicationRewardPermissions?.approve_applications}
-            />
-          )}
-          {(application.status === 'review' || application.status === 'inProgress') && (
-            <RewardReview
-              onConfirmReview={() => null}
-              reviewType='submission'
-              readOnly={!applicationRewardPermissions?.review}
-            />
-          )}
         </Grid>
 
         <Grid item xs={12} className='focalboard-body' flexDirection='column'>
@@ -101,6 +78,28 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
               refreshRewardPermissions={() => {}}
             />
           </Collapse>
+        </Grid>
+
+        <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box display='flex' gap={2}>
+            <h3>Applicant</h3>
+            <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
+          </Box>
+
+          {application.status === 'applied' && (
+            <RewardReview
+              onConfirmReview={() => null}
+              reviewType='application'
+              readOnly={!applicationRewardPermissions?.approve_applications}
+            />
+          )}
+          {(application.status === 'review' || application.status === 'inProgress') && (
+            <RewardReview
+              onConfirmReview={() => null}
+              reviewType='submission'
+              readOnly={!applicationRewardPermissions?.review}
+            />
+          )}
         </Grid>
 
         {application.reward.approveSubmitters && application.status === 'applied' && (

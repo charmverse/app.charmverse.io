@@ -120,7 +120,7 @@ export function ApplicationComments({
   return (
     <Stack>
       <Stack>
-        {applicationComments.length !== 0 && <FormLabel sx={{ fontWeight: 'bold', my: 1 }}>Messages</FormLabel>}
+        {applicationComments.length !== 0 && <FormLabel sx={{ fontWeight: 'bold', my: 1 }}>Discussion</FormLabel>}
         {isLoading ? (
           <Box height={100}>
             <LoadingComponent size={24} isLoading label='Fetching comments' />
