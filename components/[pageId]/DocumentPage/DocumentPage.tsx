@@ -37,6 +37,7 @@ import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
+import { AlertContainer } from './components/AlertContainer';
 import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
@@ -69,18 +70,6 @@ const ScrollContainer = styled.div<{ showPageActionSidebar: boolean }>(
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
     height: ${showPageActionSidebar ? 'calc(100vh - 65px)' : '100%'};
     overflow: ${showPageActionSidebar ? 'auto' : 'inherit'};
-  }
-`
-);
-
-const StyledBannerContainer = styled.div<{ showPageActionSidebar: boolean }>(
-  ({ showPageActionSidebar, theme }) => `
-  transition: width ease-in 0.25s;
-  ${theme.breakpoints.up('lg')} {
-    width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
-    position: sticky;
-    top: 0;
-    z-index: var(--z-index-pageBar);
   }
 `
 );
@@ -213,19 +202,23 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   return (
     <>
       {!!page?.deletedAt && (
-        <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
+        <AlertContainer showPageActionSidebar={showPageActionSidebar}>
           <PageDeleteBanner pageType={page.type} pageId={page.id} />
-        </StyledBannerContainer>
+        </AlertContainer>
       )}
       {connectionError && (
-        <StyledBannerContainer showPageActionSidebar={showPageActionSidebar}>
+        <AlertContainer showPageActionSidebar={showPageActionSidebar}>
           <PageConnectionBanner />
-        </StyledBannerContainer>
+        </AlertContainer>
       )}
-      {page?.convertedProposalId && <ProposalBanner type='page' proposalId={page.convertedProposalId} />}
+      {page?.convertedProposalId && (
+        <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <ProposalBanner type='page' proposalId={page.convertedProposalId} />
+        </AlertContainer>
+      )}
       <div ref={printRef} className={`document-print-container ${fontClassName}`}>
         <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
-          <Box display='flex' ref={containerRef}>
+          <Box display='flex' flexDirection='column' ref={containerRef}>
             <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
             {/* temporary? disable editing of page meta data when in suggestion mode */}
             {page.headerImage && (
