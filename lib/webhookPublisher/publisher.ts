@@ -66,7 +66,14 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
     }
 
     // Add the message to the queue
-    await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+    if (event.scope === 'document.mention.created') {
+      setTimeout(() => {
+        addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+      }, 15000);
+    } else {
+      await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+    }
+
     log.debug(`Sent webhook event to SQS: "${event.scope}"`, {
       spaceId,
       queueUrl: SQS_QUEUE_NAME,

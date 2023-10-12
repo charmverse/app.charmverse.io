@@ -17,6 +17,7 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -411,12 +412,12 @@ export function NotificationContent({
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
+  const notificationContent = notification.group === 'document' ? notification.content : null;
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
   const todaysDate = new Date();
   const isDateEqual = date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
   const notificationDate = isDateEqual ? `Today at ${formatTime(createdAt)}` : formatDate(createdAt);
-
   const isSmallScreen = useSmallScreen();
 
   return (
@@ -518,6 +519,19 @@ export function NotificationContent({
             <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
               {spaceName}
             </Typography>
+            {notificationContent && (
+              <CharmEditor
+                isContentControlled
+                disableRowHandles
+                content={notificationContent}
+                readOnly
+                style={{
+                  left: 0,
+                  padding: 0,
+                  fontSize: '14px'
+                }}
+              />
+            )}
             {archived && (
               <Button
                 sx={{

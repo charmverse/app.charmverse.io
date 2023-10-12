@@ -77,7 +77,6 @@ export async function createProposalNotifications(
           domain: true,
           name: true,
           paidTier: true,
-          notifyNewProposals: true,
           notificationToggles: true
         }
       });

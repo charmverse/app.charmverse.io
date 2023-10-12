@@ -1,4 +1,4 @@
-import { Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
@@ -136,7 +136,9 @@ export function ProposalInEvaluation() {
   return (
     <Context>
       <Paper>
-        <DocumentPage page={page} refreshPage={async () => {}} readOnly={true} savePage={() => {}} />
+        <Box sx={{ overflowY: 'auto' }}>
+          <DocumentPage page={page} refreshPage={async () => {}} readOnly={true} savePage={() => {}} />
+        </Box>
       </Paper>
     </Context>
   );

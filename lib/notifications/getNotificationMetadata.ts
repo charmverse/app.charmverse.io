@@ -90,7 +90,7 @@ function getCardContent(n: CardNotification) {
   const { createdBy, type } = n;
   switch (type) {
     case 'person_assigned': {
-      return createdBy?.username ? `${createdBy?.username} assigned you to a card` : `You were assigned to a card`;
+      return createdBy.username ? `${createdBy.username} assigned you to a card` : `You were assigned to a card`;
     }
 
     default: {

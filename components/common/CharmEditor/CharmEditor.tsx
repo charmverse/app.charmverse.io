@@ -122,8 +122,11 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
     padding: ${({ theme }) => theme.spacing(2)};
   }
 
-  .charm-link:hover {
-    cursor: pointer;
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    .charm-link:hover {
+      cursor: pointer;
+    }
   }
 
   hr {

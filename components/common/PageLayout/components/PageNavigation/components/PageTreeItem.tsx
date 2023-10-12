@@ -24,7 +24,6 @@ import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
-import TreeItemContent from 'components/common/TreeItemContent';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
@@ -36,6 +35,10 @@ import AddNewCard from '../../AddNewCard';
 import NewPageMenu, { StyledIconButton } from '../../NewPageMenu';
 import { PageIcon } from '../../PageIcon';
 import PageTitle from '../../PageTitle';
+
+import TreeItemContent from './TreeItemContent';
+
+// disable hover UX on ios which converts first click to a hover event
 
 interface PageTreeItemProps {
   addSubPage: (page: Partial<Page>) => void;
@@ -70,8 +73,6 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
     marginBottom: 1,
-    // paddingRight: theme.spacing(1),
-    // fontWeight: theme.typography.fontWeightMedium,
     '.MuiTypography-root': {
       fontWeight: 500
     },
@@ -207,7 +208,7 @@ interface PageLinkProps {
 }
 
 export function PageLink({
-  showPicker = !isTouchScreen(),
+  showPicker = true,
   children,
   href,
   isEmptyContent,
@@ -295,14 +296,15 @@ function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) 
   );
 }
 
-const TreeItemComponent = React.forwardRef<React.Ref<HTMLDivElement>, TreeItemContentProps & { isAdjacent?: boolean }>(
-  ({ isAdjacent, ...props }, ref) => (
-    <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
-      <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
-      {isAdjacent && <AdjacentDropZone />}
-    </div>
-  )
-);
+const TreeItemComponent = React.forwardRef<
+  React.Ref<HTMLDivElement>,
+  TreeItemContentProps & { isAdjacent?: boolean; hasSelectedChildView?: boolean }
+>(({ isAdjacent, ...props }, ref) => (
+  <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
+    <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
+    {isAdjacent && <AdjacentDropZone />}
+  </div>
+));
 
 // eslint-disable-next-line react/function-component-definition
 const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
@@ -334,11 +336,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
     setAnchorEl(null);
   }
 
-  const ContentProps = useMemo(
-    () => ({ isAdjacent, className: hasSelectedChildView ? 'Mui-selected' : undefined }),
-    [isAdjacent, hasSelectedChildView]
-  );
-
+  const ContentProps = useMemo(() => ({ isAdjacent, hasSelectedChildView }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
   const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
   const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
@@ -380,6 +378,7 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         nodeId={pageId}
         // @ts-ignore
         ContentComponent={TreeItemComponent}
+        // @ts-ignore
         ContentProps={ContentProps}
         TransitionProps={TransitionProps}
         ref={ref}

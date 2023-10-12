@@ -1,4 +1,4 @@
-import type { SxProps } from '@mui/material';
+import type { BoxProps, SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -44,24 +44,32 @@ type MultiTabsProps = {
   activeTab?: number;
   setActiveTab?: (tabIndex: number) => void;
   endAdornmentComponent?: React.ReactNode;
-};
+} & BoxProps;
 
 export default function MultiTabs(props: MultiTabsProps) {
   const [value, setValue] = React.useState<any>(0);
-  const { tabs, disabled = false, tabPanelSx = {} } = props;
+  const {
+    tabs,
+    disabled = false,
+    tabPanelSx = {},
+    activeTab,
+    endAdornmentComponent,
+    setActiveTab,
+    ...boxProps
+  } = props;
   const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
     setValue(newValue);
-    props.setActiveTab?.(newValue);
+    setActiveTab?.(newValue);
   };
 
   useEffect(() => {
-    if (typeof props.activeTab !== 'undefined') {
-      setValue(props.activeTab);
+    if (typeof activeTab !== 'undefined') {
+      setValue(activeTab);
     }
-  }, [props.activeTab]);
+  }, [activeTab]);
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%' }} {...boxProps}>
       <Box
         sx={{
           borderBottom: 1,
@@ -90,7 +98,7 @@ export default function MultiTabs(props: MultiTabsProps) {
             />
           ))}
         </Tabs>
-        {props.endAdornmentComponent}
+        {endAdornmentComponent}
       </Box>
       {tabs.map(([tabLabel, tabComponent, _props], tabIndex) => {
         const sxProps = _props?.sx ?? ({} as SxProps);

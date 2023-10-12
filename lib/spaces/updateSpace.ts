@@ -9,14 +9,7 @@ import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 export type UpdateableSpaceFields = Partial<
   Pick<
     Space,
-    | 'notifyNewProposals'
-    | 'hiddenFeatures'
-    | 'domain'
-    | 'name'
-    | 'spaceImage'
-    | 'features'
-    | 'memberProfiles'
-    | 'notificationToggles'
+    'hiddenFeatures' | 'domain' | 'name' | 'spaceImage' | 'features' | 'memberProfiles' | 'notificationToggles'
   >
 >;
 
