@@ -40,7 +40,11 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         });
 
         if (webhookMessage) {
-          log.warn('Webhook message already processed', { ...webhookData, id: webhookMessageHash });
+          log.warn('SQS message already processed', {
+            ...webhookData,
+            id: webhookMessageHash,
+            spaceId: webhookData.spaceId
+          });
           return;
         }
 
@@ -52,12 +56,14 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             payload: webhookData as Prisma.InputJsonObject
           }
         });
+        log.debug('Saved record of SQS message', { id: webhookMessageHash, spaceId: webhookData.spaceId });
 
         const isWhitelistedEvent = whiteListedWebhookEvents.includes(webhookData.event.scope);
 
         if (!isWhitelistedEvent) {
-          log.debug('Ignore event for webhook events', {
-            scope: webhookData.event.scope
+          log.debug('Event is not whitelisted for publishing to webhooks', {
+            scope: webhookData.event.scope,
+            spaceId: webhookData.spaceId
           });
         } else if (webhookURL && signingSecret) {
           const secret = Buffer.from(signingSecret, 'hex');
@@ -73,7 +79,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             }
           });
 
-          log.debug('Webhook call response', response);
+          log.debug('Webhook call response', { ...response, spaceId: webhookData.spaceId });
 
           // If not 200 back, we throw an error
           if (response.status !== 200) {
