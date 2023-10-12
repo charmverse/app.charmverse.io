@@ -13,14 +13,22 @@ import { usePostCategoryPermissions } from '../hooks/usePostCategoryPermissions'
 import { CategoryContextMenu } from './CategoryContextMenu';
 
 const StyledMenuItem = styled(MenuItem)`
-  ${hoverIconsStyle({ marginForIcons: false })}
-
   min-height: 36px;
 
   &.Mui-focused,
   &.Mui-selected,
   &.Mui-selected.Mui-focused {
     background-color: ${({ theme }) => theme.palette.action.selected};
+  }
+
+  &:hover .icons {
+    transition: opacity 150ms ease-in-out;
+    opacity: 1;
+  }
+
+  & .icons {
+    transition: opacity 150ms ease-in-out;
+    opacity: 0;
   }
 `;
 type ForumSortFilterLinkProps = {
