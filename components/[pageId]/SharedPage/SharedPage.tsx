@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
@@ -86,6 +87,13 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
   ) : (
-    <DocumentPage page={publicPage.page} refreshPage={() => Promise.resolve()} savePage={() => null} readOnly={true} />
+    <Box sx={{ overflowY: 'auto' }}>
+      <DocumentPage
+        page={publicPage.page}
+        refreshPage={() => Promise.resolve()}
+        savePage={() => null}
+        readOnly={true}
+      />
+    </Box>
   );
 }

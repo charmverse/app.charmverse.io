@@ -3,7 +3,8 @@ import { v4 } from 'uuid';
 
 import { createDocumentNotification } from 'lib/notifications/saveNotification';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
-import { generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { builders } from 'testing/prosemirror/builders';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { sendUserNotifications } from '../sendNotifications';
 
@@ -24,7 +25,8 @@ describe('sendNotification()', () => {
       spaceId: space.id,
       type: 'mention.created',
       mentionId: v4(),
-      userId: user.id
+      userId: user.id,
+      content: builders.doc(builders.p('Test')).toJSON()
     });
 
     const notificationsNo = await sendUserNotifications();
@@ -49,7 +51,8 @@ describe('sendNotification()', () => {
       spaceId: space.id,
       type: 'mention.created',
       mentionId: v4(),
-      userId: user.id
+      userId: user.id,
+      content: builders.doc(builders.p('Test')).toJSON()
     });
 
     await updateUserProfile(user.id, { emailNotifications: false });

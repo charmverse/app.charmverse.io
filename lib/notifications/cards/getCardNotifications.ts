@@ -47,7 +47,6 @@ export async function getCardNotifications(userId: string): Promise<CardNotifica
       spaceId: notificationMetadata.spaceId,
       spaceName: notificationMetadata.space.name,
       pageType: page.type,
-      text: '',
       type: notification.type,
       personPropertyId: notification.personPropertyId,
       archived: !!notificationMetadata.archivedAt,
