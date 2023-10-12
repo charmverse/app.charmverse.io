@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -50,6 +51,20 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const { showMessage } = useSnackbar();
 
   const [showProperties, setShowProperties] = useState(false);
+
+  async function recordTransaction(transactionId: string, chainId: number) {
+    try {
+      await charmClient.rewards.recordTransaction({
+        applicationId,
+        chainId: chainId.toString(),
+        transactionId
+      });
+      await charmClient.rewards.markSubmissionAsPaid(applicationId);
+      refreshApplication();
+    } catch (err: any) {
+      showMessage(err.message || err, 'error');
+    }
+  }
 
   if (!application || !reward) {
     return null;
@@ -136,7 +151,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
               receiver={application.walletAddress as string}
               reward={reward}
               tokenSymbolOrAddress={reward.rewardToken as string}
-              onSuccess={() => refreshApplication()}
+              onSuccess={recordTransaction}
               onError={(message) => showMessage(message, 'warning')}
             />
           )}
