@@ -18,7 +18,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .get(getApplications)
-  .use(requireKeys<Application>(['bountyId', 'message'], 'body'))
+  .use(requireKeys<Application>(['bountyId'], 'body'))
   .post(createApplicationController);
 
 async function getApplications(req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions[]>) {

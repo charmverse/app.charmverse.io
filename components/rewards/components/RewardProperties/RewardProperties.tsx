@@ -30,6 +30,9 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
 // import RewardApplicantsTable from './components/RewardApplicantsTable';
+import { RewardApplications } from '../RewardApplications/RewardApplications';
+import RewardSubmissionsTable from '../RewardApplications/RewardSubmissionsTable';
+
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardSignupButton } from './components/RewardSignupButton';
 
@@ -41,7 +44,7 @@ export function RewardProperties(props: {
   refreshRewardPermissions: (rewardId: string) => void;
 }) {
   const { rewardId, pageId, readOnly: parentReadOnly = false, refreshRewardPermissions } = props;
-  const { rewards, mutateRewards, updateReward, tempReward, setTempReward } = useRewards();
+  const { rewards, mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<(RewardCreationData & RewardWithUsers) | null>();
   const { user } = useUser();
 
@@ -395,6 +398,15 @@ export function RewardProperties(props: {
           </div>
         )}
 
+        {rewardId && currentReward && (
+          <RewardApplications
+            refreshReward={(_rewardId: string) =>
+              refreshReward(_rewardId).then((updatedReward) => setCurrentReward(updatedReward))
+            }
+            reward={currentReward}
+            permissions={rewardPermissions}
+          />
+        )}
         {/*
       TODO - Fix this when we fix rewards table
       {rewardPermissions?.review &&

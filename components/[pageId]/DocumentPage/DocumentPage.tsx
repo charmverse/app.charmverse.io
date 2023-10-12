@@ -338,7 +338,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         proposalPage={page}
                       />
                     )}
-                    {(tempReward || page.bountyId) && isRewardsPage && (
+                    {(tempReward || page.bountyId) && (
                       <RewardProperties
                         rewardId={page.bountyId}
                         pageId={page.id}
@@ -347,6 +347,9 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         refreshRewardPermissions={() => refreshBountyPermissions()}
                       />
                     )}
+
+                    {/* 
+                    PERMANENT DELETE WHEN WE MIGRATE TO REWARDS
                     {(draftBounty || page.bountyId) && !isRewardsPage && (
                       <BountyProperties
                         bountyId={page.bountyId}
@@ -356,7 +359,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                         permissions={bountyPermissions || null}
                         refreshBountyPermissions={() => refreshBountyPermissions()}
                       />
-                    )}
+                    )} */}
                     {(page.type === 'card' || page.type === 'card_synced') && (
                       <CommentsList
                         comments={comments}

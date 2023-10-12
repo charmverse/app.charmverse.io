@@ -72,7 +72,7 @@ export class RewardsApi {
     return http.PUT<Application>(`/api/applications/${applicationId}`, update);
   }
 
-  createApplication(application: Pick<Application, 'message' | 'status'> & { bountyId: string }): Promise<Application> {
+  createApplication(application: Pick<Application, 'message'> & { bountyId: string }): Promise<Application> {
     return http.POST<Application>('/api/applications', application);
   }
 

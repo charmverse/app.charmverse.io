@@ -1,5 +1,7 @@
 import type { Application, Bounty } from '@charmverse/core/prisma';
 
+import type { ApplicationMeta } from 'lib/rewards/interfaces';
+
 export const MINIMUM_APPLICATION_MESSAGE_CHARACTERS = 1;
 
 /**
@@ -40,7 +42,7 @@ export function moveUserApplicationToFirstRow<Data extends Application>(submissi
   return copiedSubmissions;
 }
 
-export function countValidSubmissions(submissions: Application[]): number {
+export function countValidSubmissions(submissions: ApplicationMeta[]): number {
   return (
     submissions?.reduce((count, submission) => {
       if (submission.status !== 'applied' && submission.status !== 'rejected') {

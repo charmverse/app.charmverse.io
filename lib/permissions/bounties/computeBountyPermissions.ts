@@ -126,11 +126,5 @@ export async function computeBountyPermissions({
     });
   }
 
-  // DENY case-specific permissions
-  // 1. Don't allow bounty creator to apply to their own bounty
-  if (bounty.createdBy === userId) {
-    basePermissions.work = false;
-  }
-
   return basePermissions;
 }

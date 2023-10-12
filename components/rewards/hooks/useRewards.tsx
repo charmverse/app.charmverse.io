@@ -9,7 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
 
 type RewardsContextType = {
@@ -20,7 +20,7 @@ type RewardsContextType = {
   mutateRewards: KeyedMutator<RewardWithUsers[]>;
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
-  refreshReward: (rewardId: string) => Promise<void>;
+  refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
   createReward: (input: RewardCreationData) => Promise<RewardWithUsers | null>;
   tempReward?: RewardCreationData | null;
   setTempReward: (input?: RewardCreationData | null) => void;
@@ -36,7 +36,7 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   },
   isLoading: false,
   updateReward: () => Promise.resolve(),
-  refreshReward: () => Promise.resolve(),
+  refreshReward: () => Promise.resolve() as any,
   createReward: () => Promise.resolve(null),
   tempReward: null,
   setTempReward: () => {}
@@ -99,6 +99,7 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
         }
         return rewardList;
       });
+      return reward;
     },
     [mutateRewards]
   );

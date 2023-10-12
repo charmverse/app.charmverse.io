@@ -1,13 +1,13 @@
 import type { Application } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getBountyOrThrow } from 'lib/bounties';
+import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
+import { getRewardOrThrow } from 'lib/rewards/getReward';
 import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { ApplicationCreationData } from '../interfaces';
-import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS, submissionsCapReached } from '../shared';
 
 export async function createApplication({
   bountyId,
@@ -15,24 +15,26 @@ export async function createApplication({
   userId,
   status = 'applied'
 }: ApplicationCreationData): Promise<Application> {
-  const bounty = await getBountyOrThrow(bountyId);
+  const reward = await getRewardOrThrow({ rewardId: bountyId });
 
-  const existingApplication = bounty.applications.find((app) => app.createdBy === userId);
+  const existingApplication = reward.applications.find((app) => app.createdBy === userId);
 
   if (existingApplication) {
     throw new DuplicateDataError('You have already applied to this bounty');
   }
 
-  if (!message || message.length < MINIMUM_APPLICATION_MESSAGE_CHARACTERS) {
+  if (typeof message !== 'string' && !message) {
     throw new StringTooShortError();
   }
 
-  const capReached = submissionsCapReached({ bounty, submissions: bounty.applications });
+  const capReached =
+    reward.maxSubmissions &&
+    (countRemainingSubmissionSlots({ applications: reward.applications, limit: reward.maxSubmissions }) as number) <= 0;
 
   if (capReached) {
     throw new LimitReachedError(
-      `The submissions cap of ${bounty.maxSubmissions} submission${
-        bounty.maxSubmissions !== 1 ? 's' : ''
+      `The submissions cap of ${reward.maxSubmissions} submission${
+        reward.maxSubmissions !== 1 ? 's' : ''
       } has been reached for this bounty.`
     );
   }
@@ -51,14 +53,14 @@ export async function createApplication({
           id: bountyId
         }
       },
-      spaceId: bounty.spaceId
+      spaceId: reward.spaceId
     }
   });
 
   await publishBountyEvent({
     scope: WebhookEventNames.RewardApplicationCreated,
     bountyId,
-    spaceId: bounty.spaceId,
+    spaceId: reward.spaceId,
     applicationId: application.id
   });
 
