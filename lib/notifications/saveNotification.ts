@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type {
@@ -6,7 +6,6 @@ import type {
   CommentNotification,
   DocumentNotificationType,
   InlineCommentNotification,
-  InlineCommentNotificationType,
   MentionNotification,
   PostNotificationType,
   ProposalNotificationType,
@@ -98,6 +97,7 @@ type CreateDocumentNotificationInput = {
   postCommentId?: string;
   pageCommentId?: string;
   type: DocumentNotificationType;
+  content: Prisma.JsonValue | null;
 } & (CommentNotification | MentionNotification | InlineCommentNotification);
 
 export async function createDocumentNotification({
@@ -108,6 +108,7 @@ export async function createDocumentNotification({
   spaceId,
   postId,
   userId,
+  content,
   type,
   pageCommentId,
   postCommentId
@@ -126,6 +127,7 @@ export async function createDocumentNotification({
           userId
         }
       },
+      content: content ?? Prisma.DbNull,
       inlineComment: inlineCommentId
         ? {
             connect: {

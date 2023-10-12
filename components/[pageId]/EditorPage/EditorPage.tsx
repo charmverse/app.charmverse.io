@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
+import { Box } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
@@ -118,9 +119,11 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     ) {
       return <DatabasePage page={page} setPage={savePage} pagePermissions={page.permissionFlags} />;
     } else {
+      // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
-        // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+        <Box sx={{ overflowY: 'auto' }}>
+          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+        </Box>
       );
     }
   }

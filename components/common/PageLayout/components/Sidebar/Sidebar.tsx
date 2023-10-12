@@ -137,9 +137,10 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
 
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
+
   const handleModalClick = (path?: SettingsPath) => {
-    onClick(path);
+    openSettings(path);
     navAction?.();
   };
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });

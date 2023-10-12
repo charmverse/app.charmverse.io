@@ -1,10 +1,12 @@
-import type { Page, Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { extractMentions } from 'lib/prosemirror/extractMentions';
+import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { DocumentNotification, NotificationsGroup } from './interfaces';
-import { notificationMetadataSelectStatement, sortByDate } from './utils';
+import type { DocumentNotification } from '../interfaces';
+import { notificationMetadataSelectStatement } from '../utils';
 
 export async function getDocumentNotifications(userId: string): Promise<DocumentNotification[]> {
   const documentNotifications = await prisma.documentNotification.findMany({
@@ -16,23 +18,50 @@ export async function getDocumentNotifications(userId: string): Promise<Document
     select: {
       id: true,
       type: true,
+      content: true,
       page: {
         select: {
           id: true,
           path: true,
           type: true,
+          content: true,
           title: true
         }
       },
+      inlineCommentId: true,
+      mentionId: true,
       post: {
         select: {
           id: true,
           path: true,
-          title: true
+          title: true,
+          content: true
+        }
+      },
+      pageComment: {
+        select: {
+          contentText: true
+        }
+      },
+      postComment: {
+        select: {
+          contentText: true
+        }
+      },
+      inlineComment: {
+        select: {
+          content: true
         }
       },
       notificationMetadata: {
-        select: notificationMetadataSelectStatement
+        select: {
+          ...notificationMetadataSelectStatement,
+          user: {
+            select: {
+              username: true
+            }
+          }
+        }
       }
     }
   });
@@ -45,13 +74,12 @@ export async function getDocumentNotifications(userId: string): Promise<Document
         id: string;
         path: string;
         title: string;
+        content: PageContent;
       };
-      const inlineCommentId = 'inlineCommentId' in notification ? notification.inlineCommentId : null;
-      const mentionId = 'mentionId' in notification ? notification.mentionId : null;
       const documentNotification = {
         id: notification.id,
-        inlineCommentId,
-        mentionId,
+        inlineCommentId: notification.inlineCommentId,
+        mentionId: notification.mentionId,
         createdAt: notificationMetadata.createdAt.toISOString(),
         createdBy: notificationMetadata.author,
         pageId: page.id,
@@ -61,7 +89,7 @@ export async function getDocumentNotifications(userId: string): Promise<Document
         spaceId: notificationMetadata.spaceId,
         spaceName: notificationMetadata.space.name,
         pageType: page.type,
-        text: '',
+        content: notification.content,
         type: notification.type,
         archived: !!notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt,

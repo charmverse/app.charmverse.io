@@ -30,7 +30,6 @@ export type EditMode = keyof typeof EDIT_MODE_CONFIG;
 
 interface CharmEditorContext {
   isSaving: boolean;
-  availableEditModes: EditMode[];
   editMode: EditMode | null;
   permissions: PagePermissionFlags | null;
   participants: FrontendParticipant[];
@@ -44,7 +43,6 @@ interface CharmEditorContextWithSetter extends CharmEditorContext {
 
 const defaultProps = {
   isSaving: false,
-  availableEditModes: [],
   editMode: null,
   permissions: null,
   participants: [],
@@ -60,8 +58,6 @@ const CharmEditorContext = createContext<Readonly<CharmEditorContextWithSetter>>
 export function CharmEditorProvider({ children }: { children: ReactNode }) {
   const [props, _setPageProps] = useState<CharmEditorContext>(defaultProps);
 
-  const availableEditModes = Object.keys(EDIT_MODE_CONFIG) as EditMode[];
-
   const setPageProps: CharmEditorContextWithSetter['setPageProps'] = (_props) => {
     _setPageProps((prev) => ({ ...prev, ..._props }));
   };
@@ -73,7 +69,6 @@ export function CharmEditorProvider({ children }: { children: ReactNode }) {
   const value: CharmEditorContextWithSetter = useMemo(
     () => ({
       ...props,
-      availableEditModes,
       setPageProps,
       resetPageProps
     }),

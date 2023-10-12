@@ -9,7 +9,7 @@ import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 export type UpdateableSpaceFields = Partial<
   Pick<
     Space,
-    'notifyNewProposals' | 'hiddenFeatures' | 'domain' | 'name' | 'spaceImage' | 'features' | 'memberProfiles'
+    'hiddenFeatures' | 'domain' | 'name' | 'spaceImage' | 'features' | 'memberProfiles' | 'notificationToggles'
   >
 >;
 
@@ -38,8 +38,8 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       domain,
       name: updates.name,
       spaceImage: updates.spaceImage,
-      notifyNewProposals: updates.notifyNewProposals,
       hiddenFeatures: updates.hiddenFeatures,
+      notificationToggles: updates.notificationToggles as any,
       features: updates.features,
       memberProfiles: updates.memberProfiles
     }

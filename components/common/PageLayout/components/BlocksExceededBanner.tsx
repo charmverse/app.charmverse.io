@@ -13,7 +13,7 @@ export function BlocksExceededBanner() {
   const { user } = useUser();
   const { space } = useCurrentSpace();
   const { spaceBlockQuota, spaceBlockCount, hasPassedBlockQuota } = useSpaceSubscription();
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
   const showUpgradeBanner = !!user && hasPassedBlockQuota && space?.paidTier !== 'enterprise';
 
   if (!showUpgradeBanner) {
@@ -35,7 +35,7 @@ export function BlocksExceededBanner() {
             endIcon={<EastIcon />}
             sx={{ ml: 1, pb: 0, pt: 0, fontWeight: 600 }}
             color='white'
-            onClick={() => onClick('subscription')}
+            onClick={() => openSettings('subscription')}
             variant='outlined'
           >
             UPGRADE

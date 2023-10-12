@@ -31,6 +31,7 @@ import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
@@ -88,6 +89,7 @@ export async function generateSpaceUser({
 /**
  * Simple utility to provide a user and space object inside test code
  * @param walletAddress
+ * @deprecated - this calls createUserFromWallet() which should not be called during tests. Please use generateUserAndSpace() instead
  * @returns
  */
 export async function generateUserAndSpaceWithApiToken(
@@ -157,7 +159,7 @@ type CreateUserAndSpaceInput = {
   paidTier?: SubscriptionTier;
   superApiTokenId?: string;
   walletAddress?: string;
-  notifyNewProposals?: Date | null;
+  spaceNotificationToggles?: NotificationToggles;
 };
 
 export async function generateUserAndSpace({
@@ -171,7 +173,7 @@ export async function generateUserAndSpace({
   superApiTokenId,
   walletAddress,
   paidTier,
-  notifyNewProposals
+  spaceNotificationToggles
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -198,7 +200,7 @@ export async function generateUserAndSpace({
               domain: `domain-${v4()}`,
               customDomain: spaceCustomDomain,
               publicBountyBoard,
-              notifyNewProposals,
+              notificationToggles: spaceNotificationToggles,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
             }
           }

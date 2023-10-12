@@ -7,7 +7,11 @@ import { useUser } from 'hooks/useUser';
 
 import { UserDetailsFormWithSave } from './components/UserDetailsForm';
 
-export default function ProfileSettings() {
+export default function ProfileSettings({
+  setUnsavedChanges
+}: {
+  setUnsavedChanges: (unsavedChanges: boolean) => void;
+}) {
   const { user } = useUser();
 
   useTrackPageView({ type: 'settings/my-profile' });
@@ -20,7 +24,7 @@ export default function ProfileSettings() {
     <>
       <Legend>My Profile</Legend>
       <Stack spacing={2}>
-        <UserDetailsFormWithSave user={user} />
+        <UserDetailsFormWithSave user={user} setUnsavedChanges={setUnsavedChanges} />
         <ProfileTabs user={user} />
       </Stack>
     </>
