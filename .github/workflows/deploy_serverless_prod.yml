@@ -55,6 +55,10 @@ jobs:
                 echo "$env_var_name=\"$secret_value\"" >> .env
             fi
           done
+      - name: Copy Prisma files
+        run:
+          node copyPrismaFiles.js
+          ls ./serverless
       - name: serverless deploy ${{ matrix.function_name }}
         uses: serverless/github-action@v3.1
         with:

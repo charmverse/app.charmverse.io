@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install dependencies
         uses: ./.github/actions/install
-      - name: populate env file
+      - name: Populate env file
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -60,6 +60,10 @@ jobs:
             fi
           done
           aws s3 cp .env s3://charm.devops/
+      - name: Copy Prisma files
+        run:
+          node copyPrismaFiles.js
+          ls ./serverless
       - name: serverless deploy ${{ matrix.function_name }}
         uses: serverless/github-action@v3.1
         with:
