@@ -42,7 +42,12 @@ export async function createDocumentNotifications(webhookData: {
           content: targetMention.parentNode
         });
       } else {
-        log.warn('Ignore mention', { pageId: documentId, mentionedUserId, mentionAuthorId, targetMention });
+        log.warn('Ignore user mention - could not find it in the doc', {
+          pageId: documentId,
+          mentionedUserId,
+          mentionAuthorId,
+          targetMention
+        });
       }
 
       break;

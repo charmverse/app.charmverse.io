@@ -432,46 +432,6 @@ export class DocumentEventHandler {
 
         message.ds = message.ds.map(this.removeTooltipMarks);
 
-        const extractedMentions = message.ds
-          .map((ds) => {
-            if (ds.stepType === 'replace') {
-              const extractedMentionsMap = extractMentions(
-                {
-                  type: 'doc',
-                  content: ds.slice?.content
-                },
-                session.user.name
-              );
-
-              return Array.from(extractedMentionsMap.values());
-            }
-
-            return [];
-          })
-          .flat();
-
-        // Don't create notifications for self mentions
-        const filteredMentions = extractedMentions.filter((mention) => mention.value !== session.user.id);
-
-        if (filteredMentions.length) {
-          await Promise.all(
-            filteredMentions.map((mention) => {
-              log.info('Publishing a new mention event', {
-                mentionedUserId: mention.value,
-                spaceId: room.doc.spaceId,
-                userId: session.user.id
-              });
-              return publishDocumentEvent({
-                documentId: room.doc.id,
-                scope: WebhookEventNames.DocumentMentionCreated,
-                spaceId: room.doc.spaceId,
-                mention,
-                userId: session.user.id
-              });
-            })
-          );
-        }
-
         // Go through the diffs and see if any of them are for deleting a page.
         try {
           // If its 2 then its drag and drop within the editor
@@ -566,6 +526,49 @@ export class DocumentEventHandler {
 
         this.confirmDiff(message.rid);
         this.sendUpdatesToOthers(message, !!socketEvent);
+
+        // publish user mention events
+        const extractedMentions = message.ds
+          .map((ds) => {
+            if (ds.stepType === 'replace') {
+              return extractMentions(
+                {
+                  type: 'doc',
+                  content: ds.slice?.content
+                },
+                session.user.name
+              );
+            }
+
+            return [];
+          })
+          .flat();
+
+        // Don't create notifications for self mentions
+        const filteredMentions = extractedMentions.filter((mention) => mention.value !== session.user.id);
+
+        if (filteredMentions.length) {
+          Promise.all(
+            filteredMentions.map((mention) => {
+              log.info('Publishing a user mention', {
+                ...logMeta,
+                mentionedUserId: mention.value
+              });
+              return publishDocumentEvent({
+                documentId: room.doc.id,
+                scope: WebhookEventNames.DocumentMentionCreated,
+                spaceId: room.doc.spaceId,
+                mention,
+                userId: session.user.id
+              });
+            })
+          ).catch((error) => {
+            log.error('Could not publish user mention', {
+              ...logMeta,
+              error
+            });
+          });
+        }
       } catch (error) {
         log.error('Error when saving changes to the db', { error, ...logMeta });
         this.sendError('There was an error saving your changes! Please refresh and try again.');
