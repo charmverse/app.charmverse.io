@@ -26,7 +26,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         run: |
-          sed -i 's/prd/stg/g' .ebstalk.apps.env/serverless.env
           secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
 
           cat .ebstalk.apps.env/serverless.env | while read line; do
