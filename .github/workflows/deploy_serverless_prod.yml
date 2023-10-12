@@ -7,6 +7,7 @@ on:
       # Trigger the job only when the serverless config or files have been changed
       - serverless/**
       - serverless.yml
+      - lib/**
 
 jobs:
   deploy:
