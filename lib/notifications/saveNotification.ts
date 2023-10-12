@@ -326,7 +326,7 @@ export async function createBountyNotification({
       }
     }
   });
-  log.info('Created poll notification', {
+  log.info('Created bounty notification', {
     bountyId,
     applicationId,
     notificationId: record.id,
