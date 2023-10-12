@@ -18,7 +18,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
   // Store failed messageIDs
   const batchItemFailures: SQSBatchItemFailure[] = [];
 
-  log.debug('Webhook worker initiated.');
+  log.debug('Webhook worker initiated.', { recordCount: event.Records.length });
 
   // Execute messages
   await Promise.allSettled(
@@ -40,7 +40,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         });
 
         if (webhookMessage) {
-          log.debug('Webhook message already processed', { id: webhookMessageHash, ...webhookData });
+          log.warn('Webhook message already processed', { ...webhookData, id: webhookMessageHash });
           return;
         }
 
@@ -56,14 +56,10 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         const isWhitelistedEvent = whiteListedWebhookEvents.includes(webhookData.event.scope);
 
         if (!isWhitelistedEvent) {
-          log.debug('Webhook event not whitelisted', {
-            scope: webhookData.event.scope,
-            ...webhookData
+          log.debug('Ignore event for webhook events', {
+            scope: webhookData.event.scope
           });
-          return;
-        }
-
-        if (webhookURL && signingSecret) {
+        } else if (webhookURL && signingSecret) {
           const secret = Buffer.from(signingSecret, 'hex');
 
           const signedJWT = await signJwt('webhook', webhookData, secret);
@@ -90,7 +86,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        log.error(`Error in processing SQS Worker`, { body, error: e, record });
+        log.error(`Error in processing SQS message`, { body, error: e, record });
 
         batchItemFailures.push({ itemIdentifier: record.messageId });
       }
