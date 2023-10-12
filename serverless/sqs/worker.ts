@@ -52,6 +52,21 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
 
         // Create and save notifications
         const notifications = await createNotificationsFromEvent(webhookData);
+
+        await prisma.sQSMessage.create({
+          data: {
+            id: webhookMessageHash,
+            payload: webhookData as Prisma.InputJsonObject
+          }
+        });
+
+        log.debug('Saved record of SQS message', {
+          id: webhookMessageHash,
+          notifications: notifications.length,
+          scope: webhookData.event.scope,
+          spaceId: webhookData.spaceId
+        });
+
         // Send emails
         let notificationCount = 0;
         for (const notification of notifications) {
@@ -64,19 +79,6 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           log.info(`Sent ${notificationCount} email notifications`);
           count('cron.user-notifications.sent', notificationCount);
         }
-
-        await prisma.sQSMessage.create({
-          data: {
-            id: webhookMessageHash,
-            payload: webhookData as Prisma.InputJsonObject
-          }
-        });
-
-        log.debug('Saved record of SQS message', {
-          id: webhookMessageHash,
-          scope: webhookData.event.scope,
-          spaceId: webhookData.spaceId
-        });
 
         await publishToWebhook({ webhookURL, signingSecret, ...webhookData });
       } catch (e) {
