@@ -1,4 +1,5 @@
 /* eslint-disable no-continue */
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { extractMentionFromId, extractMentions } from 'lib/prosemirror/extractMentions';
@@ -39,6 +40,13 @@ export async function createDocumentNotifications(webhookData: {
           spaceId: webhookData.spaceId,
           userId: mentionedUserId,
           content: targetMention.parentNode
+        });
+      } else {
+        log.warn('Ignore user mention - could not find it in the doc', {
+          pageId: documentId,
+          mentionedUserId,
+          mentionAuthorId,
+          targetMention
         });
       }
 
