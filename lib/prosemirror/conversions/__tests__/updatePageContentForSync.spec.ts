@@ -30,6 +30,11 @@ describe('updatePageContentForSync', () => {
         type: 'page',
         path: childPage1Path
       }),
+      _.page({
+        id: childPage1Id,
+        type: 'page',
+        path: childPage1Path
+      }),
       _.paragraph('Paragraph 2'),
       _.page({
         id: linkedPage1.id,
@@ -60,7 +65,8 @@ describe('updatePageContentForSync', () => {
       createdBy: user.id,
       spaceId: space.id,
       parentId: parentPage.id,
-      id: childPage1Id
+      id: childPage1Id,
+      path: childPage1Path
     });
 
     const childPage2 = await testUtilsPages.generatePage({
@@ -101,8 +107,13 @@ describe('updatePageContentForSync', () => {
         _.p('Paragraph 1'),
         _.page({
           id: childPage1.id,
-          path: childPage1Path,
+          path: childPage1.path,
           type: childPage1.type
+        }),
+        _.linkedPage({
+          id: childPage1.id,
+          type: childPage1.type,
+          path: childPage1.path
         }),
         _.paragraph('Paragraph 2'),
         _.linkedPage({
@@ -143,8 +154,26 @@ describe('updatePageContentForSync', () => {
           v: 1,
           ds: [
             {
-              from: 27,
-              to: 28,
+              to: 15,
+              from: 14,
+              slice: {
+                content: [
+                  {
+                    type: 'linkedPage',
+                    attrs: {
+                      id: childPage1.id,
+                      path: childPage1.path,
+                      type: childPage1.type,
+                      track: []
+                    }
+                  }
+                ]
+              },
+              stepType: 'replace'
+            },
+            {
+              from: 28,
+              to: 29,
               slice: {
                 content: [
                   {
@@ -161,8 +190,8 @@ describe('updatePageContentForSync', () => {
               stepType: 'replace'
             },
             {
-              from: 41,
-              to: 42,
+              from: 42,
+              to: 43,
               slice: {
                 content: [
                   {
@@ -191,8 +220,8 @@ describe('updatePageContentForSync', () => {
           v: 2,
           ds: [
             {
-              to: 56,
-              from: 56,
+              to: 57,
+              from: 57,
               slice: {
                 content: [childPage2, childPage3].map((childPage) => ({
                   type: 'page',
