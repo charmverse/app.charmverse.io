@@ -1,7 +1,8 @@
 /* eslint-disable no-continue */
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { extractMentions } from 'lib/prosemirror/extractMentions';
+import { extractMentionFromId, extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -16,16 +17,36 @@ export async function createDocumentNotifications(webhookData: {
   switch (webhookData.event.scope) {
     case WebhookEventNames.DocumentMentionCreated: {
       const mentionedUserId = webhookData.event.mention.value;
+      const mentionId = webhookData.event.mention.id;
       const mentionAuthorId = webhookData.event.user.id;
+      const documentId = webhookData.event.document.id;
 
-      if (mentionedUserId !== mentionAuthorId) {
+      const document = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: documentId
+        },
+        select: {
+          content: true
+        }
+      });
+      const documentContent = document.content as PageContent;
+      const targetMention = extractMentionFromId(documentContent, mentionId);
+      if (mentionedUserId !== mentionAuthorId && targetMention) {
         await createDocumentNotification({
           type: 'mention.created',
           createdBy: mentionAuthorId,
           mentionId: webhookData.event.mention.id,
           pageId: webhookData.event.document.id,
           spaceId: webhookData.spaceId,
-          userId: mentionedUserId
+          userId: mentionedUserId,
+          content: targetMention.parentNode
+        });
+      } else {
+        log.warn('Ignore user mention - could not find it in the doc', {
+          pageId: documentId,
+          mentionedUserId,
+          mentionAuthorId,
+          targetMention
         });
       }
 
@@ -75,7 +96,8 @@ export async function createDocumentNotifications(webhookData: {
           inlineCommentId,
           pageId,
           spaceId,
-          userId: previousInlineComment.userId
+          userId: previousInlineComment.userId,
+          content: inlineCommentContent
         });
       }
 
@@ -87,7 +109,8 @@ export async function createDocumentNotifications(webhookData: {
             inlineCommentId,
             pageId,
             spaceId,
-            userId: authorId
+            userId: authorId,
+            content: inlineCommentContent
           });
         }
       }
@@ -103,7 +126,8 @@ export async function createDocumentNotifications(webhookData: {
             mentionId: extractedMention.id,
             pageId,
             spaceId,
-            userId: mentionedUserId
+            userId: mentionedUserId,
+            content: extractedMention.parentNode
           });
         }
       }
@@ -153,7 +177,8 @@ export async function createDocumentNotifications(webhookData: {
               spaceId,
               pageCommentId: documentId ? commentId : undefined,
               postCommentId: postId ? commentId : undefined,
-              userId: authorId
+              userId: authorId,
+              content: comment.content
             });
           }
         }
@@ -187,7 +212,8 @@ export async function createDocumentNotifications(webhookData: {
             spaceId,
             pageCommentId: documentId ? commentId : undefined,
             postCommentId: postId ? commentId : undefined,
-            userId: parentCommentAuthorId
+            userId: parentCommentAuthorId,
+            content: comment.content
           });
         }
       }
@@ -207,7 +233,8 @@ export async function createDocumentNotifications(webhookData: {
           pageCommentId: documentId ? commentId : undefined,
           postCommentId: postId ? commentId : undefined,
           spaceId,
-          userId: mentionedUserId
+          userId: mentionedUserId,
+          content: extractedMention.parentNode
         });
       }
 

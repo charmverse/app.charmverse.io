@@ -125,7 +125,7 @@ export default function Callout({
             />
           </Menu>
         </CalloutEmoji>
-        <Box my={0.5}>{children}</Box>
+        {children}
       </StyledCallout>
     </Box>
   );

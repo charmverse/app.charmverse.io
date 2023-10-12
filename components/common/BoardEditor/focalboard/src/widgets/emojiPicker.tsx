@@ -9,7 +9,13 @@ type Props = {
 
 function EmojiPicker(props: Props): JSX.Element {
   return (
-    <div className='EmojiPicker' onClick={(e) => e.stopPropagation()}>
+    <div
+      className='EmojiPicker'
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+    >
       <Picker onSelect={(emoji: BaseEmoji) => props.onSelect(emoji.native)} />
     </div>
   );
