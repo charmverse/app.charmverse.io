@@ -27,14 +27,20 @@ describe('lockApplicationAndSubmissions', () => {
       userId: nonAdminUser.id
     });
 
-    const updatedBounty = await lockApplicationAndSubmissions(bounty.id);
+    const updatedBounty = await lockApplicationAndSubmissions({
+      bountyId: bounty.id,
+      userId: nonAdminUser.id
+    });
 
     expect(updatedBounty.submissionsLocked).toBe(true);
   });
 
   it('should fail if the bounty does not exist', async () => {
     try {
-      await lockApplicationAndSubmissions(v4());
+      await lockApplicationAndSubmissions({
+        bountyId: v4(),
+        userId: nonAdminUser.id
+      });
       throw new ExpectedAnError();
     } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);

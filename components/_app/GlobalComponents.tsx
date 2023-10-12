@@ -5,7 +5,7 @@ import { mutate } from 'swr';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
-import { UserProfileDialogGlobal } from 'components/common/UserProfile/UserProfileDialogGlobal';
+import { MemberProfileDialogGlobal } from 'components/members/components/MemberProfileDialogGlobal';
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -14,6 +14,7 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
+import { UserOnboardingDialogGlobal } from './components/UserOnboardingDialog';
 import useDatadogLogger from './hooks/useDatadogLogger';
 
 export function GlobalComponents() {
@@ -21,7 +22,7 @@ export function GlobalComponents() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setPages } = usePages();
-  const { onClick: openSettingsModal, open: isSettingsDialogOpen } = useSettingsDialog();
+  const { openSettings, isOpen: isSettingsDialogOpen } = useSettingsDialog();
   // Register logs to Datadog
   useDatadogLogger();
 
@@ -65,18 +66,19 @@ export function GlobalComponents() {
 
     if (!isSettingsDialogOpen && router.isReady) {
       if (account) {
-        openSettingsModal('account');
+        openSettings('account');
       }
       if (subscription) {
-        openSettingsModal('subscription');
+        openSettings('subscription');
       }
     }
-  }, [isSettingsDialogOpen, router.isReady, openSettingsModal, router.query.account, router.query.subscription]);
+  }, [isSettingsDialogOpen, router.isReady, openSettings, router.query.account, router.query.subscription]);
 
   return (
     <>
       <HexagonalAvatarMask id='hexagon-avatar' />
-      <UserProfileDialogGlobal />
+      <MemberProfileDialogGlobal />
+      <UserOnboardingDialogGlobal />
       <Snackbar />
     </>
   );

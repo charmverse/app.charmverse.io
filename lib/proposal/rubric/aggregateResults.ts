@@ -9,6 +9,8 @@ import { isNumber } from 'lib/utilities/numbers';
  */
 export type NumericResults = { sum: number | null; average: number | null };
 
+export type CriteriaResults = NumericResults & { comments: string[] };
+
 export type ReviewerResults = NumericResults & {
   id: string;
   answersMap: Record<string, { score: number | undefined; comment: string | null }>;
@@ -19,7 +21,7 @@ export type ReviewerResults = NumericResults & {
  */
 export type AggregateResults = {
   reviewersResults: Record<string, ReviewerResults>;
-  criteriaSummary: Record<string, NumericResults>;
+  criteriaSummary: Record<string, CriteriaResults>;
   allScores: NumericResults;
 };
 
@@ -40,6 +42,11 @@ export function aggregateResults({
     return criteriaRecord;
   }, {} as Record<string, number[]>);
 
+  const criteriaComments: Record<string, string[]> = criteria.reduce((criteriaRecord, _criteria) => {
+    criteriaRecord[_criteria.id] = [];
+    return criteriaRecord;
+  }, {} as Record<string, string[]>);
+
   const reviewersResults: ReviewerResults[] = [];
 
   const reviewers = arrayUtils.uniqueValues(answers.map((answer) => answer.userId));
@@ -58,6 +65,9 @@ export function aggregateResults({
         } = answer;
 
         criteriaScores[criteriaId].push(score);
+        if (comment) {
+          criteriaComments[criteriaId].push(comment);
+        }
         userScores.push(score);
         answersMap[criteriaId] = { score, comment };
       }
@@ -69,9 +79,11 @@ export function aggregateResults({
     reviewersResults.push({ id: reviewer, answersMap, average, sum: scoreSum });
   });
   const criteriaSummary = Object.entries(criteriaScores).reduce((acc, [criteriaId, scores]) => {
-    acc[criteriaId] = scores.length ? { average: mean(scores), sum: sum(scores) } : { average: null, sum: null };
+    acc[criteriaId] = scores.length
+      ? { average: mean(scores), sum: sum(scores), comments: criteriaComments[criteriaId] }
+      : { average: null, sum: null, comments: [] };
     return acc;
-  }, {} as Record<string, NumericResults>);
+  }, {} as Record<string, CriteriaResults>);
 
   const allScores = Object.values(criteriaScores).flat();
   const allScoresSum = allScores.length ? sum(allScores) : null;

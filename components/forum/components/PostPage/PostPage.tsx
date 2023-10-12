@@ -17,7 +17,6 @@ import { CommentSort } from 'components/common/comments/CommentSort';
 import { processComments, sortComments } from 'components/common/comments/utils';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
 import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
@@ -215,12 +214,29 @@ export function PostPage({
       return sortComments({
         comments: processComments({ comments: postComments, sort: commentSort }),
         sort: commentSort
-      });
+      }) as PostCommentWithVoteAndChildren[];
     }
     return [];
   }, [postComments, post, commentSort]);
 
   const canEdit = !!permissions?.edit_post;
+
+  useEffect(() => {
+    const commentId = router.query.commentId;
+    if (commentId && typeof window !== 'undefined' && !isValidating && postComments.length) {
+      setTimeout(() => {
+        const commentDomElement = window.document.getElementById(`post-comment-${commentId}`);
+        if (commentDomElement) {
+          requestAnimationFrame(() => {
+            commentDomElement.scrollIntoView({
+              behavior: 'smooth'
+            });
+            setUrlWithoutRerender(router.pathname, { commentId: null });
+          });
+        }
+      }, 250);
+    }
+  }, [router.query.commentId, isValidating]);
 
   if (!permissions) {
     return <LoadingComponent />;
@@ -231,148 +247,146 @@ export function PostPage({
   return (
     <>
       {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
-      <ScrollableWindow>
-        {post?.isDraft && <DraftPostBanner />}
-        <div ref={printRef} className={`document-print-container ${fontClassName}`}>
-          <Stack flexDirection='row'>
-            <Container top={50}>
-              <Box minHeight={300} data-test='post-charmeditor'>
-                <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
-                {createdBy && (
-                  <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+      {post?.isDraft && <DraftPostBanner />}
+      <div ref={printRef} className={`document-print-container ${fontClassName}`}>
+        <Stack flexDirection='row'>
+          <Container top={50}>
+            <Box minHeight={300} data-test='post-charmeditor'>
+              <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
+              {createdBy && (
+                <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+              )}
+              <Box my={2}>
+                <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
+              </Box>
+              <CharmEditor
+                allowClickingFooter={true}
+                pageType='post'
+                autoFocus={false}
+                readOnly={!canEdit}
+                pageActionDisplay={null}
+                postId={post?.id}
+                disablePageSpecificFeatures
+                enableVoting={true}
+                isContentControlled
+                key={`${user?.id}.${post?.proposalId}.${canEdit}`}
+                content={formInputs.content as PageContent}
+                onContentChange={updatePostContent}
+              />
+            </Box>
+            {canEdit && (
+              <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
+                {(!post || post.isDraft) && (
+                  <Button
+                    disabled={Boolean(disabledTooltip) || !contentUpdated}
+                    disabledTooltip={disabledTooltip}
+                    onClick={() => createForumPost(true)}
+                    color='secondary'
+                    variant='outlined'
+                  >
+                    {post ? 'Update draft' : 'Save draft'}
+                  </Button>
                 )}
-                <Box my={2}>
-                  <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
-                </Box>
-                <CharmEditor
-                  allowClickingFooter={true}
-                  pageType='post'
-                  autoFocus={false}
-                  readOnly={!canEdit}
-                  pageActionDisplay={null}
-                  postId={post?.id}
-                  disablePageSpecificFeatures
-                  enableVoting={true}
-                  isContentControlled
-                  key={`${user?.id}.${post?.proposalId}.${canEdit}`}
-                  content={formInputs.content as PageContent}
-                  onContentChange={updatePostContent}
-                />
-              </Box>
-              {canEdit && (
-                <Stack flexDirection='row' gap={1} justifyContent='flex-end' my={2}>
-                  {(!post || post.isDraft) && (
-                    <Button
-                      disabled={Boolean(disabledTooltip) || !contentUpdated}
-                      disabledTooltip={disabledTooltip}
-                      onClick={() => createForumPost(true)}
-                      color='secondary'
-                      variant='outlined'
-                    >
-                      {post ? 'Update draft' : 'Save draft'}
-                    </Button>
-                  )}
-                  {post?.isDraft && (
-                    <Button
-                      disabled={
-                        Boolean(disabledTooltip) || isPublishingDraftPost || categoryPermissions?.create_post === false
-                      }
-                      disabledTooltip={disabledTooltip}
-                      onClick={() => publishDraftPost(post)}
-                      loading={isPublishingDraftPost}
-                    >
-                      Post
-                    </Button>
-                  )}
-                  {!post?.isDraft && (
-                    <Button
-                      disabled={
-                        Boolean(disabledTooltip) ||
-                        !contentUpdated ||
-                        (!post && categoryPermissions?.create_post === false)
-                      }
-                      disabledTooltip={disabledTooltip}
-                      onClick={() => createForumPost(false)}
-                    >
-                      {post ? 'Update' : 'Post'}
-                    </Button>
-                  )}
-                </Stack>
-              )}
-              {post && !post.isDraft && (
-                <>
-                  <Box my={2} data-test='new-top-level-post-comment'>
-                    <PostCommentForm
-                      disabled={!permissions.add_comment}
-                      placeholder={
-                        !permissions.add_comment
-                          ? 'You do not have permission to comment on posts in this category'
-                          : undefined
-                      }
-                      setPostComments={setPostComments}
-                      postId={post.id}
-                    />
-                  </Box>
-
-                  <Divider
-                    sx={{
-                      my: 2
-                    }}
-                  />
-
-                  {isLoading ? (
-                    <Box height={100}>
-                      <LoadingComponent size={24} isLoading label='Fetching comments' />
-                    </Box>
-                  ) : (
-                    post && (
-                      <>
-                        {topLevelComments.length > 0 && (
-                          <Stack gap={1}>
-                            <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
-                            {topLevelComments.map((comment) => (
-                              <PostComment
-                                post={post}
-                                permissions={permissions}
-                                setPostComments={setPostComments}
-                                comment={comment}
-                                key={comment.id}
-                              />
-                            ))}
-                          </Stack>
-                        )}
-                        {topLevelComments.length === 0 && (
-                          <Stack gap={1} alignItems='center' my={1}>
-                            <CommentIcon color='secondary' fontSize='large' />
-                            <Typography color='secondary' variant='h6'>
-                              No Comments Yet
-                            </Typography>
-                            {permissions?.add_comment && (
-                              <Typography color='secondary'>Be the first to share what you think!</Typography>
-                            )}
-                          </Stack>
-                        )}
-                      </>
-                    )
-                  )}
-                </>
-              )}
-            </Container>
-            {post && showOtherCategoryPosts && (
-              <Box
-                width='25%'
-                mr={8}
-                display={{
-                  xs: 'none',
-                  md: 'initial'
-                }}
-              >
-                <CategoryPosts postId={post.id} categoryId={post.categoryId} />
-              </Box>
+                {post?.isDraft && (
+                  <Button
+                    disabled={
+                      Boolean(disabledTooltip) || isPublishingDraftPost || categoryPermissions?.create_post === false
+                    }
+                    disabledTooltip={disabledTooltip}
+                    onClick={() => publishDraftPost(post)}
+                    loading={isPublishingDraftPost}
+                  >
+                    Post
+                  </Button>
+                )}
+                {!post?.isDraft && (
+                  <Button
+                    disabled={
+                      Boolean(disabledTooltip) ||
+                      !contentUpdated ||
+                      (!post && categoryPermissions?.create_post === false)
+                    }
+                    disabledTooltip={disabledTooltip}
+                    onClick={() => createForumPost(false)}
+                  >
+                    {post ? 'Update' : 'Post'}
+                  </Button>
+                )}
+              </Stack>
             )}
-          </Stack>
-        </div>
-      </ScrollableWindow>
+            {post && !post.isDraft && (
+              <>
+                <Box my={2} data-test='new-top-level-post-comment'>
+                  <PostCommentForm
+                    disabled={!permissions.add_comment}
+                    placeholder={
+                      !permissions.add_comment
+                        ? 'You do not have permission to comment on posts in this category'
+                        : undefined
+                    }
+                    setPostComments={setPostComments}
+                    postId={post.id}
+                  />
+                </Box>
+
+                <Divider
+                  sx={{
+                    my: 2
+                  }}
+                />
+
+                {isLoading ? (
+                  <Box height={100}>
+                    <LoadingComponent size={24} isLoading label='Fetching comments' />
+                  </Box>
+                ) : (
+                  post && (
+                    <>
+                      {topLevelComments.length > 0 && (
+                        <Stack gap={1}>
+                          <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+                          {topLevelComments.map((comment) => (
+                            <PostComment
+                              post={post}
+                              permissions={permissions}
+                              setPostComments={setPostComments}
+                              comment={comment}
+                              key={comment.id}
+                            />
+                          ))}
+                        </Stack>
+                      )}
+                      {topLevelComments.length === 0 && (
+                        <Stack gap={1} alignItems='center' my={1}>
+                          <CommentIcon color='secondary' fontSize='large' />
+                          <Typography color='secondary' variant='h6'>
+                            No Comments Yet
+                          </Typography>
+                          {permissions?.add_comment && (
+                            <Typography color='secondary'>Be the first to share what you think!</Typography>
+                          )}
+                        </Stack>
+                      )}
+                    </>
+                  )
+                )}
+              </>
+            )}
+          </Container>
+          {post && showOtherCategoryPosts && (
+            <Box
+              width='25%'
+              mr={8}
+              display={{
+                xs: 'none',
+                md: 'initial'
+              }}
+            >
+              <CategoryPosts postId={post.id} categoryId={post.categoryId} />
+            </Box>
+          )}
+        </Stack>
+      </div>
     </>
   );
 }

@@ -20,7 +20,7 @@ const PageActionListBox = styled.div`
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
-  padding: ${({ theme }) => theme.spacing(0, 1, 0, 3)};
+  padding: ${({ theme }) => theme.spacing(0, 1)};
   background: ${({ theme }) => theme.palette.background.default};
 `;
 

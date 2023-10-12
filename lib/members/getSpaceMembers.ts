@@ -1,7 +1,10 @@
 import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
+import {
+  getAccessibleMemberPropertiesBySpace,
+  getAllMemberPropertiesBySpace
+} from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import { getMemberSearchValue } from 'lib/members/getMemberSearchValue';
 import { getSpaceMemberSearchParams } from 'lib/members/getSpaceMemberSearchParams';
 import type { Member } from 'lib/members/interfaces';
@@ -11,14 +14,18 @@ import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 export async function getSpaceMembers({
   requestingUserId,
   spaceId,
-  search
+  search,
+  skipAccessCheck
 }: {
   requestingUserId?: string;
   spaceId: string;
   search?: string;
+  skipAccessCheck?: boolean;
 }) {
   const whereOr = getSpaceMemberSearchParams(search || '');
-  const visibleProperties = await getAccessibleMemberPropertiesBySpace({ requestingUserId, spaceId });
+  const visibleProperties = skipAccessCheck
+    ? await getAllMemberPropertiesBySpace({ spaceId })
+    : await getAccessibleMemberPropertiesBySpace({ requestingUserId, spaceId });
   const visiblePropertiesMap = (visibleProperties as MemberProperty[]).reduce((acc, prop) => {
     acc[prop.id] = prop.name;
     if (prop.options instanceof Array) {
@@ -80,7 +87,7 @@ export async function getSpaceMembers({
           createdAt: userData.createdAt,
           deletedAt: userData.deletedAt || undefined,
           updatedAt: userData.updatedAt,
-          profile: userData.profile || undefined,
+          profile: (userData.profile as Member['profile']) || undefined,
           avatar: userData.avatar || undefined,
           avatarTokenId: userData.avatarTokenId || undefined,
           username,

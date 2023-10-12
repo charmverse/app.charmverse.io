@@ -31,6 +31,7 @@ import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
+import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
@@ -88,6 +89,7 @@ export async function generateSpaceUser({
 /**
  * Simple utility to provide a user and space object inside test code
  * @param walletAddress
+ * @deprecated - this calls createUserFromWallet() which should not be called during tests. Please use generateUserAndSpace() instead
  * @returns
  */
 export async function generateUserAndSpaceWithApiToken(
@@ -152,11 +154,12 @@ type CreateUserAndSpaceInput = {
   isGuest?: boolean;
   onboarded?: boolean;
   spaceName?: string;
+  spaceCustomDomain?: string;
   publicBountyBoard?: boolean;
   paidTier?: SubscriptionTier;
   superApiTokenId?: string;
   walletAddress?: string;
-  notifyNewProposals?: Date | null;
+  spaceNotificationToggles?: NotificationToggles;
 };
 
 export async function generateUserAndSpace({
@@ -165,11 +168,12 @@ export async function generateUserAndSpace({
   isGuest,
   onboarded = true,
   spaceName = 'Example Space',
+  spaceCustomDomain,
   publicBountyBoard,
   superApiTokenId,
   walletAddress,
   paidTier,
-  notifyNewProposals
+  spaceNotificationToggles
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -194,8 +198,9 @@ export async function generateUserAndSpace({
               name: spaceName,
               // Adding prefix avoids this being evaluated as uuid
               domain: `domain-${v4()}`,
+              customDomain: spaceCustomDomain,
               publicBountyBoard,
-              notifyNewProposals,
+              notificationToggles: spaceNotificationToggles,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined)
             }
           }
@@ -964,7 +969,7 @@ export async function generateProposal({
   proposalStatus: ProposalStatus;
   evaluationType?: ProposalEvaluationType;
   title?: string;
-}): Promise<PageWithProposal & { workspaceEvent: WorkspaceEvent }> {
+}): Promise<PageWithProposal> {
   const proposalId = v4();
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
@@ -1047,22 +1052,7 @@ export async function generateProposal({
     }
   });
 
-  const workspaceEvent = await prisma.workspaceEvent.create({
-    data: {
-      type: 'proposal_status_change',
-      meta: {
-        newStatus: proposalStatus
-      },
-      actorId: userId,
-      pageId: proposalId,
-      spaceId
-    }
-  });
-
-  return {
-    ...result,
-    workspaceEvent
-  };
+  return result;
 }
 
 /**
@@ -1123,23 +1113,6 @@ export async function generateBoard({
   return prisma
     .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
     .then((result) => result[0] as Page);
-}
-
-export async function generateWorkspaceEvents({
-  actorId,
-  spaceId,
-  meta,
-  pageId
-}: Pick<WorkspaceEvent, 'actorId' | 'meta' | 'pageId' | 'spaceId'>) {
-  return prisma.workspaceEvent.create({
-    data: {
-      type: 'proposal_status_change',
-      actorId,
-      spaceId,
-      meta: meta ?? undefined,
-      pageId
-    }
-  });
 }
 
 export async function generateForumComment({

@@ -12,7 +12,10 @@ import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
+import { DocumentHeaderElements } from 'components/common/PageLayout/components/Header/components/DocumentHeaderElements';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -33,11 +36,9 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   const { updatePage } = usePages();
   // This is needed so that the surrounding currentPage context provides the correct pageId
   const { setCurrentPageId } = useCurrentPage();
-  useEffect(() => {
-    if (pageId) {
-      setCurrentPageId(pageId);
-    }
-  }, [pageId]);
+  const { editMode, resetPageProps, setPageProps } = useCharmEditor();
+
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
   const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(
@@ -62,6 +63,34 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
     [page]
   );
 
+  useEffect(() => {
+    if (pageId) {
+      setCurrentPageId(pageId);
+    }
+    return () => {
+      setCurrentPageId('');
+      resetPageProps();
+    };
+  }, [pageId]);
+
+  // set page attributes of the primary charm editor
+  useEffect(() => {
+    if (!page) {
+      // wait for pages loaded for permissions to be correct
+      return;
+    }
+    if (!editMode) {
+      if (page.permissionFlags.edit_content) {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'editing' });
+      } else {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'viewing' });
+      }
+    } else {
+      // pass editMode thru to fix hot-reloading which resets the prop
+      setPageProps({ permissions: page.permissionFlags, editMode });
+    }
+  }, [page?.permissionFlags.edit_content]);
+
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
     mounted.current = true;
@@ -79,7 +108,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
 
   useEffect(() => {
     if (page?.id) {
-      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type });
+      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: space?.domain });
     }
   }, [page?.id]);
 
@@ -111,9 +140,15 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
               href={relativePath}
               variant='text'
               startIcon={<OpenInFullIcon fontSize='small' />}
+              sx={{ px: 1.5 }}
             >
               Open as Page
             </Button>
+            {page && (
+              <Box display='flex' alignItems='center' gap={0.5}>
+                <DocumentHeaderElements headerHeight={0} page={page} />
+              </Box>
+            )}
           </Box>
         ) : (
           <div />

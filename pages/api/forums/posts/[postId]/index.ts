@@ -101,7 +101,7 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
 
     // Publish webhook event if needed
     await publishPostEvent({
-      scope: WebhookEventNames.PostCreated,
+      scope: WebhookEventNames.ForumPostCreated,
       postId: post.id,
       spaceId: post.spaceId
     });

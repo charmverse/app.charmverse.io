@@ -16,7 +16,7 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-type GroupedRole = { id: string; group: 'role' };
+export type GroupedRole = { id: string; group: 'role' };
 type GroupedMember = { id: string; group: 'user' };
 type GroupedOption = GroupedRole | GroupedMember;
 type GroupedRolePopulated = ListSpaceRolesResponse & { group: 'role' };
@@ -31,7 +31,7 @@ const StyledAutocomplete = styled(Autocomplete<GroupedOptionPopulated, true, boo
   min-width: 150px;
 `;
 
-const StyledUserPropertyContainer = styled(Box, {
+export const StyledUserPropertyContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'displayType'
 })<ContainerProps>`
   flex-grow: 1;
@@ -128,7 +128,6 @@ function SelectedReviewers({
     </Tooltip>
   );
 }
-
 type Props = {
   displayType?: 'details';
   onChange: (value: GroupedOptionPopulated[]) => void;
@@ -139,6 +138,8 @@ type Props = {
   value: GroupedOption[];
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
+  wrapColumn?: boolean;
+  type?: 'role' | 'roleAndUser';
 };
 
 export function UserAndRoleSelect({
@@ -150,7 +151,9 @@ export function UserAndRoleSelect({
   showEmptyPlaceholder = true,
   variant = 'standard',
   value: inputValue,
-  'data-test': dataTest
+  'data-test': dataTest,
+  wrapColumn = true,
+  type = 'roleAndUser'
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -192,13 +195,19 @@ export function UserAndRoleSelect({
       ];
     } else if (isFreeSpace) {
       // In public space, don't include custom roles
-      _filteredOptions = [...mappedMembers];
+      _filteredOptions = type === 'role' ? [] : [...mappedMembers];
     } else {
       // For bounties, allow any space member or role to be selected
-      _filteredOptions = [...mappedMembers, ...mappedRoles];
+      if (type === 'role') {
+        _filteredOptions = mappedRoles;
+      }
+
+      if (type === 'roleAndUser') {
+        _filteredOptions = [...mappedMembers, ...mappedRoles];
+      }
     }
     return _filteredOptions;
-  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId]);
+  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
 
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
@@ -225,6 +234,18 @@ export function UserAndRoleSelect({
     onChange(populatedValue.filter(({ id }) => id !== idToRemove));
   }
 
+  function getPlaceholderLabel() {
+    if (isFreeSpace) {
+      return 'Search for a person...';
+    }
+
+    if (type === 'role') {
+      return 'Search for a role...';
+    }
+
+    return 'Search for a person or role...';
+  }
+
   // TODO: maybe we don't need a separate component for un-open state?
   if (variant === 'standard' && !isOpen) {
     return (
@@ -241,7 +262,7 @@ export function UserAndRoleSelect({
           ) : (
             <SelectedReviewers
               readOnlyMessage={readOnlyMessage}
-              wrapColumn
+              wrapColumn={wrapColumn}
               readOnly
               value={populatedValue}
               onRemove={removeReviewer}
@@ -287,13 +308,7 @@ export function UserAndRoleSelect({
             autoFocus={variant === 'standard'}
             size='small'
             value={applicableValues}
-            placeholder={
-              populatedValue.length === 0
-                ? isFreeSpace
-                  ? 'Search for a person...'
-                  : 'Search for a person or role...'
-                : ''
-            }
+            placeholder={populatedValue.length === 0 ? getPlaceholderLabel() : ''}
             InputProps={{
               ...params.InputProps,
               ...(variant === 'standard' && { disableUnderline: true })

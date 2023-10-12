@@ -1,9 +1,6 @@
 import type { User } from '@charmverse/core/prisma';
 
-export type NotificationActor = Pick<
-  User,
-  'id' | 'username' | 'path' | 'avatar' | 'avatarContract' | 'avatarTokenId' | 'avatarChain' | 'deletedAt'
->;
+import type { NotificationActor } from './interfaces';
 
 export function mapNotificationActor(user: User | null): NotificationActor | null {
   if (!user) return null;

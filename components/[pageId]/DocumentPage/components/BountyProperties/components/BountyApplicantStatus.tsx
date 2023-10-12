@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function BountyApplicantStatus({ submission }: Props) {
-  const transaction = (submission as ApplicationWithTransactions).transactions[0];
+  const transaction = (submission as ApplicationWithTransactions).transactions?.[0];
   const { safeTxUrl } = useGnosisTransaction({ tx: transaction });
 
   return (

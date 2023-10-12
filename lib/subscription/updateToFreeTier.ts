@@ -1,4 +1,4 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';
@@ -11,6 +11,8 @@ export async function updateToFreeTier(spaceId: string, userId: string) {
     const space = await prisma.space.findFirst({ where: { id: spaceId } });
     if (!space) {
       throw new DataNotFoundError('Space not found');
+    } else if (space.paidTier === 'enterprise') {
+      throw new InvalidInputError(`This space is already on the enterprise plan`);
     }
   }
 

@@ -13,15 +13,15 @@ export const webhookChecker = async (event: APIGatewayProxyEvent): Promise<APIGa
     const signature = headers?.Signature;
 
     if (!signature) {
-      throw new Error('No signature found');
+      throw new Error('Checker: No signature found');
     }
 
     try {
-      const tokenSecret = 'your_token_secret';
+      const tokenSecret = 'Checker: your_token_secret';
       const secret = Buffer.from(tokenSecret, 'hex');
       await jwtVerify(signature, secret);
     } catch (e) {
-      throw new Error('Invalid signature');
+      throw new Error('Checker: Invalid signature');
     }
 
     return {

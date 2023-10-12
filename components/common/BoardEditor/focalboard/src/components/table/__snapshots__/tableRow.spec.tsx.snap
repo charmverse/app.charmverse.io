@@ -12,12 +12,10 @@ exports[`components/table/TableRow should match snapshot 1`] = `
       style="opacity: 1;"
     >
       <div
-        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+        class="icons row-actions MuiBox-root css-0"
       >
-        <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
-          tabindex="0"
-          type="button"
+        <div
+          class="charm-drag-handle MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -30,7 +28,11 @@ exports[`components/table/TableRow should match snapshot 1`] = `
               d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
             />
           </svg>
-        </button>
+        </div>
+      </div>
+      <div
+        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+      >
         <div
           style="display: flex; width: 100%;"
         >
@@ -107,12 +109,10 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
       style="opacity: 1;"
     >
       <div
-        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+        class="icons row-actions MuiBox-root css-0"
       >
-        <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
-          tabindex="0"
-          type="button"
+        <div
+          class="charm-drag-handle MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -125,7 +125,11 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
               d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
             />
           </svg>
-        </button>
+        </div>
+      </div>
+      <div
+        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+      >
         <div
           style="display: flex; width: 100%;"
         >
@@ -202,12 +206,10 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       style="opacity: 1;"
     >
       <div
-        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+        class="icons row-actions MuiBox-root css-0"
       >
-        <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
-          tabindex="0"
-          type="button"
+        <div
+          class="charm-drag-handle MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -220,7 +222,11 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
               d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
             />
           </svg>
-        </button>
+        </div>
+      </div>
+      <div
+        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+      >
         <div
           style="display: flex; width: 100%;"
         >
@@ -345,12 +351,10 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
       style="opacity: 1;"
     >
       <div
-        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+        class="icons row-actions MuiBox-root css-0"
       >
-        <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
-          tabindex="0"
-          type="button"
+        <div
+          class="charm-drag-handle MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -363,7 +367,11 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
               d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
             />
           </svg>
-        </button>
+        </div>
+      </div>
+      <div
+        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+      >
         <div
           style="display: flex; width: 100%;"
         >
@@ -519,12 +527,10 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       style="opacity: 1;"
     >
       <div
-        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+        class="icons row-actions MuiBox-root css-0"
       >
-        <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
-          tabindex="0"
-          type="button"
+        <div
+          class="charm-drag-handle MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -537,7 +543,11 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
               d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
             />
           </svg>
-        </button>
+        </div>
+      </div>
+      <div
+        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+      >
         <div
           style="display: flex; width: 100%;"
         >

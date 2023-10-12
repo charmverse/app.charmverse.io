@@ -19,9 +19,6 @@ export function getAccessType(condition: AccsDefaultParams): TokenGateAccessType
     case 'members':
       return 'dao_members';
 
-    case 'getActiveSubscriptionCount':
-      return 'cask_subscribers';
-
     case 'balanceOf':
     case 'eth_getBalance':
       return 'group_token_or_nft';

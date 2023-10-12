@@ -1,3 +1,4 @@
+import { PageNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -9,6 +10,8 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -33,6 +36,17 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     throw new DataNotFoundError(`Thread with id ${threadId} not found`);
   }
 
+  const pageId = thread.pageId;
+
+  const page = await prisma.page.findUnique({
+    where: { id: pageId },
+    select: { spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true, cardId: true, id: true }
+  });
+
+  if (!page) {
+    throw new PageNotFoundError(pageId);
+  }
+
   const permissionSet = await getPermissionsClient({
     resourceId: thread.pageId,
     resourceIdType: 'page'
@@ -51,6 +65,13 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     threadId,
     userId,
     content
+  });
+
+  await publishDocumentEvent({
+    documentId: page.id,
+    scope: WebhookEventNames.DocumentInlineCommentCreated,
+    inlineCommentId: createdComment.id,
+    spaceId: page.spaceId
   });
 
   trackUserAction('page_comment_created', {

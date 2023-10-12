@@ -1,4 +1,3 @@
-import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import MenuIcon from '@mui/icons-material/Menu';
 import Box from '@mui/material/Box';
@@ -7,21 +6,16 @@ import Toolbar from '@mui/material/Toolbar';
 import { useRouter } from 'next/router';
 import { memo } from 'react';
 
-import { documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
-import { useUser } from 'hooks/useUser';
 
 import BountyShareButton from './components/BountyShareButton/BountyShareButton';
-import { DocumentParticipants } from './components/DocumentParticipants';
-import EditingModeToggle from './components/EditingModeToggle';
-import { NotificationButton } from './components/NotificationPreview/NotificationButton';
+import { DocumentHeaderElements } from './components/DocumentHeaderElements';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
-import ShareButton from './components/ShareButton';
 
 export const headerHeight = 56;
 
@@ -42,7 +36,6 @@ type HeaderProps = {
 
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const router = useRouter();
-  const { user } = useUser();
   const basePageId = usePageIdFromPath();
   const { space: currentSpace } = useCurrentSpace();
   const { page: basePage } = usePage({
@@ -54,7 +47,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const forumPostInfo = usePostByPath();
   const isBountyBoard = router.route === '/[domain]/bounties';
   const isProposalsPage = router.route === '/[domain]/proposals';
-  const isBasePageDocument = documentTypes.includes(basePage?.type as PageType);
+
   return (
     <StyledToolbar variant='dense'>
       <IconButton
@@ -84,21 +77,13 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
         </div>
 
-        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.25}>
+        <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
           {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
 
-          {basePage && (
-            <>
-              {isBasePageDocument && <DocumentParticipants />}
-              {isBasePageDocument && <EditingModeToggle />}
-              {!basePage?.deletedAt && <ShareButton headerHeight={headerHeight} pageId={basePage.id} />}
-            </>
-          )}
+          {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
 
           <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
-
-          {user && <NotificationButton />}
         </Box>
       </Box>
     </StyledToolbar>

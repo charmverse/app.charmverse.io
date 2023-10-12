@@ -89,6 +89,24 @@ describe('getDefaultPageForSpace()', () => {
     const url = await getDefaultPageForSpace({ space, userId: user.id });
     expect(url).toEqual(`/${space.domain}/proposals%20?id=123`);
   });
+
+  it('should not include subdomain when going to custom domain', async () => {
+    const customDomain = 'work.charmverse.fyi';
+    const { space, user } = await generateUserAndSpace({
+      spaceCustomDomain: customDomain
+    });
+    const page = await createPage({ spaceId: space.id, createdBy: user.id, path: '日本語' });
+    await savePageView({
+      createdBy: user.id,
+      spaceId: space.id,
+      pageId: page.id,
+      pageType: 'page',
+      meta: { pathname: `/proposals%20?id=123` }
+    });
+
+    const url = await getDefaultPageForSpace({ space, userId: user.id, host: customDomain });
+    expect(url).toEqual(`/proposals%20?id=123`);
+  });
 });
 
 type EventData = Pick<UserSpaceAction, 'pageType' | 'createdBy' | 'spaceId'> & {

@@ -15,7 +15,6 @@ export type BountyCreationData = Pick<Bounty, 'spaceId' | 'createdBy'> &
       'status' | 'chainId' | 'approveSubmitters' | 'maxSubmissions' | 'rewardAmount' | 'rewardToken' | 'customReward'
     >
   > & { permissions?: Partial<BountyPermissions>; pageType?: PageType; linkedPageId?: string };
-
 export type UpdateableBountyFields = Partial<
   Pick<Bounty, 'chainId' | 'rewardAmount' | 'rewardToken' | 'approveSubmitters' | 'maxSubmissions' | 'customReward'>
 > & { permissions?: Partial<BountyPermissions> };

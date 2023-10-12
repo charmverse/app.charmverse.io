@@ -83,7 +83,7 @@ type Props = WrappedComponentProps &
 type State = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
-  showSettings: 'view-options' | null;
+  openSettings: 'view-options' | null;
 };
 
 function CenterPanel(props: Props) {
@@ -93,7 +93,7 @@ function CenterPanel(props: Props) {
     cardIdToFocusOnRender: '',
     selectedCardIds: [],
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
-    showSettings: null
+    openSettings: null
   });
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
@@ -132,7 +132,7 @@ function CenterPanel(props: Props) {
 
   useEffect(() => {
     if (activeView) {
-      setState((s) => ({ ...s, showSettings: null }));
+      setState((s) => ({ ...s, openSettings: null }));
     }
   }, [activeView?.id, views.length, activePage]);
 
@@ -386,21 +386,21 @@ function CenterPanel(props: Props) {
     showView('');
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
-      setState({ ...state, showSettings: 'view-options' });
+      setState({ ...state, openSettings: 'view-options' });
     });
   }
 
   function toggleViewOptions(enable?: boolean) {
-    enable = enable ?? state.showSettings !== 'view-options';
-    const showSettings = enable ? 'view-options' : null;
+    enable = enable ?? state.openSettings !== 'view-options';
+    const openSettings = enable ? 'view-options' : null;
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
-      setState({ ...state, showSettings });
+      setState({ ...state, openSettings });
     });
   }
 
   function closeSettings() {
-    setState({ ...state, showSettings: null });
+    setState({ ...state, openSettings: null });
   }
 
   // close settings once a view has been added
@@ -510,8 +510,8 @@ function CenterPanel(props: Props) {
           )}
         </div>
 
-        <div className={`container-container ${state.showSettings ? 'sidebar-visible' : ''}`}>
-          <Box display='flex' sx={{ minHeight: state.showSettings ? 450 : 0 }}>
+        <div className={`container-container ${state.openSettings ? 'sidebar-visible' : ''}`}>
+          <Box display='flex' sx={{ minHeight: state.openSettings ? 450 : 0 }}>
             <Box width='100%'>
               {/* Show page title for inline boards */}
               {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
@@ -637,7 +637,7 @@ function CenterPanel(props: Props) {
               pageId={activePage?.id}
               rootBoard={board}
               view={activeView}
-              isOpen={state.showSettings === 'view-options'}
+              isOpen={state.openSettings === 'view-options'}
               closeSidebar={closeSettings}
               groupByProperty={groupByProperty}
               showView={showView}

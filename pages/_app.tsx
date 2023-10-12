@@ -1,3 +1,4 @@
+import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
@@ -20,11 +21,10 @@ import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/compo
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
-import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { UserProfileProvider } from 'components/common/UserProfile/hooks/useUserProfile';
+import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
@@ -48,7 +48,6 @@ import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
 import '@bangle.dev/tooltip/style.css';
-import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetail.scss';
@@ -88,6 +87,9 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
 import 'lib/lit-protocol-modal/index.css';
 import 'lib/lit-protocol-modal/reusableComponents/litChainSelector/LitChainSelector.css';
 import 'lib/lit-protocol-modal/reusableComponents/litCheckbox/LitCheckbox.css';
@@ -150,9 +152,12 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
-    if (!isOldBuild && data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
+    if (!isOldBuild && data.buildId !== env('BUILD_ID')) {
       setIsOldBuild(true);
-      log.info('Requested user to refresh their browser to get new version');
+      log.info('Requested user to refresh their browser to get new version', {
+        oldVersion: env('BUILD_ID'),
+        newVersion: data.buildId
+      });
     }
   }, 180000);
 
@@ -181,38 +186,36 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
         <ReactDndProvider>
           <DataProviders>
             <SettingsDialogProvider>
-              <NotificationsProvider>
-                <LocalizationProvider>
-                  <FocalBoardProvider>
-                    <NotionProvider>
-                      <IntlProvider>
-                        <PageHead {...pageProps} />
+              <LocalizationProvider>
+                <FocalBoardProvider>
+                  <NotionProvider>
+                    <IntlProvider>
+                      <PageHead {...pageProps} />
 
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
 
-                            {getLayout(<Component {...pageProps} />)}
+                          {getLayout(<Component {...pageProps} />)}
 
-                            <GlobalComponents />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </IntlProvider>
-                    </NotionProvider>
-                  </FocalBoardProvider>
-                </LocalizationProvider>
-              </NotificationsProvider>
+                          <GlobalComponents />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </IntlProvider>
+                  </NotionProvider>
+                </FocalBoardProvider>
+              </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
         </ReactDndProvider>

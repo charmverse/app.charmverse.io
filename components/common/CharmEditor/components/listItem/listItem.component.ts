@@ -47,7 +47,7 @@ const isValidList = (state: EditorState) => {
 
 function specFactory(): RawSpecs {
   const { toDOM, parseDOM } = domSerializationHelpers(name, {
-    tag: 'li',
+    tag: 'li.old-list-item',
     // @ts-ignore DOMOutputSpec in @types is buggy
     content: 0
   });
@@ -75,31 +75,6 @@ function specFactory(): RawSpecs {
       },
       toDOM,
       parseDOM
-    },
-    markdown: {
-      toMarkdown(state: MarkdownSerializerState, node: Node) {
-        if (node.attrs.todoChecked != null) {
-          state.write(node.attrs.todoChecked ? '[x] ' : '[ ] ');
-        }
-        state.renderContent(node);
-      },
-      parseMarkdown: {
-        list_item: {
-          block: name,
-          getAttrs: (tok: Token) => {
-            let todoChecked = null;
-            const todoIsDone = tok.attrGet('isDone');
-            if (todoIsDone === 'yes') {
-              todoChecked = true;
-            } else if (todoIsDone === 'no') {
-              todoChecked = false;
-            }
-            return {
-              todoChecked
-            };
-          }
-        }
-      }
     }
   };
 }
@@ -121,13 +96,13 @@ function pluginsFactory({ keybindings = defaultKeys, nodeView = true, readOnly =
             }))
           ),
 
-          Backspace: backspaceKeyCommand(type),
+          // Backspace: backspaceKeyCommand(type),
           Enter: enterKeyCommand(type),
           ...createObject([
-            [keybindings.indent, indentListItem()],
-            [keybindings.outdent, outdentListItem()],
-            [keybindings.moveUp, moveListItemUp()],
-            [keybindings.moveDown, moveListItemDown()],
+            [keybindings.indent, filter(isValidList, indentListItem())],
+            [keybindings.outdent, filter(isValidList, outdentListItem())],
+            [keybindings.moveUp, filter(isValidList, moveListItemUp())],
+            [keybindings.moveDown, filter(isValidList, moveListItemDown())],
             [keybindings.emptyCut, filter(isValidList, cutEmptyCommand(type))],
             [keybindings.emptyCopy, filter(isValidList, copyEmptyCommand(type))],
             [keybindings.insertEmptyListAbove, insertEmptySiblingListAbove()],

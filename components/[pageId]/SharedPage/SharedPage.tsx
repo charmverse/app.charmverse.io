@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
@@ -11,6 +12,7 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -24,6 +26,7 @@ export function SharedPage({ publicPage }: Props) {
   const { setCurrentPageId } = useCurrentPage();
   const { pages } = usePages();
   const [, setTitleState] = usePageTitle();
+  const { space } = useCurrentSpace();
 
   const basePageId = publicPage?.page?.id || '';
 
@@ -42,7 +45,8 @@ export function SharedPage({ publicPage }: Props) {
     trackPageView({
       type: rootPage.type,
       pageId: rootPage.id,
-      spaceId: rootPage.spaceId
+      spaceId: rootPage.spaceId,
+      spaceDomain: space?.domain
     });
 
     setTitleState(rootPage.title);
@@ -83,6 +87,13 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
   ) : (
-    <DocumentPage page={publicPage.page} refreshPage={() => Promise.resolve()} savePage={() => null} readOnly={true} />
+    <Box sx={{ overflowY: 'auto' }}>
+      <DocumentPage
+        page={publicPage.page}
+        refreshPage={() => Promise.resolve()}
+        savePage={() => null}
+        readOnly={true}
+      />
+    </Box>
   );
 }

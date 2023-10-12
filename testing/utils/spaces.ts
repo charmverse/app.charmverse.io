@@ -13,7 +13,7 @@ export async function addUserToSpace({
   userId
 }: {
   spaceId: string;
-  isAdmin: boolean;
+  isAdmin?: boolean;
   userId: string;
 }): Promise<LoggedInUser> {
   return prisma.user.update({

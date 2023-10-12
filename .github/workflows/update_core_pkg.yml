@@ -35,6 +35,7 @@ jobs:
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
+          save_cache: true
 
       - name: Calculate Build ID
         id: get_build_id
@@ -45,25 +46,8 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'production'
-          NEXT_PUBLIC_DD_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN: ${{ secrets.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN }}
-          NEXT_PUBLIC_DD_RUM_APP_ID: ${{ secrets.NEXT_PUBLIC_DD_RUM_APP_ID }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID }}
-          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-          NEXT_PUBLIC_WEBSOCKETS_HOST: https://sockets.charmverse.io
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
-          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY }}
-          NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID }}
-          NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
-          NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID }}
-          NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_PRD }}
-          NEXT_PUBLIC_WALLETCONNECT_PROJECTID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECTID }}
-          NEXT_PUBLIC_BUILD_ID: ${{ steps.get_build_id.outputs.build_id }}
+          REACT_APP_APP_ENV: 'production'
+
       - name: Save dependency and build using another cache key to do one step restore in subsequent jobs
         id: update_cache_build
         uses: actions/cache/save@v3
@@ -177,8 +161,9 @@ jobs:
                     .IMGTAG = "${{ needs.build-docker-image.outputs.img_tag }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-      - name: Bundle Webapp beanstalk payload
+      - name: Add build_id and Bundle Webapp beanstalk payload
         run: |
+          echo "REACT_APP_BUILD_ID=${{ needs.build-test-env.outputs.build_id }}" >> ./.ebstalk.apps.env/webapp.env
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Bundle CronWorker beanstalk payload
@@ -206,7 +191,7 @@ jobs:
     needs: [ build-test-env, package-beanstalk-payload ]
     strategy:
       max-parallel: 2
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - step_name: 'Deploying prd Worker to beanstalk'
@@ -247,5 +232,27 @@ jobs:
           region: us-east-1
           deployment_package: ${{matrix.deployment_package}}
           use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: true 
+          wait_for_deployment: true
+          wait_for_environment_recovery: 120
+
+  discord_alert:
+    name: Notify discord of failure
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [build-test-env, build-docker-image, package-beanstalk-payload, deploy_to_beanstalk]
+    steps:
+      - name: If any of prev jobs failed notify discord
+        if: contains(needs.*.result, 'failure')
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
+          status: 'failure'
+          content: "Hey <@&1027309276454207519>"    
+          title: "Webapp: Core pkg upgrade failed"
+          description: |
+            Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
+          color: "16515843"
+          url: "https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}"
+          username: GitHub Actions
+          avatar_url: "https://github.githubassets.com/images/modules/logos_page/Octocat.png"
 
