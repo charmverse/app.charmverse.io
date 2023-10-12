@@ -12,7 +12,8 @@ export async function createPollNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.VoteCreated: {
       const voteId = webhookData.event.vote.id;
@@ -68,7 +69,7 @@ export async function createPollNotifications(webhookData: {
                   userId: spaceUserId
                 });
           if (pagePermission.comment && vote.author.id !== spaceUserId) {
-            await savePollNotification({
+            const { id } = await savePollNotification({
               createdAt: webhookData.createdAt,
               createdBy: vote.author.id,
               spaceId,
@@ -76,6 +77,7 @@ export async function createPollNotifications(webhookData: {
               userId: spaceUserId,
               voteId
             });
+            ids.push(id);
           }
         }
       } else if (vote.post) {
@@ -92,7 +94,7 @@ export async function createPollNotifications(webhookData: {
                 });
 
           if (categories.length !== 0 && categories[0].permissions.comment_posts && vote.author.id !== spaceUserId) {
-            await savePollNotification({
+            const { id } = await savePollNotification({
               createdAt: webhookData.createdAt,
               createdBy: vote.author.id,
               spaceId,
@@ -100,6 +102,7 @@ export async function createPollNotifications(webhookData: {
               userId: spaceUserId,
               voteId
             });
+            ids.push(id);
           }
         }
       }
@@ -110,4 +113,5 @@ export async function createPollNotifications(webhookData: {
     default:
       break;
   }
+  return ids;
 }

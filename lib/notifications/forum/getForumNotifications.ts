@@ -1,15 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PostNotification } from '../interfaces';
-import { notificationMetadataSelectStatement } from '../utils';
+import type { QueryCondition } from '../utils';
+import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
-export async function getPostNotifications(userId: string): Promise<PostNotification[]> {
+export async function getPostNotifications({ id, userId }: QueryCondition): Promise<PostNotification[]> {
   const postNotifications = await prisma.postNotification.findMany({
-    where: {
-      notificationMetadata: {
-        userId
-      }
-    },
+    where: queryCondition({ id, userId }),
     select: {
       id: true,
       type: true,

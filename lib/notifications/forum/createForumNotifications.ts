@@ -13,7 +13,8 @@ export async function createForumNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.ForumPostCreated: {
       const spaceId = webhookData.spaceId;
@@ -51,7 +52,7 @@ export async function createForumNotifications(webhookData: {
           postCategoriesUserRecord.subscriptions[post.category.id]
         ) {
           const userMentions = extractedMentions.filter((mention) => mention.value === userId);
-          await savePostNotification({
+          const { id } = await savePostNotification({
             createdAt: webhookData.createdAt,
             createdBy: postAuthorId,
             postId,
@@ -59,9 +60,10 @@ export async function createForumNotifications(webhookData: {
             userId,
             type: 'created'
           });
+          ids.push(id);
 
           for (const userMention of userMentions) {
-            await saveDocumentNotification({
+            const { id: _id } = await saveDocumentNotification({
               createdAt: webhookData.createdAt,
               createdBy: postAuthorId,
               mentionId: userMention.id,
@@ -71,6 +73,7 @@ export async function createForumNotifications(webhookData: {
               type: 'mention.created',
               content: userMention.parentNode
             });
+            ids.push(id);
           }
         }
       }
@@ -80,4 +83,5 @@ export async function createForumNotifications(webhookData: {
     default:
       break;
   }
+  return ids;
 }

@@ -4,14 +4,14 @@ import { v4 } from 'uuid';
 import { saveDocumentNotification } from 'lib/notifications/saveNotification';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { builders } from 'testing/prosemirror/builders';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
-import { sendUserNotifications } from '../sendNotifications';
+import { sendNotificationEmail } from '../sendNotifications';
 
-describe('sendNotification()', () => {
-  it('Should send a notification email only once', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken({
-      email: `${Math.random()}@charmversetest.io`
+describe('sendNotificationEmail()', () => {
+  it('Should send a notification email', async () => {
+    const { user, space } = await generateUserAndSpace({
+      user: { email: `${Math.random()}@charmversetest.io` }
     });
 
     const page = await testUtilsPages.generatePage({
@@ -19,7 +19,7 @@ describe('sendNotification()', () => {
       spaceId: space.id
     });
 
-    await saveDocumentNotification({
+    const notification = await saveDocumentNotification({
       createdAt: new Date().toISOString(),
       createdBy: user.id,
       pageId: page.id,
@@ -30,15 +30,13 @@ describe('sendNotification()', () => {
       content: builders.doc(builders.p('Test')).toJSON()
     });
 
-    const notificationsNo = await sendUserNotifications();
-    expect(notificationsNo).toBeGreaterThan(0);
-    const secondNotificationsNo = await sendUserNotifications();
-    expect(secondNotificationsNo).toBe(0);
+    const notificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
+    expect(notificationsNo).toBe(true);
   });
 
   it('Should send a notification only when the user is subscribed to email notifications', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken({
-      email: `${Math.random()}@charmversetest.io`
+    const { user, space } = await generateUserAndSpace({
+      user: { email: `${Math.random()}@charmversetest.io`, emailNotifications: false }
     });
 
     const page = await testUtilsPages.generatePage({
@@ -46,7 +44,7 @@ describe('sendNotification()', () => {
       spaceId: space.id
     });
 
-    await saveDocumentNotification({
+    const notification = await saveDocumentNotification({
       createdAt: new Date().toISOString(),
       createdBy: user.id,
       pageId: page.id,
@@ -57,14 +55,12 @@ describe('sendNotification()', () => {
       content: builders.doc(builders.p('Test')).toJSON()
     });
 
-    await updateUserProfile(user.id, { emailNotifications: false });
-
-    const notificationsNo = await sendUserNotifications();
-    expect(notificationsNo).toBe(0);
+    const notificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
+    expect(notificationsNo).toBe(true);
 
     await updateUserProfile(user.id, { emailNotifications: true });
 
-    const secondNotificationsNo = await sendUserNotifications();
-    expect(secondNotificationsNo).toBeGreaterThan(0);
+    const secondNotificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
+    expect(secondNotificationsNo).toBe(false);
   });
 });

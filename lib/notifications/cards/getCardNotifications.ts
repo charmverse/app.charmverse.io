@@ -2,15 +2,12 @@ import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { CardNotification } from '../interfaces';
-import { notificationMetadataSelectStatement } from '../utils';
+import type { QueryCondition } from '../utils';
+import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
-export async function getCardNotifications(userId: string): Promise<CardNotification[]> {
+export async function getCardNotifications({ id, userId }: QueryCondition): Promise<CardNotification[]> {
   const cardNotifications = await prisma.cardNotification.findMany({
-    where: {
-      notificationMetadata: {
-        userId
-      }
-    },
+    where: queryCondition({ id, userId }),
     select: {
       id: true,
       type: true,

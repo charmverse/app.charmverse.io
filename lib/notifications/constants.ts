@@ -1,1 +1,1 @@
-export const notificationGroups = ['forum', 'documents', 'proposals', 'rewards', 'polls'] as const;
+export const notificationGroups = ['card', 'forum', 'documents', 'proposals', 'rewards', 'polls'] as const;

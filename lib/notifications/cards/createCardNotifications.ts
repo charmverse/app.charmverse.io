@@ -7,7 +7,8 @@ export async function createCardNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.CardPersonPropertyAssigned: {
       const spaceId = webhookData.spaceId;
@@ -15,7 +16,7 @@ export async function createCardNotifications(webhookData: {
       const cardId = webhookData.event.card.id;
 
       if (webhookData.event.user.id !== assignedUserId) {
-        await saveCardNotification({
+        const { id } = await saveCardNotification({
           type: 'person_assigned',
           personPropertyId: webhookData.event.personProperty.id,
           cardId,
@@ -24,6 +25,7 @@ export async function createCardNotifications(webhookData: {
           createdAt: webhookData.createdAt,
           createdBy: webhookData.event.user.id
         });
+        ids.push(id);
       }
       break;
     }
@@ -31,4 +33,5 @@ export async function createCardNotifications(webhookData: {
     default:
       break;
   }
+  return ids;
 }

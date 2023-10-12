@@ -13,7 +13,8 @@ export async function createProposalNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.ProposalStatusChanged: {
       const userId = webhookData.event.user.id;
@@ -152,7 +153,7 @@ export async function createProposalNotifications(webhookData: {
           continue;
         }
 
-        await saveProposalNotification({
+        const { id } = await saveProposalNotification({
           createdAt: webhookData.createdAt,
           createdBy: userId,
           proposalId,
@@ -160,6 +161,7 @@ export async function createProposalNotifications(webhookData: {
           userId: spaceRole.userId,
           type: action
         });
+        ids.push(id);
       }
 
       break;
@@ -168,4 +170,5 @@ export async function createProposalNotifications(webhookData: {
     default:
       break;
   }
+  return ids;
 }

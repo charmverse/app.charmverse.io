@@ -13,7 +13,8 @@ export async function createDocumentNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.DocumentMentionCreated: {
       const mentionedUserId = webhookData.event.mention.value;
@@ -32,7 +33,7 @@ export async function createDocumentNotifications(webhookData: {
       const documentContent = document.content as PageContent;
       const targetMention = extractMentionFromId(documentContent, mentionId);
       if (mentionedUserId !== mentionAuthorId && targetMention) {
-        await saveDocumentNotification({
+        const { id } = await saveDocumentNotification({
           type: 'mention.created',
           createdAt: webhookData.createdAt,
           createdBy: mentionAuthorId,
@@ -42,6 +43,7 @@ export async function createDocumentNotifications(webhookData: {
           userId: mentionedUserId,
           content: targetMention.parentNode
         });
+        ids.push(id);
       } else {
         log.warn('Ignore user mention - could not find it in the doc', {
           pageId: documentId,
@@ -91,7 +93,7 @@ export async function createDocumentNotifications(webhookData: {
         previousInlineComment?.id !== inlineCommentId &&
         previousInlineComment.userId !== inlineCommentAuthorId
       ) {
-        await saveDocumentNotification({
+        const { id } = await saveDocumentNotification({
           type: 'inline_comment.replied',
           createdAt: webhookData.createdAt,
           createdBy: inlineCommentAuthorId,
@@ -101,11 +103,12 @@ export async function createDocumentNotifications(webhookData: {
           userId: previousInlineComment.userId,
           content: inlineCommentContent
         });
+        ids.push(id);
       }
 
       for (const authorId of authorIds) {
         if (inlineCommentAuthorId !== authorId && previousInlineComment?.userId !== authorId) {
-          await saveDocumentNotification({
+          const { id } = await saveDocumentNotification({
             type: 'inline_comment.created',
             createdAt: webhookData.createdAt,
             createdBy: inlineCommentAuthorId,
@@ -115,6 +118,7 @@ export async function createDocumentNotifications(webhookData: {
             userId: authorId,
             content: inlineCommentContent
           });
+          ids.push(id);
         }
       }
 
@@ -122,7 +126,7 @@ export async function createDocumentNotifications(webhookData: {
       for (const extractedMention of extractedMentions) {
         const mentionedUserId = extractedMention.value;
         if (mentionedUserId !== inlineCommentAuthorId) {
-          await saveDocumentNotification({
+          const { id } = await saveDocumentNotification({
             type: 'inline_comment.mention.created',
             createdAt: webhookData.createdAt,
             createdBy: inlineCommentAuthorId,
@@ -133,6 +137,7 @@ export async function createDocumentNotifications(webhookData: {
             userId: mentionedUserId,
             content: extractedMention.parentNode
           });
+          ids.push(id);
         }
       }
       break;
@@ -172,7 +177,7 @@ export async function createDocumentNotifications(webhookData: {
       if (!comment.parentId) {
         for (const authorId of authorIds) {
           if (authorId !== commentAuthorId) {
-            await saveDocumentNotification({
+            const { id } = await saveDocumentNotification({
               type: 'comment.created',
               createdAt: webhookData.createdAt,
               createdBy: commentAuthorId,
@@ -185,6 +190,7 @@ export async function createDocumentNotifications(webhookData: {
               userId: authorId,
               content: comment.content
             });
+            ids.push(id);
           }
         }
       } else {
@@ -208,7 +214,7 @@ export async function createDocumentNotifications(webhookData: {
 
         const parentCommentAuthorId = parentComment.createdBy;
         if (parentCommentAuthorId !== commentAuthorId) {
-          await saveDocumentNotification({
+          const { id } = await saveDocumentNotification({
             type: 'comment.replied',
             createdAt: webhookData.createdAt,
             createdBy: commentAuthorId,
@@ -221,6 +227,7 @@ export async function createDocumentNotifications(webhookData: {
             userId: parentCommentAuthorId,
             content: comment.content
           });
+          ids.push(id);
         }
       }
 
@@ -229,7 +236,7 @@ export async function createDocumentNotifications(webhookData: {
       const extractedMentions = extractMentions(commentContent);
       for (const extractedMention of extractedMentions) {
         const mentionedUserId = extractedMention.value;
-        await saveDocumentNotification({
+        const { id } = await saveDocumentNotification({
           type: 'comment.mention.created',
           createdAt: webhookData.createdAt,
           createdBy: commentAuthorId,
@@ -243,6 +250,7 @@ export async function createDocumentNotifications(webhookData: {
           userId: mentionedUserId,
           content: extractedMention.parentNode
         });
+        ids.push(id);
       }
 
       break;
@@ -251,4 +259,5 @@ export async function createDocumentNotifications(webhookData: {
     default:
       break;
   }
+  return ids;
 }

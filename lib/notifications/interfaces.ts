@@ -6,7 +6,6 @@ import type { CardPropertyEntity, WebhookEventNames } from 'lib/webhookPublisher
 import type { notificationGroups } from './constants';
 
 export type NotificationGroup = (typeof notificationGroups)[number];
-export type NotificationGroupType = 'forum' | 'discussions' | 'votes' | 'proposals' | 'bounties';
 
 export type NotificationActor = Pick<
   User,

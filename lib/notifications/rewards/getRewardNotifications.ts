@@ -2,15 +2,12 @@ import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BountyNotification } from '../interfaces';
-import { notificationMetadataSelectStatement } from '../utils';
+import type { QueryCondition } from '../utils';
+import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
-export async function getBountyNotifications(userId: string): Promise<BountyNotification[]> {
+export async function getBountyNotifications({ id, userId }: QueryCondition): Promise<BountyNotification[]> {
   const bountyNotifications = await prisma.bountyNotification.findMany({
-    where: {
-      notificationMetadata: {
-        userId
-      }
-    },
+    where: queryCondition({ id, userId }),
     select: {
       id: true,
       type: true,

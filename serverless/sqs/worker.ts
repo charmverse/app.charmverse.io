@@ -7,7 +7,7 @@ import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 
 
 import { count } from 'lib/metrics';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
-import { sendUserNotifications } from 'lib/notifications/mailer/sendNotifications';
+import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotifications';
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 import { publishToWebhook } from '../webhooks/publisher';
@@ -53,9 +53,17 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         // Create and save notifications
         const notifications = await createNotificationsFromEvent(webhookData);
         // Send emails
-        const notificationCount = await sendUserNotifications();
-        log.info(`Sent ${notificationCount} notifications`);
-        count('cron.user-notifications.sent', notificationCount);
+        let notificationCount = 0;
+        for (const notification of notifications) {
+          const sent = await sendNotificationEmail(notification);
+          if (sent) {
+            notificationCount += 1;
+          }
+        }
+        if (notificationCount > 0) {
+          log.info(`Sent ${notificationCount} email notifications`);
+          count('cron.user-notifications.sent', notificationCount);
+        }
 
         await prisma.sQSMessage.create({
           data: {
