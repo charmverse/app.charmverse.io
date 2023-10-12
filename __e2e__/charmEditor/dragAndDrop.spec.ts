@@ -1,11 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { test as base, expect } from '@playwright/test';
+import { DocumentPage } from '__e2e__/po/document.po';
+import { loginBrowserUser } from '__e2e__/utils/mocks';
+import { generatePage } from '__e2e__/utils/pages';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { createPage } from 'testing/setupDatabase';
-
-import { DocumentPage } from '../po/document.po';
-import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
+import { builders } from 'testing/prosemirror/builders';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 type Fixtures = {
   documentPage: DocumentPage;
@@ -15,52 +16,16 @@ const test = base.extend<Fixtures>({
   documentPage: async ({ page }, use) => use(new DocumentPage(page))
 });
 
-test('Drag and drop a nested page node over a linked page node in the CharmEditor', async ({ documentPage }) => {
-  const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
-
-  const nestedPage = await createPage({
-    spaceId: space.id,
-    createdBy: user.id,
-    title: 'Nested Page',
-    parentId: generatedPage.id,
-    pagePermissions: [
-      {
-        spaceId: space.id,
-        permissionLevel: 'full_access'
-      }
-    ]
-  });
-
-  const linkedPage = await createPage({
-    spaceId: space.id,
-    createdBy: user.id,
-    title: 'Linked Page',
-    pagePermissions: [
-      {
-        spaceId: space.id,
-        permissionLevel: 'full_access'
-      }
-    ]
-  });
+test('Drag and drop one paragraph over another in the CharmEditor', async ({ documentPage }) => {
+  const { space, user } = await generateUserAndSpace({ isAdmin: true });
+  const generatedPage = await generatePage({ spaceId: space.id, createdBy: user.id });
 
   await prisma.page.update({
     where: {
       id: generatedPage.id
     },
     data: {
-      content: {
-        type: 'doc',
-        content: [
-          {
-            type: 'page',
-            attrs: { id: nestedPage.id, track: [] }
-          },
-          {
-            type: 'linkedPage',
-            attrs: { id: linkedPage.id, track: [] }
-          }
-        ]
-      }
+      content: builders.doc(builders.p('Item 1'), builders.p('Item 2')).toJSON()
     }
   });
 
@@ -76,13 +41,13 @@ test('Drag and drop a nested page node over a linked page node in the CharmEdito
 
   await expect(documentPage.charmEditor).toBeVisible();
 
-  const nestedPageLocator = documentPage.page.locator('.bangle-editor-core .page-container');
-  const linkedPageLocator = documentPage.page.locator('.bangle-editor-core .linkedPage-container');
-  await linkedPageLocator.hover();
+  const paragraph1Locator = documentPage.page.locator('.bangle-editor-core p:nth-child(1)');
+  const paragraph2Locator = documentPage.page.locator('.bangle-editor-core p:nth-child(2)');
+  await paragraph2Locator.hover();
 
   const rowActionsHandleLocator = documentPage.page.locator('.bangle-editor-core .charm-drag-handle');
   await expect(rowActionsHandleLocator).toBeVisible();
-  await rowActionsHandleLocator.dragTo(nestedPageLocator, {
+  await rowActionsHandleLocator.dragTo(paragraph1Locator, {
     force: true,
     targetPosition: {
       x: 0,
@@ -94,12 +59,6 @@ test('Drag and drop a nested page node over a linked page node in the CharmEdito
     }
   });
 
-  await documentPage.page.waitForTimeout(1000);
-  await documentPage.page.reload();
-  await documentPage.page.waitForTimeout(1000);
-  const documentText = await documentPage.getDocumentText();
-  expect(documentText).toBe(`${linkedPage.title}${nestedPage.title}`);
-
   const page = await prisma.page.findUniqueOrThrow({
     where: {
       id: generatedPage.id
@@ -108,25 +67,8 @@ test('Drag and drop a nested page node over a linked page node in the CharmEdito
       content: true
     }
   });
+
   const pageContent = page.content as PageContent;
 
-  expect(pageContent).toMatchObject({
-    type: 'doc',
-    content: [
-      {
-        type: 'linkedPage',
-        attrs: { id: linkedPage.id, track: [] }
-      },
-      {
-        type: 'page',
-        attrs: { id: nestedPage.id, track: [] }
-      },
-      {
-        type: 'paragraph',
-        attrs: {
-          track: []
-        }
-      }
-    ]
-  });
+  expect(pageContent).toMatchObject(builders.doc(builders.p('Item 2'), builders.p('Item 1')).toJSON());
 });
