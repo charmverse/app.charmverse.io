@@ -89,7 +89,7 @@ export class ForumHomePage {
   }
 
   getCategoryContextMenuLocator(categoryId: string) {
-    return this.page.locator(`data-test=open-category-context-menu-${categoryId}`);
+    return this.page.locator(`data-test=open-forum-category-context-menu-${categoryId}`);
   }
 
   getCategoryEditDescriptionLocator(categoryId: string) {

@@ -1,5 +1,4 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
-import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -113,7 +112,7 @@ export function ProposalCategoryContextMenu({ category }: Props) {
   return (
     <>
       <PopperPopup popupContent={popupContent} onClose={onSave}>
-        <IconButton data-test={`open-category-context-menu-${category.id}`} size='small'>
+        <IconButton data-test={`open-proposal-category-context-menu-${category.id}`} size='small'>
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
