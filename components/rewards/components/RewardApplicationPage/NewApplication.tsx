@@ -70,7 +70,7 @@ export function NewApplication({ setFormInputs, formInputs, contentUpdated, setC
     <div className={`document-print-container ${fontClassName}`}>
       <StyledContainer data-test='page-charmeditor' fullWidth={isSmallScreen}>
         <Box minHeight={450}>
-          <ApplicationInput bountyId='' refreshApplication={() => null} />
+          <ApplicationInput onSubmit={() => null} rewardId='' />
         </Box>
       </StyledContainer>
     </div>

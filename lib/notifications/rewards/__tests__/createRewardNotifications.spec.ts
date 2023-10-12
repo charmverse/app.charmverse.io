@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { approveApplication, createApplication, reviewSubmission, updateSubmission } from 'lib/applications/actions';
+import { reviewApplication, createApplication, reviewSubmission, updateSubmission } from 'lib/applications/actions';
 import { createBounty } from 'lib/bounties';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getApplicationEntity, getRewardEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
@@ -89,9 +89,10 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    await approveApplication({
+    await reviewApplication({
       applicationOrApplicationId: application.id,
-      userId: user.id
+      userId: user.id,
+      decision: 'approve'
     });
 
     await createRewardNotifications({
@@ -202,9 +203,10 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    await approveApplication({
+    await reviewApplication({
       applicationOrApplicationId: application.id,
-      userId: user.id
+      userId: user.id,
+      decision: 'approve'
     });
 
     await updateSubmission({
@@ -281,9 +283,10 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    await approveApplication({
+    await reviewApplication({
       applicationOrApplicationId: application.id,
-      userId: user.id
+      userId: user.id,
+      decision: 'approve'
     });
 
     await updateSubmission({
@@ -371,9 +374,10 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    await approveApplication({
+    await reviewApplication({
       applicationOrApplicationId: application.id,
-      userId: user.id
+      userId: user.id,
+      decision: 'approve'
     });
 
     await updateSubmission({

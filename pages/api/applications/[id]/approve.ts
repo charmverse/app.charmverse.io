@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { approveApplication } from 'lib/applications/actions';
+import { reviewApplication } from 'lib/applications/actions';
 import { rollupBountyStatus } from 'lib/bounties/rollupBountyStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -48,9 +48,10 @@ async function approveUserApplication(req: NextApiRequest, res: NextApiResponse<
     throw new UnauthorisedActionError('You do not have the permission to approve applications for this bounty');
   }
 
-  const approvedApplication = await approveApplication({
+  const approvedApplication = await reviewApplication({
     applicationOrApplicationId: applicationId as string,
-    userId
+    userId,
+    decision: req.body.decision
   });
 
   await publishBountyEvent({

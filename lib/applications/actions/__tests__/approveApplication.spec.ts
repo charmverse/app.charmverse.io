@@ -7,7 +7,7 @@ import { ExpectedAnError } from 'testing/errors';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createApplication } from '../createApplication';
-import { approveApplication } from '../reviewApplication';
+import { reviewApplication } from '../reviewApplication';
 
 let user: User;
 let space: Space;
@@ -41,9 +41,10 @@ describe('approveApplication', () => {
       userId: user.id
     });
 
-    const approved = await approveApplication({
+    const approved = await reviewApplication({
       userId: reviewerUser.id,
-      applicationOrApplicationId: application
+      applicationOrApplicationId: application,
+      decision: 'approve'
     });
 
     expect(approved.status).toBe('inProgress');
@@ -77,9 +78,10 @@ describe('approveApplication', () => {
     });
 
     try {
-      await approveApplication({
+      await reviewApplication({
         userId: reviewerUser.id,
-        applicationOrApplicationId: application
+        applicationOrApplicationId: application,
+        decision: 'approve'
       });
       throw new ExpectedAnError();
     } catch (error) {
@@ -105,9 +107,10 @@ describe('approveApplication', () => {
     });
 
     await expect(
-      approveApplication({
+      reviewApplication({
         userId: user.id,
-        applicationOrApplicationId: application
+        applicationOrApplicationId: application,
+        decision: 'approve'
       })
     ).rejects.toBeInstanceOf(UndesirableOperationError);
   });
