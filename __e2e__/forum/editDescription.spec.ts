@@ -78,6 +78,7 @@ test.describe.serial('Update category permissions', () => {
 
     // Open edit description dialog
     await forumHomePage.getCategoryContextMenuLocator(postCategory.id).click();
+    await forumHomePage.getCategoryEditDescriptionLocator(postCategory.id).waitFor({ state: 'visible' });
     await forumHomePage.getCategoryEditDescriptionLocator(postCategory.id).click();
 
     // Edit text in modal and save
