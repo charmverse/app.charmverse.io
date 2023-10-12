@@ -1,4 +1,5 @@
 /* eslint-disable no-continue */
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { extractMentionFromId, extractMentions } from 'lib/prosemirror/extractMentions';
@@ -40,6 +41,8 @@ export async function createDocumentNotifications(webhookData: {
           userId: mentionedUserId,
           content: targetMention.parentNode
         });
+      } else {
+        log.warn('Ignore mention', { pageId: documentId, mentionedUserId, mentionAuthorId, targetMention });
       }
 
       break;

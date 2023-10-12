@@ -455,15 +455,20 @@ export class DocumentEventHandler {
 
         if (filteredMentions.length) {
           await Promise.all(
-            filteredMentions.map((mention) =>
-              publishDocumentEvent({
+            filteredMentions.map((mention) => {
+              log.info('Publishing a new mention event', {
+                mentionedUserId: mention.value,
+                spaceId: room.doc.spaceId,
+                userId: session.user.id
+              });
+              return publishDocumentEvent({
                 documentId: room.doc.id,
                 scope: WebhookEventNames.DocumentMentionCreated,
                 spaceId: room.doc.spaceId,
                 mention,
                 userId: session.user.id
-              })
-            )
+              });
+            })
           );
         }
 

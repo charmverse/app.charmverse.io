@@ -56,7 +56,12 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             payload: webhookData as Prisma.InputJsonObject
           }
         });
-        log.debug('Saved record of SQS message', { id: webhookMessageHash, spaceId: webhookData.spaceId });
+
+        log.debug('Saved record of SQS message', {
+          id: webhookMessageHash,
+          scope: webhookData.event.scope,
+          spaceId: webhookData.spaceId
+        });
 
         const isWhitelistedEvent = whiteListedWebhookEvents.includes(webhookData.event.scope);
 
