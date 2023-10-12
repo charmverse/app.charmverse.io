@@ -31,12 +31,14 @@ export async function createSubmission({
     throw new DuplicateDataError('You already have a submission for this bounty');
   }
 
-  if (!submissionContent.submission || submissionContent.submission.length < 1 || !submissionContent.submissionNodes) {
+  if (typeof submissionContent.submission !== 'string' || !submissionContent.submissionNodes) {
     throw new MissingDataError('You must provide content in your submission');
   }
 
   if (!submissionContent.walletAddress && !customReward) {
-    throw new MissingDataError('You must provide a wallet address in your submission');
+    throw new MissingDataError(
+      'You must provide a wallet address or information for the custom reward in your submission'
+    );
   }
 
   const submission = await prisma.application.create({
