@@ -7,7 +7,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createDocumentNotification, createPostNotification } from '../saveNotification';
+import { saveDocumentNotification, savePostNotification } from '../saveNotification';
 
 export async function createForumNotifications(webhookData: {
   createdAt: string;
@@ -51,7 +51,8 @@ export async function createForumNotifications(webhookData: {
           postCategoriesUserRecord.subscriptions[post.category.id]
         ) {
           const userMentions = extractedMentions.filter((mention) => mention.value === userId);
-          await createPostNotification({
+          await savePostNotification({
+            createdAt: webhookData.createdAt,
             createdBy: postAuthorId,
             postId,
             spaceId,
@@ -60,7 +61,8 @@ export async function createForumNotifications(webhookData: {
           });
 
           for (const userMention of userMentions) {
-            await createDocumentNotification({
+            await saveDocumentNotification({
+              createdAt: webhookData.createdAt,
               createdBy: postAuthorId,
               mentionId: userMention.id,
               postId,

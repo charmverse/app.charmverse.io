@@ -6,7 +6,7 @@ import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createVoteNotification } from '../saveNotification';
+import { savePollNotification } from '../saveNotification';
 
 export async function createPollNotifications(webhookData: {
   createdAt: string;
@@ -68,7 +68,8 @@ export async function createPollNotifications(webhookData: {
                   userId: spaceUserId
                 });
           if (pagePermission.comment && vote.author.id !== spaceUserId) {
-            await createVoteNotification({
+            await savePollNotification({
+              createdAt: webhookData.createdAt,
               createdBy: vote.author.id,
               spaceId,
               type: 'new_vote',
@@ -91,7 +92,8 @@ export async function createPollNotifications(webhookData: {
                 });
 
           if (categories.length !== 0 && categories[0].permissions.comment_posts && vote.author.id !== spaceUserId) {
-            await createVoteNotification({
+            await savePollNotification({
+              createdAt: webhookData.createdAt,
               createdBy: vote.author.id,
               spaceId,
               type: 'new_vote',

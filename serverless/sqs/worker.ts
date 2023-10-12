@@ -5,10 +5,12 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
+import { count } from 'lib/metrics';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
-import { signJwt } from 'lib/webhookPublisher/authentication';
+import { sendUserNotifications } from 'lib/notifications/mailer/sendNotifications';
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
-import { whiteListedWebhookEvents } from 'lib/webhookPublisher/interfaces';
+
+import { publishToWebhook } from '../webhooks/publisher';
 
 /**
  * SQS worker, message are executed one by one
@@ -48,7 +50,12 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           return;
         }
 
-        await createNotificationsFromEvent(webhookData);
+        // Create and save notifications
+        const notifications = await createNotificationsFromEvent(webhookData);
+        // Send emails
+        const notificationCount = await sendUserNotifications();
+        log.info(`Sent ${notificationCount} notifications`);
+        count('cron.user-notifications.sent', notificationCount);
 
         await prisma.sQSMessage.create({
           data: {
@@ -63,38 +70,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           spaceId: webhookData.spaceId
         });
 
-        const isWhitelistedEvent = whiteListedWebhookEvents.includes(webhookData.event.scope);
-
-        if (!isWhitelistedEvent) {
-          log.debug('Event is not whitelisted for publishing to webhooks', {
-            scope: webhookData.event.scope,
-            spaceId: webhookData.spaceId
-          });
-        } else if (webhookURL && signingSecret) {
-          const secret = Buffer.from(signingSecret, 'hex');
-
-          const signedJWT = await signJwt('webhook', webhookData, secret);
-
-          // Call their endpoint with the event's data
-          const response = await fetch(webhookURL, {
-            method: 'POST',
-            body: JSON.stringify(webhookData),
-            headers: {
-              Signature: signedJWT
-            }
-          });
-
-          log.debug('Webhook call response', { ...response, spaceId: webhookData.spaceId });
-
-          // If not 200 back, we throw an error
-          if (response.status !== 200) {
-            // Add messageID to failed message array
-            batchItemFailures.push({ itemIdentifier: record.messageId });
-
-            // Throw the error so we can log it for debugging
-            throw new Error(`Expect error 200 back. Received: ${response.status}`);
-          }
-        }
+        await publishToWebhook({ webhookURL, signingSecret, ...webhookData });
       } catch (e) {
         // eslint-disable-next-line no-console
         log.error(`Error in processing SQS message`, { body, error: e, record });

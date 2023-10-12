@@ -5,7 +5,7 @@ import { getBountyReviewerIds } from 'lib/bounties/getBountyReviewerIds';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createBountyNotification } from '../saveNotification';
+import { saveRewardNotification } from '../saveNotification';
 
 export async function createRewardNotifications(webhookData: {
   createdAt: string;
@@ -30,8 +30,9 @@ export async function createRewardNotifications(webhookData: {
       const bountyReviewerIds = await getBountyReviewerIds(bountyId);
       for (const bountyReviewerId of bountyReviewerIds) {
         if (application.createdBy !== bountyReviewerId) {
-          await createBountyNotification({
+          await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: application.createdBy,
             spaceId,
             type: 'application.created',
@@ -60,8 +61,9 @@ export async function createRewardNotifications(webhookData: {
       });
 
       if (application.acceptedBy) {
-        await createBountyNotification({
+        await saveRewardNotification({
           bountyId,
+          createdAt: webhookData.createdAt,
           createdBy: application.acceptedBy,
           spaceId,
           type: 'application.approved',
@@ -88,8 +90,9 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      await createBountyNotification({
+      await saveRewardNotification({
         bountyId,
+        createdAt: webhookData.createdAt,
         createdBy: userId,
         spaceId,
         type: 'application.rejected',
@@ -117,8 +120,9 @@ export async function createRewardNotifications(webhookData: {
 
       for (const bountyReviewerId of bountyReviewerIds) {
         if (application.createdBy !== bountyReviewerId) {
-          await createBountyNotification({
+          await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: application.createdBy,
             spaceId,
             type: 'submission.created',
@@ -146,8 +150,9 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      await createBountyNotification({
+      await saveRewardNotification({
         bountyId,
+        createdAt: webhookData.createdAt,
         createdBy: userId,
         spaceId,
         type: 'submission.approved',
@@ -159,8 +164,9 @@ export async function createRewardNotifications(webhookData: {
 
       for (const bountyReviewerId of bountyReviewerIds) {
         if (userId !== bountyReviewerId) {
-          await createBountyNotification({
+          await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: userId,
             spaceId,
             type: 'application.payment_pending',
@@ -188,8 +194,9 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      await createBountyNotification({
+      await saveRewardNotification({
         bountyId,
+        createdAt: webhookData.createdAt,
         createdBy: userId,
         spaceId,
         type: 'application.payment_completed',
@@ -226,8 +233,9 @@ export async function createRewardNotifications(webhookData: {
 
       for (const spaceAdminUserId of spaceAdminUserIds) {
         if (spaceAdminUserId !== bounty.createdBy) {
-          await createBountyNotification({
+          await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: bounty.createdBy,
             spaceId,
             type: 'suggestion.created',

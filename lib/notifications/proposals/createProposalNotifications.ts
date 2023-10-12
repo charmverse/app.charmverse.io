@@ -7,16 +7,13 @@ import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import type { NotificationToggles } from '../notificationToggles';
-import { createProposalNotification } from '../saveNotification';
+import { saveProposalNotification } from '../saveNotification';
 
-export async function createProposalNotifications(
-  webhookData: {
-    createdAt: string;
-    event: WebhookEvent;
-    spaceId: string;
-  },
-  toggles?: NotificationToggles
-) {
+export async function createProposalNotifications(webhookData: {
+  createdAt: string;
+  event: WebhookEvent;
+  spaceId: string;
+}) {
   switch (webhookData.event.scope) {
     case WebhookEventNames.ProposalStatusChanged: {
       const userId = webhookData.event.user.id;
@@ -155,7 +152,8 @@ export async function createProposalNotifications(
           continue;
         }
 
-        await createProposalNotification({
+        await saveProposalNotification({
+          createdAt: webhookData.createdAt,
           createdBy: userId,
           proposalId,
           spaceId,

@@ -1,7 +1,7 @@
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createCardNotification } from '../saveNotification';
+import { saveCardNotification } from '../saveNotification';
 
 export async function createCardNotifications(webhookData: {
   createdAt: string;
@@ -15,12 +15,13 @@ export async function createCardNotifications(webhookData: {
       const cardId = webhookData.event.card.id;
 
       if (webhookData.event.user.id !== assignedUserId) {
-        await createCardNotification({
+        await saveCardNotification({
           type: 'person_assigned',
           personPropertyId: webhookData.event.personProperty.id,
           cardId,
           spaceId,
           userId: assignedUserId,
+          createdAt: webhookData.createdAt,
           createdBy: webhookData.event.user.id
         });
       }

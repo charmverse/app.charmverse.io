@@ -1,7 +1,7 @@
 import { testUtilsPages } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { createDocumentNotification } from 'lib/notifications/saveNotification';
+import { saveDocumentNotification } from 'lib/notifications/saveNotification';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { builders } from 'testing/prosemirror/builders';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -19,7 +19,8 @@ describe('sendNotification()', () => {
       spaceId: space.id
     });
 
-    await createDocumentNotification({
+    await saveDocumentNotification({
+      createdAt: new Date().toISOString(),
       createdBy: user.id,
       pageId: page.id,
       spaceId: space.id,
@@ -45,7 +46,8 @@ describe('sendNotification()', () => {
       spaceId: space.id
     });
 
-    await createDocumentNotification({
+    await saveDocumentNotification({
+      createdAt: new Date().toISOString(),
       createdBy: user.id,
       pageId: page.id,
       spaceId: space.id,

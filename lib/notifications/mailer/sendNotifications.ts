@@ -19,7 +19,7 @@ export async function sendUserNotifications(): Promise<number> {
   const notificationsToSend = await getNotifications();
 
   for (const notification of notificationsToSend) {
-    log.info('Debug: send notification to user', {
+    log.debug('Send notification to user', {
       userId: notification.user.id,
       notifications: notification.totalUnreadNotifications
     });
