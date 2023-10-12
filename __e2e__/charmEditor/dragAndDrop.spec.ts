@@ -5,7 +5,6 @@ import { loginBrowserUser } from '__e2e__/utils/mocks';
 import { generatePage } from '__e2e__/utils/pages';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { builders } from 'testing/prosemirror/builders';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 type Fixtures = {
@@ -25,7 +24,31 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
       id: generatedPage.id
     },
     data: {
-      content: builders.doc(builders.p('Item 1'), builders.p('Item 2')).toJSON()
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            attrs: { track: [] },
+            content: [
+              {
+                text: 'Item 1',
+                type: 'text'
+              }
+            ]
+          },
+          {
+            type: 'paragraph',
+            attrs: { track: [] },
+            content: [
+              {
+                text: 'Item 2',
+                type: 'text'
+              }
+            ]
+          }
+        ]
+      }
     }
   });
 
@@ -70,5 +93,33 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
 
   const pageContent = page.content as PageContent;
 
-  expect(pageContent).toMatchObject(builders.doc(builders.p('Item 2'), builders.p('Item 1')).toJSON());
+  expect(pageContent).toMatchObject({
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        attrs: {
+          track: []
+        },
+        content: [
+          {
+            text: 'Item 2',
+            type: 'text'
+          }
+        ]
+      },
+      {
+        type: 'paragraph',
+        attrs: {
+          track: []
+        },
+        content: [
+          {
+            text: 'Item 1',
+            type: 'text'
+          }
+        ]
+      }
+    ]
+  });
 });
