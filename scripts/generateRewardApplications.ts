@@ -1,15 +1,16 @@
 import { ApplicationStatus, prisma } from "@charmverse/core/prisma-client";
-import { isTestEnv } from "config/constants";
+import { isStagingEnv, isTestEnv } from "config/constants";
 import {testUtilsUser} from '@charmverse/core/test'
 import { stubProsemirrorDoc } from "testing/stubs/pageContent";
 import { stringUtils } from "@charmverse/core/utilities";
+import randomName from "lib/utilities/randomName";
 
 
 
 
 
 export async function generateRewardApplications({rewardPagePathOrId, amount, status}: {rewardPagePathOrId: string, amount: number, status: ApplicationStatus}) {
-  if (!isTestEnv) {
+  if (!isTestEnv && !isStagingEnv) {
     throw new Error('This script cannot be used in production')
   }
 
@@ -29,6 +30,15 @@ export async function generateRewardApplications({rewardPagePathOrId, amount, st
     const spaceUser = await testUtilsUser.generateSpaceUser({
       spaceId
     });
+
+    await prisma.user.update({
+      where: {
+        id: spaceUser.id
+      },
+      data: {
+        username: randomName()
+      }
+    })
     await prisma.application.create({
       data: {
         spaceId,
@@ -40,11 +50,35 @@ export async function generateRewardApplications({rewardPagePathOrId, amount, st
         submissionNodes: JSON.stringify(stubProsemirrorDoc({text: 'This is my contribution'}))
       }
     })
+
+    console.log('Generated app ', i+1, '/', amount, 'with status', status)
   }
 }
 
-// generateRewardApplications({
-//   amount: 15,
-//   status: 'review',
-//   rewardPagePathOrId: "106934ad-9c71-492c-82c2-4e2bfe0491dd"
-// }).then(() => console.log('Done'))
+const rewardId = "a3255f85-dcee-446c-9e0e-cf256d06360d"
+
+generateRewardApplications({
+  amount: 12,
+  status: 'applied',
+  rewardPagePathOrId:rewardId
+}).then(() => console.log('Done'))
+
+generateRewardApplications({
+  amount: 6,
+  status: 'inProgress',
+  rewardPagePathOrId: rewardId
+}).then(() => console.log('Done'))
+
+
+generateRewardApplications({
+  amount: 5,
+  status: 'review',
+  rewardPagePathOrId:rewardId
+}).then(() => console.log('Done'))
+
+
+generateRewardApplications({
+  amount: 4,
+  status: 'complete',
+  rewardPagePathOrId:rewardId
+}).then(() => console.log('Done'))

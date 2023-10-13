@@ -4,13 +4,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
 import type { RequiredNotNull } from 'lib/utilities/types';
 
-export interface ApplicationCreationData {
-  userId: string;
-  bountyId: string;
-  message: string;
-  status?: ApplicationStatus;
-}
-
 export interface ApplicationUpdateData {
   applicationId: string;
   message: string;
