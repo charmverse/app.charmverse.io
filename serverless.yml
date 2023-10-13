@@ -22,7 +22,11 @@ plugins:
 custom:
   esbuild:
     # uglify-js is imported via mjml and uses require.resolve()
-    external: ["canvas", "uglify-js"]
+    external: ["canvas"]
+    # plugins: serverless/esbuildPlugin.js
+    # fix for uglify-js, copied from https://blog.logrocket.com/building-serverless-app-typescript/#creating-lambda-functions
+    alias: { 'uglify-js': 'serverless/requireShim' }
+    # resolveExtensions: [".ts", ".js"]
     watch:
       pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
   scriptHooks:
