@@ -179,3 +179,7 @@ export function formatDate(dateInput: Date | string, config?: DateFormatConfig, 
 export function formatTime(dateInput: Date | string, locale?: string | null) {
   return getFormattedDateTime(dateInput, { timeStyle: 'short' }, locale);
 }
+
+export function sortByDate<T extends { createdAt: string | Date }>(a: T, b: T): number {
+  return a.createdAt > b.createdAt ? -1 : 1;
+}

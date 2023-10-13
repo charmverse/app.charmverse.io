@@ -2,15 +2,13 @@ import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { ProposalNotification } from 'lib/notifications/interfaces';
-import { notificationMetadataSelectStatement } from 'lib/notifications/utils';
 
-export async function getProposalNotifications(userId: string): Promise<ProposalNotification[]> {
+import type { QueryCondition } from '../utils';
+import { notificationMetadataSelectStatement, queryCondition } from '../utils';
+
+export async function getProposalNotifications({ id, userId }: QueryCondition): Promise<ProposalNotification[]> {
   const proposalNotifications = await prisma.proposalNotification.findMany({
-    where: {
-      notificationMetadata: {
-        userId
-      }
-    },
+    where: queryCondition({ id, userId }),
     select: {
       id: true,
       type: true,

@@ -6,7 +6,6 @@ import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as processWebhookMessages } from './tasks/processWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
-import { task as notificationTask } from './tasks/sendNotifications';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -19,9 +18,6 @@ processWebhookMessages();
 
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);
-
-// Send user task notifications by email
-cron.schedule('*/30 * * * *', notificationTask);
 
 // Update votes status
 cron.schedule('*/30 * * * *', voteTask);

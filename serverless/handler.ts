@@ -1,2 +1,2 @@
-export { webhookWorker } from './webhook/worker';
-export { webhookChecker } from './webhook/checker';
+export { webhookWorker } from './sqs/worker';
+export { webhookChecker } from './webhooks/checker';
