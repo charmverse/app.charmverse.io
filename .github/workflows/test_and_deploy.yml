@@ -198,7 +198,6 @@ jobs:
       - name: Run ${{matrix.test_name}}
         env:
           REACT_APP_APP_ENV: 'test'
-        run: ${{matrix.test_setup}}
         run: ${{matrix.test_command}}
 
   deploy:
