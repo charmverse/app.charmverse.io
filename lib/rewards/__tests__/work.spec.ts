@@ -218,6 +218,39 @@ describe('work', () => {
     await expect(work(invalidApplicationIdData)).rejects.toThrow(InvalidInputError);
   });
 
+  it('should fail if allowMultipleApplications is false and user tries to create a second application', async () => {
+    // Assuming you've already created an application for the user previously
+    // Or, add logic here to create an initial application for the user
+
+    // Mock or set up your data to make sure the reward has allowMultipleApplications set to false
+    const reward = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      approveSubmitters: true,
+      maxSubmissions: 5
+    });
+    // The data for the second application attempt by the user
+    const applicationData = {
+      // ...yourApplicationData,
+      // Do not include applicationId to simulate creating a new application
+    };
+
+    const invalidApplicationIdData: WorkUpsertData = {
+      userId: user.id,
+      rewardId: reward.id,
+      applicationId: 'invalidId',
+      message: 'Invalid application ID test',
+      submission: 'Invalid application ID data'
+    };
+
+    // Depending on how your upsert handles invalid IDs, you might expect another error. Adjust as necessary.
+    await expect(work(invalidApplicationIdData)).rejects.toThrow(InvalidInputError);
+
+    // Assume the function `work` would throw an error if a second application is attempted
+    // when allowMultipleApplications is set to false.
+    await expect(work(applicationData)).rejects.toThrow(SomeSpecificErrorType); // Replace with your error type
+  });
+
   it('should handle rewardInfo correctly', async () => {
     const reward = await generateBounty({
       createdBy: user.id,

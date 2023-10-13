@@ -1,4 +1,5 @@
 import { BountyOperation } from '@charmverse/core/prisma';
+import { testUtilsMembers } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';
@@ -77,7 +78,7 @@ describe('computeBountyPermissions', () => {
     });
   });
 
-  it('should give user space permissions via their role', async () => {
+  it('should give user permissions via their role', async () => {
     const { space, user } = await generateUserAndSpace({ isAdmin: false });
     const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
@@ -88,14 +89,10 @@ describe('computeBountyPermissions', () => {
       status: 'open'
     });
 
-    const role = await generateRole({
+    const role = await testUtilsMembers.generateRole({
       spaceId: space.id,
-      createdBy: user.id
-    });
-
-    await assignRole({
-      roleId: role.id,
-      userId: otherUser.id
+      createdBy: user.id,
+      assigneeUserIds: [otherUser.id]
     });
 
     await addBountyPermissionGroup({
@@ -143,19 +140,19 @@ describe('computeBountyPermissions', () => {
       }
     });
 
-    const availableOperations = bountyPermissionMapping.reviewer;
-
     const computed = await computeBountyPermissions({
       resourceId: bounty.id,
       userId: otherUser.id
     });
 
-    typedKeys(BountyOperation).forEach((op) => {
-      if (availableOperations.indexOf(op) > -1) {
-        expect(computed[op]).toBe(true);
-      } else {
-        expect(computed[op]).toBe(false);
-      }
+    expect(computed).toMatchObject<BountyPermissionFlags>({
+      approve_applications: true,
+      grant_permissions: false,
+      lock: false,
+      mark_paid: false,
+      review: true,
+      // No submitter permission exists in this space
+      work: true
     });
   });
 
@@ -211,13 +208,14 @@ describe('computeBountyPermissions', () => {
       resourceId: bounty.id,
       userId: otherUser.id
     });
-
-    typedKeys(BountyOperation).forEach((op) => {
-      if (availableOperations.indexOf(op) > -1) {
-        expect(computed[op]).toBe(true);
-      } else {
-        expect(computed[op]).toBe(false);
-      }
+    expect(computed).toMatchObject<BountyPermissionFlags>({
+      approve_applications: true,
+      grant_permissions: false,
+      lock: false,
+      mark_paid: false,
+      review: true,
+      // No submitter permission exists in this space
+      work: true
     });
   });
 

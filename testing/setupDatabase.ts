@@ -251,10 +251,21 @@ export async function generateBounty({
   pagePermissions = [],
   page = {},
   type = 'bounty',
-  id
+  id,
+  allowMultipleApplications
 }: Pick<Bounty, 'createdBy' | 'spaceId'> &
   Partial<
-    Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'status' | 'approveSubmitters'>
+    Pick<
+      Bounty,
+      | 'id'
+      | 'maxSubmissions'
+      | 'chainId'
+      | 'rewardAmount'
+      | 'rewardToken'
+      | 'status'
+      | 'approveSubmitters'
+      | 'allowMultipleApplications'
+    >
   > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
     bountyPermissions?: Partial<BountyPermissions>;
@@ -291,6 +302,7 @@ export async function generateBounty({
       data: {
         id: pageId,
         createdBy,
+        allowMultipleApplications,
         chainId,
         rewardAmount,
         rewardToken,

@@ -1,15 +1,11 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import type { Application } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
-import { getRewardOrThrow } from 'lib/rewards/getReward';
-import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
-import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import { updateRewardSettings } from 'lib/rewards/updateRewardSettings';
+import { work } from 'lib/rewards/work';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
@@ -25,63 +21,19 @@ handler
     })
   )
   .put(workOnRewardController);
-
-async function workOnRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsersAndPageMeta>) {
+async function workOnRewardController(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id } = req.query;
   const userId = req.session.user.id;
 
+  // Check user's permission before applying to a reward.
   const rewardPermissions = await computeBountyPermissions({ resourceId: id as string, userId });
-
-  const reward = await getRewardOrThrow({ rewardId: id as string });
-
-  const pageId = reward.id;
-
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
-    resourceId: pageId,
-    userId: req.session.user?.id
-  });
-
-  if (!permissions.read) {
-    throw new UnauthorisedActionError('You do not have permissions to view this reward.');
+  if (!rewardPermissions.work) {
+    throw new UnauthorisedActionError('You do not have permissions to work on this reward.');
   }
 
-  const rewardPage = await prisma.page.findUniqueOrThrow({
-    where: {
-      id: reward.id
-    },
-    select: {
-      id: true,
-      title: true,
-      path: true
-    }
-  });
+  const applicationResponse = await work({ ...req.body, rewardId: id });
 
-  res.status(200).json({ ...reward, page: rewardPage });
-}
-
-async function updateReward(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
-  const { id } = req.query as { id: string };
-
-  const updateContent = (req.body ?? {}) as UpdateableRewardFields;
-
-  const userId = req.session.user.id;
-
-  const rewardPagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
-    resourceId: id,
-    userId
-  });
-
-  if (rewardPagePermissions.edit_content !== true) {
-    throw new UnauthorisedActionError('You do not have permissions to edit this reward.');
-  }
-  await updateRewardSettings({
-    rewardId: id,
-    updateContent
-  });
-
-  const rolledUpReward = await rollupRewardStatus({ rewardId: id });
-
-  res.status(200).json(rolledUpReward);
+  res.status(200).json(applicationResponse);
 }
 
 export default withSessionRoute(handler);
