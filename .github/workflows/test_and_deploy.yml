@@ -62,6 +62,7 @@ jobs:
 
       - uses: chromaui/action@v1
         with:
+          onlyChanged: true
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test:
