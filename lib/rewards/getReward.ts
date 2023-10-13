@@ -1,3 +1,4 @@
+import { stringUtils } from '@charmverse/core/dist/cjs/utilities';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
