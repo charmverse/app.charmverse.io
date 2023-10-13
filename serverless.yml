@@ -45,7 +45,7 @@ constructs:
         MAILGUN_DOMAIN: ${env:MAILGUN_DOMAIN}
         MAILGUN_KEY: ${env:MAILGUN_KEY}
         PERMISSIONS_API_URL: ${env:PERMISSIONS_API_URL}
-        DOMAIN: ${env:DOMAIN}
+        DOMAIN: https://app.charmverse.io
 
     extensions:
       queue:
