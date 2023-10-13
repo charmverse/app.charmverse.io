@@ -185,15 +185,8 @@ function TableHeader(props: Props): JSX.Element {
         <Divider />
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle name column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId)
-              mutator.insertPropertyTemplate(board, activeView, index);
-            }
+            const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
+            mutator.insertPropertyTemplate(board, activeView, index);
           }}
         >
           <ListItemIcon>
@@ -203,15 +196,8 @@ function TableHeader(props: Props): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle title column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId) + 1
-              mutator.insertPropertyTemplate(board, activeView, index);
-            }
+            const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
+            mutator.insertPropertyTemplate(board, activeView, index);
           }}
         >
           <ListItemIcon>

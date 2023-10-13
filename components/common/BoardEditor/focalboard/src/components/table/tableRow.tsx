@@ -150,7 +150,6 @@ function TableRow(props: Props) {
     }
   }
 
-  const wrapColumn = activeView.fields.columnWrappedIds?.includes(Constants.titleColumnId);
   const commonProps = {
     ref: titleRef,
     value: title,
@@ -178,7 +177,7 @@ function TableRow(props: Props) {
       )}
 
       {/* Columns, one per property */}
-      {visiblePropertyTemplates.map((template, templateIndex) => {
+      {visiblePropertyTemplates.map((template) => {
         if (template.id === Constants.titleColumnId) {
           return (
             <Box
@@ -219,7 +218,10 @@ function TableRow(props: Props) {
                       icon={pageIcon}
                     />
                   )}
-                  <TextInput {...commonProps} multiline={wrapColumn} />
+                  <TextInput
+                    {...commonProps}
+                    multiline={activeView.fields.columnWrappedIds?.includes(Constants.titleColumnId)}
+                  />
                 </div>
 
                 <div className='open-button' data-test={`database-row-open-${card.id}`}>

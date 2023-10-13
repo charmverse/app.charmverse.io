@@ -64,10 +64,6 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
     className += ' expanded';
   }
 
-  const columnWidth = (templateId: string): number => {
-    return Math.max(Constants.minColumnWidth, props.activeView.fields.columnWidths[templateId] || 0);
-  };
-
   return (
     <div
       key={`${group.option.id}header`}
@@ -75,7 +71,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
       style={{ opacity: isDragging ? 0.5 : 1 }}
       className={className}
     >
-      <div className='octo-table-cell' style={{ width: columnWidth(Constants.titleColumnId) }}>
+      <div className='octo-table-cell' style={{ border: 'none' }}>
         <IconButton
           icon={<ArrowDropDownOutlinedIcon fontSize='small' />}
           onClick={() => (props.readOnly ? {} : props.hideGroup(group.option.id || 'undefined'))}

@@ -28,7 +28,6 @@ import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
-import ViewHeaderSortMenu from './viewHeaderSortMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {

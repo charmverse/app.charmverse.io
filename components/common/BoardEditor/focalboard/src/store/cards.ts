@@ -338,10 +338,7 @@ export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; bo
         return [];
       }
       let result = cards;
-      const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
-      const cardProperties: IPropertyTemplate[] = hasTitleProperty
-        ? board.fields.cardProperties
-        : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+      const cardProperties: IPropertyTemplate[] = board.fields.cardProperties;
 
       if (view.fields.filter) {
         result = CardFilter.applyFilterGroup(

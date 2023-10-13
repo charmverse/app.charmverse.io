@@ -86,7 +86,9 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     constructedView.fields.linkedSourceId = sourceDatabaseId;
     constructedView.fields.groupById = relatedSourceView?.fields.groupById;
     constructedView.fields.visibleOptionIds = relatedSourceView?.fields.visibleOptionIds ?? [];
-    constructedView.fields.visiblePropertyIds = relatedSourceView?.fields.visiblePropertyIds ?? [];
+    constructedView.fields.visiblePropertyIds = relatedSourceView?.fields.visiblePropertyIds ?? [
+      Constants.titleColumnId
+    ];
 
     if (activeView) {
       await mutator.updateBlock(constructedView, activeView, 'change view source');
@@ -168,10 +170,6 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
       ...rootBoard,
       fields: {
         ...rootBoard.fields,
-        cardProperties: [
-          ...(rootBoard.fields.cardProperties ?? []),
-          { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] }
-        ],
         sourceType
       }
     };

@@ -339,17 +339,7 @@ export async function addNewCards({
 }) {
   // We assume that the first column is the title so we rename it accordingly
   const { csvData, headers } = transformCsvResults(results, apiPageKeys ? 'Form Response' : undefined);
-
-  const containsTitleProperty = board.fields.cardProperties.find(
-    (cardProperty) => cardProperty.id === Constants.titleColumnId
-  );
-
-  const boardCardProperties: IPropertyTemplate[] = containsTitleProperty
-    ? board.fields.cardProperties
-    : [
-        ...board.fields.cardProperties,
-        { id: Constants.titleColumnId, name: titleColumnName, type: 'text', options: [] }
-      ];
+  const boardCardProperties: IPropertyTemplate[] = board.fields.cardProperties;
   const mappedInitialBoardProperties = mapCardBoardProperties(boardCardProperties);
 
   if (apiPageKeys && apiPageKeys.length > 0) {

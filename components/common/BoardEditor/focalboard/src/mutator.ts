@@ -608,20 +608,15 @@ export class Mutator {
     newName: string,
     views: BoardView[]
   ) {
-    const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
       return;
     }
     const newBoard = createBoard({ block: board });
     const cardProperty = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id);
-    const newTemplate = propertyTemplate.id === Constants.titleColumnId ? cardProperty || titleProperty : cardProperty;
+    const newTemplate = cardProperty ? { ...cardProperty } : null;
 
     if (!newTemplate) {
       return;
-    }
-
-    if (!cardProperty && propertyTemplate.id === Constants.titleColumnId) {
-      newBoard.fields.cardProperties = [newTemplate, ...newBoard.fields.cardProperties];
     }
 
     if (propertyTemplate.type !== newType) {

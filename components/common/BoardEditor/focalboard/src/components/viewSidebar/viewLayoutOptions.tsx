@@ -42,9 +42,11 @@ function LayoutOptions(props: LayoutOptionsProps) {
   });
 
   const handleAddViewBoard = useCallback(async () => {
+    const { properties } = props;
     const newView = createBoardView(activeView);
     newView.fields.viewType = 'board';
     newView.fields.cardOrder = newView.fields.cardOrder ?? [];
+    newView.fields.visiblePropertyIds = properties.map((o: IPropertyTemplate) => o.id) ?? [];
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, activeView, 'change view type');

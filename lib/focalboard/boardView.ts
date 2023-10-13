@@ -1,5 +1,6 @@
 import { upperFirst } from 'lodash';
 
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
@@ -48,7 +49,7 @@ function createBoardView(block?: Block): BoardView {
     groupById: block?.fields.groupById,
     dateDisplayPropertyId: block?.fields.dateDisplayPropertyId,
     sortOptions: block?.fields.sortOptions?.map((o: ISortOption) => ({ ...o })) || [],
-    visiblePropertyIds: block?.fields.visiblePropertyIds?.slice() || [],
+    visiblePropertyIds: block?.fields.visiblePropertyIds?.slice() || [Constants.titleColumnId],
     visibleOptionIds: block?.fields.visibleOptionIds?.slice() || [],
     hiddenOptionIds: block?.fields.hiddenOptionIds?.slice() || [],
     collapsedOptionIds: block?.fields.collapsedOptionIds?.slice() || [],

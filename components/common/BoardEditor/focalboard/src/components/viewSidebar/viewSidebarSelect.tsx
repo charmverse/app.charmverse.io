@@ -13,6 +13,8 @@ import { usePages } from 'hooks/usePages';
 import type { Board, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
+import { Constants } from '../../constants';
+
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 
 export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source';
@@ -101,7 +103,7 @@ export function ViewSidebarSelect({
   const withGroupBy = view?.fields.viewType.match(/board/) || view?.fields.viewType === 'table';
   const currentGroup = board?.fields.cardProperties.find((prop) => prop.id === groupByProperty?.id)?.name;
   const currentLayout = view?.fields.viewType;
-  const visiblePropertyIds = view?.fields.visiblePropertyIds ?? [];
+  const visiblePropertyIds = view?.fields.visiblePropertyIds ?? [Constants.titleColumnId];
   const currentProperties = visiblePropertyIds.filter((id) =>
     board?.fields.cardProperties.some((c) => c.id === id)
   ).length;

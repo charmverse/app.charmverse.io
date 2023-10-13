@@ -18,13 +18,6 @@ interface LayoutOptionsProps {
   view: BoardView;
 }
 
-const titleProperty: IPropertyTemplate = {
-  id: Constants.titleColumnId,
-  name: 'Title',
-  options: [],
-  type: 'text'
-};
-
 function PropertyMenuItem({
   isVisible,
   property,
@@ -75,19 +68,12 @@ function PropertyOptions(props: LayoutOptionsProps) {
 
   const { visiblePropertyIds } = view.fields;
 
-  const propertiesWithTitle = properties.find((property) => property.id === Constants.titleColumnId)
-    ? properties
-    : [titleProperty, ...properties];
-
   const { hiddenProperties, visibleProperties } = useMemo(() => {
-    const propertyIds = propertiesWithTitle.map((property) => property.id);
-    const _propertiesRecord = propertiesWithTitle.reduce<Record<string, IPropertyTemplate>>(
-      (__propertiesRecord, property) => {
-        __propertiesRecord[property.id] = property;
-        return __propertiesRecord;
-      },
-      {}
-    );
+    const propertyIds = properties.map((property) => property.id);
+    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>((__propertiesRecord, property) => {
+      __propertiesRecord[property.id] = property;
+      return __propertiesRecord;
+    }, {});
 
     const _visibleProperties = visiblePropertyIds
       .map((visiblePropertyId) => _propertiesRecord[visiblePropertyId])
@@ -106,7 +92,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
       visibleProperties: _visibleProperties,
       hiddenProperties: _hiddenProperties
     };
-  }, [visiblePropertyIds, propertiesWithTitle]);
+  }, [visiblePropertyIds, properties]);
 
   const onDrop = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
     const isDestinationPropertyVisible = visiblePropertyIds.includes(destinationProperty.id);
@@ -150,7 +136,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
     mutator.changeViewVisibleProperties(
       view.id,
       visiblePropertyIds,
-      propertiesWithTitle.map((property) => property.id)
+      properties.map((property) => property.id)
     );
   };
 

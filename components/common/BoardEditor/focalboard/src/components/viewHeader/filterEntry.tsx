@@ -345,15 +345,7 @@ function FilterEntry(props: Props) {
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
   const properties: IPropertyTemplate[] = containsTitleProperty
     ? viewProperties
-    : [
-        {
-          id: Constants.titleColumnId,
-          name: 'Title',
-          type: 'text',
-          options: []
-        },
-        ...viewProperties
-      ];
+    : [Constants.TitleProperty, ...viewProperties];
 
   const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
 

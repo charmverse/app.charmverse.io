@@ -61,9 +61,8 @@ function generateTableArray(
   context: PropertyContext
 ): string[][] {
   const rows: string[][] = [];
-  const visibleProperties = board.fields.cardProperties.filter(
-    (template: IPropertyTemplate) =>
-      template.id === Constants.titleColumnId || viewToExport.fields.visiblePropertyIds.includes(template.id)
+  const visibleProperties = board.fields.cardProperties.filter((template: IPropertyTemplate) =>
+    viewToExport.fields.visiblePropertyIds.includes(template.id)
   );
 
   if (
@@ -81,7 +80,7 @@ function generateTableArray(
 
   const titleProperty = visibleProperties.find((visibleProperty) => visibleProperty.id === Constants.titleColumnId);
   // Header row
-  const row: string[] = titleProperty ? [] : ['Title'];
+  const row: string[] = [];
   visibleProperties.forEach((template: IPropertyTemplate) => {
     row.push(template.name);
   });

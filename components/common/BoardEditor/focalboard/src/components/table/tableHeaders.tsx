@@ -139,10 +139,7 @@ function TableHeaders(props: Props): JSX.Element {
   const onDropToColumn = async (sourceProperty: IPropertyTemplate, destinationProperty: IPropertyTemplate) => {
     Utils.log(`ondrop. Source column: ${sourceProperty.name}, dest column: ${destinationProperty.name}`);
     // Move template to new index
-    let visiblePropertyIds = activeView.fields.visiblePropertyIds;
-    visiblePropertyIds = visiblePropertyIds.includes(Constants.titleColumnId)
-      ? visiblePropertyIds
-      : [Constants.titleColumnId, ...visiblePropertyIds];
+    const visiblePropertyIds = activeView.fields.visiblePropertyIds;
     const destIndex = visiblePropertyIds.indexOf(destinationProperty.id);
 
     await mutator.changeViewVisiblePropertiesOrder(
@@ -152,12 +149,6 @@ function TableHeaders(props: Props): JSX.Element {
       destIndex >= 0 ? destIndex : 0
     );
   };
-
-  const titleSortOption = activeView.fields.sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
-  let titleSorted: 'up' | 'down' | 'none' = 'none';
-  if (titleSortOption) {
-    titleSorted = titleSortOption.reversed ? 'down' : 'up';
-  }
 
   const propertyTypes = useMemo(
     () =>

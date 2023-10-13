@@ -1,3 +1,4 @@
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 class Constants {
@@ -114,6 +115,13 @@ class Constants {
       displayName: 'Svenska (Beta)'
     }
   ];
+
+  static readonly TitleProperty: IPropertyTemplate = {
+    id: Constants.titleColumnId,
+    name: 'Title',
+    type: 'text',
+    options: []
+  };
 }
 
 function randomBoardColor() {

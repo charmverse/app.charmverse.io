@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -109,6 +110,12 @@ function createBoard({
         options: o.options ? o.options.map((option) => ({ ...option })) : []
       };
     }) ?? [];
+
+  const titleProperty = cardProperties.find((o) => o.id === Constants.titleColumnId);
+
+  if (!titleProperty) {
+    cardProperties.unshift(Constants.TitleProperty);
+  }
 
   const selectProperties = cardProperties.find((o) => o.type === 'select');
 
