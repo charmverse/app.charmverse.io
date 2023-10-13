@@ -1,3 +1,4 @@
+import type { PermissionCompute } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -11,10 +12,9 @@ import type { BountyPermissionFlags } from './interfaces';
 import { bountyPermissionMapping } from './mapping';
 
 export async function computeBountyPermissions({
-  allowAdminBypass,
   resourceId,
   userId
-}: PermissionComputeRequest): Promise<BountyPermissionFlags> {
+}: PermissionCompute): Promise<BountyPermissionFlags> {
   const allowedOperations = new AvailableBountyPermissions();
 
   const bounty = await prisma.bounty.findUnique({
@@ -70,7 +70,7 @@ export async function computeBountyPermissions({
   let basePermissions = allowedOperations.empty as BountyPermissionFlags;
 
   // Provision full set of operations
-  if (isAdmin && allowAdminBypass) {
+  if (isAdmin) {
     basePermissions = allowedOperations.full;
   }
   // Calculate actual available permissions

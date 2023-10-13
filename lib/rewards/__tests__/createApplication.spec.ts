@@ -20,7 +20,7 @@ beforeAll(async () => {
 describe('createApplication', () => {
   // Success Cases
 
-  it('should create an applicaton if reward requires applications, and a submission if not', async () => {
+  it('should create an application if reward requires applications, and a submission if not', async () => {
     const reward = await generateBounty({
       createdBy: user.id,
       spaceId: space.id,
