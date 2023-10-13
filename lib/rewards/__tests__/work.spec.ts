@@ -2,7 +2,7 @@ import type { Application } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
-import { InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
+import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
 import { generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { WorkUpsertData } from '../work';
@@ -94,7 +94,8 @@ describe('work', () => {
       createdBy: user.id,
       spaceId: space.id,
       approveSubmitters: true,
-      maxSubmissions: 2
+      maxSubmissions: 2,
+      allowMultipleApplications: true
     });
 
     const applicationData = {
@@ -228,28 +229,26 @@ describe('work', () => {
       spaceId: space.id,
       approveSubmitters: true,
       maxSubmissions: 5,
-      all
+      allowMultipleApplications: false
     });
-    // The data for the second application attempt by the user
-    const applicationData = {
-      // ...yourApplicationData,
-      // Do not include applicationId to simulate creating a new application
-    };
+
+    await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        bountyId: reward.id,
+        createdBy: user.id
+      }
+    });
 
     const invalidApplicationIdData: WorkUpsertData = {
       userId: user.id,
       rewardId: reward.id,
-      applicationId: 'invalidId',
       message: 'Invalid application ID test',
       submission: 'Invalid application ID data'
     };
 
     // Depending on how your upsert handles invalid IDs, you might expect another error. Adjust as necessary.
-    await expect(work(invalidApplicationIdData)).rejects.toThrow(InvalidInputError);
-
-    // Assume the function `work` would throw an error if a second application is attempted
-    // when allowMultipleApplications is set to false.
-    await expect(work(applicationData)).rejects.toThrow(SomeSpecificErrorType); // Replace with your error type
+    await expect(work(invalidApplicationIdData)).rejects.toThrow(DuplicateDataError);
   });
 
   it('should handle rewardInfo correctly', async () => {
@@ -273,7 +272,11 @@ describe('work', () => {
 
     expect(application.rewardInfo).toBe('Sample reward info');
 
-    const updatedApplication = await work({ ...applicationDataWithRewardInfo, rewardInfo: 'New reward info' });
+    const updatedApplication = await work({
+      ...applicationDataWithRewardInfo,
+      rewardInfo: 'New reward info',
+      applicationId: application.id
+    });
 
     expect(updatedApplication.rewardInfo).toBe('New reward info');
   });

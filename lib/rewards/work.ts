@@ -1,7 +1,8 @@
 import type { Application, Prisma, PrismaPromise } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
-import { InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
+import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -31,8 +32,16 @@ export async function work({
 
   const userApplications = reward.applications.filter((a) => a.createdBy === userId);
 
-  if (applicationId && !userApplications.some((app) => app.id === applicationId)) {
-    throw new InvalidInputError(`You cannot update another users work`);
+  const userHasExistingApplication = !!userApplications.length;
+
+  if (applicationId) {
+    if (!stringUtils.isUUID(applicationId)) {
+      throw new InvalidInputError(`Invalid application id: ${applicationId}`);
+    } else if (!userApplications.some((app) => app.id === applicationId)) {
+      throw new InvalidInputError(`You cannot update another users work`);
+    }
+  } else if (!applicationId && userHasExistingApplication && !reward.allowMultipleApplications) {
+    throw new DuplicateDataError(`You cannot apply twice to work on this reward`);
   }
 
   const capReached =
