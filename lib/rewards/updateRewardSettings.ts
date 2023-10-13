@@ -50,15 +50,11 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
     }
   });
 
-  if (
-    typeof updateContent.maxSubmissions === 'number' &&
-    reward.maxSubmissions !== null &&
-    updateContent.maxSubmissions <
-      (countRemainingSubmissionSlots({
-        applications: reward.applications,
-        limit: updateContent.rewardAmount
-      }) as number)
-  ) {
+  const remaining = countRemainingSubmissionSlots({
+    applications: reward.applications,
+    limit: updateContent.maxSubmissions ?? reward.maxSubmissions
+  }) as number;
+  if (typeof remaining === 'number' && typeof updateContent.maxSubmissions === 'number' && remaining <= 0) {
     throw new InvalidInputError('New reward cap cannot be lower than total of active and valid submissions.');
   }
   const updatedReward = await prisma.$transaction(async (tx) => {

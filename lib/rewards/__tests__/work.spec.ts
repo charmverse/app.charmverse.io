@@ -227,7 +227,8 @@ describe('work', () => {
       createdBy: user.id,
       spaceId: space.id,
       approveSubmitters: true,
-      maxSubmissions: 5
+      maxSubmissions: 5,
+      all
     });
     // The data for the second application attempt by the user
     const applicationData = {
