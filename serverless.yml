@@ -17,11 +17,12 @@ plugins:
   # This plugins gives superpowers to serverless and allows us to deploy SQS queues easily
   - serverless-lift
   - serverless-scriptable-plugin
-  - serverless-jetpack
 
 custom:
   esbuild:
     external: ["canvas"]
+    # fix for uglify-js, copied from https://blog.logrocket.com/building-serverless-app-typescript/#creating-lambda-functions
+    define: { 'require.resolve': undefined }
     watch:
       pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
   scriptHooks:
