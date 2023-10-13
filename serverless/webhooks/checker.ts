@@ -10,7 +10,7 @@ export const webhookChecker = async (event: APIGatewayProxyEvent): Promise<APIGa
     log.debug('Webhook check: BODY', body);
     log.debug('Webhook check: HEADERS', headers);
 
-    const signature = headers?.Signature;
+    const signature = headers?.Signature || headers?.signature;
 
     if (!signature) {
       throw new Error('Checker: No signature found');
