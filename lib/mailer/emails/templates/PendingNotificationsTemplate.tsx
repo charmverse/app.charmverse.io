@@ -34,7 +34,7 @@ export const buttonStyle = {
 const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
 const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px', marginBottom: '5px' };
 
-export interface PendingNotificationsData {
+export type PendingNotificationsData = {
   // eslint-disable-next-line
   cardNotifications: CardNotification[];
   documentNotifications: DocumentNotification[];
@@ -45,7 +45,7 @@ export interface PendingNotificationsData {
   forumNotifications: PostNotification[];
   // eslint-disable-next-line
   user: TemplateUser;
-}
+};
 
 export default function PendingNotifications(props: PendingNotificationsData) {
   const totalDocumentNotifications = props.documentNotifications.length;

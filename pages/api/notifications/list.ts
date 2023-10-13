@@ -9,8 +9,8 @@ import type { Notification } from 'lib/notifications/interfaces';
 import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
 import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
 import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
-import { sortByDate } from 'lib/notifications/utils';
 import { withSessionRoute } from 'lib/session/withSession';
+import { sortByDate } from 'lib/utilities/dates';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -20,12 +20,12 @@ async function getNotifications(req: NextApiRequest, res: NextApiResponse<Notifi
   const userId = req.session.user.id;
   const notifications: Notification[] = (
     await Promise.all([
-      getDocumentNotifications(userId),
-      getCardNotifications(userId),
-      getPollNotifications(userId),
-      getProposalNotifications(userId),
-      getBountyNotifications(userId),
-      getPostNotifications(userId)
+      getDocumentNotifications({ userId }),
+      getCardNotifications({ userId }),
+      getPollNotifications({ userId }),
+      getProposalNotifications({ userId }),
+      getBountyNotifications({ userId }),
+      getPostNotifications({ userId })
     ])
   ).flat();
 

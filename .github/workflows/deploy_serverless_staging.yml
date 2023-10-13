@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        function_name: ["webhook-queueWorker", "webhookChecker"]
+        function_name: ['webhook-queueWorker', 'webhookChecker']
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
@@ -40,7 +40,7 @@ jobs:
                 secret_json_key=${BASH_REMATCH[3]}
                 secret_version=${BASH_REMATCH[4]:-AWSCURRENT}
 
-                if [[ $secret_version =~ ^AWS ]]; then 
+                if [[ $secret_version =~ ^AWS ]]; then
                     secret_version_option=(--version-stage "$secret_version")
                 else
                     secret_version_option=(--version-id "$secret_version")
@@ -61,13 +61,12 @@ jobs:
             fi
           done
       - name: Copy Prisma files
-        run:
-          node copyPrismaFiles.js
+        run: node copyPrismaFiles.js
           ls -lA ./serverless/
       - name: serverless deploy ${{ matrix.function_name }}
         uses: serverless/github-action@v3.1
         with:
-          args: deploy --function ${{ matrix.function_name }}
+          args: deploy --force --function ${{ matrix.function_name }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

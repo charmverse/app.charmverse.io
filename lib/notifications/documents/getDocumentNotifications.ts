@@ -6,15 +6,12 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { DocumentNotification } from '../interfaces';
-import { notificationMetadataSelectStatement } from '../utils';
+import type { QueryCondition } from '../utils';
+import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
-export async function getDocumentNotifications(userId: string): Promise<DocumentNotification[]> {
+export async function getDocumentNotifications({ id, userId }: QueryCondition): Promise<DocumentNotification[]> {
   const documentNotifications = await prisma.documentNotification.findMany({
-    where: {
-      notificationMetadata: {
-        userId
-      }
-    },
+    where: queryCondition({ id, userId }),
     select: {
       id: true,
       type: true,
