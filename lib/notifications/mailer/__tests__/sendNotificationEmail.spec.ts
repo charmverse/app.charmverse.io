@@ -56,11 +56,11 @@ describe('sendNotificationEmail()', () => {
     });
 
     const notificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
-    expect(notificationsNo).toBe(true);
+    expect(notificationsNo).toBe(false);
 
     await updateUserProfile(user.id, { emailNotifications: true });
 
     const secondNotificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
-    expect(secondNotificationsNo).toBe(false);
+    expect(secondNotificationsNo).toBe(true);
   });
 });
