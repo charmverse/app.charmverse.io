@@ -11,6 +11,7 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import PropertyValueElement from '../propertyValueElement';
@@ -82,21 +83,23 @@ const GalleryCard = React.memo((props: Props) => {
       )}
       {visiblePropertyTemplates.length > 0 && (
         <div className='gallery-props'>
-          {visiblePropertyTemplates.map((template) => (
-            <PropertyValueElement
-              key={template.id}
-              updatedAt={cardPage?.updatedAt.toString() || ''}
-              updatedBy={cardPage?.updatedBy || ''}
-              syncWithPageId={cardPage.syncWithPageId}
-              board={board}
-              readOnly={true}
-              card={card}
-              propertyTemplate={template}
-              showEmptyPlaceholder={false}
-              showTooltip
-              displayType='gallery'
-            />
-          ))}
+          {visiblePropertyTemplates
+            .filter((prop) => prop.id !== Constants.titleColumnId)
+            .map((template) => (
+              <PropertyValueElement
+                key={template.id}
+                updatedAt={cardPage?.updatedAt.toString() || ''}
+                updatedBy={cardPage?.updatedBy || ''}
+                syncWithPageId={cardPage.syncWithPageId}
+                board={board}
+                readOnly={true}
+                card={card}
+                propertyTemplate={template}
+                showEmptyPlaceholder={false}
+                showTooltip
+                displayType='gallery'
+              />
+            ))}
         </div>
       )}
     </StyledBox>

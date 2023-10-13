@@ -5,6 +5,7 @@ import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
@@ -116,7 +117,13 @@ interface DefaultBoardProps {
 }
 
 function createDefaultBoardData({ boardId }: DefaultBoardProps) {
-  const board = createBoard();
+  const board = createBoard({
+    block: {
+      fields: {
+        cardProperties: [Constants.TitleProperty]
+      }
+    }
+  });
   board.id = boardId;
   board.rootId = board.id;
 

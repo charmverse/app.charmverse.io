@@ -14,6 +14,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTruthy } from 'lib/utilities/types';
 
+import { Constants } from '../../constants';
 import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
@@ -248,27 +249,29 @@ function CardDetailProperties(props: Props) {
 
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
-      {board.fields.cardProperties.map((propertyTemplate) => {
-        return (
-          <CardDetailProperty
-            syncWithPageId={syncWithPageId}
-            onDrop={onDrop}
-            key={propertyTemplate.id}
-            board={board}
-            card={card}
-            deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
-            onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
-            onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
-              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
-            }}
-            pageUpdatedAt={pageUpdatedAt}
-            pageUpdatedBy={pageUpdatedBy}
-            property={propertyTemplate}
-            readOnly={props.readOnly}
-            mutator={mutator}
-          />
-        );
-      })}
+      {board.fields.cardProperties
+        .filter((prop) => prop.id !== Constants.titleColumnId)
+        .map((propertyTemplate) => {
+          return (
+            <CardDetailProperty
+              syncWithPageId={syncWithPageId}
+              onDrop={onDrop}
+              key={propertyTemplate.id}
+              board={board}
+              card={card}
+              deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
+              onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
+              onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
+                onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+              }}
+              pageUpdatedAt={pageUpdatedAt}
+              pageUpdatedBy={pageUpdatedBy}
+              property={propertyTemplate}
+              readOnly={props.readOnly}
+              mutator={mutator}
+            />
+          );
+        })}
 
       {showConfirmationDialog && (
         <ConfirmDeleteModal

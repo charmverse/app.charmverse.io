@@ -111,12 +111,6 @@ function createBoard({
       };
     }) ?? [];
 
-  const titleProperty = cardProperties.find((o) => o.id === Constants.titleColumnId);
-
-  if (!titleProperty) {
-    cardProperties.unshift(Constants.TitleProperty);
-  }
-
   const selectProperties = cardProperties.find((o) => o.type === 'select');
 
   if (!selectProperties && addDefaultProperty) {

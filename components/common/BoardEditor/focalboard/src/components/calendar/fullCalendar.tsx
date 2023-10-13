@@ -14,6 +14,7 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
+import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
@@ -148,25 +149,27 @@ function CalendarFullView(props: Props): JSX.Element | null {
             {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
           </div>
         </div>
-        {visiblePropertyTemplates.map((template) => {
-          const card = cards.find((o) => o.id === event.id) || cards[0];
+        {visiblePropertyTemplates
+          .filter((prop) => prop.id !== Constants.titleColumnId)
+          .map((template) => {
+            const card = cards.find((o) => o.id === event.id) || cards[0];
 
-          return (
-            <PropertyValueElement
-              board={board}
-              syncWithPageId={page?.syncWithPageId}
-              key={template.id}
-              readOnly={true}
-              card={card}
-              updatedAt={page?.updatedAt.toString() ?? ''}
-              updatedBy={page?.updatedBy ?? ''}
-              propertyTemplate={template}
-              showEmptyPlaceholder={true}
-              showTooltip
-              displayType='calendar'
-            />
-          );
-        })}
+            return (
+              <PropertyValueElement
+                board={board}
+                syncWithPageId={page?.syncWithPageId}
+                key={template.id}
+                readOnly={true}
+                card={card}
+                updatedAt={page?.updatedAt.toString() ?? ''}
+                updatedBy={page?.updatedBy ?? ''}
+                propertyTemplate={template}
+                showEmptyPlaceholder={true}
+                showTooltip
+                displayType='calendar'
+              />
+            );
+          })}
       </div>
     );
   };

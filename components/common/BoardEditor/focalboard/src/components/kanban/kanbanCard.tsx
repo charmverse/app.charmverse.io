@@ -18,6 +18,7 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
@@ -137,21 +138,23 @@ const KanbanCard = React.memo((props: Props) => {
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
-          {visiblePropertyTemplates.map((template) => (
-            <PropertyValueElement
-              key={template.id}
-              board={board}
-              readOnly={true}
-              card={card}
-              syncWithPageId={cardPage?.syncWithPageId}
-              updatedAt={cardPage?.updatedAt.toString() || ''}
-              updatedBy={cardPage?.updatedBy || ''}
-              propertyTemplate={template}
-              showEmptyPlaceholder={false}
-              displayType='kanban'
-              showTooltip
-            />
-          ))}
+          {visiblePropertyTemplates
+            .filter((prop) => prop.id !== Constants.titleColumnId)
+            .map((template) => (
+              <PropertyValueElement
+                key={template.id}
+                board={board}
+                readOnly={true}
+                card={card}
+                syncWithPageId={cardPage?.syncWithPageId}
+                updatedAt={cardPage?.updatedAt.toString() || ''}
+                updatedBy={cardPage?.updatedBy || ''}
+                propertyTemplate={template}
+                showEmptyPlaceholder={false}
+                displayType='kanban'
+                showTooltip
+              />
+            ))}
           {linkedBounty && (
             <BountyFooter>
               <BountyStatusBadge bounty={linkedBounty} truncate />
