@@ -17,11 +17,11 @@ plugins:
   # This plugins gives superpowers to serverless and allows us to deploy SQS queues easily
   - serverless-lift
   - serverless-scriptable-plugin
+  - serverless-jetpack
 
 custom:
   esbuild:
-    # exclude relative paths from uglify-js, imported via mjml: https://github.com/mishoo/UglifyJS/issues/5764
-    external: ["canvas", "../lib/utils.js", "../lib/ast.js", "../lib/transform.js", "../lib/parse.js", "../lib/scope.js", "../lib/compress.js", "../lib/output.js", "../lib/sourcemap.js", "../lib/mozilla-ast.js", "../lib/propmangle.js", "../lib/minify.js", "./exports.js"]
+    external: ["canvas"]
     watch:
       pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
   scriptHooks:
