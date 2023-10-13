@@ -8,6 +8,8 @@ jspm_packages
 # Serverless directories
 .serverless
 .build
+serverless/schema.prisma
+serverless/*.node
 
 # next.js
 /.next/
