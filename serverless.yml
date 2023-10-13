@@ -21,12 +21,9 @@ plugins:
 
 custom:
   esbuild:
-    # uglify-js is imported via mjml and uses require.resolve()
     external: ["canvas"]
-    # plugins: serverless/esbuildPlugin.js
-    # fix for uglify-js, copied from https://blog.logrocket.com/building-serverless-app-typescript/#creating-lambda-functions
-    alias: { 'uglify-js': 'serverless/requireShim' }
-    # resolveExtensions: [".ts", ".js"]
+    # uglify-js via mjml uses require.resolve() to find local files, which breaks esbuild. we don't need it since we don't do minification
+    alias: { 'uglify-js': 'serverless/packageShim' }
     watch:
       pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
   scriptHooks:
