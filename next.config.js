@@ -178,8 +178,7 @@ const config = {
           return {
             ..._entry,
             cron: './background/cron.ts',
-            websockets: './background/initWebsockets.ts',
-            updatePageContentForSync: './scripts/migrations/2023_10_11_updatePageContentForSync.ts'
+            websockets: './background/initWebsockets.ts'
             // countSpaceData: './scripts/countSpaceData.ts',
             // importFromDiscourse: './scripts/importFromDiscourse.ts',
           };
