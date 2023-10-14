@@ -186,7 +186,7 @@ const reward = await generateBounty({
 final_instruction=""""
 Only write the code if I confirm. If you have any questions, ask me before you write the code
 
-Never mock unless asked to. Use generators or prisma directly.
+Never mock unless asked to. Use generators or prisma directly. Generate basic test data inside describe blocks. Make each unit test from state of other tests when the test would mutate data
 
 Always confirm Success and Error cases with me before writing code
 

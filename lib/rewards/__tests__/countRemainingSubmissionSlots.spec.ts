@@ -2,29 +2,29 @@ import type { Application } from '@charmverse/core/prisma-client';
 
 import type { ApplicationWithOnlyStatus } from '../countRemainingSubmissionSlots';
 import {
-  submissionIsValid,
+  submissionIsComplete,
   countCompleteSubmissions,
   countRemainingSubmissionSlots
 } from '../countRemainingSubmissionSlots';
 
-describe('submissionIsValid', () => {
+describe('submissionIsComplete', () => {
   it('should return true if the application status is "complete"', () => {
-    const result = submissionIsValid({ application: { status: 'complete' } });
+    const result = submissionIsComplete({ application: { status: 'complete' } });
     expect(result).toBe(true);
   });
 
   it('should return true if the application status is "paid"', () => {
-    const result = submissionIsValid({ application: { status: 'paid' } });
+    const result = submissionIsComplete({ application: { status: 'paid' } });
     expect(result).toBe(true);
   });
 
   it('should return true if the application status is "processing"', () => {
-    const result = submissionIsValid({ application: { status: 'processing' } });
+    const result = submissionIsComplete({ application: { status: 'processing' } });
     expect(result).toBe(true);
   });
 
   it('should return false for any other application status', () => {
-    const result = submissionIsValid({ application: { status: 'otherStatus' as Application['status'] } });
+    const result = submissionIsComplete({ application: { status: 'otherStatus' as Application['status'] } });
     expect(result).toBe(false);
   });
 });
