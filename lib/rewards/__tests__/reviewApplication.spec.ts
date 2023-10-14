@@ -40,7 +40,7 @@ describe('reviewApplication', () => {
       userId: reviewerUser.id
     });
     expect(reviewedApp.status).toBe('inProgress');
-    expect(reviewedApp.reviewedBy).toBe(reviewerUser.id);
+    expect(reviewedApp.acceptedBy).toBe(reviewerUser.id);
   });
 
   it('should update application status to complete when current status is in progress or review and decision is approve', async () => {

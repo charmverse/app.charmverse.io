@@ -44,7 +44,8 @@ export async function reviewApplication({ applicationId, decision, userId }: App
     },
     data: {
       status: nextStatus,
-      reviewedBy: userId
+      reviewedBy: nextStatus !== 'inProgress' ? userId : undefined,
+      acceptedBy: nextStatus === 'inProgress' ? userId : undefined
     }
   })) as Application;
 
