@@ -5,15 +5,20 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
+
+export type CreateApplicationCommentPayload = {
+  content: PageContent | null;
+  contentText: string;
+  parentCommentId?: string;
+};
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(createApplicationCommentController).get(getApplicationCommentsController);
-
 async function createApplicationCommentController(req: NextApiRequest, res: NextApiResponse<ApplicationComment>) {
   const { contentText, content, parentCommentId } = req.body as CreateApplicationCommentPayload;
   const { id: userId } = req.session.user;
