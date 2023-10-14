@@ -20,7 +20,7 @@ export type UpdateableRewardFields = Partial<
     | 'customReward'
     | 'fields'
   >
-> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] };
+> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null };
 
 export type RewardUpdate = {
   rewardId: string;

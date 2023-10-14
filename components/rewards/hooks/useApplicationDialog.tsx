@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import type { ApplicationCreationData, SubmissionCreationData } from 'lib/applications/interfaces';
+import type { WorkUpsertData, SubmissionCreationData } from 'lib/applications/interfaces';
 
 export type ApplicationPropertiesInput = {
-  applicationContent?: ApplicationCreationData;
+  applicationContent?: WorkUpsertData;
   submissionContent?: SubmissionCreationData;
   wallet?: string;
 };

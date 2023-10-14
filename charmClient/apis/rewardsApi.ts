@@ -69,6 +69,10 @@ export class RewardsApi {
     return http.POST<ApplicationComment>(`/api/reward-applications/comments?applicationId=${applicationId}`, payload);
   }
 
+  markSubmissionAsPaid(submissionId: string) {
+    return http.POST<Application>(`/api/reward-applications/mark-paid?applicationId=${submissionId}`);
+  }
+
   deleteApplicationComment({ applicationId, commentId }: { applicationId: string; commentId: string }) {
     return http.DELETE<ApplicationComment>(
       `/api/reward-applications/comments/${commentId}?applicationId=${applicationId}`

@@ -18,7 +18,7 @@ import charmClient from 'charmClient';
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useUser } from 'hooks/useUser';
-import { countValidSubmissions } from 'lib/applications/shared';
+import { countCompleteSubmissions } from 'lib/applications/shared';
 import type { BountyPermissionFlags } from 'lib/bounties';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
@@ -43,7 +43,7 @@ export default function RewardSubmissionsTable({ reward, permissions, refreshRew
 
   const { showApplication } = useApplicationDialog();
 
-  const validSubmissions = countValidSubmissions(reward.applications);
+  const validSubmissions = countCompleteSubmissions(reward.applications);
 
   async function lockRewardSubmissions() {
     const updatedReward = await charmClient.bounties.lockSubmissions(reward!.id, !reward.submissionsLocked);

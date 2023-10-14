@@ -134,11 +134,10 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       setTempRewardData(
         data ?? {
           chainId: 1,
-          status: 'open',
           spaceId: space.id,
-          createdBy: user.id,
           rewardAmount: 1,
-          rewardToken: 'ETH'
+          rewardToken: 'ETH',
+          userId: user.id
         }
       );
     },

@@ -15,7 +15,6 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
-import { RewardApplicantForm } from 'components/rewards/components/RewardProperties/components/RewardApplicantForm/RewardApplicantForm';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
@@ -31,7 +30,6 @@ import { isTruthy } from 'lib/utilities/types';
 
 // import RewardApplicantsTable from './components/RewardApplicantsTable';
 import { RewardApplications } from '../RewardApplications/RewardApplications';
-import RewardSubmissionsTable from '../RewardApplications/RewardSubmissionsTable';
 
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardSignupButton } from './components/RewardSignupButton';
@@ -45,7 +43,7 @@ export function RewardProperties(props: {
 }) {
   const { rewardId, pageId, readOnly: parentReadOnly = false, refreshRewardPermissions } = props;
   const { rewards, mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
-  const [currentReward, setCurrentReward] = useState<(RewardCreationData & RewardWithUsers) | null>();
+  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
   const { user } = useUser();
 
   const { data: initialReward } = useGetReward({
@@ -54,7 +52,7 @@ export function RewardProperties(props: {
 
   useEffect(() => {
     if (!currentReward && initialReward) {
-      setCurrentReward(initialReward);
+      setCurrentReward(initialReward as any);
     }
   }, [initialReward]);
 
@@ -62,12 +60,11 @@ export function RewardProperties(props: {
 
   /* TODO @Mo - permissions */
   const { data: rewardPermissions } = useSWR(rewardId ? `/rewards-${rewardId}` : null, () =>
-    charmClient.rewards.computePermissions({
-      resourceId: rewardId as string,
-      userId: user?.id
+    charmClient.rewards.computeRewardPermissions({
+      resourceId: rewardId as string
     })
   );
-  const { data: rewardPagePermissions, mutate: refreshPermissions } = useGetPermissions(pageId);
+  const { data: rewardPagePermissions, mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const [rewardType, setRewardType] = useState<RewardType>('Token');
   // Using ref to make sure we don't keep redirecting to custom reward tab
   const { isSpaceMember } = useIsSpaceMember();
@@ -83,18 +80,13 @@ export function RewardProperties(props: {
     }
   }, [currentReward?.customReward]);
 
-  const readOnly = parentReadOnly || !isSpaceMember;
+  const readOnly = parentReadOnly || !isSpaceMember || props.readOnly;
 
-  const { data: applications, mutate: refreshSubmissions } = useSWR(
-    !rewardId ? null : `/rewards/${rewardId}/applications`,
-    () => charmClient.rewards.listApplications(rewardId as string),
-    {
-      fallbackData: []
-    }
-  );
+  const applications = currentReward?.applications;
 
   async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
     setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
+
     if (currentReward?.id) {
       await updateReward({ rewardId: currentReward.id, updateContent: updates });
     }
@@ -162,7 +154,7 @@ export function RewardProperties(props: {
   // handling tempReward
   async function confirmNewReward() {
     if (currentReward) {
-      const createdReward = await charmClient.rewards.createReward(currentReward);
+      const createdReward = await charmClient.rewards.createReward(currentReward as RewardCreationData);
       mutateRewards((_rewards = []) => [..._rewards, createdReward]);
     }
   }
@@ -196,10 +188,10 @@ export function RewardProperties(props: {
       <Stack className='octo-propertylist' mt={2} flex={1}>
         <Divider />
         <RewardPropertiesHeader
-          reward={currentReward}
+          reward={currentReward as RewardWithUsers}
           pageId={pageId}
           readOnly={readOnly}
-          refreshPermissions={refreshPermissions}
+          refreshPermissions={refreshPagePermissionsList}
         />
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -208,7 +200,7 @@ export function RewardProperties(props: {
           </PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
-            value={currentReward.reviewers}
+            value={currentReward.reviewers ?? []}
             onChange={async (options) => {
               await applyRewardUpdates({
                 reviewers: options.map((option) => ({ group: option.group, id: option.id }))
@@ -269,7 +261,7 @@ export function RewardProperties(props: {
               isOn={Boolean(currentReward?.approveSubmitters)}
               onChanged={(isOn) => {
                 applyRewardUpdates({
-                  approveSubmitters: isOn
+                  approveSubmitters: !!isOn
                 });
               }}
               disabled={readOnly}
@@ -339,7 +331,11 @@ export function RewardProperties(props: {
             <PropertyLabel readOnly highlighted>
               Reward Token
             </PropertyLabel>
-            <RewardTokenProperty onChange={onRewardTokenUpdate} currentReward={currentReward} readOnly={readOnly} />
+            <RewardTokenProperty
+              onChange={onRewardTokenUpdate}
+              currentReward={currentReward as (RewardCreationData & RewardWithUsers) | null}
+              readOnly={readOnly}
+            />
           </Box>
         )}
 
@@ -386,84 +382,16 @@ export function RewardProperties(props: {
 
         {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
 
-        {/* TODO: Replace this old component with new apply flow */}
-        {rewardPermissions?.work && isSpaceMember && currentReward.createdBy !== user?.id && (
-          <div data-test='reward-applicant-form'>
-            <RewardApplicantForm
-              reward={currentReward}
-              submissions={applications}
-              permissions={rewardPermissions}
-              refreshSubmissions={refreshSubmissions}
-            />
-          </div>
-        )}
-
-        {rewardId && currentReward && (
+        {rewardId && currentReward && applications && (
           <RewardApplications
             refreshReward={(_rewardId: string) =>
               refreshReward(_rewardId).then((updatedReward) => setCurrentReward(updatedReward))
             }
-            reward={currentReward}
+            reward={currentReward as RewardWithUsers}
             permissions={rewardPermissions}
           />
         )}
-        {/*
-      TODO - Fix this when we fix rewards table
-      {rewardPermissions?.review &&
-        currentReward.status !== 'suggestion' && ( // &&!draftReward
-          <RewardApplicantsTable reward={currentReward} permissions={permissions} />
-        )} */}
       </Stack>
     </Box>
   );
 }
-
-// utils - TODO - Fix this later when we check page permissions
-
-// function rollupPermissions({
-//   selectedReviewerUsers,
-//   selectedReviewerRoles,
-//   assignedRoleSubmitters,
-//   spaceId
-// }: {
-//   selectedReviewerUsers: string[];
-//   selectedReviewerRoles: string[];
-//   assignedRoleSubmitters: string[];
-//   spaceId: string;
-// }): Pick<RewardPermissions, 'reviewer' | 'submitter'> {
-//   const reviewers: RewardPermissions['reviewer'] = [
-//     ...selectedReviewerUsers.map((uid) => {
-//       return {
-//         id: uid,
-//         group: 'user' as const
-//       };
-//     }),
-//     ...selectedReviewerRoles.map((uid) => {
-//       return {
-//         id: uid,
-//         group: 'role' as const
-//       };
-//     })
-//   ];
-//   const submitters: RewardPermissions['submitter'] =
-//     assignedRoleSubmitters.length !== 0
-//       ? assignedRoleSubmitters.map((uid) => {
-//           return {
-//             group: 'role',
-//             id: uid
-//           };
-//         })
-//       : [
-//           {
-//             id: spaceId,
-//             group: 'space'
-//           }
-//         ];
-
-//   const permissionsToSend: Pick<RewardPermissions, 'reviewer' | 'submitter'> = {
-//     reviewer: reviewers,
-//     submitter: submitters
-//   };
-
-//   return permissionsToSend;
-// }
