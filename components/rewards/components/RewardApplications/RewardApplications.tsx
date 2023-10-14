@@ -29,22 +29,26 @@ export function RewardApplications({ reward, refreshReward, permissions }: Props
 
   return (
     <Box>
-      <>
-        <Tooltip title={!permissions?.work ? 'You do not have permission to work on this reward' : ''}>
-          <Box
-            alignItems='center'
-            display='flex'
-            flexDirection='column'
-            justifyContent='center'
-            sx={{ height: '100px' }}
-          >
-            <Button disabled={!permissions?.work} onClick={newApplication}>
-              {reward.approveSubmitters ? 'New Application' : 'New Submission'}
-            </Button>
-          </Box>
-        </Tooltip>
-        <Divider />
-      </>
+      {!hasApplication ||
+        (hasApplication && reward.allowMultipleApplications && (
+          <>
+            <Tooltip title={!permissions?.work ? 'You do not have permission to work on this reward' : ''}>
+              <Box
+                alignItems='center'
+                display='flex'
+                flexDirection='column'
+                justifyContent='center'
+                sx={{ height: '100px' }}
+              >
+                <Button disabled={!permissions?.work} onClick={newApplication}>
+                  {reward.approveSubmitters ? 'New Application' : 'New Submission'}
+                </Button>
+              </Box>
+            </Tooltip>
+
+            <Divider />
+          </>
+        ))}
       <RewardSubmissionsTable reward={reward} refreshReward={refreshReward} permissions={permissions} />
     </Box>
   );

@@ -12,7 +12,6 @@ import { useUser } from 'hooks/useUser';
 
 import { useApplicationDialog } from '../hooks/useApplicationDialog';
 
-import { NewApplication } from './RewardApplicationPage/NewApplication';
 import { RewardApplicationPageComponent } from './RewardApplicationPage/RewardApplicationPage';
 
 export function ApplicationDialog() {
@@ -101,17 +100,7 @@ export function ApplicationDialog() {
       ) : currentApplicationId ? (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <RewardApplicationPageComponent applicationId={currentApplicationId} />
-      ) : (
-        <NewApplication
-          formInputs={{}}
-          setFormInputs={(_formInputs) => {
-            setContentUpdated(true);
-            // setFormInputs((existingFormInputs) => ({ ...existingFormInputs, ..._formInputs }));
-          }}
-          contentUpdated={contentUpdated}
-          setContentUpdated={setContentUpdated}
-        />
-      )}
+      ) : null}
       <ConfirmDeleteModal
         onClose={() => {
           setShowConfirmDialog(false);

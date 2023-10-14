@@ -177,8 +177,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
               onSubmit={(submission) =>
                 updateApplication({
                   rewardId: reward.id,
-
-                  submissionNodes: submission.submissionNodes ? JSON.parse(submission.submissionNodes) : null,
+                  submissionNodes: submission.submissionNodes,
                   applicationId: application.id
                 })
               }

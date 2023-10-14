@@ -66,11 +66,13 @@ export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
 }
 
 export function useGetApplication({ applicationId }: { applicationId?: string }) {
-  return useGET<Application>(applicationId ? `/api/reward-applications/work?${applicationId}` : null);
+  return useGET<Application>(applicationId ? `/api/reward-applications/work?applicationId=${applicationId}` : null);
 }
 
 export function useGetApplicationComments({ applicationId }: { applicationId?: string }) {
-  return useGET<ApplicationComment[]>(applicationId ? `/api/applications/${applicationId}/comments/v2` : null);
+  return useGET<ApplicationComment[]>(
+    applicationId ? `/api/reward-applications/comments?applicationId=${applicationId}` : null
+  );
 }
 
 export function useGetReward({ rewardId }: { rewardId?: string }) {
