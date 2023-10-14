@@ -1,107 +1,61 @@
-import type { PermissionCompute, UserPermissionFlags } from '@charmverse/core/permissions';
+import type { Resource, UserPermissionFlags } from '@charmverse/core/permissions';
 import type { Application, ApplicationComment, BountyOperation, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
-import type {
-  ApplicationWithTransactions,
-  CreateApplicationCommentPayload,
-  ReviewDecision,
-  SubmissionCreationData,
-  SubmissionUpdateData
-} from 'lib/applications/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
 import type { TransactionCreationData } from 'lib/transactions/interface';
+import type { CreateApplicationCommentPayload } from 'pages/api/rewards/[id]/[applicationId]/comments';
 
 export class RewardsApi {
   createReward(reward: RewardCreationData) {
     return http.POST<RewardWithUsers>('/api/rewards', reward);
   }
 
-  listRewards(spaceId: string, publicOnly?: boolean): Promise<RewardWithUsers[]> {
-    return http.GET('/api/rewards', { spaceId, publicOnly });
+  updateReward({ rewardId, updateContent }: RewardUpdate): Promise<RewardWithUsers> {
+    return http.PUT<RewardWithUsers>(`/api/rewards/${rewardId}`, updateContent);
   }
 
-  /**
-   * Get full set of permissions for a specific user on a certain page
-   *
-   * TODO - Replace inline permissions by permission flags in final location
-   */
-  computePermissions({ resourceId, userId }: PermissionCompute): Promise<UserPermissionFlags<BountyOperation>> {
-    return http.GET(`/api/rewards/${resourceId}/permissions?userId=${userId}`);
+  listRewards(spaceId: string): Promise<RewardWithUsers[]> {
+    return http.GET('/api/rewards', { spaceId });
+  }
+
+  computeRewardPermissions({ resourceId }: Resource): Promise<UserPermissionFlags<BountyOperation>> {
+    return http.GET(`/api/rewards/${resourceId}/permissions`);
   }
 
   getReward(rewardId: string) {
     return http.GET<RewardWithUsers>(`/api/rewards/${rewardId}`);
   }
 
-  updateReward({ rewardId, updateContent }: RewardUpdate): Promise<RewardWithUsers> {
-    return http.PUT<RewardWithUsers>(`/api/rewards/${rewardId}`, updateContent);
-  }
-
-  lockSubmissions(rewardId: string, lock?: boolean): Promise<RewardWithUsers> {
-    return http.POST<RewardWithUsers>(`/api/rewards/${rewardId}/lock?lock=${lock ?? true}`);
-  }
-
   closeReward(rewardId: string): Promise<RewardWithUsers> {
     return http.POST<RewardWithUsers>(`/api/rewards/${rewardId}/close`);
   }
 
-  markRewardAsPaid(rewardId: string): Promise<RewardWithUsers> {
-    return http.POST<RewardWithUsers>(`/api/rewards/${rewardId}/mark-paid`);
-  }
-
   reviewApplication({
     decision,
-    applicationId
+    applicationId,
+    rewardId
   }: {
-    applicationId: string;
+    rewardId: string;
+    applicationId?: string;
     decision: ReviewDecision;
   }): Promise<Application> {
-    return http.POST<Application>(`/api/applications/${applicationId}/v2/review`, { decision });
+    return http.POST<Application>(`/api/rewards/${rewardId}/${applicationId}/review`, { decision });
   }
 
-  updateApplication({
+  work({
+    rewardId,
     applicationId,
     update
   }: {
-    applicationId: string;
+    rewardId: string;
+    applicationId?: string;
     update: Partial<Application>;
   }): Promise<Application> {
-    return http.PUT<Application>(`/api/applications/${applicationId}`, update);
-  }
-
-  createApplication(application: Pick<Application, 'message'> & { bountyId: string }): Promise<Application> {
-    return http.POST<Application>('/api/applications', application);
-  }
-
-  listApplications(rewardId: string): Promise<ApplicationWithTransactions[]> {
-    return http.GET('/api/applications', { rewardId });
-  }
-
-  createSubmission(content: Omit<SubmissionCreationData, 'userId' | 'customReward'>): Promise<Application> {
-    return http.POST<Application>('/api/submissions', content);
-  }
-
-  updateSubmission({ submissionId, submissionContent }: SubmissionUpdateData): Promise<Application> {
-    return http.PUT<Application>(`/api/submissions/${submissionId}`, { content: submissionContent });
-  }
-
-  reviewSubmission({
-    decision,
-    submissionId
-  }: {
-    submissionId: string;
-    decision: ReviewDecision;
-  }): Promise<Application> {
-    return http.POST<Application>(`/api/submissions/${submissionId}/review`, {
-      decision
-    });
-  }
-
-  markSubmissionAsPaid(submissionId: string) {
-    return http.POST<Application>(`/api/submissions/${submissionId}/mark-as-paid`);
+    return http.PUT<Application>(`/api/rewards/${rewardId}/work?applicationId=${applicationId}`, update);
   }
 
   recordTransaction(data: TransactionCreationData) {
@@ -122,32 +76,40 @@ export class RewardsApi {
 
   addApplicationComment({
     applicationId,
-    payload
+    payload,
+    rewardId
   }: {
+    rewardId: string;
     applicationId: string;
     payload: CreateApplicationCommentPayload;
   }) {
-    return http.POST<ApplicationComment>(`/api/applications/${applicationId}/comments/v2`, payload);
+    return http.POST<ApplicationComment>(`/api/rewards/${rewardId}/${applicationId}/comments`, payload);
   }
 
-  deleteApplicationComment({ applicationId, commentId }: { applicationId: string; commentId: string }) {
-    return http.DELETE<ApplicationComment>(`/api/applications/${applicationId}/comments/v2/${commentId}`);
+  deleteApplicationComment({
+    applicationId,
+    commentId,
+    rewardId
+  }: {
+    rewardId: string;
+    applicationId: string;
+    commentId: string;
+  }) {
+    return http.DELETE<ApplicationComment>(`/api/rewards/${rewardId}/${applicationId}/comments/${commentId}`);
   }
 
   editApplicationComment({
     applicationId,
     commentId,
-    payload
+    payload,
+    rewardId
   }: {
+    rewardId: string;
     applicationId: string;
     commentId: string;
     payload: CreateApplicationCommentPayload;
   }) {
-    return http.PUT<ApplicationComment>(`/api/applications/${applicationId}/comments/v2/${commentId}`, payload);
-  }
-
-  refreshApplicationStatus(applicationId: string) {
-    return http.GET<Application>(`/api/applications/${applicationId}/refresh-status`);
+    return http.PUT<ApplicationComment>(`/api/rewards/${rewardId}/${applicationId}/comments/${commentId}`, payload);
   }
 
   isRewardEditable(rewardId: string) {
