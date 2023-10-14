@@ -1,41 +1,82 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
-import type { Space, User } from '@charmverse/core/prisma-client';
+import { prisma, type Space, type User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { RewardCreationData } from 'lib/rewards/createReward';
+import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateBounty } from 'testing/setupDatabase';
 
-describe('GET /api/rewards - getBounties', () => {
+describe('GET /api/rewards - getRewards', () => {
   let user: User;
+  let admin: User;
   let space: Space;
   let userCookie: string;
+  let reward: RewardWithUsers;
+  let hiddenReward: RewardWithUsers;
+  let publicReward: RewardWithUsers;
 
   beforeAll(async () => {
-    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
-    user = generated.user;
+    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true, publicBountyBoard: true });
+    admin = generated.user;
     space = generated.space;
+    user = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
+
     userCookie = await loginUser(user.id);
+
+    const { id: hiddenRewardId } = await generateBounty({
+      createdBy: admin.id,
+      spaceId: space.id
+    });
+
+    const { id: rewardId } = await generateBounty({
+      createdBy: admin.id,
+      spaceId: space.id,
+      pagePermissions: [{ permissionLevel: 'view_comment', spaceId: space.id }]
+    });
+
+    const { id: publicRewardId } = await generateBounty({
+      createdBy: admin.id,
+      spaceId: space.id,
+      pagePermissions: [{ permissionLevel: 'view', public: true }]
+    });
+
+    // Make a public reward
+    reward = await getRewardOrThrow({ rewardId });
+    hiddenReward = await getRewardOrThrow({ rewardId: hiddenRewardId });
+    publicReward = await getRewardOrThrow({ rewardId: publicRewardId });
+  });
+  it('should provide space members with a list of rewards they can view and respond with a status code 200', async () => {
+    const response = (
+      await request(baseUrl).get(`/api/rewards?spaceId=${space.id}`).set('Cookie', userCookie).expect(200)
+    ).body as RewardWithUsers[];
+
+    expect(response).toHaveLength(2);
+
+    expect(response).toEqual(
+      expect.arrayContaining([
+        { ...reward, createdAt: expect.any(String), updatedAt: expect.any(String) },
+        { ...publicReward, createdAt: expect.any(String), updatedAt: expect.any(String) }
+      ])
+    );
   });
 
-  it('should return a list of rewards with a status code 200 when the user has permission', async () => {
-    const response = await request(baseUrl)
-      .get(`/api/rewards?spaceId=${space.id}`)
-      .set('Cookie', userCookie)
-      .expect(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body[0]).toHaveProperty('id');
-  });
+  it('should return a list of public rewards with a status code 200 for non-logged-in users if the space uses public rewards', async () => {
+    const response = (await request(baseUrl).get(`/api/rewards?spaceId=${space.id}`).expect(200))
+      .body as RewardWithUsers[];
 
-  it('should return a status code 401 when a non-logged-in user tries to access without publicOnly flag', async () => {
-    await request(baseUrl).get(`/api/rewards?spaceId=${space.id}`).expect(401);
-  });
+    expect(response).toHaveLength(1);
 
-  it('should return a list of public rewards with a status code 200 for non-logged-in users when the publicOnly flag is true', async () => {
-    const response = await request(baseUrl).get(`/api/rewards?spaceId=${space.id}`).expect(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body[0]).toHaveProperty('id');
+    expect(response).toEqual([{ ...publicReward, createdAt: expect.any(String), updatedAt: expect.any(String) }]);
+  });
+  it('should return a status code 401 if a person outside the space requests rewards and the space has turned off public rewards board setting', async () => {
+    const { space: spaceWithoutPublicRewards } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true,
+      publicBountyBoard: false
+    });
+    await request(baseUrl).get(`/api/rewards?spaceId=${spaceWithoutPublicRewards.id}`).expect(401);
   });
 });
 
@@ -45,9 +86,16 @@ describe('POST /api/rewards - createRewardController', () => {
   let userCookie: string;
 
   beforeAll(async () => {
-    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
     user = generated.user;
     space = generated.space;
+    await prisma.spacePermission.create({
+      data: {
+        space: { connect: { id: space.id } },
+        forSpace: { connect: { id: space.id } },
+        operations: ['createBounty']
+      }
+    });
     userCookie = await loginUser(user.id);
   });
 
