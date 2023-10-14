@@ -28,6 +28,10 @@ export async function work({
   rewardInfo,
   walletAddress
 }: WorkUpsertData): Promise<Application> {
+  if (!stringUtils.isUUID(userId)) {
+    throw new InvalidInputError(`User id is invalid: ${userId}`);
+  }
+
   const reward = await getRewardOrThrow({ rewardId });
 
   const userApplications = reward.applications.filter((a) => a.createdBy === userId);
