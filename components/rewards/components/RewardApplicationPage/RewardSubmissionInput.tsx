@@ -18,7 +18,7 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
-import type { BountyPermissionFlags } from 'lib/bounties';
+import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
 
@@ -85,21 +85,12 @@ export default function SubmissionInput({
 
   async function onSubmit(values: FormValues) {
     setFormError(null);
-    let application: Application;
+    const application = await charmClient.rewards.work({
+      applicationId: submission?.id,
+      rewardId: bountyId,
+      ...values
+    });
     try {
-      if (submission) {
-        // Update
-        application = await charmClient.bounties.updateSubmission({
-          submissionId: submission.id,
-          content: values
-        });
-      } else {
-        // create
-        application = await charmClient.bounties.createSubmission({
-          bountyId,
-          submissionContent: values
-        });
-      }
       setIsEditorTouched(false);
       if (onSubmitProp) {
         onSubmitProp(values);

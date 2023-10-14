@@ -7,10 +7,8 @@
 
 // import type { PageWithReward } from 'lib/pages';
 import type { Application, ApplicationComment, PageComment } from '@charmverse/core/prisma-client';
-import { ex } from '@fullcalendar/core/internal-common';
 
-import type { ApplicationWithReward } from 'lib/applications/interfaces';
-import type { BountyPermissionFlags } from 'lib/bounties';
+import type { BountyPermissionFlags } from 'lib/permissions/bounties/interfaces';
 import type {
   RewardBlockInput,
   RewardBlockUpdateInput,
@@ -68,7 +66,7 @@ export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
 }
 
 export function useGetApplication({ applicationId }: { applicationId?: string }) {
-  return useGET<ApplicationWithReward>(applicationId ? `/api/applications/${applicationId}` : null);
+  return useGET<Application>(applicationId ? `/api/reward-applications/work?${applicationId}` : null);
 }
 
 export function useGetApplicationComments({ applicationId }: { applicationId?: string }) {

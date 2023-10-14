@@ -13,8 +13,6 @@ import * as yup from 'yup';
 
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
-import type { SubmissionReview } from 'lib/applications/interfaces';
-import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS } from 'lib/applications/shared';
 
 import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 
@@ -30,13 +28,7 @@ interface IApplicationFormProps {
 }
 
 export const schema = yup.object({
-  message: yup
-    .string()
-    .required('Please enter a submission.')
-    .min(
-      MINIMUM_APPLICATION_MESSAGE_CHARACTERS,
-      `Application submission must contain at least ${MINIMUM_APPLICATION_MESSAGE_CHARACTERS} characters.`
-    )
+  message: yup.string().required('Please enter a submission.')
 });
 
 type FormValues = yup.InferType<typeof schema>;

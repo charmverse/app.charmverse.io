@@ -169,7 +169,7 @@ function RewardsPageTitle({
 }) {
   const [pageTitle] = usePageTitle();
   const { data: application } = useGetApplication({ applicationId });
-  const { data: rewardWithPageMeta } = useGetReward({ rewardId: application?.reward.id });
+  const { data: rewardWithPageMeta } = useGetReward({ rewardId: application?.bountyId });
 
   return (
     <PageTitle>

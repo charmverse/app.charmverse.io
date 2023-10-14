@@ -4,7 +4,7 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { BountyPermissionFlags } from 'lib/bounties';
+import type { BountyPermissionFlags } from 'lib/permissions/bounties/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
@@ -23,23 +23,8 @@ export function RewardApplications({ reward, refreshReward, permissions }: Props
   const { account } = useWeb3Account();
 
   async function newApplication() {
-    if (!hasApplication) {
-      if (reward.approveSubmitters) {
-        await charmClient.rewards.createApplication({ bountyId: reward.id, message: '' });
-      } else {
-        await charmClient.rewards.createSubmission({
-          bountyId: reward.id,
-          submissionContent: {
-            submission: '',
-            submissionNodes: JSON.stringify({ ...emptyDocument }),
-            walletAddress:
-              account && user?.wallets.some((w) => lowerCaseEqual(w.address, account)) ? account : undefined
-          }
-        });
-      }
-
-      refreshReward(reward.id);
-    }
+    await charmClient.rewards.work({ rewardId: reward.id, message: '' });
+    refreshReward(reward.id);
   }
 
   return (

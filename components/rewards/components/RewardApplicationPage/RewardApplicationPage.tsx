@@ -31,17 +31,10 @@ type Props = {
 };
 
 export function RewardApplicationPageComponent({ applicationId }: Props) {
-  const {
-    application,
-    refreshApplication,
-    applicationRewardPermissions,
-    updateApplication,
-    updateSubmission,
-    reviewSubmission,
-    reviewApplication
-  } = useApplication({
-    applicationId
-  });
+  const { application, refreshApplication, applicationRewardPermissions, updateApplication, reviewApplication } =
+    useApplication({
+      applicationId
+    });
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
 
   const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
@@ -107,7 +100,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
                 pageId={reward.page.id}
                 pagePath={reward.page.path}
                 readOnly={true}
-                refreshRewardPermissions={() => {}}
               />
               {rewardPageContent && (
                 <>
@@ -139,7 +131,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           )}
           {(application.status === 'review' || application.status === 'inProgress') && (
             <RewardReview
-              onConfirmReview={(decision) => reviewSubmission({ decision })}
+              onConfirmReview={(decision) => reviewApplication({ decision })}
               reviewType='submission'
               readOnly={!applicationRewardPermissions?.review}
             />
@@ -157,19 +149,18 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           )}
         </Grid>
 
-        {application.reward.approveSubmitters && application.status === 'applied' && (
+        {reward.approveSubmitters && application.status === 'applied' && (
           <Grid item xs={12}>
             <ApplicationInput
               application={application}
-              rewardId={application.reward.id}
+              rewardId={reward.id}
               expandedOnLoad
               readOnly={application.createdBy !== user?.id}
               onSubmit={(updatedApplication) =>
                 updateApplication({
                   applicationId: application.id,
-                  update: {
-                    message: updatedApplication
-                  }
+                  message: updatedApplication,
+                  rewardId: reward.id
                 })
               }
             />
@@ -184,15 +175,16 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
               expandedOnLoad
               refreshSubmission={refreshApplication}
               onSubmit={(submission) =>
-                updateSubmission({
-                  customReward: false,
-                  submissionContent: submission.submissionNodes ? JSON.parse(submission.submissionNodes) : null,
-                  submissionId: application.id
+                updateApplication({
+                  rewardId: reward.id,
+
+                  submissionNodes: submission.submissionNodes ? JSON.parse(submission.submissionNodes) : null,
+                  applicationId: application.id
                 })
               }
               bountyId={application.bountyId}
               permissions={applicationRewardPermissions}
-              hasCustomReward={!!application.reward.customReward}
+              hasCustomReward={!!reward.customReward}
             />
           </Grid>
         )}

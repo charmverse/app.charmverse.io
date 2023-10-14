@@ -35,11 +35,11 @@ export class RewardsApi {
     return http.POST<RewardWithUsers>(`/api/rewards/${rewardId}/close`);
   }
 
-  reviewApplication({ decision, applicationId }: ApplicationReview): Promise<Application> {
+  reviewApplication({ decision, applicationId }: Omit<ApplicationReview, 'userId'>): Promise<Application> {
     return http.POST<Application>(`/api/reward-applications/review?applicationId=${applicationId}`, { decision });
   }
 
-  work(input: WorkUpsertData): Promise<Application> {
+  work(input: Omit<WorkUpsertData, 'userId'>): Promise<Application> {
     return http.PUT<Application>('/api/reward-applications/work', input);
   }
 
@@ -67,6 +67,10 @@ export class RewardsApi {
     payload: CreateApplicationCommentPayload;
   }) {
     return http.POST<ApplicationComment>(`/api/reward-applications/comments?applicationId=${applicationId}`, payload);
+  }
+
+  markRewardAsPaid(rewardId: string): Promise<RewardWithUsers> {
+    return http.POST<RewardWithUsers>(`/api/rewards/${rewardId}/mark-paid`);
   }
 
   markSubmissionAsPaid(submissionId: string) {

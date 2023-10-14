@@ -1,36 +1,24 @@
-import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, Stack, useMediaQuery } from '@mui/material';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
+import { Box, useMediaQuery } from '@mui/material';
+import { useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
-import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
-import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { Button } from 'components/common/Button';
-import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import { ScrollableWindow } from 'components/common/PageLayout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import type { WorkUpsertData } from 'lib/rewards/work';
 import { fontClassName } from 'theme/fonts';
 
-import type { ApplicationPropertiesInput } from '../../hooks/useApplicationDialog';
 import { useApplicationDialog } from '../../hooks/useApplicationDialog';
 
 import ApplicationInput from './RewardApplicationInput';
 
 type Props = {
-  setFormInputs: (params: Partial<ApplicationPropertiesInput>) => void;
-  formInputs: ApplicationPropertiesInput;
+  setFormInputs: (params: Partial<WorkUpsertData>) => void;
+  formInputs: Partial<WorkUpsertData>;
   contentUpdated: boolean;
   setContentUpdated: (changed: boolean) => void;
 };

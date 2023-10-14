@@ -1,25 +1,16 @@
-import { log } from '@charmverse/core/log';
-import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { trackPageView } from 'charmClient/hooks/track';
-import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { useApplication } from 'components/rewards/hooks/useApplication';
-import { useCurrentPage } from 'hooks/useCurrentPage';
-import { usePage } from 'hooks/usePage';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import debouncePromise from 'lib/utilities/debouncePromise';
 
-import { useApplicationDialog, type ApplicationPropertiesInput } from '../hooks/useApplicationDialog';
+import { useApplicationDialog } from '../hooks/useApplicationDialog';
 
 import { NewApplication } from './RewardApplicationPage/NewApplication';
 import { RewardApplicationPageComponent } from './RewardApplicationPage/RewardApplicationPage';

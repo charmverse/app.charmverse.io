@@ -4,9 +4,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { createBounty } from 'lib/bounties';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateBounty } from 'testing/setupDatabase';
 
 describe('PUT /api/reward-applications/work - work on a reward', () => {
   let space: Space;
@@ -23,7 +23,7 @@ describe('PUT /api/reward-applications/work - work on a reward', () => {
   });
 
   it('should allow user with permissions to create and update work, and receive their application with a 200', async () => {
-    const reward = await createBounty({
+    const reward = await generateBounty({
       createdBy: admin.id,
       spaceId: space.id,
       status: 'open',
@@ -71,7 +71,7 @@ describe('PUT /api/reward-applications/work - work on a reward', () => {
   });
 
   it('should only allow users with correct role to create work, if the reward is restricted to certain roles, and respond 200 or 401', async () => {
-    const reward = await createBounty({
+    const reward = await generateBounty({
       createdBy: admin.id,
       spaceId: space.id,
       status: 'open',
@@ -116,7 +116,7 @@ describe('PUT /api/reward-applications/work - work on a reward', () => {
   });
 
   it('it should prevent a user without permissions from working on this reward, and respond with 401', async () => {
-    const reward = await createBounty({
+    const reward = await generateBounty({
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',

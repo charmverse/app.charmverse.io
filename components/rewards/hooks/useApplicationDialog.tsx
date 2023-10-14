@@ -1,13 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import type { WorkUpsertData, SubmissionCreationData } from 'lib/applications/interfaces';
-
-export type ApplicationPropertiesInput = {
-  applicationContent?: WorkUpsertData;
-  submissionContent?: SubmissionCreationData;
-  wallet?: string;
-};
 type Context = {
   currentApplicationId: string | null;
   isOpen: boolean;

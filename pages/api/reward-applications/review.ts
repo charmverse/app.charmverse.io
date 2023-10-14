@@ -3,10 +3,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { reviewApplication } from 'lib/applications/actions';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { reviewApplication } from 'lib/rewards/reviewApplication';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 

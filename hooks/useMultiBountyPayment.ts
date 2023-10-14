@@ -7,7 +7,6 @@ import useSWR from 'swr';
 import { getAddress, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
-import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -17,6 +16,7 @@ import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
 
+import type { MultiPaymentResult } from './useGnosisPayment';
 import { usePages } from './usePages';
 
 const ERC20_ABI = ['function transfer(address to, uint256 value)'];
@@ -114,7 +114,7 @@ export function useMultiBountyPayment({
       setIsLoading(true);
       await Promise.all(
         result.transactions.map(async (transaction) => {
-          await charmClient.bounties.recordTransaction({
+          await charmClient.rewards.recordTransaction({
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
             safeTxHash: result.txHash,

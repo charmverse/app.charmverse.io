@@ -1,7 +1,5 @@
 import { useTheme } from '@emotion/react';
-import { LockOpen } from '@mui/icons-material';
-import LockIcon from '@mui/icons-material/Lock';
-import { Divider, IconButton, Tooltip } from '@mui/material';
+import { Divider } from '@mui/material';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
@@ -14,15 +12,11 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useUser } from 'hooks/useUser';
-import { countCompleteSubmissions } from 'lib/applications/shared';
-import type { BountyPermissionFlags } from 'lib/bounties';
-import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
+import type { BountyPermissionFlags } from 'lib/permissions/bounties';
+import { countCompleteSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { isRewardLockable } from 'lib/rewards/shared';
 
 import { RewardApplicantTableRow } from './RewardApplicantTableRow';
 import type { ApplicationFilterStatus } from './RewardApplicationFilter';
@@ -43,12 +37,7 @@ export default function RewardSubmissionsTable({ reward, permissions, refreshRew
 
   const { showApplication } = useApplicationDialog();
 
-  const validSubmissions = countCompleteSubmissions(reward.applications);
-
-  async function lockRewardSubmissions() {
-    const updatedReward = await charmClient.bounties.lockSubmissions(reward!.id, !reward.submissionsLocked);
-    refreshReward(updatedReward.id);
-  }
+  const validSubmissions = countCompleteSubmissions({ applications: reward.applications });
 
   const filteredApplications =
     !applicationsFilter || applicationsFilter === 'all'
@@ -76,6 +65,8 @@ export default function RewardSubmissionsTable({ reward, permissions, refreshRew
               reward?.maxSubmissions ? `${validSubmissions} / ${reward.maxSubmissions}` : validSubmissions
             }`}
           />
+          {/*
+          // Re-enable later
           {permissions?.lock && isRewardLockable(reward) && (
             <Tooltip
               key='stop-new'
@@ -98,7 +89,7 @@ export default function RewardSubmissionsTable({ reward, permissions, refreshRew
                 )}
               </IconButton>
             </Tooltip>
-          )}
+          )} */}
         </Box>
 
         <RewardApplicationFilter status={applicationsFilter} onStatusSelect={setApplicationsFilter} />

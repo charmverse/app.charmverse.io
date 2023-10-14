@@ -39,9 +39,8 @@ export function RewardProperties(props: {
   rewardId: string | null;
   pageId: string;
   pagePath: string;
-  refreshRewardPermissions: (rewardId: string) => void;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false, refreshRewardPermissions } = props;
+  const { rewardId, pageId, readOnly: parentReadOnly = false } = props;
   const { rewards, mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
   const { user } = useUser();
@@ -205,10 +204,6 @@ export function RewardProperties(props: {
               await applyRewardUpdates({
                 reviewers: options.map((option) => ({ group: option.group, id: option.id }))
               });
-
-              if (currentReward?.id) {
-                await refreshRewardPermissions(currentReward.id);
-              }
             }}
           />
         </Box>
@@ -284,10 +279,6 @@ export function RewardProperties(props: {
               await applyRewardUpdates({
                 allowedSubmitterRoles: roleIds
               });
-
-              if (currentReward?.id) {
-                await refreshRewardPermissions(currentReward.id);
-              }
             }}
           />
           {/* TODO @Mo - FIX later

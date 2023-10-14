@@ -32,12 +32,10 @@ import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
-import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
-import { BountiesApi } from './apis/bountiesApi';
 import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
@@ -70,8 +68,6 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 //
 class CharmClient {
   blockchain = new BlockchainApi();
-
-  bounties = new BountiesApi();
 
   comments = new CommentsApi();
 

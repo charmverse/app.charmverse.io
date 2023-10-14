@@ -21,7 +21,7 @@ type RewardsContextType = {
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
   refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
-  createReward: (input: RewardCreationData) => Promise<RewardWithUsers | null>;
+  createReward: (input: Omit<RewardCreationData, 'userId'>) => Promise<RewardWithUsers | null>;
   tempReward?: RewardCreationData | null;
   setTempReward: (input?: RewardCreationData | null) => void;
 };
@@ -105,8 +105,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   );
 
   const createReward = useCallback(
-    async (rewardData: RewardCreationData) => {
-      const reward = await createRewardTrigger(rewardData);
+    async (rewardData: Omit<RewardCreationData, 'userId'>) => {
+      const reward = await createRewardTrigger(rewardData as any);
       if (!reward) {
         return null;
       }

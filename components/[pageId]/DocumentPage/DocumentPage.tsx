@@ -24,12 +24,9 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useBounties } from 'hooks/useBounties';
-import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
@@ -38,7 +35,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
-import BountyProperties from './components/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -84,17 +80,13 @@ export interface DocumentPageProps {
 
 function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = false }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
-  const { draftBounty } = useBounties();
+
   const { tempReward } = useRewards();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
-
-  const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
-    bountyId: page.bountyId
-  });
   const [containerRef, { width: containerWidth }] = useElementSize();
 
   const pagePermissions = page.permissionFlags;
@@ -330,30 +322,6 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
-                      refreshRewardPermissions={() => refreshBountyPermissions()}
-                    />
-                  )}
-
-                  {/* 
-                    PERMANENT DELETE WHEN WE MIGRATE TO REWARDS
-                    {(draftBounty || page.bountyId) && !isRewardsPage && (
-                      <BountyProperties
-                        bountyId={page.bountyId}
-                        pageId={page.id}
-                        pagePath={page.path}
-                        readOnly={readOnly}
-                        permissions={bountyPermissions || null}
-                        refreshBountyPermissions={() => refreshBountyPermissions()}
-                      />
-                    */}
-                  {(draftBounty || page.bountyId) && !isRewardsPage && (
-                    <BountyProperties
-                      bountyId={page.bountyId}
-                      pageId={page.id}
-                      pagePath={page.path}
-                      readOnly={readOnly}
-                      permissions={bountyPermissions || null}
-                      refreshBountyPermissions={() => refreshBountyPermissions()}
                     />
                   )}
                   {(page.type === 'card' || page.type === 'card_synced') && (

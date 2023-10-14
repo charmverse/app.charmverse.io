@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import type { ReviewDecision } from 'lib/applications/interfaces';
+import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
 /**
  * @expandedOnLoad Use this to expand the application initially

@@ -1,17 +1,15 @@
 import { useTrackPageView } from 'charmClient/hooks/track';
-import { BountiesPage } from 'components/bounties/BountiesPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import getPageLayout from 'components/common/PageLayout/getLayout';
-import { useBounties } from 'hooks/useBounties';
+import { useRewards } from 'components/rewards/hooks/useRewards';
+import { RewardsPageWithProviders } from 'components/rewards/RewardsPageWithProviders';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { setTitle } from 'hooks/usePageTitle';
 import { useSharedPage } from 'hooks/useSharedPage';
 
-export default function BountyPage() {
-  const { bounties, loadingBounties } = useBounties();
+export default function RewardsPage() {
+  const { rewards, isLoading } = useRewards();
   const { accessChecked } = useSharedPage();
   const { mappedFeatures } = useFeaturesAndMembers();
   const bountiesTitle = mappedFeatures.bounties.title;
@@ -22,15 +20,10 @@ export default function BountyPage() {
 
   setTitle(bountiesTitle);
 
-  if (loadingBounties || !bounties || !accessChecked || isLoadingAccess) {
+  if (isLoading || !rewards || !accessChecked || isLoadingAccess) {
     return <LoadingComponent isLoading />;
   }
-  return (
-    <PageDialogProvider>
-      <BountiesPage bounties={bounties} publicMode={!isSpaceMember} title={bountiesTitle} />
-      <PageDialogGlobal />
-    </PageDialogProvider>
-  );
+  return <RewardsPageWithProviders />;
 }
 
-BountyPage.getLayout = getPageLayout;
+RewardsPage.getLayout = getPageLayout;
