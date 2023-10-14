@@ -3,6 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { WrongStateError } from 'lib/utilities/errors';
 
+import { rollupRewardStatus } from './rollupRewardStatus';
+
 export type ReviewDecision = 'approve' | 'reject';
 
 export type ApplicationReview = {
@@ -20,7 +22,8 @@ export async function reviewApplication({ applicationId, decision, userId }: App
       id: applicationId
     },
     select: {
-      status: true
+      status: true,
+      bountyId: true
     }
   });
 
@@ -44,6 +47,8 @@ export async function reviewApplication({ applicationId, decision, userId }: App
       reviewedBy: userId
     }
   })) as Application;
+
+  await rollupRewardStatus({ rewardId: application.bountyId });
 
   return updated;
 }
