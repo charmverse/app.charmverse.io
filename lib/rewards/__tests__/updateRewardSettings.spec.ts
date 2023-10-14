@@ -38,26 +38,45 @@ beforeAll(async () => {
 });
 
 describe('updateRewardSettings', () => {
-  it('should update reward settings for valid input', async () => {
-    const updateContent = {
-      rewardAmount: 1000,
-      rewardToken: 'TOKEN'
-    };
-    const updatedReward = await updateRewardSettings({ rewardId: reward.id, updateContent });
-    expect(updatedReward.rewardAmount).toBe(1000);
-    expect(updatedReward.rewardToken).toBe('TOKEN');
-  });
+  it('should update other fields with valid data types', async () => {
+    const submitterRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
+    const reviewerRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
 
-  it('should set allowed submitter roles and reviewers', async () => {
-    const reviewers: TargetPermissionGroup<'user'>[] = [{ group: 'user', id: user.id }];
+    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
+      { group: 'role', id: reviewerRole.id },
+      { group: 'user', id: user.id }
+    ];
 
     const updateContent: UpdateableRewardFields = {
-      allowedSubmitterRoles: [role1.id, role2.id],
-      reviewers
+      rewardAmount: 1000,
+      rewardToken: 'TOKEN',
+      chainId: 12,
+      approveSubmitters: false,
+      dueDate: new Date(2025, 11, 31),
+      customReward: 'Custom Reward Description',
+      fields: ['Field1', 'Field2'],
+      reviewers,
+      allowedSubmitterRoles: [submitterRole.id]
     };
+
     const updatedReward = await updateRewardSettings({ rewardId: reward.id, updateContent });
-    expect(updatedReward.allowedSubmitterRoles).toEqual([role1.id, role2.id]);
-    expect(updatedReward.reviewers).toEqual(reviewers);
+
+    expect(updatedReward).toMatchObject(updateContent);
+  });
+
+  it('should set maxSubmissions without any prior submissions', async () => {
+    const testReward = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      approveSubmitters: true,
+      maxSubmissions: 0 // Initially no submissions limit
+    });
+
+    const updateContent = {
+      maxSubmissions: 5
+    };
+    const updatedReward = await updateRewardSettings({ rewardId: testReward.id, updateContent });
+    expect(updatedReward.maxSubmissions).toBe(5);
   });
 
   it('should throw InvalidInputError for non-UUID rewardId', async () => {
