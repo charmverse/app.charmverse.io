@@ -1,16 +1,14 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
-import type { PageComment, ApplicationComment } from '@charmverse/core/prisma';
+import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getApplicationDetails } from 'lib/applications/getApplicationDetails';
 import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,7 +17,7 @@ handler.use(requireUser).post(createApplicationCommentController).get(getApplica
 async function createApplicationCommentController(req: NextApiRequest, res: NextApiResponse<ApplicationComment>) {
   const { contentText, content, parentCommentId } = req.body as CreateApplicationCommentPayload;
   const { id: userId } = req.session.user;
-  const applicationId = req.query.id as string;
+  const applicationId = req.query.applicationId as string;
 
   const application = await prisma.application.findUniqueOrThrow({
     where: {
@@ -34,8 +32,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
 
   const permissions = await computeBountyPermissions({
     resourceId: application.bountyId,
-    userId,
-    allowAdminBypass: true
+    userId
   });
 
   if (!permissions.review && application.createdBy !== userId) {
@@ -57,7 +54,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
 
 async function getApplicationCommentsController(req: NextApiRequest, res: NextApiResponse<ApplicationComment[]>) {
   const { id: userId } = req.session.user;
-  const applicationId = req.query.id as string;
+  const applicationId = req.query.applicationId as string;
 
   const application = await prisma.application.findUniqueOrThrow({
     where: {
