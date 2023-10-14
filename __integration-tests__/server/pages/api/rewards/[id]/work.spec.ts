@@ -7,6 +7,7 @@ import request from 'supertest';
 import { createBounty } from 'lib/bounties';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateBounty } from 'testing/setupDatabase';
 
 describe('PUT /api/rewards/:id/work - work on a reward', () => {
   let space: Space;
