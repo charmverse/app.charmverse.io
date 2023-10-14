@@ -1,4 +1,4 @@
-import type { Application, Prisma, PrismaPromise } from '@charmverse/core/prisma';
+import type { Application, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
