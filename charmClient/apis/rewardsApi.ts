@@ -4,10 +4,11 @@ import type { Application, ApplicationComment, BountyOperation, Space } from '@c
 import * as http from 'adapters/http';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import type { ReviewDecision } from 'lib/rewards/reviewApplication';
+import type { ApplicationReview } from 'lib/rewards/reviewApplication';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
+import type { WorkUpsertData } from 'lib/rewards/work';
 import type { TransactionCreationData } from 'lib/transactions/interface';
-import type { CreateApplicationCommentPayload } from 'pages/api/rewards/[id]/[applicationId]/comments';
+import type { CreateApplicationCommentPayload } from 'pages/api/reward-applications/comments';
 
 export class RewardsApi {
   createReward(reward: RewardCreationData) {
@@ -34,28 +35,12 @@ export class RewardsApi {
     return http.POST<RewardWithUsers>(`/api/rewards/${rewardId}/close`);
   }
 
-  reviewApplication({
-    decision,
-    applicationId,
-    rewardId
-  }: {
-    rewardId: string;
-    applicationId?: string;
-    decision: ReviewDecision;
-  }): Promise<Application> {
-    return http.POST<Application>(`/api/rewards/${rewardId}/${applicationId}/review`, { decision });
+  reviewApplication({ decision, applicationId }: ApplicationReview): Promise<Application> {
+    return http.POST<Application>(`/api/reward-applications/review?applicationId=${applicationId}`, { decision });
   }
 
-  work({
-    rewardId,
-    applicationId,
-    update
-  }: {
-    rewardId: string;
-    applicationId?: string;
-    update: Partial<Application>;
-  }): Promise<Application> {
-    return http.PUT<Application>(`/api/rewards/${rewardId}/work?applicationId=${applicationId}`, update);
+  work(input: WorkUpsertData): Promise<Application> {
+    return http.PUT<Application>('/api/reward-applications/work', input);
   }
 
   recordTransaction(data: TransactionCreationData) {
@@ -76,40 +61,33 @@ export class RewardsApi {
 
   addApplicationComment({
     applicationId,
-    payload,
-    rewardId
+    payload
   }: {
-    rewardId: string;
     applicationId: string;
     payload: CreateApplicationCommentPayload;
   }) {
-    return http.POST<ApplicationComment>(`/api/rewards/${rewardId}/${applicationId}/comments`, payload);
+    return http.POST<ApplicationComment>(`/api/reward-applications/comments?applicationId=${applicationId}`, payload);
   }
 
-  deleteApplicationComment({
-    applicationId,
-    commentId,
-    rewardId
-  }: {
-    rewardId: string;
-    applicationId: string;
-    commentId: string;
-  }) {
-    return http.DELETE<ApplicationComment>(`/api/rewards/${rewardId}/${applicationId}/comments/${commentId}`);
+  deleteApplicationComment({ applicationId, commentId }: { applicationId: string; commentId: string }) {
+    return http.DELETE<ApplicationComment>(
+      `/api/reward-applications/comments/${commentId}?applicationId=${applicationId}`
+    );
   }
 
   editApplicationComment({
     applicationId,
     commentId,
-    payload,
-    rewardId
+    payload
   }: {
-    rewardId: string;
     applicationId: string;
     commentId: string;
     payload: CreateApplicationCommentPayload;
   }) {
-    return http.PUT<ApplicationComment>(`/api/rewards/${rewardId}/${applicationId}/comments/${commentId}`, payload);
+    return http.PUT<ApplicationComment>(
+      `/api/reward-applications/comments/${commentId}?applicationId=${applicationId}`,
+      payload
+    );
   }
 
   isRewardEditable(rewardId: string) {

@@ -7,7 +7,7 @@ import type { ApplicationMeta, Reward } from 'lib/rewards/interfaces';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
-describe('PUT /api/applications/:id/comments/:commentId - update application comment', () => {
+describe('PUT /api/reward-applications/comments/:commentId - update application comment', () => {
   let space: Space;
   let user: User;
   let userCookie: string;
@@ -48,7 +48,7 @@ describe('PUT /api/applications/:id/comments/:commentId - update application com
     };
 
     const response = await request(baseUrl)
-      .put(`/api/rewards/${reward.id}/${comment.applicationId}/comments/${comment.id}`)
+      .put(`/api/reward-applications/comments/${comment.id}`)
       .set('Cookie', userCookie)
       .send(updatedContent)
       .expect(200);
@@ -76,14 +76,14 @@ describe('PUT /api/applications/:id/comments/:commentId - update application com
     };
 
     await request(baseUrl)
-      .put(`/api/rewards/${reward.id}/${comment.applicationId}/comments/${comment.id}`)
+      .put(`/api/reward-applications/comments/${comment.id}`)
       .set('Cookie', otherUserCookie)
       .send(updatedContent)
       .expect(401);
   });
 });
 
-describe('DELETE /api/applications/:id/comments/:commentId - delete application comment', () => {
+describe('DELETE /api/reward-applications/comments/:commentId - delete application comment', () => {
   let space: Space;
   let admin: User;
   let adminCookie: string;
@@ -121,7 +121,7 @@ describe('DELETE /api/applications/:id/comments/:commentId - delete application 
     });
 
     const response = await request(baseUrl)
-      .delete(`/api/rewards/${reward.id}/${comment.applicationId}/comments/${comment.id}`)
+      .delete(`/api/reward-applications/comments/${comment.id}`)
       .set('Cookie', userCookie)
       .expect(200);
 
@@ -140,7 +140,7 @@ describe('DELETE /api/applications/:id/comments/:commentId - delete application 
     });
 
     const response = await request(baseUrl)
-      .delete(`/api/rewards/${reward.id}/${comment.applicationId}/comments/${comment.id}`)
+      .delete(`/api/reward-applications/comments/${comment.id}`)
       .set('Cookie', adminCookie)
       .expect(200);
 
@@ -160,7 +160,7 @@ describe('DELETE /api/applications/:id/comments/:commentId - delete application 
       }
     });
     await request(baseUrl)
-      .delete(`/api/rewards/${reward.id}/${comment.applicationId}/comments/${comment.id}`)
+      .delete(`/api/reward-applications/comments/${comment.id}`)
       .set('Cookie', otherUserCookie)
       .expect(401);
   });

@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
@@ -19,10 +20,16 @@ export type CreateApplicationCommentPayload = {
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(createApplicationCommentController).get(getApplicationCommentsController);
+
 async function createApplicationCommentController(req: NextApiRequest, res: NextApiResponse<ApplicationComment>) {
+  const applicationId = req.query.applicationId ?? req.body.applicationId;
+
+  if (!applicationId) {
+    throw new InvalidInputError(`applicationId is required`);
+  }
+
   const { contentText, content, parentCommentId } = req.body as CreateApplicationCommentPayload;
   const { id: userId } = req.session.user;
-  const applicationId = req.query.applicationId as string;
 
   const application = await prisma.application.findUniqueOrThrow({
     where: {

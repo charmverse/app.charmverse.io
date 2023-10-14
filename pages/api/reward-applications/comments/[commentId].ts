@@ -1,16 +1,14 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
-import type { ApplicationComment, PageComment } from '@charmverse/core/prisma';
+import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getApplicationDetails } from 'lib/applications/getApplicationDetails';
-import type { CreateApplicationCommentPayload } from 'lib/applications/interfaces';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPageComment } from 'lib/pages/comments/getPageComment';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+
+import type { CreateApplicationCommentPayload } from './index';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,7 +17,7 @@ handler.use(requireUser).put(updateApplicationCommentController).delete(deleteAp
 async function updateApplicationCommentController(req: NextApiRequest, res: NextApiResponse<ApplicationComment>) {
   const { contentText, content } = req.body as CreateApplicationCommentPayload;
   const { id: userId } = req.session.user;
-  const applicationId = req.query.id as string;
+  const applicationId = req.query.applicationId as string;
   const commentId = req.query.commentId as string;
 
   const application = await prisma.application.findFirstOrThrow({
@@ -48,7 +46,7 @@ async function updateApplicationCommentController(req: NextApiRequest, res: Next
 
 async function deleteApplicationCommentController(req: NextApiRequest, res: NextApiResponse<ApplicationComment>) {
   const { id: userId } = req.session.user;
-  const applicationId = req.query.id as string;
+  const applicationId = req.query.applicationId as string;
   const commentId = req.query.commentId as string;
 
   const application = await prisma.application.findFirstOrThrow({

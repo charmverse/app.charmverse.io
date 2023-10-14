@@ -7,9 +7,8 @@ import request from 'supertest';
 import { createBounty } from 'lib/bounties';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty } from 'testing/setupDatabase';
 
-describe('PUT /api/rewards/:id/work - work on a reward', () => {
+describe('PUT /api/reward-applications/work - work on a reward', () => {
   let space: Space;
   let admin: User;
   let user: User;
@@ -41,9 +40,9 @@ describe('PUT /api/rewards/:id/work - work on a reward', () => {
 
     const createdApplication = (
       await request(baseUrl)
-        .put(`/api/rewards/${reward.id}/work`)
+        .put(`/api/reward-applications/work`)
         .set('Cookie', userCookie)
-        .send(workContent)
+        .send({ ...workContent, rewardId: reward.id })
         .expect(200)
     ).body;
 
@@ -57,7 +56,7 @@ describe('PUT /api/rewards/:id/work - work on a reward', () => {
 
     const updatedApplication = (
       await request(baseUrl)
-        .put(`/api/rewards/${reward.id}/work?applicationId=${createdApplication.id}`)
+        .put(`/api/reward-applications/work?applicationId=${createdApplication.id}`)
         .set('Cookie', userCookie)
         .send(submissionUpdate)
         .expect(200)
@@ -100,23 +99,20 @@ describe('PUT /api/rewards/:id/work - work on a reward', () => {
       submissionNodes: '',
       submission: '',
       rewardInfo: 'Fedex please',
-      walletAddress: testUtilsRandom.randomETHWallet().address
+      walletAddress: testUtilsRandom.randomETHWallet().address,
+      rewardId: reward.id
     };
 
     // Case where this works
     const memberWithRoleCookie = await loginUser(memberWithRole.id);
 
     await request(baseUrl)
-      .put(`/api/rewards/${reward.id}/work`)
+      .put(`/api/reward-applications/work`)
       .set('Cookie', memberWithRoleCookie)
       .send(workContent)
       .expect(200);
 
-    await request(baseUrl)
-      .put(`/api/rewards/${reward.id}/work`)
-      .set('Cookie', userCookie)
-      .send(workContent)
-      .expect(401);
+    await request(baseUrl).put(`/api/reward-applications/work`).set('Cookie', userCookie).send(workContent).expect(401);
   });
 
   it('it should prevent a user without permissions from working on this reward, and respond with 401', async () => {
@@ -128,14 +124,14 @@ describe('PUT /api/rewards/:id/work - work on a reward', () => {
     });
 
     const workContent = {
-      // ... data necessary to "work" on the reward.
+      rewardId: reward.id
     };
 
     const otherUser = await testUtilsUser.generateUser();
     const otherUserCookie = await loginUser(otherUser.id);
 
     await request(baseUrl)
-      .put(`/api/rewards/${reward.id}/work`)
+      .put(`/api/reward-applications/work`)
       .set('Cookie', otherUserCookie)
       .send(workContent)
       .expect(401);

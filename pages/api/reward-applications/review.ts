@@ -3,13 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { ReviewDecision } from 'lib/applications/actions';
 import { reviewApplication } from 'lib/applications/actions';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,10 +18,15 @@ handler
   .post(reviewUserApplication);
 
 async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<Application>) {
-  const { id: applicationId } = req.query as { id: string; decision: ReviewDecision };
+  const applicationId = req.query?.applicationId ?? req.body.applicationId;
+
+  if (!applicationId) {
+    throw new InvalidInputError(`applicationId is required`);
+  }
+
   const { id: userId } = req.session.user;
 
-  const application = await prisma.application.findUniqueOrThrow({
+  const application = await prisma.application.findUnique({
     where: {
       id: applicationId as string
     },
@@ -37,7 +41,6 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
   }
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: application.bountyId,
     userId
   });
@@ -47,12 +50,12 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
   }
 
   const reviewedApplication = await reviewApplication({
-    applicationOrApplicationId: applicationId as string,
+    applicationId: applicationId as string,
     userId,
     decision: req.body.decision
   });
 
-  const rewardData = await prisma.bounty.findUniqueOrThrow({
+  const rewardData = await prisma.bounty.findUnique({
     where: {
       id: application.bountyId
     },
@@ -65,7 +68,14 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
     }
   });
 
-  trackUserAction('bounty_application_rejected', {
+  if (!rewardData) {
+    throw new DataNotFoundError(`Bounty with id ${application.bountyId} not found`);
+  }
+
+  // Adjusted the event name to be generic based on decision (approved/rejected)
+  const event = req.body.decision === 'approve' ? 'bounty_application_accepted' : 'bounty_application_rejected';
+
+  trackUserAction(event, {
     userId,
     spaceId: rewardData.spaceId,
     rewardAmount: rewardData.rewardAmount,

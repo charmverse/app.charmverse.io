@@ -7,7 +7,7 @@ import type { Reward } from 'lib/rewards/interfaces';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty } from 'testing/setupDatabase';
 
-describe('POST /api/applications/:id/comments - create comment on an application', () => {
+describe('POST /api/reward-applications/comments - create comment on an application', () => {
   let space: Space;
   let admin: User;
   let user: User;
@@ -41,18 +41,18 @@ describe('POST /api/applications/:id/comments - create comment on an application
 
   it('should allow a reward reviewer or the creator of the submission to create a comment with status code 201', async () => {
     const commentContent = {
-      contentText: 'This is a comment'
-      // Add other necessary data
+      contentText: 'This is a comment',
+      applicationId: application.id
     };
 
     await request(baseUrl)
-      .post(`/api/rewards/${reward.id}/${application.id}/comments`)
+      .post(`/api/reward-applications/comments`)
       .set('Cookie', userCookie)
       .send(commentContent)
       .expect(201);
 
     await request(baseUrl)
-      .post(`/api/rewards/${reward.id}/${application.id}/comments`)
+      .post(`/api/reward-applications/comments`)
       .set('Cookie', reviewerUserCookie)
       .send(commentContent)
       .expect(201);
@@ -63,19 +63,19 @@ describe('POST /api/applications/:id/comments - create comment on an application
     const otherUserCookie = await loginUser(otherUser.id);
 
     const commentContent = {
-      contentText: 'This is another comment'
-      // Add other necessary data
+      contentText: 'This is another comment',
+      applicationId: application.id
     };
 
     await request(baseUrl)
-      .post(`/api/rewards/${reward.id}/${application.id}/comments`)
+      .post(`/api/reward-applications/comments`)
       .set('Cookie', otherUserCookie)
       .send(commentContent)
       .expect(401);
   });
 });
 
-describe('GET /api/applications/:id/comments - fetch comments of an application', () => {
+describe('GET /api/reward-applications/comments - fetch comments of an application', () => {
   let space: Space;
   let admin: User;
   let user: User;
@@ -104,7 +104,7 @@ describe('GET /api/applications/:id/comments - fetch comments of an application'
 
   it('should allow a user with access to the space to fetch comments with status code 200', async () => {
     await request(baseUrl)
-      .get(`/api/rewards/${reward.id}/${application.id}/comments`)
+      .get(`/reward-applications/comments?applicationId=${application.id}`)
       .set('Cookie', userCookie)
       .expect(200);
   });
@@ -114,7 +114,7 @@ describe('GET /api/applications/:id/comments - fetch comments of an application'
     const otherUserCookie = await loginUser(otherUser.id);
 
     await request(baseUrl)
-      .get(`/api/rewards/${reward.id}/${application.id}/comments`)
+      .get(`/api/reward-applications/comments?applicationId=${application.id}`)
       .set('Cookie', otherUserCookie)
       .expect(401);
   });

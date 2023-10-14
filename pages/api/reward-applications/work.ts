@@ -15,24 +15,24 @@ handler
   .use(requireUser)
   .use(
     providePermissionClients({
-      key: 'id',
-      location: 'query',
+      key: 'rewardId',
+      location: 'body',
       resourceIdType: 'bounty'
     })
   )
   .put(workOnRewardController);
 async function workOnRewardController(req: NextApiRequest, res: NextApiResponse<Application>) {
-  const { id, applicationId } = req.query;
+  const applicationId = req.query.applicationId ?? req.body.applicationId;
   const userId = req.session.user.id;
 
   // Check user's permission before applying to a reward.
-  const rewardPermissions = await computeBountyPermissions({ resourceId: id as string, userId });
+  const rewardPermissions = await computeBountyPermissions({ resourceId: req.body.rewardId, userId });
 
   if (!rewardPermissions.work) {
     throw new UnauthorisedActionError('You do not have permissions to work on this reward.');
   }
 
-  const applicationResponse = await work({ ...req.body, rewardId: id, applicationId, userId });
+  const applicationResponse = await work({ ...req.body, applicationId, userId });
 
   res.status(200).json(applicationResponse);
 }
