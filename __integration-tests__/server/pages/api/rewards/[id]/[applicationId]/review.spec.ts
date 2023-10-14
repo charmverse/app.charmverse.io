@@ -48,7 +48,7 @@ describe('POST /api/rewards/:id/review - review user application', () => {
     });
 
     await request(baseUrl)
-      .post(`/api/rewards/${reward.id}/review?applicationId=${application.id}`)
+      .post(`/api/rewards/${reward.id}/${application.id}/review`)
       .set('Cookie', rewardCreatorCookie)
       .send({ decision: 'approve' })
       .expect(200);
@@ -64,7 +64,7 @@ describe('POST /api/rewards/:id/review - review user application', () => {
     });
 
     await request(baseUrl)
-      .post(`/api/rewards/${reward.id}/review?applicationId=${application.id}`)
+      .post(`/api/rewards/${reward.id}/${application.id}/review`)
       .set('Cookie', adminCookie)
       .send({ decision: 'reject' })
       .expect(200);
@@ -80,7 +80,7 @@ describe('POST /api/rewards/:id/review - review user application', () => {
     });
 
     await request(baseUrl)
-      .post(`/api/rewards/${application.id}/review?applicationId=${application.id}`)
+      .post(`/api/rewards/${application.id}/${application.id}/review`)
       .set('Cookie', userCookie)
       .send({ decision: 'approve' })
       .expect(401);
@@ -88,7 +88,7 @@ describe('POST /api/rewards/:id/review - review user application', () => {
 
   it('should respond with 404 if application ID provided does not exist', async () => {
     await request(baseUrl)
-      .post(`/api/rewards/non-existent-id/review?applicationId=${uuid()}`)
+      .post(`/api/rewards/non-existent-id/review/${uuid()}`)
       .set('Cookie', userCookie)
       .send({ decision: 'approve' })
       .expect(404);
@@ -97,7 +97,7 @@ describe('POST /api/rewards/:id/review - review user application', () => {
   // This test assumes that an application will always have a valid bounty ID, if not, you might need this:
   it('should respond with 404 if bounty ID from the application does not exist', async () => {
     await request(baseUrl)
-      .post(`/api/rewards/${uuid()}/review?applicationId=${uuid()}`)
+      .post(`/api/rewards/${uuid()}/review/${uuid()}`)
       .set('Cookie', userCookie)
       .send({ decision: 'approve' })
       .expect(404);
