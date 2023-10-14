@@ -989,7 +989,7 @@
             ]
           },
           {
-            "type": "page",
+            "type": "linkedPage",
             "attrs": {
               "id": "2ad188ca-b4b9-421b-8d20-9c3d8eb82c11",
               "track": []

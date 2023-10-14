@@ -13,21 +13,26 @@ import type {
   VoteNotificationType
 } from './interfaces';
 
-type CreatePostNotificationInput = {
+type NotificationInput = {
+  createdAt: string;
   createdBy: string;
-  postId: string;
   spaceId: string;
   userId: string;
+};
+
+type PostNotificationInput = NotificationInput & {
+  postId: string;
   type: PostNotificationType;
 };
 
-export async function createPostNotification({
+export async function savePostNotification({
+  createdAt,
   createdBy,
   postId,
   spaceId,
   userId,
   type
-}: CreatePostNotificationInput) {
+}: PostNotificationInput) {
   const notificationId = v4();
   const record = await prisma.postNotification.create({
     data: {
@@ -35,6 +40,7 @@ export async function createPostNotification({
       id: notificationId,
       notificationMetadata: {
         create: {
+          createdAt,
           id: notificationId,
           createdBy,
           spaceId,
@@ -52,21 +58,19 @@ export async function createPostNotification({
   return record;
 }
 
-export type CreateProposalNotificationInput = {
+type ProposalNotificationInput = NotificationInput & {
   type: ProposalNotificationType;
   proposalId: string;
-  createdBy: string;
-  spaceId: string;
-  userId: string;
 };
 
-export async function createProposalNotification({
+export async function saveProposalNotification({
   type,
+  createdAt,
   createdBy,
   spaceId,
   userId,
   proposalId
-}: CreateProposalNotificationInput) {
+}: ProposalNotificationInput) {
   const notificationId = v4();
   const record = await prisma.proposalNotification.create({
     data: {
@@ -75,6 +79,7 @@ export async function createProposalNotification({
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -97,12 +102,9 @@ export async function createProposalNotification({
   return record;
 }
 
-type CreateDocumentNotificationInput = {
-  createdBy: string;
+type DocumentNotificationInput = NotificationInput & {
   pageId?: string;
   postId?: string;
-  spaceId: string;
-  userId: string;
   mentionId?: string;
   inlineCommentId?: string;
   postCommentId?: string;
@@ -111,7 +113,8 @@ type CreateDocumentNotificationInput = {
   content: Prisma.JsonValue | null;
 } & (CommentNotification | MentionNotification | InlineCommentNotification);
 
-export async function createDocumentNotification({
+export async function saveDocumentNotification({
+  createdAt,
   createdBy,
   mentionId,
   pageId,
@@ -123,7 +126,7 @@ export async function createDocumentNotification({
   type,
   pageCommentId,
   postCommentId
-}: CreateDocumentNotificationInput) {
+}: DocumentNotificationInput) {
   const notificationId = v4();
   const record = await prisma.documentNotification.create({
     data: {
@@ -133,6 +136,7 @@ export async function createDocumentNotification({
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -186,23 +190,21 @@ export async function createDocumentNotification({
   return record;
 }
 
-export type CreateCardNotificationInput = {
+export type CardNotificationInput = NotificationInput & {
   cardId: string;
-  createdBy: string;
-  spaceId: string;
   type: 'person_assigned';
-  userId: string;
   personPropertyId: string;
 };
 
-export async function createCardNotification({
+export async function saveCardNotification({
   type,
   personPropertyId,
+  createdAt,
   createdBy,
   spaceId,
   userId,
   cardId
-}: CreateCardNotificationInput) {
+}: CardNotificationInput) {
   const notificationId = v4();
   const record = await prisma.cardNotification.create({
     data: {
@@ -211,6 +213,7 @@ export async function createCardNotification({
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -231,19 +234,19 @@ export async function createCardNotification({
   return record;
 }
 
-export async function createVoteNotification({
+type PollNotificationInput = NotificationInput & {
+  type: VoteNotificationType;
+  voteId: string;
+};
+
+export async function savePollNotification({
   type,
+  createdAt,
   createdBy,
   spaceId,
   userId,
   voteId
-}: {
-  type: VoteNotificationType;
-  voteId: string;
-  createdBy: string;
-  spaceId: string;
-  userId: string;
-}) {
+}: PollNotificationInput) {
   const notificationId = v4();
   const record = await prisma.voteNotification.create({
     data: {
@@ -252,6 +255,7 @@ export async function createVoteNotification({
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -274,25 +278,23 @@ export async function createVoteNotification({
   return record;
 }
 
-type CreateBountyNotificationInput = {
+type CreateBountyNotificationInput = NotificationInput & {
   type: BountyNotificationType;
   bountyId: string;
-  createdBy: string;
-  spaceId: string;
-  userId: string;
   applicationId?: string;
 } & (
-  | {
-      type: Exclude<BountyNotificationType, 'suggestion.created'>;
-      applicationId: string;
-    }
-  | {
-      type: 'suggestion.created';
-    }
-);
+    | {
+        type: Exclude<BountyNotificationType, 'suggestion.created'>;
+        applicationId: string;
+      }
+    | {
+        type: 'suggestion.created';
+      }
+  );
 
-export async function createBountyNotification({
+export async function saveRewardNotification({
   type,
+  createdAt,
   createdBy,
   spaceId,
   userId,
@@ -307,6 +309,7 @@ export async function createBountyNotification({
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -326,7 +329,7 @@ export async function createBountyNotification({
       }
     }
   });
-  log.info('Created bounty notification', {
+  log.info('Created reward notification', {
     bountyId,
     applicationId,
     notificationId: record.id,

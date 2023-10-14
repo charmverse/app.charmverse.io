@@ -255,6 +255,10 @@ export function getSubdomainPath(
   config?: { domain: string; customDomain?: string | null },
   host?: string
 ) {
+  if (path.startsWith('/api')) {
+    return path;
+  }
+
   const subdomain = getSpaceDomainFromHost(host);
   const customDomain = getCustomDomainFromHost(host);
   // strip out domain when using full custom domain

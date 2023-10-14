@@ -1,9 +1,9 @@
-import type { KeyLike } from 'jose';
+import type { KeyLike, JWTPayload } from 'jose';
 import { SignJWT } from 'jose';
 
 export type SignedPayloadFields = 'createdAt' | 'event' | 'spaceId';
 
-export function signJwt(subject: string, payload: Record<SignedPayloadFields, any>, secret: KeyLike | Uint8Array) {
+export function signJwt(subject: string, payload: JWTPayload, secret: KeyLike | Uint8Array) {
   return (
     new SignJWT(payload)
       .setProtectedHeader({ alg: 'HS256' })

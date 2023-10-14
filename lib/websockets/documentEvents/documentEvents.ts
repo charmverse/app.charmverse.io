@@ -14,7 +14,7 @@ import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishBountyEvent, publishDocumentEvent, publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';
