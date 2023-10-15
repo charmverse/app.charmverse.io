@@ -1,4 +1,4 @@
-import type { UserPermissionFlags } from '@charmverse/core/dist/cjs/permissions';
+import type { UserPermissionFlags } from '@charmverse/core/permissions';
 import type { Application, Bounty, BountyOperation } from '@charmverse/core/prisma';
 import { Box, Button, Divider, Stack, Tooltip } from '@mui/material';
 import { useState } from 'react';
