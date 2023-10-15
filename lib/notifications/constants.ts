@@ -1,7 +1,7 @@
 export const notificationGroups = ['card', 'forum', 'documents', 'proposals', 'rewards', 'polls'] as const;
 
 export const bountyNotificationTypes = [
-  ' application.created',
+  'application.created',
   'application.approved',
   'application.rejected',
   'submission.created',
@@ -19,4 +19,4 @@ export const proposalNotificationTypes = [
   'vote',
   'evaluation_active',
   'evaluation_closed'
-];
+] as const;
