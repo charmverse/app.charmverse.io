@@ -183,3 +183,8 @@ export function formatTime(dateInput: Date | string, locale?: string | null) {
 export function sortByDate<T extends { createdAt: string | Date }>(a: T, b: T): number {
   return a.createdAt > b.createdAt ? -1 : 1;
 }
+
+export function getCurrentDate() {
+  // Use static time for Storybook
+  return process.env.IS_STORYBOOK ? new Date('2021-10-01T00:00:00.000Z') : new Date();
+}
