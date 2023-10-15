@@ -110,7 +110,9 @@ function getCardContent(n: CardNotification) {
   switch (type) {
     case 'person_assigned': {
       return createdBy.username ? (
-        <span>{createdBy.username} assigned you to a card</span>
+        <span>
+          <strong>{createdBy.username}</strong> assigned you to a card
+        </span>
       ) : (
         `You were assigned to a card`
       );

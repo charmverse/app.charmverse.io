@@ -23,6 +23,17 @@ const handler = nc({
   onNoMatch
 });
 
+const dummyUser = {
+  avatarChain: 1,
+  avatarContract: null,
+  deletedAt: null,
+  id: v4(),
+  username: 'John Doe',
+  avatar: '',
+  path: 'John Doe',
+  avatarTokenId: null
+};
+
 const createDocumentNotification = ({
   pageTitle,
   spaceName,
@@ -47,16 +58,7 @@ const createDocumentNotification = ({
     content: createDocumentWithText(mentionText),
     inlineCommentId: null,
     type: 'mention.created',
-    createdBy: {
-      avatarChain: 1,
-      avatarContract: null,
-      deletedAt: null,
-      id: v4(),
-      username: 'username',
-      avatar: '',
-      path: 'username',
-      avatarTokenId: null
-    },
+    createdBy: dummyUser,
     pageType: 'page',
     archived: false,
     group: 'document',
@@ -82,16 +84,7 @@ const createCardNotification = ({
     spaceName,
     pageTitle,
     type: 'person_assigned',
-    createdBy: {
-      avatarChain: 1,
-      avatarContract: null,
-      deletedAt: null,
-      id: v4(),
-      username: 'username',
-      avatar: '',
-      path: 'username',
-      avatarTokenId: null
-    },
+    createdBy: dummyUser,
     personPropertyId: v4(),
     archived: false,
     group: 'card',
@@ -116,16 +109,7 @@ const createPostNotification = ({
     postTitle,
     postPath: getPagePath(),
     createdAt: new Date().toISOString(),
-    createdBy: {
-      avatarChain: 1,
-      avatarContract: null,
-      deletedAt: null,
-      id: v4(),
-      username: 'username',
-      avatar: '',
-      path: 'username',
-      avatarTokenId: null
-    },
+    createdBy: dummyUser,
     archived: false,
     group: 'post',
     read: false
@@ -146,22 +130,24 @@ const createVoteNotification = ({
   return {
     deadline,
     id: v4(),
-    page: {
-      path: getPagePath(),
-      title: pageTitle
-    } as any,
-    space: {
-      domain: randomName(),
-      name: spaceName
-    } as any,
-    pageId: v4(),
+    pageType: 'page',
+    archived: false,
+    categoryId: v4(),
+    createdAt: new Date().toISOString(),
+    createdBy: dummyUser,
+    group: 'vote',
+    read: false,
+    status: 'InProgress',
+    type: 'new_vote',
+    userChoice: null,
+    voteId: v4(),
     spaceId: v4(),
     title: voteTitle,
     pageTitle,
     spaceName,
     pagePath: getPagePath(),
     spaceDomain: randomName()
-  } as any;
+  };
 };
 
 const createProposalNotification = ({
@@ -180,16 +166,7 @@ const createProposalNotification = ({
     spaceName,
     pageId: v4(),
     spaceId: v4(),
-    createdBy: {
-      avatarChain: 1,
-      avatarContract: null,
-      deletedAt: null,
-      id: v4(),
-      username: 'username',
-      avatar: '',
-      path: 'username',
-      avatarTokenId: null
-    },
+    createdBy: dummyUser,
     archived: false,
     group: 'proposal',
     read: false
@@ -214,16 +191,7 @@ const createBountyNotification = ({
     createdAt: new Date().toISOString(),
     applicationId: v4(),
     spaceId: v4(),
-    createdBy: {
-      avatarChain: 1,
-      avatarContract: null,
-      deletedAt: null,
-      id: v4(),
-      username: 'username',
-      avatar: '',
-      path: 'username',
-      avatarTokenId: null
-    },
+    createdBy: dummyUser,
     archived: false,
     group: 'bounty',
     read: false

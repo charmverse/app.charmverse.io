@@ -477,9 +477,11 @@ export function NotificationContent({
                 >
                   {content}
                 </Typography>
-                <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
-                  {!isSmallScreen && notificationDate}
-                </Typography>
+                {!isSmallScreen && (
+                  <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
+                    {notificationDate}
+                  </Typography>
+                )}
               </Stack>
               {!archived && (
                 <Card

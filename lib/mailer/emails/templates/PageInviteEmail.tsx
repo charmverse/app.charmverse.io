@@ -2,7 +2,7 @@ import { MjmlColumn, MjmlSection, MjmlText } from 'mjml-react';
 
 import { baseUrl } from 'config/constants';
 
-import { Button, EmailWrapper, Footer, Header } from './components';
+import { Button, EmailWrapper } from './components';
 
 export type PageInviteEmailProps = {
   guestEmail: string;
@@ -27,11 +27,6 @@ export function PageInviteEmail(props: PageInviteEmailProps) {
     <EmailWrapper title={`${props.invitingUserName} shared a document`}>
       <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
         <MjmlColumn>
-          <Header size='small' />
-        </MjmlColumn>
-      </MjmlSection>
-      <MjmlSection backgroundColor='#fff' paddingTop={0} paddingBottom={0}>
-        <MjmlColumn>
           <MjmlText paddingBottom={40} paddingTop={0}>
             <p>
               {props.invitingUserName} has invited you to <b>view</b> the following document:
@@ -46,7 +41,6 @@ export function PageInviteEmail(props: PageInviteEmailProps) {
           </Button>
         </MjmlColumn>
       </MjmlSection>
-      <Footer />
     </EmailWrapper>
   );
 }

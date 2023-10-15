@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
-import type { PendingNotificationsData } from 'lib/mailer/emails/templates/PendingNotificationsTemplate';
+import type { PendingNotificationsData } from 'lib/mailer/emails/templates/NotificationTemplate';
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
 import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
