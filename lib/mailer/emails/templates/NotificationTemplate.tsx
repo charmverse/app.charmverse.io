@@ -1,6 +1,5 @@
 import type { User } from '@charmverse/core/prisma';
 import { Hr } from '@react-email/hr';
-import { Img } from '@react-email/img';
 import { Link } from '@react-email/link';
 import { Section } from '@react-email/section';
 
@@ -18,10 +17,8 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { fancyTrim } from 'lib/utilities/strings';
 import { baseUrl } from 'testing/mockApiCall';
 
-import { EmailWrapper, Text } from './components';
+import { EmailWrapper, Feedback, Text } from './components';
 
-const domain = process.env.DOMAIN;
-const logoImagePath = '/images/charmverse_logo_sm_black.png';
 const MAX_ITEMS_PER_NOTIFICATION = 3;
 const MAX_CHAR = 60;
 
@@ -35,17 +32,6 @@ export type PendingNotificationsData = {
   forumNotifications: PostNotification[];
   // eslint-disable-next-line
   user: Pick<User, 'id' | 'username'> & { email: string };
-};
-
-const dimensions = {
-  medium: {
-    height: '46px',
-    width: '243px'
-  },
-  small: {
-    height: '36px',
-    width: '190px'
-  }
 };
 
 function NotificationSections({ notifications }: { notifications: Notification[] }) {
@@ -62,27 +48,16 @@ function NotificationSections({ notifications }: { notifications: Notification[]
 export function PendingNotifications(props: PendingNotificationsData) {
   return (
     <EmailWrapper title='Your open notifications' preview='Your open notifications'>
-      <Link href={domain}>
-        <Img
-          src={`${domain}${logoImagePath}`}
-          style={{
-            width: dimensions.medium.width,
-            height: dimensions.medium.height,
-            paddingBottom: '10px',
-            paddingTop: '10px'
-          }}
-        />
-      </Link>
       <Text
         style={{
-          padding: 0
+          padding: 0,
+          fontSize: 24,
+          fontWeight: 'bold'
         }}
       >
-        <h2>
-          {notificationsRequiresYourAttention({
-            count: props.totalUnreadNotifications
-          })}
-        </h2>
+        {notificationsRequiresYourAttention({
+          count: props.totalUnreadNotifications
+        })}
       </Text>
       <NotificationSections notifications={props.documentNotifications} />
       <NotificationSections notifications={props.cardNotifications} />
@@ -90,6 +65,7 @@ export function PendingNotifications(props: PendingNotificationsData) {
       <NotificationSections notifications={props.proposalNotifications} />
       <NotificationSections notifications={props.bountyNotifications} />
       <NotificationSections notifications={props.forumNotifications} />
+      <Feedback />
     </EmailWrapper>
   );
 }

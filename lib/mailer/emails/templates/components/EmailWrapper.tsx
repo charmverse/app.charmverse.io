@@ -6,13 +6,14 @@ import React from 'react';
 
 import { lightGreyColor } from 'theme/colors';
 
-import Feedback from './Feedback';
 import Footer from './Footer';
+import Header from './Header';
 
 interface Props {
   children: React.ReactNode;
   preview?: string;
   title: string;
+  headerSize?: 'medium' | 'small';
 }
 
 export default function EmailWrapper(props: Props) {
@@ -34,8 +35,8 @@ export default function EmailWrapper(props: Props) {
             padding: 30
           }}
         >
+          <Header size={props.headerSize} />
           {props.children}
-          <Feedback />
         </Section>
         <Footer />
       </Section>

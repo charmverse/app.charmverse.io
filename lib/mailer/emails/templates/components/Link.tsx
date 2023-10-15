@@ -8,6 +8,8 @@ export default function Link({ children, ...props }: { children: ReactNode } & L
   return (
     <ReactEmailLink
       {...props}
+      target='_blank'
+      rel='noreferrer'
       style={{
         color: blueColor,
         textDecoration: 'none',
