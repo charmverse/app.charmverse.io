@@ -4,6 +4,7 @@ import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { InsecureOperationError } from 'lib/utilities/errors';
 import { extractPollIds } from 'lib/votes/extractPollIds';
@@ -77,8 +78,6 @@ export async function createForumPost({
 }
 
 export async function trackCreateForumPostEvent({ post, userId }: { post: Post; userId: string }) {
-  const { getNodeFromJson } = await import('lib/prosemirror/getNodeFromJson');
-
   const category = await prisma.postCategory.findUnique({
     where: {
       id: post.categoryId
