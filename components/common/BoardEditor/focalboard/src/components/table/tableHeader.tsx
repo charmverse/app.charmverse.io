@@ -63,7 +63,9 @@ function TableHeader(props: Props): JSX.Element {
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
-  const disableRename = proposalPropertyTypesList.includes(type as any) || DEFAULT_BLOCK_IDS.includes(templateId);
+  const disableRename =
+    proposalPropertyTypesList.includes(type as any) ||
+    DEFAULT_BLOCK_IDS.filter((blockId) => blockId !== Constants.titleColumnId).includes(templateId);
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -185,15 +187,13 @@ function TableHeader(props: Props): JSX.Element {
         <Divider />
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle name column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId)
-              mutator.insertPropertyTemplate(board, activeView, index);
-            }
+            const containsTitle = activeView.fields.visiblePropertyIds.includes(Constants.titleColumnId);
+            const index = (
+              containsTitle
+                ? activeView.fields.visiblePropertyIds
+                : [Constants.titleColumnId, ...activeView.fields.visiblePropertyIds]
+            ).findIndex((i) => i === templateId);
+            mutator.insertPropertyTemplate(board, activeView, index);
           }}
         >
           <ListItemIcon>
@@ -203,15 +203,13 @@ function TableHeader(props: Props): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle title column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId) + 1
-              mutator.insertPropertyTemplate(board, activeView, index);
-            }
+            const containsTitle = activeView.fields.visiblePropertyIds.includes(Constants.titleColumnId);
+            const index =
+              (containsTitle
+                ? activeView.fields.visiblePropertyIds
+                : [Constants.titleColumnId, ...activeView.fields.visiblePropertyIds]
+              ).findIndex((i) => i === templateId) + 1;
+            mutator.insertPropertyTemplate(board, activeView, index);
           }}
         >
           <ListItemIcon>
