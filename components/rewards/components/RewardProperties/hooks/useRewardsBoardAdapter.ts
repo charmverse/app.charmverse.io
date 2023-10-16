@@ -23,7 +23,7 @@ import {
   REWARDER_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
-import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
+import { countRemainingSubmissionSlots, countValidSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 
 export type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
@@ -110,14 +110,14 @@ function mapRewardToCardPage({
     ...rewardFields.properties,
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]:
-      (reward &&
-        'maxSubmissions' in reward &&
-        reward.maxSubmissions &&
-        `${countRemainingSubmissionSlots({
-          applications: reward.applications ?? [],
-          limit: reward.maxSubmissions
-        })} / ${reward.maxSubmissions}`) ||
-      '-',
+      reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
+        ? (
+            countRemainingSubmissionSlots({
+              applications: reward.applications ?? [],
+              limit: reward.maxSubmissions
+            }) as number
+          )?.toString()
+        : '-',
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).toISOString() : '',
