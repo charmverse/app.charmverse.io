@@ -17,15 +17,9 @@ import { RewardApplicationPageComponent } from './RewardApplicationPage/RewardAp
 export function ApplicationDialog() {
   const mounted = useRef(false);
   const router = useRouter();
-  const { isOpen, showApplication, hideApplication, currentApplicationId } = useApplicationDialog();
+  const { isOpen, hideApplication, currentApplicationId } = useApplicationDialog();
 
-  const { application, isLoading } = useApplication({ applicationId: currentApplicationId as string });
-
-  const { user } = useUser();
-  // const [formInputs, setFormInputs] = useState<ApplicationPageAndPropertiesInput>(
-  //   emptyState({ ...newApplication, userId: user?.id })
-  // );
-
+  const { isLoading } = useApplication({ applicationId: currentApplicationId as string });
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -36,20 +30,6 @@ export function ApplicationDialog() {
       mounted.current = false;
     };
   }, []);
-
-  // useEffect(() => {
-  // //  setFormInputs((prevState) => ({
-  //     ...prevState,
-  //     publishToLens: !!user?.publishToLensDefault
-  //   }));
-  // }, [user?.id]);
-
-  // useEffect(() => {
-  //   if (page?.id) {
-  //     trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type });
-  //   }
-  // }, [page?.id]);
-
   function close() {
     //    setFormInputs(emptyState());
     setContentUpdated(false);
@@ -78,6 +58,7 @@ export function ApplicationDialog() {
         currentApplicationId ? (
           <Box display='flex' justifyContent='space-between'>
             <Button
+              onClick={hideApplication}
               data-test='open-as-page'
               size='small'
               color='secondary'
