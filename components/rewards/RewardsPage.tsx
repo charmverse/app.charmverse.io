@@ -186,7 +186,7 @@ export function RewardsPage({ title }: { title: string }) {
                   <EmptyStateVideo
                     description='Getting started with rewards'
                     videoTitle='Rewards | Getting started with CharmVerse'
-                    videoUrl='https://tiny.charmverse.io/reward-builder'
+                    videoUrl='https://tiny.charmverse.io/bounties'
                   />
                 </Box>
               </Grid>

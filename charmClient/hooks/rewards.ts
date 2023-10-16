@@ -14,52 +14,10 @@ import type {
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields
 } from 'lib/rewards/blocks/interfaces';
-// import type { CreateRewardInput } from 'lib/rewards/createReward';
-// import type { RubricRewardsUserInfo } from 'lib/rewards/getRewardsEvaluatedByUser';
-// import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-// import type { RewardWithUsersAndRubric } from 'lib/rewards/interface';
-// import type { RubricAnswerUpsert } from 'lib/rewards/rubric/upsertRubricAnswers';
-// import type { RubricCriteriaUpsert } from 'lib/rewards/rubric/upsertRubricCriteria';
-// import type { UpdateRewardLensPropertiesRequest } from 'lib/rewards/updateRewardLensProperties';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
 import { useGET, usePOST, usePUT, useDELETE } from './helpers';
-
-type MaybeString = string | null | undefined;
-
-// Getters
-
-// export function useGetRewardDetails(rewardId: MaybeString) {
-//   return useGET<RewardWithUsersAndRubric>(rewardId ? `/api/rewards/${rewardId}` : null);
-// }
-
-// export function useGetAllReviewerUserIds(rewardId: MaybeString) {
-//   return useGET<string[]>(rewardId ? `/api/rewards/${rewardId}/get-user-reviewerids` : null);
-// }
-
-// export function useGetReviewerPool(categoryId: MaybeString) {
-//   return useGET<RewardReviewerPool>(categoryId ? `/api/rewards/reviewer-pool?resourceId=${categoryId}` : null);
-// }
-
-// export function useGetRewardFlowFlags(rewardId: MaybeString) {
-//   return useGET<RewardFlowPermissionFlags>(rewardId ? `/api/rewards/${rewardId}/compute-flow-flags` : null);
-// }
-// export function useGetRewardsBySpace({ spaceId, categoryIds }: Partial<ListRewardsRequest>) {
-//   return useGET<RewardWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/rewards` : null, { categoryIds });
-// }
-
-// // export function useGetRewardTemplatesBySpace(spaceId: MaybeString) {
-// //   return useGET<RewardTemplate[]>(spaceId ? `/api/spaces/${spaceId}/reward-templates` : null);
-// // }
-
-// // export function useGetRewardCategories(spaceId?: string) {
-// //   return useGET<RewardCategoryWithPermissions[]>(spaceId ? `/api/spaces/${spaceId}/reward-categories` : null);
-// // }
-
-// export function useGetRewardIdsEvaluatedByUser(spaceId: MaybeString) {
-//   return useGET<RubricRewardsUserInfo>(spaceId ? `/api/spaces/${spaceId}/rewards-evaluated-by-user` : null);
-// }
 
 export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
   return useGET<BountyPermissionFlags>(rewardId ? `/api/rewards/${rewardId}/permissions` : null);
@@ -84,7 +42,7 @@ export function useGetRewardApplications({ rewardId }: { rewardId?: string }) {
 }
 
 export function useGetRewards({ spaceId }: { spaceId?: string }) {
-  return useGET<RewardWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/rewards` : null);
+  return useGET<RewardWithUsers[]>(spaceId ? `/api/rewards?spaceId=${spaceId}` : null);
 }
 
 export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {

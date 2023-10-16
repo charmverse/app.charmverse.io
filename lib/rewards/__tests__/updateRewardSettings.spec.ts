@@ -53,6 +53,8 @@ describe('updateRewardSettings', () => {
       chainId: 12,
       approveSubmitters: false,
       dueDate: new Date(2025, 11, 31),
+      allowMultipleApplications: true,
+      maxSubmissions: 1000,
       customReward: 'Custom Reward Description',
       fields: ['Field1', 'Field2'],
       reviewers,

@@ -84,21 +84,24 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const refreshReward = useCallback(
     async (rewardId: string) => {
       const reward = await charmClient.rewards.getReward(rewardId);
-      mutateRewards((data) => {
-        const rewardList = data ? [...data] : [];
-        const rewardIndex = rewardList.findIndex((p) => p.id === rewardId);
+      mutateRewards(
+        (data) => {
+          const rewardList = data ? [...data] : [];
+          const rewardIndex = rewardList.findIndex((p) => p.id === rewardId);
 
-        if (rewardIndex >= 0) {
-          const existingReward = rewardList[rewardIndex];
-          rewardList[rewardIndex] = {
-            ...existingReward,
-            ...reward
-          };
-        } else {
-          rewardList.push(reward);
-        }
-        return rewardList;
-      });
+          if (rewardIndex >= 0) {
+            const existingReward = rewardList[rewardIndex];
+            rewardList[rewardIndex] = {
+              ...existingReward,
+              ...reward
+            };
+          } else {
+            rewardList.push(reward);
+          }
+          return rewardList;
+        },
+        { revalidate: false }
+      );
       return reward;
     },
     [mutateRewards]

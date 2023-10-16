@@ -1,4 +1,4 @@
-import { Box, Divider, Stack } from '@mui/material';
+import { Box, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
@@ -19,6 +19,7 @@ import { RewardTokenProperty } from 'components/rewards/components/RewardPropert
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
+import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useUser } from 'hooks/useUser';
@@ -41,9 +42,10 @@ export function RewardProperties(props: {
   pagePath: string;
 }) {
   const { rewardId, pageId, readOnly: parentReadOnly = false } = props;
-  const { rewards, mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
+  const { mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
-  const { user } = useUser();
+
+  const { showApplication } = useApplicationDialog();
 
   const { data: initialReward } = useGetReward({
     rewardId: rewardId as string
@@ -79,6 +81,14 @@ export function RewardProperties(props: {
     }
   }, [currentReward?.customReward]);
 
+  async function resyncReward() {
+    const _rewardId = currentReward?.id;
+    if (_rewardId) {
+      const updated = await refreshReward(_rewardId);
+      setCurrentReward({ ...currentReward, ...updated });
+    }
+  }
+
   const readOnly = parentReadOnly || !isSpaceMember || props.readOnly;
 
   const applications = currentReward?.applications;
@@ -88,6 +98,7 @@ export function RewardProperties(props: {
 
     if (currentReward?.id) {
       await updateReward({ rewardId: currentReward.id, updateContent: updates });
+      resyncReward();
     }
   }
 
@@ -265,6 +276,28 @@ export function RewardProperties(props: {
           </SelectPreviewContainer>
         </Box>
 
+        <Tooltip placement='left' title='Allow the same user to participate in this reward more than once'>
+          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+            <PropertyLabel readOnly highlighted>
+              Multiple submissions
+            </PropertyLabel>
+
+            <SelectPreviewContainer readOnly={readOnly} displayType='details'>
+              <Switch
+                sx={{ ml: '0 !important' }}
+                isOn={Boolean(currentReward?.allowMultipleApplications)}
+                onChanged={(isOn) => {
+                  applyRewardUpdates({
+                    allowMultipleApplications: !!isOn
+                  });
+                }}
+                disabled={readOnly}
+                readOnly={readOnly}
+              />
+            </SelectPreviewContainer>
+          </Box>
+        </Tooltip>
+
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
           <PropertyLabel readOnly highlighted>
             Applicant Roles
@@ -380,6 +413,7 @@ export function RewardProperties(props: {
             }
             reward={currentReward as RewardWithUsers}
             permissions={rewardPermissions}
+            openApplication={showApplication}
           />
         )}
       </Stack>

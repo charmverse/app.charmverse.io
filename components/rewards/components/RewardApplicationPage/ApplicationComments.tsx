@@ -1,7 +1,6 @@
 import type { Application, ApplicationComment } from '@charmverse/core/prisma';
-import { FormLabel, Box, Stack } from '@mui/material';
+import { Box, FormLabel, Stack } from '@mui/material';
 import { useMemo } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetApplicationComments } from 'charmClient/hooks/rewards';

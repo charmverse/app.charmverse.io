@@ -12,9 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useUser } from 'hooks/useUser';
-import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import { countCompleteSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
@@ -24,18 +22,15 @@ import { RewardApplicationFilter } from './RewardApplicationFilter';
 
 interface Props {
   reward: RewardWithUsers;
-  refreshReward: (rewardId: string) => void;
-  permissions?: BountyPermissionFlags;
+  openApplication: (applicationId: string) => void;
 }
 
-export default function RewardSubmissionsTable({ reward, permissions, refreshReward }: Props) {
+export function RewardSubmissionsTable({ reward, openApplication }: Props) {
   const theme = useTheme();
 
   const { user } = useUser();
 
   const [applicationsFilter, setApplicationsFilter] = useState<ApplicationFilterStatus>('all');
-
-  const { showApplication } = useApplicationDialog();
 
   const validSubmissions = countCompleteSubmissions({ applications: reward.applications });
 
@@ -61,7 +56,7 @@ export default function RewardSubmissionsTable({ reward, permissions, refreshRew
             sx={{
               my: 1
             }}
-            label={`Submissions: ${
+            label={`Complete: ${
               reward?.maxSubmissions ? `${validSubmissions} / ${reward.maxSubmissions}` : validSubmissions
             }`}
           />
@@ -116,7 +111,7 @@ export default function RewardSubmissionsTable({ reward, permissions, refreshRew
             <TableBody>
               {sortedApplications.map((submission) => (
                 <RewardApplicantTableRow
-                  onClickView={() => showApplication(submission.id)}
+                  onClickView={() => openApplication(submission.id)}
                   submission={submission}
                   key={submission.id}
                 />

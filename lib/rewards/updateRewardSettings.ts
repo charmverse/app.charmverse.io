@@ -15,6 +15,7 @@ export type UpdateableRewardFields = Partial<
     | 'rewardAmount'
     | 'rewardToken'
     | 'approveSubmitters'
+    | 'allowMultipleApplications'
     | 'maxSubmissions'
     | 'dueDate'
     | 'customReward'
@@ -70,6 +71,7 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
         rewardAmount: updateContent.rewardAmount,
         rewardToken: updateContent.rewardToken,
         approveSubmitters: updateContent.approveSubmitters,
+        allowMultipleApplications: updateContent.allowMultipleApplications,
         maxSubmissions: updateContent.maxSubmissions,
         fields: updateContent.fields as any
       },
