@@ -329,15 +329,16 @@ export async function generateImportWorkspacePages({
       }
     } else if (isBoardPageType(node.type)) {
       const boardBlock = node.blocks?.board;
-      const viewBlocks = node.blocks?.views ?? [];
+      const viewBlocks = (node.blocks?.views ?? []).map((view) => ({ ...view, id: v4() }));
+      if (boardBlock && boardBlock.fields) {
+        (boardBlock.fields as any).viewIds = viewBlocks.map((viewBlock) => viewBlock.id);
+      }
 
       // We don't want to create empty databases, but we do want to allow inline databases to be empty so they can be initialised
       if (boardBlock && ((!node.type.match('inline') && viewBlocks.length > 0) || node.type.match('inline'))) {
         [boardBlock, ...viewBlocks].forEach((block) => {
           if (block.type === 'board') {
             block.id = newId;
-          } else {
-            block.id = v4();
           }
 
           block.rootId = newId;
