@@ -60,6 +60,11 @@ const config = {
         permanent: true
       },
       {
+        source: '/:domain/bounties',
+        destination: '/:domain/rewards',
+        permanent: true
+      },
+      {
         source: '/nexus',
         destination: '/',
         permanent: true

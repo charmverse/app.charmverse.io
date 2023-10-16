@@ -1,3 +1,4 @@
+import { stringUtils } from '@charmverse/core/utilities';
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -89,13 +90,14 @@ export function RewardsPage({ title }: { title: string }) {
   }, []);
 
   useEffect(() => {
-    if (typeof router.query.id === 'string') {
+    const rewardIdFromUrl = router.query.bountyId ?? router.query.id;
+    if (rewardIdFromUrl && stringUtils.isUUID(rewardIdFromUrl as string)) {
       showReward({
-        pageId: router.query.id,
+        pageId: rewardIdFromUrl as string,
         onClose
       });
     }
-  }, [router.query.id]);
+  }, [router.query.id, router.query.bountyId]);
 
   const showRewardOrApplication = useCallback(
     (id: string | null, rewardId?: string) => {
