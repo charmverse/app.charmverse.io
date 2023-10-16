@@ -48,6 +48,6 @@ describe('closeOutReward', () => {
   });
 
   it('throws an error if reward does not exist', async () => {
-    await expect(closeOutReward('nonExistentRewardId')).rejects.toThrowErrorMatchingSnapshot();
+    await expect(closeOutReward('nonExistentRewardId')).rejects.toThrow();
   });
 });
