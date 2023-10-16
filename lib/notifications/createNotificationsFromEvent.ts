@@ -4,7 +4,6 @@ import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 import { createCardNotifications } from './cards/createCardNotifications';
 import { createDocumentNotifications } from './documents/createDocumentNotifications';
 import { createForumNotifications } from './forum/createForumNotifications';
-import type { NotificationGroup } from './interfaces';
 import type { NotificationEmailInput } from './mailer/sendNotifications';
 import { getNotificationToggles, isNotificationEnabled } from './notificationToggles';
 import { createPollNotifications } from './polls/createPollNotifications';

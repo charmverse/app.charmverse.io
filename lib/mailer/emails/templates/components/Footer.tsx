@@ -37,12 +37,7 @@ export default function Footer({ showSnooze = true }: { showSnooze?: boolean }) 
             textAlign: 'center'
           }}
         >
-          <Text
-            style={{
-              color: greyColor2,
-              fontSize: 12
-            }}
-          >
+          <Text variant='caption'>
             <Link href={unsubscribeLink} style={{ textDecoration: 'underline', color: 'inherit' }}>
               Disable or Snooze
             </Link>{' '}

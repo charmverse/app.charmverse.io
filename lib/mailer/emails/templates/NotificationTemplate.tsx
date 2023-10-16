@@ -9,12 +9,13 @@ import type {
   CardNotification,
   DocumentNotification,
   Notification,
+  NotificationGroup,
   PostNotification,
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import { fancyTrim } from 'lib/utilities/strings';
+import { capitalize, fancyTrim } from 'lib/utilities/strings';
 import { baseUrl } from 'testing/mockApiCall';
 
 import { EmailWrapper, Feedback, Text } from './components';
@@ -34,43 +35,40 @@ export type PendingNotificationsData = {
   user: Pick<User, 'id' | 'username'> & { email: string };
 };
 
-function NotificationSections({ notifications }: { notifications: Notification[] }) {
+function NotificationSections({ notifications, group }: { group: NotificationGroup; notifications: Notification[] }) {
   return notifications.length > 0 ? (
-    <>
+    <Section>
+      <Text variant='h2' primary>
+        {capitalize(group)}
+      </Text>
       {notifications.slice(0, MAX_ITEMS_PER_NOTIFICATION).map((notification) => (
-        <NotificationSection key={notification.id} notification={notification} />
+        <NotificationSection group={group} key={notification.id} notification={notification} />
       ))}
       <Hr />
-    </>
+    </Section>
   ) : null;
 }
 
 export function PendingNotifications(props: PendingNotificationsData) {
   return (
     <EmailWrapper title='Your open notifications' preview='Your open notifications'>
-      <Text
-        style={{
-          padding: 0,
-          fontSize: 24,
-          fontWeight: 'bold'
-        }}
-      >
+      <Text variant='h2'>
         {notificationsRequiresYourAttention({
           count: props.totalUnreadNotifications
         })}
       </Text>
-      <NotificationSections notifications={props.documentNotifications} />
-      <NotificationSections notifications={props.cardNotifications} />
-      <NotificationSections notifications={props.voteNotifications} />
-      <NotificationSections notifications={props.proposalNotifications} />
-      <NotificationSections notifications={props.bountyNotifications} />
-      <NotificationSections notifications={props.forumNotifications} />
+      <NotificationSections group='documents' notifications={props.documentNotifications} />
+      <NotificationSections group='card' notifications={props.cardNotifications} />
+      <NotificationSections group='polls' notifications={props.voteNotifications} />
+      <NotificationSections group='proposals' notifications={props.proposalNotifications} />
+      <NotificationSections group='rewards' notifications={props.bountyNotifications} />
+      <NotificationSections group='forum' notifications={props.forumNotifications} />
       <Feedback />
     </EmailWrapper>
   );
 }
 
-function NotificationSection({ notification }: { notification: Notification }) {
+function NotificationSection({ notification }: { notification: Notification; group: NotificationGroup }) {
   const { spaceName, spaceDomain } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
   const notificationContent = notification.group === 'document' ? notification.content : null;
@@ -97,25 +95,19 @@ function NotificationSection({ notification }: { notification: Notification }) {
           {content}
         </Text>
         <Text
+          hideOverflow
+          variant='subtitle1'
           style={{
-            margin: `6px 0px`,
-            fontSize: 16,
-            opacity: 0.65,
-            fontWeight: 400,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap'
+            margin: `6px 0px`
           }}
         >
           {spaceName}
         </Text>
         <Text
+          bold
+          hideOverflow
           style={{
-            margin: `6px 0px`,
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            fontWeight: 'bold'
+            margin: `6px 0px`
           }}
         >
           {pageTitle}
