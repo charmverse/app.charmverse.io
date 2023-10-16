@@ -2,6 +2,7 @@
 import { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { sessionUserRelations } from 'lib/session/config';
+import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isAddress } from 'viem';
 
@@ -126,6 +127,26 @@ async function attachWalletToProfileWithDiscord({
     },
     include: sessionUserRelations
   })
+
+  const oldUser = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: walletToReattach.userId
+    },
+    include: sessionUserRelations
+  });
+
+  const identities = await countConnectableIdentities(oldUser);
+
+  if (identities === 0) {
+    await prisma.user.update({
+      where: {
+        id: oldUser.id,
+      },
+      data: {
+        deletedAt: new Date()
+      }
+    })
+  }
 
   return updatedUser
 }
