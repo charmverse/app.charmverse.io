@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Application, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
+import type { ApplicationWithTransactions, Reward } from 'lib/rewards/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty } from 'testing/setupDatabase';
@@ -135,5 +135,73 @@ describe('PUT /api/reward-applications/work - work on a reward', () => {
       .set('Cookie', otherUserCookie)
       .send(workContent)
       .expect(401);
+  });
+});
+describe('GET /api/reward-applications/work - retrieve an application', () => {
+  let user: User;
+  let space: Space;
+  let userCookie: string;
+  let application: ApplicationWithTransactions;
+  let reward: Reward;
+
+  beforeAll(async () => {
+    // Create a user and an application for testing
+    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    user = generated.user;
+    space = generated.space;
+    userCookie = await loginUser(user.id);
+    reward = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        bounty: { connect: { id: reward.id } },
+        applicant: { connect: { id: user.id } },
+        status: 'paid',
+        transactions: {
+          create: {
+            chainId: '1',
+            transactionId: 'abcdef',
+            safeTxHash: '123456'
+          }
+        }
+      },
+      include: {
+        transactions: true
+      }
+    });
+  });
+
+  it('should return the application with a status code 200 if user has permission', async () => {
+    const response = await request(baseUrl)
+      .get(`/api/reward-applications/work?applicationId=${application.id}`)
+      .set('Cookie', userCookie)
+      .expect(200);
+
+    const tx = application.transactions[0];
+
+    expect(response.body).toMatchObject({
+      ...application,
+      createdAt: application.createdAt.toISOString(),
+      updatedAt: application.createdAt.toISOString(),
+      transactions: [{ ...tx, createdAt: tx.createdAt.toISOString(), updatedAt: tx.updatedAt.toISOString() }]
+    });
+  });
+
+  it('should return a status code 401 if user has no permission', async () => {
+    const otherUser = await testUtilsUser.generateUser();
+    const otherUserCookie = await loginUser(otherUser.id);
+
+    await request(baseUrl)
+      .get(`/api/reward-applications/work?applicationId=${application.id}`)
+      .set('Cookie', otherUserCookie)
+      .expect(401);
+  });
+
+  it('should return an error response if applicationId is missing', async () => {
+    await request(baseUrl).get(`/api/reward-applications/work`).set('Cookie', userCookie).expect(400); // or whichever status code you use for bad requests
   });
 });

@@ -40,8 +40,9 @@ export function RewardProperties(props: {
   rewardId: string | null;
   pageId: string;
   pagePath: string;
+  hideApplications?: boolean;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false } = props;
+  const { rewardId, pageId, readOnly: parentReadOnly = false, hideApplications } = props;
   const { mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
 
@@ -406,7 +407,7 @@ export function RewardProperties(props: {
 
         {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
 
-        {rewardId && currentReward && applications && (
+        {rewardId && currentReward && applications && !hideApplications && (
           <RewardApplications
             refreshReward={(_rewardId: string) =>
               refreshReward(_rewardId).then((updatedReward) => setCurrentReward(updatedReward))

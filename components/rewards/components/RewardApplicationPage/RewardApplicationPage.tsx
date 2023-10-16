@@ -15,6 +15,7 @@ import { RewardProperties } from 'components/rewards/components/RewardProperties
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -38,6 +39,8 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
 
   const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
+
+  const { permissions: rewardPagePermissions } = usePagePermissions({ pageIdOrPath: reward?.id as string });
 
   const { members } = useMembers();
   const { user } = useUser();
@@ -99,7 +102,8 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
                 rewardId={reward.id}
                 pageId={reward.page.id}
                 pagePath={reward.page.path}
-                readOnly={true}
+                readOnly={!rewardPagePermissions?.edit_content}
+                hideApplications
               />
               {rewardPageContent && (
                 <>

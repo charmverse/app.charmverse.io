@@ -1,5 +1,5 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
-import type { Bounty, User, Application, BountyStatus, Page } from '@charmverse/core/prisma-client';
+import type { Bounty, User, Application, BountyStatus, Page, Transaction } from '@charmverse/core/prisma-client';
 
 export type RewardReviewer = TargetPermissionGroup<'role' | 'user'>;
 
@@ -23,4 +23,8 @@ export type RewardWithUsersAndPageMeta = Bounty & {
   applications: ApplicationMeta[];
   allowedSubmitterRoles: string[] | null;
   page: Pick<Page, 'id' | 'title' | 'path'>;
+};
+
+export type ApplicationWithTransactions = Application & {
+  transactions: Transaction[];
 };

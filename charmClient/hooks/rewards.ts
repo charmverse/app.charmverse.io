@@ -15,7 +15,7 @@ import type {
   RewardBlockWithTypedFields
 } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
+import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
 import { useGET, usePOST, usePUT, useDELETE } from './helpers';
 
@@ -24,7 +24,9 @@ export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
 }
 
 export function useGetApplication({ applicationId }: { applicationId?: string }) {
-  return useGET<Application>(applicationId ? `/api/reward-applications/work?applicationId=${applicationId}` : null);
+  return useGET<ApplicationWithTransactions>(
+    applicationId ? `/api/reward-applications/work?applicationId=${applicationId}` : null
+  );
 }
 
 export function useGetApplicationComments({ applicationId }: { applicationId?: string }) {

@@ -331,7 +331,7 @@ def api_test(code_to_test_path, example_tests=""):
 
     # If example is not provided, attempt to read it from the file
     if not example_tests:
-        default_example_path = get_absolute_path("__integration-tests__/server/pages/api/rewards/[id]/work.spec.ts")
+        default_example_path = get_absolute_path("__integration-tests__/server/pages/api/reward-applications/work.spec.ts")
 
         print("Using default API Test example", default_example_path)
         with open(default_example_path, 'r') as file:

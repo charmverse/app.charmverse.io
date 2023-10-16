@@ -6,6 +6,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
+import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
 import { work } from 'lib/rewards/work';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -40,12 +41,15 @@ async function workOnRewardController(req: NextApiRequest, res: NextApiResponse<
   res.status(200).json(applicationResponse);
 }
 
-async function getApplicationController(req: NextApiRequest, res: NextApiResponse<Application>) {
+async function getApplicationController(req: NextApiRequest, res: NextApiResponse<ApplicationWithTransactions>) {
   const applicationId = req.query.applicationId as string;
 
   const application = await prisma.application.findUniqueOrThrow({
     where: {
       id: applicationId
+    },
+    include: {
+      transactions: true
     }
   });
 
