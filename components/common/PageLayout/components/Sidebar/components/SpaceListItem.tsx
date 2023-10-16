@@ -1,9 +1,11 @@
 import type { Space } from '@charmverse/core/prisma';
+import { Badge } from '@mui/material';
 import type { MenuItemProps } from '@mui/material/MenuItem';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 
+import type { Notification } from 'lib/notifications/interfaces';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 import DraggableListItem from '../../DraggableListItem';
@@ -12,10 +14,20 @@ import WorkspaceAvatar from './WorkspaceAvatar';
 
 interface SpaceListItemProps extends MenuItemProps {
   space: Space;
+  notifications: Notification[];
   changeOrderHandler: (draggedProperty: string, droppedOnProperty: string) => Promise<void>;
 }
 
-export default function SpaceListItem({ space, changeOrderHandler, selected, disabled }: SpaceListItemProps) {
+export default function SpaceListItem({
+  notifications,
+  space,
+  changeOrderHandler,
+  selected,
+  disabled
+}: SpaceListItemProps) {
+  const spaceNotifications = notifications.filter(
+    (notification) => notification.spaceId === space.id && !notification.read
+  );
   return (
     <DraggableListItem name='spaceItem' itemId={space.id} changeOrderHandler={changeOrderHandler} key={space.domain}>
       <MenuItem
@@ -24,7 +36,9 @@ export default function SpaceListItem({ space, changeOrderHandler, selected, dis
         selected={selected}
         disabled={disabled}
       >
-        <WorkspaceAvatar name={space.name} image={space.spaceImage} />
+        <Badge badgeContent={spaceNotifications.length} color='error'>
+          <WorkspaceAvatar name={space.name} image={space.spaceImage} />
+        </Badge>
         <Typography noWrap ml={1}>
           {space.name}
         </Typography>

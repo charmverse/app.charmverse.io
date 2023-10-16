@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Badge } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,6 +9,7 @@ import { memo } from 'react';
 
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
@@ -42,6 +44,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     pageIdOrPath: currentSpace ? basePageId : undefined,
     spaceId: currentSpace?.id
   });
+  const { notifications = [] } = useNotifications();
 
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();
@@ -60,7 +63,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           ...(open && { display: 'none' })
         }}
       >
-        <MenuIcon />
+        <Badge badgeContent={notifications.length} color='error'>
+          <MenuIcon />
+        </Badge>
       </IconButton>
 
       <Box

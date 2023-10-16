@@ -22,6 +22,8 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
@@ -43,7 +45,7 @@ const StyledSidebarBox = styled(Box)`
   ${sidebarItemStyles}
 `;
 
-const NotificationCountBox = styled(Box)`
+export const NotificationCountBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.error.main};
   color: white;
   width: 20px;
@@ -53,26 +55,15 @@ const NotificationCountBox = styled(Box)`
   border-radius: 20%;
   font-weight: semi-bold;
   font-size: 12px;
+  padding: 2px;
 `;
 
 export function NotificationUpdates() {
-  const { user } = useUser();
-
   const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
-  const {
-    data: notifications = [],
-    isLoading,
-    mutate: mutateNotifications
-  } = useSWRImmutable(
-    user ? `/notifications/list/${user.id}` : null,
-    () => charmClient.notifications.getNotifications(),
-    {
-      // 10 minutes
-      refreshInterval: 1000 * 10 * 60
-    }
-  );
-
-  const unreadNotifications = notifications.filter((notification) => !notification.read);
+  const { notifications = [], isLoading, mutate: mutateNotifications } = useNotifications();
+  const { space } = useCurrentSpace();
+  const spaceNotifications = notifications.filter((notification) => space && notification.spaceId === space.id);
+  const unreadNotifications = spaceNotifications.filter((notification) => !notification.read);
 
   return (
     <Box>
@@ -100,7 +91,7 @@ export function NotificationUpdates() {
         }}
       >
         <NotificationsPopover
-          notifications={notifications}
+          notifications={spaceNotifications}
           mutateNotifications={mutateNotifications}
           isLoading={isLoading}
           close={notificationPopupState.close}

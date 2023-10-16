@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -21,6 +22,7 @@ import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useUserDetails } from 'components/settings/profile/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
@@ -29,6 +31,7 @@ import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 import { headerHeight } from '../../Header/Header';
 
+import { NotificationCountBox } from './NotificationsPopover';
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
 
@@ -86,6 +89,7 @@ export default function SidebarSubmenu({
   logoutCurrentUser: () => void;
   openProfileModal: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
 }) {
+  const { notifications = [] } = useNotifications();
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -159,18 +163,21 @@ export default function SidebarSubmenu({
           </Typography>
         </MenuItem>
         <Divider />
-        <Typography component='p' variant='caption' mx={2} mb={0.5}>
+        <Typography component='p' variant='caption' mx={2} mb={1}>
           My Spaces
         </Typography>
-        {spaces.map((_space) => (
-          <SpaceListItem
-            key={_space.id}
-            disabled={isSaving || !isLoaded || isCreatingSpace}
-            selected={currentSpace?.domain === _space.domain}
-            space={_space}
-            changeOrderHandler={changeOrderHandler}
-          />
-        ))}
+        <Stack gap={1}>
+          {spaces.map((_space) => (
+            <SpaceListItem
+              notifications={notifications}
+              key={_space.id}
+              disabled={isSaving || !isLoaded || isCreatingSpace}
+              selected={currentSpace?.domain === _space.domain}
+              space={_space}
+              changeOrderHandler={changeOrderHandler}
+            />
+          ))}
+        </Stack>
         <MenuItem onClick={showSpaceForm} data-test='spaces-menu-add-new-space'>
           <AddIcon sx={{ m: '5px 15px 5px 8px' }} />
           Create or join a space
@@ -184,9 +191,11 @@ export default function SidebarSubmenu({
         <Tooltip title='Close sidebar' placement='bottom'>
           <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
             <MenuOpenIcon />
+            {notifications.length ? <NotificationCountBox mx={1}>{notifications.length}</NotificationCountBox> : null}
           </IconButton>
         </Tooltip>
       )}
+
       <Modal
         size='medium'
         open={spaceFormOpen}
