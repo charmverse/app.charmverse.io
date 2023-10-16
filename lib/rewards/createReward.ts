@@ -109,6 +109,20 @@ export async function createReward({
         },
         page: {
           create: {
+            permissions: {
+              createMany: {
+                data: [
+                  {
+                    permissionLevel: 'view',
+                    spaceId
+                  },
+                  {
+                    permissionLevel: 'full_access',
+                    userId
+                  }
+                ]
+              }
+            },
             id: rewardId,
             path: getPagePath(),
             title: '',
