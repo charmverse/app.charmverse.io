@@ -64,7 +64,7 @@ describe('markRewardAsPaid', () => {
     });
 
     await expect(() => markRewardAsPaid(bounty.id)).rejects.toThrow(
-      new InvalidInputError('All applications need to be either completed or paid in order to mark bounty as paid')
+      new InvalidInputError('All applications need to be either completed or paid in order to mark reward as paid')
     );
   });
 
@@ -78,7 +78,7 @@ describe('markRewardAsPaid', () => {
     });
 
     await expect(() => markRewardAsPaid(bounty.id)).rejects.toThrow(
-      new InvalidInputError('All applications need to be either completed or paid in order to mark bounty as paid')
+      new InvalidInputError('All applications need to be either completed or paid in order to mark reward as paid')
     );
   });
 });
