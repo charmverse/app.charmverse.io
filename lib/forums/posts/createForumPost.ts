@@ -4,9 +4,9 @@ import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { extractPollIdsFromDoc } from 'lib/prosemirror/extractPollIdsFromDoc';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { InsecureOperationError } from 'lib/utilities/errors';
+import { extractPollIds } from 'lib/votes/extractPollIds';
 
 import { getPostPath } from './getPostPath';
 
@@ -42,7 +42,7 @@ export async function createForumPost({
   const postId = v4();
 
   // check for polls that were created before publishing the forum post
-  const pollIds = content ? extractPollIdsFromDoc(content) : [];
+  const pollIds = content ? extractPollIds(content as PageContent) : [];
 
   const createdPost = await prisma.post.create({
     data: {
@@ -77,6 +77,8 @@ export async function createForumPost({
 }
 
 export async function trackCreateForumPostEvent({ post, userId }: { post: Post; userId: string }) {
+  const { getNodeFromJson } = await import('lib/prosemirror/getNodeFromJson');
+
   const category = await prisma.postCategory.findUnique({
     where: {
       id: post.categoryId
