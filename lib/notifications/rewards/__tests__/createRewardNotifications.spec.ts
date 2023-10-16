@@ -13,7 +13,7 @@ import { createNotificationsFromEvent } from '../../createNotificationsFromEvent
 import { createRewardNotifications } from '../createRewardNotifications';
 
 describe(`Test reward events and notifications`, () => {
-  it(`Should create bounty notifications for application.created event`, async () => {
+  it(`Should create reward notifications for reward creator and reviewers application.created event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
@@ -31,7 +31,7 @@ describe(`Test reward events and notifications`, () => {
         reviewer: [
           {
             group: 'user',
-            id: user.id
+            id: user2.id
           }
         ]
       }
@@ -63,15 +63,28 @@ describe(`Test reward events and notifications`, () => {
         bountyId: bounty.id,
         notificationMetadata: {
           spaceId: space.id,
-          userId: user.id
+          userId: user2.id
+        }
+      }
+    });
+
+    const applicationPendingCreatorNotification = await prisma.bountyNotification.findFirst({
+      where: {
+        type: 'application.created',
+        applicationId: application.id,
+        bountyId: bounty.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: user2.id
         }
       }
     });
 
     expect(applicationPendingReviewerNotification).toBeTruthy();
+    expect(applicationPendingCreatorNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.accepted event`, async () => {
+  it(`Should create reward notifications for application.accepted event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
@@ -124,7 +137,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationAcceptedNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.rejected event`, async () => {
+  it(`Should create reward notifications for application.rejected event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
@@ -178,7 +191,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationRejectedNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.submitted event`, async () => {
+  it(`Should create reward notifications for application.submitted event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
     await addUserToSpace({
@@ -222,7 +235,7 @@ describe(`Test reward events and notifications`, () => {
       submissionNodes: 'Hello World',
       rewardId: bounty.id,
       applicationId: application.id,
-      userId: user.id
+      userId: user2.id
     });
 
     await createRewardNotifications({
@@ -251,7 +264,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationSubmittedNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.approved event`, async () => {
+  it(`Should create reward notifications for application.approved event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const bountyReviewer = await createUserFromWallet();
     await addUserToSpace({
@@ -352,7 +365,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationPaymentPendingNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.payment_completed event`, async () => {
+  it(`Should create reward notifications for application.payment_completed event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
     await addUserToSpace({
