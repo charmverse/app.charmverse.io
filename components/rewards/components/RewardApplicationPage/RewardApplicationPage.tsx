@@ -1,18 +1,23 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Collapse, Divider, FormLabel, IconButton, Stack } from '@mui/material';
+import LaunchIcon from '@mui/icons-material/Launch';
+import { Collapse, Divider, FormLabel, IconButton, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import { getChainExplorerLink } from 'connectors/index';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
+import Link from 'components/common/Link';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplication } from 'components/rewards/hooks/useApplication';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
@@ -39,6 +44,8 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
 
   const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
+
+  const { space } = useCurrentSpace();
 
   const { permissions: rewardPagePermissions } = usePagePermissions({ pageIdOrPath: reward?.id as string });
 
@@ -76,8 +83,16 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
     <ScrollableWindow>
       {/** TODO - Use more elegant layout */}
       <Grid container px='10%' gap={2}>
-        <Grid item xs={12} display='flex' justifyContent='space-between'>
+        <Grid item xs={12} display='flex' flexDirection='column' justifyContent='space-between' sx={{ mb: 1 }}>
           <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
+          {space && rewardPageContent && (
+            <Link href={`/${space.domain}/${rewardPageContent.path}`}>
+              <Typography variant='body2' display='flex' gap={1} color='secondary'>
+                <LaunchIcon fontSize='small' sx={{ transform: 'rotate(270deg)' }} />
+                <span>Back to reward</span>
+              </Typography>
+            </Link>
+          )}
         </Grid>
 
         <Grid item xs={12} className='focalboard-body' flexDirection='column'>
@@ -150,6 +165,22 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
               onSuccess={recordTransaction}
               onError={(message) => showMessage(message, 'warning')}
             />
+          )}
+
+          {application.status === 'paid' && application.transactions.length && (
+            <Button
+              variant='outlined'
+              color='secondary'
+              external
+              target='_blank'
+              href={getChainExplorerLink(
+                application.transactions[0].chainId,
+                application.transactions[0].transactionId
+              )}
+            >
+              <LaunchIcon sx={{ mr: 1 }} />
+              View transaction
+            </Button>
           )}
         </Grid>
 
