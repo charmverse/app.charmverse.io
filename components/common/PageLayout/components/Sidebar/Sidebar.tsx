@@ -232,7 +232,6 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
 
   const { features } = useFeaturesAndMembers();
-  const isCharmverse = useIsCharmverseSpace();
 
   return (
     <SidebarContainer>
@@ -282,7 +281,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                   <NotificationUpdates />
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
-                    .filter((feat) => !feat.isHidden && (feat.path !== 'rewards' || isCharmverse))
+                    .filter((feat) => !feat.isHidden)
                     .map((feat) => {
                       if (
                         showMemberFeatures ||
