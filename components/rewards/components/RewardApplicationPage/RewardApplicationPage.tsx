@@ -5,6 +5,7 @@ import { Collapse, Divider, FormLabel, IconButton, Stack, Typography } from '@mu
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { getChainExplorerLink } from 'connectors/index';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -17,6 +18,7 @@ import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplication } from 'components/rewards/hooks/useApplication';
+import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
@@ -30,7 +32,7 @@ import { RewardPaymentButton } from '../RewardProperties/components/RewardApplic
 import { ApplicationComments } from './ApplicationComments';
 import ApplicationInput from './RewardApplicationInput';
 import RewardReview from './RewardReview';
-import SubmissionInput from './RewardSubmissionInput';
+import { RewardSubmissionInput } from './RewardSubmissionInput';
 
 type Props = {
   applicationId: string;
@@ -41,7 +43,10 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
     useApplication({
       applicationId
     });
+  const router = useRouter();
   const { data: reward } = useGetReward({ rewardId: application?.bountyId });
+
+  const { hideApplication } = useApplicationDialog();
 
   const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
 
@@ -73,6 +78,13 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
     return null;
   }
 
+  function goToReward() {
+    if (space && rewardPageContent) {
+      hideApplication();
+      router.push(`/${space.domain}/${rewardPageContent.path}`);
+    }
+  }
+
   const submitter = members.find((m) => m.id === application.createdBy);
 
   const readonlySubmission =
@@ -86,12 +98,12 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
         <Grid item xs={12} display='flex' flexDirection='column' justifyContent='space-between' sx={{ mb: 1 }}>
           <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
           {space && rewardPageContent && (
-            <Link href={`/${space.domain}/${rewardPageContent.path}`}>
+            <Box onClick={goToReward}>
               <Typography variant='body2' display='flex' gap={1} color='secondary'>
                 <LaunchIcon fontSize='small' sx={{ transform: 'rotate(270deg)' }} />
                 <span>Back to reward</span>
               </Typography>
-            </Link>
+            </Box>
           )}
         </Grid>
 
@@ -204,7 +216,8 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
 
         {application.status !== 'applied' && (
           <Grid item xs={12}>
-            <SubmissionInput
+            <RewardSubmissionInput
+              currentUserIsApplicant={!!user && user?.id === application.createdBy}
               submission={application}
               readOnly={readonlySubmission}
               expandedOnLoad

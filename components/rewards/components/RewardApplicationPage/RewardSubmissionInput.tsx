@@ -19,6 +19,7 @@ import charmClient from 'charmClient';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
+import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
 
@@ -34,7 +35,8 @@ const schema = (customReward?: boolean) => {
       (value) => {
         return !value || isValidChainAddress(value);
       }
-    )
+    ),
+    rewardInfo: yup.string()
   });
 };
 
@@ -43,16 +45,19 @@ type FormValues = yup.InferType<ReturnType<typeof schema>>;
 interface Props {
   submission?: Application;
   bountyId: string;
-  onSubmit?: (content: Partial<Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>>) => void;
+  onSubmit?: (
+    content: Partial<Pick<WorkUpsertData, 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo'>>
+  ) => void;
   readOnly?: boolean;
   permissions?: BountyPermissionFlags;
   expandedOnLoad?: boolean;
   alwaysExpanded?: boolean;
   hasCustomReward: boolean;
   refreshSubmission: VoidFunction;
+  currentUserIsApplicant: boolean;
 }
 
-export default function SubmissionInput({
+export function RewardSubmissionInput({
   permissions,
   readOnly = false,
   submission,
@@ -60,7 +65,8 @@ export default function SubmissionInput({
   bountyId,
   alwaysExpanded,
   expandedOnLoad,
-  hasCustomReward
+  hasCustomReward,
+  currentUserIsApplicant
 }: Props) {
   const { user } = useUser();
   const [isVisible, setIsVisible] = useState(expandedOnLoad ?? alwaysExpanded ?? false);
@@ -165,7 +171,7 @@ export default function SubmissionInput({
               />
             </Grid>
 
-            {!readOnly && !hasCustomReward && (
+            {!readOnly && (
               <Grid item>
                 <InputLabel>Address to receive reward</InputLabel>
                 <TextField
@@ -175,6 +181,22 @@ export default function SubmissionInput({
                   error={!!errors.walletAddress}
                   helperText={errors.walletAddress?.message}
                   disabled={readOnly}
+                />
+              </Grid>
+            )}
+
+            {currentUserIsApplicant && (
+              <Grid item>
+                <InputLabel>Information for custom reward</InputLabel>
+                <TextField
+                  multiline
+                  minRows={2}
+                  {...register('rewardInfo')}
+                  type='text'
+                  fullWidth
+                  error={!!errors.walletAddress}
+                  helperText={errors.walletAddress?.message}
+                  disabled={!currentUserIsApplicant}
                 />
               </Grid>
             )}

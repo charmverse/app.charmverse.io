@@ -44,6 +44,7 @@ export function RewardsPage({ title }: { title: string }) {
   }, [currentApplicationId]);
 
   const { space: currentSpace } = useCurrentSpace();
+
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, rewards } = useRewards();
 

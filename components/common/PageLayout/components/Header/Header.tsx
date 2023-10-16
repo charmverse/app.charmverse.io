@@ -12,7 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 
-import BountyShareButton from './components/BountyShareButton/BountyShareButton';
+import RewardsShareButton from './components/BountyShareButton/BountyShareButton';
 import { DocumentHeaderElements } from './components/DocumentHeaderElements';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
@@ -45,7 +45,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();
-  const isBountyBoard = router.route === '/[domain]/bounties';
+  const isRewardsList = router.route === '/[domain]/rewards';
   const isProposalsPage = router.route === '/[domain]/proposals';
 
   return (
@@ -78,7 +78,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
-          {isBountyBoard && <BountyShareButton headerHeight={headerHeight} />}
+          {isRewardsList && <RewardsShareButton headerHeight={headerHeight} />}
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
 
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}

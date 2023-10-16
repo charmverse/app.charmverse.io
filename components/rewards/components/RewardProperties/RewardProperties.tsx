@@ -95,6 +95,10 @@ export function RewardProperties(props: {
   const applications = currentReward?.applications;
 
   async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
+    if (readOnly) {
+      return;
+    }
+
     setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
 
     if (currentReward?.id) {
