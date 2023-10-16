@@ -7,6 +7,147 @@ import webbrowser
 
 import time
 
+defaukt_api_test="""
+import type { Application, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
+import request from 'supertest';
+
+import type { ApplicationWithTransactions, Reward } from 'lib/rewards/interfaces';
+import type { WorkUpsertData } from 'lib/rewards/work';
+import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateBounty } from 'testing/setupDatabase';
+
+describe('PUT /api/reward-applications/work - work on a reward', () => {
+  let space: Space;
+  let admin: User;
+  let user: User;
+  let userCookie: string;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    space = generated.space;
+    admin = generated.user;
+    user = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
+    userCookie = await loginUser(user.id);
+  });
+
+  it('should allow user with permissions to create and update work, and receive their application with a 200', async () => {
+    const reward = await generateBounty({
+      createdBy: admin.id,
+      spaceId: space.id,
+      status: 'open',
+      rewardAmount: 1
+    });
+
+    const workContent: Partial<WorkUpsertData> = {
+      message: 'Applying to work',
+      submissionNodes: '',
+      submission: '',
+      rewardInfo: 'Fedex please',
+      walletAddress: testUtilsRandom.randomETHWallet().address
+    };
+
+    const createdApplication = (
+      await request(baseUrl)
+        .put(`/api/reward-applications/work`)
+        .set('Cookie', userCookie)
+        .send({ ...workContent, rewardId: reward.id })
+        .expect(200)
+    ).body;
+
+    expect(createdApplication).toMatchObject(expect.objectContaining<Partial<Application>>(workContent));
+
+    const submissionUpdate: WorkUpsertData = {
+      rewardId: reward.id,
+      userId: user.id,
+      submission: 'New content'
+    };
+
+    const updatedApplication = (
+      await request(baseUrl)
+        .put(`/api/reward-applications/work?applicationId=${createdApplication.id}`)
+        .set('Cookie', userCookie)
+        .send(submissionUpdate)
+        .expect(200)
+    ).body;
+
+    expect(updatedApplication).toMatchObject(
+      expect.objectContaining<Partial<Application>>({
+        ...createdApplication,
+        submission: submissionUpdate.submission
+      })
+    );
+  });
+
+  it('should only allow users with correct role to create work, if the reward is restricted to certain roles, and respond 200 or 401', async () => {
+    const reward = await generateBounty({
+      createdBy: admin.id,
+      spaceId: space.id,
+      status: 'open',
+      rewardAmount: 1
+    });
+
+    const memberWithRole = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
+
+    const submitterRole = await testUtilsMembers.generateRole({
+      createdBy: admin.id,
+      spaceId: space.id,
+      assigneeUserIds: [memberWithRole.id]
+    });
+
+    await prisma.bountyPermission.create({
+      data: {
+        permissionLevel: 'submitter',
+        bounty: { connect: { id: reward.id } },
+        role: { connect: { id: submitterRole.id } }
+      }
+    });
+
+    const workContent: Partial<WorkUpsertData> = {
+      message: 'Applying to work',
+      submissionNodes: '',
+      submission: '',
+      rewardInfo: 'Fedex please',
+      walletAddress: testUtilsRandom.randomETHWallet().address,
+      rewardId: reward.id
+    };
+
+    // Case where this works
+    const memberWithRoleCookie = await loginUser(memberWithRole.id);
+
+    await request(baseUrl)
+      .put(`/api/reward-applications/work`)
+      .set('Cookie', memberWithRoleCookie)
+      .send(workContent)
+      .expect(200);
+
+    await request(baseUrl).put(`/api/reward-applications/work`).set('Cookie', userCookie).send(workContent).expect(401);
+  });
+
+  it('should prevent a user without permissions from working on this reward, and respond with 401', async () => {
+    const reward = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'open',
+      rewardAmount: 1
+    });
+
+    const workContent = {
+      rewardId: reward.id
+    };
+
+    const otherUser = await testUtilsUser.generateUser();
+    const otherUserCookie = await loginUser(otherUser.id);
+
+    await request(baseUrl)
+      .put(`/api/reward-applications/work`)
+      .set('Cookie', otherUserCookie)
+      .send(workContent)
+      .expect(401);
+  });
+});
+"""
 
 default_unit_test="""
 import type { Application } from '@charmverse/core/prisma-client';
@@ -230,6 +371,24 @@ def copy_to_clipboard(text):
     except Exception as e:
         print(f"Failed to copy to clipboard: {e}")
 
+def create_test_file(full_path):
+    instructions = f"""
+\033[101m\033[97m\033[1mFailed to create test file. Here is a potential fix.\033[0m
+
+1. Open VSCode.
+2. Press Cmd + Shift + P (on macOS) or Ctrl + Shift + P (on other platforms) to open the command palette.
+3. Type Shell Command: Install 'code' command in PATH and select it.
+4. This will add the code command to your shell's PATH
+    """
+
+    try:
+      subprocess.run(["code", full_path])
+      print(f"Created test file at {full_path}")
+    except FileNotFoundError as e:
+      print(e, '\n\n', instructions)
+    # Handle the error, perhaps notifying the user or logging the issue
+
+
 
 def create_unit_test_file(link):
     """Generate test file path and create an empty test file."""
@@ -245,12 +404,10 @@ def create_unit_test_file(link):
       
       with open(test_filepath, 'w') as f:
           pass  # Just create an empty file
-    
-    print(f"Created test file at {test_filepath}")
 
-    # Open the test file in VSCode
-    subprocess.run(["code", test_filepath])
-    
+    create_test_file(test_filepath)
+
+
 def create_api_test_file(link):
     """Generate API test file path and create an empty test file if it doesn't exist."""
     
@@ -268,6 +425,8 @@ def create_api_test_file(link):
         print(f"Created API test file at {test_filepath}")
     else:
         print(f"API test file already exists at {test_filepath}")
+
+    create_test_file(test_filepath)
 
 
 #  Example usage:
@@ -417,6 +576,8 @@ def main():
 
     file_link = get_absolute_path(link)
 
+    print(file_link)
+
     if type_name == "API":
       create_api_test_file(link)
     elif type_name == "unit":
@@ -444,7 +605,7 @@ def main():
       #  
       # Ongoing conversation
       # Replace by a custom conversation if you want
-      webbrowser.open_new_tab("https://chat.openai.com/c/509b4c4c-8913-4eb6-9e4c-61cd8876457c")
+      webbrowser.open_new_tab("https://chat.openai.com/c/65d696f8-37f2-47fe-8e93-ab57cb300fbe")
 
     else:
       print("Goodbye for now")
