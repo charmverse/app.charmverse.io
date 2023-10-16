@@ -2,7 +2,6 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import { WrongStateError } from 'lib/utilities/errors';
-import { ExpectedAnError } from 'testing/errors';
 import { generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import { markSubmissionAsPaid } from '../markSubmissionAsPaid';
@@ -40,11 +39,6 @@ describe('markSubmissionAsPaid', () => {
       bountyCap: null
     });
 
-    try {
-      await markSubmissionAsPaid(bountyWithSubmission.applications[0].id);
-      throw new ExpectedAnError();
-    } catch (error: any) {
-      expect(error).toBeInstanceOf(WrongStateError);
-    }
+    await expect(markSubmissionAsPaid(bountyWithSubmission.applications[0].id)).rejects.toThrow(WrongStateError);
   });
 });

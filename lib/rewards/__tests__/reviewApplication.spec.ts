@@ -1,9 +1,9 @@
 import type { ApplicationStatus, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser, testUtilsMembers } from '@charmverse/core/test';
+import { testUtilsUser } from '@charmverse/core/test';
 
 import { WrongStateError } from 'lib/utilities/errors';
-import { generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateBounty } from 'testing/setupDatabase';
 
 import type { Reward } from '../interfaces';
 import { reviewApplication } from '../reviewApplication';
@@ -15,7 +15,7 @@ describe('reviewApplication', () => {
   let reward: Reward;
 
   beforeAll(async () => {
-    ({ user, space } = await generateUserAndSpace());
+    ({ user, space } = await testUtilsUser.generateUserAndSpace());
     reviewerUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
     reward = await generateBounty({
       createdBy: user.id,
