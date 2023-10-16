@@ -87,8 +87,27 @@ describe('work', () => {
     );
   });
 
-  // Error Cases
+  it('should fail if the reward is not open or in progress', async () => {
+    const reward = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      approveSubmitters: true,
+      maxSubmissions: 10000,
+      allowMultipleApplications: true,
+      status: 'complete'
+    });
 
+    const applicationData = {
+      userId: user.id,
+      rewardId: reward.id,
+      message: 'Sample message for testing',
+      submission: 'Sample submission data',
+      submissionNodes: '{}',
+      status: 'applied'
+    };
+
+    await expect(work(applicationData)).rejects.toThrow(WrongStateError);
+  });
   it('should fail if Submission cap reached', async () => {
     const reward = await generateBounty({
       createdBy: user.id,

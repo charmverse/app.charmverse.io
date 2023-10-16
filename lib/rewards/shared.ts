@@ -8,3 +8,5 @@ export function isRewardLockable(reward: Pick<Reward, 'status'>): boolean {
 
   return lockableStatuses.includes(reward.status);
 }
+
+export const statusesAcceptingNewWork: BountyStatus[] = ['open', 'inProgress'];

@@ -8,6 +8,7 @@ import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';
+import { statusesAcceptingNewWork } from './shared';
 
 export type WorkUpsertData = { userId: string; rewardId: string; applicationId?: string } & Partial<
   Pick<Application, 'message' | 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo'>
@@ -46,6 +47,10 @@ export async function work({
     }
   } else if (!applicationId && userHasExistingApplication && !reward.allowMultipleApplications) {
     throw new DuplicateDataError(`You cannot apply twice to work on this reward`);
+  } else if (!applicationId && !statusesAcceptingNewWork.includes(reward.status)) {
+    throw new WrongStateError(
+      `This reward is not accepting new ${reward.approveSubmitters ? 'applications' : 'submissions'}`
+    );
   }
 
   const capReached =
