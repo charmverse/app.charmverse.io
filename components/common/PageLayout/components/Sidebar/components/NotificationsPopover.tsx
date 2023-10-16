@@ -417,7 +417,9 @@ export function NotificationContent({
   const date = new Date(createdAt);
   const todaysDate = new Date();
   const isDateEqual = date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
-  const notificationDate = isDateEqual ? `Today at ${formatTime(createdAt)}` : formatDate(createdAt);
+  const notificationDate = isDateEqual
+    ? `Today at ${formatTime(createdAt)}`
+    : formatDate(createdAt, { withYear: false });
   const isSmallScreen = useSmallScreen();
 
   return (
@@ -465,8 +467,8 @@ export function NotificationContent({
             <Stack direction='row' justifyContent='space-between'>
               <Stack direction='row' gap={1} alignItems='center'>
                 <Typography
-                  variant='subtitle1'
                   sx={{
+                    fontSize: 14,
                     display: '-webkit-box',
                     overflow: 'hidden',
                     WebkitBoxOrient: 'vertical',
@@ -513,11 +515,18 @@ export function NotificationContent({
                 </Card>
               )}
             </Stack>
-            <Typography mb={0.5} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' fontWeight='bold'>
-              {pageTitle}
-            </Typography>
-            <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
+            <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2' fontSize={12}>
               {spaceName}
+            </Typography>
+            <Typography
+              mb={0.5}
+              fontSize={14}
+              whiteSpace='nowrap'
+              overflow='hidden'
+              textOverflow='ellipsis'
+              fontWeight='bold'
+            >
+              {pageTitle}
             </Typography>
             {notificationContent && (
               <CharmEditor

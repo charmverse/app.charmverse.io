@@ -1,4 +1,5 @@
-import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
+import type { PageType } from '@charmverse/core/prisma-client';
+import type { ReactNode } from 'react';
 
 import type {
   BountyNotification,
@@ -31,8 +32,8 @@ function getUrlSearchParamsFromNotificationType(notification: Notification) {
       break;
     }
   }
-
-  return Array.from(urlSearchParams.values()).length ? `?${urlSearchParams.toString()}` : '';
+  const query = urlSearchParams.toString();
+  return query ? `?${query}` : '';
 }
 
 function getCommentTypeNotificationContent({
@@ -47,22 +48,34 @@ function getCommentTypeNotificationContent({
   switch (notificationType) {
     case 'inline_comment.created':
     case 'comment.created': {
-      return createdBy?.username
-        ? `${createdBy?.username} left a comment in a ${pageType}`
-        : `New comment in a ${pageType}`;
+      return createdBy?.username ? (
+        <span>
+          <strong>{createdBy?.username}</strong> left a comment in a {pageType}
+        </span>
+      ) : (
+        `New comment in a ${pageType}`
+      );
     }
     case 'inline_comment.replied':
     case 'comment.replied': {
-      return createdBy?.username
-        ? `${createdBy?.username} replied to your comment in a ${pageType}`
-        : `New reply to your comment in a ${pageType}`;
+      return createdBy?.username ? (
+        <span>
+          <strong>{createdBy?.username}</strong> replied to your comment in a {pageType}
+        </span>
+      ) : (
+        `New reply to your comment in a ${pageType}`
+      );
     }
     case 'inline_comment.mention.created':
     case 'comment.mention.created':
     case 'mention.created': {
-      return createdBy?.username
-        ? `${createdBy?.username} mentioned you in a ${pageType}`
-        : `You were mentioned in a ${pageType}`;
+      return createdBy?.username ? (
+        <span>
+          <strong>{createdBy?.username}</strong> mentioned you in a {pageType}
+        </span>
+      ) : (
+        `You were mentioned in a ${pageType}`
+      );
     }
     default: {
       return '';
@@ -74,7 +87,13 @@ function getPostContent(n: PostNotification) {
   const { createdBy, type } = n;
   switch (type) {
     case 'created': {
-      return createdBy?.username ? `${createdBy?.username} created a new forum post` : `New forum post created`;
+      return createdBy?.username ? (
+        <span>
+          <strong>{createdBy?.username}</strong> created a new forum post
+        </span>
+      ) : (
+        `New forum post created`
+      );
     }
     default: {
       return getCommentTypeNotificationContent({
@@ -90,11 +109,14 @@ function getCardContent(n: CardNotification) {
   const { createdBy, type } = n;
   switch (type) {
     case 'person_assigned': {
-      return createdBy.username ? `${createdBy.username} assigned you to a card` : `You were assigned to a card`;
+      return createdBy.username ? (
+        <span>{createdBy.username} assigned you to a card</span>
+      ) : (
+        `You were assigned to a card`
+      );
     }
-
     default: {
-      return '';
+      throw new Error(`Type Not implemented for card notifications: ${type}`);
     }
   }
 }
@@ -113,10 +135,18 @@ function getBountyContent(n: BountyNotification) {
 
   switch (type) {
     case 'application.created': {
-      return `${createdBy?.username} applied for a bounty`;
+      return (
+        <span>
+          <strong>{createdBy?.username}</strong> applied for a bounty
+        </span>
+      );
     }
     case 'submission.created': {
-      return `${createdBy?.username} applied for a bounty`;
+      return (
+        <span>
+          <strong>{createdBy?.username}</strong> applied for a bounty
+        </span>
+      );
     }
     case 'application.approved': {
       return `Your application for a bounty was accepted`;
@@ -134,7 +164,13 @@ function getBountyContent(n: BountyNotification) {
       return `You have been paid for a bounty`;
     }
     case 'suggestion.created': {
-      return createdBy?.username ? `${createdBy?.username} suggested a new bounty` : `New bounty suggestion`;
+      return createdBy?.username ? (
+        <span>
+          <strong>{createdBy?.username}</strong> suggested a new bounty
+        </span>
+      ) : (
+        `New bounty suggestion`
+      );
     }
     default: {
       return '';
@@ -148,9 +184,13 @@ function getProposalContent(n: ProposalNotification) {
   switch (type) {
     case 'start_review':
     case 'start_discussion': {
-      return createdBy?.username
-        ? `${createdBy?.username} seeking feedback for a proposal`
-        : `Feedback requested for a proposal`;
+      return createdBy?.username ? (
+        <span>
+          <strong>{createdBy?.username}</strong> requested feedback for a proposal
+        </span>
+      ) : (
+        `Feedback requested for a proposal`
+      );
     }
     case 'reviewed': {
       return `Review completed for a proposal`;
@@ -175,7 +215,7 @@ function getProposalContent(n: ProposalNotification) {
 
 export function getNotificationMetadata(notification: Notification): {
   href: string;
-  content: string;
+  content: ReactNode;
   pageTitle: string;
 } {
   switch (notification.group) {
