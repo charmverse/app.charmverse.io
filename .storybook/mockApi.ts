@@ -11,7 +11,7 @@ import {
   proposalCategories,
   proposalTemplates,
   userProfile,
-  userMemberProfile,
+  userMemberProfile
 } from '../stories/lib/mockData';
 
 // mock requests globally via msw. see : https://storybook.js.org/addons/msw-storybook-addon
@@ -80,6 +80,9 @@ const proposalHandlers = {
       evaluation_closed: true
     };
     return res(ctx.json(permissions));
+  }),
+  reviewerIds: rest.get(`/api/proposals/:pageId/get-user-reviewerids`, (req, res, ctx) => {
+    return res(ctx.json([]));
   }),
   proposalPermissions: rest.post(`/api/permissions/proposals/compute-proposal-permissions`, (req, res, ctx) => {
     const permissions: ProposalPermissionFlags = {
