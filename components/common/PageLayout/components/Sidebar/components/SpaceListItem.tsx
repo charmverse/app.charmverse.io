@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import NextLink from 'next/link';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Notification } from 'lib/notifications/interfaces';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
@@ -25,9 +26,12 @@ export default function SpaceListItem({
   selected,
   disabled
 }: SpaceListItemProps) {
-  const spaceNotifications = notifications.filter(
-    (notification) => notification.spaceId === space.id && !notification.read
-  );
+  const { space: currentSpace } = useCurrentSpace();
+  // Don't show notifications badge for the current space (notion ux)
+  const spaceNotifications =
+    currentSpace?.id === space.id
+      ? []
+      : notifications.filter((notification) => notification.spaceId === space.id && !notification.read);
   return (
     <DraggableListItem name='spaceItem' itemId={space.id} changeOrderHandler={changeOrderHandler} key={space.domain}>
       <MenuItem
