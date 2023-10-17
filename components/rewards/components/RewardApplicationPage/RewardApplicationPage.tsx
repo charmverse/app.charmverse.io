@@ -128,24 +128,31 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           </Collapse>
         </Grid>
 
-        <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box display='flex' alignItems='center' gap={2}>
+        <Grid
+          item
+          container
+          xs={12}
+          gap={2}
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <Grid item display='flex' alignItems='center' gap={2}>
             <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
               {application.status === 'application_rejected' || application.status === 'applied'
                 ? 'Applicant'
                 : 'Submitter'}
             </FormLabel>
             <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
-          </Box>
-
-          <RewardReviewerActions
-            application={application}
-            reward={reward}
-            rewardPermissions={rewardPermissions}
-            refreshApplication={refreshApplication}
-            reviewApplication={reviewApplication}
-            hasCustomReward={!!reward.customReward}
-          />
+          </Grid>
+          <Grid item>
+            <RewardReviewerActions
+              application={application}
+              reward={reward}
+              rewardPermissions={rewardPermissions}
+              refreshApplication={refreshApplication}
+              reviewApplication={reviewApplication}
+              hasCustomReward={!!reward.customReward}
+            />
+          </Grid>
         </Grid>
 
         {reward.approveSubmitters && application.status === 'applied' && (
