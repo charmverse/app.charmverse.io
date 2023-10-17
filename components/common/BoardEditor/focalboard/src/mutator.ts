@@ -397,12 +397,14 @@ export class Mutator {
       oldBlocks.push(activeView);
 
       const newActiveView = createBoardView(activeView);
-
+      let visiblePropertyIds = newActiveView.fields.visiblePropertyIds;
+      const containsTitle = visiblePropertyIds.includes(Constants.titleColumnId);
+      visiblePropertyIds = containsTitle ? visiblePropertyIds : [Constants.titleColumnId, ...visiblePropertyIds];
       // insert in proper location in activeview.fields.visiblePropetyIds
-      const viewIndex = index > 0 ? index : activeView.fields.visiblePropertyIds.length;
-      newActiveView.fields.visiblePropertyIds.splice(viewIndex, 0, newTemplate.id);
+      const viewIndex = index > 0 ? index : visiblePropertyIds.length;
+      visiblePropertyIds.splice(viewIndex, 0, newTemplate.id);
       changedBlocks.push(newActiveView);
-
+      newActiveView.fields.visiblePropertyIds = visiblePropertyIds;
       description = 'add column';
     }
 

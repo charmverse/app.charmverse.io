@@ -29,7 +29,15 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import { DEFAULT_BLOCK_IDS } from 'lib/proposal/blocks/constants';
+import {
+  AUTHORS_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_BOARD_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  REVIEWERS_BLOCK_ID,
+  STATUS_BLOCK_ID
+} from 'lib/proposal/blocks/constants';
 
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
@@ -56,6 +64,16 @@ type Props = {
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
 };
 
+const DEFAULT_BLOCK_IDS = [
+  DEFAULT_BOARD_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  STATUS_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  AUTHORS_BLOCK_ID,
+  REVIEWERS_BLOCK_ID
+];
+
 function TableHeader(props: Props): JSX.Element {
   const { activeView, board, views, cards, sorted, name, type, template, readOnly, readOnlySourceData } = props;
   const { id: templateId } = template;
@@ -63,9 +81,7 @@ function TableHeader(props: Props): JSX.Element {
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
-  const disableRename =
-    proposalPropertyTypesList.includes(type as any) ||
-    DEFAULT_BLOCK_IDS.filter((blockId) => blockId !== Constants.titleColumnId).includes(templateId);
+  const disableRename = proposalPropertyTypesList.includes(type as any) || DEFAULT_BLOCK_IDS.includes(templateId);
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -187,12 +203,10 @@ function TableHeader(props: Props): JSX.Element {
         <Divider />
         <MenuItem
           onClick={() => {
-            const containsTitle = activeView.fields.visiblePropertyIds.includes(Constants.titleColumnId);
-            const index = (
-              containsTitle
-                ? activeView.fields.visiblePropertyIds
-                : [Constants.titleColumnId, ...activeView.fields.visiblePropertyIds]
-            ).findIndex((i) => i === templateId);
+            let index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
+            if (templateId === Constants.titleColumnId && index === -1) {
+              index = 0;
+            }
             mutator.insertPropertyTemplate(board, activeView, index);
           }}
         >
@@ -203,13 +217,11 @@ function TableHeader(props: Props): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            const containsTitle = activeView.fields.visiblePropertyIds.includes(Constants.titleColumnId);
-            const index =
-              (containsTitle
-                ? activeView.fields.visiblePropertyIds
-                : [Constants.titleColumnId, ...activeView.fields.visiblePropertyIds]
-              ).findIndex((i) => i === templateId) + 1;
-            mutator.insertPropertyTemplate(board, activeView, index);
+            let index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
+            if (templateId === Constants.titleColumnId && index === -1) {
+              index = 0;
+            }
+            mutator.insertPropertyTemplate(board, activeView, index + 1);
           }}
         >
           <ListItemIcon>
