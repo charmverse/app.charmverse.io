@@ -3,8 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { getPostCategoriesUsersRecord } from 'lib/forums/categories/getPostCategoriesUsersRecord';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
+import { extractPollIds } from 'lib/prosemirror/extractPollIds';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { extractPollIds } from 'lib/votes/extractPollIds';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 

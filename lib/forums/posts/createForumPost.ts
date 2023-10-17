@@ -4,10 +4,10 @@ import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { extractPollIds } from 'lib/prosemirror/extractPollIds';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { InsecureOperationError } from 'lib/utilities/errors';
-import { extractPollIds } from 'lib/votes/extractPollIds';
 
 import { getPostPath } from './getPostPath';
 
