@@ -187,16 +187,19 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      {currentSpace && (
-        <Tooltip title='Close sidebar' placement='bottom'>
-          <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
-            <MenuOpenIcon />
-            {otherSpacesUnreadNotifications.length ? (
-              <NotificationCountBox mx={1}>{otherSpacesUnreadNotifications.length}</NotificationCountBox>
-            ) : null}
-          </IconButton>
-        </Tooltip>
-      )}
+      <Box sx={{ position: 'absolute', right: 0, top: 12 }} px={2}>
+        {currentSpace && (
+          <Tooltip title='Close sidebar' placement='bottom'>
+            <IconButton onClick={closeSidebar} size='small'>
+              <MenuOpenIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {otherSpacesUnreadNotifications.length ? (
+          <NotificationCountBox ml={0.5}>{otherSpacesUnreadNotifications.length}</NotificationCountBox>
+        ) : null}
+      </Box>
 
       <Modal
         size='medium'
