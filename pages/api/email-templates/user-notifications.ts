@@ -199,109 +199,58 @@ const createBountyNotification = ({
 };
 
 const templates = {
-  'Notify the user about notifications': () => {
-    return emails.getPendingNotificationsEmail({
-      user: {
-        id: '<userId>',
-        email: '<userEmail>',
-        username: 'ghostpepper'
-      },
-      totalUnreadNotifications: 6,
-      bountyNotifications: [
-        createBountyNotification({
-          pageTitle: 'Create a new protocol',
-          spaceName: 'Uniswap',
-          status: 'open'
-        })
-      ],
-      proposalNotifications: [
-        createProposalNotification({
-          pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
-          spaceName: 'Uniswap',
-          status: 'discussion'
-        }),
-        createProposalNotification({
-          pageTitle: 'Proposal to add XSTUSD-3CRV to the Gauge Controller',
-          spaceName: 'Curve Finance',
-          status: 'draft'
-        })
-      ],
-      cardNotifications: [
-        createCardNotification({
-          pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse'
-        })
-      ],
-      documentNotifications: [
-        createDocumentNotification({
-          mentionText: 'Hey there, please respond to this message.',
-          pageTitle: 'Attention please',
-          spaceName: 'CharmVerse'
-        }),
-        createDocumentNotification({
-          mentionText: 'cc @ghostpepper',
-          pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse'
-        }),
-        createDocumentNotification({
-          mentionText: "Let's have a meeting @ghostpepper",
-          pageTitle: 'Product Discussion',
-          spaceName: 'CharmVerse'
-        }),
-        createDocumentNotification({
-          mentionText: 'Take a look at this @ghostpepper',
-          pageTitle: 'Task Board',
-          spaceName: 'CharmVerse'
-        }),
-        createDocumentNotification({
-          mentionText: 'We should discuss about this @ghostpepper',
-          pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse'
-        }),
-        createDocumentNotification({
-          mentionText: 'We are facing issues @ghostpepper',
-          pageTitle: 'Product Discussion',
-          spaceName: 'CharmVerse'
-        })
-      ],
-      voteNotifications: [
-        createVoteNotification({
-          deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
-          pageTitle: 'This is a really really long vote title',
-          spaceName: 'This is a really really long space name',
-          voteTitle:
-            'Should we add this section? I think it can be a great addition but need all of your votes to decide'
-        }),
-        createVoteNotification({
-          deadline: new Date(Date.now() + 26 * 60 * 60 * 1000),
-          pageTitle: 'Product Discussion',
-          spaceName: 'CharmVerse',
-          voteTitle: 'Should we format the text?'
-        }),
-        createVoteNotification({
-          deadline: new Date(Date.now() + 32 * 60 * 60 * 1000),
-          pageTitle: 'Task Board',
-          spaceName: 'CharmVerse',
-          voteTitle: "Let's vote"
-        }),
-        createVoteNotification({
-          deadline: new Date(Date.now() + 52 * 60 * 60 * 1000),
-          pageTitle: 'Product Road Map',
-          spaceName: 'CharmVerse Demo',
-          voteTitle: 'We should all vote on this'
-        })
-      ],
-      forumNotifications: [
-        createPostNotification({
-          postTitle: "New idea. Let's discuss!",
-          spaceName: 'CharmVerse'
-        }),
-        createPostNotification({
-          postTitle: 'Start the new process.',
-          spaceName: 'CharmVerse'
-        })
-      ]
-    });
+  'Notify the user about bounty notifications': () => {
+    return emails.getPendingNotificationsEmail(
+      createBountyNotification({
+        pageTitle: 'Create a new protocol',
+        spaceName: 'Uniswap',
+        status: 'open'
+      })
+    );
+  },
+  'Notify the user about proposal notifications': () => {
+    return emails.getPendingNotificationsEmail(
+      createProposalNotification({
+        pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
+        spaceName: 'Uniswap',
+        status: 'discussion'
+      })
+    );
+  },
+  'Notify the user about card notifications': () => {
+    return emails.getPendingNotificationsEmail(
+      createCardNotification({
+        pageTitle: 'Product Road Map',
+        spaceName: 'CharmVerse'
+      })
+    );
+  },
+  'Notify the user about document notifications': () => {
+    return emails.getPendingNotificationsEmail(
+      createDocumentNotification({
+        mentionText: 'Hey there, please respond to this message.',
+        pageTitle: 'Attention please',
+        spaceName: 'CharmVerse'
+      })
+    );
+  },
+  'Notify the user about post notifications': () => {
+    return emails.getPendingNotificationsEmail(
+      createPostNotification({
+        postTitle: 'New idea. Let us discuss!',
+        spaceName: 'CharmVerse'
+      })
+    );
+  },
+  'Notify the user about vote notifications': () => {
+    return emails.getPendingNotificationsEmail(
+      createVoteNotification({
+        deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
+        pageTitle: 'This is a really really long vote title',
+        spaceName: 'CharmVerse',
+        voteTitle: 'Should we add this section? I think it can be a great addition but need all of your votes to decide'
+      })
+    );
   }
 };
 
