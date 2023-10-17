@@ -91,8 +91,8 @@ function NotificationSection({ notification }: { notification: Notification }) {
       <Row>
         <Button
           style={{
-            width: '75%',
-            margin: '10px auto'
+            width: '340px',
+            marginLeft: 50
           }}
           fullWidth
           href={link}
