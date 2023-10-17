@@ -18,14 +18,14 @@ import type { BrandColor } from 'theme/colors';
 
 export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: 'Applied',
-  cancelled: 'Cancelled',
   application_rejected: 'Application rejected',
-  rejected: 'Submission rejected',
+  cancelled: 'Cancelled',
   inProgress: 'In progress',
-  paid: 'Paid',
+  rejected: 'Submission rejected',
+  review: 'Review',
   complete: 'Approved',
   processing: 'Processing payment',
-  review: 'Review'
+  paid: 'Paid'
 };
 
 export const REWARD_APPLICATION_STATUS_COLORS: Record<ApplicationStatus, BrandColor> = {

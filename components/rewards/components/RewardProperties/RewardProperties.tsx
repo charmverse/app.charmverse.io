@@ -281,7 +281,7 @@ export function RewardProperties(props: {
         <Tooltip placement='left' title='Allow the same user to participate in this reward more than once'>
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
             <PropertyLabel readOnly highlighted>
-              Multiple submissions
+              Allow multiple entries
             </PropertyLabel>
 
             <SelectPreviewContainer readOnly={readOnly} displayType='details'>
