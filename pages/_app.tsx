@@ -28,6 +28,7 @@ import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { ApplicationDialogProvider } from 'components/rewards/hooks/useApplicationDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv } from 'config/constants';
+import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
@@ -248,17 +249,19 @@ function DataProviders({ children }: { children: ReactNode }) {
                       <IsSpaceMemberProvider>
                         <WebSocketClientProvider>
                           <MembersProvider>
-                            <RewardsProvider>
-                              <PaymentMethodsProvider>
-                                <PagesProvider>
-                                  <MemberPropertiesProvider>
-                                    <UserProfileProvider>
-                                      <PageTitleProvider>{children}</PageTitleProvider>
-                                    </UserProfileProvider>
-                                  </MemberPropertiesProvider>
-                                </PagesProvider>
-                              </PaymentMethodsProvider>
-                            </RewardsProvider>
+                            <BountiesProvider>
+                              <RewardsProvider>
+                                <PaymentMethodsProvider>
+                                  <PagesProvider>
+                                    <MemberPropertiesProvider>
+                                      <UserProfileProvider>
+                                        <PageTitleProvider>{children}</PageTitleProvider>
+                                      </UserProfileProvider>
+                                    </MemberPropertiesProvider>
+                                  </PagesProvider>
+                                </PaymentMethodsProvider>
+                              </RewardsProvider>
+                            </BountiesProvider>
                           </MembersProvider>
                         </WebSocketClientProvider>
                       </IsSpaceMemberProvider>
