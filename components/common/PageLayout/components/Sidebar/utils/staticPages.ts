@@ -1,4 +1,4 @@
-export type Feature = 'member_directory' | 'proposals' | 'forum' | 'rewards';
+export type Feature = 'member_directory' | 'proposals' | 'forum' | 'rewards' | 'bounties';
 
 export type FeatureJson = {
   id: Feature;

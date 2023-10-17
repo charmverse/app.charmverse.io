@@ -34,7 +34,7 @@ export function useMultiBountyPayment({
   postPaymentSuccess
 }: {
   postPaymentSuccess?: () => void;
-  rewards: RewardWithUsers[];
+  rewards: Pick<RewardWithUsers, 'applications' | 'chainId' | 'id' | 'rewardAmount' | 'rewardToken'>[];
   selectedApplicationIds?: string[];
 }) {
   const [isLoading, setIsLoading] = useState(false);
