@@ -41,8 +41,9 @@ export function RewardProperties(props: {
   pageId: string;
   pagePath: string;
   hideApplications?: boolean;
+  rewardChanged?: () => void;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false, hideApplications } = props;
+  const { rewardId, pageId, readOnly: parentReadOnly = false, hideApplications, rewardChanged } = props;
   const { mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
 
@@ -87,6 +88,7 @@ export function RewardProperties(props: {
     if (_rewardId) {
       const updated = await refreshReward(_rewardId);
       setCurrentReward({ ...currentReward, ...updated });
+      rewardChanged?.();
     }
   }
 
