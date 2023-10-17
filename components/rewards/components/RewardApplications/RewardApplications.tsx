@@ -49,7 +49,7 @@ export function RewardApplications({ reward, refreshReward, permissions, openApp
             <Divider />
           </>
         )}
-      <RewardSubmissionsTable reward={reward} openApplication={openApplication} />
+      <RewardSubmissionsTable rewardId={reward.id} openApplication={openApplication} />
     </Box>
   );
 }

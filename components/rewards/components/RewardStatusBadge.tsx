@@ -29,8 +29,6 @@ export function RewardStatusBadge({ truncate = false, hideStatus, reward, layout
 
   const rewardLink = `/${space?.domain}/bounties/${reward.id}`;
 
-  const chain = reward.chainId ? getChainById(reward.chainId) : undefined;
-
   if (layout === 'row') {
     return (
       <Grid container direction='column' alignItems='center'>
@@ -50,7 +48,6 @@ export function RewardStatusBadge({ truncate = false, hideStatus, reward, layout
             <RewardAmount reward={reward} truncate={truncate} />
             {!hideStatus && <RewardStatusChip status={reward.status} />}
           </Box>
-          {chain && <Typography variant='caption'>{chain.chainName}</Typography>}
         </Grid>
       </Grid>
     );
@@ -112,8 +109,8 @@ export function RewardAmount({
       return 'Invalid number';
     }
   };
-
-  const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
+  const chain = reward.chainId ? getChainById(reward.chainId) : undefined;
+  const tooltip = `${formattedAmount} ${tokenInfo.tokenSymbol} ${chain ? `on ${chain.chainName}` : ''}`;
 
   return (
     <Tooltip arrow placement='top' title={rewardAmount === 0 ? '' : tooltip}>

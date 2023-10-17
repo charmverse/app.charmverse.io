@@ -59,11 +59,16 @@ const config = {
         destination: '/:domain',
         permanent: true
       },
-      {
-        source: '/:domain/bounties',
-        destination: '/:domain/rewards',
-        permanent: true
-      },
+      // {
+      //   source: '/:domain/bounties',
+      //   destination: '/:domain/rewards',
+      //   permanent: true
+      // },
+      // {
+      //   source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
+      //   destination: '/:domain/bounties?bountyId=:id',
+      //   permanent: false
+      // },
       {
         source: '/nexus',
         destination: '/',
@@ -83,11 +88,6 @@ const config = {
         source: '/integrations',
         destination: '/',
         permanent: true
-      },
-      {
-        source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
-        destination: '/:domain/bounties?bountyId=:id',
-        permanent: false
       },
       {
         // strip out old /share prefix
