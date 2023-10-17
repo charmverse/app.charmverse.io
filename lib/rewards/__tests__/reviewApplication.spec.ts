@@ -83,7 +83,7 @@ describe('reviewApplication', () => {
     expect(reviewedApp2.reviewedBy).toBe(reviewerUser.id);
   });
 
-  it('should update application status to application_rejected and submission status to rejected when decision is reject', async () => {
+  it('should update application status to rejected and submission status to submission_rejected when decision is reject', async () => {
     const applicationInProgress = await prisma.application.create({
       data: {
         applicant: { connect: { id: user.id } },
@@ -114,10 +114,10 @@ describe('reviewApplication', () => {
       decision: 'reject',
       userId: user.id
     });
-    expect(reviewedSubmission.status).toBe('rejected');
+    expect(reviewedSubmission.status).toBe('submission_rejected');
     expect(reviewedSubmission.reviewedBy).toBe(user.id);
 
-    expect(reviewedApplication.status).toBe('application_rejected');
+    expect(reviewedApplication.status).toBe('rejected');
     expect(reviewedApplication.reviewedBy).toBe(user.id);
   });
 

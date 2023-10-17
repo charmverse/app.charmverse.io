@@ -37,7 +37,7 @@ export async function reviewApplication({ applicationId, decision, userId }: App
 
   const approveStatus: ApplicationStatus = application.status === 'applied' ? 'inProgress' : 'complete';
 
-  const rejectStatus: ApplicationStatus = application.status === 'applied' ? 'application_rejected' : 'rejected';
+  const rejectStatus: ApplicationStatus = application.status === 'applied' ? 'rejected' : 'submission_rejected';
 
   const nextStatus = decision === 'approve' ? approveStatus : rejectStatus;
 
