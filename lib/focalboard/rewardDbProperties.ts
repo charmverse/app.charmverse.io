@@ -63,7 +63,6 @@ export const rewardStatusBoardColors: Record<BountyStatus, keyof (typeof Constan
 export const applicationStatusBoardColors: Record<ApplicationStatus, keyof (typeof Constants)['menuColors']> = {
   applied: 'propColorTeal',
   cancelled: 'propColorGray',
-  application_rejected: 'propColorRed',
   complete: 'propColorGray',
   inProgress: 'propColorGreen',
   rejected: 'propColorRed',
