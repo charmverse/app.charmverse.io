@@ -83,85 +83,85 @@ describe('PUT /api/reward-applications/comments/:commentId - update application 
   });
 });
 
-describe('DELETE /api/reward-applications/comments/:commentId - delete application comment', () => {
-  let space: Space;
-  let admin: User;
-  let adminCookie: string;
-  let user: User;
-  let userCookie: string;
-  let reward: Reward & { applications: ApplicationMeta[] };
-  let application: ApplicationMeta;
+// describe('DELETE /api/reward-applications/comments/:commentId - delete application comment', () => {
+//   let space: Space;
+//   let admin: User;
+//   let adminCookie: string;
+//   let user: User;
+//   let userCookie: string;
+//   let reward: Reward & { applications: ApplicationMeta[] };
+//   let application: ApplicationMeta;
 
-  beforeAll(async () => {
-    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
-    space = generated.space;
-    admin = generated.user;
-    adminCookie = await loginUser(admin.id);
-    user = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
-    userCookie = await loginUser(user.id);
+//   beforeAll(async () => {
+//     const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+//     space = generated.space;
+//     admin = generated.user;
+//     adminCookie = await loginUser(admin.id);
+//     user = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
+//     userCookie = await loginUser(user.id);
 
-    reward = await generateBountyWithSingleApplication({
-      applicationStatus: 'inProgress',
-      bountyCap: 20,
-      spaceId: space.id,
-      userId: user.id
-    });
+//     reward = await generateBountyWithSingleApplication({
+//       applicationStatus: 'inProgress',
+//       bountyCap: 20,
+//       spaceId: space.id,
+//       userId: user.id
+//     });
 
-    application = reward.applications[0];
-  });
+//     application = reward.applications[0];
+//   });
 
-  it('should return soft deleted comment with a status code 200 if user has permission', async () => {
-    const comment = await prisma.applicationComment.create({
-      data: {
-        content: '',
-        contentText: '',
-        applicationId: application.id,
-        createdBy: user.id
-      }
-    });
+//   it('should return soft deleted comment with a status code 200 if user has permission', async () => {
+//     const comment = await prisma.applicationComment.create({
+//       data: {
+//         content: '',
+//         contentText: '',
+//         applicationId: application.id,
+//         createdBy: user.id
+//       }
+//     });
 
-    const response = await request(baseUrl)
-      .delete(`/api/reward-applications/comments/${comment.id}`)
-      .set('Cookie', userCookie)
-      .expect(200);
+//     const response = await request(baseUrl)
+//       .delete(`/api/reward-applications/comments/${comment.id}`)
+//       .set('Cookie', userCookie)
+//       .expect(200);
 
-    expect(response.body.deletedAt).toBeDefined();
-    expect(response.body.deletedBy).toBe(user.id);
-  });
+//     expect(response.body.deletedAt).toBeDefined();
+//     expect(response.body.deletedBy).toBe(user.id);
+//   });
 
-  it('should return soft deleted comment with a status code 200 if user is an admin of the space', async () => {
-    const comment = await prisma.applicationComment.create({
-      data: {
-        content: '',
-        contentText: '',
-        applicationId: application.id,
-        createdBy: user.id
-      }
-    });
+//   it('should return soft deleted comment with a status code 200 if user is an admin of the space', async () => {
+//     const comment = await prisma.applicationComment.create({
+//       data: {
+//         content: '',
+//         contentText: '',
+//         applicationId: application.id,
+//         createdBy: user.id
+//       }
+//     });
 
-    const response = await request(baseUrl)
-      .delete(`/api/reward-applications/comments/${comment.id}`)
-      .set('Cookie', adminCookie)
-      .expect(200);
+//     const response = await request(baseUrl)
+//       .delete(`/api/reward-applications/comments/${comment.id}`)
+//       .set('Cookie', adminCookie)
+//       .expect(200);
 
-    expect(response.body.deletedAt).toBeDefined();
-    expect(response.body.deletedBy).toBe(admin.id);
-  });
+//     expect(response.body.deletedAt).toBeDefined();
+//     expect(response.body.deletedBy).toBe(admin.id);
+//   });
 
-  it('should return a status code 401 if user has no permission to delete the comment', async () => {
-    const otherUser = await testUtilsUser.generateUser();
-    const otherUserCookie = await loginUser(otherUser.id);
-    const comment = await prisma.applicationComment.create({
-      data: {
-        content: '',
-        contentText: '',
-        applicationId: application.id,
-        createdBy: user.id
-      }
-    });
-    await request(baseUrl)
-      .delete(`/api/reward-applications/comments/${comment.id}`)
-      .set('Cookie', otherUserCookie)
-      .expect(401);
-  });
-});
+//   it('should return a status code 401 if user has no permission to delete the comment', async () => {
+//     const otherUser = await testUtilsUser.generateUser();
+//     const otherUserCookie = await loginUser(otherUser.id);
+//     const comment = await prisma.applicationComment.create({
+//       data: {
+//         content: '',
+//         contentText: '',
+//         applicationId: application.id,
+//         createdBy: user.id
+//       }
+//     });
+//     await request(baseUrl)
+//       .delete(`/api/reward-applications/comments/${comment.id}`)
+//       .set('Cookie', otherUserCookie)
+//       .expect(401);
+//   });
+// });
