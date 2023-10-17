@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box } from '@mui/material';
+import { Box, DialogActions } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
@@ -15,6 +15,7 @@ type Props = {
   className?: string;
   onClose: () => void;
   fullWidth?: boolean;
+  footerActions?: React.ReactNode;
 };
 
 const Toolbar = styled(Box)`
@@ -31,7 +32,7 @@ const Content = styled.div`
 `;
 
 function FBDialog(props: Props) {
-  const { toolbar, toolsMenu, fullWidth = false } = props;
+  const { toolbar, toolsMenu, fullWidth = false, footerActions } = props;
 
   useHotkeys('esc', () => props.onClose());
 
@@ -57,6 +58,8 @@ function FBDialog(props: Props) {
               )}
             </Toolbar>
             <Content>{props.children}</Content>
+
+            {!!footerActions && <DialogActions>{footerActions}</DialogActions>}
           </div>
         </div>
       </div>
