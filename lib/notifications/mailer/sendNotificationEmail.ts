@@ -165,7 +165,7 @@ async function sendEmail({
   notification: Notification;
   user: { username: string; email: string };
 }) {
-  const template = emails.getPendingNotificationsEmail(notification);
+  const template = emails.getPendingNotificationEmail(notification);
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,

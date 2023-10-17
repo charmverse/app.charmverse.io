@@ -15,7 +15,6 @@ export function Button({
   return (
     <Link {...props} href={href}>
       <Text
-        primary={variant === 'outlined'}
         bold
         style={
           variant === 'outlined'
@@ -23,14 +22,15 @@ export function Button({
                 width: 'fit-content',
                 borderRadius: '30px',
                 border: '1px solid #ccc',
-                padding: '10px 30px'
+                padding: '8px 24px',
+                color: blueColor
               }
             : {
                 width: 'fit-content',
                 color: '#fff',
-                padding: '10px 30px !important',
-                borderRadius: '3px !important',
-                background: `${blueColor} !important`
+                padding: '8px 24px',
+                borderRadius: '3px',
+                background: blueColor
               }
         }
       >

@@ -4,12 +4,12 @@ import { htmlToText } from 'html-to-text';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 
-import { PendingNotifications } from './templates/NotificationTemplate';
+import { PendingNotification } from './templates/NotificationTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteEmail';
 import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
 
-export function getPendingNotificationsEmail(notification: Notification) {
-  const html = render(PendingNotifications({ notification }));
+export function getPendingNotificationEmail(notification: Notification) {
+  const html = render(PendingNotification(notification));
   const subject = htmlToText(`${getNotificationMetadata(notification).content}`);
 
   return { html, subject };

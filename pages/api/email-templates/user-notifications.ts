@@ -200,7 +200,7 @@ const createBountyNotification = ({
 
 const templates = {
   'Notify the user about bounty notifications': () => {
-    return emails.getPendingNotificationsEmail(
+    return emails.getPendingNotificationEmail(
       createBountyNotification({
         pageTitle: 'Create a new protocol',
         spaceName: 'Uniswap',
@@ -209,7 +209,7 @@ const templates = {
     );
   },
   'Notify the user about proposal notifications': () => {
-    return emails.getPendingNotificationsEmail(
+    return emails.getPendingNotificationEmail(
       createProposalNotification({
         pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
         spaceName: 'Uniswap',
@@ -218,7 +218,7 @@ const templates = {
     );
   },
   'Notify the user about card notifications': () => {
-    return emails.getPendingNotificationsEmail(
+    return emails.getPendingNotificationEmail(
       createCardNotification({
         pageTitle: 'Product Road Map',
         spaceName: 'CharmVerse'
@@ -226,7 +226,7 @@ const templates = {
     );
   },
   'Notify the user about document notifications': () => {
-    return emails.getPendingNotificationsEmail(
+    return emails.getPendingNotificationEmail(
       createDocumentNotification({
         mentionText: 'Hey there, please respond to this message.',
         pageTitle: 'Attention please',
@@ -235,7 +235,7 @@ const templates = {
     );
   },
   'Notify the user about post notifications': () => {
-    return emails.getPendingNotificationsEmail(
+    return emails.getPendingNotificationEmail(
       createPostNotification({
         postTitle: 'New idea. Let us discuss!',
         spaceName: 'CharmVerse'
@@ -243,7 +243,7 @@ const templates = {
     );
   },
   'Notify the user about vote notifications': () => {
-    return emails.getPendingNotificationsEmail(
+    return emails.getPendingNotificationEmail(
       createVoteNotification({
         deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
         pageTitle: 'This is a really really long vote title',

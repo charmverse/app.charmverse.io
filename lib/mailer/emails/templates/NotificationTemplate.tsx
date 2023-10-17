@@ -1,37 +1,39 @@
-import type { User } from '@charmverse/core/prisma';
+import { Hr } from '@react-email/hr';
 import { Link } from '@react-email/link';
 import { Section } from '@react-email/section';
 
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import { getFormattedDateTime } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
 import { baseUrl } from 'testing/mockApiCall';
 
-import { EmailWrapper, Feedback, Text } from './components';
+import { Button, EmailWrapper, Feedback, Text } from './components';
 
 const MAX_CHAR = 60;
 
-export type PendingNotificationsData = {
-  notification: Notification;
-};
-
-export function PendingNotifications({ notification }: PendingNotificationsData) {
+export function PendingNotification(notification: Notification) {
   return (
     <EmailWrapper title='Your open notifications' preview='Your open notifications'>
       <NotificationSection notification={notification} />
+      <Hr />
       <Feedback />
     </EmailWrapper>
   );
 }
 
 function NotificationSection({ notification }: { notification: Notification }) {
-  const { spaceName, spaceDomain } = notification;
+  const { spaceName, spaceDomain, createdAt } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
   const notificationContent = notification.group === 'document' ? notification.content : null;
+  const dateTime = getFormattedDateTime(new Date(createdAt), {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
 
   const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
-
+  const link = `${baseUrl}/${spaceDomain}/${href}`;
   return (
     <Section
       style={{
@@ -39,7 +41,7 @@ function NotificationSection({ notification }: { notification: Notification }) {
       }}
     >
       <Link
-        href={`${baseUrl}/${spaceDomain}/${href}`}
+        href={link}
         style={{
           color: 'inherit'
         }}
@@ -50,6 +52,15 @@ function NotificationSection({ notification }: { notification: Notification }) {
           }}
         >
           {content}
+        </Text>
+        <Text
+          hideOverflow
+          variant='caption'
+          style={{
+            margin: `6px 0px`
+          }}
+        >
+          {dateTime}
         </Text>
         <Text
           hideOverflow
@@ -77,6 +88,7 @@ function NotificationSection({ notification }: { notification: Notification }) {
           {fancyTrim(text, MAX_CHAR)}
         </Text>
       </Link>
+      <Button href={link}>View</Button>
     </Section>
   );
 }
