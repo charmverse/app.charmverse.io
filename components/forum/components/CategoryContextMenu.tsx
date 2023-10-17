@@ -15,7 +15,6 @@ import PopperPopup from 'components/common/PopperPopup';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 
 import { EditCategoryDialog } from './EditCategoryDialog';
@@ -33,8 +32,6 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
   const [tempName, setTempName] = useState(category.name || '');
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
-
-  const { isFreeSpace } = useIsFreeSpace();
 
   const notifications = useForumCategoryNotification(category.id);
 
