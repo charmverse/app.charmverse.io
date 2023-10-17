@@ -47,15 +47,17 @@ const StyledSidebarBox = styled(Box)`
 
 export const NotificationCountBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.error.main};
-  color: white;
-  width: 20px;
-  display: flex;
-  justify-content: center;
+  display: inline-flex;
   align-items: center;
-  border-radius: 20%;
-  font-weight: semi-bold;
-  font-size: 12px;
-  padding: 2px;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 3px;
+  color: white;
 `;
 
 export function NotificationUpdates() {
