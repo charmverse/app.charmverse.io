@@ -1,3 +1,4 @@
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getPermissionsClient } from 'lib/permissions/api';
@@ -17,7 +18,7 @@ export async function getPostCategoriesUsersRecord({ spaceId }: { spaceId: strin
     {
       userId: string;
       subscriptions: Record<string, boolean>;
-      visibleCategoryIds: string[];
+      visiblePostCategories: PostCategoryWithPermissions[];
     }
   > = {};
 
@@ -36,11 +37,10 @@ export async function getPostCategoriesUsersRecord({ spaceId }: { spaceId: strin
       })
     );
     const subscriptions = spaceNotifications.forums.categories;
-    const visibleCategoryIds = visiblePostCategories.map((category) => category.id);
     postCategoriesUsersRecord[userId] = {
       subscriptions,
       userId,
-      visibleCategoryIds
+      visiblePostCategories
     };
   }
 

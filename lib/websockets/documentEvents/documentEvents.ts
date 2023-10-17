@@ -531,13 +531,10 @@ export class DocumentEventHandler {
         const extractedMentions = message.ds
           .map((ds) => {
             if (ds.stepType === 'replace') {
-              return extractMentions(
-                {
-                  type: 'doc',
-                  content: ds.slice?.content
-                },
-                session.user.name
-              );
+              return extractMentions({
+                type: 'doc',
+                content: ds.slice?.content
+              });
             }
 
             return [];
