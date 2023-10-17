@@ -15,7 +15,7 @@ class BountyPermissionLevelOperationMapping implements OperationGroupMapping<Bou
   readonly submitter: Readonly<BountyOperation[]>;
 
   constructor() {
-    this.creator = ['lock', 'approve_applications', 'grant_permissions', 'review', 'mark_paid'];
+    this.creator = ['lock', 'approve_applications', 'grant_permissions', 'review', 'mark_paid', 'work'];
     this.reviewer = ['review', 'approve_applications'];
     this.submitter = ['work'];
   }
