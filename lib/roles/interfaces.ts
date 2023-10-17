@@ -3,4 +3,4 @@ export type RoleAssignment = {
   roleId: string;
 };
 
-export type ExternalRole = { id: string | number; name: string; managed?: boolean };
+export type ExternalRole = { id?: string | number; name: string; managed?: boolean };

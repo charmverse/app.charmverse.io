@@ -461,6 +461,31 @@ export interface SpaceMemberRolesResponseBody {
  * @swagger
  * components:
  *  schemas:
+ *    UpdateSpaceMemberRolesRequestBody:
+ *      required:
+ *        - userId
+ *        - roles
+ *      type: object
+ *      properties:
+ *        userId:
+ *          type: string
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        roles:
+ *          type: array
+ *          items:
+ *            type: string
+ *            example: ['tester', 'reviewer']
+ *
+ */
+export interface UpdateSpaceMemberRolesRequestBody {
+  userId: string;
+  roles: string[];
+}
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
  *    CreateWorkspaceRequestBody:
  *      required:
  *        - name

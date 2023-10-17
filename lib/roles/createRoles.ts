@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { ExternalRole } from 'lib/roles/interfaces';
 
-type RolesRecord = Record<string, Role | null>;
+type RolesRecord = Record<string, Role>;
 
 // Create charmverse roles or find them from prisma to generate a final record
 export async function findOrCreateRoles(
@@ -68,7 +68,13 @@ export async function findOrCreateRoles(
         }
       }
 
-      rolesRecord[externalRole.id] = charmVerseRole;
+      if (charmVerseRole) {
+        if (externalRole.id) {
+          rolesRecord[externalRole.id] = charmVerseRole;
+        } else {
+          rolesRecord[charmVerseRole.id] = charmVerseRole;
+        }
+      }
     }
   }
   return rolesRecord;
