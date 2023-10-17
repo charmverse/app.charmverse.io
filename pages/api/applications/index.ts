@@ -85,7 +85,6 @@ async function createApplicationController(req: NextApiRequest, res: NextApiResp
   const userId = req.session.user.id;
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: bountyId,
     userId
   });
