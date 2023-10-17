@@ -188,7 +188,6 @@ function RewardsPageTitle({
     </PageTitle>
   );
 }
-
 function PublicBountyPageTitle() {
   const { space } = useCurrentSpace();
   return (
@@ -214,7 +213,7 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/rewards/')) {
+  } else if (pageType === 'bounty' && router.route.startsWith('/[domain]/rewards/')) {
     const baseTitle = mappedFeatures.rewards.title;
     return (
       <RewardsPageTitle
@@ -223,6 +222,10 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
         applicationId={router.query.applicationId as string}
       />
     );
+  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/bounties/')) {
+    const baseTitle = mappedFeatures.bounties.title;
+    return <BountyPageTitle baseTitle={baseTitle} basePath={`/${router.query.domain}`} />;
+    // Switch over when we use rewards
   } else if (pageType === 'proposal') {
     const baseTitle = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;

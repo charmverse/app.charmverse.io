@@ -78,7 +78,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = getAbsolutePath('/rewards', space?.domain);
+      const shareLinkToSet = getAbsolutePath('/bounties', space?.domain);
       setShareLink(shareLinkToSet);
     }
   }
@@ -87,12 +87,12 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     <>
       <Box display='flex' justifyContent='space-between' alignItems='center' padding={padding}>
         <Box>
-          <Typography>Make rewards public</Typography>
+          <Typography>Make bounties public</Typography>
 
           <Typography variant='body2' color='secondary'>
             {bountiesArePublic
-              ? 'Anyone outside this space can view rewards, except for bounties restricted to certain roles.'
-              : 'Rewards can only be seen by space members.'}
+              ? 'Anyone outside this space can view bounties, except for bounties restricted to certain roles.'
+              : 'Bounties can only be seen by space members.'}
           </Typography>
         </Box>
         <Switch checked={bountiesArePublic} disabled={!isAdmin} onChange={togglePublic} />

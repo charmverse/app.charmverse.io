@@ -48,7 +48,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();
-  const isRewardsList = router.route === '/[domain]/rewards';
+  const isRewardsList = router.route === '/[domain]/rewards' || router.route === '/[domain]/bounties';
   const isProposalsPage = router.route === '/[domain]/proposals';
 
   return (
