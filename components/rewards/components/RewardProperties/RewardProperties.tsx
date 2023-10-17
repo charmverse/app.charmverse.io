@@ -22,15 +22,11 @@ import type { RewardTokenDetails, RewardType } from 'components/rewards/componen
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { useUser } from 'hooks/useUser';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
-
-// import RewardApplicantsTable from './components/RewardApplicantsTable';
-import { RewardApplications } from '../RewardApplications/RewardApplications';
 
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardSignupButton } from './components/RewardSignupButton';
@@ -40,10 +36,9 @@ export function RewardProperties(props: {
   rewardId: string | null;
   pageId: string;
   pagePath: string;
-  hideApplications?: boolean;
   rewardChanged?: () => void;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false, hideApplications, rewardChanged } = props;
+  const { rewardId, pageId, readOnly: parentReadOnly = false, rewardChanged } = props;
   const { mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
 
@@ -412,17 +407,6 @@ export function RewardProperties(props: {
         />
 
         {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
-
-        {rewardId && currentReward && applications && !hideApplications && (
-          <RewardApplications
-            refreshReward={(_rewardId: string) =>
-              refreshReward(_rewardId).then((updatedReward) => setCurrentReward(updatedReward))
-            }
-            reward={currentReward as RewardWithUsers}
-            permissions={rewardPermissions}
-            openApplication={showApplication}
-          />
-        )}
       </Stack>
     </Box>
   );

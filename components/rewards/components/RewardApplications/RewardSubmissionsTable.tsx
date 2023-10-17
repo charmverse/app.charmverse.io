@@ -12,25 +12,31 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
+import { useGetReward } from 'charmClient/hooks/rewards';
 import { useUser } from 'hooks/useUser';
 import { countCompleteSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
 import { RewardApplicantTableRow } from './RewardApplicantTableRow';
 import type { ApplicationFilterStatus } from './RewardApplicationFilter';
 import { RewardApplicationFilter } from './RewardApplicationFilter';
 
 interface Props {
-  reward: RewardWithUsers;
+  rewardId: string;
   openApplication: (applicationId: string) => void;
 }
 
-export function RewardSubmissionsTable({ reward, openApplication }: Props) {
+export function RewardSubmissionsTable({ rewardId, openApplication }: Props) {
   const theme = useTheme();
 
   const { user } = useUser();
 
+  const { data: reward } = useGetReward({ rewardId });
+
   const [applicationsFilter, setApplicationsFilter] = useState<ApplicationFilterStatus>('all');
+
+  if (!reward) {
+    return null;
+  }
 
   const validSubmissions = countCompleteSubmissions({ applications: reward.applications });
 

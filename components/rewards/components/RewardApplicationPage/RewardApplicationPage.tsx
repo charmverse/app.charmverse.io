@@ -111,7 +111,6 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
                 pageId={reward.page.id}
                 pagePath={reward.page.path}
                 readOnly={!rewardPagePermissions?.edit_content}
-                hideApplications
                 rewardChanged={refreshReward}
               />
               {rewardPageContent && (
