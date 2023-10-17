@@ -44,8 +44,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     pageIdOrPath: currentSpace ? basePageId : undefined,
     spaceId: currentSpace?.id
   });
-  const { notifications = [] } = useNotifications();
-  const unreadNotifications = notifications.filter((notification) => !notification.read);
+  const { unreadNotifications } = useNotifications();
 
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();

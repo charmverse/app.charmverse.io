@@ -89,8 +89,7 @@ export default function SidebarSubmenu({
   logoutCurrentUser: () => void;
   openProfileModal: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
 }) {
-  const { notifications = [] } = useNotifications();
-  const unreadNotifications = notifications.filter((n) => !n.read);
+  const { notifications = [], otherSpacesUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -192,8 +191,8 @@ export default function SidebarSubmenu({
         <Tooltip title='Close sidebar' placement='bottom'>
           <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
             <MenuOpenIcon />
-            {unreadNotifications.length ? (
-              <NotificationCountBox mx={1}>{unreadNotifications.length}</NotificationCountBox>
+            {otherSpacesUnreadNotifications.length ? (
+              <NotificationCountBox mx={1}>{otherSpacesUnreadNotifications.length}</NotificationCountBox>
             ) : null}
           </IconButton>
         </Tooltip>

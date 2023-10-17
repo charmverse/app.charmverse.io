@@ -60,10 +60,12 @@ export const NotificationCountBox = styled(Box)`
 
 export function NotificationUpdates() {
   const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
-  const { notifications = [], isLoading, mutate: mutateNotifications } = useNotifications();
-  const { space } = useCurrentSpace();
-  const spaceNotifications = notifications.filter((notification) => space && notification.spaceId === space.id);
-  const unreadNotifications = spaceNotifications.filter((notification) => !notification.read);
+  const {
+    currentSpaceNotifications,
+    currentSpaceUnreadNotifications,
+    isLoading,
+    mutate: mutateNotifications
+  } = useNotifications();
 
   return (
     <Box>
@@ -72,7 +74,9 @@ export function NotificationUpdates() {
           <QueryBuilderOutlinedIcon color='secondary' fontSize='small' />
           Updates
         </Stack>
-        {unreadNotifications.length !== 0 && <NotificationCountBox>{unreadNotifications.length}</NotificationCountBox>}
+        {currentSpaceUnreadNotifications.length !== 0 && (
+          <NotificationCountBox>{currentSpaceUnreadNotifications.length}</NotificationCountBox>
+        )}
       </StyledSidebarBox>
       <Popover
         {...bindPopover(notificationPopupState)}
@@ -91,7 +95,7 @@ export function NotificationUpdates() {
         }}
       >
         <NotificationsPopover
-          notifications={spaceNotifications}
+          notifications={currentSpaceNotifications}
           mutateNotifications={mutateNotifications}
           isLoading={isLoading}
           close={notificationPopupState.close}
