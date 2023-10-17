@@ -25,7 +25,9 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { RewardSubmissionsTable } from 'components/rewards/components/RewardApplications/RewardSubmissionsTable';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
+import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -88,6 +90,8 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
+
+  const { showApplication } = useApplicationDialog();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -334,6 +338,12 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   )}
                 </CardPropertiesWrapper>
               </CharmEditor>
+
+              {page.bountyId && (
+                <Box mt='-100px'>
+                  <RewardSubmissionsTable openApplication={showApplication} rewardId={page.bountyId} />
+                </Box>
+              )}
 
               {page.type === 'proposal' && pagePermissions.comment && (
                 <Box mt='-100px'>

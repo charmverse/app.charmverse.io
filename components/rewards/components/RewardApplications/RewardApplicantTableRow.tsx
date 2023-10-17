@@ -1,7 +1,6 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { IconButton, TableCell, TableRow, Tooltip } from '@mui/material';
-import { useState } from 'react';
 
+import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
@@ -31,9 +30,9 @@ export function RewardApplicantTableRow({ submission, onClickView }: Props) {
 
       <TableCell align='right'>
         <Tooltip title='View application details'>
-          <IconButton size='small' onClick={onClickView}>
-            <VisibilityIcon fontSize='small' />
-          </IconButton>
+          <Button variant='outlined' onClick={onClickView}>
+            View
+          </Button>
         </Tooltip>
       </TableCell>
     </TableRow>

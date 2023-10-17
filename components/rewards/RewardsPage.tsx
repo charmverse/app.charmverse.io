@@ -206,7 +206,7 @@ export function RewardsPage({ title }: { title: string }) {
                       views={views}
                       visibleGroups={[]}
                       selectedCardIds={[]}
-                      readOnly={!isAdmin}
+                      readOnly
                       readOnlySourceData={false}
                       disableAddingCards={true}
                       showCard={showRewardOrApplication}
@@ -215,6 +215,7 @@ export function RewardsPage({ title }: { title: string }) {
                       addCard={async () => {}}
                       onCardClicked={() => {}}
                       onDeleteCard={onDelete}
+                      expandSubRowsOnLoad
                     />
                   </Box>
 

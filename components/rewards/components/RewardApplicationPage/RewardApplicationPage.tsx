@@ -4,16 +4,12 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import { Collapse, Divider, FormLabel, IconButton, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import { getChainExplorerLink } from 'connectors/index';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
-import { useGetReward } from 'charmClient/hooks/rewards';
+import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
-import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
-import Link from 'components/common/Link';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
@@ -27,11 +23,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import { RewardPaymentButton } from '../RewardProperties/components/RewardApplicantsTable/RewardPaymentButton';
-
 import { ApplicationComments } from './ApplicationComments';
 import ApplicationInput from './RewardApplicationInput';
-import RewardReview from './RewardReview';
+import { RewardReviewerActions } from './RewardReviewerActions';
 import { RewardSubmissionInput } from './RewardSubmissionInput';
 
 type Props = {
@@ -44,7 +38,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
       applicationId
     });
   const router = useRouter();
-  const { data: reward } = useGetReward({ rewardId: application?.bountyId });
+  const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId });
 
   const { hideApplication } = useApplicationDialog();
 
@@ -53,26 +47,13 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const { space } = useCurrentSpace();
 
   const { permissions: rewardPagePermissions } = usePagePermissions({ pageIdOrPath: reward?.id as string });
+  const { data: rewardPermissions } = useGetRewardPermissions({ rewardId: reward?.id });
 
   const { members } = useMembers();
   const { user } = useUser();
   const { showMessage } = useSnackbar();
 
   const [showProperties, setShowProperties] = useState(false);
-
-  async function recordTransaction(transactionId: string, chainId: number) {
-    try {
-      await charmClient.rewards.recordTransaction({
-        applicationId,
-        chainId: chainId.toString(),
-        transactionId
-      });
-      await charmClient.rewards.markSubmissionAsPaid(applicationId);
-      refreshApplication();
-    } catch (err: any) {
-      showMessage(err.message || err, 'error');
-    }
-  }
 
   if (!application || !reward) {
     return null;
@@ -130,7 +111,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
                 pageId={reward.page.id}
                 pagePath={reward.page.path}
                 readOnly={!rewardPagePermissions?.edit_content}
-                hideApplications
+                rewardChanged={refreshReward}
               />
               {rewardPageContent && (
                 <>
@@ -146,54 +127,29 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
           </Collapse>
         </Grid>
 
-        <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box display='flex' gap={2}>
-            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>Applicant</FormLabel>
+        <Grid
+          item
+          container
+          xs={12}
+          gap={2}
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
+          <Grid item display='flex' alignItems='center' gap={2}>
+            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
+              {application.status === 'rejected' || application.status === 'applied' ? 'Applicant' : 'Submitter'}
+            </FormLabel>
             <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
-          </Box>
-
-          {/** This section contaisn all possible reviewer actions */}
-          {application.status === 'applied' && (
-            <RewardReview
-              onConfirmReview={(decision) => reviewApplication({ decision })}
-              reviewType='application'
-              readOnly={!applicationRewardPermissions?.approve_applications}
-            />
-          )}
-          {(application.status === 'review' || application.status === 'inProgress') && (
-            <RewardReview
-              onConfirmReview={(decision) => reviewApplication({ decision })}
-              reviewType='submission'
-              readOnly={!applicationRewardPermissions?.review}
-            />
-          )}
-          {application.status === 'complete' && reward.rewardAmount && (
-            <RewardPaymentButton
-              amount={String(reward.rewardAmount)}
-              chainIdToUse={reward.chainId as number}
-              receiver={application.walletAddress as string}
+          </Grid>
+          <Grid item>
+            <RewardReviewerActions
+              application={application}
               reward={reward}
-              tokenSymbolOrAddress={reward.rewardToken as string}
-              onSuccess={recordTransaction}
-              onError={(message) => showMessage(message, 'warning')}
+              rewardPermissions={rewardPermissions}
+              refreshApplication={refreshApplication}
+              reviewApplication={reviewApplication}
+              hasCustomReward={!!reward.customReward}
             />
-          )}
-
-          {application.status === 'paid' && application.transactions.length && (
-            <Button
-              variant='outlined'
-              color='secondary'
-              external
-              target='_blank'
-              href={getChainExplorerLink(
-                application.transactions[0].chainId,
-                application.transactions[0].transactionId
-              )}
-            >
-              <LaunchIcon sx={{ mr: 1 }} />
-              View transaction
-            </Button>
-          )}
+          </Grid>
         </Grid>
 
         {reward.approveSubmitters && application.status === 'applied' && (

@@ -171,7 +171,7 @@ export function RewardSubmissionInput({
               />
             </Grid>
 
-            {!readOnly && (
+            {(currentUserIsApplicant || permissions?.review) && !hasCustomReward && (
               <Grid item>
                 <InputLabel>Address to receive reward</InputLabel>
                 <TextField
@@ -185,7 +185,7 @@ export function RewardSubmissionInput({
               </Grid>
             )}
 
-            {currentUserIsApplicant && (
+            {(currentUserIsApplicant || permissions?.review) && hasCustomReward && (
               <Grid item>
                 <InputLabel>Information for custom reward</InputLabel>
                 <TextField
