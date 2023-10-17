@@ -7,18 +7,25 @@ import Button from '../../focalboard/src/widgets/buttons/button';
 type PropertyLabelProps = {
   children: ReactNode;
   readOnly?: boolean;
+  required?: boolean;
   highlighted?: boolean;
 };
 
-const Wrapper = styled(Box)<{ highlighted?: boolean }>`
+const Wrapper = styled(({ highlighted, ...props }: any) => <Box {...props} />)<{ highlighted?: boolean }>`
   color: ${({ highlighted }) => (highlighted ? 'var(--primary-text) !important' : '')};
 `;
 
-export function PropertyLabel({ children, readOnly = true, highlighted }: PropertyLabelProps) {
+const Asterisk = styled.span`
+  color: var(--danger-text);
+`;
+
+export function PropertyLabel({ children, required, readOnly = true, highlighted }: PropertyLabelProps) {
   if (readOnly) {
     return (
       <Wrapper className='octo-propertyname octo-propertyname--readonly' highlighted={highlighted}>
-        <Button>{children}</Button>
+        <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>}>
+          {children}
+        </Button>
       </Wrapper>
     );
   }
