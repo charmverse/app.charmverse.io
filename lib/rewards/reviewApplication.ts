@@ -35,8 +35,11 @@ export async function reviewApplication({ applicationId, decision, userId }: App
     );
   }
 
-  const nextStatus: ApplicationStatus =
-    decision === 'approve' ? (application.status === 'applied' ? 'inProgress' : 'complete') : 'rejected';
+  const approveStatus: ApplicationStatus = application.status === 'applied' ? 'inProgress' : 'complete';
+
+  const rejectStatus: ApplicationStatus = application.status === 'applied' ? 'application_rejected' : 'rejected';
+
+  const nextStatus = decision === 'approve' ? approveStatus : rejectStatus;
 
   const updated = (await prisma.application.update({
     where: {
@@ -45,6 +48,7 @@ export async function reviewApplication({ applicationId, decision, userId }: App
     data: {
       status: nextStatus,
       reviewedBy: nextStatus !== 'inProgress' ? userId : undefined,
+      // We only use this field when tracking who accepted an application (if the reward requires applications before submitting)
       acceptedBy: nextStatus === 'inProgress' ? userId : undefined
     }
   })) as Application;

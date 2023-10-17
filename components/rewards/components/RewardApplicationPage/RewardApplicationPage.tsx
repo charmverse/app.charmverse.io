@@ -148,7 +148,11 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
 
         <Grid item xs={12} gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box display='flex' gap={2}>
-            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>Applicant</FormLabel>
+            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>
+              {application.status === 'application_rejected' || application.status === 'applied'
+                ? 'Applicant'
+                : 'Submitter'}
+            </FormLabel>
             <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
           </Box>
 

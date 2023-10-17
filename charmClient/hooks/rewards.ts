@@ -1,11 +1,3 @@
-// import type {
-//   RewardCategoryWithPermissions,
-//   RewardFlowPermissionFlags,
-//   RewardReviewerPool
-// } from '@charmverse/core/permissions';
-// import type { RewardWithUsers, ListRewardsRequest } from '@charmverse/core/rewards';
-
-// import type { PageWithReward } from 'lib/pages';
 import type { Application, ApplicationComment, PageComment } from '@charmverse/core/prisma-client';
 
 import type { BountyPermissionFlags } from 'lib/permissions/bounties/interfaces';

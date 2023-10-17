@@ -1,5 +1,5 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
-import type { Bounty, User, Application, BountyStatus, Page, Transaction } from '@charmverse/core/prisma-client';
+import type { Application, Bounty, BountyStatus, Page, Transaction } from '@charmverse/core/prisma-client';
 
 export type RewardReviewer = TargetPermissionGroup<'role' | 'user'>;
 
