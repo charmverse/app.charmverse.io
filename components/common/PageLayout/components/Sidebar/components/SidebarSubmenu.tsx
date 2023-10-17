@@ -61,12 +61,20 @@ const SidebarHeader = styled(Box)(
   .MuiIconButton-root, .MuiButton-root {
     transition: ${theme.transitions.create('all', {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
+      duration: theme.transitions.duration.shorter
     })}
   }
+  
   & .MuiIconButton-root {
+    background-color: ${theme.palette.background.light};
     border-radius: 4px;
-  }`
+    padding: 2px;
+  }
+
+  & .MuiIconButton-root:hover {
+    background-color: ${theme.palette.background.default};
+  }
+  `
 );
 
 const StyledCreateSpaceForm = styled(CreateSpaceForm)`
@@ -187,11 +195,11 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      <Box sx={{ position: 'absolute', right: 0, top: 12 }} px={1}>
+      <Box sx={{ position: 'absolute', right: 0 }} px={1}>
         {currentSpace && (
           <Tooltip title='Close sidebar' placement='bottom'>
             <IconButton onClick={closeSidebar} size='small'>
-              <MenuOpenIcon />
+              <MenuOpenIcon fontSize='small' />
             </IconButton>
           </Tooltip>
         )}
