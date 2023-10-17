@@ -52,7 +52,6 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   });
 
   const { space } = useCurrentSpace();
-  const { user } = useUser();
   const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
