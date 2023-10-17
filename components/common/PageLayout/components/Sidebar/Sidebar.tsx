@@ -40,7 +40,7 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { NotificationsPopover, NotificationUpdates } from './components/NotificationsPopover';
+import { NotificationUpdates } from './components/NotificationsPopover';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';

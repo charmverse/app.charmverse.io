@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -21,6 +22,7 @@ import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useUserDetails } from 'components/settings/profile/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
@@ -29,6 +31,7 @@ import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 import { headerHeight } from '../../Header/Header';
 
+import { NotificationCountBox } from './NotificationsPopover';
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
 
@@ -58,12 +61,20 @@ const SidebarHeader = styled(Box)(
   .MuiIconButton-root, .MuiButton-root {
     transition: ${theme.transitions.create('all', {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
+      duration: theme.transitions.duration.shorter
     })}
   }
+  
   & .MuiIconButton-root {
+    background-color: ${theme.palette.background.light};
     border-radius: 4px;
-  }`
+    padding: 2px;
+  }
+
+  & .MuiIconButton-root:hover {
+    background-color: ${theme.palette.background.default};
+  }
+  `
 );
 
 const StyledCreateSpaceForm = styled(CreateSpaceForm)`
@@ -86,6 +97,7 @@ export default function SidebarSubmenu({
   logoutCurrentUser: () => void;
   openProfileModal: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
 }) {
+  const { notifications = [], otherSpacesUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -131,7 +143,7 @@ export default function SidebarSubmenu({
       >
         {currentSpace ? (
           <>
-            <WorkspaceAvatar name={currentSpace.name} image={currentSpace.spaceImage ?? null} />
+            <WorkspaceAvatar size='xSmall' name={currentSpace.name} image={currentSpace.spaceImage ?? null} />
             <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
               {currentSpace.name ?? 'Spaces'}
             </Typography>
@@ -159,18 +171,21 @@ export default function SidebarSubmenu({
           </Typography>
         </MenuItem>
         <Divider />
-        <Typography component='p' variant='caption' mx={2} mb={0.5}>
+        <Typography component='p' variant='caption' mx={2} mb={1}>
           My Spaces
         </Typography>
-        {spaces.map((_space) => (
-          <SpaceListItem
-            key={_space.id}
-            disabled={isSaving || !isLoaded || isCreatingSpace}
-            selected={currentSpace?.domain === _space.domain}
-            space={_space}
-            changeOrderHandler={changeOrderHandler}
-          />
-        ))}
+        <Stack gap={1}>
+          {spaces.map((_space) => (
+            <SpaceListItem
+              notifications={notifications}
+              key={_space.id}
+              disabled={isSaving || !isLoaded || isCreatingSpace}
+              selected={currentSpace?.domain === _space.domain}
+              space={_space}
+              changeOrderHandler={changeOrderHandler}
+            />
+          ))}
+        </Stack>
         <MenuItem onClick={showSpaceForm} data-test='spaces-menu-add-new-space'>
           <AddIcon sx={{ m: '5px 15px 5px 8px' }} />
           Create or join a space
@@ -180,13 +195,22 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      {currentSpace && (
-        <Tooltip title='Close sidebar' placement='bottom'>
-          <IconButton onClick={closeSidebar} size='small' sx={{ position: 'absolute', right: 0, top: 12 }}>
-            <MenuOpenIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+      <Box sx={{ position: 'absolute', right: 0 }} px={1}>
+        {currentSpace && (
+          <Tooltip title='Close sidebar' placement='bottom'>
+            <IconButton onClick={closeSidebar} size='small'>
+              <MenuOpenIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {otherSpacesUnreadNotifications.length ? (
+          <NotificationCountBox ml={0.5} mr={1}>
+            {otherSpacesUnreadNotifications.length}
+          </NotificationCountBox>
+        ) : null}
+      </Box>
+
       <Modal
         size='medium'
         open={spaceFormOpen}
