@@ -28,6 +28,7 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { useVotes } from 'hooks/useVotes';
@@ -36,6 +37,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
+import BountyProperties from './components/BountyProperties/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -89,6 +91,9 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
+  const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
+    bountyId: page.bountyId
+  });
 
   const { showApplication } = useApplicationDialog();
 
@@ -320,13 +325,23 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                     />
                   )}
                   {(tempReward || page.bountyId) && (
+                    <BountyProperties
+                      bountyId={page.bountyId}
+                      pageId={page.id}
+                      pagePath={page.path}
+                      readOnly={readOnly}
+                      permissions={bountyPermissions}
+                      refreshBountyPermissions={() => refreshBountyPermissions()}
+                    />
+                  )}
+                  {/* {(tempReward || page.bountyId) && (
                     <RewardProperties
                       rewardId={page.bountyId}
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
                     />
-                  )}
+                  )} */}
                   {(page.type === 'card' || page.type === 'card_synced') && (
                     <CommentsList
                       comments={comments}
