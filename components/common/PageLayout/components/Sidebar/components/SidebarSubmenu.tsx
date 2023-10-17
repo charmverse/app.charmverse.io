@@ -195,7 +195,7 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      <Box sx={{ position: 'absolute', right: 0 }} px={1}>
+      <Box sx={{ position: 'absolute', right: 0 }} px={1.5}>
         {currentSpace && (
           <Tooltip title='Close sidebar' placement='bottom'>
             <IconButton onClick={closeSidebar} size='small'>
@@ -205,7 +205,7 @@ export default function SidebarSubmenu({
         )}
 
         {otherSpacesUnreadNotifications.length ? (
-          <NotificationCountBox ml={0.5} mr={1}>
+          <NotificationCountBox ml={0.5} mr={0.5}>
             {otherSpacesUnreadNotifications.length}
           </NotificationCountBox>
         ) : null}
