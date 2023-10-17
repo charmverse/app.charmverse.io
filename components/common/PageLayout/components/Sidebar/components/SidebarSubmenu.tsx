@@ -135,7 +135,7 @@ export default function SidebarSubmenu({
       >
         {currentSpace ? (
           <>
-            <WorkspaceAvatar name={currentSpace.name} image={currentSpace.spaceImage ?? null} />
+            <WorkspaceAvatar size='xSmall' name={currentSpace.name} image={currentSpace.spaceImage ?? null} />
             <Typography variant='body1' data-test='sidebar-space-name' noWrap ml={1}>
               {currentSpace.name ?? 'Spaces'}
             </Typography>
@@ -187,7 +187,7 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      <Box sx={{ position: 'absolute', right: 0, top: 12 }} px={2}>
+      <Box sx={{ position: 'absolute', right: 0, top: 12 }} px={1}>
         {currentSpace && (
           <Tooltip title='Close sidebar' placement='bottom'>
             <IconButton onClick={closeSidebar} size='small'>
@@ -197,7 +197,9 @@ export default function SidebarSubmenu({
         )}
 
         {otherSpacesUnreadNotifications.length ? (
-          <NotificationCountBox ml={0.5}>{otherSpacesUnreadNotifications.length}</NotificationCountBox>
+          <NotificationCountBox ml={0.5} mr={1}>
+            {otherSpacesUnreadNotifications.length}
+          </NotificationCountBox>
         ) : null}
       </Box>
 
