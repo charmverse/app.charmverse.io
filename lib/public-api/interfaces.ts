@@ -9,6 +9,59 @@ export type BoardPropertyValue = string | string[] | number | null | boolean | R
  * @swagger
  * components:
  *  schemas:
+ *    UserProfile:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        avatar:
+ *          type: string
+ *          example: https://google.com/image.png
+ *        wallet:
+ *          type: string
+ *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *        username:
+ *          type: string
+ *          example: testuser
+ *        email:
+ *          type: string
+ *          example: johndoe@gmail.com
+ */
+
+export type UserProfile = {
+  id: string;
+  avatar: string | null;
+  wallet: string;
+  username: string;
+  email: string;
+};
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    MemberRole:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *       name:
+ *          type: string
+ *          example: tester
+ */
+export type MemberRole = {
+  id: string;
+  name: string;
+};
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
  *    PagePropertyOption:
  *     type: object
  *     properties:
@@ -370,6 +423,44 @@ export interface Workspace {
  * @swagger
  * components:
  *  schemas:
+ *    GetSpaceMemberRolesRequestBody:
+ *      required:
+ *        - userId
+ *      type: object
+ *      properties:
+ *        userId:
+ *          type: string
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ */
+export interface GetSpaceMemberRolesRequestBody {
+  userId: string;
+}
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    SpaceMemberRolesResponseBody:
+ *      type: object
+ *      properties:
+ *        user:
+ *          type: object
+ *          $ref: '#/components/schemas/UserProfile'
+ *        roles:
+ *          type: array
+ *          items:
+ *            type: object
+ *            $ref: '#/components/schemas/MemberRole'
+ */
+export interface SpaceMemberRolesResponseBody {
+  user: UserProfile;
+  roles: MemberRole[];
+}
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
  *    CreateWorkspaceRequestBody:
  *      required:
  *        - name
@@ -474,11 +565,3 @@ export interface SpaceApiResponse {
 export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
   webhookSigningSecret?: string;
 }
-
-export type UserProfile = {
-  id: string;
-  avatar: string | null;
-  wallet: string;
-  username: string;
-  email: string;
-};

@@ -4,6 +4,30 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
+export async function searchUserProfileById(id: string) {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      googleAccounts: true,
+      wallets: true
+    }
+  });
+
+  if (!user) {
+    throw new DataNotFoundError(`A user with id ${id} was not found.`);
+  }
+
+  const profile: UserProfile = {
+    id: user.id,
+    avatar: user.avatar || '',
+    wallet: user.wallets[0]?.address || '',
+    email: user.email || user.googleAccounts[0]?.email || '',
+    username: user.username
+  };
+
+  return profile;
+}
+
 export async function searchUserProfile({
   email,
   spaceIds,
