@@ -10,8 +10,9 @@ export function Button({
   children,
   href,
   variant = 'filled',
+  style,
   ...props
-}: { variant?: 'filled' | 'outlined'; children: ReactNode; href: string } & LinkProps) {
+}: { fullWidth?: boolean; variant?: 'filled' | 'outlined'; children: ReactNode; href: string } & LinkProps) {
   return (
     <Link {...props} href={href}>
       <Text
@@ -19,18 +20,22 @@ export function Button({
         style={
           variant === 'outlined'
             ? {
+                textAlign: 'center',
                 width: 'fit-content',
                 borderRadius: '30px',
                 border: '1px solid #ccc',
                 padding: '8px 24px',
-                color: blueColor
+                color: blueColor,
+                ...style
               }
             : {
+                textAlign: 'center',
                 width: 'fit-content',
                 color: '#fff',
                 padding: '8px 24px',
                 borderRadius: '3px',
-                background: blueColor
+                background: blueColor,
+                ...style
               }
         }
       >

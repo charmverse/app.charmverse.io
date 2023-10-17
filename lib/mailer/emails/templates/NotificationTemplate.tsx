@@ -1,4 +1,5 @@
 import { Column } from '@react-email/column';
+import { Container } from '@react-email/container';
 import { Hr } from '@react-email/hr';
 import { Link } from '@react-email/link';
 import { Row } from '@react-email/row';
@@ -55,7 +56,6 @@ function NotificationSection({ notification }: { notification: Notification }) {
             {content}
           </Text>
           <Text
-            hideOverflow
             variant='caption'
             style={{
               margin: `6px 0px`
@@ -64,7 +64,6 @@ function NotificationSection({ notification }: { notification: Notification }) {
             {dateTime}
           </Text>
           <Text
-            hideOverflow
             variant='subtitle1'
             style={{
               margin: `6px 0px`
@@ -74,7 +73,6 @@ function NotificationSection({ notification }: { notification: Notification }) {
           </Text>
           <Text
             bold
-            hideOverflow
             style={{
               margin: `6px 0px`
             }}
@@ -91,7 +89,16 @@ function NotificationSection({ notification }: { notification: Notification }) {
         </Column>
       </Row>
       <Row>
-        <Button href={link}>View</Button>
+        <Button
+          style={{
+            width: '75%',
+            margin: '10px auto'
+          }}
+          fullWidth
+          href={link}
+        >
+          View
+        </Button>
       </Row>
     </Section>
   );
