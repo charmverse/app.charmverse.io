@@ -22,7 +22,7 @@ export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string>
   rejected: 'Rejected',
   inProgress: 'In progress',
   paid: 'Paid',
-  complete: 'Complete',
+  complete: 'Approved',
   processing: 'Processing payment',
   review: 'Review'
 };
