@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 
 import { getPagePath } from 'lib/pages/utils';
 import { randomETHWalletAddress as _randomETHWalletAddress } from 'lib/utilities/blockchain';
+import type { RequiredNotNull } from 'lib/utilities/types';
 
 export function generatePageToCreateStub({
   userId,
@@ -53,7 +54,9 @@ export function generatePageNode({
   };
 }
 
-export function generateSubmissionContent(): Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'> {
+export function generateSubmissionContent(): RequiredNotNull<
+  Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>
+> {
   return {
     submission: 'My submission and all of its content',
     submissionNodes:
