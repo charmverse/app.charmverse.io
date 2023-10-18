@@ -451,6 +451,7 @@ export async function generateBountyWithSingleApplication({
   reviewer?: string;
   bountyTitle?: string;
   bountyDescription?: string;
+  deletedAt?: Date | null;
 }): Promise<Bounty & { applications: Application[]; page: Page }> {
   const createdBounty = (await prisma.bounty.create({
     data: {
