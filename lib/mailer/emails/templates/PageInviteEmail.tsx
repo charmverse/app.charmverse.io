@@ -21,7 +21,7 @@ const pageContainerStyle = {
 };
 
 export function PageInviteEmail(props: PageInviteEmailProps) {
-  const pageLink = `${baseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
+  const pageLink = `${baseUrl}/invite/request-code?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
 
   return (
     <EmailWrapper title={`${props.invitingUserName} shared a document`}>
