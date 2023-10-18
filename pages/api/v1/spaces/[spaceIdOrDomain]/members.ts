@@ -1,9 +1,8 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { requireKeys } from 'lib/middleware';
-import { getSpaceById } from 'lib/public-api/getSpaceById';
-import { defaultHandler } from 'lib/public-api/handler';
+import { requireApiKey, requireKeys } from 'lib/middleware';
+import { logApiRequest, defaultHandler } from 'lib/public-api/handler';
 import type {
   GetSpaceMemberRolesRequestBody,
   SpaceMemberRolesResponseBody,
@@ -104,6 +103,10 @@ async function getSpaceMemberWithRoles(req: NextApiRequest, res: NextApiResponse
 async function updateSpaceMemberRoles(req: NextApiRequest, res: NextApiResponse<SpaceMemberRolesResponseBody>) {
   const { userId, roles } = req.body as UpdateSpaceMemberRolesRequestBody;
 
+  if (roles.length === 0) {
+    throw new InvalidInputError('At least one role must be provided.');
+  }
+
   const spaceIdOrDomain = req.query.spaceIdOrDomain as string;
   let spaceId = isUUID(spaceIdOrDomain) ? spaceIdOrDomain : null;
 
@@ -123,19 +126,19 @@ async function updateSpaceMemberRoles(req: NextApiRequest, res: NextApiResponse<
     source: null
   });
 
-  if (rolesRecord) {
-    return res.status(200).json({
-      roles: Object.values(rolesRecord)
-        .filter(isTruthy)
-        .map((role) => ({
-          id: role.id,
-          name: role.name
-        })),
-      user: spaceMember
-    });
-  } else {
-    throw new Error('Roles could not be created or assigned');
+  if (!rolesRecord) {
+    throw new DataNotFoundError(`User ${userId} is not a member of space ${spaceId}`);
   }
+
+  return res.status(200).json({
+    roles: Object.values(rolesRecord)
+      .filter(isTruthy)
+      .map((role) => ({
+        id: role.id,
+        name: role.name
+      })),
+    user: spaceMember
+  });
 }
 
 export default withSessionRoute(handler);

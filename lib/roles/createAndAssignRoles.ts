@@ -9,12 +9,14 @@ export async function createAndAssignRoles({
   userId,
   spaceId,
   roles,
-  source = 'collabland'
+  source = 'collabland',
+  createRoles = true
 }: {
   userId: string;
   spaceId: string;
   roles: ExternalRole[];
   source?: RoleSource | null;
+  createRoles?: boolean;
 }) {
   if (!roles.length) {
     return null;
@@ -32,7 +34,7 @@ export async function createAndAssignRoles({
 
   const rolesRecord = await findOrCreateRoles(roles, spaceId, userId, {
     source,
-    createRoles: true
+    createRoles
   });
 
   const roleIdsToAssign: string[] = Object.values(rolesRecord)
