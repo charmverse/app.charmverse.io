@@ -40,7 +40,7 @@ describe('paginatedPrismaTask', () => {
         }
       },
       mapper: async (result: Post) => {
-        return result.title;
+        return result.id;
       }
     });
 
