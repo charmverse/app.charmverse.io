@@ -28,6 +28,7 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
@@ -94,6 +95,8 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
   const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
     bountyId: page.bountyId
   });
+
+  const { draftBounty } = useBounties();
 
   const { showApplication } = useApplicationDialog();
 
@@ -324,7 +327,7 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       proposalPage={page}
                     />
                   )}
-                  {(tempReward || page.bountyId) && (
+                  {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}
                       pageId={page.id}
