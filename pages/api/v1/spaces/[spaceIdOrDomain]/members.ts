@@ -1,3 +1,4 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';
@@ -11,6 +12,7 @@ import type {
 import { searchUserProfileById } from 'lib/public-api/searchUserProfile';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
@@ -57,7 +59,10 @@ async function getSpaceMemberWithRoles(req: NextApiRequest, res: NextApiResponse
   let spaceId = isUUID(spaceIdOrDomain) ? spaceIdOrDomain : null;
 
   if (!spaceId) {
-    const space = await getSpaceById(spaceIdOrDomain);
+    const space = await getSpaceByDomain(spaceIdOrDomain);
+    if (!space) {
+      throw new DataNotFoundError('Space not found');
+    }
     spaceId = space.id;
   }
 
@@ -103,12 +108,14 @@ async function updateSpaceMemberRoles(req: NextApiRequest, res: NextApiResponse<
   let spaceId = isUUID(spaceIdOrDomain) ? spaceIdOrDomain : null;
 
   if (!spaceId) {
-    const space = await getSpaceById(spaceIdOrDomain);
+    const space = await getSpaceByDomain(spaceIdOrDomain);
+    if (!space) {
+      throw new DataNotFoundError('Space not found');
+    }
     spaceId = space.id;
   }
 
   const spaceMember = await searchUserProfileById(userId);
-
   const rolesRecord = await createAndAssignRoles({
     userId,
     spaceId,

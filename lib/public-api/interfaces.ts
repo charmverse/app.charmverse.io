@@ -590,3 +590,25 @@ export interface SpaceApiResponse {
 export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
   webhookSigningSecret?: string;
 }
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    GetSpaceWithRolesResponseBody:
+ *      type: object
+ *      properties:
+ *        space:
+ *          type: object
+ *          $ref: '#/components/schemas/SpaceApiResponse'
+ *        roles:
+ *          type: array
+ *          items:
+ *            type: object
+ *            $ref: '#/components/schemas/MemberRole'
+ */
+
+export interface GetSpaceWithRolesResponseBody {
+  space: SpaceApiResponse;
+  roles: MemberRole[];
+}
