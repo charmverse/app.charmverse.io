@@ -40,8 +40,8 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       spaceImage: updates.spaceImage,
       hiddenFeatures: updates.hiddenFeatures,
       notificationToggles: updates.notificationToggles as any,
-      features: updates.features,
-      memberProfiles: updates.memberProfiles
+      features: updates.features as any,
+      memberProfiles: updates.memberProfiles as any
     }
   });
 

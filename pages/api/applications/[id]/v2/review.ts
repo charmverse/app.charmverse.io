@@ -53,7 +53,6 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
   }
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: application.bountyId,
     userId
   });

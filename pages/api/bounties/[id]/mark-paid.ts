@@ -21,7 +21,6 @@ async function markBountyAsPaidController(req: NextApiRequest, res: NextApiRespo
   const userId = req.session.user.id;
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: bounty.id,
     userId
   });

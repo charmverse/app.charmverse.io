@@ -8,11 +8,11 @@ import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid, validate } from 'uuid';
 
-import type { BountyWithDetails } from 'lib/bounties';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
 import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
+import type { Reward } from 'lib/rewards/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
@@ -108,7 +108,7 @@ type WorkspaceImportResult = {
   totalBlocks: number;
   totalPages: number;
   rootPageIds: string[];
-  bounties: BountyWithDetails[];
+  bounties: Reward[];
   blockIds: string[];
 };
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getBountyReviewerIds } from 'lib/bounties/getBountyReviewerIds';
+import { getRewardReviewerIds } from 'lib/rewards/getRewardReviewerIds';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -28,7 +28,7 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+      const bountyReviewerIds = await getRewardReviewerIds(bountyId);
       for (const bountyReviewerId of bountyReviewerIds) {
         if (application.createdBy !== bountyReviewerId) {
           const { id } = await saveRewardNotification({
@@ -120,7 +120,7 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+      const bountyReviewerIds = await getRewardReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
         if (application.createdBy !== bountyReviewerId) {
@@ -166,7 +166,7 @@ export async function createRewardNotifications(webhookData: {
       });
       ids.push(id);
 
-      const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+      const bountyReviewerIds = await getRewardReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
         if (userId !== bountyReviewerId) {

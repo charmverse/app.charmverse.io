@@ -1,6 +1,6 @@
-import { generateRole } from 'testing/setupDatabase';
+import { generateBounty, generateRole } from 'testing/setupDatabase';
 
-import { generateUserAndSpace, generateBounty } from '../utils/mocks';
+import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 import { test, expect } from '../utils/test';
 

@@ -24,9 +24,9 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
+import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
@@ -38,7 +38,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
-import BountyProperties from './components/BountyProperties';
+import BountyProperties from './components/BountyProperties/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -84,18 +84,21 @@ export interface DocumentPageProps {
 
 function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = false }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
-  const { draftBounty } = useBounties();
+
   const { tempReward } = useRewards();
   const { currentPageActionDisplay } = usePageActionDisplay();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
-
+  const [containerRef, { width: containerWidth }] = useElementSize();
   const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
     bountyId: page.bountyId
   });
-  const [containerRef, { width: containerWidth }] = useElementSize();
+
+  const { draftBounty } = useBounties();
+
+  const { showApplication } = useApplicationDialog();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -324,25 +327,24 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                       proposalPage={page}
                     />
                   )}
-                  {(tempReward || page.bountyId) && isRewardsPage && (
-                    <RewardProperties
-                      rewardId={page.bountyId}
-                      pageId={page.id}
-                      pagePath={page.path}
-                      readOnly={readOnly}
-                      refreshRewardPermissions={() => refreshBountyPermissions()}
-                    />
-                  )}
-                  {(draftBounty || page.bountyId) && !isRewardsPage && (
+                  {(draftBounty || page.bountyId) && (
                     <BountyProperties
                       bountyId={page.bountyId}
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
-                      permissions={bountyPermissions || null}
+                      permissions={bountyPermissions}
                       refreshBountyPermissions={() => refreshBountyPermissions()}
                     />
                   )}
+                  {/* {(tempReward || page.bountyId) && (
+                    <RewardProperties
+                      rewardId={page.bountyId}
+                      pageId={page.id}
+                      pagePath={page.path}
+                      readOnly={readOnly}
+                    />
+                  )} */}
                   {(page.type === 'card' || page.type === 'card_synced') && (
                     <CommentsList
                       comments={comments}
@@ -353,6 +355,14 @@ function DocumentPage({ page, refreshPage, savePage, insideModal, readOnly = fal
                   )}
                 </CardPropertiesWrapper>
               </CharmEditor>
+
+              {/** REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE
+                             {page.bountyId && (
+                <Box mt='-100px'>
+                  <RewardSubmissionsTable openApplication={showApplication} rewardId={page.bountyId} />
+                </Box>
+              )}  
+                 */}
 
               {page.type === 'proposal' && pagePermissions.comment && (
                 <Box mt='-100px'>
