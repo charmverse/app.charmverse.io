@@ -2,6 +2,7 @@ import env from '@beam-australia/react-env';
 import { RPCList } from 'connectors/index';
 import type { Address } from 'viem';
 import { createPublicClient, custom, createWalletClient, http } from 'viem';
+import type { Connector } from 'wagmi';
 import { createConfig, configureChains, mainnet } from 'wagmi';
 import * as wagmiChains from 'wagmi/chains';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
@@ -20,31 +21,37 @@ const supportedChains = RPCList.map((rpc) => wagmiChainList.find((ch) => ch.id =
 
 const { chains, publicClient } = configureChains(supportedChains, [publicProvider()]);
 
-export const injectedConnector = new InjectedConnector({
-  chains,
-  options: {
-    name: 'Injected',
-    shimDisconnect: true
-  }
-});
+const connectors: Connector[] = [
+  new InjectedConnector({
+    chains,
+    options: {
+      name: 'Injected',
+      shimDisconnect: true
+    }
+  }),
+  new CoinbaseWalletConnector({
+    chains,
+    options: {
+      appName: 'CharmVerse.io'
+    }
+  })
+];
 
-export const coinbaseWalletConnector = new CoinbaseWalletConnector({
-  chains,
-  options: {
-    appName: 'CharmVerse.io'
-  }
-});
-
-export const walletConnectConnector = new WalletConnectConnector({
-  chains,
-  options: {
-    projectId: env('WALLETCONNECT_PROJECTID')
-  }
-});
+const walletConnectProjectId = env('WALLETCONNECT_PROJECTID');
+if (walletConnectProjectId) {
+  connectors.push(
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId: walletConnectProjectId
+      }
+    })
+  );
+}
 
 export const wagmiConfig = createConfig({
   autoConnect: true,
-  connectors: [injectedConnector, coinbaseWalletConnector, walletConnectConnector],
+  connectors,
   publicClient
 });
 
