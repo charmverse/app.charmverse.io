@@ -75,6 +75,12 @@ const config = {
         permanent: true
       },
       {
+        // Added for backwards compatibility
+        source: '/invite/page',
+        destination: '/invite-request-code',
+        permanent: true
+      },
+      {
         source: '/profile',
         destination: '/',
         permanent: true
