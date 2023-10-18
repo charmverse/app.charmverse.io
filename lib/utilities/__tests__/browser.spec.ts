@@ -23,6 +23,11 @@ describe('getNewUrl()', () => {
 });
 
 describe('getSubdomainPath()', () => {
+  it('should not modify the path that starts with /api', () => {
+    const result = getSubdomainPath('/api', { domain: 'charmverse' });
+    expect(result).toEqual('/api');
+  });
+
   it('should not return the path with subdomain when on subdomain host', () => {
     const result = getSubdomainPath('/foo', { domain: 'charmverse' }, 'charmverse.charmverse.io');
     expect(result).toEqual('/foo');

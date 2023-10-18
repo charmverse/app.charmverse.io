@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
@@ -9,7 +10,7 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useBounties } from 'hooks/useBounties';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -29,14 +30,14 @@ export function SharedPage({ publicPage }: Props) {
 
   const basePageId = publicPage?.page?.id || '';
 
-  const { setBounties, loadingBounties } = useBounties();
+  const { isLoading: isLoadingRewards, mutateRewards: refreshRewards } = useRewards();
 
   // Pre-populate bounties state in place of prop drilling
   useEffect(() => {
-    if (publicPage?.bounty && !loadingBounties) {
-      setBounties([publicPage.bounty]);
+    if (publicPage?.bounty && !isLoadingRewards) {
+      refreshRewards([publicPage.bounty]);
     }
-  }, [publicPage, loadingBounties]);
+  }, [publicPage, isLoadingRewards]);
 
   async function onLoad(_publicPage: PublicPageResponse) {
     const { page: rootPage, cards, boards, views } = _publicPage;
@@ -86,6 +87,13 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
   ) : (
-    <DocumentPage page={publicPage.page} refreshPage={() => Promise.resolve()} savePage={() => null} readOnly={true} />
+    <Box sx={{ overflowY: 'auto' }}>
+      <DocumentPage
+        page={publicPage.page}
+        refreshPage={() => Promise.resolve()}
+        savePage={() => null}
+        readOnly={true}
+      />
+    </Box>
   );
 }

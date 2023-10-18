@@ -177,7 +177,7 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
         />
       ))}
       {(isLoadingPosts || isLoadingSearch) && !hasNext && <PostSkeleton />}
-      {!hasNext && (
+      {!hasNext && !isLoadingPosts && !isLoadingSearch && (
         <>
           <Divider flexItem sx={{ mb: 4 }} />
           <Box display='flex' alignItems='center' justifyContent='center'>

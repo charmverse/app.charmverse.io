@@ -4,7 +4,7 @@ import { PageDialog } from './PageDialog';
 // a wrapper of page dialog that uses usePageDialogHook
 export function PageDialogGlobal() {
   const { props, hidePage } = usePageDialog();
-  const { bountyId, hideToolsMenu, pageId, readOnly, toolbar } = props;
+  const { bountyId, hideToolsMenu, pageId, readOnly } = props;
   function closeDialog() {
     hidePage();
   }
@@ -13,7 +13,6 @@ export function PageDialogGlobal() {
     <PageDialog
       hideToolsMenu={hideToolsMenu}
       readOnly={readOnly}
-      toolbar={toolbar}
       pageId={bountyId || (pageId as string)}
       onClose={closeDialog}
     />

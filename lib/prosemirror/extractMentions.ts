@@ -5,8 +5,29 @@ export interface UserMentionMetadata {
   id: string;
   createdAt: string;
   createdBy: string;
-  text: string;
   value: string;
+  parentNode: PageContent | null;
+}
+
+function checkMentionNode(node: PageContent) {
+  if (
+    node.type === 'mention' &&
+    node.attrs &&
+    node.attrs.type === 'user' &&
+    node.attrs.id &&
+    node.attrs.createdAt &&
+    node.attrs.createdBy &&
+    node.attrs.value
+  ) {
+    return {
+      id: node.attrs.id,
+      createdAt: node.attrs.createdAt,
+      createdBy: node.attrs.createdBy,
+      value: node.attrs.value
+    };
+  }
+
+  return null;
 }
 
 /**
@@ -14,7 +35,11 @@ export interface UserMentionMetadata {
  * @param content Page content as raw json
  * @returns An array of mention ids
  */
-export function extractMentions(content: PageContent, username?: string) {
+export function extractMentions(content: PageContent | null) {
+  if (!content) {
+    return [];
+  }
+
   const mentions: Map<string, UserMentionMetadata> = new Map();
 
   function recurse(node: PageContent, parentNode: PageContent | null) {
@@ -25,34 +50,11 @@ export function extractMentions(content: PageContent, username?: string) {
       });
     }
 
-    // Checking if all the mention attributes exist or not, and continue only if they exist
-    if (
-      node.type === 'mention' &&
-      node.attrs &&
-      node.attrs.type === 'user' &&
-      parentNode &&
-      node.attrs.id &&
-      node.attrs.createdAt &&
-      node.attrs.createdBy &&
-      node.attrs.value
-    ) {
-      let text = '';
-      if (parentNode.type.match(/(paragraph|heading)/)) {
-        parentNode.content?.forEach((childNode: PageContent) => {
-          if (childNode.text) {
-            text += childNode.text;
-          } else if (childNode.type === 'mention') {
-            text += `@${username ?? shortenHex(childNode.attrs?.value)}`;
-          }
-        });
-      }
-
-      mentions.set(node.attrs.id, {
-        id: node.attrs.id,
-        text,
-        createdAt: node.attrs.createdAt,
-        createdBy: node.attrs.createdBy,
-        value: node.attrs.value
+    const mention = parentNode ? checkMentionNode(node) : null;
+    if (mention) {
+      mentions.set(mention.id, {
+        ...mention,
+        parentNode
       });
     }
   }
@@ -60,4 +62,33 @@ export function extractMentions(content: PageContent, username?: string) {
   recurse(content, null);
 
   return Array.from(mentions.values());
+}
+
+export function extractMentionFromId(content: PageContent | null, mentionId: string): UserMentionMetadata | null {
+  if (!content) {
+    return null;
+  }
+
+  function recurse(node: PageContent, parentNode: PageContent | null): null | UserMentionMetadata {
+    if (node.content) {
+      for (const childNode of node.content) {
+        const mention = recurse(childNode, node);
+        if (mention) {
+          return mention;
+        }
+      }
+    }
+
+    const mention = parentNode ? checkMentionNode(node) : null;
+    if (mention) {
+      return {
+        ...mention,
+        parentNode
+      };
+    }
+
+    return null;
+  }
+
+  return recurse(content, null);
 }

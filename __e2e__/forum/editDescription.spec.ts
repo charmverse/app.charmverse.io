@@ -23,7 +23,7 @@ let memberUser: User;
 let postCategory: PostCategory;
 let post: Post;
 
-test.describe.serial('Update category permissions', () => {
+test.describe('Update category permissions', () => {
   test('category description - admin can set the category description', async ({ page, forumHomePage }) => {
     // Initial setup
     const generated = await createUserAndSpace({
@@ -77,6 +77,7 @@ test.describe.serial('Update category permissions', () => {
     await expect(forumHomePage.currentCategoryDescription).not.toBeVisible();
 
     // Open edit description dialog
+    await forumHomePage.page.waitForTimeout(100); // give the view a chance to complete its update after navigation
     await forumHomePage.getCategoryContextMenuLocator(postCategory.id).click();
     await forumHomePage.getCategoryEditDescriptionLocator(postCategory.id).click();
 

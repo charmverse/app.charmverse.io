@@ -1,3 +1,4 @@
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
@@ -10,8 +11,7 @@ import {
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID,
-  TITLE_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesBlock } from 'lib/rewards/blocks/interfaces';
 
@@ -62,7 +62,7 @@ export function getDefaultTableView({ storedBoard }: { storedBoard: RewardProper
 
   view.id = DEFAULT_VIEW_BLOCK_ID;
   view.fields.columnWidths = {
-    [TITLE_BLOCK_ID]: 310,
+    [Constants.titleColumnId]: 310,
     [DUE_DATE_ID]: 150,
     [ASSIGNEES_BLOCK_ID]: 200,
     [REWARD_REVIEWERS_BLOCK_ID]: 150,

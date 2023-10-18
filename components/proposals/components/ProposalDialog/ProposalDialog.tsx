@@ -12,6 +12,9 @@ import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
+import { DocumentHeaderElements } from 'components/common/PageLayout/components/Header/components/DocumentHeaderElements';
+import { useNewProposal } from 'components/proposals/components/ProposalDialog/hooks/useNewProposal';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
@@ -34,19 +37,23 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   const { updatePage } = usePages();
   // This is needed so that the surrounding currentPage context provides the correct pageId
   const { setCurrentPageId } = useCurrentPage();
-  useEffect(() => {
-    if (pageId) {
-      setCurrentPageId(pageId);
-    }
-  }, [pageId]);
-  const { space } = useCurrentSpace();
-  const { user } = useUser();
-  const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
-  const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(
-    emptyState({ ...newProposal, userId: user?.id })
-  );
+  const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
-  const [contentUpdated, setContentUpdated] = useState(false);
+  const {
+    formInputs,
+    setFormInputs,
+    clearFormInputs,
+    contentUpdated,
+    createProposal,
+    isCreatingProposal,
+    disabledTooltip
+  } = useNewProposal({
+    newProposal
+  });
+
+  const { space } = useCurrentSpace();
+  const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const isLoading = !!pageId && isPageLoading;
@@ -64,6 +71,34 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
     [page]
   );
 
+  useEffect(() => {
+    if (pageId) {
+      setCurrentPageId(pageId);
+    }
+    return () => {
+      setCurrentPageId('');
+      resetPageProps();
+    };
+  }, [pageId]);
+
+  // set page attributes of the primary charm editor
+  useEffect(() => {
+    if (!page) {
+      // wait for pages loaded for permissions to be correct
+      return;
+    }
+    if (!editMode) {
+      if (page.permissionFlags.edit_content) {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'editing' });
+      } else {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'viewing' });
+      }
+    } else {
+      // pass editMode thru to fix hot-reloading which resets the prop
+      setPageProps({ permissions: page.permissionFlags, editMode });
+    }
+  }, [page?.permissionFlags.edit_content]);
+
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
     mounted.current = true;
@@ -73,13 +108,6 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    setFormInputs((prevState) => ({
-      ...prevState,
-      publishToLens: !!user?.publishToLensDefault
-    }));
-  }, [user?.id]);
-
-  useEffect(() => {
     if (page?.id) {
       trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: space?.domain });
     }
@@ -87,8 +115,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
 
   function close() {
     onClose();
-    setFormInputs(emptyState());
-    setContentUpdated(false);
+    clearFormInputs();
     setShowConfirmDialog(false);
   }
 
@@ -113,9 +140,15 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
               href={relativePath}
               variant='text'
               startIcon={<OpenInFullIcon fontSize='small' />}
+              sx={{ px: 1.5 }}
             >
               Open as Page
             </Button>
+            {page && (
+              <Box display='flex' alignItems='center' gap={0.5}>
+                <DocumentHeaderElements headerHeight={0} page={page} />
+              </Box>
+            )}
           </Box>
         ) : (
           <div />
@@ -128,6 +161,19 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
           </Stack>
         ) : null
       }
+      footerActions={
+        isLoading || page || !newProposal ? null : (
+          <Button
+            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+            disabledTooltip={disabledTooltip}
+            onClick={createProposal}
+            loading={isCreatingProposal}
+            data-test='create-proposal-button'
+          >
+            Save
+          </Button>
+        )
+      }
     >
       {isLoading ? (
         <LoadingComponent isLoading />
@@ -135,15 +181,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
       ) : (
-        <NewProposalPage
-          formInputs={formInputs}
-          setFormInputs={(_formInputs) => {
-            setContentUpdated(true);
-            setFormInputs((existingFormInputs) => ({ ...existingFormInputs, ..._formInputs }));
-          }}
-          contentUpdated={contentUpdated}
-          setContentUpdated={setContentUpdated}
-        />
+        <NewProposalPage formInputs={formInputs} setFormInputs={setFormInputs} contentUpdated={contentUpdated} />
       )}
       <ConfirmDeleteModal
         onClose={() => {
@@ -158,26 +196,4 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
       />
     </Dialog>
   );
-}
-
-function emptyState({
-  userId,
-  ...inputs
-}: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
-  return {
-    categoryId: null,
-    content: null,
-    contentText: '',
-    headerImage: null,
-    icon: null,
-    evaluationType: 'vote',
-    proposalTemplateId: null,
-    reviewers: [],
-    rubricCriteria: [],
-    title: '',
-    publishToLens: false,
-    fields: { properties: {} },
-    ...inputs,
-    authors: userId ? [userId] : []
-  };
 }

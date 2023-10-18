@@ -1,5 +1,18 @@
-export function sortByDate<T extends { createdAt: string | Date }>(a: T, b: T): number {
-  return a.createdAt > b.createdAt ? -1 : 1;
+export type QueryCondition = { id?: string; userId?: string };
+export function queryCondition({ id, userId }: QueryCondition) {
+  if (id) {
+    return { id };
+  }
+
+  if (userId) {
+    return {
+      notificationMetadata: {
+        userId
+      }
+    };
+  }
+
+  throw new Error('id or userId must be defined to query notification');
 }
 
 export const notificationMetadataSelectStatement = {
@@ -14,6 +27,7 @@ export const notificationMetadataSelectStatement = {
       domain: true
     }
   },
+  userId: true,
   author: {
     select: {
       id: true,

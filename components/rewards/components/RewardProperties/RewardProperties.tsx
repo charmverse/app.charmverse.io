@@ -1,4 +1,4 @@
-import { Box, Divider, Stack } from '@mui/material';
+import { Box, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
@@ -8,27 +8,26 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetPermissions } from 'charmClient/hooks/permissions';
+import { useGetReward } from 'charmClient/hooks/rewards';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
-import { RewardApplicantForm } from 'components/rewards/components/RewardProperties/components/RewardApplicantForm/RewardApplicantForm';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
+import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { useUser } from 'hooks/useUser';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
-// import RewardApplicantsTable from './components/RewardApplicantsTable';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardSignupButton } from './components/RewardSignupButton';
 
@@ -37,23 +36,33 @@ export function RewardProperties(props: {
   rewardId: string | null;
   pageId: string;
   pagePath: string;
-  refreshRewardPermissions: (rewardId: string) => void;
+  rewardChanged?: () => void;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false, refreshRewardPermissions } = props;
-  const { rewards, mutateRewards, updateReward, tempReward, setTempReward } = useRewards();
-  const [currentReward, setCurrentReward] = useState<(RewardCreationData & RewardWithUsers) | null>();
-  const { user } = useUser();
+  const { rewardId, pageId, readOnly: parentReadOnly = false, rewardChanged } = props;
+  const { mutateRewards, updateReward, refreshReward, tempReward, setTempReward } = useRewards();
+  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
+
+  const { showApplication } = useApplicationDialog();
+
+  const { data: initialReward } = useGetReward({
+    rewardId: rewardId as string
+  });
+
+  useEffect(() => {
+    if (!currentReward && initialReward) {
+      setCurrentReward(initialReward as any);
+    }
+  }, [initialReward]);
 
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
 
   /* TODO @Mo - permissions */
   const { data: rewardPermissions } = useSWR(rewardId ? `/rewards-${rewardId}` : null, () =>
-    charmClient.rewards.computePermissions({
-      resourceId: rewardId as string,
-      userId: user?.id
+    charmClient.rewards.computeRewardPermissions({
+      resourceId: rewardId as string
     })
   );
-  const { data: rewardPagePermissions, mutate: refreshPermissions } = useGetPermissions(pageId);
+  const { data: rewardPagePermissions, mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const [rewardType, setRewardType] = useState<RewardType>('Token');
   // Using ref to make sure we don't keep redirecting to custom reward tab
   const { isSpaceMember } = useIsSpaceMember();
@@ -69,29 +78,29 @@ export function RewardProperties(props: {
     }
   }, [currentReward?.customReward]);
 
-  useEffect(() => {
-    const rewardFromContext = rewards?.find((r) => r.id === rewardId);
-    setCurrentReward(rewardFromContext || (tempReward as RewardWithUsers));
-
-    if (rewardFromContext && tempReward) {
-      setTempReward(null);
+  async function resyncReward() {
+    const _rewardId = currentReward?.id;
+    if (_rewardId) {
+      const updated = await refreshReward(_rewardId);
+      setCurrentReward({ ...currentReward, ...updated });
+      rewardChanged?.();
     }
-  }, [rewardId, rewards, setTempReward, tempReward]);
+  }
 
-  const readOnly = parentReadOnly || !isSpaceMember;
+  const readOnly = parentReadOnly || !isSpaceMember || props.readOnly;
 
-  const { data: applications, mutate: refreshSubmissions } = useSWR(
-    !rewardId ? null : `/rewards/${rewardId}/applications`,
-    () => charmClient.rewards.listApplications(rewardId as string),
-    {
-      fallbackData: []
-    }
-  );
+  const applications = currentReward?.applications;
 
   async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
+    if (readOnly) {
+      return;
+    }
+
     setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
+
     if (currentReward?.id) {
       await updateReward({ rewardId: currentReward.id, updateContent: updates });
+      resyncReward();
     }
   }
 
@@ -157,7 +166,7 @@ export function RewardProperties(props: {
   // handling tempReward
   async function confirmNewReward() {
     if (currentReward) {
-      const createdReward = await charmClient.rewards.createReward(currentReward);
+      const createdReward = await charmClient.rewards.createReward(currentReward as RewardCreationData);
       mutateRewards((_rewards = []) => [..._rewards, createdReward]);
     }
   }
@@ -191,10 +200,10 @@ export function RewardProperties(props: {
       <Stack className='octo-propertylist' mt={2} flex={1}>
         <Divider />
         <RewardPropertiesHeader
-          reward={currentReward}
+          reward={currentReward as RewardWithUsers}
           pageId={pageId}
           readOnly={readOnly}
-          refreshPermissions={refreshPermissions}
+          refreshPermissions={refreshPagePermissionsList}
         />
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -203,15 +212,11 @@ export function RewardProperties(props: {
           </PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
-            value={currentReward.reviewers}
+            value={currentReward.reviewers ?? []}
             onChange={async (options) => {
               await applyRewardUpdates({
                 reviewers: options.map((option) => ({ group: option.group, id: option.id }))
               });
-
-              if (currentReward?.id) {
-                await refreshRewardPermissions(currentReward.id);
-              }
             }}
           />
         </Box>
@@ -264,7 +269,7 @@ export function RewardProperties(props: {
               isOn={Boolean(currentReward?.approveSubmitters)}
               onChanged={(isOn) => {
                 applyRewardUpdates({
-                  approveSubmitters: isOn
+                  approveSubmitters: !!isOn
                 });
               }}
               disabled={readOnly}
@@ -272,6 +277,28 @@ export function RewardProperties(props: {
             />
           </SelectPreviewContainer>
         </Box>
+
+        <Tooltip placement='left' title='Allow the same user to participate in this reward more than once'>
+          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+            <PropertyLabel readOnly highlighted>
+              Allow multiple entries
+            </PropertyLabel>
+
+            <SelectPreviewContainer readOnly={readOnly} displayType='details'>
+              <Switch
+                sx={{ ml: '0 !important' }}
+                isOn={Boolean(currentReward?.allowMultipleApplications)}
+                onChanged={(isOn) => {
+                  applyRewardUpdates({
+                    allowMultipleApplications: !!isOn
+                  });
+                }}
+                disabled={readOnly}
+                readOnly={readOnly}
+              />
+            </SelectPreviewContainer>
+          </Box>
+        </Tooltip>
 
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
           <PropertyLabel readOnly highlighted>
@@ -287,10 +314,6 @@ export function RewardProperties(props: {
               await applyRewardUpdates({
                 allowedSubmitterRoles: roleIds
               });
-
-              if (currentReward?.id) {
-                await refreshRewardPermissions(currentReward.id);
-              }
             }}
           />
           {/* TODO @Mo - FIX later
@@ -334,7 +357,11 @@ export function RewardProperties(props: {
             <PropertyLabel readOnly highlighted>
               Reward Token
             </PropertyLabel>
-            <RewardTokenProperty onChange={onRewardTokenUpdate} currentReward={currentReward} readOnly={readOnly} />
+            <RewardTokenProperty
+              onChange={onRewardTokenUpdate}
+              currentReward={currentReward as (RewardCreationData & RewardWithUsers) | null}
+              readOnly={readOnly}
+            />
           </Box>
         )}
 
@@ -380,76 +407,7 @@ export function RewardProperties(props: {
         />
 
         {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
-
-        {/* TODO: Replace this old component with new apply flow */}
-        {rewardPermissions?.work && isSpaceMember && currentReward.createdBy !== user?.id && (
-          <div data-test='reward-applicant-form'>
-            <RewardApplicantForm
-              reward={currentReward}
-              submissions={applications}
-              permissions={rewardPermissions}
-              refreshSubmissions={refreshSubmissions}
-            />
-          </div>
-        )}
-
-        {/*
-      TODO - Fix this when we fix rewards table
-      {rewardPermissions?.review &&
-        currentReward.status !== 'suggestion' && ( // &&!draftReward
-          <RewardApplicantsTable reward={currentReward} permissions={permissions} />
-        )} */}
       </Stack>
     </Box>
   );
 }
-
-// utils - TODO - Fix this later when we check page permissions
-
-// function rollupPermissions({
-//   selectedReviewerUsers,
-//   selectedReviewerRoles,
-//   assignedRoleSubmitters,
-//   spaceId
-// }: {
-//   selectedReviewerUsers: string[];
-//   selectedReviewerRoles: string[];
-//   assignedRoleSubmitters: string[];
-//   spaceId: string;
-// }): Pick<RewardPermissions, 'reviewer' | 'submitter'> {
-//   const reviewers: RewardPermissions['reviewer'] = [
-//     ...selectedReviewerUsers.map((uid) => {
-//       return {
-//         id: uid,
-//         group: 'user' as const
-//       };
-//     }),
-//     ...selectedReviewerRoles.map((uid) => {
-//       return {
-//         id: uid,
-//         group: 'role' as const
-//       };
-//     })
-//   ];
-//   const submitters: RewardPermissions['submitter'] =
-//     assignedRoleSubmitters.length !== 0
-//       ? assignedRoleSubmitters.map((uid) => {
-//           return {
-//             group: 'role',
-//             id: uid
-//           };
-//         })
-//       : [
-//           {
-//             id: spaceId,
-//             group: 'space'
-//           }
-//         ];
-
-//   const permissionsToSend: Pick<RewardPermissions, 'reviewer' | 'submitter'> = {
-//     reviewer: reviewers,
-//     submitter: submitters
-//   };
-
-//   return permissionsToSend;
-// }

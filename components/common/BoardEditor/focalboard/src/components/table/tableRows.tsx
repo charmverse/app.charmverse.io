@@ -27,10 +27,11 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
+  expandSubRowsOnLoad?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
-  const { board, cardPages: allCardPages, activeView, onDeleteCard } = props;
+  const { board, cardPages: allCardPages, activeView, onDeleteCard, expandSubRowsOnLoad } = props;
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
 
@@ -78,6 +79,7 @@ function TableRows(props: Props): JSX.Element {
           cardPage={page}
           readOnlyTitle={props.readOnlyTitle}
           subPages={subPages}
+          expandSubRowsOnLoad={expandSubRowsOnLoad}
         />
       ))}
 

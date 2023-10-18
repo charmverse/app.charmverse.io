@@ -22,7 +22,7 @@ import charmClient from 'charmClient';
 import { useColorMode } from 'context/darkMode';
 import { useUser } from 'hooks/useUser';
 import { useUserPreferences } from 'hooks/useUserPreferences';
-import { formatDateTime } from 'lib/utilities/dates';
+import { formatDateTime, getCurrentDate } from 'lib/utilities/dates';
 import debounce from 'lib/utilities/debounce';
 
 import Legend from '../../Legend';
@@ -34,7 +34,6 @@ export const schema = yup.object({
 });
 
 export type FormValues = yup.InferType<typeof schema>;
-
 export function AccountPreferences() {
   const { userPreferences, updatePreferences } = useUserPreferences();
   const theme = useTheme();
@@ -142,9 +141,9 @@ export function AccountPreferences() {
         <Box>
           <InputLabel>Preferred date and time format:</InputLabel>
           <Select value={userPreferences.locale || ''} displayEmpty onChange={(e) => updateLocale(e.target.value)}>
-            <MenuItem value=''>My native format ({formatDateTime(new Date())})</MenuItem>
-            <MenuItem value='en-US'>American English format ({formatDateTime(new Date(), 'en-US')})</MenuItem>
-            <MenuItem value='en-GB'>European English format ({formatDateTime(new Date(), 'en-GB')})</MenuItem>
+            <MenuItem value=''>My native format ({formatDateTime(getCurrentDate())})</MenuItem>
+            <MenuItem value='en-US'>American English format ({formatDateTime(getCurrentDate(), 'en-US')})</MenuItem>
+            <MenuItem value='en-GB'>European English format ({formatDateTime(getCurrentDate(), 'en-GB')})</MenuItem>
           </Select>
         </Box>
       </Box>

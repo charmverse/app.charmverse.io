@@ -34,10 +34,16 @@ interface Props {
   newPostCategory?: PostCategory | null;
 }
 
+const emptyPost: FormInputs = {
+  title: '',
+  content: null,
+  contentText: ''
+};
+
 export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory }: Props) {
   const mounted = useRef(false);
   const router = useRouter();
-  const [formInputs, setFormInputs] = useState<FormInputs>(post ?? { title: '', content: null, contentText: '' });
+  const [formInputs, setFormInputs] = useState<FormInputs | undefined>(isLoading ? undefined : emptyPost);
   const [contentUpdated, setContentUpdated] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { space } = useCurrentSpace();
@@ -55,19 +61,6 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
   const isMobile = useSmallScreen();
 
   const [isDraftPostListOpen, setIsDraftPostListOpen] = useState(false);
-  // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (spaceId && post?.id) {
-      trackPageView({ spaceId, postId: post.id, type: 'post', spaceDomain: space?.domain });
-    }
-  }, [post?.id]);
 
   function close() {
     onClose();
@@ -108,77 +101,95 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
 
   const relativePath = `/${router.query.domain}/forum/post/${post?.path}`;
 
+  // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (spaceId && post?.id) {
+      trackPageView({ spaceId, postId: post.id, type: 'post', spaceDomain: space?.domain });
+      setFormInputs(post);
+    }
+  }, [post?.id]);
+
   return (
-    <Dialog
-      fullWidth
-      toolbar={
-        post ? (
-          <Box display='flex' justifyContent='space-between'>
-            <Button
-              data-test='open-post-as-page'
-              size='small'
-              color='secondary'
-              href={relativePath}
-              variant='text'
-              startIcon={<OpenInFullIcon fontSize='small' />}
-            >
-              Open as Page
-            </Button>
-          </Box>
-        ) : (
-          <div />
-        )
-      }
-      toolsMenu={
-        <Stack flexDirection='row' gap={1}>
-          {!isDraftsLoading && ((!isLoading && !post) || post?.isDraft) ? (
-            <Button
-              data-test='view-drafted-posts'
-              size='small'
-              color='secondary'
-              onClick={() => setIsDraftPostListOpen(true)}
-              variant='text'
-              startIcon={<MessageOutlinedIcon fontSize='small' />}
-            >
-              View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
-            </Button>
-          ) : null}
-          <FullPageActionsMenuButton post={post} onDelete={close} />
-        </Stack>
-      }
-      onClose={() => {
-        if (contentUpdated) {
-          setShowConfirmDialog(true);
-        } else {
-          close();
+    <>
+      <Dialog
+        fullWidth
+        toolbar={
+          post ? (
+            <Box display='flex' justifyContent='space-between'>
+              <Button
+                data-test='open-post-as-page'
+                size='small'
+                color='secondary'
+                href={relativePath}
+                variant='text'
+                startIcon={<OpenInFullIcon fontSize='small' />}
+                sx={{ px: 1.5 }}
+              >
+                Open as Page
+              </Button>
+            </Box>
+          ) : (
+            <div />
+          )
         }
-      }}
-    >
-      {!isLoading && spaceId && (
-        <PostPage
-          formInputs={formInputs}
-          setFormInputs={(_formInputs) => {
-            setContentUpdated(true);
-            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
-          }}
-          post={post ?? null}
-          spaceId={spaceId}
-          contentUpdated={contentUpdated}
-          setContentUpdated={setContentUpdated}
-          newPostCategory={newPostCategory}
-        />
-      )}
-      <ConfirmDeleteModal
+        toolsMenu={
+          <Stack flexDirection='row' gap={1}>
+            {!isDraftsLoading && ((!isLoading && !post) || post?.isDraft) ? (
+              <Button
+                data-test='view-drafted-posts'
+                size='small'
+                color='secondary'
+                onClick={() => setIsDraftPostListOpen(true)}
+                variant='text'
+                startIcon={<MessageOutlinedIcon fontSize='small' />}
+              >
+                View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
+              </Button>
+            ) : null}
+            <FullPageActionsMenuButton post={post} onDelete={close} />
+          </Stack>
+        }
         onClose={() => {
-          setShowConfirmDialog(false);
+          if (contentUpdated) {
+            setShowConfirmDialog(true);
+          } else {
+            close();
+          }
         }}
-        title='Unsaved changes'
-        open={showConfirmDialog}
-        buttonText='Discard'
-        secondaryButtonText='Go back'
-        question='Are you sure you want to close this post? You have unsaved changes'
-        onConfirm={close}
-      />
+      >
+        {!isLoading && spaceId && formInputs && (
+          <PostPage
+            formInputs={formInputs}
+            setFormInputs={(_formInputs) => {
+              setContentUpdated(true);
+              setFormInputs((__formInputs) => ({ ...emptyPost, ...(__formInputs ?? {}), ..._formInputs }));
+            }}
+            post={post ?? null}
+            spaceId={spaceId}
+            contentUpdated={contentUpdated}
+            setContentUpdated={setContentUpdated}
+            newPostCategory={newPostCategory}
+          />
+        )}
+        <ConfirmDeleteModal
+          onClose={() => {
+            setShowConfirmDialog(false);
+          }}
+          title='Unsaved changes'
+          open={showConfirmDialog}
+          buttonText='Discard'
+          secondaryButtonText='Go back'
+          question='Are you sure you want to close this post? You have unsaved changes'
+          onConfirm={close}
+        />
+      </Dialog>
       <MuiDialog
         fullWidth
         fullScreen={isMobile}
@@ -206,6 +217,6 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
           )}
         </DialogContent>
       </MuiDialog>
-    </Dialog>
+    </>
   );
 }

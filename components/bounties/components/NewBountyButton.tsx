@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -18,7 +17,6 @@ export function NewBountyButton() {
   const suggestBounties = currentUserPermissions?.createBounty === false;
   const { setBounties } = useBounties();
   const { mutatePage } = usePages();
-  const { showPage } = usePageDialog();
 
   async function onClickCreate() {
     if (currentSpace && user) {

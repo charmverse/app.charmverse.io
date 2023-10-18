@@ -4,6 +4,7 @@ import type { EditorState, Transaction } from 'prosemirror-state';
 import type { NodeView, Decoration, EditorView } from 'prosemirror-view';
 
 import { MARK_TEXT_COLOR, MARK_FONT_SIZE } from './markNames';
+import { LIST_ITEM } from './nodeNames';
 
 // This implements the `NodeView` interface
 // https://prosemirror.net/docs/ref/#view.NodeView
@@ -38,15 +39,15 @@ export class ListItemNodeView implements NodeView {
       }
     }
 
-    // Connect the two contentDOM and containerDOM for pm to write to
-    // this.containerDOM?.appendChild(this.contentDOM!);
-
     this._updateDOM(node);
   }
 
   // This implements the `NodeView` interface.
   // update(node: Node, decorations: Decoration[]): boolean {
   update(node: Node): boolean {
+    if (LIST_ITEM !== node.type.name) {
+      return false;
+    }
     return this._updateDOM(node);
   }
 
@@ -112,21 +113,21 @@ export class ListItemNodeView implements NodeView {
 
     // handle TO DO
     const { todoChecked } = node.attrs;
-    if (todoChecked == null) {
-      removeCheckbox(this.dom!);
-      return false;
+    if (todoChecked === null) {
+      removeCheckbox(this.dom);
+      return true;
     }
 
     // if parent is not bulletList i.e. it is orderedList
     if (!checkParentBulletList(this.view.state, this.getPos())) {
-      return false;
+      return true;
     }
     // assume nothing about the dom elements state.
     // for example it is possible that the checkbox is not created
     // when a regular list is converted to todo list only update handler
     // will be called. The create handler was called in the past
     // but without the checkbox element, hence the checkbox wont be there
-    setupCheckbox(this.dom!, node.attrs, this.readOnly, (attrs: Node['attrs']) => {
+    setupCheckbox(this.dom, node.attrs, this.readOnly, (attrs: Node['attrs']) => {
       this.view.dispatch(updateAttrs(this.getPos(), node, attrs, this.view.state.tr));
     });
     // const checkbox = this!.containerDOM!.firstChild!.firstChild! as HTMLInputElement;

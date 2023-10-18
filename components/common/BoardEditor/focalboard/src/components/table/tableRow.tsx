@@ -61,6 +61,7 @@ type Props = {
   isExpanded?: boolean | null;
   setIsExpanded?: (expanded: boolean) => void;
   indentTitle?: number;
+  expandSubRowsOnLoad?: boolean;
 };
 
 export const columnWidth = (
@@ -277,12 +278,13 @@ function TableRow(props: Props) {
 }
 
 export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { subPages?: CardPage[] }) {
-  const [isExpanded, setIsExpanded] = useState<boolean | null>(props.subPages?.length ? false : null);
+  const isExpandedOnRender = props.subPages?.length ? !!props.expandSubRowsOnLoad : null;
+  const [isExpanded, setIsExpanded] = useState<boolean | null>(isExpandedOnRender);
 
   useEffect(() => {
     setIsExpanded((v) => {
       if (v === null && props.subPages?.length) {
-        return false;
+        return !!props.expandSubRowsOnLoad;
       }
 
       return v;

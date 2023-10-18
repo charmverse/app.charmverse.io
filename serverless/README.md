@@ -17,7 +17,8 @@ It will use esbuild and compile all the TS files into a minified bundle ready to
 In order to deploy the serverless environment, you need to run the following command:
 
 ```
-$ serverless deploy
+$ serverless deploy     # staging/dev worker
+$ serverless deploy --stage prod     # production
 ```
 
 ### Functions

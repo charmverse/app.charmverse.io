@@ -1,12 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
 
-import { approveApplication, createApplication, reviewSubmission, updateSubmission } from 'lib/applications/actions';
-import { createBounty } from 'lib/bounties';
+import { reviewApplication } from 'lib/rewards/reviewApplication';
+import { work } from 'lib/rewards/work';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getApplicationEntity, getRewardEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
@@ -14,7 +13,7 @@ import { createNotificationsFromEvent } from '../../createNotificationsFromEvent
 import { createRewardNotifications } from '../createRewardNotifications';
 
 describe(`Test reward events and notifications`, () => {
-  it(`Should create bounty notifications for application.created event`, async () => {
+  it(`Should create reward notifications for reward creator and reviewers application.created event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
@@ -22,26 +21,28 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
       rewardAmount: 1,
       rewardToken: 'ETH',
-      permissions: {
+      bountyPermissions: {
         reviewer: [
           {
             group: 'user',
-            id: user.id
+            id: user2.id
           }
         ]
       }
     });
 
-    const application = await createApplication({
-      bountyId: bounty.id,
-      message: 'Hello World',
-      userId: user2.id
+    const application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user.id,
+        bountyId: bounty.id
+      }
     });
 
     await createRewardNotifications({
@@ -62,15 +63,28 @@ describe(`Test reward events and notifications`, () => {
         bountyId: bounty.id,
         notificationMetadata: {
           spaceId: space.id,
-          userId: user.id
+          userId: user2.id
+        }
+      }
+    });
+
+    const applicationPendingCreatorNotification = await prisma.bountyNotification.findFirst({
+      where: {
+        type: 'application.created',
+        applicationId: application.id,
+        bountyId: bounty.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: user2.id
         }
       }
     });
 
     expect(applicationPendingReviewerNotification).toBeTruthy();
+    expect(applicationPendingCreatorNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.accepted event`, async () => {
+  it(`Should create reward notifications for application.accepted event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
@@ -78,20 +92,23 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: user.id,
       spaceId: space.id
     });
 
-    const application = await createApplication({
-      bountyId: bounty.id,
-      message: 'Hello World',
-      userId: user2.id
+    const application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user2.id,
+        bountyId: bounty.id
+      }
     });
 
-    await approveApplication({
-      applicationOrApplicationId: application.id,
-      userId: user.id
+    await reviewApplication({
+      applicationId: application.id,
+      userId: user.id,
+      decision: 'approve'
     });
 
     await createRewardNotifications({
@@ -120,7 +137,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationAcceptedNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.rejected event`, async () => {
+  it(`Should create reward notifications for application.rejected event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await generateUser();
     await addUserToSpace({
@@ -128,20 +145,22 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: user.id,
       spaceId: space.id
     });
 
-    const application = await createApplication({
-      bountyId: bounty.id,
-      message: 'Hello World',
-      userId: user2.id
+    const application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user2.id,
+        bountyId: bounty.id
+      }
     });
 
-    await reviewSubmission({
+    await reviewApplication({
       decision: 'reject',
-      submissionId: application.id,
+      applicationId: application.id,
       userId: user.id
     });
 
@@ -172,7 +191,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationRejectedNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.submitted event`, async () => {
+  it(`Should create reward notifications for application.submitted event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
     await addUserToSpace({
@@ -180,13 +199,13 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
       rewardAmount: 1,
       chainId: 1,
-      permissions: {
+      bountyPermissions: {
         reviewer: [
           {
             group: 'user',
@@ -196,24 +215,27 @@ describe(`Test reward events and notifications`, () => {
       }
     });
 
-    const application = await createApplication({
-      bountyId: bounty.id,
-      message: 'Hello World',
+    const application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user2.id,
+        bountyId: bounty.id
+      }
+    });
+
+    await reviewApplication({
+      applicationId: application.id,
+      userId: user.id,
+      decision: 'approve'
+    });
+
+    await work({
+      rewardInfo: '',
+      walletAddress: user2.wallets[0].address,
+      submissionNodes: 'Hello World',
+      rewardId: bounty.id,
+      applicationId: application.id,
       userId: user2.id
-    });
-
-    await approveApplication({
-      applicationOrApplicationId: application.id,
-      userId: user.id
-    });
-
-    await updateSubmission({
-      customReward: false,
-      submissionContent: {
-        walletAddress: user2.wallets[0].address,
-        submissionNodes: 'Hello World'
-      },
-      submissionId: application.id
     });
 
     await createRewardNotifications({
@@ -242,7 +264,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationSubmittedNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.approved event`, async () => {
+  it(`Should create reward notifications for application.approved event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const bountyReviewer = await createUserFromWallet();
     await addUserToSpace({
@@ -255,13 +277,13 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
       rewardAmount: 1,
       chainId: 1,
-      permissions: {
+      bountyPermissions: {
         reviewer: [
           {
             group: 'user',
@@ -275,30 +297,32 @@ describe(`Test reward events and notifications`, () => {
       }
     });
 
-    const application = await createApplication({
-      bountyId: bounty.id,
-      message: 'Hello World',
+    const application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user2.id,
+        bountyId: bounty.id
+      }
+    });
+
+    await reviewApplication({
+      applicationId: application.id,
+      userId: user.id,
+      decision: 'approve'
+    });
+
+    await work({
+      walletAddress: user2.wallets[0].address,
+      submissionNodes: 'Hello World',
+      applicationId: application.id,
+      rewardId: bounty.id,
       userId: user2.id
     });
 
-    await approveApplication({
-      applicationOrApplicationId: application.id,
-      userId: user.id
-    });
-
-    await updateSubmission({
-      customReward: false,
-      submissionContent: {
-        walletAddress: user2.wallets[0].address,
-        submissionNodes: 'Hello World'
-      },
-      submissionId: application.id
-    });
-
-    await reviewSubmission({
-      decision: 'approve',
-      submissionId: application.id,
-      userId: user.id
+    await reviewApplication({
+      applicationId: application.id,
+      userId: user.id,
+      decision: 'approve'
     });
 
     await createRewardNotifications({
@@ -341,7 +365,7 @@ describe(`Test reward events and notifications`, () => {
     expect(applicationPaymentPendingNotification).toBeTruthy();
   });
 
-  it(`Should create bounty notifications for application.payment_completed event`, async () => {
+  it(`Should create reward notifications for application.payment_completed event`, async () => {
     const { space, user } = await generateUserAndSpace();
     const user2 = await createUserFromWallet();
     await addUserToSpace({
@@ -349,13 +373,13 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
       rewardAmount: 1,
       chainId: 1,
-      permissions: {
+      bountyPermissions: {
         reviewer: [
           {
             group: 'user',
@@ -365,29 +389,30 @@ describe(`Test reward events and notifications`, () => {
       }
     });
 
-    const application = await createApplication({
-      bountyId: bounty.id,
-      message: 'Hello World',
+    const application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user2.id,
+        bountyId: bounty.id
+      }
+    });
+    await reviewApplication({
+      applicationId: application.id,
+      userId: user.id,
+      decision: 'approve'
+    });
+
+    await work({
+      walletAddress: user2.wallets[0].address,
+      submissionNodes: 'Hello World',
+      applicationId: application.id,
+      rewardId: bounty.id,
       userId: user2.id
     });
 
-    await approveApplication({
-      applicationOrApplicationId: application.id,
-      userId: user.id
-    });
-
-    await updateSubmission({
-      customReward: false,
-      submissionContent: {
-        walletAddress: user2.wallets[0].address,
-        submissionNodes: 'Hello World'
-      },
-      submissionId: application.id
-    });
-
-    await reviewSubmission({
+    await reviewApplication({
       decision: 'approve',
-      submissionId: application.id,
+      applicationId: application.id,
       userId: user.id
     });
 
@@ -430,13 +455,13 @@ describe(`Test reward events and notifications`, () => {
       userId: user2.id
     });
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
       rewardAmount: 1,
       rewardToken: 'ETH',
-      permissions: {
+      bountyPermissions: {
         reviewer: [
           {
             group: 'user',
@@ -446,10 +471,12 @@ describe(`Test reward events and notifications`, () => {
       }
     });
 
-    const application = await createApplication({
-      bountyId: bounty.id,
-      message: 'Hello World',
-      userId: user2.id
+    const application = await prisma.application.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user2.id,
+        bountyId: bounty.id
+      }
     });
 
     await createNotificationsFromEvent({

@@ -19,6 +19,7 @@ import {
   getUserEntity
 } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { builders } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { generateProposalCategory } from 'testing/utils/proposals';
@@ -35,13 +36,23 @@ describe(`Test document events and notifications`, () => {
       spaceId: space.id,
       userId: user2.id
     });
+    const mentionId = v4();
 
     const createdPage = await createPage({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      content: builders
+        .doc(
+          builders.mention({
+            type: 'user',
+            value: user2.id,
+            id: mentionId,
+            createdAt: new Date().toISOString(),
+            createdBy: user.id
+          })
+        )
+        .toJSON()
     });
-
-    const mentionId = v4();
 
     await createDocumentNotifications({
       event: {
@@ -53,8 +64,8 @@ describe(`Test document events and notifications`, () => {
           createdAt: new Date().toISOString(),
           createdBy: user.id,
           id: mentionId,
-          text: '',
-          value: user2.id
+          value: user2.id,
+          parentNode: null
         }
       },
       spaceId: space.id,
@@ -351,10 +362,7 @@ describe(`Test document events and notifications`, () => {
 
     const post = await createForumPost({
       categoryId: postCategory.id,
-      content: {
-        type: 'doc',
-        content: emptyDocument
-      },
+      content: emptyDocument,
       contentText: 'Hello World',
       createdBy: user.id,
       isDraft: false,

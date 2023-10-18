@@ -17,10 +17,13 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
@@ -42,36 +45,29 @@ const StyledSidebarBox = styled(Box)`
   ${sidebarItemStyles}
 `;
 
-const NotificationCountBox = styled(Box)`
+export const NotificationCountBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.error.main};
-  color: white;
-  width: 20px;
-  display: flex;
-  justify-content: center;
+  display: inline-flex;
   align-items: center;
-  border-radius: 20%;
-  font-weight: semi-bold;
-  font-size: 12px;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 3px;
+  color: white;
 `;
 
 export function NotificationUpdates() {
-  const { user } = useUser();
-
   const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
   const {
-    data: notifications = [],
+    currentSpaceNotifications,
+    currentSpaceUnreadNotifications,
     isLoading,
     mutate: mutateNotifications
-  } = useSWRImmutable(
-    user ? `/notifications/list/${user.id}` : null,
-    () => charmClient.notifications.getNotifications(),
-    {
-      // 10 minutes
-      refreshInterval: 1000 * 10 * 60
-    }
-  );
-
-  const unreadNotifications = notifications.filter((notification) => !notification.read);
+  } = useNotifications();
 
   return (
     <Box>
@@ -80,7 +76,9 @@ export function NotificationUpdates() {
           <QueryBuilderOutlinedIcon color='secondary' fontSize='small' />
           Updates
         </Stack>
-        {unreadNotifications.length !== 0 && <NotificationCountBox>{unreadNotifications.length}</NotificationCountBox>}
+        {currentSpaceUnreadNotifications.length !== 0 && (
+          <NotificationCountBox>{currentSpaceUnreadNotifications.length}</NotificationCountBox>
+        )}
       </StyledSidebarBox>
       <Popover
         {...bindPopover(notificationPopupState)}
@@ -99,7 +97,7 @@ export function NotificationUpdates() {
         }}
       >
         <NotificationsPopover
-          notifications={notifications}
+          notifications={currentSpaceNotifications}
           mutateNotifications={mutateNotifications}
           isLoading={isLoading}
           close={notificationPopupState.close}
@@ -411,12 +409,14 @@ export function NotificationContent({
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
+  const notificationContent = notification.group === 'document' ? notification.content : null;
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
   const todaysDate = new Date();
   const isDateEqual = date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
-  const notificationDate = isDateEqual ? `Today at ${formatTime(createdAt)}` : formatDate(createdAt);
-
+  const notificationDate = isDateEqual
+    ? `Today at ${formatTime(createdAt)}`
+    : formatDate(createdAt, { withYear: false });
   const isSmallScreen = useSmallScreen();
 
   return (
@@ -464,8 +464,8 @@ export function NotificationContent({
             <Stack direction='row' justifyContent='space-between'>
               <Stack direction='row' gap={1} alignItems='center'>
                 <Typography
-                  variant='subtitle1'
                   sx={{
+                    fontSize: 14,
                     display: '-webkit-box',
                     overflow: 'hidden',
                     WebkitBoxOrient: 'vertical',
@@ -512,12 +512,32 @@ export function NotificationContent({
                 </Card>
               )}
             </Stack>
-            <Typography mb={0.5} whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' fontWeight='bold'>
-              {pageTitle}
-            </Typography>
-            <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
+            <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2' fontSize={12}>
               {spaceName}
             </Typography>
+            <Typography
+              mb={0.5}
+              fontSize={14}
+              whiteSpace='nowrap'
+              overflow='hidden'
+              textOverflow='ellipsis'
+              fontWeight='bold'
+            >
+              {pageTitle}
+            </Typography>
+            {notificationContent && (
+              <CharmEditor
+                isContentControlled
+                disableRowHandles
+                content={notificationContent}
+                readOnly
+                style={{
+                  left: 0,
+                  padding: 0,
+                  fontSize: '14px'
+                }}
+              />
+            )}
             {archived && (
               <Button
                 sx={{

@@ -1,10 +1,11 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { updateRewardSettings } from 'lib/rewards/updateRewardSettings';
@@ -25,7 +26,7 @@ handler
   .get(getRewardController)
   .put(updateReward);
 
-async function getRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
+async function getRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsersAndPageMeta>) {
   const { id } = req.query;
 
   const reward = await getRewardOrThrow({ rewardId: id as string });
@@ -41,7 +42,18 @@ async function getRewardController(req: NextApiRequest, res: NextApiResponse<Rew
     throw new UnauthorisedActionError('You do not have permissions to view this reward.');
   }
 
-  res.status(200).json(reward);
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      id: reward.id
+    },
+    select: {
+      id: true,
+      title: true,
+      path: true
+    }
+  });
+
+  res.status(200).json({ ...reward, page: rewardPage });
 }
 
 async function updateReward(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {

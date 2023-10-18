@@ -37,7 +37,8 @@ describe('GET /api/public/profile/[userPath]', () => {
       bountyCap: 1,
       applicationStatus: 'complete',
       spaceId: space.id,
-      userId: user.id
+      userId: user.id,
+      bountyTitle: 'Page title'
     });
 
     const aggregatedData = await getAggregatedData(user.id);
