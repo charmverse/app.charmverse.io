@@ -34,6 +34,9 @@ describe('paginatedPrismaTask', () => {
       model: 'post',
       batchSize,
       queryOptions: {
+        where: {
+          spaceId: space.id
+        },
         select: {
           id: true,
           title: true
