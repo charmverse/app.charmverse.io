@@ -11,7 +11,7 @@ import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
@@ -62,7 +62,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   };
   const lastHighlightedCommentId = React.useRef<string | null>(null);
 
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { setActiveView } = usePageSidebar();
 
   let threadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadFilter === 'resolved') {
@@ -104,7 +104,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
     const highlightedCommentId = router.query.inlineCommentId;
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
-      setCurrentPageActionDisplay('comments');
+      setActiveView('comments');
       const isHighlightedResolved = resolvedThreads.some((thread) =>
         thread.comments.some((comment) => comment.id === highlightedCommentId)
       );
