@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box } from '@mui/material';
+import { Box, DialogActions, Divider, Stack } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
@@ -15,6 +15,7 @@ type Props = {
   className?: string;
   onClose: () => void;
   fullWidth?: boolean;
+  footerActions?: React.ReactNode;
 };
 
 const Toolbar = styled(Box)`
@@ -30,8 +31,24 @@ const Content = styled.div`
   -webkit-overflow-scrolling: touch;
 `;
 
+const FooterActionsContainer = styled(Box)`
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  position: relative;
+  padding: 0 40px 0 30px;
+
+  ${({ theme }) => theme.breakpoints.up('lg')} {
+    width: 860px;
+  }
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    padding: 0 80px;
+  }
+`;
+
 function FBDialog(props: Props) {
-  const { toolbar, toolsMenu, fullWidth = false } = props;
+  const { toolbar, toolsMenu, fullWidth = false, footerActions } = props;
 
   useHotkeys('esc', () => props.onClose());
 
@@ -57,6 +74,15 @@ function FBDialog(props: Props) {
               )}
             </Toolbar>
             <Content>{props.children}</Content>
+
+            {!!footerActions && (
+              <Stack>
+                <Divider light />
+                <FooterActionsContainer>
+                  <DialogActions sx={{ px: 0 }}>{footerActions}</DialogActions>
+                </FooterActionsContainer>
+              </Stack>
+            )}
           </div>
         </div>
       </div>
