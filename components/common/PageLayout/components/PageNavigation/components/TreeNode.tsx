@@ -151,12 +151,12 @@ function DraggableTreeNode({
         addPage({ ...page, parentId: item.id });
       }
     },
-    [addPage]
+    [item.id, addPage]
   );
 
   const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
 
-  const allViews = useAppSelector(getSortedViews);
+  const allViews = useAppSelector(getSortedViews(item.id));
   const views = allViews.filter((view) => view.parentId === item.id);
 
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);

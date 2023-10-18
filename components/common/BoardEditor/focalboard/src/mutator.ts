@@ -783,7 +783,6 @@ export class Mutator {
     const droppedViewIndex = tempViewIds.indexOf(droppedView.id);
     const dropzoneViewIndex = tempViewIds.indexOf(dropzoneView.id);
     tempViewIds.splice(dropzoneViewIndex, 0, tempViewIds.splice(droppedViewIndex, 1)[0]);
-
     await undoManager.perform(
       async () => {
         await this.patchBlock(boardId, { updatedFields: { viewIds: tempViewIds } }, publishIncrementalUpdate);
