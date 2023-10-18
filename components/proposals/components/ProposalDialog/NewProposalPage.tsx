@@ -85,7 +85,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
               onContentChange={updateProposalContent}
               focusOnInit
               isContentControlled
-              insideModal
               readOnly={readOnlyEditor}
               key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
             >

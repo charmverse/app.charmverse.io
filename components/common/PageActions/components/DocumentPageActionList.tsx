@@ -18,8 +18,8 @@ import { Button } from 'components/common/Button';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useMembers } from 'hooks/useMembers';
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageUpdates, PageWithContent } from 'lib/pages';
 import { fontClassName } from 'theme/fonts';
@@ -97,7 +97,6 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
 }
 
 type Props = {
-  insideModal?: boolean;
   onComplete: VoidFunction;
   page: PageActionMeta;
   pagePermissions?: PagePermissionFlags;
@@ -105,21 +104,14 @@ type Props = {
   onDelete?: VoidFunction;
 };
 
-export function DocumentPageActionList({
-  insideModal,
-  page,
-  onComplete,
-  onDelete,
-  pagePermissions,
-  undoEditorChanges
-}: Props) {
+export function DocumentPageActionList({ page, onComplete, onDelete, pagePermissions, undoEditorChanges }: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
   const { rewards, mutateRewards: refreshRewards } = useRewards();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { setActiveView, isInsideDialog } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
   const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
@@ -242,13 +234,13 @@ export function DocumentPageActionList({
           label={<Typography variant='body2'>Full width</Typography>}
         />
       </ListItemButton>
-      {!insideModal && (
+      {!isInsideDialog && (
         <>
           <Divider />
           <ListItemButton
             disabled={!pagePermissions?.comment}
             onClick={() => {
-              setCurrentPageActionDisplay('comments');
+              setActiveView('comments');
               onComplete();
             }}
           >
@@ -262,7 +254,7 @@ export function DocumentPageActionList({
           </ListItemButton>
           <ListItemButton
             onClick={() => {
-              setCurrentPageActionDisplay('suggestions');
+              setActiveView('suggestions');
               onComplete();
             }}
           >

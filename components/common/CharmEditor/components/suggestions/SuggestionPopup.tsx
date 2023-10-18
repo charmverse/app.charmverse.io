@@ -4,7 +4,7 @@ import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
 import { createPortal } from 'react-dom';
 
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useUser } from 'hooks/useUser';
 
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
@@ -18,10 +18,8 @@ export function SuggestionsPopup({
   pluginKey,
   readOnly,
   pageId,
-  spaceId,
-  insideModal
+  spaceId
 }: {
-  insideModal?: boolean;
   pluginKey: PluginKey<SuggestionPluginState>;
   readOnly: boolean;
   pageId: string;
@@ -29,10 +27,10 @@ export function SuggestionsPopup({
 }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, rowPos } = usePluginState(pluginKey) as SuggestionPluginState;
-  const { currentPageActionDisplay } = usePageActionDisplay();
+  const { activeView } = usePageSidebar();
   const { user } = useUser();
 
-  const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || insideModal) && isVisible;
+  const popupIsVisible = activeView !== 'suggestions' && isVisible;
 
   if (popupIsVisible) {
     const rows = getEventsFromDoc({ state: view.state });

@@ -270,7 +270,7 @@ export function PostPage({
                 pageType='post'
                 autoFocus={false}
                 readOnly={!canEdit}
-                pageActionDisplay={null}
+                PageSidebar={null}
                 postId={post?.id}
                 disablePageSpecificFeatures
                 enableVoting={true}
