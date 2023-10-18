@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import useSWRImmutable from 'swr/immutable';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -13,14 +13,10 @@ export function useNotifications() {
     error: serverError,
     isLoading,
     mutate
-  } = useSWRImmutable(
-    user ? `/notifications/list/${user.id}` : null,
-    () => charmClient.notifications.getNotifications(),
-    {
-      // 10 minutes
-      refreshInterval: 1000 * 10 * 60
-    }
-  );
+  } = useSWR(user ? `/notifications/list/${user.id}` : null, () => charmClient.notifications.getNotifications(), {
+    // 10 minutes
+    refreshInterval: 1000 * 10 * 60
+  });
 
   const error = serverError?.message || serverError;
 

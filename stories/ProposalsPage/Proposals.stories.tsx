@@ -118,7 +118,6 @@ export function NewProposal() {
             setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
           }}
           contentUpdated={contentUpdated}
-          setContentUpdated={setContentUpdated}
         />
       </Paper>
     </Context>

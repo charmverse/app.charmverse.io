@@ -13,6 +13,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from 'components/common/PageLayout/components/Header/components/DocumentHeaderElements';
+import { useNewProposal } from 'components/proposals/components/ProposalDialog/hooks/useNewProposal';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -38,14 +39,21 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
-  const { space } = useCurrentSpace();
-  const { user } = useUser();
-  const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
-  const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>(
-    emptyState({ ...newProposal, userId: user?.id })
-  );
+  const {
+    formInputs,
+    setFormInputs,
+    clearFormInputs,
+    contentUpdated,
+    createProposal,
+    isCreatingProposal,
+    disabledTooltip
+  } = useNewProposal({
+    newProposal
+  });
 
-  const [contentUpdated, setContentUpdated] = useState(false);
+  const { space } = useCurrentSpace();
+  const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const isLoading = !!pageId && isPageLoading;
@@ -100,13 +108,6 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    setFormInputs((prevState) => ({
-      ...prevState,
-      publishToLens: !!user?.publishToLensDefault
-    }));
-  }, [user?.id]);
-
-  useEffect(() => {
     if (page?.id) {
       trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: space?.domain });
     }
@@ -114,8 +115,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
 
   function close() {
     onClose();
-    setFormInputs(emptyState());
-    setContentUpdated(false);
+    clearFormInputs();
     setShowConfirmDialog(false);
   }
 
@@ -161,6 +161,19 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
           </Stack>
         ) : null
       }
+      footerActions={
+        isLoading || page || !newProposal ? null : (
+          <Button
+            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+            disabledTooltip={disabledTooltip}
+            onClick={createProposal}
+            loading={isCreatingProposal}
+            data-test='create-proposal-button'
+          >
+            Save
+          </Button>
+        )
+      }
     >
       {isLoading ? (
         <LoadingComponent isLoading />
@@ -168,15 +181,7 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
       ) : (
-        <NewProposalPage
-          formInputs={formInputs}
-          setFormInputs={(_formInputs) => {
-            setContentUpdated(true);
-            setFormInputs((existingFormInputs) => ({ ...existingFormInputs, ..._formInputs }));
-          }}
-          contentUpdated={contentUpdated}
-          setContentUpdated={setContentUpdated}
-        />
+        <NewProposalPage formInputs={formInputs} setFormInputs={setFormInputs} contentUpdated={contentUpdated} />
       )}
       <ConfirmDeleteModal
         onClose={() => {
@@ -191,26 +196,4 @@ export function ProposalDialog({ pageId, newProposal, onClose }: Props) {
       />
     </Dialog>
   );
-}
-
-function emptyState({
-  userId,
-  ...inputs
-}: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
-  return {
-    categoryId: null,
-    content: null,
-    contentText: '',
-    headerImage: null,
-    icon: null,
-    evaluationType: 'vote',
-    proposalTemplateId: null,
-    reviewers: [],
-    rubricCriteria: [],
-    title: '',
-    publishToLens: false,
-    fields: { properties: {} },
-    ...inputs,
-    authors: userId ? [userId] : []
-  };
 }
