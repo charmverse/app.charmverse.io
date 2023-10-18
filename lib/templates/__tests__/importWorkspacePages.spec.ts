@@ -7,6 +7,8 @@ import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { Block, prismaToBlock } from 'lib/focalboard/block';
+import type { Board } from 'lib/focalboard/board';
 import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
@@ -96,6 +98,10 @@ describe('importWorkspacePages', () => {
       }
     });
 
+    const boardBlock = prismaToBlock(blocks.find((b) => b.type === 'board')!) as Board;
+    const viewBlocks = blocks.filter((b) => b.type === 'view');
+
+    expect(boardBlock.fields.viewIds.sort()).toStrictEqual(viewBlocks.map((b) => b.id).sort());
     expect(pages.length).toBe(totalSourcePages);
     expect(blocks.length).toBe(totalSourceBlocks);
   });

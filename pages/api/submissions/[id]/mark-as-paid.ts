@@ -35,7 +35,6 @@ async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiR
   }
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: submission.bounty.id,
     userId
   });

@@ -14,7 +14,6 @@ async function computeRewardPermissionsController(req: NextApiRequest, res: Next
   const { id: rewardId } = req.query as { id: string };
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: rewardId,
     userId: req.session.user?.id
   });

@@ -1,16 +1,16 @@
-import type { Application } from '@charmverse/core/prisma-client';
 import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
 import { useGetApplication, useGetRewardPermissions } from 'charmClient/hooks/rewards';
-import type { ReviewDecision, SubmissionUpdateData } from 'lib/applications/interfaces';
+import type { ReviewDecision } from 'lib/rewards/reviewApplication';
+import type { WorkUpsertData } from 'lib/rewards/work';
 
 export function useApplication({ applicationId }: { applicationId: string }) {
   const { data: application, mutate: refreshApplication, isLoading } = useGetApplication({ applicationId });
 
   const { data: applicationRewardPermissions } = useGetRewardPermissions({ rewardId: application?.bountyId });
 
-  const approveApplication = useCallback(
+  const reviewApplication = useCallback(
     async ({ decision }: { decision: ReviewDecision }) => {
       await charmClient.rewards.reviewApplication({ applicationId, decision });
       refreshApplication();
@@ -18,36 +18,17 @@ export function useApplication({ applicationId }: { applicationId: string }) {
     [refreshApplication]
   );
 
-  const reviewSubmission = useCallback(
-    async ({ decision }: { decision: ReviewDecision }) => {
-      await charmClient.rewards.reviewSubmission({ submissionId: applicationId, decision });
-      refreshApplication();
-    },
-    [refreshApplication]
-  );
-
   const updateApplication = useCallback(
-    async (input: { applicationId: string; update: Partial<Application> }) => {
-      await charmClient.rewards.updateApplication(input);
+    async (input: Omit<WorkUpsertData, 'userId'>) => {
+      await charmClient.rewards.work(input);
       refreshApplication();
     },
     [refreshApplication]
   );
-
-  const updateSubmission = useCallback(
-    async (input: SubmissionUpdateData) => {
-      await charmClient.rewards.updateSubmission(input);
-      refreshApplication();
-    },
-    [refreshApplication]
-  );
-
   return {
     application,
     updateApplication,
-    approveApplication,
-    reviewSubmission,
-    updateSubmission,
+    reviewApplication,
     refreshApplication,
     isLoading,
     applicationRewardPermissions

@@ -35,7 +35,7 @@ function checkMentionNode(node: PageContent) {
  * @param content Page content as raw json
  * @returns An array of mention ids
  */
-export function extractMentions(content: PageContent | null, username?: string) {
+export function extractMentions(content: PageContent | null) {
   if (!content) {
     return [];
   }

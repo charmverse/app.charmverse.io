@@ -1,5 +1,6 @@
 import type { ProposalCategory } from '@charmverse/core/prisma';
 
+import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { evaluationTypeOptions } from 'components/proposals/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
 import type { Block } from 'lib/focalboard/block';
@@ -13,8 +14,7 @@ import {
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
   REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID,
-  TITLE_BLOCK_ID
+  STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertiesBlock } from 'lib/proposal/blocks/interfaces';
 
@@ -109,7 +109,7 @@ export function getDefaultTableView({
 
   view.id = DEFAULT_VIEW_BLOCK_ID;
   view.fields.columnWidths = {
-    [TITLE_BLOCK_ID]: 310,
+    [Constants.titleColumnId]: 310,
     [CATEGORY_BLOCK_ID]: 200,
     [STATUS_BLOCK_ID]: 150,
     [AUTHORS_BLOCK_ID]: 150,

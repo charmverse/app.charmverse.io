@@ -118,7 +118,6 @@ export function NewProposal() {
             setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
           }}
           contentUpdated={contentUpdated}
-          setContentUpdated={setContentUpdated}
         />
       </Paper>
     </Context>
@@ -147,6 +146,9 @@ export function ProposalInEvaluation() {
 ProposalInEvaluation.parameters = {
   msw: {
     handlers: {
+      proposalReviewerPool: rest.get('/api/proposals/reviewer-pool', (req, res, ctx) => {
+        return res(ctx.json(null));
+      }),
       proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
         const rubricCriteria: ProposalWithUsersAndRubric['rubricCriteria'] = [
           {

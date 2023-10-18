@@ -1,12 +1,12 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
-import { MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { ListItemIcon, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import { useProposals } from 'components/proposals/hooks/useProposals';
-import { useBounties } from 'hooks/useBounties';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
@@ -28,7 +28,7 @@ export function DuplicatePageAction({
   const { space: currentSpace } = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const router = useRouter();
-  const { refreshBounty } = useBounties();
+  const { refreshReward } = useRewards();
   const { refreshProposal } = useProposals();
 
   const disabled = !pagePermissions?.read || !userSpacePermissions?.createPage;
@@ -44,7 +44,7 @@ export function DuplicatePageAction({
         router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
       }
       if (pageType === 'bounty' || pageType === 'bounty_template') {
-        refreshBounty(duplicatePageResponse.rootPageId);
+        refreshReward(duplicatePageResponse.rootPageId);
       } else if (pageType === 'proposal') {
         refreshProposal(duplicatePageResponse.rootPageId);
       }

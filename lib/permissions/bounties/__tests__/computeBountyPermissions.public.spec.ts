@@ -40,7 +40,7 @@ describe('computeBountyPermissions - public space', () => {
       lock: true,
       mark_paid: true,
       review: true,
-      work: false
+      work: true
     });
   });
 

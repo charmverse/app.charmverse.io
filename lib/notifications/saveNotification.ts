@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -12,28 +13,34 @@ import type {
   VoteNotificationType
 } from './interfaces';
 
-type CreatePostNotificationInput = {
+type NotificationInput = {
+  createdAt: string;
   createdBy: string;
-  postId: string;
   spaceId: string;
   userId: string;
+};
+
+type PostNotificationInput = NotificationInput & {
+  postId: string;
   type: PostNotificationType;
 };
 
-export async function createPostNotification({
+export async function savePostNotification({
+  createdAt,
   createdBy,
   postId,
   spaceId,
   userId,
   type
-}: CreatePostNotificationInput) {
+}: PostNotificationInput) {
   const notificationId = v4();
-  await prisma.postNotification.create({
+  const record = await prisma.postNotification.create({
     data: {
       type,
       id: notificationId,
       notificationMetadata: {
         create: {
+          createdAt,
           id: notificationId,
           createdBy,
           spaceId,
@@ -47,31 +54,32 @@ export async function createPostNotification({
       }
     }
   });
+  log.info('Created post notification', { postId, notificationId: record.id, spaceId, userId: createdBy, type });
+  return record;
 }
 
-export type CreateProposalNotificationInput = {
+type ProposalNotificationInput = NotificationInput & {
   type: ProposalNotificationType;
   proposalId: string;
-  createdBy: string;
-  spaceId: string;
-  userId: string;
 };
 
-export async function createProposalNotification({
+export async function saveProposalNotification({
   type,
+  createdAt,
   createdBy,
   spaceId,
   userId,
   proposalId
-}: CreateProposalNotificationInput) {
+}: ProposalNotificationInput) {
   const notificationId = v4();
-  await prisma.proposalNotification.create({
+  const record = await prisma.proposalNotification.create({
     data: {
       type,
       id: notificationId,
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -84,14 +92,19 @@ export async function createProposalNotification({
       }
     }
   });
+  log.info('Created proposal notification', {
+    proposalId,
+    notificationId: record.id,
+    spaceId,
+    userId: createdBy,
+    type
+  });
+  return record;
 }
 
-type CreateDocumentNotificationInput = {
-  createdBy: string;
+type DocumentNotificationInput = NotificationInput & {
   pageId?: string;
   postId?: string;
-  spaceId: string;
-  userId: string;
   mentionId?: string;
   inlineCommentId?: string;
   postCommentId?: string;
@@ -100,7 +113,8 @@ type CreateDocumentNotificationInput = {
   content: Prisma.JsonValue | null;
 } & (CommentNotification | MentionNotification | InlineCommentNotification);
 
-export async function createDocumentNotification({
+export async function saveDocumentNotification({
+  createdAt,
   createdBy,
   mentionId,
   pageId,
@@ -112,9 +126,9 @@ export async function createDocumentNotification({
   type,
   pageCommentId,
   postCommentId
-}: CreateDocumentNotificationInput) {
+}: DocumentNotificationInput) {
   const notificationId = v4();
-  await prisma.documentNotification.create({
+  const record = await prisma.documentNotification.create({
     data: {
       id: notificationId,
       type,
@@ -122,6 +136,7 @@ export async function createDocumentNotification({
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -165,33 +180,40 @@ export async function createDocumentNotification({
         : undefined
     }
   });
+  log.info('Created document notification', {
+    pageId,
+    notificationId: record.id,
+    spaceId,
+    userId: createdBy,
+    type
+  });
+  return record;
 }
 
-export type CreateCardNotificationInput = {
+export type CardNotificationInput = NotificationInput & {
   cardId: string;
-  createdBy: string;
-  spaceId: string;
   type: 'person_assigned';
-  userId: string;
   personPropertyId: string;
 };
 
-export async function createCardNotification({
+export async function saveCardNotification({
   type,
   personPropertyId,
+  createdAt,
   createdBy,
   spaceId,
   userId,
   cardId
-}: CreateCardNotificationInput) {
+}: CardNotificationInput) {
   const notificationId = v4();
-  await prisma.cardNotification.create({
+  const record = await prisma.cardNotification.create({
     data: {
       id: notificationId,
       type,
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -201,29 +223,39 @@ export async function createCardNotification({
       personPropertyId
     }
   });
+  log.info('Created card notification', {
+    cardId,
+    personPropertyId,
+    notificationId: record.id,
+    spaceId,
+    userId: createdBy,
+    type
+  });
+  return record;
 }
 
-export async function createVoteNotification({
+type PollNotificationInput = NotificationInput & {
+  type: VoteNotificationType;
+  voteId: string;
+};
+
+export async function savePollNotification({
   type,
+  createdAt,
   createdBy,
   spaceId,
   userId,
   voteId
-}: {
-  type: VoteNotificationType;
-  voteId: string;
-  createdBy: string;
-  spaceId: string;
-  userId: string;
-}) {
+}: PollNotificationInput) {
   const notificationId = v4();
-  await prisma.voteNotification.create({
+  const record = await prisma.voteNotification.create({
     data: {
       type,
       id: notificationId,
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -236,27 +268,33 @@ export async function createVoteNotification({
       }
     }
   });
+  log.info('Created poll notification', {
+    voteId,
+    notificationId: record.id,
+    spaceId,
+    userId: createdBy,
+    type
+  });
+  return record;
 }
 
-type CreateBountyNotificationInput = {
+type CreateBountyNotificationInput = NotificationInput & {
   type: BountyNotificationType;
   bountyId: string;
-  createdBy: string;
-  spaceId: string;
-  userId: string;
   applicationId?: string;
 } & (
-  | {
-      type: Exclude<BountyNotificationType, 'suggestion.created'>;
-      applicationId: string;
-    }
-  | {
-      type: 'suggestion.created';
-    }
-);
+    | {
+        type: Exclude<BountyNotificationType, 'suggestion.created'>;
+        applicationId: string;
+      }
+    | {
+        type: 'suggestion.created';
+      }
+  );
 
-export async function createBountyNotification({
+export async function saveRewardNotification({
   type,
+  createdAt,
   createdBy,
   spaceId,
   userId,
@@ -264,13 +302,14 @@ export async function createBountyNotification({
   applicationId
 }: CreateBountyNotificationInput) {
   const notificationId = v4();
-  await prisma.bountyNotification.create({
+  const record = await prisma.bountyNotification.create({
     data: {
       type,
       id: notificationId,
       notificationMetadata: {
         create: {
           id: notificationId,
+          createdAt,
           createdBy,
           spaceId,
           userId
@@ -290,4 +329,13 @@ export async function createBountyNotification({
       }
     }
   });
+  log.info('Created reward notification', {
+    bountyId,
+    applicationId,
+    notificationId: record.id,
+    spaceId,
+    userId: createdBy,
+    type
+  });
+  return record;
 }

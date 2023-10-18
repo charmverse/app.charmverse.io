@@ -66,6 +66,7 @@ export const applicationStatusBoardColors: Record<ApplicationStatus, keyof (type
   complete: 'propColorGray',
   inProgress: 'propColorGreen',
   rejected: 'propColorRed',
+  submission_rejected: 'propColorRed',
   paid: 'propColorGray',
   processing: 'propColorPink',
   review: 'propColorYellow'

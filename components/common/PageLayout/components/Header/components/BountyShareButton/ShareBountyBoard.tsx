@@ -58,8 +58,8 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
   const bountiesArePublic = !!space?.publicBountyBoard;
 
   async function togglePublic() {
-    const updatedSpace = await charmClient.bounties.setPublicBountyBoard({
-      publicBountyBoard: !bountiesArePublic,
+    const updatedSpace = await charmClient.rewards.setPublicRewardBoard({
+      publicRewardBoard: !bountiesArePublic,
       spaceId: space?.id as string
     });
     setSpace(updatedSpace);
@@ -97,16 +97,6 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
         </Box>
         <Switch checked={bountiesArePublic} disabled={!isAdmin} onChange={togglePublic} />
       </Box>
-      {space?.permissionConfigurationMode !== 'custom' && (
-        <Alert severity='info'>
-          Your space is using the
-          <b>{` ${configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode]} `}</b>
-          preset.
-          <br />
-          <br />
-          Manual updates here will change space permissions to <b>custom mode.</b>
-        </Alert>
-      )}
       <Collapse in={bountiesArePublic}>
         {shareLink && (
           <Box p={padding} sx={{ mt: padding === 0 ? 1 : undefined }}>

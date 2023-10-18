@@ -6,13 +6,14 @@ import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createVoteNotification } from '../saveNotification';
+import { savePollNotification } from '../saveNotification';
 
 export async function createPollNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.VoteCreated: {
       const voteId = webhookData.event.vote.id;
@@ -24,9 +25,6 @@ export async function createPollNotifications(webhookData: {
         include: {
           page: {
             select: { id: true, path: true, title: true }
-          },
-          post: {
-            include: { category: true }
           },
           space: {
             select: {
@@ -68,44 +66,23 @@ export async function createPollNotifications(webhookData: {
                   userId: spaceUserId
                 });
           if (pagePermission.comment && vote.author.id !== spaceUserId) {
-            await createVoteNotification({
+            const { id } = await savePollNotification({
+              createdAt: webhookData.createdAt,
               createdBy: vote.author.id,
               spaceId,
               type: 'new_vote',
               userId: spaceUserId,
               voteId
             });
-          }
-        }
-      } else if (vote.post) {
-        for (const spaceUserId of spaceUserIds) {
-          const categories =
-            vote.space.paidTier === 'free'
-              ? await publicPermissionsClient.forum.getPermissionedCategories({
-                  postCategories: [vote.post.category],
-                  userId: spaceUserId
-                })
-              : await premiumPermissionsApiClient.forum.getPermissionedCategories({
-                  postCategories: [vote.post.category],
-                  userId: spaceUserId
-                });
-
-          if (categories.length !== 0 && categories[0].permissions.comment_posts && vote.author.id !== spaceUserId) {
-            await createVoteNotification({
-              createdBy: vote.author.id,
-              spaceId,
-              type: 'new_vote',
-              userId: spaceUserId,
-              voteId
-            });
+            ids.push(id);
           }
         }
       }
-
       break;
     }
 
     default:
       break;
   }
+  return ids;
 }

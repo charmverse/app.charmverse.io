@@ -82,7 +82,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
-  const { signer, provider } = useWeb3Signer();
+  const { signer, provider } = useWeb3Signer({ chainId });
 
   const setSignature = useCallback(
     (_account: string, signature: AuthSig | null, writeToLocalStorage?: boolean) => {

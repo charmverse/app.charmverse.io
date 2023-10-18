@@ -42,7 +42,7 @@ export function MultiPaymentModal({ bounties }: { bounties: BountyWithDetails[] 
 
   const { isDisabled, onPaymentSuccess, getTransactions, gnosisSafes, gnosisSafeData, isLoading, setGnosisSafeData } =
     useMultiBountyPayment({
-      bounties,
+      rewards: bounties,
       postPaymentSuccess() {
         setSelectedApplicationIds([]);
         popupState.close();

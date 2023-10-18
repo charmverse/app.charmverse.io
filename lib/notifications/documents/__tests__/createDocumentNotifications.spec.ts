@@ -8,7 +8,6 @@ import { createNotificationsFromEvent } from 'lib/notifications/createNotificati
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { createProposal } from 'lib/proposal/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { createThread } from 'lib/threads';
 import { createUserFromWallet } from 'lib/users/createUser';
 import {
@@ -363,10 +362,7 @@ describe(`Test document events and notifications`, () => {
 
     const post = await createForumPost({
       categoryId: postCategory.id,
-      content: {
-        type: 'doc',
-        content: emptyDocument
-      },
+      content: emptyDocument,
       contentText: 'Hello World',
       createdBy: user.id,
       isDraft: false,

@@ -42,18 +42,6 @@ export type PermissionAssignee<A extends AssignablePermissionGroups = 'any'> = A
 export type UserPermissionFlags<T extends string, P extends boolean = boolean> = Record<T, P>;
 
 /**
- * Required data for calculating operations a user can access relating to a resource
- * @allowAdminBypass - If true, compute should return full privileges if user is an admin
- * @resourceId - ID of the entity, such as a page or a space
- * userId is optional as we can also request unquthenticated permissions for a resource
- */
-export interface PermissionComputeRequest {
-  resourceId: string;
-  allowAdminBypass: boolean;
-  userId?: string;
-}
-
-/**
  * This is the data we need to compute permissions for a resource
  * It is an improvement after Permission Compute Request, since we assume that all permission compute methods should be responsible for deciding if an admin override is available for a specific operation
  */
