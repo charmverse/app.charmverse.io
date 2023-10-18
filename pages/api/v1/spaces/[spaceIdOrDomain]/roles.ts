@@ -2,7 +2,6 @@ import { DataNotFoundError } from '@charmverse/core/errors';
 import type { Space } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { requireKeys } from 'lib/middleware';
 import { mapSpace } from 'lib/public-api/createWorkspaceApi';
 import { getSpaceById } from 'lib/public-api/getSpaceById';
 import { defaultHandler } from 'lib/public-api/handler';
@@ -14,7 +13,7 @@ import { isUUID } from 'lib/utilities/strings';
 
 const handler = defaultHandler();
 
-handler.use(requireKeys([{ key: 'userId', truthy: true }], 'body')).get(getSpaceWithRoles);
+handler.get(getSpaceWithRoles);
 
 /**
  * @swagger

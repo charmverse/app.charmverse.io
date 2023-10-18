@@ -423,23 +423,6 @@ export interface Workspace {
  * @swagger
  * components:
  *  schemas:
- *    GetSpaceMemberRolesRequestBody:
- *      required:
- *        - userId
- *      type: object
- *      properties:
- *        userId:
- *          type: string
- *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- */
-export interface GetSpaceMemberRolesRequestBody {
-  userId: string;
-}
-
-/**
- * @swagger
- * components:
- *  schemas:
  *    SpaceMemberRolesResponseBody:
  *      type: object
  *      properties:
@@ -463,13 +446,9 @@ export interface SpaceMemberRolesResponseBody {
  *  schemas:
  *    UpdateSpaceMemberRolesRequestBody:
  *      required:
- *        - userId
  *        - roles
  *      type: object
  *      properties:
- *        userId:
- *          type: string
- *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
  *        roles:
  *          type: array
  *          items:
@@ -478,7 +457,6 @@ export interface SpaceMemberRolesResponseBody {
  *
  */
 export interface UpdateSpaceMemberRolesRequestBody {
-  userId: string;
   roles: string[];
 }
 
