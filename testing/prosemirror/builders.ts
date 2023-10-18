@@ -44,6 +44,7 @@ export type NodeType =
   | 'italic'
   | 'label'
   | 'link'
+  | 'linkedPage'
   | 'list_item'
   | 'listItem'
   | 'mention'

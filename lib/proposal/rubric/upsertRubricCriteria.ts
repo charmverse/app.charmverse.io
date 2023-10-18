@@ -29,9 +29,7 @@ export async function upsertRubricCriteria({
 
   const existingCriteria = await prisma.proposalRubricCriteria.findMany({
     where: {
-      OR: {
-        proposalId
-      }
+      proposalId
     },
     select: {
       id: true

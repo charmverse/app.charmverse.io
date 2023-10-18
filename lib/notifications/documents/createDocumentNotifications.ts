@@ -1,4 +1,5 @@
 /* eslint-disable no-continue */
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { extractMentionFromId, extractMentions } from 'lib/prosemirror/extractMentions';
@@ -6,13 +7,14 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createDocumentNotification } from '../saveNotification';
+import { saveDocumentNotification } from '../saveNotification';
 
 export async function createDocumentNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.DocumentMentionCreated: {
       const mentionedUserId = webhookData.event.mention.value;
@@ -31,14 +33,23 @@ export async function createDocumentNotifications(webhookData: {
       const documentContent = document.content as PageContent;
       const targetMention = extractMentionFromId(documentContent, mentionId);
       if (mentionedUserId !== mentionAuthorId && targetMention) {
-        await createDocumentNotification({
+        const { id } = await saveDocumentNotification({
           type: 'mention.created',
+          createdAt: webhookData.createdAt,
           createdBy: mentionAuthorId,
           mentionId: webhookData.event.mention.id,
           pageId: webhookData.event.document.id,
           spaceId: webhookData.spaceId,
           userId: mentionedUserId,
           content: targetMention.parentNode
+        });
+        ids.push(id);
+      } else {
+        log.warn('Ignore user mention - could not find it in the doc', {
+          pageId: documentId,
+          mentionedUserId,
+          mentionAuthorId,
+          targetMention
         });
       }
 
@@ -82,8 +93,9 @@ export async function createDocumentNotifications(webhookData: {
         previousInlineComment?.id !== inlineCommentId &&
         previousInlineComment.userId !== inlineCommentAuthorId
       ) {
-        await createDocumentNotification({
+        const { id } = await saveDocumentNotification({
           type: 'inline_comment.replied',
+          createdAt: webhookData.createdAt,
           createdBy: inlineCommentAuthorId,
           inlineCommentId,
           pageId,
@@ -91,12 +103,14 @@ export async function createDocumentNotifications(webhookData: {
           userId: previousInlineComment.userId,
           content: inlineCommentContent
         });
+        ids.push(id);
       }
 
       for (const authorId of authorIds) {
         if (inlineCommentAuthorId !== authorId && previousInlineComment?.userId !== authorId) {
-          await createDocumentNotification({
+          const { id } = await saveDocumentNotification({
             type: 'inline_comment.created',
+            createdAt: webhookData.createdAt,
             createdBy: inlineCommentAuthorId,
             inlineCommentId,
             pageId,
@@ -104,6 +118,7 @@ export async function createDocumentNotifications(webhookData: {
             userId: authorId,
             content: inlineCommentContent
           });
+          ids.push(id);
         }
       }
 
@@ -111,8 +126,9 @@ export async function createDocumentNotifications(webhookData: {
       for (const extractedMention of extractedMentions) {
         const mentionedUserId = extractedMention.value;
         if (mentionedUserId !== inlineCommentAuthorId) {
-          await createDocumentNotification({
+          const { id } = await saveDocumentNotification({
             type: 'inline_comment.mention.created',
+            createdAt: webhookData.createdAt,
             createdBy: inlineCommentAuthorId,
             inlineCommentId,
             mentionId: extractedMention.id,
@@ -121,6 +137,7 @@ export async function createDocumentNotifications(webhookData: {
             userId: mentionedUserId,
             content: extractedMention.parentNode
           });
+          ids.push(id);
         }
       }
       break;
@@ -160,8 +177,9 @@ export async function createDocumentNotifications(webhookData: {
       if (!comment.parentId) {
         for (const authorId of authorIds) {
           if (authorId !== commentAuthorId) {
-            await createDocumentNotification({
+            const { id } = await saveDocumentNotification({
               type: 'comment.created',
+              createdAt: webhookData.createdAt,
               createdBy: commentAuthorId,
               commentId,
               pageId: documentId,
@@ -172,6 +190,7 @@ export async function createDocumentNotifications(webhookData: {
               userId: authorId,
               content: comment.content
             });
+            ids.push(id);
           }
         }
       } else {
@@ -195,8 +214,9 @@ export async function createDocumentNotifications(webhookData: {
 
         const parentCommentAuthorId = parentComment.createdBy;
         if (parentCommentAuthorId !== commentAuthorId) {
-          await createDocumentNotification({
+          const { id } = await saveDocumentNotification({
             type: 'comment.replied',
+            createdAt: webhookData.createdAt,
             createdBy: commentAuthorId,
             commentId,
             pageId: documentId,
@@ -207,6 +227,7 @@ export async function createDocumentNotifications(webhookData: {
             userId: parentCommentAuthorId,
             content: comment.content
           });
+          ids.push(id);
         }
       }
 
@@ -215,8 +236,9 @@ export async function createDocumentNotifications(webhookData: {
       const extractedMentions = extractMentions(commentContent);
       for (const extractedMention of extractedMentions) {
         const mentionedUserId = extractedMention.value;
-        await createDocumentNotification({
+        const { id } = await saveDocumentNotification({
           type: 'comment.mention.created',
+          createdAt: webhookData.createdAt,
           createdBy: commentAuthorId,
           commentId,
           mentionId: extractedMention.id,
@@ -228,6 +250,7 @@ export async function createDocumentNotifications(webhookData: {
           userId: mentionedUserId,
           content: extractedMention.parentNode
         });
+        ids.push(id);
       }
 
       break;
@@ -236,4 +259,5 @@ export async function createDocumentNotifications(webhookData: {
     default:
       break;
   }
+  return ids;
 }

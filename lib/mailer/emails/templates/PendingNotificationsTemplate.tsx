@@ -2,8 +2,8 @@ import type { User } from '@charmverse/core/prisma';
 import { DateTime } from 'luxon';
 import { MjmlColumn, MjmlDivider, MjmlSection, MjmlText } from 'mjml-react';
 
-import { BOUNTY_STATUS_COLORS, BOUNTY_STATUS_LABELS } from 'components/bounties/components/BountyStatusBadge';
 import { ProposalStatusColors } from 'components/proposals/components/ProposalStatusBadge';
+import { REWARD_STATUS_COLORS, REWARD_STATUS_LABELS } from 'components/rewards/components/RewardChip';
 import { baseUrl } from 'config/constants';
 import type {
   CardNotification,
@@ -34,7 +34,7 @@ export const buttonStyle = {
 const h2Style = { lineHeight: '1.2em', fontSize: '24px', fontWeight: 'bold', marginTop: '10px' };
 const h3Style = { lineHeight: '1em', fontSize: '20px', fontWeight: 'bold', marginTop: '8px', marginBottom: '5px' };
 
-export interface PendingNotificationsData {
+export type PendingNotificationsData = {
   // eslint-disable-next-line
   cardNotifications: CardNotification[];
   documentNotifications: DocumentNotification[];
@@ -45,7 +45,7 @@ export interface PendingNotificationsData {
   forumNotifications: PostNotification[];
   // eslint-disable-next-line
   user: TemplateUser;
-}
+};
 
 export default function PendingNotifications(props: PendingNotificationsData) {
   const totalDocumentNotifications = props.documentNotifications.length;
@@ -327,11 +327,11 @@ function BountyNotificationMjml({ notification }: { notification: BountyNotifica
           alignItems: 'center',
           height: '24px',
           borderRadius: '16px',
-          backgroundColor: colors[BOUNTY_STATUS_COLORS[notification.status]].light,
+          backgroundColor: colors[REWARD_STATUS_COLORS[notification.status]].light,
           fontWeight: 500
         }}
       >
-        <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>{BOUNTY_STATUS_LABELS[notification.status]}</span>
+        <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>{REWARD_STATUS_LABELS[notification.status]}</span>
       </div>
     </MjmlText>
   );

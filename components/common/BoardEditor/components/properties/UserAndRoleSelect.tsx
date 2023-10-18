@@ -161,7 +161,6 @@ export function UserAndRoleSelect({
   const { isFreeSpace } = useIsFreeSpace();
   // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
   const { data: reviewerPool } = useGetReviewerPool(proposalCategoryId);
-
   const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace

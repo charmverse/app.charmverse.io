@@ -97,33 +97,25 @@ html {
   width: 24pt;
 }
 
-/* [FS] IRAD-947 2020-05-26
-Bullet list type changing fix */
 
-/* prettier-ignore */
 .ProseMirror ul[data-indent='7'] li > span > p::before,
-/* prettier-ignore */
 .ProseMirror ul[data-indent='4'] li > span > p::before,
-/* prettier-ignore */
 .ProseMirror ul[data-indent='1'] li > span > p::before {
-  content: '\25e6'; /* circle */
+  content: '◦'; /* circle */
 }
 
-/* prettier-ignore */
 .ProseMirror ul[data-indent='5'] li > span > p::before,
-/* prettier-ignore */
 .ProseMirror ul[data-indent='2'] li > span > p::before {
-  content: '\25aa'; /* square */
+  content: '▪'; /* square */
 }
 
 .ProseMirror ul[data-indent='6'] li > span > p::before,
 .ProseMirror ul[data-indent='3'] li > span > p::before,
 .ProseMirror ul[data-indent='0'] li > span > p::before {
-  content: '\2022'; /* circle */
+  content: '•'; /* circle */
 }
 
 /* To do lists */
-
 
 .ProseMirror {
   li[data-bangle-is-todo] {

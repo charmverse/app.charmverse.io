@@ -18,19 +18,21 @@ import type { BrandColor } from 'theme/colors';
 
 export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: 'Applied',
+  submission_rejected: 'Submission rejected',
   cancelled: 'Cancelled',
-  rejected: 'Rejected',
   inProgress: 'In progress',
-  paid: 'Paid',
-  complete: 'Complete',
+  rejected: 'Application rejected',
+  review: 'Review',
+  complete: 'Approved',
   processing: 'Processing payment',
-  review: 'Review'
+  paid: 'Paid'
 };
 
 export const REWARD_APPLICATION_STATUS_COLORS: Record<ApplicationStatus, BrandColor> = {
   applied: 'teal',
   cancelled: 'gray',
   rejected: 'red',
+  submission_rejected: 'red',
   inProgress: 'yellow',
   paid: 'green',
   complete: 'blue',
@@ -62,6 +64,7 @@ const REWARD_APPLICATION_STATUS_ICONS: Record<
 > = {
   applied: ModeStandbyIcon,
   rejected: DoDisturbOutlinedIcon,
+  submission_rejected: DoDisturbOutlinedIcon,
   inProgress: AssignmentIndIcon,
   review: RuleIcon,
   complete: CheckCircleOutlineIcon,

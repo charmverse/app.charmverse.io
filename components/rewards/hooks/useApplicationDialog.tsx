@@ -1,15 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import { ThreadsProvider } from 'hooks/useThreads';
-import type { ApplicationCreationData, SubmissionCreationData } from 'lib/applications/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-
-export type ApplicationPropertiesInput = {
-  applicationContent?: ApplicationCreationData;
-  submissionContent?: SubmissionCreationData;
-  wallet?: string;
-};
 type Context = {
   currentApplicationId: string | null;
   isOpen: boolean;

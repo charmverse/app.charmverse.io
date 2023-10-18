@@ -43,27 +43,6 @@ jobs:
         with:
           save_cache: true
 
-  chromatic:
-    name: Publish to Chromatic
-    runs-on: ubuntu-latest
-    needs: build-test-env
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-
-      - name: Restore app from cache
-        uses: ./.github/actions/build
-
-      - uses: chromaui/action@v1
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
   test:
     name: Validate code
     runs-on: ubuntu-latest
@@ -129,7 +108,9 @@ jobs:
           - test_name: 'Browser e2e test #1'
             test_command: 'npx playwright install chromium chrome --with-deps; npm run sockets:test & npm run start:test:ci & npm run test:e2e:ci -- --shard=1/2'
           - test_name: 'Browser e2e test #2'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run sockets:test & npm run start:test:ci & npm run test:e2e:ci -- --shard=2/2'
+            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci -- --shard=2/2'
+          - test_name: 'Serverless tests'
+            test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
 
     steps:
       - uses: actions/checkout@v3

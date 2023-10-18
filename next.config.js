@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
-const path = require('node:path');
-
 const BundleAnalyzer = require('@next/bundle-analyzer');
 const next = require('next/dist/lib/is-serializable-props');
-const uuid = require('uuid');
-const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
 
@@ -64,6 +59,16 @@ const config = {
         destination: '/:domain',
         permanent: true
       },
+      // {
+      //   source: '/:domain/bounties',
+      //   destination: '/:domain/rewards',
+      //   permanent: true
+      // },
+      // {
+      //   source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
+      //   destination: '/:domain/bounties?bountyId=:id',
+      //   permanent: false
+      // },
       {
         source: '/nexus',
         destination: '/',
@@ -83,11 +88,6 @@ const config = {
         source: '/integrations',
         destination: '/',
         permanent: true
-      },
-      {
-        source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
-        destination: '/:domain/bounties?bountyId=:id',
-        permanent: false
       },
       {
         // strip out old /share prefix
@@ -186,7 +186,6 @@ const config = {
             websockets: './background/initWebsockets.ts'
             // countSpaceData: './scripts/countSpaceData.ts',
             // importFromDiscourse: './scripts/importFromDiscourse.ts',
-            // updatePageContentForSync: './scripts/updatePageContentForSync.ts'
           };
         });
       };

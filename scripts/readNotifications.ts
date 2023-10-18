@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { log } from '@charmverse/core/log';
-import { getNotifications } from '../background/tasks/sendNotifications/sendNotifications';
+import { getNotifications } from '../lib/notifications/mailer/sendNotifications';
 
 /**
  * Read notifications that should be sent out

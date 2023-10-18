@@ -1,3 +1,4 @@
+import { stringUtils } from '@charmverse/core/dist/cjs/utilities';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -14,7 +15,8 @@ export function rewardWithUsersInclude() {
         createdBy: true,
         status: true,
         createdAt: true,
-        updatedAt: true
+        updatedAt: true,
+        walletAddress: true
       }
     },
     permissions: {

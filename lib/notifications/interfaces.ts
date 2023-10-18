@@ -3,10 +3,9 @@ import type { BountyStatus, PageType, ProposalStatus, User, VoteStatus } from '@
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { CardPropertyEntity, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import type { notificationGroups } from './constants';
+import type { notificationGroups, bountyNotificationTypes, proposalNotificationTypes } from './constants';
 
 export type NotificationGroup = (typeof notificationGroups)[number];
-export type NotificationGroupType = 'forum' | 'discussions' | 'votes' | 'proposals' | 'bounties';
 
 export type NotificationActor = Pick<
   User,
@@ -52,7 +51,7 @@ export type CommentNotificationType = CommentNotification['type'];
 export type InlineCommentNotificationType = InlineCommentNotification['type'];
 export type MentionNotificationType = MentionNotification['type'];
 
-interface NotificationBase {
+export interface NotificationBase {
   id: string;
   spaceId: string;
   spaceDomain: string;
@@ -103,14 +102,7 @@ export interface PostNotification extends NotificationBase {
   group: 'post';
 }
 
-export type ProposalNotificationType =
-  | 'start_review'
-  | 'start_discussion'
-  | 'reviewed'
-  | 'needs_review'
-  | 'vote'
-  | 'evaluation_active'
-  | 'evaluation_closed';
+export type ProposalNotificationType = (typeof proposalNotificationTypes)[number];
 
 export type ProposalNotification = NotificationBase & {
   pageTitle: string;
@@ -137,15 +129,7 @@ export type VoteNotification = NotificationBase & {
   group: 'vote';
 };
 
-export type BountyNotificationType =
-  | 'application.created'
-  | 'application.approved'
-  | 'application.rejected'
-  | 'submission.created'
-  | 'submission.approved'
-  | 'application.payment_pending'
-  | 'application.payment_completed'
-  | 'suggestion.created';
+export type BountyNotificationType = (typeof bountyNotificationTypes)[number];
 
 export type BountyNotification = NotificationBase & {
   status: BountyStatus;

@@ -16,10 +16,10 @@ import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useBounties } from 'hooks/useBounties';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useMembers } from 'hooks/useMembers';
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
 import { usePages } from 'hooks/usePages';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageUpdates, PageWithContent } from 'lib/pages';
 import { fontClassName } from 'theme/fonts';
@@ -28,12 +28,12 @@ import { exportMarkdown } from '../utils/exportMarkdown';
 
 import { AddToFavoritesAction } from './AddToFavoritesAction';
 import { ArchiveProposalAction } from './ArchiveProposalAction';
-import { BountyActions } from './BountyActions';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DocumentHistory } from './DocumentHistory';
 import { DuplicatePageAction } from './DuplicatePageAction';
 import { ExportMarkdownAction } from './ExportMarkdownAction';
 import { ExportToPDFAction } from './ExportToPDFAction';
+import { RewardActions } from './RewardActions';
 import { PublishToSnapshot } from './SnapshotAction/PublishToSnapshot';
 import { UndoAction } from './UndoAction';
 
@@ -97,7 +97,6 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
 }
 
 type Props = {
-  insideModal?: boolean;
   onComplete: VoidFunction;
   page: PageActionMeta;
   pagePermissions?: PagePermissionFlags;
@@ -105,28 +104,20 @@ type Props = {
   onDelete?: VoidFunction;
 };
 
-export function DocumentPageActionList({
-  insideModal,
-  page,
-  onComplete,
-  onDelete,
-  pagePermissions,
-  undoEditorChanges
-}: Props) {
+export function DocumentPageActionList({ page, onComplete, onDelete, pagePermissions, undoEditorChanges }: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { updatePage, deletePage } = usePages();
-  const { bounties } = useBounties();
+  const { rewards, mutateRewards: refreshRewards } = useRewards();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
-  const { setBounties } = useBounties();
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { setActiveView, isInsideDialog } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
   const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
-  const basePageBounty = bounties.find((bounty) => bounty.page.id === pageId);
+  const basePageBounty = rewards?.find((r) => r.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
       id: pageId,
@@ -151,7 +142,7 @@ export function DocumentPageActionList({
       pageId
     });
     if (page?.type === 'bounty') {
-      setBounties((_bounties) => _bounties.filter((_bounty) => _bounty.page.id !== page.id));
+      refreshRewards((_bounties) => _bounties?.filter((_bounty) => _bounty.id !== page.id));
     }
     onComplete();
     onDelete?.();
@@ -243,13 +234,13 @@ export function DocumentPageActionList({
           label={<Typography variant='body2'>Full width</Typography>}
         />
       </ListItemButton>
-      {!insideModal && (
+      {!isInsideDialog && (
         <>
           <Divider />
           <ListItemButton
             disabled={!pagePermissions?.comment}
             onClick={() => {
-              setCurrentPageActionDisplay('comments');
+              setActiveView('comments');
               onComplete();
             }}
           >
@@ -263,7 +254,7 @@ export function DocumentPageActionList({
           </ListItemButton>
           <ListItemButton
             onClick={() => {
-              setCurrentPageActionDisplay('suggestions');
+              setActiveView('suggestions');
               onComplete();
             }}
           >
@@ -342,7 +333,7 @@ export function DocumentPageActionList({
       {pageType === 'bounty' && basePageBounty && (
         <>
           <Divider />
-          <BountyActions bountyId={basePageBounty.id} onClick={onComplete} />
+          <RewardActions rewardId={basePageBounty.id} onClick={onComplete} />
         </>
       )}
       {charmversePage && (

@@ -248,7 +248,13 @@ export function PostPage({
     <>
       {post?.proposalId && <ProposalBanner type='post' proposalId={post.proposalId} />}
       {post?.isDraft && <DraftPostBanner />}
-      <div ref={printRef} className={`document-print-container ${fontClassName}`}>
+      <div
+        ref={printRef}
+        className={`document-print-container ${fontClassName}`}
+        style={{
+          overflowY: 'auto'
+        }}
+      >
         <Stack flexDirection='row'>
           <Container top={50}>
             <Box minHeight={300} data-test='post-charmeditor'>
@@ -264,7 +270,7 @@ export function PostPage({
                 pageType='post'
                 autoFocus={false}
                 readOnly={!canEdit}
-                pageActionDisplay={null}
+                PageSidebar={null}
                 postId={post?.id}
                 disablePageSpecificFeatures
                 enableVoting={true}

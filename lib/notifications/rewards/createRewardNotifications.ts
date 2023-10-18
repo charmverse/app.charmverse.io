@@ -1,17 +1,18 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getBountyReviewerIds } from 'lib/bounties/getBountyReviewerIds';
+import { getRewardReviewerIds } from 'lib/rewards/getRewardReviewerIds';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import { createBountyNotification } from '../saveNotification';
+import { saveRewardNotification } from '../saveNotification';
 
 export async function createRewardNotifications(webhookData: {
   createdAt: string;
   event: WebhookEvent;
   spaceId: string;
-}) {
+}): Promise<string[]> {
+  const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.RewardApplicationCreated: {
       const bountyId = webhookData.event.bounty.id;
@@ -27,17 +28,19 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+      const bountyReviewerIds = await getRewardReviewerIds(bountyId);
       for (const bountyReviewerId of bountyReviewerIds) {
         if (application.createdBy !== bountyReviewerId) {
-          await createBountyNotification({
+          const { id } = await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: application.createdBy,
             spaceId,
             type: 'application.created',
             userId: bountyReviewerId,
             applicationId
           });
+          ids.push(id);
         }
       }
 
@@ -60,14 +63,16 @@ export async function createRewardNotifications(webhookData: {
       });
 
       if (application.acceptedBy) {
-        await createBountyNotification({
+        const { id } = await saveRewardNotification({
           bountyId,
+          createdAt: webhookData.createdAt,
           createdBy: application.acceptedBy,
           spaceId,
           type: 'application.approved',
           userId: application.createdBy,
           applicationId
         });
+        ids.push(id);
       }
 
       break;
@@ -88,14 +93,16 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      await createBountyNotification({
+      const { id } = await saveRewardNotification({
         bountyId,
+        createdAt: webhookData.createdAt,
         createdBy: userId,
         spaceId,
         type: 'application.rejected',
         userId: application.createdBy,
         applicationId
       });
+      ids.push(id);
 
       break;
     }
@@ -113,18 +120,20 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+      const bountyReviewerIds = await getRewardReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
         if (application.createdBy !== bountyReviewerId) {
-          await createBountyNotification({
+          const { id } = await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: application.createdBy,
             spaceId,
             type: 'submission.created',
             userId: bountyReviewerId,
             applicationId
           });
+          ids.push(id);
         }
       }
 
@@ -146,27 +155,31 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      await createBountyNotification({
+      const { id } = await saveRewardNotification({
         bountyId,
+        createdAt: webhookData.createdAt,
         createdBy: userId,
         spaceId,
         type: 'submission.approved',
         userId: application.createdBy,
         applicationId
       });
+      ids.push(id);
 
-      const bountyReviewerIds = await getBountyReviewerIds(bountyId);
+      const bountyReviewerIds = await getRewardReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
         if (userId !== bountyReviewerId) {
-          await createBountyNotification({
+          const { id: _id } = await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: userId,
             spaceId,
             type: 'application.payment_pending',
             userId: bountyReviewerId,
             applicationId
           });
+          ids.push(_id);
         }
       }
 
@@ -188,14 +201,16 @@ export async function createRewardNotifications(webhookData: {
         }
       });
 
-      await createBountyNotification({
+      const { id } = await saveRewardNotification({
         bountyId,
+        createdAt: webhookData.createdAt,
         createdBy: userId,
         spaceId,
         type: 'application.payment_completed',
         userId: application.createdBy,
         applicationId
       });
+      ids.push(id);
 
       break;
     }
@@ -226,13 +241,15 @@ export async function createRewardNotifications(webhookData: {
 
       for (const spaceAdminUserId of spaceAdminUserIds) {
         if (spaceAdminUserId !== bounty.createdBy) {
-          await createBountyNotification({
+          const { id } = await saveRewardNotification({
             bountyId,
+            createdAt: webhookData.createdAt,
             createdBy: bounty.createdBy,
             spaceId,
             type: 'suggestion.created',
             userId: spaceAdminUserId
           });
+          ids.push(id);
         }
       }
 
@@ -242,4 +259,5 @@ export async function createRewardNotifications(webhookData: {
     default:
       break;
   }
+  return ids;
 }

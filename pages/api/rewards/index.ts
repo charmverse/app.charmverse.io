@@ -1,17 +1,18 @@
-import type { Bounty as Reward } from '@charmverse/core/prisma';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import type { AvailableResourcesRequest } from 'lib/permissions/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
+import { rewardWithUsersInclude } from 'lib/rewards/getReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
@@ -24,7 +25,7 @@ handler
       location: 'query',
       resourceIdType: 'space'
     }),
-    getBounties
+    getRewards
   )
   .use(requireUser)
   .post(
@@ -36,50 +37,65 @@ handler
     createRewardController
   );
 
-async function getBounties(req: NextApiRequest, res: NextApiResponse<Reward[]>) {
-  const { spaceId, publicOnly } = req.query as any as AvailableResourcesRequest;
-
-  const publicResourcesOnly = (publicOnly as any) === 'true' || publicOnly === true;
+async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUsers[]>) {
+  const spaceId = req.query.spaceId as string;
 
   // Session may be undefined as non-logged in users can access this endpoint
   const userId = req.session?.user?.id;
 
-  const bounties = await req.basePermissionsClient.spaces.listAvailableBounties({
-    spaceId: spaceId as string,
-    userId: publicResourcesOnly ? undefined : userId
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId,
+    userId
   });
-  return res.status(200).json(bounties);
+
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      publicBountyBoard: true
+    }
+  });
+
+  if (!spaceRole && !space.publicBountyBoard) {
+    throw new ActionNotPermittedError(`You cannot access the rewards list`);
+  }
+
+  const accessiblePageIds = await req.basePermissionsClient.pages.getAccessiblePageIds({
+    spaceId,
+    userId
+  });
+
+  const rewards = await prisma.bounty
+    .findMany({
+      where: {
+        id: {
+          in: accessiblePageIds
+        }
+      },
+      include: rewardWithUsersInclude()
+    })
+    .then((_rewards) => _rewards.map(mapDbRewardToReward));
+
+  return res.status(200).json(rewards);
 }
 
 async function createRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
-  const { spaceId, status, linkedPageId } = req.body as RewardCreationData;
+  const { spaceId, linkedPageId } = req.body as RewardCreationData;
 
   const { id: userId } = req.session.user;
 
-  if (status === 'suggestion') {
-    const { error } = await hasAccessToSpace({
-      spaceId,
-      userId,
-      adminOnly: false,
-      disallowGuest: true
-    });
-
-    if (error) {
-      throw error;
-    }
-  } else {
-    const userPermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
-      resourceId: spaceId as string,
-      userId
-    });
-    if (!userPermissions.createBounty) {
-      throw new UnauthorisedActionError('You do not have permissions to create a bounty.');
-    }
+  const userPermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
+    resourceId: spaceId as string,
+    userId
+  });
+  if (!userPermissions.createBounty) {
+    throw new UnauthorisedActionError('You do not have permissions to create a bounty.');
   }
 
   const createdReward = await createReward({
     ...req.body,
-    createdBy: req.session.user.id
+    userId: req.session.user.id
   });
 
   if (linkedPageId) {

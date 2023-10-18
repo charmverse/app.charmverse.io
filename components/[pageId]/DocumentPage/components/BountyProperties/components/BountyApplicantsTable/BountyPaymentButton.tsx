@@ -49,7 +49,7 @@ function SafeMenuItem({
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
 }) {
-  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ bounties: [bounty] });
+  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ rewards: [bounty] });
 
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
