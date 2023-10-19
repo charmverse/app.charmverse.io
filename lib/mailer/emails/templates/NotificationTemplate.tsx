@@ -3,12 +3,12 @@ import { Hr } from '@react-email/hr';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
 
+import { baseUrl } from 'config/constants';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { getFormattedDateTime } from 'lib/utilities/dates';
 import { fancyTrim } from 'lib/utilities/strings';
-import { baseUrl } from 'testing/mockApiCall';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 
@@ -34,7 +34,7 @@ function NotificationSection({ notification }: { notification: Notification }) {
   });
 
   const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
-  const link = `${baseUrl}/${spaceDomain}${href}?notificationId=${id}`;
+  const link = `${baseUrl}/${spaceDomain}${href}${href.includes('?') ? '&' : '?'}notificationId=${id}`;
   return (
     <Section
       style={{
