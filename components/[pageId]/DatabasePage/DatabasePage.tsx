@@ -39,12 +39,11 @@ interface Props {
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
   const boardViews = useAppSelector(getCurrentBoardViews);
   // grab the first board view if current view is not specified
   const { showMessage } = useSnackbar();
-  const activeView =
-    typeof currentViewId === 'string' ? boardViews.find((view) => view.id === currentViewId) : boardViews[0];
+  const currentViewId = router.query.viewId as string | undefined;
+  const activeView = boardViews.find((view) => view.id === currentViewId) ?? boardViews[0];
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
 
@@ -78,7 +77,6 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
     if (boardId) {
       dispatch(setCurrentBoard(boardId));
-      setCurrentViewId(urlViewId);
       // Note: current view in Redux is only used for search, which we currently are not using at the moment
       dispatch(setCurrentView(urlViewId || ''));
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
@@ -127,22 +125,14 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
   const showView = useCallback(
     (viewId: string) => {
-      if (viewId === '') {
-        // when creating an ew view for linked boards, user must select a source before the view exists
-        // but we dont want to change the URL until the view is created
-        setCurrentViewId('');
-      } else {
-        const { cardId, ...rest } = router.query;
-        router.push({
-          pathname: router.pathname,
-          query: {
-            ...rest,
-            viewId: viewId || ''
-          }
-        });
-        // call setCurrentViewId in case user clicked "add view", because we didnt update the URL so it wouldnt affect the activeView
-        setCurrentViewId(viewId);
-      }
+      const { cardId, ...rest } = router.query;
+      router.replace({
+        pathname: router.pathname,
+        query: {
+          ...rest,
+          viewId: viewId || ''
+        }
+      });
     },
     [router.query]
   );

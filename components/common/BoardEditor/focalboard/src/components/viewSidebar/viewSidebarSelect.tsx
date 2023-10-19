@@ -17,8 +17,6 @@ import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 
 export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source';
 
-export const initialSidebarState: SidebarView = 'view-options';
-
 function MenuRow({
   icon,
   title,

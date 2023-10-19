@@ -82,7 +82,7 @@ type Props = WrappedComponentProps &
 type State = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
-  openSettings: 'view-options' | null;
+  openSettings: 'create-linked-view' | 'view-options' | null;
 };
 
 function CenterPanel(props: Props) {
@@ -103,7 +103,6 @@ function CenterPanel(props: Props) {
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
-  const isLinkedDatabase = !!String(boardPage?.type).match('linked');
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   let activeBoardId: string | undefined = board.id;
@@ -130,7 +129,9 @@ function CenterPanel(props: Props) {
   );
 
   useEffect(() => {
-    if (activeView) {
+    if (views.length === 0) {
+      setState((s) => ({ ...s, openSettings: 'create-linked-view' }));
+    } else if (activeView) {
       setState((s) => ({ ...s, openSettings: null }));
     }
   }, [activeView?.id, views.length, activePage]);
@@ -381,11 +382,10 @@ function CenterPanel(props: Props) {
     const _hiddenGroups = groupCardsByOptions(__cardPages, hiddenOptionIds, groupByProperty);
     return { visible: _visibleGroups, hidden: _hiddenGroups };
   }
-  function openSelectSource() {
-    showView('');
+  function addNewLinkedView() {
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
-      setState({ ...state, openSettings: 'view-options' });
+      setState({ ...state, openSettings: 'create-linked-view' });
     });
   }
 
@@ -422,12 +422,13 @@ function CenterPanel(props: Props) {
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
-
+  const isLinkedDatabase = !!String(boardPage?.type).match('linked');
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
   const boardSourceType = activeView?.fields.sourceType ?? activeBoard?.fields.sourceType;
 
   const disableAddingNewCards = boardSourceType === 'proposals';
+  const noBoardViewsYet = !isLoadingSourceData && views.length === 0;
 
   return (
     <>
@@ -487,7 +488,7 @@ function CenterPanel(props: Props) {
               showView={props.showView}
               onClickNewView={
                 boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
-                  ? openSelectSource
+                  ? addNewLinkedView
                   : undefined
               }
               activeBoard={activeBoard}
@@ -510,122 +511,121 @@ function CenterPanel(props: Props) {
 
         <div className={`container-container ${state.openSettings ? 'sidebar-visible' : ''}`}>
           <Box display='flex' sx={{ minHeight: state.openSettings ? 450 : 0 }}>
-            <Box width='100%'>
-              {/* Show page title for inline boards */}
-              {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
-                <InlineViewTitle
-                  key={activePage.id + activePage.title}
-                  pageTitle={activePage.title}
-                  readOnly={props.readOnly}
-                  setPage={props.setPage}
-                />
-              )}
-              {activeBoard && activeView?.fields.sourceType === 'google_form' && (
-                <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
-                  Form responses to{' '}
-                  <Link
-                    target='_blank'
-                    href={`${activeView?.fields.sourceData?.formUrl}/edit#responses`}
-                    sx={{ color: 'inherit', fontWeight: 700 }}
-                  >
-                    {activeView?.fields.sourceData?.formName || 'Untitled'}
-                    <LaunchIcon fontSize='small' sx={{ ml: 0.5, position: 'relative', top: 3 }} />
-                  </Link>
-                  {loadingFormResponses && (
-                    <Box ml={2} component='span'>
-                      <CircularProgress style={{ color: '#ccc', height: 14, width: 14 }} />
-                    </Box>
-                  )}
-                </Typography>
-              )}
-              {/* Show page title for linked boards */}
-              {activePage &&
-                activeView?.fields?.sourceType === 'board_page' &&
-                boardPageType === 'inline_linked_board' && (
-                  <Button
-                    color='secondary'
-                    startIcon={<CallMadeIcon />}
-                    variant='text'
-                    size='large'
-                    href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
-                      activePage?.path
-                    }`}
-                    sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
-                  >
-                    {activePage?.title || 'Untitled'}
-                  </Button>
+            {(state.openSettings === 'create-linked-view' || noBoardViewsYet) && (
+              <Box width='100%'>
+                <CreateLinkedView rootBoard={board} views={views} showView={showView} />
+              </Box>
+            )}
+            {state.openSettings !== 'create-linked-view' && (
+              <Box width='100%'>
+                {/* Show page title for inline boards */}
+                {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
+                  <InlineViewTitle
+                    key={activePage.id + activePage.title}
+                    pageTitle={activePage.title}
+                    readOnly={props.readOnly}
+                    setPage={props.setPage}
+                  />
                 )}
-              {!activeView && board && (views.length === 0 || isLinkedDatabase) && (
-                <CreateLinkedView
-                  rootBoard={board}
-                  views={views}
-                  showView={showView}
-                  // if it links to deleted db page then the board can't be inline_board type
-                />
-              )}
-              {activeBoard && activeView?.fields.viewType === 'board' && (
-                <Kanban
-                  board={activeBoard}
-                  activeView={activeView}
-                  cards={cards}
-                  groupByProperty={groupByProperty}
-                  visibleGroups={visibleGroups}
-                  hiddenGroups={hiddenGroups}
-                  selectedCardIds={state.selectedCardIds}
-                  readOnly={props.readOnly}
-                  onCardClicked={cardClicked}
-                  addCard={addCard}
-                  showCard={showCard}
-                  disableAddingCards={disableAddingNewCards}
-                  readOnlyTitle={readOnlyTitle}
-                />
-              )}
-              {activeBoard && activeView?.fields.viewType === 'table' && (
-                <Table
-                  board={activeBoard}
-                  activeView={activeView}
-                  cardPages={cardPages}
-                  groupByProperty={groupByProperty}
-                  views={views}
-                  visibleGroups={visibleGroups}
-                  selectedCardIds={state.selectedCardIds}
-                  readOnly={props.readOnly}
-                  cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-                  showCard={showCard}
-                  addCard={addCard}
-                  onCardClicked={cardClicked}
-                  disableAddingCards={disableAddingNewCards}
-                  readOnlyTitle={readOnlyTitle}
-                />
-              )}
-              {activeBoard && activeView?.fields.viewType === 'calendar' && (
-                <CalendarFullView
-                  board={activeBoard}
-                  cards={cards}
-                  activeView={activeView}
-                  readOnly={props.readOnly}
-                  dateDisplayProperty={dateDisplayProperty}
-                  showCard={showCard}
-                  addCard={(properties: Record<string, string>) => {
-                    addCard('', true, properties);
-                  }}
-                  disableAddingCards={disableAddingNewCards}
-                />
-              )}
-              {activeBoard && activeView?.fields.viewType === 'gallery' && (
-                <Gallery
-                  board={activeBoard}
-                  cards={cards}
-                  activeView={activeView}
-                  readOnly={props.readOnly}
-                  onCardClicked={cardClicked}
-                  selectedCardIds={state.selectedCardIds}
-                  addCard={(show) => addCard('', show)}
-                  disableAddingCards={disableAddingNewCards}
-                />
-              )}
-              {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
-            </Box>
+                {activeBoard && activeView?.fields.sourceType === 'google_form' && (
+                  <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
+                    Form responses to{' '}
+                    <Link
+                      target='_blank'
+                      href={`${activeView?.fields.sourceData?.formUrl}/edit#responses`}
+                      sx={{ color: 'inherit', fontWeight: 700 }}
+                    >
+                      {activeView?.fields.sourceData?.formName || 'Untitled'}
+                      <LaunchIcon fontSize='small' sx={{ ml: 0.5, position: 'relative', top: 3 }} />
+                    </Link>
+                    {loadingFormResponses && (
+                      <Box ml={2} component='span'>
+                        <CircularProgress style={{ color: '#ccc', height: 14, width: 14 }} />
+                      </Box>
+                    )}
+                  </Typography>
+                )}
+                {/* Show page title for linked boards */}
+                {activePage &&
+                  activeView?.fields?.sourceType === 'board_page' &&
+                  boardPageType === 'inline_linked_board' && (
+                    <Button
+                      color='secondary'
+                      startIcon={<CallMadeIcon />}
+                      variant='text'
+                      size='large'
+                      href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
+                        activePage?.path
+                      }`}
+                      sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
+                    >
+                      {activePage?.title || 'Untitled'}
+                    </Button>
+                  )}
+                {activeBoard && activeView?.fields.viewType === 'board' && (
+                  <Kanban
+                    board={activeBoard}
+                    activeView={activeView}
+                    cards={cards}
+                    groupByProperty={groupByProperty}
+                    visibleGroups={visibleGroups}
+                    hiddenGroups={hiddenGroups}
+                    selectedCardIds={state.selectedCardIds}
+                    readOnly={props.readOnly}
+                    onCardClicked={cardClicked}
+                    addCard={addCard}
+                    showCard={showCard}
+                    disableAddingCards={disableAddingNewCards}
+                    readOnlyTitle={readOnlyTitle}
+                  />
+                )}
+                {activeBoard && activeView?.fields.viewType === 'table' && (
+                  <Table
+                    board={activeBoard}
+                    activeView={activeView}
+                    cardPages={cardPages}
+                    groupByProperty={groupByProperty}
+                    views={views}
+                    visibleGroups={visibleGroups}
+                    selectedCardIds={state.selectedCardIds}
+                    readOnly={props.readOnly}
+                    cardIdToFocusOnRender={state.cardIdToFocusOnRender}
+                    showCard={showCard}
+                    addCard={addCard}
+                    onCardClicked={cardClicked}
+                    disableAddingCards={disableAddingNewCards}
+                    readOnlyTitle={readOnlyTitle}
+                  />
+                )}
+                {activeBoard && activeView?.fields.viewType === 'calendar' && (
+                  <CalendarFullView
+                    board={activeBoard}
+                    cards={cards}
+                    activeView={activeView}
+                    readOnly={props.readOnly}
+                    dateDisplayProperty={dateDisplayProperty}
+                    showCard={showCard}
+                    addCard={(properties: Record<string, string>) => {
+                      addCard('', true, properties);
+                    }}
+                    disableAddingCards={disableAddingNewCards}
+                  />
+                )}
+                {activeBoard && activeView?.fields.viewType === 'gallery' && (
+                  <Gallery
+                    board={activeBoard}
+                    cards={cards}
+                    activeView={activeView}
+                    readOnly={props.readOnly}
+                    onCardClicked={cardClicked}
+                    selectedCardIds={state.selectedCardIds}
+                    addCard={(show) => addCard('', show)}
+                    disableAddingCards={disableAddingNewCards}
+                  />
+                )}
+                {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}
+              </Box>
+            )}
 
             <ViewSidebar
               views={views}
