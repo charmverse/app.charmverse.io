@@ -89,6 +89,7 @@ export const getSortedViews = (boardId: string) =>
     (board, views) => {
       const viewIds = board?.fields.viewIds ? board?.fields.viewIds : Object.keys(views);
       return Object.values(views)
+        .filter((v) => v.parentId === boardId)
         .sort((a, b) => (viewIds.indexOf(a.id) > viewIds.indexOf(b.id) ? 1 : -1))
         .map((v) => createBoardView(v));
     }
