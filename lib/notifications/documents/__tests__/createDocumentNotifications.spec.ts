@@ -29,7 +29,7 @@ import { generateUser } from 'testing/utils/users';
 import { createDocumentNotifications } from '../createDocumentNotifications';
 
 describe(`Test document events and notifications`, () => {
-  it(`Should create document notifications for mention.created event`, async () => {
+  it(`Should create document notifications for mention.created event in a page`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
     const user2 = await generateUser();
     await addUserToSpace({
@@ -58,6 +58,7 @@ describe(`Test document events and notifications`, () => {
       event: {
         scope: WebhookEventNames.DocumentMentionCreated,
         document: await getDocumentEntity(createdPage.id),
+        post: null,
         space: await getSpaceEntity(space.id),
         user: await getUserEntity(user.id),
         mention: {
@@ -77,6 +78,71 @@ describe(`Test document events and notifications`, () => {
         type: 'mention.created',
         mentionId,
         pageId: createdPage.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: user2.id
+        }
+      }
+    });
+
+    expect(documentNotification).toBeTruthy();
+  });
+
+  it(`Should create document notifications for mention.created event in a post`, async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const user2 = await generateUser();
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: user2.id
+    });
+    const mentionId = v4();
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    const post = await createForumPost({
+      categoryId: postCategory.id,
+      content: builders
+        .doc(
+          builders.mention({
+            type: 'user',
+            value: user2.id,
+            id: mentionId,
+            createdAt: new Date().toISOString(),
+            createdBy: user.id
+          })
+        )
+        .toJSON(),
+      contentText: 'Hello World',
+      createdBy: user.id,
+      isDraft: false,
+      spaceId: space.id,
+      title: 'Hello World'
+    });
+
+    await createDocumentNotifications({
+      event: {
+        scope: WebhookEventNames.DocumentMentionCreated,
+        post: await getPostEntity(post.id),
+        document: null,
+        space: await getSpaceEntity(space.id),
+        user: await getUserEntity(user.id),
+        mention: {
+          createdAt: new Date().toISOString(),
+          createdBy: user.id,
+          id: mentionId,
+          value: user2.id,
+          parentNode: null
+        }
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
+    const documentNotification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'mention.created',
+        mentionId,
+        postId: post.id,
         notificationMetadata: {
           spaceId: space.id,
           userId: user2.id
