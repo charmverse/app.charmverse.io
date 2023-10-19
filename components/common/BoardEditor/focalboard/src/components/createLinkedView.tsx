@@ -30,7 +30,7 @@ export function CreateLinkedView(props: Props) {
   }, []);
 
   return (
-    <Box display='flex'>
+    <Box display='flex' data-test='create-linked-view'>
       <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
         <Stack alignItems='center' spacing={0} mt={{ xs: 3, md: 0 }}>
           <HelpOutlineIcon color='secondary' fontSize='large' />

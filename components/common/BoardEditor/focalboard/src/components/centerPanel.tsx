@@ -422,7 +422,7 @@ function CenterPanel(props: Props) {
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
-
+  const isLinkedDatabase = !!String(boardPage?.type).match('linked');
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
   const boardSourceType = activeView?.fields.sourceType ?? activeBoard?.fields.sourceType;
@@ -512,7 +512,6 @@ function CenterPanel(props: Props) {
         <div className={`container-container ${state.openSettings ? 'sidebar-visible' : ''}`}>
           <Box display='flex' sx={{ minHeight: state.openSettings ? 450 : 0 }}>
             {(state.openSettings === 'create-linked-view' || noBoardViewsYet) && (
-              // {!activeView && board && (views.length === 0 || isLinkedDatabase) && (
               <Box width='100%'>
                 <CreateLinkedView rootBoard={board} views={views} showView={showView} />
               </Box>

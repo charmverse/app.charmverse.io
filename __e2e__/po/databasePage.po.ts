@@ -41,11 +41,15 @@ export class DatabasePage extends GlobalPage {
   }
 
   selectNewDatabaseAsSource({ boardId }: OptionalBoardId = {}) {
-    return this.getPageOrBoardLocator({ boardId }).locator('data-test=source-new-database');
+    return this.getPageOrBoardLocator({ boardId })
+      .locator('data-test=create-linked-view') // there are two instances of ViewSourceOptions, expect the one for creating a new linked view
+      .locator('data-test=source-new-database');
   }
 
   selectProposalsAsSource({ boardId }: OptionalBoardId = {}) {
-    return this.getPageOrBoardLocator({ boardId }).locator('data-test=source-proposals');
+    return this.getPageOrBoardLocator({ boardId })
+      .locator('data-test=create-linked-view') // there are two instances of ViewSourceOptions, expect the one for creating a new linked view
+      .locator('data-test=source-proposals');
   }
 
   addTablePropButton({ boardId }: OptionalBoardId = {}) {
