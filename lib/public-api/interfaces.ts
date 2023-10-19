@@ -42,26 +42,6 @@ export type UserProfile = {
  * @swagger
  * components:
  *  schemas:
- *    MemberRole:
- *      type: object
- *      properties:
- *        id:
- *          type: string
- *          format: uuid
- *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- *       name:
- *          type: string
- *          example: tester
- */
-export type MemberRole = {
-  id: string;
-  name: string;
-};
-
-/**
- * @swagger
- * components:
- *  schemas:
  *    PagePropertyOption:
  *     type: object
  *     properties:
@@ -423,47 +403,6 @@ export interface Workspace {
  * @swagger
  * components:
  *  schemas:
- *    SpaceMemberRolesResponseBody:
- *      type: object
- *      properties:
- *        user:
- *          type: object
- *          $ref: '#/components/schemas/UserProfile'
- *        roles:
- *          type: array
- *          items:
- *            type: object
- *            $ref: '#/components/schemas/MemberRole'
- */
-export interface SpaceMemberRolesResponseBody {
-  user: UserProfile;
-  roles: MemberRole[];
-}
-
-/**
- * @swagger
- * components:
- *  schemas:
- *    UpdateSpaceMemberRolesRequestBody:
- *      required:
- *        - roles
- *      type: object
- *      properties:
- *        roles:
- *          type: array
- *          items:
- *            type: string
- *            example: ['tester', 'reviewer']
- *
- */
-export interface UpdateSpaceMemberRolesRequestBody {
-  roles: string[];
-}
-
-/**
- * @swagger
- * components:
- *  schemas:
  *    CreateWorkspaceRequestBody:
  *      required:
  *        - name
@@ -573,20 +512,21 @@ export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
  * @swagger
  * components:
  *  schemas:
- *    GetSpaceWithRolesResponseBody:
+ *    CreateSpaceMemberRequestBody:
+ *      required:
+ *        - email
+ *        - wallet
  *      type: object
  *      properties:
- *        space:
- *          type: object
- *          $ref: '#/components/schemas/SpaceApiResponse'
- *        roles:
- *          type: array
- *          items:
- *            type: object
- *            $ref: '#/components/schemas/MemberRole'
+ *        email:
+ *          type: string
+ *          example: john.doe@gmail.com
+ *        wallet:
+ *          required: false
+ *          type: string
+ *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
  */
-
-export interface GetSpaceWithRolesResponseBody {
-  space: SpaceApiResponse;
-  roles: MemberRole[];
+export interface CreateSpaceMemberRequestBody {
+  email: string;
+  wallet: string;
 }
