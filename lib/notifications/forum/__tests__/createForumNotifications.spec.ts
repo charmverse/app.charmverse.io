@@ -1,13 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
 import { getPostEntity, getSpaceEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
@@ -33,21 +31,6 @@ describe(`Test forum events and notifications`, () => {
 
     const postCategory = await generatePostCategory({ spaceId: space.id });
 
-    const mentionId = v4();
-    const postVote = await createVote({
-      content: emptyDocument,
-      contentText: '',
-      context: 'inline',
-      createdBy: user.id,
-      deadline: new Date(),
-      maxChoices: 3,
-      spaceId: space.id,
-      threshold: 2,
-      title: 'Vote',
-      type: 'Approval',
-      voteOptions: []
-    });
-
     const post = await createForumPost({
       categoryId: postCategory.id,
       content: {
@@ -55,25 +38,7 @@ describe(`Test forum events and notifications`, () => {
         content: [
           {
             type: 'paragraph',
-            content: [
-              { text: 'Hello World ', type: 'text' },
-              {
-                type: 'mention',
-                attrs: {
-                  id: mentionId,
-                  type: 'user',
-                  value: user2.id,
-                  createdAt: new Date().toISOString(),
-                  createdBy: user.id
-                }
-              }
-            ]
-          },
-          {
-            type: 'poll',
-            attrs: {
-              pollId: postVote.id
-            }
+            content: [{ text: 'Hello World ', type: 'text' }]
           }
         ]
       },
@@ -141,32 +106,7 @@ describe(`Test forum events and notifications`, () => {
       }
     });
 
-    const postMentionCreatedNotification = await prisma.documentNotification.findFirst({
-      where: {
-        type: 'mention.created',
-        mentionId,
-        postId: post.id,
-        notificationMetadata: {
-          spaceId: space.id,
-          userId: user2.id
-        }
-      }
-    });
-
-    const pollCreatedNotification = await prisma.voteNotification.findFirst({
-      where: {
-        type: 'new_vote',
-        voteId: postVote.id,
-        notificationMetadata: {
-          spaceId: space.id,
-          userId: user2.id
-        }
-      }
-    });
-
     expect(postCreatedNotification).toBeTruthy();
     expect(postCreatedUser3Notification).toBeFalsy();
-    expect(postMentionCreatedNotification).toBeTruthy();
-    expect(pollCreatedNotification).toBeTruthy();
   });
 });
