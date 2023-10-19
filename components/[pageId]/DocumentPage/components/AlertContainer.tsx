@@ -6,6 +6,7 @@ export const AlertContainer = styled.div<{ showPageActionSidebar: boolean }>(
   ${theme.breakpoints.up('lg')} {
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
     position: sticky;
+    left: 0;
     top: 0;
     z-index: var(--z-index-pageBar);
   }

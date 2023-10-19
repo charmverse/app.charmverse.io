@@ -6,7 +6,7 @@ import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { builders } from 'testing/prosemirror/builders';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
-import { sendNotificationEmail } from '../sendNotifications';
+import { sendNotificationEmail } from '../sendNotificationEmail';
 
 describe('sendNotificationEmail()', () => {
   it('Should send a notification email', async () => {

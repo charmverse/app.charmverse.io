@@ -22,8 +22,6 @@ plugins:
 custom:
   esbuild:
     external: ["canvas"]
-    # uglify-js via mjml uses require.resolve() to find local files, which breaks esbuild. we don't need it since we don't do minification
-    alias: { 'uglify-js': 'serverless/packageShim' }
     watch:
       pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
   scriptHooks:

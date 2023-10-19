@@ -1,9 +1,6 @@
-import { MjmlText, MjmlImage } from 'mjml-react';
-import React from 'react';
-import {} from 'theme/colors';
+import { Img } from '@react-email/img';
 
-const domain = process.env.DOMAIN;
-const logoImagePath = '/images/charmverse_logo_sm_black.png';
+import Link from './Link';
 
 const dimensions = {
   medium: {
@@ -16,17 +13,21 @@ const dimensions = {
   }
 };
 
-export default function Header({ size = 'medium' }: { size?: 'small' | 'medium' }) {
+const domain = process.env.DOMAIN;
+const logoImagePath = '/images/charmverse_logo_sm_black.png';
+
+export default function Header({ size = 'medium' }: { size?: 'medium' | 'small' }) {
   return (
-    <MjmlImage
-      align='left'
-      href={domain}
-      src={`${domain}${logoImagePath}`}
-      width={dimensions[size].width}
-      height={dimensions[size].height}
-      padding-bottom='20px'
-      padding-left='20px'
-      padding-top='20px'
-    />
+    <Link href={domain}>
+      <Img
+        src={`${domain}${logoImagePath}`}
+        style={{
+          width: dimensions[size].width,
+          height: dimensions[size].height,
+          paddingBottom: '10px',
+          paddingTop: '10px'
+        }}
+      />
+    </Link>
   );
 }

@@ -13,10 +13,15 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       id: true,
       type: true,
       proposal: {
-        include: {
-          authors: true,
-          reviewers: true,
-          page: true
+        select: {
+          status: true,
+          page: {
+            select: {
+              id: true,
+              path: true,
+              title: true
+            }
+          }
         }
       },
       notificationMetadata: {

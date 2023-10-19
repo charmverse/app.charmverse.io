@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { isUUID } from 'lib/utilities/strings';
+
 export interface MarkNotifications {
   ids: string[];
   state: 'read' | 'archived' | 'unread' | 'unarchived';
@@ -8,12 +10,14 @@ export interface MarkNotifications {
 export async function markNotifications(payload: MarkNotifications) {
   const { ids, state } = payload;
 
+  const filteredIds = ids.filter((id) => isUUID(id));
+
   switch (state) {
     case 'read': {
       await prisma.userNotificationMetadata.updateMany({
         where: {
           id: {
-            in: ids
+            in: filteredIds
           }
         },
         data: {
@@ -28,7 +32,7 @@ export async function markNotifications(payload: MarkNotifications) {
       await prisma.userNotificationMetadata.updateMany({
         where: {
           id: {
-            in: ids
+            in: filteredIds
           }
         },
         data: {
@@ -44,7 +48,7 @@ export async function markNotifications(payload: MarkNotifications) {
       await prisma.userNotificationMetadata.updateMany({
         where: {
           id: {
-            in: ids
+            in: filteredIds
           }
         },
         data: {
@@ -58,7 +62,7 @@ export async function markNotifications(payload: MarkNotifications) {
       await prisma.userNotificationMetadata.updateMany({
         where: {
           id: {
-            in: ids
+            in: filteredIds
           }
         },
         data: {
