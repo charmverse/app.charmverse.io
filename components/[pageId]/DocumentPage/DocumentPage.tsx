@@ -25,6 +25,7 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
@@ -165,6 +166,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
 
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const isRewardsPage = router.pathname.endsWith('/rewards');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
@@ -319,7 +321,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       proposalPage={page}
                     />
                   )}
-                  {(draftBounty || page.bountyId) && (
+                  {(draftBounty || page.bountyId) && !isRewardsPage && (
                     <BountyProperties
                       bountyId={page.bountyId}
                       pageId={page.id}
@@ -329,14 +331,14 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       refreshBountyPermissions={() => refreshBountyPermissions()}
                     />
                   )}
-                  {/* {(tempReward || page.bountyId) && (
+                  {page.bountyId && isRewardsPage && (
                     <RewardProperties
                       rewardId={page.bountyId}
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
                     />
-                  )} */}
+                  )}
                   {(page.type === 'card' || page.type === 'card_synced') && (
                     <CommentsList
                       comments={comments}

@@ -1,37 +1,31 @@
 import { useRouter } from 'next/router';
 
 import { Button } from 'components/common/Button';
-import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
+import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
+import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
+import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 
 export function NewRewardButton() {
-  const { user } = useUser();
-  const router = useRouter();
-  const { space: currentSpace } = useCurrentSpace();
-  const { createReward } = useRewards();
-  const { refreshPage } = usePages();
+  const { openNewPage } = useNewPage();
+  const { clearFormInputs, formInputs, setFormInputs, createReward, isSavingReward } = useNewReward();
 
   async function onClickCreate() {
-    if (currentSpace && user) {
-      const createdReward = await createReward({
-        chainId: 1,
-        spaceId: currentSpace.id,
-        rewardAmount: 1,
-        rewardToken: 'ETH'
-      });
-
-      if (createdReward) {
-        refreshPage(createdReward.id);
-        router.push({ pathname: router.pathname, query: { ...router.query, id: createdReward.id } });
-      }
-    }
+    openNewPage();
   }
 
   return (
-    <Button data-test='create-suggest-bounty' onClick={onClickCreate}>
-      Create
-    </Button>
+    <>
+      <Button data-test='create-suggest-bounty' onClick={onClickCreate}>
+        Create
+      </Button>
+
+      <NewPageDialog onClose={clearFormInputs} onSave={createReward} isSaving={isSavingReward}>
+        <RewardPropertiesForm onChange={setFormInputs} values={formInputs} />
+      </NewPageDialog>
+    </>
   );
 }

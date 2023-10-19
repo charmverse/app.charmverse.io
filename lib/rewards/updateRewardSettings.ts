@@ -1,27 +1,11 @@
-import type { Bounty as Reward } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
-import type { RewardReviewer, RewardWithUsers } from './interfaces';
+import type { RewardWithUsers, UpdateableRewardFields } from './interfaces';
 import { setRewardUsers } from './setRewardUsers';
-
-export type UpdateableRewardFields = Partial<
-  Pick<
-    Reward,
-    | 'chainId'
-    | 'rewardAmount'
-    | 'rewardToken'
-    | 'approveSubmitters'
-    | 'allowMultipleApplications'
-    | 'maxSubmissions'
-    | 'dueDate'
-    | 'customReward'
-    | 'fields'
-  >
-> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null };
 
 export type RewardUpdate = {
   rewardId: string;

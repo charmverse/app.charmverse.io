@@ -4,13 +4,10 @@ import { v4 } from 'uuid';
 
 import { NotFoundError } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
+import type { RewardCreationData } from 'lib/rewards/interfaces';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 
 import { getRewardOrThrow } from './getReward';
-import type { UpdateableRewardFields } from './updateRewardSettings';
-
-export type RewardCreationData = UpdateableRewardFields & { linkedPageId?: string; spaceId: string; userId: string };
-
 /**
  * You can create a reward suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the reward to suggestion status. Your logic should account for this.
  */

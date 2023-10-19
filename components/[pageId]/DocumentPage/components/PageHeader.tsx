@@ -62,25 +62,25 @@ const EditorHeader = styled.div<{ pageType: 'page' | 'board' }>`
   }
 `;
 
-type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
+export type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
 
 type PageHeaderProps = {
   headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
-  setPage: (p: PageHeaderValues) => void;
+  setPage: ((p: PageHeaderValues) => void) | null;
   updatedAt: string;
   readOnlyTitle?: boolean;
 };
 
 function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, readOnlyTitle }: PageHeaderProps) {
   function updateTitle(page: { title: string; updatedAt: any }) {
-    setPage(page);
+    setPage?.(page);
   }
 
   function addPageHeader() {
-    setPage({ headerImage: randomBannerImage() });
+    setPage?.({ headerImage: randomBannerImage() });
   }
 
   return (
@@ -107,14 +107,14 @@ function PageControls({
 }: {
   endAdornmentComponent?: React.ReactNode;
   headerImage: string | null;
-  setPage: (p: PageHeaderValues) => void;
+  setPage: ((p: PageHeaderValues) => void) | null;
   icon?: string | null;
   readOnly: boolean;
   addPageHeader: ListItemButtonProps['onClick'];
 }) {
   function addPageIcon() {
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
-    setPage({ icon: _icon });
+    setPage?.({ icon: _icon });
   }
   return (
     <Controls className='page-controls'>
@@ -148,7 +148,7 @@ export function PageHeaderControls({
   controlsPosition?: 'top' | 'bottom';
   endAdornmentComponent?: React.ReactNode;
   headerImage: string | null;
-  setPage: (p: PageHeaderValues) => void;
+  setPage: ((p: PageHeaderValues) => void) | null;
   icon?: string | null;
   readOnly: boolean;
   addPageHeader: ListItemButtonProps['onClick'];
@@ -197,7 +197,7 @@ export function PageHeaderControls({
                 dense
                 disabled={readOnly}
                 onClick={() => {
-                  setPage({ icon: BlockIcons.shared.randomIcon() });
+                  setPage?.({ icon: BlockIcons.shared.randomIcon() });
                   closeMenu();
                 }}
               >
@@ -225,7 +225,7 @@ export function PageHeaderControls({
                 dense
                 disabled={readOnly}
                 onClick={() => {
-                  setPage({ icon: null });
+                  setPage?.({ icon: null });
                   closeMenu();
                 }}
               >
@@ -262,7 +262,7 @@ export function PageHeaderControls({
             onUpdate={(emoji) => {
               setSubMenuAnchorEl(null);
               closeMenu();
-              setPage({ icon: emoji });
+              setPage?.({ icon: emoji });
             }}
           />
         </Menu>
@@ -271,7 +271,7 @@ export function PageHeaderControls({
   );
 }
 
-export function getPageTop({ headerImage, icon }: Pick<Page, 'headerImage' | 'icon'>) {
+export function getPageTop({ headerImage, icon }: Partial<Pick<Page, 'headerImage' | 'icon'>>) {
   let pageTop = 100;
   if (headerImage) {
     pageTop = 50;

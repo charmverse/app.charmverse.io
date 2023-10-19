@@ -5,9 +5,8 @@ import { testUtilsMembers, testUtilsPages, testUtilsUser } from '@charmverse/cor
 
 import { PositiveNumbersOnlyError } from 'lib/utilities/errors';
 
-import type { RewardCreationData } from '../createReward';
 import { createReward } from '../createReward';
-import type { Reward } from '../interfaces';
+import type { RewardCreationData, Reward } from '../interfaces';
 
 let user: User;
 let space: Space;

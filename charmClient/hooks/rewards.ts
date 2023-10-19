@@ -6,8 +6,12 @@ import type {
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields
 } from 'lib/rewards/blocks/interfaces';
-import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
+import type {
+  RewardCreationData,
+  ApplicationWithTransactions,
+  RewardWithUsers,
+  RewardWithUsersAndPageMeta
+} from 'lib/rewards/interfaces';
 
 import { useGET, usePOST, usePUT, useDELETE } from './helpers';
 

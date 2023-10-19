@@ -8,8 +8,7 @@ import type { RewardStatusFilter } from 'components/rewards/components/RewardVie
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardCreationData, Reward, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
 
 type RewardsContextType = {
