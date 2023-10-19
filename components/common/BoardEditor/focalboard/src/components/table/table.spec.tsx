@@ -79,7 +79,6 @@ describe('components/table/Table', () => {
       <ReduxProvider store={store}>
         <Table
           cardPages={[]}
-          readOnlySourceData={false}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -108,7 +107,6 @@ describe('components/table/Table', () => {
       <ReduxProvider store={store}>
         <Table
           cardPages={[]}
-          readOnlySourceData={false}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -138,7 +136,6 @@ describe('components/table/Table', () => {
       <ReduxProvider store={store}>
         <Table
           cardPages={[]}
-          readOnlySourceData={false}
           board={board}
           activeView={{ ...view, fields: { ...view.fields, groupById: 'property1' } } as BoardView}
           visibleGroups={[{ option: { id: '', value: 'test', color: '' }, cardPages: [], cards: [] }]}
@@ -245,7 +242,6 @@ describe('components/table/Table extended', () => {
               }) as PageMeta
             }
           ]}
-          readOnlySourceData={false}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -346,7 +342,6 @@ describe('components/table/Table extended', () => {
               }) as PageMeta
             }
           ]}
-          readOnlySourceData={false}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -425,7 +420,6 @@ describe('components/table/Table extended', () => {
               }) as PageMeta
             }
           ]}
-          readOnlySourceData={false}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -531,7 +525,6 @@ describe('components/table/Table extended', () => {
               }) as PageMeta
             }
           ]}
-          readOnlySourceData={false}
           board={board}
           activeView={view}
           visibleGroups={[]}

@@ -176,7 +176,12 @@ export function PostPage({
   async function publishDraftPost(draftPost: Post) {
     if (!isPublishingDraftPost) {
       setIsPublishingDraftPost(true);
+      // pass in latest content as well
       await charmClient.forum.updateForumPost(draftPost.id, {
+        categoryId,
+        content: formInputs.content,
+        contentText: formInputs.contentText,
+        title: formInputs.title,
         isDraft: false
       });
       setIsPublishingDraftPost(false);

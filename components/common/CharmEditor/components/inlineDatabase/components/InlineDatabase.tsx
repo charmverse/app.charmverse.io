@@ -128,7 +128,6 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const readOnly =
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions?.edit_content !== true : readOnlyOverride;
 
-  const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   const deleteView = useCallback(
     (viewId: string) => {
       setCurrentViewId(views.filter((view) => view.id !== viewId)?.[0]?.id ?? null);
@@ -156,7 +155,6 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
           onDeleteView={deleteView}
           hideBanner
           readOnly={readOnly}
-          readOnlySourceData={readOnlySourceData}
           board={board}
           embeddedBoardPath={boardPage.path}
           setPage={debouncedPageUpdate}

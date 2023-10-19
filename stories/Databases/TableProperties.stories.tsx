@@ -170,7 +170,6 @@ export function DatabaseTableView() {
             board={board}
             showCard={voidFunction}
             readOnly={false}
-            readOnlySourceData={false}
             views={[view]}
             activeView={view}
             addCard={voidFunction}
