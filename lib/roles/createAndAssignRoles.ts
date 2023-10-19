@@ -1,25 +1,19 @@
-import type { RoleSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import type { ExternalRole } from 'lib/roles/interfaces';
-import { isTruthy } from 'lib/utilities/types';
 
 export async function createAndAssignRoles({
   userId,
   spaceId,
-  roles,
-  source = 'collabland',
-  createRoles = true
+  roles
 }: {
   userId: string;
   spaceId: string;
   roles: ExternalRole[];
-  source?: RoleSource | null;
-  createRoles?: boolean;
 }) {
   if (!roles.length) {
-    return null;
+    return;
   }
   const spaceMembership = await prisma.spaceRole.findFirst({
     where: {
@@ -29,17 +23,21 @@ export async function createAndAssignRoles({
   });
 
   if (!spaceMembership) {
-    return null;
+    return;
   }
 
   const rolesRecord = await findOrCreateRoles(roles, spaceId, userId, {
-    source,
-    createRoles
+    source: 'collabland',
+    createRoles: true
   });
 
-  const roleIdsToAssign: string[] = Object.values(rolesRecord)
-    .filter(isTruthy)
-    .map((role) => role.id);
+  const roleIdsToAssign: string[] = [];
+  roles.forEach((externalRole) => {
+    const role = rolesRecord[externalRole.id];
+    if (role) {
+      roleIdsToAssign.push(role.id);
+    }
+  });
 
   await prisma.$transaction(
     roleIdsToAssign.map((roleId) => {
@@ -68,6 +66,4 @@ export async function createAndAssignRoles({
       });
     })
   );
-
-  return rolesRecord;
 }

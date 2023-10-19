@@ -34,7 +34,6 @@ export async function addUserToSpace({ spaceId, userId, userXpsEngineId }: Props
       }
     });
   }
-
   await prisma.user.update({
     where: {
       id: userId
