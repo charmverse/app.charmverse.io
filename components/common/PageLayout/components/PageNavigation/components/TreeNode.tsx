@@ -156,9 +156,7 @@ function DraggableTreeNode({
 
   const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
 
-  const allViews = useAppSelector(getSortedViews(item.id));
-  const views = allViews.filter((view) => view.parentId === item.id);
-
+  const views = useAppSelector(getSortedViews(item.id));
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
 
