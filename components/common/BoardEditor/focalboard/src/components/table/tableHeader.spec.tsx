@@ -18,7 +18,6 @@ describe('components/table/TableHeaderMenu', () => {
     const onAutoSizeColumn = jest.fn();
     const component = wrapDNDIntl(
       <TableHeader
-        readOnlySourceData={false}
         readOnly={false}
         sorted='none'
         name='my Name'

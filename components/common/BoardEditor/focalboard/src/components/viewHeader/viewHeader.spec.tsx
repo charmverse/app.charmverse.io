@@ -48,7 +48,6 @@ describe('components/viewHeader/viewHeader', () => {
         <ReduxProvider store={store}>
           <ViewHeader
             currentRootPageId={card.id}
-            readOnlySourceData={false}
             showCard={jest.fn()}
             showView={jest.fn()}
             toggleViewOptions={jest.fn()}
@@ -73,7 +72,6 @@ describe('components/viewHeader/viewHeader', () => {
           <ViewHeader
             viewsBoard={board}
             currentRootPageId={card.id}
-            readOnlySourceData={false}
             showCard={jest.fn()}
             showView={jest.fn()}
             toggleViewOptions={jest.fn()}

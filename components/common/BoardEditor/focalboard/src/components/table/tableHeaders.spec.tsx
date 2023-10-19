@@ -15,7 +15,6 @@ describe('components/table/TableHeaders', () => {
   test('should match snapshot', async () => {
     const component = wrapDNDIntl(
       <TableHeaders
-        readOnlySourceData={false}
         board={board}
         cards={[card]}
         activeView={view}
