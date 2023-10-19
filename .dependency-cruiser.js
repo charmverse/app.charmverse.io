@@ -44,6 +44,18 @@ module.exports = {
         path: '^components'
       }
     },
+    {
+      name: 'no-test-imports',
+      comment:
+        'This module imports a test utility file. Test utilities cannot be used in production',
+      severity: 'error',
+      from: {
+        pathNot: "^.*(\\.spec\\.ts|\\.spec\\.tsx|__e2e__|__integration-tests__|testing|testUtils).*$"
+      },
+      to: {
+        path: 'testing/|__e2e__/'
+      }
+    },
     /* rules from the 'recommended' preset: */
     // {
     //   name: 'no-orphans',
