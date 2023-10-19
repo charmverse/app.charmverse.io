@@ -11,7 +11,7 @@ import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
 import ViewPropertyOptions from './viewPropertyOptions';
 import type { SidebarView } from './viewSidebarSelect';
-import { ViewSidebarSelect, initialSidebarState } from './viewSidebarSelect';
+import { ViewSidebarSelect } from './viewSidebarSelect';
 import { ViewSourceOptions } from './viewSourceOptions/viewSourceOptions';
 
 interface Props {
@@ -30,8 +30,12 @@ interface Props {
   hideGroupOptions?: boolean;
 }
 
+function getDefaultView(hasBoardView: boolean): SidebarView {
+  return hasBoardView ? 'view-options' : 'source';
+}
+
 function ViewSidebar(props: Props) {
-  const [sidebarView, setSidebarView] = useState<SidebarView>(initialSidebarState);
+  const [sidebarView, setSidebarView] = useState<SidebarView>(getDefaultView(!!props.view));
   function goToSidebarHome() {
     setSidebarView('view-options');
   }
@@ -39,7 +43,7 @@ function ViewSidebar(props: Props) {
   useEffect(() => {
     // reset state on close
     if (!props.isOpen) {
-      setSidebarView(initialSidebarState);
+      setSidebarView(getDefaultView(!!props.view));
     }
   }, [props.isOpen]);
 
