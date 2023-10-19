@@ -104,7 +104,6 @@ function CenterPanel(props: Props) {
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
-  const isLinkedDatabase = !!String(boardPage?.type).match('linked');
 
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   let activeBoardId: string | undefined = board.id;
