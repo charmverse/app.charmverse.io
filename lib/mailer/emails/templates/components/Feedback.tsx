@@ -1,28 +1,44 @@
-import { MjmlSection, MjmlColumn, MjmlGroup, MjmlText, MjmlImage } from 'mjml-react';
+import { Column } from '@react-email/column';
+import { Container } from '@react-email/container';
+import { Img } from '@react-email/img';
+import { Row } from '@react-email/row';
 
 import { charmverseDiscordInvite } from 'config/constants';
+
+import Link from './Link';
+import Text from './Text';
 
 const domain = process.env.DOMAIN;
 const chatIconPath = '/images/icons/speech-bubbles.png';
 
 export default function Feedback() {
   return (
-    <MjmlSection backgroundColor='#fff' paddingTop={40} paddingBottom={40}>
-      <MjmlGroup>
-        <MjmlColumn width='25%' paddingRight={0}>
-          <MjmlImage paddingRight={0} align='center' height='47px' width='64px' src={`${domain}/${chatIconPath}`} />
-        </MjmlColumn>
-        <MjmlColumn width='75%'>
-          <MjmlText paddingLeft={0}>
-            <p>
-              <strong>Do you have any feedback on this email?</strong>
-            </p>
-            <p>
-              Please share it with us on <a href={charmverseDiscordInvite}>Discord</a>
-            </p>
-          </MjmlText>
-        </MjmlColumn>
-      </MjmlGroup>
-    </MjmlSection>
+    <Container
+      style={{
+        marginTop: 20
+      }}
+    >
+      <Column width='64'>
+        <Img
+          style={{
+            marginRight: 28,
+            paddingRight: 0,
+            height: '47px',
+            width: '64px'
+          }}
+          src={`${domain}/${chatIconPath}`}
+        />
+      </Column>
+      <Column>
+        <Text>
+          <Row>
+            <strong>Do you have any feedback on this email?</strong>
+          </Row>
+          <Row>
+            Please share it with us on <Link href={charmverseDiscordInvite}>Discord</Link>
+          </Row>
+        </Text>
+      </Column>
+    </Container>
   );
 }

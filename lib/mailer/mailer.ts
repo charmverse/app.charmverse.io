@@ -8,7 +8,7 @@ import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
 export interface EmailRecipient {
   email: string;
   displayName?: string | null;
-  userId?: string;
+  userId: string;
 }
 
 interface EmailProps {

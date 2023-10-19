@@ -10,6 +10,7 @@ import { ApplicationDialog } from 'components/rewards/components/RewardApplicati
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMarkNotificationFromUrl } from 'hooks/useMarkNotificationFromUrl';
 import { getPagesListCacheKey, usePages } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
@@ -31,6 +32,8 @@ export function GlobalComponents() {
 
   // Trigger discord role import on redirect since modal won't be open
   useImportDiscordRoles();
+
+  useMarkNotificationFromUrl();
 
   const handlePagesRestoredEvent = async (payload: WebSocketPayload<'pages_restored'>) => {
     // Refetch pages after restoration

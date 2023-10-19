@@ -8,11 +8,11 @@ import { getForumPost } from 'lib/forums/posts/getForumPost';
 import type { UpdateForumPostInput } from 'lib/forums/posts/updateForumPost';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { publishForumPostEvents } from 'lib/notifications/publishForumPostEvents';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -99,10 +99,10 @@ async function updateForumPostController(req: NextApiRequest, res: NextApiRespon
       post.spaceId
     );
 
-    // Publish webhook event if needed
-    await publishPostEvent({
-      scope: WebhookEventNames.ForumPostCreated,
-      postId: post.id,
+    await publishForumPostEvents({
+      content: post.content as PageContent,
+      createdBy: post.createdBy,
+      id: post.id,
       spaceId: post.spaceId
     });
   }

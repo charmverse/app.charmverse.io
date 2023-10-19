@@ -187,7 +187,6 @@ export function ProposalsPage({ title }: { title: string }) {
                       visibleGroups={[]}
                       selectedCardIds={[]}
                       readOnly={!isAdmin}
-                      readOnlySourceData={false}
                       disableAddingCards={true}
                       showCard={openPage}
                       readOnlyTitle={true}

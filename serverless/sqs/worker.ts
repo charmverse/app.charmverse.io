@@ -7,7 +7,7 @@ import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 
 
 import { count } from 'lib/metrics';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
-import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotifications';
+import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotificationEmail';
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 import { publishToWebhook } from '../webhooks/publisher';

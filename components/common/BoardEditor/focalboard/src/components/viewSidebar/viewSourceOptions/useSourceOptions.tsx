@@ -165,7 +165,6 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     }
 
     const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType } };
-
     await mutator.updateBlock(boardBlockUpdate, rootBoard, 'Update board datasource');
     const { view } = await createNewDataSource({
       board: boardBlockUpdate,
