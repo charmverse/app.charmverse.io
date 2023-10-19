@@ -43,5 +43,5 @@ function invalidateCache() {
 
 // allow app and tests to shut the process down properly
 export function cleanup() {
-  clearInterval(intervalId as any);
+  clearInterval(intervalId);
 }
