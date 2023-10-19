@@ -25,7 +25,7 @@ export function PendingNotification(notification: Notification) {
 }
 
 function NotificationSection({ notification }: { notification: Notification }) {
-  const { spaceName, spaceDomain, createdAt, createdBy } = notification;
+  const { spaceName, spaceDomain, createdAt, createdBy, id } = notification;
   const { href, content, pageTitle } = getNotificationMetadata(notification);
   const notificationContent = notification.group === 'document' ? notification.content : null;
   const dateTime = getFormattedDateTime(new Date(createdAt), {
@@ -34,7 +34,7 @@ function NotificationSection({ notification }: { notification: Notification }) {
   });
 
   const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
-  const link = `${baseUrl}/${spaceDomain}${href}`;
+  const link = `${baseUrl}/${spaceDomain}${href}?notificationId=${id}`;
   return (
     <Section
       style={{
