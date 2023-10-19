@@ -24,7 +24,8 @@ export async function createReward({
   allowedSubmitterRoles,
   dueDate,
   fields,
-  reviewers
+  reviewers,
+  pageProps
 }: RewardCreationData) {
   if (!rewardAmount && !customReward) {
     throw new InvalidInputError('A reward must have a reward amount or a custom reward assigned');
@@ -96,6 +97,8 @@ export async function createReward({
   });
 
   if (!linkedPageId) {
+    const newPageProps = pageProps || {};
+
     await prisma.bounty.create({
       data: {
         ...rewardCreateInput,
@@ -122,9 +125,6 @@ export async function createReward({
             },
             id: rewardId,
             path: getPagePath(),
-            title: '',
-            contentText: '',
-            content: undefined,
             space: {
               connect: {
                 id: spaceId
@@ -136,7 +136,13 @@ export async function createReward({
                 id: userId
               }
             },
-            type: 'bounty'
+            type: 'bounty',
+            content: pageProps?.content ?? undefined,
+            contentText: pageProps?.contentText ?? '',
+            headerImage: pageProps?.headerImage,
+            sourceTemplateId: pageProps?.sourceTemplateId,
+            title: pageProps?.title ?? '',
+            icon: pageProps?.icon
           }
         }
       }
