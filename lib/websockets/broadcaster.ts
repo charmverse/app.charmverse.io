@@ -36,11 +36,13 @@ export class WebsocketBroadcaster implements AbstractWebsocketBroadcaster {
       log.debug('Connecting to Redis for socket.io');
       // @ts-ignore
       io.adapter(createRedisAdapter(pubClient, subClient));
+      log.debug('Enabled Redis adapter for socket.io');
     }
     // add support for passing messages in local dev
     else if (typeof process.env.DATABASE_URL === 'string' && isDevEnv) {
       const pool = getPostgresClient(process.env.DATABASE_URL);
       io.adapter(createPostgresAdapter(pool));
+      log.debug('Enabled Postgres adapter for socket.io');
     }
 
     // Function for debugging amount of connections
