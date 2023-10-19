@@ -18,10 +18,10 @@ export function useMarkNotificationFromUrl() {
           state: 'read'
         });
         refreshNotifications();
-        setUrlWithoutRerender(router.pathname, {});
+        setUrlWithoutRerender(router.pathname, { notificationId: null });
       }
     }
 
     main();
-  }, [router.query.notificationId]);
+  }, [router.query.notificationId, router.pathname, refreshNotifications]);
 }
