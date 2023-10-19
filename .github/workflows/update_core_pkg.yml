@@ -10,6 +10,10 @@ on:
         description: 'Core pkg version'
         required: true
 
+# This grouping will let us include the main ci workflow as part of this group
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+
 jobs:
   build-test-env:
     name: Build test env

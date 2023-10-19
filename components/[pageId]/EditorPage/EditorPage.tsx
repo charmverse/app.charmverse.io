@@ -121,7 +121,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     } else {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
-        <Box sx={{ overflowY: 'auto' }}>
+        <Box height='100%' sx={{ overflowY: 'auto' }}>
           <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
         </Box>
       );

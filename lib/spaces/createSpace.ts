@@ -25,7 +25,7 @@ import { proposalTemplates } from 'seedData/proposalTemplates';
 
 import type { SpaceTemplateType } from './config';
 import { staticSpaceTemplates } from './config';
-import { countSpaceBlocksAndSave } from './countSpaceBlocks';
+import { countSpaceBlocksAndSave } from './countSpaceBlocks/countAllSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 
