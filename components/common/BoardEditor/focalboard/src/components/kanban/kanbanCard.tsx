@@ -5,13 +5,13 @@ import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
-import { BountyStatusBadge } from 'components/bounties/components/BountyStatusBadge';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import { useBounties } from 'hooks/useBounties';
+import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -60,8 +60,8 @@ const KanbanCard = React.memo((props: Props) => {
   }
   const { space } = useCurrentSpace();
 
-  const { bounties } = useBounties();
-  const linkedBounty = bounties.find((bounty) => bounty.page?.id === card.id);
+  const { rewards } = useRewards();
+  const linkedBounty = rewards?.find((r) => r?.id === card.id);
 
   const { pages } = usePages();
   const cardPage = pages[card.id];
@@ -154,7 +154,7 @@ const KanbanCard = React.memo((props: Props) => {
           ))}
           {linkedBounty && (
             <BountyFooter>
-              <BountyStatusBadge bounty={linkedBounty} truncate />
+              <RewardStatusBadge reward={linkedBounty} truncate />
             </BountyFooter>
           )}
         </StyledBox>

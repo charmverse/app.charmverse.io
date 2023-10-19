@@ -7,7 +7,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { getRewardOrThrow } from './getReward';
 import type { RewardReviewer, RewardWithUsers } from './interfaces';
 
-export type RewardUsersUpdate = { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] };
+export type RewardUsersUpdate = { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null };
 
 export async function setRewardUsers({
   rewardId,

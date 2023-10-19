@@ -61,6 +61,11 @@ const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, Reac
     rounded: { borderRadius: '4px' },
     circular: null,
     square: null
+  },
+  xSmall: {
+    rounded: { borderRadius: '4px' },
+    circular: null,
+    square: null
   }
 };
 

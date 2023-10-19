@@ -238,9 +238,10 @@ export function getNotificationMetadata(notification: Notification): {
     }
 
     case 'document': {
+      const basePath = notification.pageType === 'post' ? '/forum/post' : '';
       return {
         content: getDocumentContent(notification as DocumentNotification),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+        href: `${basePath}/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };
     }

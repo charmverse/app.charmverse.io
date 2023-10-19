@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { refreshPaymentStatus } from 'lib/applications/actions/refreshPaymentStatus';
+import { refreshPaymentStatus } from 'lib/rewards/refreshPaymentStatus';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { TransactionCreationData } from './interface';

@@ -87,7 +87,7 @@ interface DatabaseViewProps extends CharmNodeViewProps {
 
 export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
   const pageId = node.attrs.pageId as string;
-  const allViews = useAppSelector(getSortedViews);
+  const allViews = useAppSelector(getSortedViews(pageId));
   const router = useRouter();
   const dispatch = useAppDispatch();
 

@@ -12,7 +12,6 @@ import { Fragment, useMemo, useState } from 'react';
 import { FiInbox } from 'react-icons/fi';
 import { IoFilterCircleOutline } from 'react-icons/io5';
 import type { KeyedMutator } from 'swr';
-import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -22,9 +21,9 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { useUser } from 'hooks/useUser';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
@@ -43,36 +42,29 @@ const StyledSidebarBox = styled(Box)`
   ${sidebarItemStyles}
 `;
 
-const NotificationCountBox = styled(Box)`
+export const NotificationCountBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.error.main};
-  color: white;
-  width: 20px;
-  display: flex;
-  justify-content: center;
+  display: inline-flex;
   align-items: center;
-  border-radius: 20%;
-  font-weight: semi-bold;
-  font-size: 12px;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 3px;
+  color: white;
 `;
 
 export function NotificationUpdates() {
-  const { user } = useUser();
-
   const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
   const {
-    data: notifications = [],
+    currentSpaceNotifications,
+    currentSpaceUnreadNotifications,
     isLoading,
     mutate: mutateNotifications
-  } = useSWRImmutable(
-    user ? `/notifications/list/${user.id}` : null,
-    () => charmClient.notifications.getNotifications(),
-    {
-      // 10 minutes
-      refreshInterval: 1000 * 10 * 60
-    }
-  );
-
-  const unreadNotifications = notifications.filter((notification) => !notification.read);
+  } = useNotifications();
 
   return (
     <Box>
@@ -81,7 +73,9 @@ export function NotificationUpdates() {
           <QueryBuilderOutlinedIcon color='secondary' fontSize='small' />
           Updates
         </Stack>
-        {unreadNotifications.length !== 0 && <NotificationCountBox>{unreadNotifications.length}</NotificationCountBox>}
+        {currentSpaceUnreadNotifications.length !== 0 && (
+          <NotificationCountBox>{currentSpaceUnreadNotifications.length}</NotificationCountBox>
+        )}
       </StyledSidebarBox>
       <Popover
         {...bindPopover(notificationPopupState)}
@@ -100,7 +94,7 @@ export function NotificationUpdates() {
         }}
       >
         <NotificationsPopover
-          notifications={notifications}
+          notifications={currentSpaceNotifications}
           mutateNotifications={mutateNotifications}
           isLoading={isLoading}
           close={notificationPopupState.close}

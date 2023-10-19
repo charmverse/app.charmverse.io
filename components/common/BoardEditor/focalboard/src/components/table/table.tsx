@@ -37,10 +37,11 @@ type Props = {
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
   disableAddingCards?: boolean;
+  expandSubRowsOnLoad?: boolean;
 };
 
 function Table(props: Props): JSX.Element {
-  const { board, cardPages, activeView, visibleGroups, groupByProperty, views } = props;
+  const { board, cardPages, activeView, visibleGroups, groupByProperty, views, expandSubRowsOnLoad } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
 
@@ -278,6 +279,7 @@ function Table(props: Props): JSX.Element {
               onDrop={onDropToCard}
               onDeleteCard={props.onDeleteCard}
               readOnlyTitle={props.readOnlyTitle}
+              expandSubRowsOnLoad={expandSubRowsOnLoad}
             />
           )}
         </div>

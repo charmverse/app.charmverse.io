@@ -65,7 +65,7 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
 
     const { permissions } = (
       await request(baseUrl)
-        .post(`/api/pages/${bounty.page.id}/restrict-permissions`)
+        .post(`/api/pages/${bounty.id}/restrict-permissions`)
         .set('Cookie', cookie)
         .send({})
         .expect(200)
@@ -117,7 +117,7 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
 
     const { permissions } = (
       await request(baseUrl)
-        .post(`/api/pages/${bounty.page.id}/restrict-permissions`)
+        .post(`/api/pages/${bounty.id}/restrict-permissions`)
         .set('Cookie', adminCookie)
         .send({})
         .expect(200)
@@ -170,7 +170,7 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
     });
 
     await request(baseUrl)
-      .post(`/api/pages/${bounty.page.id}/restrict-permissions`)
+      .post(`/api/pages/${bounty.id}/restrict-permissions`)
       .set('Cookie', nonAdminCookie)
       .send({})
       .expect(401);

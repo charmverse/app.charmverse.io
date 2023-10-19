@@ -26,9 +26,6 @@ export async function createPollNotifications(webhookData: {
           page: {
             select: { id: true, path: true, title: true }
           },
-          post: {
-            include: { category: true }
-          },
           space: {
             select: {
               id: true,
@@ -80,33 +77,7 @@ export async function createPollNotifications(webhookData: {
             ids.push(id);
           }
         }
-      } else if (vote.post) {
-        for (const spaceUserId of spaceUserIds) {
-          const categories =
-            vote.space.paidTier === 'free'
-              ? await publicPermissionsClient.forum.getPermissionedCategories({
-                  postCategories: [vote.post.category],
-                  userId: spaceUserId
-                })
-              : await premiumPermissionsApiClient.forum.getPermissionedCategories({
-                  postCategories: [vote.post.category],
-                  userId: spaceUserId
-                });
-
-          if (categories.length !== 0 && categories[0].permissions.comment_posts && vote.author.id !== spaceUserId) {
-            const { id } = await savePollNotification({
-              createdAt: webhookData.createdAt,
-              createdBy: vote.author.id,
-              spaceId,
-              type: 'new_vote',
-              userId: spaceUserId,
-              voteId
-            });
-            ids.push(id);
-          }
-        }
       }
-
       break;
     }
 

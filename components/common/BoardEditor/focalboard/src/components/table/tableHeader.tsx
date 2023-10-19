@@ -29,7 +29,15 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import { DEFAULT_BLOCK_IDS } from 'lib/proposal/blocks/constants';
+import {
+  AUTHORS_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_BOARD_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  REVIEWERS_BLOCK_ID,
+  STATUS_BLOCK_ID
+} from 'lib/proposal/blocks/constants';
 
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
@@ -55,6 +63,16 @@ type Props = {
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
 };
+
+const DEFAULT_BLOCK_IDS = [
+  DEFAULT_BOARD_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  STATUS_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  AUTHORS_BLOCK_ID,
+  REVIEWERS_BLOCK_ID
+];
 
 function TableHeader(props: Props): JSX.Element {
   const { activeView, board, views, cards, sorted, name, type, template, readOnly, readOnlySourceData } = props;
@@ -185,15 +203,11 @@ function TableHeader(props: Props): JSX.Element {
         <Divider />
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle name column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId)
-              mutator.insertPropertyTemplate(board, activeView, index);
+            let index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
+            if (templateId === Constants.titleColumnId && index === -1) {
+              index = 0;
             }
+            mutator.insertPropertyTemplate(board, activeView, index);
           }}
         >
           <ListItemIcon>
@@ -203,15 +217,11 @@ function TableHeader(props: Props): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle title column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId) + 1
-              mutator.insertPropertyTemplate(board, activeView, index);
+            let index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
+            if (templateId === Constants.titleColumnId && index === -1) {
+              index = 0;
             }
+            mutator.insertPropertyTemplate(board, activeView, index + 1);
           }}
         >
           <ListItemIcon>

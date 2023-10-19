@@ -26,7 +26,6 @@ async function computeBountyGroupPermissionsController(
     !userId
       ? new AvailableBountyPermissions().empty
       : computeBountyPermissions({
-          allowAdminBypass: false,
           resourceId: bounty.id,
           userId
         }),

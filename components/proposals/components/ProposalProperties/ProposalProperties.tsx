@@ -366,7 +366,7 @@ export function ProposalProperties({
           {/* Select a category */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
+              <PropertyLabel readOnly required={isNewProposal} highlighted>
                 Category
               </PropertyLabel>
               <Box display='flex' flex={1}>
@@ -419,7 +419,7 @@ export function ProposalProperties({
                 flexGrow: 1
               }}
             >
-              <PropertyLabel readOnly highlighted>
+              <PropertyLabel readOnly required={isNewProposal} highlighted>
                 Author
               </PropertyLabel>
               <Box display='flex' flex={1}>
@@ -440,7 +440,7 @@ export function ProposalProperties({
           {/* Select reviewers */}
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
+              <PropertyLabel readOnly required={isNewProposal} highlighted>
                 Reviewer
               </PropertyLabel>
               <UserAndRoleSelect

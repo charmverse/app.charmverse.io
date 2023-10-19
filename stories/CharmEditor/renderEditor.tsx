@@ -9,7 +9,7 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
       placeholderText='Custom placeholder... start typing / to see commands'
       readOnly={false}
       autoFocus={true}
-      pageActionDisplay={null}
+      PageSidebar={null}
       pageId='123'
       disablePageSpecificFeatures={false}
       enableSuggestingMode={false}

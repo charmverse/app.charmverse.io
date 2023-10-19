@@ -6,7 +6,7 @@ import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
 import { createPortal } from 'react-dom';
 
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -41,7 +41,7 @@ export function InlineCommentThread({
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
 
-  const { currentPageActionDisplay } = usePageActionDisplay();
+  const { activeView } = usePageSidebar();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = ids
     .map((threadId) => threads[threadId])
@@ -51,7 +51,7 @@ export function InlineCommentThread({
       threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
     );
 
-  if ((currentPageActionDisplay !== 'comments' || permissions) && isVisible && unResolvedThreads.length !== 0) {
+  if ((activeView !== 'comments' || permissions) && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
       <ClickAwayListener

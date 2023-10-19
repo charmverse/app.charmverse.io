@@ -50,7 +50,7 @@ export default function BountyProperties(props: {
   bountyId: string | null;
   pageId: string;
   pagePath: string;
-  permissions: AssignedBountyPermissions | null;
+  permissions?: AssignedBountyPermissions | null;
   refreshBountyPermissions: (bountyId: string) => void;
 }) {
   const { bountyId, pageId, readOnly: parentReadOnly = false, permissions, refreshBountyPermissions } = props;

@@ -5,6 +5,7 @@ import { IconButton, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
+import { getChainById } from 'connectors';
 import millify from 'millify';
 import Link from 'next/link';
 
@@ -31,7 +32,7 @@ export function RewardStatusBadge({ truncate = false, hideStatus, reward, layout
   if (layout === 'row') {
     return (
       <Grid container direction='column' alignItems='center'>
-        <Grid item xs width='100%'>
+        <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
           <Box
             sx={{
               display: 'flex',
@@ -108,8 +109,8 @@ export function RewardAmount({
       return 'Invalid number';
     }
   };
-
-  const tooltip = `${formattedAmount} ${tokenInfo.tokenName} (${tokenInfo.tokenSymbol})`;
+  const chain = reward.chainId ? getChainById(reward.chainId) : undefined;
+  const tooltip = `${formattedAmount} ${tokenInfo.tokenSymbol} ${chain ? `on ${chain.chainName}` : ''}`;
 
   return (
     <Tooltip arrow placement='top' title={rewardAmount === 0 ? '' : tooltip}>

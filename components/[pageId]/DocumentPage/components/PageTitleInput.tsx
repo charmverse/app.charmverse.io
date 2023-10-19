@@ -77,7 +77,10 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
     if (pressedEnter) {
       if (!pressedCtrl) {
         event.preventDefault();
-        insertAndFocusFirstLine(view);
+        // add a delay for Japanese keybaords, which for some reason copy the current text to the document
+        setTimeout(() => {
+          insertAndFocusFirstLine(view);
+        });
       } else {
         const inputElement = event.target as HTMLInputElement;
         updateTitle(`${inputElement.value}\n`);

@@ -32,7 +32,6 @@ import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
-import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 

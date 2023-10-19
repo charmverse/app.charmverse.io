@@ -17,9 +17,7 @@ export function NewRewardButton() {
     if (currentSpace && user) {
       const createdReward = await createReward({
         chainId: 1,
-        status: 'open',
         spaceId: currentSpace.id,
-        createdBy: user.id,
         rewardAmount: 1,
         rewardToken: 'ETH'
       });

@@ -40,7 +40,7 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { NotificationsPopover, NotificationUpdates } from './components/NotificationsPopover';
+import { NotificationUpdates } from './components/NotificationsPopover';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';
@@ -282,7 +282,8 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                   <NotificationUpdates />
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
-                    .filter((feat) => !feat.isHidden && (feat.path !== 'rewards' || isCharmverse))
+                    .filter((feat) => feat.path !== 'rewards' || isCharmverse) // hide Rewards behind feature flag
+                    .filter((feat) => !feat.isHidden)
                     .map((feat) => {
                       if (
                         showMemberFeatures ||
