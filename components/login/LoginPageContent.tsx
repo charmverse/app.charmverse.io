@@ -38,14 +38,14 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
     if (router.query.discordError) {
       setDiscordLoginError(router.query.discordError as string);
     }
-  }, [router.query]);
+  }, [router.query.discordError]);
 
   useEffect(() => {
-    if (discordLoginError && (discordLoginError as ErrorType) !== 'Disabled account') {
+    if (discordLoginError && !isDisabledAccountError(discordLoginError)) {
       showMessage(discordLoginError, 'error');
       clearError();
     }
-  }, []);
+  }, [discordLoginError]);
 
   return (
     <Container px={3} data-test='login-page-content'>
@@ -106,7 +106,11 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
           <Image px={3} src={splashImage} />
         </Grid>
       </Grid>
-      <LoginErrorModal open={(discordLoginError as ErrorType) === 'Disabled account'} onClose={clearError} />
+      <LoginErrorModal open={isDisabledAccountError(discordLoginError)} onClose={clearError} />
     </Container>
   );
+}
+
+function isDisabledAccountError(error: string | null) {
+  return (error as ErrorType) === 'Disabled account';
 }
