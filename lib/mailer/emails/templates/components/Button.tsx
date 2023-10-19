@@ -12,7 +12,7 @@ export function Button({
   variant = 'filled',
   style,
   ...props
-}: { fullWidth?: boolean; variant?: 'filled' | 'outlined'; children: ReactNode; href: string } & LinkProps) {
+}: { variant?: 'filled' | 'outlined'; children: ReactNode; href: string } & LinkProps) {
   return (
     <Link {...props} href={href}>
       <Text

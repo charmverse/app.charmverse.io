@@ -1,7 +1,5 @@
 import { Column } from '@react-email/column';
-import { Container } from '@react-email/container';
 import { Hr } from '@react-email/hr';
-import { Link } from '@react-email/link';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
 
@@ -88,18 +86,15 @@ function NotificationSection({ notification }: { notification: Notification }) {
           </Text>
         </Column>
       </Row>
-      <Row>
-        <Button
-          style={{
-            width: '340px',
-            marginLeft: 50
-          }}
-          fullWidth
-          href={link}
-        >
-          View
-        </Button>
-      </Row>
+      <Button
+        style={{
+          width: '75%',
+          margin: '10px auto'
+        }}
+        href={link}
+      >
+        View
+      </Button>
     </Section>
   );
 }
