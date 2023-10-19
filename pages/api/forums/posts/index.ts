@@ -7,10 +7,10 @@ import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/cre
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { publishForumPostEvents } from 'lib/notifications/publishForumPostEvents';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPostEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -84,10 +84,10 @@ async function createForumPostController(req: NextApiRequest, res: NextApiRespon
       createdPost.spaceId
     );
 
-    // Publish webhook event if needed
-    await publishPostEvent({
-      scope: WebhookEventNames.ForumPostCreated,
-      postId: createdPost.id,
+    await publishForumPostEvents({
+      content: createdPost.content as PageContent,
+      createdBy: createdPost.createdBy,
+      id: createdPost.id,
       spaceId: createdPost.spaceId
     });
   }

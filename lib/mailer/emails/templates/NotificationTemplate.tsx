@@ -34,7 +34,7 @@ function NotificationSection({ notification }: { notification: Notification }) {
   });
 
   const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
-  const link = `${baseUrl}/${spaceDomain}/${href}`;
+  const link = `${baseUrl}/${spaceDomain}${href}`;
   return (
     <Section
       style={{

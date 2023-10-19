@@ -20,39 +20,72 @@ export async function createDocumentNotifications(webhookData: {
       const mentionedUserId = webhookData.event.mention.value;
       const mentionId = webhookData.event.mention.id;
       const mentionAuthorId = webhookData.event.user.id;
-      const documentId = webhookData.event.document.id;
-
-      const document = await prisma.page.findUniqueOrThrow({
-        where: {
-          id: documentId
-        },
-        select: {
-          content: true
+      if (webhookData.event.document) {
+        const documentId = webhookData.event.document.id;
+        const document = await prisma.page.findUniqueOrThrow({
+          where: {
+            id: documentId
+          },
+          select: {
+            content: true
+          }
+        });
+        const documentContent = document.content as PageContent;
+        const targetMention = extractMentionFromId(documentContent, mentionId);
+        if (mentionedUserId !== mentionAuthorId && targetMention) {
+          const { id } = await saveDocumentNotification({
+            type: 'mention.created',
+            createdAt: webhookData.createdAt,
+            createdBy: mentionAuthorId,
+            mentionId: webhookData.event.mention.id,
+            pageId: webhookData.event.document.id,
+            spaceId: webhookData.spaceId,
+            userId: mentionedUserId,
+            content: targetMention.parentNode
+          });
+          ids.push(id);
+        } else {
+          log.warn('Ignore user mention - could not find it in the doc', {
+            pageId: documentId,
+            mentionedUserId,
+            mentionAuthorId,
+            targetMention
+          });
         }
-      });
-      const documentContent = document.content as PageContent;
-      const targetMention = extractMentionFromId(documentContent, mentionId);
-      if (mentionedUserId !== mentionAuthorId && targetMention) {
-        const { id } = await saveDocumentNotification({
-          type: 'mention.created',
-          createdAt: webhookData.createdAt,
-          createdBy: mentionAuthorId,
-          mentionId: webhookData.event.mention.id,
-          pageId: webhookData.event.document.id,
-          spaceId: webhookData.spaceId,
-          userId: mentionedUserId,
-          content: targetMention.parentNode
+      } else if (webhookData.event.post) {
+        const postId = webhookData.event.post.id;
+        const post = await prisma.post.findUniqueOrThrow({
+          where: {
+            id: postId
+          },
+          select: {
+            content: true
+          }
         });
-        ids.push(id);
-      } else {
-        log.warn('Ignore user mention - could not find it in the doc', {
-          pageId: documentId,
-          mentionedUserId,
-          mentionAuthorId,
-          targetMention
-        });
-      }
+        const postContent = post.content as PageContent;
+        const targetMention = extractMentionFromId(postContent, mentionId);
 
+        if (mentionedUserId !== mentionAuthorId && targetMention) {
+          const { id } = await saveDocumentNotification({
+            type: 'mention.created',
+            createdAt: webhookData.createdAt,
+            createdBy: mentionAuthorId,
+            mentionId: webhookData.event.mention.id,
+            postId: webhookData.event.post.id,
+            spaceId: webhookData.spaceId,
+            userId: mentionedUserId,
+            content: targetMention.parentNode
+          });
+          ids.push(id);
+        } else {
+          log.warn('Ignore user mention - could not find it in the doc', {
+            postId,
+            mentionedUserId,
+            mentionAuthorId,
+            targetMention
+          });
+        }
+      }
       break;
     }
 

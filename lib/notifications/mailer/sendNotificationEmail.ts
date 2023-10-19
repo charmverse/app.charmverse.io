@@ -34,7 +34,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             notification: notifications[0],
             user: {
               email: user.email,
-              username: user.username
+              username: user.username,
+              id: user.id
             }
           });
         }
@@ -56,7 +57,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             notification: notifications[0],
             user: {
               email: user.email,
-              username: user.username
+              username: user.username,
+              id: user.id
             }
           });
         }
@@ -78,7 +80,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             notification: notifications[0],
             user: {
               email: user.email,
-              username: user.username
+              username: user.username,
+              id: user.id
             }
           });
         }
@@ -100,7 +103,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             notification: notifications[0],
             user: {
               email: user.email,
-              username: user.username
+              username: user.username,
+              id: user.id
             }
           });
         }
@@ -122,7 +126,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             notification: notifications[0],
             user: {
               email: user.email,
-              username: user.username
+              username: user.username,
+              id: user.id
             }
           });
         }
@@ -144,7 +149,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             notification: notifications[0],
             user: {
               email: user.email,
-              username: user.username
+              username: user.username,
+              id: user.id
             }
           });
         }
@@ -163,13 +169,14 @@ async function sendEmail({
   user
 }: {
   notification: Notification;
-  user: { username: string; email: string };
+  user: { username: string; email: string; id: string };
 }) {
   const template = emails.getPendingNotificationEmail(notification);
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,
-      email: user.email
+      email: user.email,
+      userId: user.id
     },
     subject: template.subject,
     html: template.html
