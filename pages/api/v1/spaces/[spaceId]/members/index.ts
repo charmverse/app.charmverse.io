@@ -1,14 +1,15 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { InvalidStateError, requireSuperApiKey } from 'lib/middleware';
+import { isTestEnv } from 'config/constants';
+import { InvalidStateError, NotFoundError, requireSuperApiKey } from 'lib/middleware';
 import { getSummonProfile } from 'lib/profile/getSummonProfile';
 import { defaultHandler } from 'lib/public-api/handler';
 import type { CreateSpaceMemberRequestBody, UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile, searchUserProfileById } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
+import { SUMMON_BASE_URL } from 'lib/summon/api';
+import { syncSummonSpaceRoles } from 'lib/summon/syncSummonSpaceRoles';
 import { createUserFromWallet } from 'lib/users/createUser';
 
 const handler = defaultHandler();
@@ -41,7 +42,7 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   const spaceId = req.query.spaceId as string;
   const payload = req.body as CreateSpaceMemberRequestBody;
   const spaceIds = req.spaceIdRange;
-
+  const summonApiUrl = /* isTestEnv ?  */ req.query.summonApiUrl /*  ?? SUMMON_BASE_URL : SUMMON_BASE_URL */ as string;
   if (!spaceIds || !spaceIds.length) {
     throw new InvalidStateError('Space ID is undefined');
   }
@@ -60,17 +61,24 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   }
 
   const summonProfile = await getSummonProfile({
-    userId: user.id
+    userId: user.id,
+    summonApiUrl
   });
 
   if (!summonProfile) {
-    throw new InvalidStateError('Summon profile is undefined');
+    throw new NotFoundError('Summon profile not found');
   }
 
   await addUserToSpace({
     spaceId,
     userId: user.id,
     userXpsEngineId: summonProfile.id
+  });
+
+  await syncSummonSpaceRoles({
+    spaceId,
+    userId: user.id,
+    summonApiUrl
   });
 
   return res.status(200).json(user);
