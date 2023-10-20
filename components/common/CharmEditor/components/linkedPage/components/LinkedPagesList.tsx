@@ -8,6 +8,7 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
+import { stringSimilarity } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
@@ -30,7 +31,7 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
     hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
   }
 
-  const listPages = useMemo(
+  const userPages = useMemo(
     () =>
       Object.values(pages)
         .filter(isTruthy)
@@ -39,32 +40,23 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
   );
 
   const filteredPages = useMemo(() => {
-    if (!triggerText) {
-      return listPages.filter((page) => page.type === 'page' || page.type === 'board' || page.type === 'linked_board');
+    if (triggerText) {
+      return sortList({ triggerText, list: userPages, prop: 'title' });
     }
+    return userPages;
+  }, [triggerText, userPages]);
 
-    return listPages.filter((page) =>
-      triggerText.length !== 0
-        ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase().trim())
-        : true
-    );
-  }, [triggerText, listPages]);
-
-  const filteredStaticPages = useMemo(
-    () =>
-      STATIC_PAGES.filter((page) =>
-        triggerText.length > 0 ? page.title.toLowerCase().startsWith(triggerText.toLowerCase().trim()) : true
-      ),
-    [triggerText]
-  );
+  const filteredStaticPages = useMemo(() => {
+    if (triggerText) {
+      return sortList({ triggerText, list: STATIC_PAGES, prop: 'title' });
+    }
+    return STATIC_PAGES;
+  }, [triggerText]);
 
   const filteredForumCategories = useMemo(() => {
     if (triggerText) {
-      return categories.filter((page) =>
-        triggerText.length > 0 ? page.name.toLowerCase().startsWith(triggerText.toLowerCase().trim()) : true
-      );
+      return sortList({ triggerText, list: categories, prop: 'name' });
     }
-
     return [];
   }, [triggerText, categories]);
 
@@ -97,6 +89,22 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
       />
     </PopoverMenu>
   );
+}
+
+function sortList<T extends object>({
+  triggerText,
+  list,
+  prop
+}: {
+  triggerText: string;
+  list: T[];
+  prop: keyof T;
+}): T[] {
+  return list
+    .map((item) => ({ item, similarity: stringSimilarity(item[prop] as string, triggerText) }))
+    .filter(({ similarity }) => similarity > 0.09)
+    .sort((a, b) => b.similarity - a.similarity)
+    .map(({ item }) => item);
 }
 
 export default memo(LinkedPagesList);
