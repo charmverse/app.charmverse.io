@@ -177,9 +177,7 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
-    return (
-      <UserAndRoleSelect wrapColumn={false} readOnly={readOnly} onChange={() => null} value={propertyValue as any} />
-    );
+    return <UserAndRoleSelect readOnly={readOnly} onChange={() => null} value={propertyValue as any} />;
   } else if (
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
