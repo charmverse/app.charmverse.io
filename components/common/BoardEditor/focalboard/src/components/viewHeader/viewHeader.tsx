@@ -130,8 +130,7 @@ function ViewHeader(props: Props) {
       {/* add a view */}
 
       {!props.readOnly && views.length <= maxTabsShown && (
-        // hide the add view button if there are no views yet many views
-        <Box className='view-actions' pt='4px' sx={{ opacity: views.length === 0 ? '0 !important' : 1 }}>
+        <Box className='view-actions' pt='4px'>
           <AddViewMenu
             board={viewsBoard}
             activeView={activeView}
