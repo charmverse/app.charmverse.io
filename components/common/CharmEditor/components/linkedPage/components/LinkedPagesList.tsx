@@ -14,7 +14,7 @@ import { isTruthy } from 'lib/utilities/types';
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
-import type { AllPagesProp } from '../../PageList';
+import type { PageListItem } from '../../PageList';
 import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 
@@ -39,32 +39,39 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
     [pages]
   );
 
+  const allPages: PageListItem[] = useMemo(() => {
+    const categoryPages: PageListItem[] = (categories || []).map((page) => ({
+      id: page.id,
+      path: page.path || '',
+      hasContent: true,
+      title: `Forum > ${page.name}`,
+      type: 'forum_category',
+      icon: null
+    }));
+
+    const staticPages: PageListItem[] = STATIC_PAGES.map((page) => ({
+      id: page.path,
+      path: page.path,
+      hasContent: true,
+      title: page.title,
+      type: page.path,
+      icon: null
+    }));
+    return [...userPages, ...categoryPages, ...staticPages];
+  }, [categories, userPages]);
+
   const filteredPages = useMemo(() => {
     if (triggerText) {
-      return sortList({ triggerText, list: userPages, prop: 'title' });
+      return sortList({ triggerText, list: allPages, prop: 'title' });
     }
     return userPages;
   }, [triggerText, userPages]);
 
-  const filteredStaticPages = useMemo(() => {
-    if (triggerText) {
-      return sortList({ triggerText, list: STATIC_PAGES, prop: 'title' });
-    }
-    return STATIC_PAGES;
-  }, [triggerText]);
-
-  const filteredForumCategories = useMemo(() => {
-    if (triggerText) {
-      return sortList({ triggerText, list: categories, prop: 'name' });
-    }
-    return [];
-  }, [triggerText, categories]);
-
-  const totalItems = filteredPages.length + filteredStaticPages.length + filteredForumCategories.length;
+  const totalItems = filteredPages.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
 
   const onSelectPage = useCallback(
-    (pageId: string, type: AllPagesProp['type'], path: string) => {
+    (pageId: string, type: PageListItem['type'], path: string) => {
       insertLinkedPage(pluginKey, view, pageId, type, path);
     },
     [view]
@@ -80,13 +87,7 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
   return (
     <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
       <GroupLabel>Select a page</GroupLabel>
-      <PagesList
-        activeItemIndex={activeItemIndex}
-        pages={filteredPages}
-        staticPages={filteredStaticPages}
-        forumCategories={filteredForumCategories}
-        onSelectPage={onSelectPage}
-      />
+      <PagesList activeItemIndex={activeItemIndex} pages={filteredPages} onSelectPage={onSelectPage} />
     </PopoverMenu>
   );
 }
