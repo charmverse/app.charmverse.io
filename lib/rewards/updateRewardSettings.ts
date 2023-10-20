@@ -4,8 +4,23 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
-import type { RewardWithUsers, UpdateableRewardFields } from './interfaces';
+import type { Reward, RewardReviewer, RewardWithUsers } from './interfaces';
 import { setRewardUsers } from './setRewardUsers';
+
+export type UpdateableRewardFields = Partial<
+  Pick<
+    Reward,
+    | 'chainId'
+    | 'rewardAmount'
+    | 'rewardToken'
+    | 'approveSubmitters'
+    | 'allowMultipleApplications'
+    | 'maxSubmissions'
+    | 'dueDate'
+    | 'customReward'
+    | 'fields'
+  >
+> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null };
 
 export type RewardUpdate = {
   rewardId: string;

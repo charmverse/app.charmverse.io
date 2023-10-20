@@ -9,7 +9,9 @@ import { RewardPropertiesForm } from 'components/rewards/components/RewardProper
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import type { RewardCreationData, RewardWithUsers, UpdateableRewardFields } from 'lib/rewards/interfaces';
+import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { RewardSignupButton } from './components/RewardSignupButton';
 

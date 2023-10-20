@@ -1,13 +1,24 @@
-import type { BountyPermissionLevel, Prisma } from '@charmverse/core/prisma';
+import type { BountyPermissionLevel, Page, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { NotFoundError } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
-import type { RewardCreationData } from 'lib/rewards/interfaces';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 
 import { getRewardOrThrow } from './getReward';
+import type { UpdateableRewardFields } from './updateRewardSettings';
+
+export type RewardPageProps = Partial<
+  Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon'>
+>;
+export type RewardCreationData = UpdateableRewardFields & {
+  linkedPageId?: string;
+  spaceId: string;
+  userId: string;
+  pageProps?: RewardPageProps;
+};
+
 /**
  * You can create a reward suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the reward to suggestion status. Your logic should account for this.
  */
@@ -97,8 +108,6 @@ export async function createReward({
   });
 
   if (!linkedPageId) {
-    const newPageProps = pageProps || {};
-
     await prisma.bounty.create({
       data: {
         ...rewardCreateInput,

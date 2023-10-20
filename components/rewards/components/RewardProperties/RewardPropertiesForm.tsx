@@ -17,7 +17,9 @@ import { RewardTypeSelect } from 'components/rewards/components/RewardProperties
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
-import type { RewardCreationData, Reward, RewardWithUsers, UpdateableRewardFields } from 'lib/rewards/interfaces';
+import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
 type Props = {

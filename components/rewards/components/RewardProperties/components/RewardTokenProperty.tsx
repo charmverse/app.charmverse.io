@@ -15,7 +15,8 @@ import TokenLogo from 'components/common/TokenLogo';
 import { RewardTokenSelect } from 'components/rewards/components/RewardProperties/components/RewardTokenSelect';
 import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/interfaces';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import type { RewardCreationData, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { isTruthy } from 'lib/utilities/types';
 

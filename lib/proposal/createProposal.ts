@@ -109,15 +109,15 @@ export async function createProposal({
     createPage({
       data: {
         content: pageProps?.content ?? undefined,
+        createdBy: userId,
         contentText: pageProps?.contentText ?? '',
         headerImage: pageProps?.headerImage,
-        sourceTemplateId: pageProps?.sourceTemplateId,
-        title: pageProps?.title ?? '',
         icon: pageProps?.icon,
-        createdBy: userId,
         id: proposalId,
         path: getPagePath(),
         proposalId,
+        sourceTemplateId: pageProps?.sourceTemplateId,
+        title: pageProps?.title ?? '',
         type: 'proposal',
         updatedBy: userId,
         spaceId

@@ -5,7 +5,7 @@ import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { generateBounty } from 'testing/setupDatabase';
 
-import type { UpdateableRewardFields } from '../interfaces';
+import type { UpdateableRewardFields } from '../updateRewardSettings';
 import { updateRewardSettings } from '../updateRewardSettings';
 
 let user: User;
