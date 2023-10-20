@@ -54,7 +54,11 @@ export function boardWithCardsArgs({
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
 
-  const cardIds = Array.from({ length: cardCount }).map(() => v4());
+  const cardIds = Array.from({ length: 2 }).map(() => v4());
+
+  if (cardCount > cardIds.length) {
+    throw new Error('cardCount cannot be greater than 2');
+  }
 
   // Skip to the bottom of this file to find the implementation that converts this stub to Prisma arguments
 
