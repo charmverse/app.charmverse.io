@@ -56,10 +56,6 @@ export function boardWithCardsArgs({
 
   const cardIds = Array.from({ length: 2 }).map(() => v4());
 
-  if (cardCount > cardIds.length) {
-    throw new Error('cardCount cannot be greater than 2');
-  }
-
   // Skip to the bottom of this file to find the implementation that converts this stub to Prisma arguments
 
   const rootBoardNode = {
@@ -290,9 +286,9 @@ export function boardWithCardsArgs({
 
   for (let i = 2; i < cardCount; i++) {
     if (i % 2 === 0) {
-      cardPages.push({ ...cardPages[0], id: cardIds[i] });
+      cardPages.push({ ...cardPages[0], id: cardIds[i] || v4() });
     } else {
-      cardPages.push({ ...cardPages[1], id: cardIds[i] });
+      cardPages.push({ ...cardPages[1], id: cardIds[i] || v4() });
     }
   }
 
