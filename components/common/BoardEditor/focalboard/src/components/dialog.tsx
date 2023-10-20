@@ -65,7 +65,13 @@ function FBDialog(props: Props) {
         >
           <div role='dialog' className={clsx('dialog', { fullWidth })}>
             <Toolbar display='flex' p={1}>
-              {toolbar ? <Box flexGrow={1}>{toolbar}</Box> : <div />}
+              {toolbar ? (
+                <Box flexGrow={1}>{toolbar}</Box>
+              ) : (
+                <Box flexGrow={1}>
+                  <div />
+                </Box>
+              )}
               {toolsMenu}
               {!props.hideCloseButton && (
                 <IconButton data-test='close-modal' size='small' onClick={props.onClose}>
