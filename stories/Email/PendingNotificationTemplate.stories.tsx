@@ -8,10 +8,10 @@ const userId = v4();
 
 export default {
   title: 'Email/Notifications',
-  component: PendingNotificationTemplateComponent
+  component: PendingNotificationTemplate
 };
 
-export function PendingNotificationTemplateComponent() {
+export function PendingNotificationTemplate() {
   return (
     <PendingNotification
       notification={{

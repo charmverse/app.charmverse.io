@@ -4,10 +4,10 @@ import { PageInviteEmail } from 'lib/mailer/emails/templates/PageInviteEmail';
 
 export default {
   title: 'Email/Page Invite',
-  component: PageInviteEmailTemplateComponent
+  component: PageInviteEmailTemplate
 };
 
-export function PageInviteEmailTemplateComponent() {
+export function PageInviteEmailTemplate() {
   return (
     <PageInviteEmail
       guestEmail='john.doe@gmail.com'
