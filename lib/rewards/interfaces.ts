@@ -1,6 +1,10 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Application, Bounty, BountyStatus, Page, Transaction } from '@charmverse/core/prisma-client';
 
+import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { RewardPageProps } from 'lib/rewards/createReward';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+
 export type RewardReviewer = TargetPermissionGroup<'role' | 'user'>;
 
 export type ApplicationMeta = Pick<
@@ -28,3 +32,5 @@ export type RewardWithUsersAndPageMeta = Bounty & {
 export type ApplicationWithTransactions = Application & {
   transactions: Transaction[];
 };
+
+export type RewardPageAndPropertiesInput = RewardPageProps & UpdateableRewardFields & { content?: PageContent | null };

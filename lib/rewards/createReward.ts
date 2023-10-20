@@ -1,4 +1,4 @@
-import type { BountyPermissionLevel, Prisma } from '@charmverse/core/prisma';
+import type { BountyPermissionLevel, Page, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -9,7 +9,15 @@ import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/error
 import { getRewardOrThrow } from './getReward';
 import type { UpdateableRewardFields } from './updateRewardSettings';
 
-export type RewardCreationData = UpdateableRewardFields & { linkedPageId?: string; spaceId: string; userId: string };
+export type RewardPageProps = Partial<
+  Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon'>
+>;
+export type RewardCreationData = UpdateableRewardFields & {
+  linkedPageId?: string;
+  spaceId: string;
+  userId: string;
+  pageProps?: RewardPageProps;
+};
 
 /**
  * You can create a reward suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the reward to suggestion status. Your logic should account for this.
@@ -27,7 +35,8 @@ export async function createReward({
   allowedSubmitterRoles,
   dueDate,
   fields,
-  reviewers
+  reviewers,
+  pageProps
 }: RewardCreationData) {
   if (!rewardAmount && !customReward) {
     throw new InvalidInputError('A reward must have a reward amount or a custom reward assigned');
@@ -125,9 +134,6 @@ export async function createReward({
             },
             id: rewardId,
             path: getPagePath(),
-            title: '',
-            contentText: '',
-            content: undefined,
             space: {
               connect: {
                 id: spaceId
@@ -139,7 +145,13 @@ export async function createReward({
                 id: userId
               }
             },
-            type: 'bounty'
+            type: 'bounty',
+            content: pageProps?.content ?? undefined,
+            contentText: pageProps?.contentText ?? '',
+            headerImage: pageProps?.headerImage,
+            sourceTemplateId: pageProps?.sourceTemplateId,
+            title: pageProps?.title ?? '',
+            icon: pageProps?.icon
           }
         }
       }
