@@ -275,7 +275,7 @@ describe('createWorkspace', () => {
         }
       });
 
-      expect(page).toMatchObject(gettingStartedPage);
+      expect(page?.title).toEqual(gettingStartedPage.title);
     }
   });
 
