@@ -334,7 +334,12 @@ export function UserAndRoleSelect({
           );
         }}
         renderTags={() => (
-          <SelectedOptions wrapColumn readOnly={!!readOnly} value={populatedValue} onRemove={removeReviewer} />
+          <SelectedOptions
+            wrapColumn={wrapColumn}
+            readOnly={!!readOnly}
+            value={populatedValue}
+            onRemove={removeReviewer}
+          />
         )}
         value={populatedValue}
       />
