@@ -24,11 +24,24 @@ export function PageInviteEmail(props: PageInviteEmailProps) {
           marginBottom: 20
         }}
       >
-        <Button variant='outlined' href={pageLink}>
+        <Button
+          variant='outlined'
+          style={{
+            width: 'fit-content'
+          }}
+          href={pageLink}
+        >
           {props.pageTitle}
         </Button>
       </Row>
-      <Button href={pageLink}>Open</Button>
+      <Button
+        style={{
+          width: 'fit-content'
+        }}
+        href={pageLink}
+      >
+        Open
+      </Button>
     </EmailWrapper>
   );
 }
