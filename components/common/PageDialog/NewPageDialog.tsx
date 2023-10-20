@@ -52,7 +52,6 @@ export function NewPageDialog({
           close();
         }
       }}
-      toolbar={<div />}
       footerActions={
         <Button
           disabled={Boolean(disabledTooltip) || !contentUpdated || isSaving}
