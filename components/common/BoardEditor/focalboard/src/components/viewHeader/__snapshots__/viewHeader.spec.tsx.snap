@@ -63,7 +63,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
         </div>
       </div>
       <div
-        class="view-actions MuiBox-root css-37urdo"
+        class="view-actions MuiBox-root css-1lqo27h"
       >
         <button
           class="Button IconButton css-w119tu"

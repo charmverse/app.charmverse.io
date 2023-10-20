@@ -70,7 +70,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
             </div>
           </div>
           <div
-            class="view-actions MuiBox-root css-37urdo"
+            class="view-actions MuiBox-root css-1lqo27h"
           >
             <button
               class="Button IconButton css-w119tu"
@@ -768,7 +768,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
             </div>
           </div>
           <div
-            class="view-actions MuiBox-root css-37urdo"
+            class="view-actions MuiBox-root css-1lqo27h"
           >
             <button
               class="Button IconButton css-w119tu"
@@ -1150,7 +1150,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
             </div>
           </div>
           <div
-            class="view-actions MuiBox-root css-37urdo"
+            class="view-actions MuiBox-root css-1lqo27h"
           >
             <button
               class="Button IconButton css-w119tu"
@@ -1744,7 +1744,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
             </div>
           </div>
           <div
-            class="view-actions MuiBox-root css-37urdo"
+            class="view-actions MuiBox-root css-1lqo27h"
           >
             <button
               class="Button IconButton css-w119tu"
