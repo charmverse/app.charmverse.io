@@ -29,7 +29,7 @@ interface AddPageResponse {
   page: PageWithPermissions;
 }
 
-type CreatedPage = Omit<AddPageResponse, 'page'> & { page: Pick<Page, 'id' | 'path'> };
+type CreatedPage = Pick<Page, 'id' | 'path'>;
 
 async function addDatabasePage(newPage: PageWithPermissions) {
   const isBoardPage = newPage.type?.match(/board/);
@@ -52,8 +52,7 @@ async function addDatabasePage(newPage: PageWithPermissions) {
       return { ...pages, [newPage.id]: newPage };
     },
     {
-      // revalidate pages for board since we create 3 default ones
-      revalidate: Boolean(isBoardPage)
+      revalidate: false
     }
   );
 
@@ -95,19 +94,20 @@ export async function addPage(
         payload: pageProperties as PageCreated['payload']
       },
       async (newPage) => {
-        const result = await addDatabasePage(newPage);
         if (cb) {
-          cb(result);
+          cb(newPage);
         }
+        await addDatabasePage(newPage);
       }
     );
   } else {
     // For creating board and other pages from the editor use the api
     const newPage = await charmClient.createPage(pageProperties);
-    const result = await addDatabasePage(newPage);
+    // call back immediately to update UI while db is created
     if (cb) {
-      cb(result);
+      cb(newPage);
     }
+    await addDatabasePage(newPage);
   }
 }
 
@@ -134,7 +134,7 @@ export async function addPageAndRedirect(page: NewPageInput, router: NextRouter)
     await addPage(page, {
       trigger: 'sidebar',
       cb: (newPage) => {
-        router.push(`/${router.query.domain}/${newPage.page.path}`);
+        router.push(`/${router.query.domain}/${newPage.path}`);
       }
     });
   }

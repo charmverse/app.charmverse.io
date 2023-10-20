@@ -130,7 +130,8 @@ function ViewHeader(props: Props) {
       {/* add a view */}
 
       {!props.readOnly && views.length <= maxTabsShown && (
-        <Box className='view-actions' pt='4px'>
+        // hide the add view button if there are no views yet many views
+        <Box className='view-actions' pt='4px' sx={{ opacity: views.length === 0 ? '0 !important' : 1 }}>
           <AddViewMenu
             board={viewsBoard}
             activeView={activeView}
@@ -199,8 +200,8 @@ function ViewHeader(props: Props) {
 
         {/* <ViewHeaderSearch/> */}
 
-        {/* Link to view embedded table in full */}
-        {props.embeddedBoardPath && (
+        {/* Link to view embedded table in full - check that at least one view is created */}
+        {props.embeddedBoardPath && !!views.length && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
               <span>

@@ -1,6 +1,7 @@
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PageType } from '@charmverse/core/prisma';
 import DatabaseIcon from '@mui/icons-material/TableChart';
+import { TextSelection } from 'prosemirror-state';
 
 import { addPage } from 'lib/pages';
 
@@ -49,16 +50,14 @@ export function items({
                   },
                   {
                     trigger: 'editor',
-                    cb: ({ page }) => {
+                    cb: (page) => {
                       const node = _state.schema.nodes.inlineDatabase.create({
                         pageId: page.id
                       });
-
-                      if (_dispatch && isAtBeginningOfLine(state)) {
+                      if (_dispatch) {
                         _dispatch(_state.tr.replaceSelectionWith(node).scrollIntoView());
                         return true;
                       }
-                      return insertNode(_state, _dispatch, node);
                     }
                   }
                 );
@@ -110,7 +109,7 @@ export function items({
               },
               {
                 trigger: 'editor',
-                cb: ({ page }) => {
+                cb: (page) => {
                   const node = _state.schema.nodes.inlineDatabase.create({
                     pageId: page.id
                   });
