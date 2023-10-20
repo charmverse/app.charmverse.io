@@ -2,11 +2,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
-import type { PendingNotificationsData } from 'lib/mailer/emails/templates/PendingNotificationsTemplate';
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
 import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
-import type { NotificationGroup } from 'lib/notifications/interfaces';
+import type { Notification, NotificationGroup } from 'lib/notifications/interfaces';
 import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
 import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
 import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
@@ -30,12 +29,16 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       });
       if (user.email && user.emailNotifications) {
         const notifications = await getCardNotifications({ id });
-        await sendEmail({
-          notification: {
-            cardNotifications: notifications
-          },
-          user: user as PendingNotificationsData['user']
-        });
+        if (notifications.length) {
+          await sendEmail({
+            notification: notifications[0],
+            user: {
+              email: user.email,
+              username: user.username,
+              id: user.id
+            }
+          });
+        }
         return true;
       }
       break;
@@ -49,12 +52,16 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       });
       if (user.email && user.emailNotifications) {
         const notifications = await getPostNotifications({ id });
-        await sendEmail({
-          notification: {
-            forumNotifications: notifications
-          },
-          user: user as PendingNotificationsData['user']
-        });
+        if (notifications.length) {
+          await sendEmail({
+            notification: notifications[0],
+            user: {
+              email: user.email,
+              username: user.username,
+              id: user.id
+            }
+          });
+        }
         return true;
       }
       break;
@@ -68,12 +75,16 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       });
       if (user.email && user.emailNotifications) {
         const notifications = await getDocumentNotifications({ id });
-        await sendEmail({
-          notification: {
-            documentNotifications: notifications
-          },
-          user: user as PendingNotificationsData['user']
-        });
+        if (notifications.length) {
+          await sendEmail({
+            notification: notifications[0],
+            user: {
+              email: user.email,
+              username: user.username,
+              id: user.id
+            }
+          });
+        }
         return true;
       }
       break;
@@ -87,12 +98,16 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       });
       if (user.email && user.emailNotifications) {
         const notifications = await getPollNotifications({ id });
-        await sendEmail({
-          notification: {
-            voteNotifications: notifications
-          },
-          user: user as PendingNotificationsData['user']
-        });
+        if (notifications.length) {
+          await sendEmail({
+            notification: notifications[0],
+            user: {
+              email: user.email,
+              username: user.username,
+              id: user.id
+            }
+          });
+        }
         return true;
       }
       break;
@@ -106,12 +121,16 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       });
       if (user.email && user.emailNotifications) {
         const notifications = await getProposalNotifications({ id });
-        await sendEmail({
-          notification: {
-            proposalNotifications: notifications
-          },
-          user: user as PendingNotificationsData['user']
-        });
+        if (notifications.length) {
+          await sendEmail({
+            notification: notifications[0],
+            user: {
+              email: user.email,
+              username: user.username,
+              id: user.id
+            }
+          });
+        }
         return true;
       }
       break;
@@ -125,12 +144,16 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       });
       if (user.email && user.emailNotifications) {
         const notifications = await getBountyNotifications({ id });
-        await sendEmail({
-          notification: {
-            bountyNotifications: notifications
-          },
-          user: user as PendingNotificationsData['user']
-        });
+        if (notifications.length) {
+          await sendEmail({
+            notification: notifications[0],
+            user: {
+              email: user.email,
+              username: user.username,
+              id: user.id
+            }
+          });
+        }
         return true;
       }
       break;
@@ -142,27 +165,18 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
 }
 
 async function sendEmail({
-  user,
-  notification
+  notification,
+  user
 }: {
-  user: { id: string; username: string; email: string };
-  notification: Partial<PendingNotificationsData>;
+  notification: Notification;
+  user: { username: string; email: string; id: string };
 }) {
-  const template = emails.getPendingNotificationsEmail({
-    user,
-    totalUnreadNotifications: 1,
-    bountyNotifications: [],
-    cardNotifications: [],
-    documentNotifications: [],
-    forumNotifications: [],
-    voteNotifications: [],
-    proposalNotifications: [],
-    ...notification
-  });
+  const template = emails.getPendingNotificationEmail(notification);
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,
-      email: user.email
+      email: user.email,
+      userId: user.id
     },
     subject: template.subject,
     html: template.html

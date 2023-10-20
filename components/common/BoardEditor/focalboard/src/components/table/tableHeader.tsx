@@ -50,7 +50,6 @@ import HorizontalGrip from './horizontalGrip';
 
 type Props = {
   readOnly: boolean;
-  readOnlySourceData: boolean;
   sorted: 'up' | 'down' | 'none';
   name: string;
   board: Board;
@@ -75,7 +74,7 @@ const DEFAULT_BLOCK_IDS = [
 ];
 
 function TableHeader(props: Props): JSX.Element {
-  const { activeView, board, views, cards, sorted, name, type, template, readOnly, readOnlySourceData } = props;
+  const { activeView, board, views, cards, sorted, name, type, template, readOnly } = props;
   const { id: templateId } = template;
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
@@ -332,7 +331,7 @@ function TableHeader(props: Props): JSX.Element {
       ref={columnRef}
     >
       <Stack width='100%' justifyContent='center'>
-        {readOnly || readOnlySourceData ? (
+        {readOnly ? (
           label
         ) : (
           <div ref={toggleRef}>

@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [unlabeled, closed]
 
+concurrency:
+  group: staging-${{ github.ref }}
+
 jobs:
   clean-up:
     if: |

@@ -29,7 +29,6 @@ type Props = {
   visibleGroups: BoardGroup[];
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
-  readOnlySourceData: boolean;
   cardIdToFocusOnRender: string;
   showCard: (cardId: string | null, parentId?: string) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
@@ -229,7 +228,6 @@ function Table(props: Props): JSX.Element {
           resizingColumn={resizingColumn}
           columnRefs={columnRefs}
           readOnly={props.readOnly}
-          readOnlySourceData={props.readOnlySourceData}
         />
 
         {/* Table rows */}
@@ -243,7 +241,7 @@ function Table(props: Props): JSX.Element {
                   activeView={activeView}
                   groupByProperty={groupByProperty}
                   group={group}
-                  readOnly={props.readOnly || props.readOnlySourceData}
+                  readOnly={props.readOnly}
                   columnRefs={columnRefs}
                   selectedCardIds={props.selectedCardIds}
                   cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -269,7 +267,7 @@ function Table(props: Props): JSX.Element {
               columnRefs={columnRefs}
               cardPages={cardPages}
               selectedCardIds={props.selectedCardIds}
-              readOnly={props.readOnly || props.readOnlySourceData}
+              readOnly={props.readOnly}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
               offset={offset}
               resizingColumn={resizingColumn}
@@ -286,25 +284,22 @@ function Table(props: Props): JSX.Element {
 
         {/* Add New row */}
         <div className='octo-table-footer'>
-          {!props.readOnly &&
-            !props.readOnlySourceData &&
-            !activeView.fields.groupById &&
-            !props.disableAddingCards && (
-              <div
-                data-test='table-add-card'
-                className='octo-table-cell'
-                onClick={() => {
-                  props.addCard('');
-                }}
-              >
-                <Box display='flex' gap={1} alignItems='center'>
-                  <Add fontSize='small' />
-                  <Typography fontSize='small' id='TableComponent.plus-new'>
-                    New
-                  </Typography>
-                </Box>
-              </div>
-            )}
+          {!props.readOnly && !activeView.fields.groupById && !props.disableAddingCards && (
+            <div
+              data-test='table-add-card'
+              className='octo-table-cell'
+              onClick={() => {
+                props.addCard('');
+              }}
+            >
+              <Box display='flex' gap={1} alignItems='center'>
+                <Add fontSize='small' />
+                <Typography fontSize='small' id='TableComponent.plus-new'>
+                  New
+                </Typography>
+              </Box>
+            </div>
+          )}
         </div>
 
         <CalculationRow
@@ -313,7 +308,7 @@ function Table(props: Props): JSX.Element {
           activeView={activeView}
           resizingColumn={resizingColumn}
           offset={offset}
-          readOnly={props.readOnly || props.readOnlySourceData}
+          readOnly={props.readOnly}
         />
       </div>
     </div>

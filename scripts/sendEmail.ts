@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import { sendEmail } from 'lib/mailer';
+import { v4 } from 'uuid';
 
 /**
  * See the docs for more info on how to use this script:
@@ -12,7 +13,8 @@ import { sendEmail } from 'lib/mailer';
     subject: 'Test Email',
     to: {
       email: 'matt.casey@charmverse.io',
-      displayName: 'Matteo'
+      displayName: 'Matteo',
+      userId: v4()
     }
   });
 

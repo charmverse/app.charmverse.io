@@ -238,7 +238,8 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         user: UserEntity;
         scope: WebhookEventNames.DocumentMentionCreated;
-        document: DocumentEntity;
+        document: DocumentEntity | null;
+        post: PostEntity | null;
         mention: UserMentionMetadata;
       }
     | {

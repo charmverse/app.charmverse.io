@@ -93,7 +93,6 @@ describe('components/centerPanel', () => {
         <ReduxProvider store={store}>
           <CenterPanel
             currentRootPageId={board.id}
-            readOnlySourceData={false}
             showView={jest.fn()}
             setPage={() => {}}
             views={[activeView]}
@@ -114,7 +113,6 @@ describe('components/centerPanel', () => {
         <ReduxProvider store={store}>
           <CenterPanel
             currentRootPageId={board.id}
-            readOnlySourceData={false}
             showView={jest.fn()}
             setPage={() => {}}
             views={[activeView]}
@@ -135,7 +133,6 @@ describe('components/centerPanel', () => {
         <ReduxProvider store={store}>
           <CenterPanel
             currentRootPageId={board.id}
-            readOnlySourceData={false}
             showView={jest.fn()}
             setPage={() => {}}
             views={[activeView]}
@@ -160,7 +157,6 @@ describe('components/centerPanel', () => {
             <ReduxProvider store={store}>
               <CenterPanel
                 currentRootPageId={board.id}
-                readOnlySourceData={false}
                 showView={jest.fn()}
                 setPage={() => {}}
                 views={[activeView]}
