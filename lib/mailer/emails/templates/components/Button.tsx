@@ -14,14 +14,19 @@ export function Button({
   ...props
 }: { variant?: 'filled' | 'outlined'; children: ReactNode; href: string } & LinkProps) {
   return (
-    <Link {...props} href={href}>
+    <Link
+      {...props}
+      style={{
+        width: '100%'
+      }}
+      href={href}
+    >
       <Text
         bold
         style={
           variant === 'outlined'
             ? {
                 textAlign: 'center',
-                width: 'fit-content',
                 borderRadius: '30px',
                 border: '1px solid #ccc',
                 padding: '8px 24px',
@@ -30,7 +35,6 @@ export function Button({
               }
             : {
                 textAlign: 'center',
-                width: 'fit-content',
                 color: '#fff',
                 padding: '8px 24px',
                 borderRadius: '3px',

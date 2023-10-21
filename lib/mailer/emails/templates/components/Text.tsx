@@ -38,6 +38,7 @@ export default function Text({
   variant = 'body1',
   bold = false,
   hideOverflow = false,
+  style = {},
   ...props
 }: {
   hideOverflow?: boolean;
@@ -63,7 +64,7 @@ export default function Text({
               whiteSpace: 'nowrap'
             }
           : {}),
-        ...(props.style ?? {})
+        ...style
       }}
     >
       {children}
