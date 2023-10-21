@@ -7,7 +7,7 @@ import { getCurrentDate } from 'lib/utilities/dates';
 const userId = v4();
 
 export default {
-  title: 'Email/Notifications',
+  title: 'Emails/Notification',
   component: PendingNotificationTemplate
 };
 

@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import { PageInviteEmail } from 'lib/mailer/emails/templates/PageInviteEmail';
 
 export default {
-  title: 'Email/Page Invite',
+  title: 'Emails/Page Invite',
   component: PageInviteEmailTemplate
 };
 
