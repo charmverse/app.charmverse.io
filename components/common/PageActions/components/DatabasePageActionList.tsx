@@ -87,8 +87,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: board?.id ?? '',
-      viewId: view?.id ?? '',
-      pages
+      viewId: view?.id ?? ''
     })
   );
 

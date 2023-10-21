@@ -41,6 +41,7 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 
+import { Constants } from '../constants';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -125,8 +126,7 @@ function CenterPanel(props: Props) {
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || '',
-      pages
+      viewId: activeView?.id || ''
     })
   );
 
@@ -139,10 +139,23 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, activePage]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = useMemo(
-    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
-    [_cards, pages]
-  );
+  const cardPages: CardPage[] = useMemo(() => {
+    return _cards
+      .map((card) => ({
+        card: {
+          ...card,
+          fields: {
+            ...card.fields,
+            properties: {
+              ...card.fields.properties,
+              [Constants.titleColumnId]: pages[card.id]?.title ?? ''
+            }
+          }
+        },
+        page: pages[card.id]!
+      }))
+      .filter(({ page }) => !!page && !page.deletedAt);
+  }, [_cards, pages]);
   const isActiveView = !!(activeView && activeBoard);
   const cards = useMemo(() => {
     const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
@@ -218,7 +231,7 @@ function CenterPanel(props: Props) {
     [props.showCard, state.selectedCardIds]
   );
 
-  const _addCard = props.addCard;
+  const __addCard = props.addCard;
   const _updateView = props.updateView;
 
   const addCard = useCallback(
@@ -278,7 +291,7 @@ function CenterPanel(props: Props) {
             if (isTemplate) {
               showCard(block.id);
             } else if (show) {
-              _addCard(createCard(block));
+              __addCard(createCard(block));
               _updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
               showCard(block.id);
             } else {
@@ -293,7 +306,7 @@ function CenterPanel(props: Props) {
         );
       });
     },
-    [activeBoard, activeView, _addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
+    [activeBoard, activeView, __addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
   );
 
   const editCardTemplate = (cardTemplateId: string) => {

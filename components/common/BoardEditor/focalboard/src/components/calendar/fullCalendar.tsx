@@ -134,40 +134,43 @@ function CalendarFullView(props: Props): JSX.Element | null {
     [cards, pages, dateDisplayProperty]
   );
 
-  const renderEventContent = (eventProps: EventContentArg): JSX.Element | null => {
-    const { event } = eventProps;
-    const page = pages[event.id];
+  const renderEventContent = useCallback(
+    (eventProps: EventContentArg): JSX.Element | null => {
+      const { event } = eventProps;
+      const page = pages[event.id];
 
-    return (
-      <div>
-        <div className='octo-icontitle'>
-          <PageIcon isEditorEmpty={!page?.hasContent} pageType='page' icon={event.extendedProps.icon} />
-          <div className='fc-event-title' key='__title'>
-            {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
+      return (
+        <div>
+          <div className='octo-icontitle'>
+            <PageIcon isEditorEmpty={!page?.hasContent} pageType='page' icon={event.extendedProps.icon} />
+            <div className='fc-event-title' key='__title'>
+              {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
+            </div>
           </div>
-        </div>
-        {visiblePropertyTemplates.map((template) => {
-          const card = cards.find((o) => o.id === event.id) || cards[0];
+          {visiblePropertyTemplates.map((template) => {
+            const card = cards.find((o) => o.id === event.id) || cards[0];
 
-          return (
-            <PropertyValueElement
-              board={board}
-              syncWithPageId={page?.syncWithPageId}
-              key={template.id}
-              readOnly={true}
-              card={card}
-              updatedAt={page?.updatedAt.toString() ?? ''}
-              updatedBy={page?.updatedBy ?? ''}
-              propertyTemplate={template}
-              showEmptyPlaceholder={true}
-              showTooltip
-              displayType='calendar'
-            />
-          );
-        })}
-      </div>
-    );
-  };
+            return (
+              <PropertyValueElement
+                board={board}
+                syncWithPageId={page?.syncWithPageId}
+                key={template.id}
+                readOnly={true}
+                card={card}
+                updatedAt={page?.updatedAt.toString() ?? ''}
+                updatedBy={page?.updatedBy ?? ''}
+                propertyTemplate={template}
+                showEmptyPlaceholder={true}
+                showTooltip
+                displayType='calendar'
+              />
+            );
+          })}
+        </div>
+      );
+    },
+    [board, cards, visiblePropertyTemplates, pages]
+  );
 
   const eventClick = useCallback(
     (eventProps: EventClickArg) => {

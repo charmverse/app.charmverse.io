@@ -320,7 +320,7 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-type getViewCardsProps = { viewId: string; boardId: string; pages: PagesMap };
+type getViewCardsProps = { viewId: string; boardId: string };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
@@ -328,8 +328,7 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
       Object.values(state.cards.cards).filter((c) => c.parentId === props.boardId) as Card[],
     (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
     (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
-    (state: RootState, props: getViewCardsProps) => props.pages,
-    (cards, board, view, pages) => {
+    (cards, board, view) => {
       if (!view || !board || !cards) {
         return [];
       }
@@ -340,20 +339,7 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
         : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
 
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(
-          view.fields.filter,
-          cardProperties,
-          result.map((card) => ({
-            ...card,
-            fields: {
-              ...card.fields,
-              properties: {
-                ...card.fields.properties,
-                [Constants.titleColumnId]: pages[card.id]?.title ?? ''
-              }
-            }
-          }))
-        );
+        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result);
       }
       return result;
     }
