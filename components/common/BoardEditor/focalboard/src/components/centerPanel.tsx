@@ -560,22 +560,20 @@ function CenterPanel(props: Props) {
                   </Typography>
                 )}
                 {/* Show page title for linked boards */}
-                {activePage &&
-                  activeView?.fields?.sourceType === 'board_page' &&
-                  boardPageType === 'inline_linked_board' && (
-                    <Button
-                      color='secondary'
-                      startIcon={<CallMadeIcon />}
-                      variant='text'
-                      size='large'
-                      href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
-                        activePage?.path
-                      }`}
-                      sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
-                    >
-                      {activePage?.title || 'Untitled'}
-                    </Button>
-                  )}
+                {activePage && activeView?.fields?.linkedSourceId && boardPageType === 'inline_linked_board' && (
+                  <Button
+                    color='secondary'
+                    startIcon={<CallMadeIcon />}
+                    variant='text'
+                    size='large'
+                    href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
+                      activePage?.path
+                    }`}
+                    sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
+                  >
+                    {activePage?.title || 'Untitled'}
+                  </Button>
+                )}
                 {activeBoard && activeView?.fields.viewType === 'board' && (
                   <Kanban
                     board={activeBoard}

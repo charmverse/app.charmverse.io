@@ -83,6 +83,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     constructedView.title = sourcePage.title ?? '';
     constructedView.fields.viewType = relatedSourceView?.fields.viewType ?? 'table';
     constructedView.fields.linkedSourceId = sourceDatabaseId;
+    constructedView.fields.sourceType = 'board_page';
     constructedView.fields.groupById = relatedSourceView?.fields.groupById;
     constructedView.fields.visibleOptionIds = relatedSourceView?.fields.visibleOptionIds ?? [];
     constructedView.fields.visiblePropertyIds = relatedSourceView?.fields.visiblePropertyIds ?? [];
