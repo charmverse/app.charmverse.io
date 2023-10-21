@@ -20,9 +20,9 @@ import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
-import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { makeSelectBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
-  getViewCardsSortedFilteredAndGrouped,
+  makeSelectViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -114,14 +114,16 @@ function CenterPanel(props: Props) {
   const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
 
   const { keys } = useApiPageKeys(props.page?.id);
-  const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const activeBoard = useAppSelector((state) => selectBoard(state, activeBoardId ?? ''));
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
 
-  const _cards = useAppSelector(
-    getViewCardsSortedFilteredAndGrouped({
+  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
+  const _cards = useAppSelector((state) =>
+    selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: activeBoard?.id || '',
       viewId: activeView?.id || '',
       pages
@@ -216,77 +218,83 @@ function CenterPanel(props: Props) {
     [props.showCard, state.selectedCardIds]
   );
 
-  const addCard = async (
-    groupByOptionId?: string,
-    show = false,
-    properties: Record<string, string> = {},
-    insertLast = true,
-    isTemplate = false
-  ) => {
-    if (!activeBoard) {
-      throw new Error('No active board');
-    }
-    if (!activeView) {
-      throw new Error('No active view');
-    }
+  const _addCard = props.addCard;
+  const _updateView = props.updateView;
 
-    const card = createCard();
-
-    // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
-
-    card.parentId = activeBoard.id;
-    card.rootId = activeBoard.rootId;
-    const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
-      activeView.fields.filter,
-      activeBoard.fields.cardProperties
-    );
-
-    if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
-      if (groupByOptionId) {
-        propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
-      } else {
-        delete propertiesThatMeetFilters[groupByProperty.id];
+  const addCard = useCallback(
+    async (
+      groupByOptionId?: string,
+      show = false,
+      properties: Record<string, string> = {},
+      insertLast = true,
+      isTemplate = false
+    ) => {
+      if (!activeBoard) {
+        throw new Error('No active board');
       }
-    }
-    card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
+      if (!activeView) {
+        throw new Error('No active view');
+      }
 
-    card.fields.contentOrder = [];
-    card.fields.isTemplate = isTemplate;
+      const card = createCard();
 
-    mutator.performAsUndoGroup(async () => {
-      const newCardOrder = insertLast
-        ? [...activeView.fields.cardOrder, card.id]
-        : [card.id, ...activeView.fields.cardOrder];
+      // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
 
-      // update view order first so that when we add the block it appears in the right spot
-      await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
-
-      await mutator.insertBlock(
-        card,
-        'add card',
-        async (block: Block) => {
-          if (space) {
-            await refreshPage(block.id);
-          }
-
-          if (isTemplate) {
-            showCard(block.id);
-          } else if (show) {
-            props.addCard(createCard(block));
-            props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
-            showCard(block.id);
-          } else {
-            // Focus on this card's title inline on next render
-            setState({ ...state, cardIdToFocusOnRender: card.id });
-            setTimeout(() => setState({ ...state, cardIdToFocusOnRender: '' }), 100);
-          }
-        },
-        async () => {
-          showCard(null);
-        }
+      card.parentId = activeBoard.id;
+      card.rootId = activeBoard.rootId;
+      const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
+        activeView.fields.filter,
+        activeBoard.fields.cardProperties
       );
-    });
-  };
+
+      if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
+        if (groupByOptionId) {
+          propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
+        } else {
+          delete propertiesThatMeetFilters[groupByProperty.id];
+        }
+      }
+      card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
+
+      card.fields.contentOrder = [];
+      card.fields.isTemplate = isTemplate;
+
+      mutator.performAsUndoGroup(async () => {
+        const newCardOrder = insertLast
+          ? [...activeView.fields.cardOrder, card.id]
+          : [card.id, ...activeView.fields.cardOrder];
+
+        // update view order first so that when we add the block it appears in the right spot
+        await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
+
+        await mutator.insertBlock(
+          card,
+          'add card',
+          async (block: Block) => {
+            if (space) {
+              await refreshPage(block.id);
+            }
+
+            if (isTemplate) {
+              showCard(block.id);
+            } else if (show) {
+              _addCard(createCard(block));
+              _updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
+              showCard(block.id);
+            } else {
+              // Focus on this card's title inline on next render
+              setState((_state) => ({ ..._state, cardIdToFocusOnRender: card.id }));
+              setTimeout(() => setState((_state) => ({ ..._state, cardIdToFocusOnRender: '' })), 100);
+            }
+          },
+          async () => {
+            showCard(null);
+          }
+        );
+      });
+    },
+    [activeBoard, activeView, _addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
+  );
 
   const editCardTemplate = (cardTemplateId: string) => {
     showCard(cardTemplateId);
@@ -334,6 +342,13 @@ function CenterPanel(props: Props) {
       }
     },
     [activeView]
+  );
+
+  const calendarAddCard = useCallback(
+    (properties: Record<string, string>) => {
+      addCard('', true, properties);
+    },
+    [addCard]
   );
 
   async function deleteSelectedCards() {
@@ -422,7 +437,6 @@ function CenterPanel(props: Props) {
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
-  const isLinkedDatabase = !!String(boardPage?.type).match('linked');
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
   const boardSourceType = activeView?.fields.sourceType ?? activeBoard?.fields.sourceType;
@@ -510,7 +524,7 @@ function CenterPanel(props: Props) {
         </div>
 
         <div className={`container-container ${state.openSettings ? 'sidebar-visible' : ''}`}>
-          <Box display='flex' sx={{ minHeight: state.openSettings ? 450 : 0 }}>
+          <Box display='flex' minHeight={state.openSettings ? 450 : 0}>
             {(state.openSettings === 'create-linked-view' || noBoardViewsYet) && (
               <Box width='100%'>
                 <CreateLinkedView rootBoard={board} views={views} showView={showView} />
@@ -528,7 +542,7 @@ function CenterPanel(props: Props) {
                   />
                 )}
                 {activeBoard && activeView?.fields.sourceType === 'google_form' && (
-                  <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
+                  <Typography fontSize={22} fontWeight={500}>
                     Form responses to{' '}
                     <Link
                       target='_blank'
@@ -605,9 +619,7 @@ function CenterPanel(props: Props) {
                     readOnly={props.readOnly}
                     dateDisplayProperty={dateDisplayProperty}
                     showCard={showCard}
-                    addCard={(properties: Record<string, string>) => {
-                      addCard('', true, properties);
-                    }}
+                    addCard={calendarAddCard}
                     disableAddingCards={disableAddingNewCards}
                   />
                 )}

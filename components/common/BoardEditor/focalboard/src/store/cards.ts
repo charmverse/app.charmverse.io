@@ -12,9 +12,7 @@ import type { PagesMap } from 'lib/pages';
 import { Constants } from '../constants';
 import { Utils } from '../utils';
 
-import { getBoard } from './boards';
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
-import { getView } from './views';
 
 import type { RootState } from './index';
 
@@ -121,11 +119,6 @@ export const getCurrentBoardCards = createSelector(
     return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
   }
 );
-
-export const getBoardCards = (boardId: string) =>
-  createSelector(getCards, (cards: { [key: string]: Card }) => {
-    return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
-  });
 
 export const getCurrentBoardTemplates = createSelector(
   (state: RootState) => state.boards.current,
@@ -327,13 +320,16 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; boardId: string; pages: PagesMap }) =>
+type getViewCardsProps = { viewId: string; boardId: string; pages: PagesMap };
+
+export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    getBoardCards(props.boardId),
-    getBoard(props.boardId),
-    getView(props.viewId),
-    () => null,
-    (cards, board, view) => {
+    (state: RootState, props: getViewCardsProps) =>
+      Object.values(state.cards.cards).filter((c) => c.parentId === props.boardId) as Card[],
+    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
+    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
+    (state: RootState, props: getViewCardsProps) => props.pages,
+    (cards, board, view, pages) => {
       if (!view || !board || !cards) {
         return [];
       }
@@ -353,7 +349,7 @@ export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; bo
               ...card.fields,
               properties: {
                 ...card.fields.properties,
-                [Constants.titleColumnId]: props.pages[card.id]?.title ?? ''
+                [Constants.titleColumnId]: pages[card.id]?.title ?? ''
               }
             }
           }))

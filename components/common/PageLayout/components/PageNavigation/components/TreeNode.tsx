@@ -1,12 +1,12 @@
 import type { Page } from '@charmverse/core/prisma';
 import { useTreeItem } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getSortedViews, getLoadedBoardViews } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { makeSelectSortedViews, getLoadedBoardViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import { formatViewTitle } from 'lib/focalboard/boardView';
@@ -156,7 +156,8 @@ function DraggableTreeNode({
 
   const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
 
-  const views = useAppSelector(getSortedViews(item.id));
+  const selectSortedViews = useMemo(makeSelectSortedViews, []);
+  const views = useAppSelector((state) => selectSortedViews(state, item.id));
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
 

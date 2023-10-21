@@ -81,17 +81,15 @@ function CalendarFullView(props: Props): JSX.Element | null {
 
   const { pages } = usePages();
 
-  const isEditable = useCallback((): boolean => {
-    if (
-      readOnly ||
-      !dateDisplayProperty ||
-      dateDisplayProperty.type === 'createdTime' ||
-      dateDisplayProperty.type === 'updatedTime'
-    ) {
-      return false;
-    }
-    return true;
-  }, [readOnly, dateDisplayProperty]);
+  let isEditable = true;
+  if (
+    readOnly ||
+    !dateDisplayProperty ||
+    dateDisplayProperty.type === 'createdTime' ||
+    dateDisplayProperty.type === 'updatedTime'
+  ) {
+    isEditable = false;
+  }
 
   const myEventsList = useMemo(
     () =>
@@ -267,8 +265,8 @@ function CalendarFullView(props: Props): JSX.Element | null {
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView='dayGridMonth'
         events={myEventsList}
-        editable={isEditable()}
-        eventResizableFromStart={isEditable()}
+        editable={isEditable}
+        eventResizableFromStart={isEditable}
         headerToolbar={toolbar}
         buttonText={buttonText}
         eventClick={eventClick}

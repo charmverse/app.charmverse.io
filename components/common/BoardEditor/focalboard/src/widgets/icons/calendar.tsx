@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function CalendarIcon({ fontSize }: { fontSize?: 'small' }): JSX.Element {
   const size = fontSize === 'small' ? 20 : 24;
   return (

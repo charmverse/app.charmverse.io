@@ -11,6 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
+import { useMemo } from 'react';
 import type { ChangeEvent } from 'react';
 
 import charmClient from 'charmClient';
@@ -18,7 +19,7 @@ import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporte
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
-  getViewCardsSortedFilteredAndGrouped,
+  makeSelectViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -82,8 +83,9 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     }
   }
 
-  const cards = useAppSelector(
-    getViewCardsSortedFilteredAndGrouped({
+  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
+  const cards = useAppSelector((state) =>
+    selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: board?.id ?? '',
       viewId: view?.id ?? '',
       pages
