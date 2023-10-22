@@ -4,11 +4,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getAddress } from 'viem';
 
 import * as http from 'adapters/http';
+import { isTestEnv } from 'config/constants';
 import { requireKeys } from 'lib/middleware';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
-import { coerceToMilliseconds } from 'lib/utilities/dates';
+import { coerceToMilliseconds, getCurrentDate } from 'lib/utilities/dates';
 
 import type { GenerateSnapshotVoteMessageResponseBody } from './generate-vote-message';
 
@@ -57,6 +58,8 @@ handler
 async function snapshotVoteHandler(req: NextApiRequest, res: NextApiResponse) {
   const payload = req.body as { address: string; data: GenerateSnapshotVoteMessageResponseBody; sig: string };
   const proposalId = req.query.proposalId as string;
+  const snapshotApiUrl = isTestEnv ? (req.query.snapshotApiUrl as string) : undefined;
+  const seqSnapshotUrl = isTestEnv ? (req.query.seqSnapshotUrl as string) : 'https://seq.snapshot.org/';
   const proposal = await prisma.proposal.findUnique({
     where: {
       id: proposalId
@@ -71,12 +74,16 @@ async function snapshotVoteHandler(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const snapshotProposalId = proposal?.page?.snapshotProposalId;
-  if (!snapshotProposalId) {
-    throw new DataNotFoundError(`A vote for proposal id ${proposalId} was not found.`);
+  if (!proposal) {
+    throw new DataNotFoundError(`Proposal with id ${proposalId} was not found.`);
   }
 
-  const snapshotProposal = await getSnapshotProposal(snapshotProposalId);
+  const snapshotProposalId = proposal?.page?.snapshotProposalId;
+  if (!snapshotProposalId) {
+    throw new DataNotFoundError(`Proposal with id ${proposalId} was not published to snapshot.`);
+  }
+
+  const snapshotProposal = await getSnapshotProposal(snapshotProposalId, snapshotApiUrl);
 
   if (!snapshotProposal) {
     throw new DataNotFoundError(`Proposal was not found on Snapshot.`);
@@ -87,13 +94,13 @@ async function snapshotVoteHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const proposalEndDate = coerceToMilliseconds(snapshotProposal?.end ?? 0);
-  const hasPassedDeadline = proposalEndDate < Date.now();
+  const hasPassedDeadline = proposalEndDate < getCurrentDate().getTime();
 
   if (hasPassedDeadline) {
     throw new UndesirableOperationError(`Voting for proposal with id: ${proposalId} has passed the deadline.`);
   }
 
-  await http.POST('https://seq.snapshot.org/', {
+  await http.POST(seqSnapshotUrl, {
     ...payload,
     address: getAddress(payload.address)
   });

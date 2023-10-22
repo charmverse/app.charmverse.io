@@ -1,6 +1,8 @@
 import type { Vote } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import { getAddress } from 'viem';
 
+import { getCurrentDate } from 'lib/utilities/dates';
+
 import type { SnapshotProposalVoteMessage, SnapshotProposalVoteType } from './interfaces';
 
 const NAME = 'snapshot';
@@ -96,7 +98,7 @@ export function generateSnapshotVoteMessage({ message, address }: { message: Vot
 } {
   const checksumAddress = getAddress(address);
   message.from = message.from ? getAddress(message.from) : checksumAddress;
-  if (!message.timestamp) message.timestamp = parseInt((Date.now() / 1e3).toFixed());
+  if (!message.timestamp) message.timestamp = parseInt((getCurrentDate().getTime() / 1e3).toFixed());
   const isShutter = message?.privacy === 'shutter';
   if (!message.reason) message.reason = '';
   if (!message.app) message.app = '';

@@ -42,7 +42,7 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   const spaceId = req.query.spaceId as string;
   const payload = req.body as CreateSpaceMemberRequestBody;
   const spaceIds = req.spaceIdRange;
-  const summonApiUrl = /* isTestEnv ?  */ req.query.summonApiUrl /*  ?? SUMMON_BASE_URL : SUMMON_BASE_URL */ as string;
+  const summonApiUrl = (isTestEnv ? req.query.summonApiUrl ?? SUMMON_BASE_URL : SUMMON_BASE_URL) as string;
   if (!spaceIds || !spaceIds.length) {
     throw new InvalidStateError('Space ID is undefined');
   }

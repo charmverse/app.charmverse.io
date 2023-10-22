@@ -2,6 +2,7 @@ import { DataNotFoundError, UndesirableOperationError } from '@charmverse/core/e
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { isTestEnv } from 'config/constants';
 import { requireKeys } from 'lib/middleware';
 import type { SnapshotProposalVoteMessage, SnapshotProposalVoteType } from 'lib/public-api';
 import { generateSnapshotVoteMessage } from 'lib/public-api/generateSnapshotVoteMessage';
@@ -78,6 +79,8 @@ async function generateSnapshotVoteMessageHandler(
 ) {
   const { choice, address } = req.body as { choice: VoteChoice; address: string };
   const proposalId = req.query.proposalId as string;
+  const snapshotApiUrl = isTestEnv ? (req.query.snapshotApiUrl as string) : undefined;
+
   const proposal = await prisma.proposal.findUnique({
     where: {
       id: proposalId
@@ -97,13 +100,17 @@ async function generateSnapshotVoteMessageHandler(
     }
   });
 
-  const snapshotProposalId = proposal?.page?.snapshotProposalId;
-  if (!snapshotProposalId) {
-    throw new DataNotFoundError(`A vote for proposal id ${proposalId} was not found.`);
+  if (!proposal) {
+    throw new DataNotFoundError(`Proposal with id ${proposalId} was not found.`);
   }
 
   if (proposal.status !== 'vote_active') {
-    throw new UndesirableOperationError(`Voting for proposal with id: ${proposalId} is not active.`);
+    throw new UndesirableOperationError(`Proposal with id ${proposalId} is not in vote_active status.`);
+  }
+
+  const snapshotProposalId = proposal?.page?.snapshotProposalId;
+  if (!snapshotProposalId) {
+    throw new DataNotFoundError(`Proposal with id ${proposalId} was not published to snapshot.`);
   }
 
   const spaceSnapshotDomain = proposal.space?.snapshotDomain;
@@ -112,7 +119,7 @@ async function generateSnapshotVoteMessageHandler(
     throw new UndesirableOperationError('No Snapshot domain connected to space yet.');
   }
 
-  const snapshotProposal = await getSnapshotProposal(snapshotProposalId);
+  const snapshotProposal = await getSnapshotProposal(snapshotProposalId, snapshotApiUrl);
 
   if (!snapshotProposal) {
     throw new DataNotFoundError(`Proposal was not found on Snapshot.`);
