@@ -1,4 +1,6 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
+import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { TypedDataField } from 'ethers/lib/ethers';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { APISpaceTemplateType } from 'lib/spaces/config';
@@ -530,3 +532,54 @@ export interface CreateSpaceMemberRequestBody {
   email: string;
   wallet: string;
 }
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    SnapshotProposalVoteMessage:
+ *      required:
+ *        - space
+ *        - proposal
+ *        - type
+ *        - choice
+ *      type: object
+ *      properties:
+ *        space:
+ *          type: string
+ *        proposal:
+ *          type: string
+ *        type:
+ *          type: string
+ *          enum: [single-choice, approval, quadratic, ranked-choice, weighted, basic]
+ *        choice:
+ *          type: string
+ *          example: Abstain
+ */
+export interface SnapshotProposalVoteMessage {
+  space: string;
+  proposal: string;
+  type: ProposalType;
+  choice: string | number;
+}
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    SnapshotProposalVoteType:
+ *      type: object
+ *      properties:
+ *        Vote:
+ *          type: array
+ *          items:
+ *            type: object
+ *            properties:
+ *              name:
+ *                type: string
+ *              type:
+ *                type: string
+ */
+export type SnapshotProposalVoteType = Record<string, TypedDataField[]>;
