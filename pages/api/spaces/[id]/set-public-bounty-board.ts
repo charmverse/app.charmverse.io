@@ -1,4 +1,3 @@
-import type { PublicBountyToggle } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -27,9 +26,13 @@ handler
   )
   .post(setPublicBountyBoardController);
 
+export type PublicRewardToggle = {
+  publicRewardBoard: boolean;
+};
+
 async function setPublicBountyBoardController(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
-  const { publicBountyBoard } = req.body as Pick<PublicBountyToggle, 'publicBountyBoard'>;
+  const { publicRewardBoard, publicBountyBoard } = req.body as PublicRewardToggle & { publicBountyBoard: boolean };
 
   // If this endpoint is being called, a manual update is happening. So we should update the space configuration mode to "custom"
   await prisma.space.update({
@@ -42,7 +45,7 @@ async function setPublicBountyBoardController(req: NextApiRequest, res: NextApiR
   });
 
   const updatedSpace = await req.premiumPermissionsClient.spaces.togglePublicBounties({
-    publicBountyBoard,
+    publicBountyBoard: publicBountyBoard ?? publicRewardBoard,
     spaceId: spaceId as string
   });
 

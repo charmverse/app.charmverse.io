@@ -11,7 +11,7 @@ function CardDialog(props: Props): JSX.Element | null {
   const { cardId, readOnly, onClose } = props;
 
   return (
-    <DocumentPageProviders>
+    <DocumentPageProviders isInsideDialog={true}>
       <PageDialog onClose={onClose} readOnly={readOnly} pageId={cardId} />
     </DocumentPageProviders>
   );

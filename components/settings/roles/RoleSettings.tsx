@@ -124,7 +124,7 @@ export function RoleSettings({ space }: { space: Space }) {
           <Typography variant='caption'>Custom role permissions override Default.</Typography>
           {roles?.map((role) => (
             <RoleRow
-              readOnly={!isAdmin}
+              readOnly={!!role.source || !isAdmin}
               assignRoles={assignRoles}
               deleteRole={deleteRole}
               refreshRoles={refreshRoles}
@@ -134,12 +134,14 @@ export function RoleSettings({ space }: { space: Space }) {
           ))}
           {roles?.length === 0 && !isCreateFormVisible && !isFreeSpace && (
             <Box p={3} mt={2} sx={{ border: '1px solid var(--input-border)', textAlign: 'center' }}>
-              <Typography sx={{ mb: 2 }} variant='body2' color='secondary'>
+              <Typography variant='body2' color='secondary'>
                 No roles have been created yet.
               </Typography>
-              <Button onClick={showCreateRoleForm} disabled={isValidating} variant='outlined'>
-                Add a role
-              </Button>
+              {isAdmin && (
+                <Button sx={{ mt: 2 }} onClick={showCreateRoleForm} disabled={isValidating} variant='outlined'>
+                  Add a role
+                </Button>
+              )}
             </Box>
           )}
         </>

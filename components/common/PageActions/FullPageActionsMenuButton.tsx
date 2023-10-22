@@ -21,11 +21,10 @@ type Props = {
   pageId?: string;
   page?: PageActionMeta | null;
   post?: PostWithVotes | null;
-  insideModal?: boolean;
   onDelete?: VoidFunction;
 };
 
-export function FullPageActionsMenuButton({ pageId, page: pageProp, post, insideModal, onDelete }: Props) {
+export function FullPageActionsMenuButton({ pageId, page: pageProp, post, onDelete }: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const { page: pageFromId } = usePage({ pageIdOrPath: pageId });
@@ -75,7 +74,6 @@ export function FullPageActionsMenuButton({ pageId, page: pageProp, post, inside
   if (isBasePageDocument && page) {
     pageOptionsList = (
       <DocumentPageActionList
-        insideModal={insideModal}
         page={page}
         pagePermissions={pagePermissions}
         onComplete={closeMenu}

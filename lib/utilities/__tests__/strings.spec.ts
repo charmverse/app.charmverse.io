@@ -1,4 +1,4 @@
-import { conditionalPlural, sanitizeForRegex, isUrl, isValidEmail } from '../strings';
+import { conditionalPlural, sanitizeForRegex, isUrl, isValidEmail, stringSimilarity } from '../strings';
 
 describe('strings', () => {
   it('should sanitize parenthesis in a regex', () => {
@@ -61,5 +61,18 @@ describe('isValidEmail', () => {
   it('should return false for an invalid email', () => {
     expect(isValidEmail('hello')).toBe(false);
     expect(isValidEmail('charmverse.io')).toBe(false);
+  });
+});
+
+describe('stringSimilarity()', () => {
+  it('should return 1 for identical strings', () => {
+    expect(stringSimilarity('hello', 'hello')).toBe(1);
+  });
+  it('should return 0 for completely different strings', () => {
+    expect(stringSimilarity('hello', 'world')).toBe(0);
+  });
+  it('should return a value between 0 and 1 for similar strings', () => {
+    expect(stringSimilarity('hello', 'hell')).toBeGreaterThan(0);
+    expect(stringSimilarity('hello', 'hell')).toBeLessThan(1);
   });
 });

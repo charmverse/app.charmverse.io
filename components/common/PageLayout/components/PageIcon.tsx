@@ -11,7 +11,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box } from '@mui/material';
 import type { ComponentProps, ReactNode } from 'react';
 
-import type { AllPagesProp } from 'components/common/CharmEditor/components/PageList';
+import type { PageListItem } from 'components/common/CharmEditor/components/PageList';
 import EmojiIcon from 'components/common/Emoji';
 import { greyColor2 } from 'theme/colors';
 
@@ -60,7 +60,7 @@ export function LinkedIcon({ children }: { children: ReactNode }) {
 
 type PageIconProps = Omit<ComponentProps<typeof StyledPageIcon>, 'icon'> & {
   icon?: ReactNode | null | 'application';
-  pageType?: AllPagesProp['type'];
+  pageType?: PageListItem['type'];
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;
 };
@@ -94,7 +94,7 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
       iconComponent = <StyledDatabaseIcon />;
     } else if (pageType === 'proposal' || pageType === 'proposals') {
       iconComponent = <ProposalIcon />;
-    } else if (pageType === 'bounty' || pageType === 'bounties') {
+    } else if (pageType === 'bounty' || pageType === 'bounties' || pageType === 'rewards') {
       iconComponent = <BountyIcon />;
     } else if (pageType === 'members') {
       iconComponent = <AccountCircleIcon />;

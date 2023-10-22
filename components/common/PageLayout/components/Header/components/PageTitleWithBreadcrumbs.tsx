@@ -4,7 +4,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
-import { useGetApplication } from 'charmClient/hooks/rewards';
+import { useGetApplication, useGetReward } from 'charmClient/hooks/rewards';
 import Link from 'components/common/Link';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -168,10 +168,8 @@ function RewardsPageTitle({
   applicationId?: string;
 }) {
   const [pageTitle] = usePageTitle();
-  const { pages } = usePages();
   const { data: application } = useGetApplication({ applicationId });
-
-  const rewardPage = application ? pages[application.bountyId] : undefined;
+  const { data: rewardWithPageMeta } = useGetReward({ rewardId: application?.bountyId });
 
   return (
     <PageTitle>
@@ -179,10 +177,10 @@ function RewardsPageTitle({
         <Link href={`${basePath}/rewards`}>{baseTitle}</Link>
       </BreadCrumb>
       {pageTitle && !applicationId ? pageTitle : null}
-      {rewardPage && (
+      {rewardWithPageMeta && (
         <>
           <BreadCrumb>
-            <Link href={`${basePath}/${rewardPage.path}`}>{rewardPage.title}</Link>
+            <Link href={`${basePath}/${rewardWithPageMeta.page.path}`}>{rewardWithPageMeta.page.title}</Link>
           </BreadCrumb>
           {applicationId && 'Application'}
         </>
@@ -190,7 +188,6 @@ function RewardsPageTitle({
     </PageTitle>
   );
 }
-
 function PublicBountyPageTitle() {
   const { space } = useCurrentSpace();
   return (
@@ -216,7 +213,7 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/rewards/')) {
+  } else if (pageType === 'bounty' && router.route.startsWith('/[domain]/rewards/')) {
     const baseTitle = mappedFeatures.rewards.title;
     return (
       <RewardsPageTitle
@@ -225,6 +222,10 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
         applicationId={router.query.applicationId as string}
       />
     );
+  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/bounties/')) {
+    const baseTitle = mappedFeatures.bounties.title;
+    return <BountyPageTitle baseTitle={baseTitle} basePath={`/${router.query.domain}`} />;
+    // Switch over when we use rewards
   } else if (pageType === 'proposal') {
     const baseTitle = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;

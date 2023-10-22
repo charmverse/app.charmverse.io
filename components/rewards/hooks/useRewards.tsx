@@ -20,8 +20,8 @@ type RewardsContextType = {
   mutateRewards: KeyedMutator<RewardWithUsers[]>;
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
-  refreshReward: (rewardId: string) => Promise<void>;
-  createReward: (input: RewardCreationData) => Promise<RewardWithUsers | null>;
+  refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
+  createReward: (input: Omit<RewardCreationData, 'userId'>) => Promise<RewardWithUsers | null>;
   tempReward?: RewardCreationData | null;
   setTempReward: (input?: RewardCreationData | null) => void;
 };
@@ -36,7 +36,7 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   },
   isLoading: false,
   updateReward: () => Promise.resolve(),
-  refreshReward: () => Promise.resolve(),
+  refreshReward: () => Promise.resolve() as any,
   createReward: () => Promise.resolve(null),
   tempReward: null,
   setTempReward: () => {}
@@ -84,28 +84,32 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const refreshReward = useCallback(
     async (rewardId: string) => {
       const reward = await charmClient.rewards.getReward(rewardId);
-      mutateRewards((data) => {
-        const rewardList = data ? [...data] : [];
-        const rewardIndex = rewardList.findIndex((p) => p.id === rewardId);
+      mutateRewards(
+        (data) => {
+          const rewardList = data ? [...data] : [];
+          const rewardIndex = rewardList.findIndex((p) => p.id === rewardId);
 
-        if (rewardIndex >= 0) {
-          const existingReward = rewardList[rewardIndex];
-          rewardList[rewardIndex] = {
-            ...existingReward,
-            ...reward
-          };
-        } else {
-          rewardList.push(reward);
-        }
-        return rewardList;
-      });
+          if (rewardIndex >= 0) {
+            const existingReward = rewardList[rewardIndex];
+            rewardList[rewardIndex] = {
+              ...existingReward,
+              ...reward
+            };
+          } else {
+            rewardList.push(reward);
+          }
+          return rewardList;
+        },
+        { revalidate: false }
+      );
+      return reward;
     },
     [mutateRewards]
   );
 
   const createReward = useCallback(
-    async (rewardData: RewardCreationData) => {
-      const reward = await createRewardTrigger(rewardData);
+    async (rewardData: Omit<RewardCreationData, 'userId'>) => {
+      const reward = await createRewardTrigger(rewardData as any);
       if (!reward) {
         return null;
       }
@@ -133,11 +137,10 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       setTempRewardData(
         data ?? {
           chainId: 1,
-          status: 'open',
           spaceId: space.id,
-          createdBy: user.id,
           rewardAmount: 1,
-          rewardToken: 'ETH'
+          rewardToken: 'ETH',
+          userId: user.id
         }
       );
     },

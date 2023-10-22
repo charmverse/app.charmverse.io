@@ -15,12 +15,13 @@ export type UpdateableRewardFields = Partial<
     | 'rewardAmount'
     | 'rewardToken'
     | 'approveSubmitters'
+    | 'allowMultipleApplications'
     | 'maxSubmissions'
     | 'dueDate'
     | 'customReward'
     | 'fields'
   >
-> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] };
+> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null };
 
 export type RewardUpdate = {
   rewardId: string;
@@ -50,15 +51,11 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
     }
   });
 
-  if (
-    typeof updateContent.maxSubmissions === 'number' &&
-    reward.maxSubmissions !== null &&
-    updateContent.maxSubmissions <
-      (countRemainingSubmissionSlots({
-        applications: reward.applications,
-        limit: updateContent.rewardAmount
-      }) as number)
-  ) {
+  const remaining = countRemainingSubmissionSlots({
+    applications: reward.applications,
+    limit: updateContent.maxSubmissions ?? reward.maxSubmissions
+  }) as number;
+  if (typeof remaining === 'number' && typeof updateContent.maxSubmissions === 'number' && remaining <= 0) {
     throw new InvalidInputError('New reward cap cannot be lower than total of active and valid submissions.');
   }
   const updatedReward = await prisma.$transaction(async (tx) => {
@@ -74,6 +71,7 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
         rewardAmount: updateContent.rewardAmount,
         rewardToken: updateContent.rewardToken,
         approveSubmitters: updateContent.approveSubmitters,
+        allowMultipleApplications: updateContent.allowMultipleApplications,
         maxSubmissions: updateContent.maxSubmissions,
         fields: updateContent.fields as any
       },

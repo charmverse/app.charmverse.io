@@ -2,12 +2,12 @@ import type { PageMeta, PageNode, PageNodeWithChildren, PageWithPermissions } fr
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Space } from '@charmverse/core/prisma';
 
-import type { BountyWithDetails } from 'lib/bounties';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
 export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];
@@ -73,5 +73,5 @@ export interface PublicPageResponse {
   cards: Card[];
   boards: Board[];
   views: BoardView[];
-  bounty: BountyWithDetails | null;
+  bounty: RewardWithUsersAndPageMeta | null;
 }

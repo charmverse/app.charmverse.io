@@ -34,8 +34,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
 
   const permissions = await computeBountyPermissions({
     resourceId: application.bountyId,
-    userId,
-    allowAdminBypass: true
+    userId
   });
 
   if (!permissions.review && application.createdBy !== userId) {

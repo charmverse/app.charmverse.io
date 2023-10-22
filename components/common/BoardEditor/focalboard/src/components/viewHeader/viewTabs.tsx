@@ -199,7 +199,7 @@ function ViewTabs(props: ViewTabsProps) {
   const showViewsMenuState = bindMenu(hiddenViewsPopupState);
 
   const views = viewsProp.filter((view) => !view.fields.inline);
-  const viewIds = props.viewIds.length === views.length ? props.viewIds : views.map((view) => view.id);
+  const viewIds = views.map((view) => view.id);
   const viewsRecord = viewsProp.reduce((acc, view) => {
     acc[view.id] = view;
     return acc;
@@ -207,16 +207,16 @@ function ViewTabs(props: ViewTabsProps) {
 
   // Find the index of the current view
   const currentViewIndex = viewIds.findIndex((viewId) => viewId === activeView?.id);
-  const shownViewIds = viewIds.slice(0, maxTabsShown);
-  let restViewIds = viewIds.slice(maxTabsShown);
+  const shownViews = views.slice(0, maxTabsShown);
+  let restViews = views.slice(maxTabsShown);
 
   // If the current view index is more than what we can show in the screen
   if (currentViewIndex >= maxTabsShown) {
-    const replacedViewId = shownViewIds[maxTabsShown - 1];
+    const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
-    shownViewIds[maxTabsShown - 1] = viewIds[currentViewIndex];
-    restViewIds = restViewIds.filter((viewId) => viewId !== activeView?.id);
-    restViewIds.unshift(replacedViewId);
+    shownViews[maxTabsShown - 1] = views[currentViewIndex];
+    restViews = restViews.filter((view) => view.id !== activeView?.id);
+    restViews.unshift(replacedView);
   }
 
   const { register, handleSubmit, setValue } = useForm<{ title: string }>({
@@ -275,7 +275,7 @@ function ViewTabs(props: ViewTabsProps) {
     );
     closeViewMenu();
     handleClose();
-  }, [dropdownView, showView, viewIds]);
+  }, [dropdownView, showView, board.id, viewIds]);
 
   const handleDeleteView = useCallback(async () => {
     Utils.log('deleteView');
@@ -293,7 +293,7 @@ function ViewTabs(props: ViewTabsProps) {
     if (nextViewId) {
       showView(nextViewId);
     }
-  }, [viewIds, dropdownView, showView, board.id]);
+  }, [viewIds, dropdownView, showView, onDeleteView, board.id]);
 
   function resyncGoogleFormData() {
     if (dropdownView) {
@@ -352,32 +352,28 @@ function ViewTabs(props: ViewTabsProps) {
         value={false} // use false to disable the indicator
         sx={{ minHeight: 0, mb: '-5px' }}
       >
-        {shownViewIds
-          .map((viewId) => {
-            const view = viewsRecord[viewId];
-            if (view) {
-              return (
-                <ViewTab
-                  onClick={handleViewClick}
-                  onDrop={reorderViews}
-                  view={view}
-                  isActive={activeView?.id === view.id}
-                  key={view.id}
-                  href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
-                />
-              );
-            }
-            return null;
+        {shownViews
+          .map((view) => {
+            return (
+              <ViewTab
+                onClick={handleViewClick}
+                onDrop={reorderViews}
+                view={view}
+                isActive={activeView?.id === view.id}
+                key={view.id}
+                href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
+              />
+            );
           })
           .filter(isTruthy)}
-        {restViewIds.length !== 0 && (
+        {restViews.length !== 0 && (
           <TabButton
             disableRipple
             sx={{ p: 0 }}
             {...showViewsTriggerState}
             label={
               <StyledTabContent color='secondary' fontSize='small' fontWeight={500}>
-                <span>{restViewIds.length} more...</span>
+                <span>{restViews.length} more...</span>
               </StyledTabContent>
             }
           />

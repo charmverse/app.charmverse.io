@@ -13,7 +13,7 @@ import type {
   ProposalNotification
 } from 'lib/notifications/interfaces';
 
-function getUrlSearchParamsFromNotificationType(notification: Notification) {
+function getUrlSearchParamsFromNotificationType(notification: Notification): string | ReactNode {
   const urlSearchParams = new URLSearchParams();
   switch (notification.type) {
     case 'comment.created':
@@ -44,7 +44,7 @@ function getCommentTypeNotificationContent({
   notificationType: InlineCommentNotificationType | CommentNotificationType | 'mention.created';
   createdBy: NotificationActor | null;
   pageType: PageType | 'post';
-}) {
+}): string | ReactNode {
   switch (notificationType) {
     case 'inline_comment.created':
     case 'comment.created': {
@@ -83,7 +83,7 @@ function getCommentTypeNotificationContent({
   }
 }
 
-function getPostContent(n: PostNotification) {
+function getPostContent(n: PostNotification): string | ReactNode {
   const { createdBy, type } = n;
   switch (type) {
     case 'created': {
@@ -105,12 +105,14 @@ function getPostContent(n: PostNotification) {
   }
 }
 
-function getCardContent(n: CardNotification) {
+function getCardContent(n: CardNotification): string | ReactNode {
   const { createdBy, type } = n;
   switch (type) {
     case 'person_assigned': {
       return createdBy.username ? (
-        <span>{createdBy.username} assigned you to a card</span>
+        <span>
+          <strong>{createdBy.username}</strong> assigned you to a card
+        </span>
       ) : (
         `You were assigned to a card`
       );
@@ -121,7 +123,7 @@ function getCardContent(n: CardNotification) {
   }
 }
 
-function getDocumentContent(n: DocumentNotification) {
+function getDocumentContent(n: DocumentNotification): string | ReactNode {
   const { type, createdBy, pageType } = n;
   return getCommentTypeNotificationContent({
     createdBy,
@@ -130,7 +132,7 @@ function getDocumentContent(n: DocumentNotification) {
   });
 }
 
-function getBountyContent(n: BountyNotification) {
+function getBountyContent(n: BountyNotification): string | ReactNode {
   const { createdBy, type } = n;
 
   switch (type) {
@@ -178,8 +180,8 @@ function getBountyContent(n: BountyNotification) {
   }
 }
 
-function getProposalContent(n: ProposalNotification) {
-  const { type, createdBy, pageTitle: title } = n;
+function getProposalContent(n: ProposalNotification): string | ReactNode {
+  const { type, createdBy } = n;
 
   switch (type) {
     case 'start_review':
@@ -236,9 +238,10 @@ export function getNotificationMetadata(notification: Notification): {
     }
 
     case 'document': {
+      const basePath = notification.pageType === 'post' ? '/forum/post' : '';
       return {
         content: getDocumentContent(notification as DocumentNotification),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+        href: `${basePath}/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };
     }

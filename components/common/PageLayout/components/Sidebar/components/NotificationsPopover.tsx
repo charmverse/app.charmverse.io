@@ -12,7 +12,6 @@ import { Fragment, useMemo, useState } from 'react';
 import { FiInbox } from 'react-icons/fi';
 import { IoFilterCircleOutline } from 'react-icons/io5';
 import type { KeyedMutator } from 'swr';
-import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -23,10 +22,8 @@ import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { useUser } from 'hooks/useUser';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
@@ -474,9 +471,11 @@ export function NotificationContent({
                 >
                   {content}
                 </Typography>
-                <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
-                  {!isSmallScreen && notificationDate}
-                </Typography>
+                {!isSmallScreen && (
+                  <Typography whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' variant='subtitle2'>
+                    {notificationDate}
+                  </Typography>
+                )}
               </Stack>
               {!archived && (
                 <Card

@@ -62,7 +62,7 @@ const EditorHeader = styled.div<{ pageType: 'page' | 'board' }>`
   }
 `;
 
-type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
+export type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
 
 type PageHeaderProps = {
   headerImage: string | null;
@@ -271,7 +271,7 @@ export function PageHeaderControls({
   );
 }
 
-export function getPageTop({ headerImage, icon }: Pick<Page, 'headerImage' | 'icon'>) {
+export function getPageTop({ headerImage, icon }: Partial<Pick<Page, 'headerImage' | 'icon'>>) {
   let pageTop = 100;
   if (headerImage) {
     pageTop = 50;

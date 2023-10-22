@@ -62,7 +62,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
     <RoleRowBase
       members={assignedMembers}
       eligibleMembers={eligibleMembers}
-      readOnlyMembers={!!role.source}
+      readOnlyMembers={readOnly}
       memberRoleId={role.id}
       title={role.name}
       description={description}

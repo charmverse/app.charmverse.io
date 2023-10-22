@@ -82,11 +82,18 @@ export const { updateViews, setCurrent, updateView, addView, deleteViews } = vie
 export const { reducer } = viewsSlice;
 
 export const getViews = (state: RootState): { [key: string]: BoardView } => state.views.views;
-export const getSortedViews = createSelector(getViews, (views) => {
-  return Object.values(views)
-    .sort((a, b) => a.title.localeCompare(b.title))
-    .map((v) => createBoardView(v));
-});
+export const getSortedViews = (boardId: string) =>
+  createSelector(
+    (state: RootState) => state.boards.boards[boardId],
+    getViews,
+    (board, views) => {
+      const viewIds = board?.fields.viewIds ? board?.fields.viewIds : Object.keys(views);
+      return Object.values(views)
+        .filter((v) => v.parentId === boardId)
+        .sort((a, b) => (viewIds.indexOf(a.id) > viewIds.indexOf(b.id) ? 1 : -1))
+        .map((v) => createBoardView(v));
+    }
+  );
 
 export function getView(viewId: string | undefined): (state: RootState) => BoardView | null {
   return (state: RootState): BoardView | null => {
@@ -101,17 +108,16 @@ export function getLoadedBoardViews(): (state: RootState) => Record<string, bool
 }
 
 export const getCurrentBoardViews = createSelector(
-  (state: RootState) => state.boards.current,
+  (state: RootState) => state.boards.boards[state.boards.current],
   getViews,
   (
-    boardId: string,
-    views: {
-      [key: string]: BoardView;
-    }
+    board, // types are wrong: board is undefined by default
+    views
   ) => {
+    const viewIds = board?.fields.viewIds ? board?.fields.viewIds : Object.keys(views);
     return Object.values(views)
-      .filter((v) => v.parentId === boardId)
-      .sort((a, b) => a.title.localeCompare(b.title))
+      .filter((v) => v.parentId === board?.id)
+      .sort((a, b) => (viewIds.indexOf(a.id) > viewIds.indexOf(b.id) ? 1 : -1))
       .map((v) => createBoardView(v));
   }
 );

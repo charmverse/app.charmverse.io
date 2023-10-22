@@ -18,16 +18,13 @@ import type {
   Thread,
   Transaction,
   User,
-  Vote,
-  WorkspaceEvent
+  Vote
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
-import type { PageType } from '@charmverse/core/prisma-client';
+import type { Application, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { BountyWithDetails } from 'lib/bounties';
-import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
@@ -39,6 +36,8 @@ import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import { getRewardOrThrow } from 'lib/rewards/getReward';
+import type { ApplicationMeta } from 'lib/rewards/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utilities/array';
@@ -254,16 +253,27 @@ export async function generateBounty({
   pagePermissions = [],
   page = {},
   type = 'bounty',
-  id
+  id,
+  allowMultipleApplications
 }: Pick<Bounty, 'createdBy' | 'spaceId'> &
   Partial<
-    Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken' | 'status' | 'approveSubmitters'>
+    Pick<
+      Bounty,
+      | 'id'
+      | 'maxSubmissions'
+      | 'chainId'
+      | 'rewardAmount'
+      | 'rewardToken'
+      | 'status'
+      | 'approveSubmitters'
+      | 'allowMultipleApplications'
+    >
   > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
     page?: Partial<Pick<Page, 'deletedAt'>>;
-  }): Promise<BountyWithDetails> {
+  }): Promise<Bounty & { applications: ApplicationMeta[] }> {
   const pageId = id ?? v4();
 
   const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(
@@ -294,6 +304,7 @@ export async function generateBounty({
       data: {
         id: pageId,
         createdBy,
+        allowMultipleApplications,
         chainId,
         rewardAmount,
         rewardToken,
@@ -333,7 +344,7 @@ export async function generateBounty({
     })
   ]);
 
-  return getBountyOrThrow(pageId);
+  return getRewardOrThrow({ rewardId: pageId });
 }
 
 export async function generateComment({
@@ -430,7 +441,8 @@ export async function generateBountyWithSingleApplication({
   bountyStatus,
   bountyTitle = 'Bounty',
   bountyDescription = 'Bounty description',
-  customReward
+  customReward,
+  deletedAt
 }: {
   customReward?: string;
   applicationStatus: ApplicationStatus;
@@ -442,7 +454,8 @@ export async function generateBountyWithSingleApplication({
   reviewer?: string;
   bountyTitle?: string;
   bountyDescription?: string;
-}): Promise<BountyWithDetails> {
+  deletedAt?: Date | null;
+}): Promise<Bounty & { applications: Application[]; page: Page }> {
   const createdBounty = (await prisma.bounty.create({
     data: {
       createdBy: userId,
@@ -461,6 +474,7 @@ export async function generateBountyWithSingleApplication({
           path: `bounty-${randomUUID()}`,
           type: 'bounty',
           updatedBy: userId,
+          deletedAt,
           space: { connect: { id: spaceId } },
           author: { connect: { id: userId } },
           contentText: bountyDescription,
@@ -487,7 +501,7 @@ export async function generateBountyWithSingleApplication({
       applications: true,
       page: true
     }
-  })) as BountyWithDetails & { page: Page };
+  })) as Bounty & { page: Page; applications: Application[] };
 
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { wallets: true } });
 
@@ -1075,7 +1089,8 @@ export async function generateBoard({
   viewDataSource,
   boardPageType,
   linkedSourceId,
-  customProps
+  customProps,
+  deletedAt
 }: {
   createdBy: string;
   spaceId: string;
@@ -1089,6 +1104,7 @@ export async function generateBoard({
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   linkedSourceId?: string;
   customProps?: CustomBoardProps;
+  deletedAt?: null | Date;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1102,7 +1118,8 @@ export async function generateBoard({
     boardPageType,
     viewType,
     linkedSourceId,
-    customProps
+    customProps,
+    deletedAt
   });
 
   const pagePermissions = pageArgs.map((createArg) => ({

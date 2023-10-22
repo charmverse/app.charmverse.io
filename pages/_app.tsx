@@ -25,6 +25,8 @@ import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
+import { ApplicationDialogProvider } from 'components/rewards/hooks/useApplicationDialog';
+import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
@@ -187,34 +189,36 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
           <DataProviders>
             <SettingsDialogProvider>
               <LocalizationProvider>
-                <FocalBoardProvider>
-                  <NotionProvider>
-                    <IntlProvider>
-                      <PageHead {...pageProps} />
+                <ApplicationDialogProvider>
+                  <FocalBoardProvider>
+                    <NotionProvider>
+                      <IntlProvider>
+                        <PageHead {...pageProps} />
 
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          <Snackbar
-                            isOpen={isOldBuild}
-                            message='New CharmVerse platform update available. Please refresh.'
-                            actions={[
-                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                <RefreshIcon fontSize='small' />
-                              </IconButton>
-                            ]}
-                            origin={{ vertical: 'top', horizontal: 'center' }}
-                            severity='warning'
-                            handleClose={() => setIsOldBuild(false)}
-                          />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
 
-                          {getLayout(<Component {...pageProps} />)}
+                            {getLayout(<Component {...pageProps} />)}
 
-                          <GlobalComponents />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </IntlProvider>
-                  </NotionProvider>
-                </FocalBoardProvider>
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </IntlProvider>
+                    </NotionProvider>
+                  </FocalBoardProvider>
+                </ApplicationDialogProvider>
               </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
@@ -246,15 +250,17 @@ function DataProviders({ children }: { children: ReactNode }) {
                         <WebSocketClientProvider>
                           <MembersProvider>
                             <BountiesProvider>
-                              <PaymentMethodsProvider>
-                                <PagesProvider>
-                                  <MemberPropertiesProvider>
-                                    <UserProfileProvider>
-                                      <PageTitleProvider>{children}</PageTitleProvider>
-                                    </UserProfileProvider>
-                                  </MemberPropertiesProvider>
-                                </PagesProvider>
-                              </PaymentMethodsProvider>
+                              <RewardsProvider>
+                                <PaymentMethodsProvider>
+                                  <PagesProvider>
+                                    <MemberPropertiesProvider>
+                                      <UserProfileProvider>
+                                        <PageTitleProvider>{children}</PageTitleProvider>
+                                      </UserProfileProvider>
+                                    </MemberPropertiesProvider>
+                                  </PagesProvider>
+                                </PaymentMethodsProvider>
+                              </RewardsProvider>
                             </BountiesProvider>
                           </MembersProvider>
                         </WebSocketClientProvider>

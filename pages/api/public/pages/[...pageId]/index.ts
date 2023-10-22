@@ -1,4 +1,4 @@
-import type { Bounty, Page } from '@charmverse/core/prisma';
+import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,6 +11,7 @@ import { NotFoundError } from 'lib/middleware/errors';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import { getPermissionsClient } from 'lib/permissions/api';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
 
@@ -214,7 +215,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   let boards: Board[] = [];
   let cards: Card[] = [];
   let views: BoardView[] = [];
-  let bounty: Bounty | null = null;
+  let bounty: (Bounty & { permissions: BountyPermission[] }) | null = null;
 
   if (page.cardId && page.parentId) {
     const boardPage = await prisma.page.findFirst({
@@ -273,19 +274,19 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     bounty = await prisma.bounty.findUnique({
       where: {
         id: page.id
+      },
+      include: {
+        permissions: true
       }
     });
   }
-
   return res.status(200).json({
     bounty: bounty
       ? {
-          ...bounty,
+          ...mapDbRewardToReward({ ...bounty, applications: [] }),
           page: {
-            ...page,
-            permissions: []
-          },
-          applications: []
+            ...page
+          }
         }
       : null,
     page: {

@@ -115,9 +115,7 @@ export function PageDialog(props: Props) {
 
   return (
     <Dialog
-      toolsMenu={
-        !hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton insideModal page={page} onDelete={close} />
-      }
+      toolsMenu={!hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton page={page} onDelete={close} />}
       toolbar={
         <Box display='flex' justifyContent='space-between'>
           <Button
@@ -141,9 +139,7 @@ export function PageDialog(props: Props) {
       }
       onClose={close}
     >
-      {page && (
-        <DocumentPage insideModal page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />
-      )}
+      {page && <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />}
     </Dialog>
   );
 }

@@ -1,4 +1,5 @@
 import { BountyOperation } from '@charmverse/core/prisma';
+import { testUtilsMembers } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';
@@ -7,6 +8,7 @@ import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace }
 
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
 import { computeBountyPermissions } from '../computeBountyPermissions';
+import type { BountyPermissionFlags } from '../interfaces';
 import { bountyPermissionMapping } from '../mapping';
 
 describe('computeBountyPermissions', () => {
@@ -59,7 +61,6 @@ describe('computeBountyPermissions', () => {
     ]);
 
     const computed = await computeBountyPermissions({
-      allowAdminBypass: false,
       resourceId: bounty.id,
       userId: otherUser.id
     });
@@ -77,7 +78,7 @@ describe('computeBountyPermissions', () => {
     });
   });
 
-  it('should give user space permissions via their role', async () => {
+  it('should give user permissions via their role', async () => {
     const { space, user } = await generateUserAndSpace({ isAdmin: false });
     const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
@@ -88,14 +89,10 @@ describe('computeBountyPermissions', () => {
       status: 'open'
     });
 
-    const role = await generateRole({
+    const role = await testUtilsMembers.generateRole({
       spaceId: space.id,
-      createdBy: user.id
-    });
-
-    await assignRole({
-      roleId: role.id,
-      userId: otherUser.id
+      createdBy: user.id,
+      assigneeUserIds: [otherUser.id]
     });
 
     await addBountyPermissionGroup({
@@ -110,7 +107,6 @@ describe('computeBountyPermissions', () => {
     const availableOperations = bountyPermissionMapping.submitter;
 
     const computed = await computeBountyPermissions({
-      allowAdminBypass: false,
       resourceId: bounty.id,
       userId: otherUser.id
     });
@@ -144,20 +140,19 @@ describe('computeBountyPermissions', () => {
       }
     });
 
-    const availableOperations = bountyPermissionMapping.reviewer;
-
     const computed = await computeBountyPermissions({
-      allowAdminBypass: false,
       resourceId: bounty.id,
       userId: otherUser.id
     });
 
-    typedKeys(BountyOperation).forEach((op) => {
-      if (availableOperations.indexOf(op) > -1) {
-        expect(computed[op]).toBe(true);
-      } else {
-        expect(computed[op]).toBe(false);
-      }
+    expect(computed).toMatchObject<BountyPermissionFlags>({
+      approve_applications: true,
+      grant_permissions: false,
+      lock: false,
+      mark_paid: false,
+      review: true,
+      // No submitter permission exists in this space
+      work: true
     });
   });
 
@@ -174,7 +169,6 @@ describe('computeBountyPermissions', () => {
     const availableOperations = bountyPermissionMapping.creator;
 
     const computed = await computeBountyPermissions({
-      allowAdminBypass: false,
       resourceId: bounty.id,
       userId: user.id
     });
@@ -211,21 +205,21 @@ describe('computeBountyPermissions', () => {
     const availableOperations = bountyPermissionMapping.reviewer;
 
     const computed = await computeBountyPermissions({
-      allowAdminBypass: false,
       resourceId: bounty.id,
       userId: otherUser.id
     });
-
-    typedKeys(BountyOperation).forEach((op) => {
-      if (availableOperations.indexOf(op) > -1) {
-        expect(computed[op]).toBe(true);
-      } else {
-        expect(computed[op]).toBe(false);
-      }
+    expect(computed).toMatchObject<BountyPermissionFlags>({
+      approve_applications: true,
+      grant_permissions: false,
+      lock: false,
+      mark_paid: false,
+      review: true,
+      // No submitter permission exists in this space
+      work: true
     });
   });
 
-  it('should return true to all operations if user is a space admin and admin bypass was enabled, except [allowing an admin to apply to their own bounty]', async () => {
+  it('should return true to all operations if user is a space admin', async () => {
     const { space, user } = await generateUserAndSpace({ isAdmin: true });
 
     const bounty = await generateBounty({
@@ -236,40 +230,17 @@ describe('computeBountyPermissions', () => {
     });
 
     const computed = await computeBountyPermissions({
-      allowAdminBypass: true,
       resourceId: bounty.id,
       userId: user.id
     });
 
-    typedKeys(BountyOperation).forEach((op) => {
-      if (op === 'work') {
-        expect(computed[op]).toBe(false);
-      } else {
-        expect(computed[op]).toBe(true);
-      }
-    });
-  });
-
-  it('should return true only for operations the user has access to if they are a space admin and admin bypass was disabled', async () => {
-    const { space, user } = await generateUserAndSpace({ isAdmin: true });
-
-    const otherUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-
-    const bounty = await generateBounty({
-      createdBy: otherUser.id,
-      approveSubmitters: true,
-      spaceId: space.id,
-      status: 'open'
-    });
-
-    const computed = await computeBountyPermissions({
-      allowAdminBypass: false,
-      resourceId: bounty.id,
-      userId: user.id
-    });
-
-    typedKeys(BountyOperation).forEach((op) => {
-      expect(computed[op]).toBe(false);
+    expect(computed).toMatchObject<BountyPermissionFlags>({
+      approve_applications: true,
+      grant_permissions: true,
+      lock: true,
+      mark_paid: true,
+      review: true,
+      work: true
     });
   });
 
@@ -284,7 +255,6 @@ describe('computeBountyPermissions', () => {
     });
 
     const computedPermissions = await computeBountyPermissions({
-      allowAdminBypass: false,
       resourceId: bounty.id,
       userId: user.id
     });
@@ -322,7 +292,6 @@ describe('computeBountyPermissions', () => {
     });
 
     const computedPermissions = await computeBountyPermissions({
-      allowAdminBypass: true,
       resourceId: bounty.id,
       userId: externalUser.id
     });
@@ -354,7 +323,6 @@ describe('computeBountyPermissions', () => {
     });
 
     const userWithRolePermissions = await computeBountyPermissions({
-      allowAdminBypass: false,
       resourceId: bounty.id,
       userId: userWithRole.id
     });
@@ -365,7 +333,6 @@ describe('computeBountyPermissions', () => {
 
   it('should return empty permissions if the bounty does not exist', async () => {
     const computed = await computeBountyPermissions({
-      allowAdminBypass: true,
       resourceId: v4()
     });
 

@@ -1,5 +1,5 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Bounty, Page, Prisma, Space } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Page as BrowserPage } from '@playwright/test';
 import { Wallet } from 'ethers';
@@ -7,13 +7,8 @@ import { v4 } from 'uuid';
 
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { baseUrl } from 'config/constants';
-import type { BountyPermissions, BountyWithDetails } from 'lib/bounties';
-import { getBountyOrThrow } from 'lib/bounties/getBounty';
-import { getPagePath } from 'lib/pages/utils';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { typedKeys } from 'lib/utilities/objects';
 import type { LoggedInUser } from 'models';
 import { createPage } from 'testing/setupDatabase';
 
@@ -176,102 +171,6 @@ export async function createUserAndSpace({
     user,
     pages
   };
-}
-
-export async function generateBounty({
-  content = undefined,
-  contentText = '',
-  spaceId,
-  createdBy,
-  status,
-  maxSubmissions,
-  approveSubmitters,
-  title = 'Example',
-  rewardToken = 'ETH',
-  rewardAmount = 1,
-  chainId = 1,
-  bountyPermissions = {},
-  pagePermissions = [],
-  page = {},
-  type = 'bounty',
-  id
-}: Pick<Bounty, 'createdBy' | 'spaceId' | 'status' | 'approveSubmitters'> &
-  Partial<Pick<Bounty, 'id' | 'maxSubmissions' | 'chainId' | 'rewardAmount' | 'rewardToken'>> &
-  Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
-    bountyPermissions?: Partial<BountyPermissions>;
-    pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
-    page?: Partial<Pick<Page, 'deletedAt'>>;
-  }): Promise<BountyWithDetails> {
-  const pageId = id ?? v4();
-
-  const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(
-    bountyPermissions
-  ).reduce((createManyInputs, permissionLevel) => {
-    const permissions = bountyPermissions[permissionLevel] as TargetPermissionGroup[];
-
-    permissions.forEach((p) => {
-      createManyInputs.push({
-        permissionLevel,
-        userId: p.group === 'user' ? p.id : undefined,
-        roleId: p.group === 'role' ? p.id : undefined,
-        spaceId: p.group === 'space' ? p.id : undefined,
-        public: p.group === 'public' ? true : undefined
-      });
-    });
-
-    createManyInputs.push({
-      permissionLevel
-    });
-
-    return createManyInputs;
-  }, [] as Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[]);
-
-  await prisma.$transaction([
-    // Step 1 - Initialise bounty with page and bounty permissions
-    prisma.bounty.create({
-      data: {
-        id: pageId,
-        createdBy,
-        chainId,
-        rewardAmount,
-        rewardToken,
-        status,
-        spaceId,
-        approveSubmitters,
-        maxSubmissions,
-        page: {
-          create: {
-            id: pageId,
-            createdBy,
-            contentText,
-            content: content ?? undefined,
-            path: getPagePath(),
-            title: title || 'Root',
-            type,
-            updatedBy: createdBy,
-            spaceId,
-            deletedAt: page?.deletedAt ?? undefined
-          }
-        },
-        permissions: {
-          createMany: {
-            data: bountyPermissionsToAssign
-          }
-        }
-      }
-    }),
-    // Step 2 populate the page permissions
-    prisma.pagePermission.createMany({
-      data: pagePermissions.map((p) => {
-        return {
-          ...p,
-          pageId
-        };
-      })
-    })
-  ]);
-
-  return getBountyOrThrow(pageId);
 }
 
 export async function generateUser({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {

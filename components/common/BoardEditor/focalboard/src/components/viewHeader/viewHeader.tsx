@@ -44,7 +44,6 @@ type Props = {
   addCardTemplate: () => void;
   editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
-  readOnlySourceData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
@@ -222,7 +221,7 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            {!props.readOnlySourceData && activeBoard?.fields.sourceType !== 'proposals' && (
+            {activeBoard?.fields.sourceType !== 'proposals' && (
               <NewCardButton
                 addCard={props.addCard}
                 addCardFromTemplate={addPageFromTemplate}

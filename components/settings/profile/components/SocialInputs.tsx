@@ -57,12 +57,15 @@ export function SocialInputs(props: SocialInputsProps) {
     trigger,
     reset,
     setValue,
-    formState: { errors }
+    formState: { errors },
+    getValues
   } = useForm<FormValues>({
     defaultValues: social,
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
+
+  const values = getValues();
 
   const onChange = useCallback(
     debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -72,13 +75,13 @@ export function SocialInputs(props: SocialInputsProps) {
 
         if (validation) {
           await save({
-            ...social,
+            ...values,
             [event.target.name]: event.target.value ?? ''
           });
         }
       }
     }, 300),
-    [readOnly, social]
+    [readOnly, values]
   );
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { SWRConfig } from 'swr';
 
-import { PageActionDisplayContext } from 'hooks/usePageActionDisplay';
+import { PageSidebarContext } from 'hooks/usePageSidebar';
 import { SnackbarContext } from 'hooks/useSnackbar';
 import { SpacesContext } from 'hooks/useSpaces';
 import type { IContext } from 'hooks/useUser';
@@ -73,11 +73,9 @@ export const customRenderWithContext = (
                 setMessage: () => {}
               }}
             >
-              <PageActionDisplayContext.Provider
-                value={{ currentPageActionDisplay: null, setCurrentPageActionDisplay: () => {} }}
-              >
+              <PageSidebarContext.Provider value={{ activeView: null, setActiveView: () => {} }}>
                 {ui}
-              </PageActionDisplayContext.Provider>
+              </PageSidebarContext.Provider>
             </SnackbarContext.Provider>
           </SpacesContext.Provider>
         </UserContext.Provider>

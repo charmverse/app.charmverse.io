@@ -9,7 +9,7 @@ export default function ProposalDialogGlobal() {
   const { newProposal, pageId } = props;
   if (newProposal || pageId) {
     return (
-      <DocumentPageProviders>
+      <DocumentPageProviders isInsideDialog={true}>
         <ProposalDialog newProposal={newProposal} pageId={pageId} onClose={hideProposal} />
       </DocumentPageProviders>
     );

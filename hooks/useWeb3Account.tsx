@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { verifyMessage } from '@ethersproject/wallet';
-import { injectedConnector } from 'connectors/config';
 import type { Signer } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
@@ -79,11 +78,11 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
   const { user, setUser, logoutUser } = useUser();
 
-  const { connectAsync } = useConnect();
+  const { connectors, connectAsync } = useConnect();
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
-  const { signer, provider } = useWeb3Signer();
+  const { signer, provider } = useWeb3Signer({ chainId });
 
   const setSignature = useCallback(
     (_account: string, signature: AuthSig | null, writeToLocalStorage?: boolean) => {
@@ -278,6 +277,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           user.wallets.some((w) => lowerCaseEqual(w.address, changedAccount)) &&
           window.ethereum?.isMetaMask
         ) {
+          const injectedConnector = connectors.find((c) => c.id === 'injected');
           connectAsync({ connector: injectedConnector });
         }
       };
@@ -288,7 +288,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
       };
     }
-  }, [user?.wallets]);
+  }, [user?.wallets, connectors]);
 
   const value = useMemo<IContext>(
     () => ({

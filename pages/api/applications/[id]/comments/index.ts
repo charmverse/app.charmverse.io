@@ -32,7 +32,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
     throw new DataNotFoundError(`Bounty not found`);
   }
 
-  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId, allowAdminBypass: false });
+  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId });
 
   if (application.createdBy === userId || bountyPermissions.review) {
     const pageComment = await prisma.pageComment.create({
@@ -66,7 +66,7 @@ async function getApplicationCommentsController(req: NextApiRequest, res: NextAp
     throw new DataNotFoundError(`Bounty not found`);
   }
 
-  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId, allowAdminBypass: false });
+  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId });
 
   if (application.createdBy === userId || bountyPermissions.review) {
     const pageComments = await prisma.pageComment.findMany({

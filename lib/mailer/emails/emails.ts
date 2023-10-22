@@ -1,18 +1,26 @@
+import { render } from '@react-email/render';
+import { htmlToText } from 'html-to-text';
+import type { ReactElement } from 'react';
+import ReactDOMServer from 'react-dom/server';
+
+import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
+import type { Notification } from 'lib/notifications/interfaces';
+
+import { PendingNotification } from './templates/NotificationTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteEmail';
 import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
-import type { PendingNotificationsData } from './templates/PendingNotificationsTemplate';
-import PendingNotifications, { notificationsRequiresYourAttention } from './templates/PendingNotificationsTemplate';
-import { renderMJML } from './templates/utils';
 
-export function getPendingNotificationsEmail(props: PendingNotificationsData) {
-  const html = renderMJML(PendingNotifications(props));
-  const subject = notificationsRequiresYourAttention({ count: props.totalUnreadNotifications, includeName: true });
+export function getPendingNotificationEmail(notification: Notification) {
+  const html = render(PendingNotification({ notification }));
+  const content = getNotificationMetadata(notification).content;
+  const subject =
+    typeof content === 'string' ? content : htmlToText(ReactDOMServer.renderToString(content as ReactElement));
 
   return { html, subject };
 }
 
 export function getPageInviteEmail(props: PageInviteEmailProps) {
-  const html = renderMJML(PageInviteEmail(props));
+  const html = render(PageInviteEmail(props));
   const subject = emailSubject(props);
 
   return { html, subject };

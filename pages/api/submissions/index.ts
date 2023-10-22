@@ -41,7 +41,6 @@ async function createSubmissionController(req: NextApiRequest, res: NextApiRespo
   const userId = req.session.user.id;
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: bountyId,
     userId
   });

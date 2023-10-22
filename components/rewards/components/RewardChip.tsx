@@ -16,7 +16,7 @@ export const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
   inProgress: 'In Progress',
-  complete: 'Complete',
+  complete: 'Approved',
   paid: 'Paid'
 };
 

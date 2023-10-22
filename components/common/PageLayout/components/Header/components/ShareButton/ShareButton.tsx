@@ -28,19 +28,11 @@ export function ShareButton({ headerHeight, pageId }: Props) {
             variant='text'
             size='small'
             {...bindTrigger(popupState)}
-            // onClick={() => {
-            //   popupState.open();
-            // }}
           >
             Share
           </Button>
         ) : (
-          <IconButton
-            data-test='toggle-page-permissions-dialog'
-            onClick={() => {
-              popupState.open();
-            }}
-          >
+          <IconButton data-test='toggle-page-permissions-dialog' {...bindTrigger(popupState)}>
             <IosShare color='secondary' fontSize='small' />
           </IconButton>
         )}

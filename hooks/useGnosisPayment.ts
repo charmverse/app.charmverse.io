@@ -6,13 +6,18 @@ import { getChainById } from 'connectors';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
-import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
 
 import useGnosisSafes from './useGnosisSafes';
+
+export type MultiPaymentResult = {
+  safeAddress: string;
+  transactions: (MetaTransactionData & { applicationId: string })[];
+  txHash: string;
+};
 
 export type GnosisPaymentProps = {
   chainId?: number;

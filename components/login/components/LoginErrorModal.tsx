@@ -1,5 +1,7 @@
+import { log } from '@charmverse/core/log';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useEffect } from 'react';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
@@ -12,6 +14,11 @@ type Props = {
 };
 
 export function LoginErrorModal({ onClose, open }: Props) {
+  useEffect(() => {
+    if (open) {
+      log.warn('Showed error to user whose account has been disabled');
+    }
+  }, [open]);
   return (
     <Modal title='Login error' open={open} onClose={onClose}>
       <Stack mb={2} spacing={2}>

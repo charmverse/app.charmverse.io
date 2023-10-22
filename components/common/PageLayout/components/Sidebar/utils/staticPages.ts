@@ -1,4 +1,4 @@
-export type Feature = 'member_directory' | 'proposals' | 'forum' | 'bounties' | 'rewards';
+export type Feature = 'member_directory' | 'proposals' | 'forum' | 'rewards' | 'bounties';
 
 export type FeatureJson = {
   id: Feature;
@@ -9,9 +9,10 @@ export type FeatureJson = {
 enum StaticPagesPath {
   members = 'members',
   forum = 'forum',
+  // This is still included for backwards compatibility
   bounties = 'bounties',
-  proposals = 'proposals',
-  rewards = 'rewards'
+  rewards = 'rewards',
+  proposals = 'proposals'
 }
 
 export type StaticPagesType = keyof typeof StaticPagesPath;

@@ -87,11 +87,10 @@ interface DatabaseViewProps extends CharmNodeViewProps {
 
 export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
   const pageId = node.attrs.pageId as string;
-  const allViews = useAppSelector(getSortedViews);
+  const views = useAppSelector(getSortedViews(pageId));
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const views = useMemo(() => allViews.filter((view) => view.parentId === pageId), [pageId, allViews]);
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
 
   useEffect(() => {
@@ -129,7 +128,6 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const readOnly =
     typeof readOnlyOverride === 'undefined' ? currentPagePermissions?.edit_content !== true : readOnlyOverride;
 
-  const readOnlySourceData = currentView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
   const deleteView = useCallback(
     (viewId: string) => {
       setCurrentViewId(views.filter((view) => view.id !== viewId)?.[0]?.id ?? null);
@@ -157,7 +155,6 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
           onDeleteView={deleteView}
           hideBanner
           readOnly={readOnly}
-          readOnlySourceData={readOnlySourceData}
           board={board}
           embeddedBoardPath={boardPage.path}
           setPage={debouncedPageUpdate}

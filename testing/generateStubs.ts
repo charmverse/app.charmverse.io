@@ -1,10 +1,10 @@
 import type { PageNode } from '@charmverse/core/pages';
-import type { Page } from '@charmverse/core/prisma';
+import type { Application, Page } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { SubmissionContent } from 'lib/applications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import { randomETHWalletAddress as _randomETHWalletAddress } from 'lib/utilities/blockchain';
+import type { RequiredNotNull } from 'lib/utilities/types';
 
 export function generatePageToCreateStub({
   userId,
@@ -54,7 +54,9 @@ export function generatePageNode({
   };
 }
 
-export function generateSubmissionContent(): SubmissionContent {
+export function generateSubmissionContent(): RequiredNotNull<
+  Pick<Application, 'submission' | 'submissionNodes' | 'walletAddress'>
+> {
   return {
     submission: 'My submission and all of its content',
     submissionNodes:

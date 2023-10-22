@@ -56,11 +56,11 @@ function CardDetailProperties(props: Props) {
   const isSmallScreen = useSmallScreen();
 
   useEffect(() => {
-    const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
+    const newProperty = board.fields?.cardProperties.find((property) => property.id === newTemplateId);
     if (newProperty) {
       setNewTemplateId('');
     }
-  }, [newTemplateId, board.fields.cardProperties]);
+  }, [newTemplateId, board.fields?.cardProperties]);
 
   const [confirmationDialogBox, setConfirmationDialogBox] = useState<{
     heading: string;
@@ -248,7 +248,7 @@ function CardDetailProperties(props: Props) {
 
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
-      {board.fields.cardProperties.map((propertyTemplate) => {
+      {board.fields?.cardProperties.map((propertyTemplate) => {
         return (
           <CardDetailProperty
             syncWithPageId={syncWithPageId}

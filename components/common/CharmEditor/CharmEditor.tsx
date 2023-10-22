@@ -19,8 +19,8 @@ import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/Com
 import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { IPageActionDisplayContext } from 'hooks/usePageActionDisplay';
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import type { IPageSidebarContext } from 'hooks/usePageSidebar';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -162,7 +162,6 @@ const defaultContent: PageContent = {
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 interface CharmEditorProps {
-  insideModal?: boolean;
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -171,7 +170,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  pageActionDisplay?: IPageActionDisplayContext['currentPageActionDisplay'];
+  PageSidebar?: IPageSidebarContext['activeView'];
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
@@ -196,10 +195,8 @@ interface CharmEditorProps {
 function CharmEditor({
   colorMode,
   enableSuggestingMode = false,
-  pageActionDisplay = null,
   content = defaultContent,
   children,
-  insideModal,
   onContentChange,
   style,
   readOnly = false,
@@ -227,7 +224,7 @@ function CharmEditor({
   const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
   const { space: currentSpace } = useCurrentSpace();
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
@@ -290,7 +287,7 @@ function CharmEditor({
     // update state that triggers updates in the sidebar
     setSuggestionState(state);
     // expand the sidebar if the user is selecting a suggestion
-    setCurrentPageActionDisplay((sidebarState) => {
+    setActiveView((sidebarState) => {
       if (sidebarState) {
         const selected = getSelectedChanges(state);
         const hasSelection = Object.values(selected).some((value) => value);
@@ -530,10 +527,10 @@ function CharmEditor({
           {(enableComments || enableSuggestingMode) && (
             <SidebarDrawer
               id='page-action-sidebar'
-              title={pageActionDisplay ? SIDEBAR_VIEWS[pageActionDisplay].title : ''}
-              open={!!pageActionDisplay}
+              title={sidebarView ? SIDEBAR_VIEWS[sidebarView].title : ''}
+              open={!!sidebarView}
             >
-              {pageActionDisplay === 'suggestions' && currentSpace && pageId && (
+              {sidebarView === 'suggestions' && currentSpace && pageId && (
                 <SuggestionsSidebar
                   pageId={pageId}
                   spaceId={currentSpace.id}
@@ -541,13 +538,12 @@ function CharmEditor({
                   state={suggestionState}
                 />
               )}
-              {pageActionDisplay === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
+              {sidebarView === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
             </SidebarDrawer>
           )}
           <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
           {currentSpace && pageId && (
             <SuggestionsPopup
-              insideModal={insideModal}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}

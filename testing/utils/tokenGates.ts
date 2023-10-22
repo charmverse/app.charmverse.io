@@ -57,7 +57,7 @@ export function addUserTokenGate({
   tokenGateId: string;
   spaceId: string;
   userId: string;
-  grantedRoles: string;
+  grantedRoles: string[];
   jwt: string;
 }) {
   return prisma.userTokenGate.create({

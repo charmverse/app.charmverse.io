@@ -1,3 +1,4 @@
+import { stringUtils } from '@charmverse/core/utilities';
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
@@ -43,6 +44,7 @@ export function RewardsPage({ title }: { title: string }) {
   }, [currentApplicationId]);
 
   const { space: currentSpace } = useCurrentSpace();
+
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, rewards } = useRewards();
 
@@ -89,13 +91,14 @@ export function RewardsPage({ title }: { title: string }) {
   }, []);
 
   useEffect(() => {
-    if (typeof router.query.id === 'string') {
+    const rewardIdFromUrl = router.query.bountyId ?? router.query.id;
+    if (rewardIdFromUrl && stringUtils.isUUID(rewardIdFromUrl as string)) {
       showReward({
-        pageId: router.query.id,
+        pageId: rewardIdFromUrl as string,
         onClose
       });
     }
-  }, [router.query.id]);
+  }, [router.query.id, router.query.bountyId]);
 
   const showRewardOrApplication = useCallback(
     (id: string | null, rewardId?: string) => {
@@ -186,7 +189,7 @@ export function RewardsPage({ title }: { title: string }) {
                   <EmptyStateVideo
                     description='Getting started with rewards'
                     videoTitle='Rewards | Getting started with CharmVerse'
-                    videoUrl='https://tiny.charmverse.io/reward-builder'
+                    videoUrl='https://tiny.charmverse.io/bounties'
                   />
                 </Box>
               </Grid>
@@ -203,8 +206,7 @@ export function RewardsPage({ title }: { title: string }) {
                       views={views}
                       visibleGroups={[]}
                       selectedCardIds={[]}
-                      readOnly={!isAdmin}
-                      readOnlySourceData={false}
+                      readOnly
                       disableAddingCards={true}
                       showCard={showRewardOrApplication}
                       readOnlyTitle={true}
@@ -212,6 +214,7 @@ export function RewardsPage({ title }: { title: string }) {
                       addCard={async () => {}}
                       onCardClicked={() => {}}
                       onDeleteCard={onDelete}
+                      expandSubRowsOnLoad
                     />
                   </Box>
 

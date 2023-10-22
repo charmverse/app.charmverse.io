@@ -12,15 +12,15 @@ import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage, CardPropertyValue } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import {
-  DEFAULT_VIEW_BLOCK_ID,
-  REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID,
   ASSIGNEES_BLOCK_ID,
-  REWARDS_AVAILABLE_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
-  REWARDER_BLOCK_ID
+  REWARDER_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_REVIEWERS_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
@@ -105,19 +105,18 @@ function mapRewardToCardPage({
 }): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
-
   rewardFields.properties = {
     ...rewardFields.properties,
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]:
-      (reward &&
-        'maxSubmissions' in reward &&
-        reward.maxSubmissions &&
-        `${countRemainingSubmissionSlots({
-          applications: reward.applications ?? [],
-          limit: reward.maxSubmissions
-        })} / ${reward.maxSubmissions}`) ||
-      '-',
+      reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
+        ? (
+            countRemainingSubmissionSlots({
+              applications: reward.applications ?? [],
+              limit: reward.maxSubmissions
+            }) as number
+          )?.toString()
+        : '-',
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).toISOString() : '',

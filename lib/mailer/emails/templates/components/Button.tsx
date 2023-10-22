@@ -1,14 +1,50 @@
-import { MjmlButton } from 'mjml-react';
-import type { ComponentProps, ReactNode } from 'react';
+import type { LinkProps } from '@react-email/link';
+import type { ReactNode } from 'react';
+
+import { blueColor } from 'theme/colors';
+
+import Link from './Link';
+import Text from './Text';
 
 export function Button({
   children,
   href,
+  variant = 'filled',
+  style,
   ...props
-}: { children: ReactNode; href: string } & ComponentProps<typeof MjmlButton>) {
+}: { variant?: 'filled' | 'outlined'; children: ReactNode; href: string } & LinkProps) {
   return (
-    <MjmlButton {...props} href={href} target='_blank' rel='noreferrer'>
-      {children}
-    </MjmlButton>
+    <Link
+      {...props}
+      style={{
+        width: '100%'
+      }}
+      href={href}
+    >
+      <Text
+        bold
+        style={
+          variant === 'outlined'
+            ? {
+                textAlign: 'center',
+                borderRadius: '30px',
+                border: '1px solid #ccc',
+                padding: '8px 24px',
+                color: blueColor,
+                ...style
+              }
+            : {
+                textAlign: 'center',
+                color: '#fff',
+                padding: '8px 24px',
+                borderRadius: '3px',
+                background: blueColor,
+                ...style
+              }
+        }
+      >
+        {children}
+      </Text>
+    </Link>
   );
 }

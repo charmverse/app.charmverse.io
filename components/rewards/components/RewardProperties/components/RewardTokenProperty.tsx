@@ -127,6 +127,8 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
     return null;
   }
 
+  const currentChain = currentReward.chainId && getChainById(currentReward.chainId);
+
   return (
     <>
       <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={() => !readOnly && setIsOpen(true)}>
@@ -143,11 +145,11 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
               <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
             </Box>
 
-            <Typography component='span' data-test='reward-amount' variant='subtitle1' fontWeight='normal'>
+            <Typography component='span' variant='subtitle1' fontWeight='normal'>
               {currentReward.rewardAmount}
             </Typography>
-            <Typography ml={0.5} component='span' data-test='reward-amount' variant='subtitle1' fontWeight='normal'>
-              {tokenInfo.tokenSymbol}
+            <Typography ml={0.5} component='span' variant='subtitle1' fontWeight='normal'>
+              {tokenInfo.tokenSymbol} {currentChain ? `(${currentChain.chainName})` : ''}
             </Typography>
           </Stack>
         ) : (

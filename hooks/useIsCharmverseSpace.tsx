@@ -1,16 +1,22 @@
-import { isProdEnv } from 'config/constants';
+import { isDevEnv, isTestEnv } from 'config/constants';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
 const defaultDomains = ['charmverse'];
 
 /**
- * Returns true if the current space is charmverse, OR the current environment is not prod
+ * Feature flag utility hook
  *
- * Use this hook for reserving some features in prod for charmverse users only
+ * Use this hook for reserving some features in prod for CharmVerse spaces only
  */
 export function useIsCharmverseSpace(allowedDomains = defaultDomains) {
   const { space: currentSpace } = useCurrentSpace();
 
-  return !isProdEnv || allowedDomains.includes(currentSpace?.domain ?? '') || currentSpace?.domain.startsWith('cvt-');
+  // check for CharmVerse spaces
+  if (allowedDomains.includes(currentSpace?.domain ?? '') || currentSpace?.domain.startsWith('cvt-')) {
+    return true;
+  }
+
+  // enable in test and dev mode
+  return isDevEnv || isTestEnv;
 }

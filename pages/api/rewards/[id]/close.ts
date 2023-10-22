@@ -1,10 +1,10 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { closeOutReward } from 'lib/rewards/closeOutReward';
-import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
@@ -16,13 +16,19 @@ handler.use(requireUser).post(closeRewardController);
 async function closeRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
   const { id: rewardId } = req.query as { id: string };
 
-  const bounty = await getRewardOrThrow({ rewardId });
+  const page = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: rewardId
+    },
+    select: {
+      id: true
+    }
+  });
 
   const userId = req.session.user.id;
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
-    resourceId: bounty.id,
+    resourceId: page.id,
     userId
   });
 
