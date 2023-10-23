@@ -83,12 +83,17 @@ export class SpaceEventHandler {
       const pageId = message.payload.id;
 
       try {
-        const { parentDocumentNode, documentRoom, participant, position, parentId, content, spaceId } =
-          await getPageDetails({
-            id: pageId,
-            userId: this.userId,
-            docRooms: this.docRooms
-          });
+        const pageDetails = await getPageDetails({
+          id: pageId,
+          userId: this.userId,
+          docRooms: this.docRooms
+        });
+
+        if (!pageDetails) {
+          return;
+        }
+
+        const { parentDocumentNode, documentRoom, participant, parentId, spaceId, content, position } = pageDetails;
 
         // Get the position from the NodeRange object
         const lastValidPos = parentDocumentNode.content.size;
@@ -164,17 +169,17 @@ export class SpaceEventHandler {
 
         childPageId = createdPage.id;
 
-        const {
-          parentDocumentNode,
-          documentRoom,
-          participant,
-          parentId,
-          content: parentPageContent
-        } = await getPageDetails({
+        const pageDetails = await getPageDetails({
           id: createdPage.id,
           userId: this.userId,
           docRooms: this.docRooms
         });
+
+        if (!pageDetails) {
+          return;
+        }
+
+        const { parentDocumentNode, documentRoom, participant, parentId, content: parentPageContent } = pageDetails;
 
         if (!parentId) {
           if (typeof callback === 'function') {
@@ -274,18 +279,17 @@ export class SpaceEventHandler {
         }
 
         if (newParentId) {
-          const {
-            parentDocumentNode,
-            documentRoom,
-            participant,
-            position,
-            content: parentPageContent
-          } = await getPageDetails({
+          const pageDetails = await getPageDetails({
             id: pageId,
             userId: this.userId,
             docRooms: this.docRooms,
             parentId: newParentId
           });
+          if (!pageDetails) {
+            return;
+          }
+
+          const { parentDocumentNode, documentRoom, participant, position, content: parentPageContent } = pageDetails;
           const lastValidPos = pos ?? parentDocumentNode.content.size;
 
           // If position is not null then the page is present in the parent page content
@@ -378,11 +382,17 @@ async function handlePageRemoveMessage({
 }) {
   try {
     const pageId = payload.id;
-    const { documentRoom, participant, parentId, spaceId, content, position } = await getPageDetails({
+    const pageDetails = await getPageDetails({
       id: pageId,
       userId,
       docRooms
     });
+
+    if (!pageDetails) {
+      return;
+    }
+
+    const { documentRoom, participant, parentId, spaceId, content, position } = pageDetails;
 
     if (parentId && position !== null) {
       if (documentRoom && participant) {
@@ -521,10 +531,18 @@ async function getPageDetails({
           id: _parentId
         },
         select: {
+          type: true,
           content: true
         }
       })
     : null;
+
+  if (
+    parentPage &&
+    ['board', 'board_template', 'inline_board', 'linked_board', 'inline_linked_board'].includes(parentPage.type)
+  ) {
+    return null;
+  }
 
   const { spaceId } = page;
 
