@@ -188,7 +188,7 @@ function PropertyValueElement(props: Props) {
       <TagSelect
         data-test='closed-select-input'
         canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
@@ -249,7 +249,7 @@ function PropertyValueElement(props: Props) {
             )
           );
         }}
-        wrapColumn={props.wrapColumn ?? false}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );

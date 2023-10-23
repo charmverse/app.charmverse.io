@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
@@ -61,23 +61,22 @@ const KanbanCard = React.memo((props: Props) => {
   const { space } = useCurrentSpace();
 
   const { rewards } = useRewards();
-  const linkedBounty = rewards?.find((r) => r?.id === card.id);
-
+  const router = useRouter();
   const { pages } = usePages();
   const cardPage = pages[card.id];
-  const router = useRouter();
+  const linkedBounty = rewards?.find((r) => r?.id === cardPage?.bountyId);
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = `/${domain}/${cardPage?.path}`;
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
-  const handleDeleteCard = async () => {
+  const handleDeleteCard = useCallback(async () => {
     if (!card) {
       Utils.assertFailure();
       return;
     }
-    await mutator.deleteBlock(card, 'delete card');
+    await mutator.deleteBlock({ id: card.id, type: card.type }, 'delete card');
     mutate(`pages/${space?.id}`);
-  };
+  }, [mutate, card.id, card.type]);
   const confirmDialogProps: {
     heading: string;
     subText?: string;
@@ -98,7 +97,7 @@ const KanbanCard = React.memo((props: Props) => {
       setShowConfirmationDialogBox(false);
     }
   };
-  const deleteCard = () => {
+  const deleteCard = useCallback(() => {
     // user trying to delete a card with blank name
     // but content present cannot be deleted without
     // confirmation dialog
@@ -107,7 +106,7 @@ const KanbanCard = React.memo((props: Props) => {
       return;
     }
     setShowConfirmationDialogBox(true);
-  };
+  }, [handleDeleteCard, setShowConfirmationDialogBox]);
 
   return (
     <>
@@ -137,21 +136,23 @@ const KanbanCard = React.memo((props: Props) => {
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
-          {visiblePropertyTemplates.map((template) => (
-            <PropertyValueElement
-              key={template.id}
-              board={board}
-              readOnly={true}
-              card={card}
-              syncWithPageId={cardPage?.syncWithPageId}
-              updatedAt={cardPage?.updatedAt.toString() || ''}
-              updatedBy={cardPage?.updatedBy || ''}
-              propertyTemplate={template}
-              showEmptyPlaceholder={false}
-              displayType='kanban'
-              showTooltip
-            />
-          ))}
+          <Stack gap={0.5}>
+            {visiblePropertyTemplates.map((template) => (
+              <PropertyValueElement
+                key={template.id}
+                board={board}
+                readOnly={true}
+                card={card}
+                syncWithPageId={cardPage?.syncWithPageId}
+                updatedAt={cardPage?.updatedAt.toString() || ''}
+                updatedBy={cardPage?.updatedBy || ''}
+                propertyTemplate={template}
+                showEmptyPlaceholder={false}
+                displayType='kanban'
+                showTooltip
+              />
+            ))}
+          </Stack>
           {linkedBounty && (
             <BountyFooter>
               <RewardStatusBadge reward={linkedBounty} truncate />

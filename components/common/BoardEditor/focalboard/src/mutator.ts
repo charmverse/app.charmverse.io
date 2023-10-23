@@ -177,7 +177,7 @@ export class Mutator {
   }
 
   async deleteBlock(
-    block: Block,
+    block: Pick<Block, 'type' | 'id'>,
     description?: string,
     beforeRedo?: () => Promise<void>,
     afterUndo?: () => Promise<void>
