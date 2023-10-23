@@ -99,7 +99,7 @@ export function SetupCustomDomain({ space }: { space: Space }) {
         </Stack>
       </Stack>
       <Typography variant='caption' color='text.secondary' mb={2}>
-        Add a custom domain you own to access your app thorugh it. You will be prompted with further instructions after
+        Add a custom domain you own to access your app through it. You will be prompted with further instructions after
         saving.
       </Typography>
       <UpgradeWrapper upgradeContext='custom_domain'>
