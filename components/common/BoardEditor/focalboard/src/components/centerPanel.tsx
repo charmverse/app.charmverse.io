@@ -469,6 +469,7 @@ function CenterPanel(props: Props) {
 
   const disableAddingNewCards = boardSourceType === 'proposals';
   const noBoardViewsYet = !isLoadingSourceData && views.length === 0;
+  const showNewLinkedBoardView = state.openSettings === 'create-linked-view' || noBoardViewsYet;
 
   return (
     <>
@@ -546,12 +547,12 @@ function CenterPanel(props: Props) {
 
         <div className={`container-container ${state.openSettings ? 'sidebar-visible' : ''}`}>
           <Box display='flex' minHeight={state.openSettings ? 450 : 0}>
-            {(state.openSettings === 'create-linked-view' || noBoardViewsYet) && (
+            {showNewLinkedBoardView && (
               <Box width='100%'>
                 <CreateLinkedView rootBoard={board} views={views} showView={showView} />
               </Box>
             )}
-            {state.openSettings !== 'create-linked-view' && (
+            {!showNewLinkedBoardView && (
               <Box width='100%'>
                 {/* Show page title for inline boards */}
                 {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
