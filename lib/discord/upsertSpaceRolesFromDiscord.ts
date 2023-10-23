@@ -16,10 +16,11 @@ export async function upsertSpaceRolesFromDiscord({ space, userId }: Props) {
 
   try {
     const roles = await getGuildRoles(space.discordServerId);
-    await findOrCreateRoles(roles, space.id, userId, {
+    const cvRoles = await findOrCreateRoles(roles, space.id, userId, {
       source: 'collabland',
       createRoles: true
     });
+    log.info('Retrieved Discord roles from Collab.land', { cvRoles, roles });
   } catch (e) {
     log.error('Failed to create space roles from disocrd', e);
   }
