@@ -74,6 +74,22 @@ export function ProposalProperties({
   const canAnswerRubric = proposalPermissions?.evaluate;
   const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
+  const sourceTemplate = isFromTemplateSource
+    ? proposalTemplates?.find((template) => template.id === proposal?.page?.sourceTemplateId)
+    : undefined;
+
+  // properties with values from templates should be read only
+  const readOnlyCustomProperties =
+    !isAdmin && sourceTemplate?.fields
+      ? Object.entries((sourceTemplate?.fields as ProposalFields).properties)?.reduce((acc, [key, value]) => {
+          if (!value) {
+            return acc;
+          }
+
+          acc.push(key);
+          return acc;
+        }, [] as string[])
+      : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
     categoryId: proposal?.categoryId,
@@ -184,6 +200,7 @@ export function ProposalProperties({
       canViewRubricAnswers={canViewRubricAnswers}
       title={title || ''}
       isPublishingToLens={isPublishingToLens}
+      readOnlyCustomProperties={readOnlyCustomProperties}
     />
   );
 }
