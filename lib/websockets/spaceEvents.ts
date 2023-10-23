@@ -83,14 +83,15 @@ export class SpaceEventHandler {
       const pageId = message.payload.id;
 
       try {
-        const { pageNode, documentRoom, participant, position, parentId, content, spaceId } = await getPageDetails({
-          id: pageId,
-          userId: this.userId,
-          docRooms: this.docRooms
-        });
+        const { parentDocumentNode, documentRoom, participant, position, parentId, content, spaceId } =
+          await getPageDetails({
+            id: pageId,
+            userId: this.userId,
+            docRooms: this.docRooms
+          });
 
         // Get the position from the NodeRange object
-        const lastValidPos = pageNode.content.size;
+        const lastValidPos = parentDocumentNode.content.size;
 
         if (parentId && documentRoom && participant && position === null) {
           await participant.handleDiff(
@@ -164,7 +165,7 @@ export class SpaceEventHandler {
         childPageId = createdPage.id;
 
         const {
-          pageNode,
+          parentDocumentNode,
           documentRoom,
           participant,
           parentId,
@@ -182,7 +183,7 @@ export class SpaceEventHandler {
           return null;
         }
 
-        const lastValidPos = pageNode.content.size;
+        const lastValidPos = parentDocumentNode.content.size;
         if (documentRoom && participant) {
           await participant.handleDiff(
             {
@@ -222,6 +223,10 @@ export class SpaceEventHandler {
       }
     } else if (message.type === 'page_reordered' && this.userId) {
       const { pageId, newParentId, newIndex, trigger, pos } = message.payload;
+      if (pageId === newParentId) {
+        return null;
+      }
+
       const page = await prisma.page.findFirst({
         where: {
           id: pageId
@@ -240,7 +245,7 @@ export class SpaceEventHandler {
       const currentParentId = page.parentId ?? null;
 
       // If the page is dropped on the same parent page or on itself, do nothing
-      if (currentParentId === newParentId || pageId === newParentId) {
+      if (currentParentId === newParentId) {
         return null;
       }
 
@@ -250,15 +255,11 @@ export class SpaceEventHandler {
           flattenChildren: true
         });
 
-        if (newParentId === pageId || flatChildren.some((p) => p.id === newParentId)) {
-          throw new UndesirableOperationError(
-            `You cannot reposition a page to be a child of ${
-              newParentId === pageId ? 'itself' : 'one of its child pages'
-            }`
-          );
+        if (flatChildren.some((p) => p.id === newParentId)) {
+          throw new UndesirableOperationError(`You cannot reposition a page to be a child of one of its child pages`);
         }
 
-        // Dropped on root level, remove reference from parent's content
+        // Remove reference from parent's content
         if (currentParentId) {
           await handlePageRemoveMessage({
             userId: this.userId,
@@ -274,7 +275,7 @@ export class SpaceEventHandler {
 
         if (newParentId) {
           const {
-            pageNode,
+            parentDocumentNode,
             documentRoom,
             participant,
             position,
@@ -285,7 +286,7 @@ export class SpaceEventHandler {
             docRooms: this.docRooms,
             parentId: newParentId
           });
-          const lastValidPos = pos ?? pageNode.content.size;
+          const lastValidPos = pos ?? parentDocumentNode.content.size;
 
           // If position is not null then the page is present in the parent page content
           if (position === null) {
@@ -315,7 +316,7 @@ export class SpaceEventHandler {
             }
 
             // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
-            if (trigger === 'sidebar-to-editor') {
+            if (trigger === 'sidebar-to-editor' || trigger === 'editor-to-editor') {
               await prisma.page.update({
                 where: {
                   id: pageId
@@ -383,28 +384,28 @@ async function handlePageRemoveMessage({
       docRooms
     });
 
-    if (parentId && documentRoom && participant && position !== null) {
-      await participant.handleDiff(
-        {
-          type: 'diff',
-          ds: [
-            {
-              stepType: 'replace',
-              from: position,
-              to: position + 1
-            }
-          ],
-          doc: documentRoom.doc.content,
-          c: participant.messages.client,
-          s: participant.messages.server,
-          v: documentRoom.doc.version,
-          rid: 0,
-          cid: -1
-        },
-        { socketEvent: event }
-      );
-    } else {
-      if (parentId && position !== null) {
+    if (parentId && position !== null) {
+      if (documentRoom && participant) {
+        await participant.handleDiff(
+          {
+            type: 'diff',
+            ds: [
+              {
+                stepType: 'replace',
+                from: position,
+                to: position + 1
+              }
+            ],
+            doc: documentRoom.doc.content,
+            c: participant.messages.client,
+            s: participant.messages.server,
+            v: documentRoom.doc.version,
+            rid: 0,
+            cid: -1
+          },
+          { socketEvent: event }
+        );
+      } else {
         await applyDiffAndSaveDocument({
           content,
           parentId,
@@ -417,17 +418,17 @@ async function handlePageRemoveMessage({
             }
           ]
         });
-      }
-      // If the user is not in the document or the position of the page node is not found (present in sidebar)
+        // If the user is not in the document or the position of the page node is not found (present in sidebar)
 
-      if (event === 'page_deleted') {
-        await archivePages({
-          pageIds: [pageId],
-          userId,
-          spaceId,
-          archive: true,
-          relay
-        });
+        if (event === 'page_deleted') {
+          await archivePages({
+            pageIds: [pageId],
+            userId,
+            spaceId,
+            archive: true,
+            relay
+          });
+        }
       }
     }
   } catch (error) {
@@ -535,7 +536,7 @@ async function getPageDetails({
   let position: null | number = null;
   let participant: DocumentEventHandler | null = null;
 
-  const pageNode = getNodeFromJson(content);
+  const parentDocumentNode = getNodeFromJson(content);
 
   // get the last position of the page node prosemirror node
   if (documentRoom) {
@@ -549,7 +550,7 @@ async function getPageDetails({
   }
 
   // Find the position of the referenced page node in the parent page content
-  pageNode.forEach((node, nodePos) => {
+  parentDocumentNode.forEach((node, nodePos) => {
     if (node.type.name === 'page' && node.attrs.id === id) {
       position = nodePos;
       return false;
@@ -557,7 +558,7 @@ async function getPageDetails({
   });
 
   return {
-    pageNode,
+    parentDocumentNode,
     documentRoom,
     participant,
     spaceId,

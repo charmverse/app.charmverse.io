@@ -108,6 +108,45 @@ export function charmEditorPlugins({
 
             const data = ev.dataTransfer.getData('sidebar-page');
             if (!data) {
+              const dom = view.nodeDOM(coordinates.pos);
+              const droppedNode = view.state.doc.nodeAt(coordinates.pos);
+              const draggedNode = view.state.doc.nodeAt(view.state.tr.selection.$anchor.pos);
+
+              if (
+                !droppedNode ||
+                !draggedNode ||
+                droppedNode.type.name !== 'page' ||
+                draggedNode.type.name !== 'page' ||
+                !dom
+              ) {
+                return false;
+              }
+
+              const draggedNodeId = draggedNode.attrs.id;
+              const droppedNodeId = droppedNode.attrs.id;
+
+              if (droppedNodeId === draggedNodeId) {
+                return false;
+              }
+
+              if (dom instanceof HTMLElement) {
+                const droppedPageId = droppedNode.attrs.id;
+                const droppedDOMNode = dom.querySelector(`[data-id="page-${droppedPageId}"]`);
+                if (!droppedDOMNode) {
+                  return false;
+                }
+
+                ev.preventDefault();
+                emitSocketMessage({
+                  type: 'page_reordered',
+                  payload: {
+                    pageId: draggedNodeId,
+                    newParentId: droppedNodeId,
+                    newIndex: -1,
+                    trigger: 'editor-to-editor'
+                  }
+                });
+              }
               return false;
             }
 

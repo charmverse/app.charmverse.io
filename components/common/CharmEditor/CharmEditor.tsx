@@ -326,7 +326,8 @@ function CharmEditor({
     plugins: getPlugins(),
     initialValue: isContentControlled && content ? Node.fromJSON(specRegistry.schema, content) : undefined,
     dropCursorOpts: {
-      color: 'var(--charmeditor-active)'
+      color: 'var(--charmeditor-active)',
+      class: 'charmeditor-drop-cursor'
     }
   });
 
