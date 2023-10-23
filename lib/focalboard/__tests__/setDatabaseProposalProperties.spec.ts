@@ -45,7 +45,7 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      databaseId: rootId
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -112,7 +112,7 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      databaseId: rootId
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -182,7 +182,7 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      databaseId: rootId
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -204,10 +204,10 @@ describe('setDatabaseProposalProperties()', () => {
 
     // --- Run this a second and third time
     await setDatabaseProposalProperties({
-      databaseId: rootId
+      boardId: rootId
     });
     await setDatabaseProposalProperties({
-      databaseId: rootId
+      boardId: rootId
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -265,7 +265,7 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     const initial = await setDatabaseProposalProperties({
-      databaseId: rootId
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -302,7 +302,7 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      databaseId: rootId
+      boardId: rootId
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -339,7 +339,7 @@ describe('setDatabaseProposalProperties()', () => {
         updatedBy: user.id,
         fields: {
           sourceType: 'board_page'
-        } as Partial<BoardFields> as Prisma.InputJsonValue,
+        },
         space: { connect: { id: space.id } },
         user: { connect: { id: user.id } }
       }
@@ -347,7 +347,7 @@ describe('setDatabaseProposalProperties()', () => {
 
     await expect(
       setDatabaseProposalProperties({
-        databaseId: rootId
+        boardId: rootId
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

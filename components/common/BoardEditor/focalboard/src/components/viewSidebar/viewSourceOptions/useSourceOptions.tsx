@@ -11,7 +11,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { Board, DataSourceType } from 'lib/focalboard/board';
+import type { BoardFields, Board, DataSourceType } from 'lib/focalboard/board';
 import type { BoardView, BoardViewFields } from 'lib/focalboard/boardView';
 import { createNewDataSource } from 'lib/focalboard/createNewDataSource';
 import { createTableView } from 'lib/focalboard/tableView';
@@ -123,7 +123,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
             showMessage('Importing your csv file...', 'info');
 
             try {
-              const view = activeView ?? (await onCreateDatabase({ sourceType: 'board_page' }));
+              const view = activeView ?? (await onCreateDatabase());
               await addNewCards({
                 board: rootBoard,
                 members,
@@ -160,7 +160,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     }
   }
 
-  async function onCreateDatabase({ sourceType }: { sourceType: Exclude<DataSourceType, 'google_form'> }) {
+  async function onCreateDatabase({ sourceType }: { sourceType?: BoardFields['sourceType'] } = {}) {
     if (!rootBoardPage || !rootBoardPage.type.match('board')) {
       throw new Error('No board page type exists');
     }

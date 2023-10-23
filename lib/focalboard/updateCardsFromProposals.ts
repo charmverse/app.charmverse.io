@@ -36,11 +36,11 @@ export async function updateCardsFromProposals({
     });
   }
 
-  const database = await setDatabaseProposalProperties({
-    databaseId: boardId
+  const boardBlock = await setDatabaseProposalProperties({
+    boardId
   });
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
-  if ((database.fields as any as BoardFields).sourceType !== 'proposals') {
+  if ((boardBlock.fields as any as BoardFields).sourceType !== 'proposals') {
     throw new InvalidStateError('Database not configured to use proposals as a source');
   }
 
@@ -105,7 +105,7 @@ export async function updateCardsFromProposals({
     }, {} as Record<string, Page & { block: Block }>);
 
   const databaseProposalProps = extractDatabaseProposalProperties({
-    database
+    boardBlock
   });
 
   /**
@@ -317,11 +317,10 @@ export async function updateCardsFromProposals({
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: [prismaToBlock(database as any)]
+      payload: [prismaToBlock(boardBlock as any)]
     },
     spaceId
   );
-
   if (updatedBlocks.length > 0) {
     relay.broadcast(
       {

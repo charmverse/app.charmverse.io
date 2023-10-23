@@ -84,7 +84,7 @@ describe('extractCardProposalProperties', () => {
     ];
 
     const extractedSchema = extractDatabaseProposalProperties({
-      database: { fields: { cardProperties: exampleProperties } as any }
+      boardBlock: { fields: { cardProperties: exampleProperties } as any }
     });
 
     const extractedValues = extractCardProposalProperties({
@@ -137,7 +137,7 @@ describe('extractCardProposalProperties', () => {
     const exampleProperties: IPropertyTemplate[] = [categoryProp];
 
     const extractedSchema = extractDatabaseProposalProperties({
-      database: { fields: { cardProperties: exampleProperties } as any }
+      boardBlock: { fields: { cardProperties: exampleProperties } as any }
     });
 
     const extractedValues = extractCardProposalProperties({

@@ -324,15 +324,14 @@ type getViewCardsProps = { viewId: string; boardId: string };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    (state: RootState, props: getViewCardsProps) =>
-      Object.values(state.cards.cards).filter((c) => c.parentId === props.boardId) as Card[],
+    getCards,
     (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
     (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
     (cards, board, view) => {
       if (!view || !board || !cards) {
         return [];
       }
-      let result = cards;
+      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
       const cardProperties: IPropertyTemplate[] = hasTitleProperty
         ? board.fields.cardProperties

@@ -15,6 +15,7 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
@@ -63,7 +64,6 @@ type Props = WrappedComponentProps &
     board: Board;
     currentRootPageId: string;
     embeddedBoardPath?: string;
-    // cards: Card[]
     activeView?: BoardView;
     views: BoardView[];
     hideBanner?: boolean;
@@ -87,7 +87,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, pageIcon, showView, views, page: boardPage } = props;
+  const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -129,14 +129,18 @@ function CenterPanel(props: Props) {
       viewId: activeView?.id || ''
     })
   );
+  const isActiveView = !!(activeView && activeBoard);
 
   useEffect(() => {
+    if (!isActiveView) {
+      return;
+    }
     if (views.length === 0) {
       setState((s) => ({ ...s, openSettings: 'create-linked-view' }));
     } else if (activeView) {
       setState((s) => ({ ...s, openSettings: null }));
     }
-  }, [activeView?.id, views.length, activePage]);
+  }, [activeView?.id, views.length, isActiveView]);
 
   // filter cards by whats accessible
   const cardPages: CardPage[] = useMemo(() => {
@@ -156,7 +160,6 @@ function CenterPanel(props: Props) {
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
   }, [_cards, pages]);
-  const isActiveView = !!(activeView && activeBoard);
   const cards = useMemo(() => {
     const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
     return sortedCardPages.map(({ card }) => card);
@@ -250,8 +253,6 @@ function CenterPanel(props: Props) {
       }
 
       const card = createCard();
-
-      // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
 
       card.parentId = activeBoard.id;
       card.rootId = activeBoard.rootId;
@@ -449,6 +450,18 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
+  const { trigger: updateProposalSource } = useSWRMutation(
+    `/api/pages/${activeBoard?.id}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
+  );
+
+  // refresh proposals as a source
+  useEffect(() => {
+    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
+      updateProposalSource({ pageId: currentRootPageId });
+    }
+  }, [currentRootPageId, activeBoard?.id]);
+
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
@@ -508,16 +521,11 @@ function CenterPanel(props: Props) {
           )}
           {(activePage || activeBoard) && (
             <ViewHeader
-              currentRootPageId={props.currentRootPageId}
               onDeleteView={props.onDeleteView}
               maxTabsShown={props.maxTabsShown}
               disableUpdatingUrl={props.disableUpdatingUrl}
               showView={props.showView}
-              onClickNewView={
-                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
-                  ? addNewLinkedView
-                  : undefined
-              }
+              onClickNewView={activeView?.fields?.linkedSourceId ? addNewLinkedView : undefined}
               activeBoard={activeBoard}
               viewsBoard={board}
               activeView={props.activeView}

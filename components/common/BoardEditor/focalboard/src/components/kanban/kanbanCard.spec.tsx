@@ -13,7 +13,6 @@ import KanbanCard from './kanbanCard';
 
 jest.mock('../../mutator');
 jest.mock('../../utils');
-// jest.mock('../../telemetry/telemetryClient')
 const mockedMutator = jest.mocked(Mutator, { shallow: true });
 
 jest.mock('next/router', () => ({
