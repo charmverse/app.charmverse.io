@@ -227,7 +227,7 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered' && this.userId) {
-      const { pageId, newParentId, newIndex, trigger, pos } = message.payload;
+      const { dragPos, isLinkedPage, pageId, newParentId, newIndex, trigger, dropPos } = message.payload;
       if (pageId === newParentId) {
         return null;
       }
@@ -239,7 +239,9 @@ export class SpaceEventHandler {
         select: {
           id: true,
           spaceId: true,
-          parentId: true
+          parentId: true,
+          type: true,
+          path: true
         }
       });
 
@@ -265,6 +267,7 @@ export class SpaceEventHandler {
         }
 
         // Remove reference from parent's content
+        // TODO: if trigger is editor-to-editor make sure the new parent is of valid content type
         if (currentParentId) {
           await handlePageRemoveMessage({
             userId: this.userId,
@@ -274,7 +277,8 @@ export class SpaceEventHandler {
             },
             sendError: this.sendError,
             event: 'page_reordered',
-            relay: this.relay
+            relay: this.relay,
+            nodePos: dragPos
           });
         }
 
@@ -285,12 +289,13 @@ export class SpaceEventHandler {
             docRooms: this.docRooms,
             parentId: newParentId
           });
+
           if (!pageDetails) {
             return;
           }
 
           const { parentDocumentNode, documentRoom, participant, position, content: parentPageContent } = pageDetails;
-          const lastValidPos = pos ?? parentDocumentNode.content.size;
+          const lastValidPos = dropPos ?? parentDocumentNode.content.size;
 
           // If position is not null then the page is present in the parent page content
           if (position === null) {
@@ -298,7 +303,13 @@ export class SpaceEventHandler {
               await participant.handleDiff(
                 {
                   type: 'diff',
-                  ds: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos }),
+                  ds: generateInsertNestedPageDiffs({
+                    pageId,
+                    pos: lastValidPos,
+                    isLinkedPage,
+                    path: page.path,
+                    type: page.type
+                  }),
                   doc: documentRoom.doc.content,
                   c: participant.messages.client,
                   s: participant.messages.server,
@@ -315,12 +326,18 @@ export class SpaceEventHandler {
                 content: parentPageContent,
                 userId: this.userId,
                 parentId: newParentId,
-                diffs: generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
+                diffs: generateInsertNestedPageDiffs({
+                  pageId,
+                  pos: lastValidPos,
+                  isLinkedPage,
+                  path: page.path,
+                  type: page.type
+                })
               });
             }
 
             // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
-            if (trigger === 'sidebar-to-editor' || trigger === 'editor-to-editor') {
+            if ((trigger === 'sidebar-to-editor' || trigger === 'editor-to-editor') && !isLinkedPage) {
               await prisma.page.update({
                 where: {
                   id: pageId
@@ -371,7 +388,8 @@ async function handlePageRemoveMessage({
   docRooms,
   payload,
   sendError,
-  relay
+  relay,
+  nodePos
 }: {
   event: 'page_deleted' | 'page_reordered';
   userId: string;
@@ -379,6 +397,7 @@ async function handlePageRemoveMessage({
   payload: WebSocketPayload<'page_deleted'>;
   sendError: (message: string) => void;
   relay: AbstractWebsocketBroadcaster;
+  nodePos?: number;
 }) {
   try {
     const pageId = payload.id;
@@ -392,8 +411,8 @@ async function handlePageRemoveMessage({
       return;
     }
 
-    const { documentRoom, participant, parentId, spaceId, content, position } = pageDetails;
-
+    const { documentRoom, participant, parentId, spaceId, content, position: _nodePos } = pageDetails;
+    const position = nodePos ?? _nodePos;
     if (parentId && position !== null) {
       if (documentRoom && participant) {
         await participant.handleDiff(
@@ -452,7 +471,19 @@ async function handlePageRemoveMessage({
   }
 }
 
-function generateInsertNestedPageDiffs({ pageId, pos }: { pageId: string; pos: number }): ProsemirrorJSONStep[] {
+function generateInsertNestedPageDiffs({
+  pageId,
+  pos,
+  isLinkedPage,
+  type = null,
+  path = null
+}: {
+  pageId: string;
+  pos: number;
+  isLinkedPage?: boolean;
+  type?: string | null;
+  path?: string | null;
+}): ProsemirrorJSONStep[] {
   return [
     {
       stepType: 'replace',
@@ -461,11 +492,11 @@ function generateInsertNestedPageDiffs({ pageId, pos }: { pageId: string; pos: n
       slice: {
         content: [
           {
-            type: 'page',
+            type: isLinkedPage ? 'linkedPage' : 'page',
             attrs: {
               id: pageId,
-              type: null,
-              path: null,
+              type,
+              path,
               track: []
             }
           }

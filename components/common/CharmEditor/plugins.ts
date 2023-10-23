@@ -10,7 +10,6 @@ import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
 import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
-import * as bulletList from './components/bulletList';
 import * as callout from './components/callout/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout/columnLayout.plugins';
@@ -111,26 +110,27 @@ export function charmEditorPlugins({
               const dom = view.nodeDOM(coordinates.pos);
               const droppedNode = view.state.doc.nodeAt(coordinates.pos);
               const draggedNode = view.state.doc.nodeAt(view.state.tr.selection.$anchor.pos);
+              const validOperation =
+                droppedNode &&
+                draggedNode &&
+                dom &&
+                (droppedNode.type.name === 'page' ||
+                  (droppedNode.type.name === 'linkedPage' && droppedNode.attrs.type === 'page') ||
+                  draggedNode.type.name === 'page' ||
+                  draggedNode.type.name === 'linkedPage');
 
-              if (
-                !droppedNode ||
-                !draggedNode ||
-                droppedNode.type.name !== 'page' ||
-                draggedNode.type.name !== 'page' ||
-                !dom
-              ) {
+              if (!validOperation) {
                 return false;
               }
 
-              const draggedNodeId = draggedNode.attrs.id;
-              const droppedNodeId = droppedNode.attrs.id;
+              const draggedPageId = draggedNode.attrs.id;
+              const droppedPageId = droppedNode.attrs.id;
 
-              if (droppedNodeId === draggedNodeId) {
+              if (droppedPageId === draggedPageId) {
                 return false;
               }
 
               if (dom instanceof HTMLElement) {
-                const droppedPageId = droppedNode.attrs.id;
                 const droppedDOMNode = dom.querySelector(`[data-id="page-${droppedPageId}"]`);
                 if (!droppedDOMNode) {
                   return false;
@@ -140,10 +140,12 @@ export function charmEditorPlugins({
                 emitSocketMessage({
                   type: 'page_reordered',
                   payload: {
-                    pageId: draggedNodeId,
-                    newParentId: droppedNodeId,
+                    pageId: draggedPageId,
+                    newParentId: droppedPageId,
                     newIndex: -1,
-                    trigger: 'editor-to-editor'
+                    trigger: 'editor-to-editor',
+                    isLinkedPage: draggedNode.type.name === 'linkedPage',
+                    dragPos: view.state.tr.selection.$anchor.pos
                   }
                 });
               }
@@ -163,7 +165,7 @@ export function charmEditorPlugins({
                   newParentId: pageId,
                   newIndex: -1,
                   trigger: 'sidebar-to-editor',
-                  pos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
+                  dropPos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
                 }
               });
               // + 1 for dropping in non empty node
