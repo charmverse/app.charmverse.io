@@ -10,18 +10,18 @@ import { InvalidStateError } from 'lib/middleware/errors';
 
 type ProposalCategoryFields = Pick<ProposalCategory, 'title' | 'id' | 'color'>;
 
-export async function setDatabaseProposalProperties({ databaseId }: { databaseId: string }): Promise<Board> {
-  const database = (await prisma.block.findUniqueOrThrow({
+export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
+  const boardBlock = (await prisma.block.findUniqueOrThrow({
     where: {
-      id: databaseId
+      id: boardId
     }
   })) as any as Board;
-  if (database.fields.sourceType !== 'proposals') {
+  if (boardBlock.fields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
   const proposalCategories = await prisma.proposalCategory.findMany({
     where: {
-      spaceId: database.spaceId
+      spaceId: boardBlock.spaceId
     },
     select: {
       id: true,
@@ -32,21 +32,21 @@ export async function setDatabaseProposalProperties({ databaseId }: { databaseId
 
   const rubricProposals = await prisma.proposal.count({
     where: {
-      spaceId: database.spaceId,
+      spaceId: boardBlock.spaceId,
       evaluationType: 'rubric'
     }
   });
 
   const spaceUsesRubrics = rubricProposals > 0;
-  const boardProperties = getBoardProperties({ database, proposalCategories, spaceUsesRubrics });
+  const boardProperties = getBoardProperties({ boardBlock, proposalCategories, spaceUsesRubrics });
 
   return prisma.block.update({
     where: {
-      id: database.id
+      id: boardBlock.id
     },
     data: {
       fields: {
-        ...(database.fields as any),
+        ...(boardBlock.fields as any),
         cardProperties: boardProperties
       }
     }
@@ -54,15 +54,15 @@ export async function setDatabaseProposalProperties({ databaseId }: { databaseId
 }
 
 export function getBoardProperties({
-  database,
+  boardBlock,
   proposalCategories,
   spaceUsesRubrics
 }: {
-  database: Board;
+  boardBlock: Board;
   proposalCategories: ProposalCategoryFields[];
   spaceUsesRubrics: boolean;
 }) {
-  const boardProperties = database.fields.cardProperties ?? [];
+  const boardProperties = boardBlock.fields.cardProperties ?? [];
 
   const categoryProp = generateUpdatedProposalCategoryProperty({
     boardProperties,

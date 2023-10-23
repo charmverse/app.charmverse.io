@@ -50,9 +50,16 @@ interface PageTitleProps {
   updatedAt?: string; // need this to determine if the title has been updated
   onChange: (page: { title: string; updatedAt: string }) => void;
   readOnly?: boolean;
+  placeholder?: string;
 }
 
-export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, readOnly }: PageTitleProps) {
+export function PageTitleInput({
+  value,
+  updatedAt: updatedAtExternal,
+  onChange,
+  readOnly,
+  placeholder
+}: PageTitleProps) {
   const view = useContext(EditorViewContext);
   const [title, setTitle] = useState(value);
   const titleInput = useRef(null);
@@ -104,7 +111,7 @@ export function PageTitleInput({ value, updatedAt: updatedAtExternal, onChange, 
         inputRef={titleInput}
         value={title}
         multiline
-        placeholder='Untitled'
+        placeholder={placeholder || 'Untitled'}
         autoFocus={!value && !readOnly && !isTouchScreen()}
         variant='standard'
         onKeyDown={handleKeyDown}

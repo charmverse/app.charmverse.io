@@ -15,6 +15,7 @@ const config: StorybookConfig = {
    */
   env: (config) => ({
     ...config,
+    DOMAIN: 'http://localhost:6006',
     IS_STORYBOOK: 'true'
   }),
   staticDirs: [

@@ -91,4 +91,5 @@ async function createAndAssignCollablandRoles({
       });
     })
   );
+  return { userId, spaceId };
 }

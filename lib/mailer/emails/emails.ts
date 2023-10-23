@@ -11,7 +11,7 @@ import type { PageInviteEmailProps } from './templates/PageInviteEmail';
 import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
 
 export function getPendingNotificationEmail(notification: Notification) {
-  const html = render(PendingNotification(notification));
+  const html = render(PendingNotification({ notification }));
   const content = getNotificationMetadata(notification).content;
   const subject =
     typeof content === 'string' ? content : htmlToText(ReactDOMServer.renderToString(content as ReactElement));

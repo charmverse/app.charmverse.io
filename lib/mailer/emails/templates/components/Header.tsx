@@ -23,9 +23,7 @@ export default function Header({ size = 'medium' }: { size?: 'medium' | 'small' 
         src={`${domain}${logoImagePath}`}
         style={{
           width: dimensions[size].width,
-          height: dimensions[size].height,
-          paddingBottom: '10px',
-          paddingTop: '10px'
+          height: dimensions[size].height
         }}
       />
     </Link>

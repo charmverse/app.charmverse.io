@@ -10,10 +10,6 @@
   }
 }
 
-.bangle-editor a:not(.MuiTypography-root) {
-  text-decoration: underline;
-}
-
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
 }
@@ -134,13 +130,12 @@ img.ProseMirror-separator {
  * Component-Styling
  */
 
-// Making sure inline database header link doesn't have underlines
-.bangle-editor a:not(.MuiTypography-root) {
+.bangle-editor .charm-link {
   color: #4299e1;
   text-decoration: underline;
 }
 
-.bangle-editor a:hover:not(.MuiTypography-root) {
+.bangle-editor .charm-link:hover {
   color: #24659b;
   text-decoration: underline;
 }
