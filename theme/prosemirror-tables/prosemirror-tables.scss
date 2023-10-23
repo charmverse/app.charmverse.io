@@ -7,23 +7,22 @@
   margin: 0 !important;
 }
 
-.ProseMirror td,
-.ProseMirror th {
-  vertical-align: top;
-  box-sizing: border-box;
-  position: relative;
-  min-width: 1em;
-  border: 1px solid var(--input-border);
-  padding: 3px 5px;
-}
 
 .ProseMirror .tableWrapper {
   margin: 1em 0;
-}
-
-.ProseMirror th {
-  font-weight: bold;
-  text-align: left;
+  td,
+  th {
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+    min-width: 1em;
+    border: 1px solid var(--input-border);
+    padding: 3px 5px;
+  }
+  th {
+    font-weight: bold;
+    text-align: left;
+  }
 }
 
 
