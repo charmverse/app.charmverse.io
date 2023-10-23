@@ -9,7 +9,7 @@ import CardDialog from 'components/common/BoardEditor/focalboard/src/components/
 import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getSortedViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { makeSelectSortedViews, makeSelectView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
@@ -87,7 +87,8 @@ interface DatabaseViewProps extends CharmNodeViewProps {
 
 export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, node }: DatabaseViewProps) {
   const pageId = node.attrs.pageId as string;
-  const views = useAppSelector(getSortedViews(pageId));
+  const selectSortedViews = useMemo(makeSelectSortedViews, []);
+  const views = useAppSelector((state) => selectSortedViews(state, pageId));
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -99,9 +100,9 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
     }
   }, [views?.length]);
 
-  const currentView = useAppSelector(getView(currentViewId || '')) ?? undefined;
+  const selectView = useMemo(makeSelectView, []);
+  const currentView = useAppSelector((state) => selectView(state, currentViewId || '')) ?? undefined;
   const { page: boardPage, updatePage } = usePage({ pageIdOrPath: pageId });
-
   const [shownCardId, setShownCardId] = useState<string | null>(null);
 
   const boards = useAppSelector(getBoards);

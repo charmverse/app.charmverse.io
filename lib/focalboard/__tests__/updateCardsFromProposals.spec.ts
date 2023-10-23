@@ -218,7 +218,7 @@ describe('updateCardsFromProposals()', () => {
     });
 
     const { proposalCategory, proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
-      database: databaseAfterUpdate as any
+      boardBlock: databaseAfterUpdate as any
     });
 
     const discussionValueId = proposalStatus?.options.find((opt) => opt.value === 'discussion')?.id;
@@ -296,7 +296,7 @@ describe('updateCardsFromProposals()', () => {
 
     const updatedCardBlockProposalProps = extractCardProposalProperties({
       card: updatedCard as any,
-      databaseProperties: extractDatabaseProposalProperties({ database: databaseAfterSecondUpdate })
+      databaseProperties: extractDatabaseProposalProperties({ boardBlock: databaseAfterSecondUpdate })
     });
 
     expect(updatedCardBlockProposalProps.cardProposalStatus).toBeDefined();
@@ -332,7 +332,7 @@ describe('updateCardsFromProposals()', () => {
     });
 
     const { proposalCategory, proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
-      database: databaseAfterUpdate as any
+      boardBlock: databaseAfterUpdate as any
     });
 
     const discussionValueId = proposalStatus?.options.find((opt) => opt.value === 'discussion')?.id;
@@ -394,7 +394,7 @@ describe('updateCardsFromProposals()', () => {
 
     const updatedCardBlockProposalProps = extractCardProposalProperties({
       card: updatedCard as any,
-      databaseProperties: extractDatabaseProposalProperties({ database: databaseAfterUpdate })
+      databaseProperties: extractDatabaseProposalProperties({ boardBlock: databaseAfterUpdate })
     });
 
     expect(updatedCardBlockProposalProps.cardProposalStatus).toBeDefined();
@@ -428,7 +428,7 @@ describe('updateCardsFromProposals()', () => {
 
     const updatedCardBlockAfterUnArchiveProposalProps = extractCardProposalProperties({
       card: updatedCardAfterUnArchive as any,
-      databaseProperties: extractDatabaseProposalProperties({ database: databaseAfterUpdate })
+      databaseProperties: extractDatabaseProposalProperties({ boardBlock: databaseAfterUpdate })
     });
 
     expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus).toBeDefined();

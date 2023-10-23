@@ -1,16 +1,15 @@
 import AddIcon from '@mui/icons-material/Add';
 import { ListItemIcon, MenuItem, Typography } from '@mui/material';
 
-import type { DataSourceType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
 export type NewDatabaseSourceProps = {
-  onCreateDatabase: (input: { sourceType: DataSourceType }) => Promise<BoardView>;
+  onCreateDatabase: () => Promise<BoardView>;
 };
 
 export function NewCharmVerseDatabase({ onCreateDatabase }: NewDatabaseSourceProps) {
   return (
-    <MenuItem onClick={() => onCreateDatabase({ sourceType: 'board_page' })}>
+    <MenuItem onClick={() => onCreateDatabase()}>
       <ListItemIcon>
         <AddIcon color='secondary' />
       </ListItemIcon>
