@@ -8,6 +8,7 @@ import type { MessageType, WebhookMessage, WebhookMessageProcessResult } from 'l
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<WebhookMessageProcessResult>> = {
   guildMemberUpdate: async (message: WebhookMessage) => {
+    let spaceId: string | undefined;
     try {
       const payload = message?.data?.payload;
       if (!payload || payload.length !== 2) {
@@ -27,20 +28,28 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       const rolesRemoved = oldRoles.filter((role) => !newRoles.includes(role));
 
       if (rolesAdded.length) {
-        await assignRolesCollabland({ discordUserId, discordServerId, roles: rolesAdded });
+        const result = await assignRolesCollabland({ discordUserId, discordServerId, roles: rolesAdded });
+        if (result?.[0]?.status === 'fulfilled') {
+          spaceId = result[0].value?.spaceId;
+        }
       }
 
       if (rolesRemoved.length) {
-        await unassignRolesDiscord({ discordUserId, discordServerId, roles: rolesRemoved });
+        const result = await unassignRolesDiscord({ discordUserId, discordServerId, roles: rolesRemoved });
+        if (result?.spaceId) {
+          spaceId = result.spaceId;
+        }
       }
 
       return {
+        spaceId,
         success: true,
         message: 'Roles updated.'
       };
       // eslint-disable-next-line no-empty
     } catch (e: any) {
       return {
+        spaceId,
         success: false,
         message: e?.message || 'Failed to process guildMemberUpdate event.'
       };
@@ -57,9 +66,10 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       }
 
       const { guildId: discordServerId, userId: discordUserId } = payload;
-      await removeSpaceMemberDiscord({ discordUserId, discordServerId });
+      const result = await removeSpaceMemberDiscord({ discordUserId, discordServerId });
 
       return {
+        spaceId: result?.spaceId,
         success: true,
         message: 'Member removed.'
       };
