@@ -184,8 +184,8 @@ function ViewHeader(props: Props) {
 
         {/* <ViewHeaderSearch/> */}
 
-        {/* Link to view embedded table in full */}
-        {props.embeddedBoardPath && (
+        {/* Link to view embedded table in full - check that at least one view is created */}
+        {props.embeddedBoardPath && !!views.length && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
               <span>

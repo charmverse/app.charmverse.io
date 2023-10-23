@@ -74,7 +74,7 @@ export function splitListItem(tr: Transaction, schema: Schema): Transaction {
   const { $from, $to } = selection;
 
   const grandParent = $from.node(-1);
-  if (grandParent.type !== nodeType) {
+  if (grandParent?.type !== nodeType) {
     return tr;
   }
 

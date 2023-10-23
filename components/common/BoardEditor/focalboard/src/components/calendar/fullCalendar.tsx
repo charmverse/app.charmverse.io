@@ -4,10 +4,10 @@ import type { EventClickArg, EventChangeArg, EventInput, EventContentArg, DayCel
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
-import React, { useCallback, useMemo } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePages } from 'hooks/usePages';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -62,7 +62,7 @@ function createDatePropertyFromCalendarDate(start: Date): DateProperty {
 
 function CalendarFullView(props: Props): JSX.Element | null {
   const intl = useIntl();
-  const { board, cards, activeView, dateDisplayProperty, readOnly } = props;
+  const { addCard, board, cards, activeView, dateDisplayProperty, readOnly, showCard } = props;
   const isSelectable = !readOnly;
   const { userPreferences } = useUserPreferences();
 
@@ -142,7 +142,6 @@ function CalendarFullView(props: Props): JSX.Element | null {
       return (
         <div>
           <div className='octo-icontitle'>
-            <PageIcon isEditorEmpty={!page?.hasContent} pageType='page' icon={event.extendedProps.icon} />
             <div className='fc-event-title' key='__title'>
               {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
@@ -169,15 +168,15 @@ function CalendarFullView(props: Props): JSX.Element | null {
         </div>
       );
     },
-    [board, cards, visiblePropertyTemplates, pages]
+    [board, cards, visiblePropertyTemplates, intl, pages]
   );
 
   const eventClick = useCallback(
     (eventProps: EventClickArg) => {
       const { event } = eventProps;
-      props.showCard(event.id);
+      showCard(event.id);
     },
-    [props.showCard]
+    [showCard]
   );
 
   const eventChange = useCallback(
@@ -218,9 +217,9 @@ function CalendarFullView(props: Props): JSX.Element | null {
         properties[dateDisplayProperty.id] = JSON.stringify(dateProperty);
       }
 
-      props.addCard(properties);
+      addCard(properties);
     },
-    [props.addCard, dateDisplayProperty]
+    [addCard, dateDisplayProperty]
   );
 
   const toolbar = useMemo(
@@ -234,7 +233,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
 
   const buttonText = useMemo(
     () => ({
-      today: intl.formatMessage({ id: 'calendar.today', defaultMessage: 'TODAY' }),
+      today: intl.formatMessage({ id: 'calendar.today', defaultMessage: 'Today' }),
       month: intl.formatMessage({ id: 'calendar.month', defaultMessage: 'Month' }),
       week: intl.formatMessage({ id: 'calendar.week', defaultMessage: 'Week' })
     }),
@@ -249,14 +248,14 @@ function CalendarFullView(props: Props): JSX.Element | null {
             <div></div>
           ) : (
             <div className='addEvent' onClick={() => onNewEvent({ start: args.date, end: args.date })}>
-              +
+              <AddIcon color='secondary' />
             </div>
           )}
           <div className='dateDisplay'>{args.dayNumberText}</div>
         </div>
       );
     },
-    [dateDisplayProperty]
+    [onNewEvent, props.readOnly, props.disableAddingCards]
   );
 
   return (

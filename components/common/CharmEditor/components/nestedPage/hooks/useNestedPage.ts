@@ -26,7 +26,7 @@ export default function useNestedPage(currentPageId?: string) {
             parentId: isInsideCard ? cardId : currentPageId
           },
           {
-            cb: ({ page }) => {
+            cb: (page) => {
               rafCommandExec(view, (state, dispatch) => {
                 const nestedPageNode = state.schema.nodes.page.create({
                   id: page.id
