@@ -10,7 +10,7 @@ import { SelectPreviewContainer } from 'components/common/BoardEditor/components
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
@@ -198,8 +198,7 @@ export function RewardPropertiesForm({
           </PropertyLabel>
 
           <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-            <Switch
-              sx={{ ml: '0 !important' }}
+            <Checkbox
               isOn={Boolean(values?.approveSubmitters)}
               onChanged={(isOn) => {
                 applyUpdates({
@@ -219,8 +218,7 @@ export function RewardPropertiesForm({
             </PropertyLabel>
 
             <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-              <Switch
-                sx={{ ml: '0 !important' }}
+              <Checkbox
                 isOn={Boolean(values?.allowMultipleApplications)}
                 onChanged={(isOn) => {
                   applyUpdates({
