@@ -58,6 +58,15 @@ const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const suggestionsPluginKey = new PluginKey('suggestions');
 
+function removeSelectedNodeClass() {
+  setTimeout(() => {
+    const selectedDomNode = document.querySelector('.ProseMirror-selectednode');
+    if (selectedDomNode) {
+      selectedDomNode.classList.remove('ProseMirror-selectednode');
+    }
+  }, 0);
+}
+
 export function charmEditorPlugins({
   onContentChange,
   onError = () => {},
@@ -107,13 +116,18 @@ export function charmEditorPlugins({
 
             const data = ev.dataTransfer.getData('sidebar-page');
             if (!data) {
-              const dom = view.nodeDOM(coordinates.pos);
+              const domElementAtCoords = document.elementFromPoint(ev.clientX, ev.clientY);
+              if (domElementAtCoords?.classList.contains('nested-page-separator')) {
+                removeSelectedNodeClass();
+                return false;
+              }
+              const domElementAtPos = view.nodeDOM(coordinates.pos);
               const droppedNode = view.state.doc.nodeAt(coordinates.pos);
               const draggedNode = view.state.doc.nodeAt(view.state.tr.selection.$anchor.pos);
               const validOperation =
                 droppedNode &&
                 draggedNode &&
-                dom &&
+                domElementAtPos &&
                 (droppedNode.type.name === 'page' ||
                   (droppedNode.type.name === 'linkedPage' && droppedNode.attrs.type === 'page')) &&
                 (draggedNode.type.name === 'page' || draggedNode.type.name === 'linkedPage');
@@ -129,8 +143,8 @@ export function charmEditorPlugins({
                 return false;
               }
 
-              if (dom instanceof HTMLElement) {
-                const droppedDOMNode = dom.querySelector(`[data-id="page-${droppedPageId}"]`);
+              if (domElementAtPos instanceof HTMLElement) {
+                const droppedDOMNode = domElementAtPos.querySelector(`[data-id="page-${droppedPageId}"]`);
                 if (!droppedDOMNode || droppedDOMNode.getAttribute('data-page-type') !== 'page') {
                   return false;
                 }
@@ -148,6 +162,7 @@ export function charmEditorPlugins({
                     currentParentId: pageId
                   }
                 });
+                removeSelectedNodeClass();
               }
               return false;
             }
