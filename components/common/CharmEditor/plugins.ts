@@ -115,9 +115,8 @@ export function charmEditorPlugins({
                 draggedNode &&
                 dom &&
                 (droppedNode.type.name === 'page' ||
-                  (droppedNode.type.name === 'linkedPage' && droppedNode.attrs.type === 'page') ||
-                  draggedNode.type.name === 'page' ||
-                  draggedNode.type.name === 'linkedPage');
+                  (droppedNode.type.name === 'linkedPage' && droppedNode.attrs.type === 'page')) &&
+                (draggedNode.type.name === 'page' || draggedNode.type.name === 'linkedPage');
 
               if (!validOperation) {
                 return false;
@@ -132,7 +131,7 @@ export function charmEditorPlugins({
 
               if (dom instanceof HTMLElement) {
                 const droppedDOMNode = dom.querySelector(`[data-id="page-${droppedPageId}"]`);
-                if (!droppedDOMNode) {
+                if (!droppedDOMNode || droppedDOMNode.getAttribute('data-page-type') !== 'page') {
                   return false;
                 }
 
@@ -145,7 +144,8 @@ export function charmEditorPlugins({
                     newIndex: -1,
                     trigger: 'editor-to-editor',
                     isLinkedPage: draggedNode.type.name === 'linkedPage',
-                    dragPos: view.state.tr.selection.$anchor.pos
+                    dragPos: view.state.tr.selection.$anchor.pos,
+                    currentParentId: pageId
                   }
                 });
               }

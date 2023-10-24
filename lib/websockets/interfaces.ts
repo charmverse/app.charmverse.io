@@ -132,6 +132,7 @@ type PageReordered = {
     dropPos?: number;
     isLinkedPage?: boolean;
     dragPos?: number;
+    currentParentId?: string | null;
   };
 };
 

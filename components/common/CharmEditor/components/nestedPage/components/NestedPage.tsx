@@ -80,6 +80,7 @@ export default function NestedPage({
   return (
     <NestedPageContainer
       data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
+      data-page-type={node.attrs.type ?? documentPage?.type}
       href={appPath ? `/${appPath}` : undefined}
       color='inherit'
       data-id={`page-${pageId}`}

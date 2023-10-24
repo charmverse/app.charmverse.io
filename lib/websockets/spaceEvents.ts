@@ -21,6 +21,8 @@ import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
 import type { AbstractWebsocketBroadcaster } from './interfaces';
 
+const nonContentPageTypes = ['board', 'board_template', 'inline_board', 'linked_board', 'inline_linked_board'];
+
 export class SpaceEventHandler {
   socketEvent = 'message';
 
@@ -227,7 +229,17 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered' && this.userId) {
-      const { dragPos, isLinkedPage, pageId, newParentId, newIndex, trigger, dropPos } = message.payload;
+      const {
+        currentParentId: _currentParentId,
+        dragPos,
+        isLinkedPage,
+        pageId,
+        newParentId,
+        newIndex,
+        trigger,
+        dropPos
+      } = message.payload;
+
       if (pageId === newParentId) {
         return null;
       }
@@ -249,7 +261,7 @@ export class SpaceEventHandler {
         return null;
       }
 
-      const currentParentId = page.parentId ?? null;
+      const currentParentId = _currentParentId ?? page.parentId ?? null;
 
       // If the page is dropped on the same parent page or on itself, do nothing
       if (currentParentId === newParentId) {
@@ -257,24 +269,39 @@ export class SpaceEventHandler {
       }
 
       try {
-        const { flatChildren } = await resolvePageTree({
-          pageId,
-          flattenChildren: true
-        });
+        if (!isLinkedPage) {
+          const { flatChildren } = await resolvePageTree({
+            pageId,
+            flattenChildren: true
+          });
 
-        if (flatChildren.some((p) => p.id === newParentId)) {
-          throw new UndesirableOperationError(`You cannot reposition a page to be a child of one of its child pages`);
+          if (flatChildren.some((p) => p.id === newParentId)) {
+            throw new UndesirableOperationError(`You cannot reposition a page to be a child of one of its child pages`);
+          }
         }
 
         // Remove reference from parent's content
-        // TODO: if trigger is editor-to-editor make sure the new parent is of valid content type
         if (currentParentId) {
+          const parentPage = newParentId
+            ? await prisma.page.findUnique({
+                where: { id: newParentId },
+                select: {
+                  type: true
+                }
+              })
+            : null;
+
+          if (parentPage && nonContentPageTypes.includes(parentPage.type)) {
+            return;
+          }
+
           await handlePageRemoveMessage({
             userId: this.userId,
             docRooms: this.docRooms,
             payload: {
               id: pageId
             },
+            parentId: currentParentId,
             sendError: this.sendError,
             event: 'page_reordered',
             relay: this.relay,
@@ -358,10 +385,12 @@ export class SpaceEventHandler {
           }
         }
 
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
-          event: 'repositioned',
-          pageId
-        });
+        if (!isLinkedPage) {
+          await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+            event: 'repositioned',
+            pageId
+          });
+        }
       } catch (error) {
         const errorMessage = 'Error repositioning a page in parent page content';
         log.error(errorMessage, {
@@ -389,8 +418,10 @@ async function handlePageRemoveMessage({
   payload,
   sendError,
   relay,
-  nodePos
+  nodePos,
+  parentId: _parentId
 }: {
+  parentId?: string;
   event: 'page_deleted' | 'page_reordered';
   userId: string;
   docRooms: Map<string | undefined, DocumentRoom>;
@@ -404,7 +435,8 @@ async function handlePageRemoveMessage({
     const pageDetails = await getPageDetails({
       id: pageId,
       userId,
-      docRooms
+      docRooms,
+      parentId: _parentId
     });
 
     if (!pageDetails) {
@@ -520,7 +552,6 @@ async function applyDiffAndSaveDocument({
   const pageNode = getNodeFromJson(content);
 
   const updatedNode = applyStepsToNode(diffs, pageNode);
-
   await prisma.page.update({
     where: { id: parentId },
     data: {
@@ -550,7 +581,8 @@ async function getPageDetails({
     },
     select: {
       parentId: true,
-      spaceId: true
+      spaceId: true,
+      type: true
     }
   });
 
@@ -568,10 +600,7 @@ async function getPageDetails({
       })
     : null;
 
-  if (
-    parentPage &&
-    ['board', 'board_template', 'inline_board', 'linked_board', 'inline_linked_board'].includes(parentPage.type)
-  ) {
+  if (parentPage && nonContentPageTypes.includes(parentPage.type)) {
     return null;
   }
 
