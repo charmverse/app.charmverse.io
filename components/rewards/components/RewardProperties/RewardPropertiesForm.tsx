@@ -6,11 +6,10 @@ import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
@@ -197,19 +196,16 @@ export function RewardPropertiesForm({
             Application required
           </PropertyLabel>
 
-          <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-            <Switch
-              sx={{ ml: '0 !important' }}
-              isOn={Boolean(values?.approveSubmitters)}
-              onChanged={(isOn) => {
-                applyUpdates({
-                  approveSubmitters: !!isOn
-                });
-              }}
-              disabled={readOnly}
-              readOnly={readOnly}
-            />
-          </SelectPreviewContainer>
+          <Checkbox
+            isOn={Boolean(values?.approveSubmitters)}
+            onChanged={(isOn) => {
+              applyUpdates({
+                approveSubmitters: !!isOn
+              });
+            }}
+            disabled={readOnly}
+            readOnly={readOnly}
+          />
         </Box>
 
         <Tooltip placement='left' title='Allow the same user to participate in this reward more than once'>
@@ -218,19 +214,16 @@ export function RewardPropertiesForm({
               Allow multiple entries
             </PropertyLabel>
 
-            <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-              <Switch
-                sx={{ ml: '0 !important' }}
-                isOn={Boolean(values?.allowMultipleApplications)}
-                onChanged={(isOn) => {
-                  applyUpdates({
-                    allowMultipleApplications: !!isOn
-                  });
-                }}
-                disabled={readOnly}
-                readOnly={readOnly}
-              />
-            </SelectPreviewContainer>
+            <Checkbox
+              isOn={Boolean(values?.allowMultipleApplications)}
+              onChanged={(isOn) => {
+                applyUpdates({
+                  allowMultipleApplications: !!isOn
+                });
+              }}
+              disabled={readOnly}
+              readOnly={readOnly}
+            />
           </Box>
         </Tooltip>
 

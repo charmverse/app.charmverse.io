@@ -40,7 +40,7 @@ import { TextInput } from '../../../components/properties/TextInput';
 import type { Mutator } from '../mutator';
 import defaultMutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
-import Switch from '../widgets/switch';
+import Checkbox from '../widgets/checkbox';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -271,7 +271,9 @@ function PropertyValueElement(props: Props) {
     }
   } else if (propertyTemplate.type === 'checkbox') {
     propertyValueElement = (
-      <Switch
+      <Checkbox
+        displayType={displayType}
+        label={propertyTemplate.name}
         isOn={propertyValue === 'true'}
         onChanged={(newBool) => {
           const newValue = newBool ? 'true' : '';

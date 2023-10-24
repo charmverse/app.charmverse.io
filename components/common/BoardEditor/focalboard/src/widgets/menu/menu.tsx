@@ -2,12 +2,12 @@ import styled from '@emotion/styled';
 import Popper from '@mui/material/Popper';
 import { useEffect, useRef, useState } from 'react';
 
+import CheckboxOption from './checkboxOption';
 import ColorOption from './colorOption';
 import LabelOption from './labelOption';
 import { useMenuContext } from './menuContext';
 import SeparatorOption from './separatorOption';
 import SubMenuOption from './subMenuOption';
-import SwitchOption from './switchOption';
 import TextOption from './textOption';
 
 type Props = {
@@ -67,7 +67,7 @@ function Menu({ position = 'bottom-start', children, disablePortal = true }: Pro
 
 Menu.Color = ColorOption;
 Menu.SubMenu = SubMenuOption;
-Menu.Switch = SwitchOption;
+Menu.Switch = CheckboxOption;
 Menu.Separator = SeparatorOption;
 Menu.Text = TextOption;
 Menu.Label = LabelOption;

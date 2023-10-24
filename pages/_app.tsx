@@ -88,7 +88,7 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/separatorOptio
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/BoardEditor/focalboard/src/widgets/checkbox.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
