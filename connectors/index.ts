@@ -1,3 +1,27 @@
+import { log } from '@charmverse/core/log';
+// ref: https://wagmi.sh/core/chains
+import {
+  arbitrum,
+  avalanche,
+  base,
+  baseGoerli,
+  bsc,
+  celo,
+  fantom,
+  goerli,
+  gnosis,
+  harmonyOne,
+  mainnet,
+  mantle,
+  mantleTestnet,
+  optimism,
+  polygon,
+  polygonMumbai,
+  sepolia,
+  zkSync,
+  zora
+} from '@wagmi/core/chains';
+
 import { uniqueValues } from 'lib/utilities/array';
 
 export interface IChainDetails {
@@ -12,13 +36,15 @@ export interface IChainDetails {
   };
   rpcUrls: readonly string[];
   blockExplorerUrls: readonly string[];
+  alchemyUrl?: string;
   gnosisUrl?: string;
   iconUrl: string;
   testnet?: boolean;
   shortName: string;
 }
 
-// Retrieve Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
+// Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
+// Alchemy endpoints: https://docs.alchemy.com/reference/nft-api-endpoints
 
 const EVM_DEFAULT = {
   nativeCurrency: {
@@ -35,18 +61,19 @@ const EVM_DEFAULT = {
  * EIP-155 specifies developer and transaction shortnames for each network. You can find the list here
  * https://github.com/ethereum-lists/chains/tree/master/_data/chains
  */
-const RPC = {
+const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     ...EVM_DEFAULT,
-    chainId: 1,
+    chainId: mainnet.id,
     chainName: 'Ethereum',
+    alchemyUrl: 'https://eth-mainnet.g.alchemy.com',
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth'
   },
   BSC: {
-    chainId: 56,
+    chainId: bsc.id,
     chainName: 'Binance Smart Chain',
     nativeCurrency: {
       name: 'Binance Coin',
@@ -62,7 +89,7 @@ const RPC = {
     shortName: 'bnb'
   },
   POLYGON: {
-    chainId: 137,
+    chainId: polygon.id,
     chainName: 'Polygon',
     nativeCurrency: {
       name: 'Polygon',
@@ -71,6 +98,7 @@ const RPC = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
+    alchemyUrl: 'https://polygon-mainnet.g.alchemy.com',
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
@@ -78,7 +106,7 @@ const RPC = {
     shortName: 'matic'
   },
   AVALANCHE: {
-    chainId: 43114,
+    chainId: avalanche.id,
     chainName: 'Avalanche',
     nativeCurrency: {
       name: 'Avalanche',
@@ -94,7 +122,7 @@ const RPC = {
     shortName: 'avax'
   },
   XDAI: {
-    chainId: 100,
+    chainId: gnosis.id,
     chainName: 'Gnosis',
     nativeCurrency: {
       name: 'xDAI',
@@ -110,7 +138,7 @@ const RPC = {
     shortName: 'gno'
   },
   FANTOM: {
-    chainId: 250,
+    chainId: fantom.id,
     chainName: 'Fantom Opera',
     nativeCurrency: {
       name: 'Fantom',
@@ -126,8 +154,9 @@ const RPC = {
   },
   ARBITRUM: {
     ...EVM_DEFAULT,
-    chainId: 42161,
+    chainId: arbitrum.id,
     chainName: 'Arbitrum One',
+    alchemyUrl: 'https://arb-mainnet.g.alchemy.com',
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
     blockExplorerUrls: ['https://arbiscan.io'],
     gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
@@ -135,7 +164,7 @@ const RPC = {
     shortName: 'arb1'
   },
   CELO: {
-    chainId: 42220,
+    chainId: celo.id,
     chainName: 'Celo',
     nativeCurrency: {
       name: 'Celo',
@@ -150,7 +179,7 @@ const RPC = {
     shortName: 'celo'
   },
   HARMONY: {
-    chainId: 1666600000,
+    chainId: harmonyOne.id,
     chainName: 'Harmony',
     nativeCurrency: {
       name: 'Harmony',
@@ -182,8 +211,9 @@ const RPC = {
   },
   GOERLI: {
     ...EVM_DEFAULT,
-    chainId: 5,
+    chainId: goerli.id,
     chainName: 'Ethereum - Goerli',
+    alchemyUrl: 'https://eth-goerli.g.alchemy.com',
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
     gnosisUrl: 'https://safe-transaction-goerli.safe.global',
@@ -192,7 +222,7 @@ const RPC = {
   },
   SEPOLIA: {
     ...EVM_DEFAULT,
-    chainId: 11155111,
+    chainId: sepolia.id,
     chainName: 'Ethereum - Sepolia',
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
     blockExplorerUrls: ['https://sepolia.etherscan.io/'],
@@ -200,7 +230,7 @@ const RPC = {
     shortName: 'sep'
   },
   MUMBAI: {
-    chainId: 80001,
+    chainId: polygonMumbai.id,
     chainName: 'Mumbai',
     nativeCurrency: {
       name: 'Polygon',
@@ -209,6 +239,7 @@ const RPC = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
+    alchemyUrl: 'https://polygon-mumbai.g.alchemy.com',
     rpcUrls: ['https://rpc-mumbai.maticvigil.com', 'https://polygon-mumbai-bor.publicnode.com'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
@@ -217,8 +248,9 @@ const RPC = {
   },
   OPTIMISM: {
     ...EVM_DEFAULT,
-    chainId: 10,
+    chainId: optimism.id,
     chainName: 'Optimism',
+    alchemyUrl: 'https://opt-mainnet.g.alchemy.com',
     rpcUrls: ['https://mainnet.optimism.io'],
     gnosisUrl: 'https://safe-transaction-optimism.safe.global',
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
@@ -226,7 +258,7 @@ const RPC = {
   },
   ZKSYNC: {
     ...EVM_DEFAULT,
-    chainId: 324,
+    chainId: zkSync.id,
     chainName: 'zkSync Era',
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
@@ -234,7 +266,7 @@ const RPC = {
     shortName: 'zksync'
   },
   MANTLE: {
-    chainId: 5000,
+    chainId: mantle.id,
     chainName: 'Mantle',
     nativeCurrency: {
       name: 'Mantle',
@@ -250,7 +282,7 @@ const RPC = {
     shortName: 'mantle'
   },
   MANTLE_TESTNET: {
-    chainId: 5001,
+    chainId: mantleTestnet.id,
     chainName: 'Mantle - Testnet',
     nativeCurrency: {
       name: 'Testnet Mantle',
@@ -269,8 +301,9 @@ const RPC = {
   // https://docs.base.org/network-information/
   BASE: {
     ...EVM_DEFAULT,
-    chainId: 8453,
+    chainId: base.id,
     chainName: 'Base',
+    alchemyUrl: 'https://base-mainnet.g.alchemy.com',
     rpcUrls: ['https://mainnet.base.org'],
     gnosisUrl: 'https://safe-transaction-base.safe.global',
     blockExplorerUrls: ['https://basescan.org'],
@@ -279,7 +312,7 @@ const RPC = {
   },
   BASE_TESTNET: {
     ...EVM_DEFAULT,
-    chainId: 84531,
+    chainId: baseGoerli.id,
     chainName: 'Base - Testnet',
     rpcUrls: ['https://goerli.base.org'],
     gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
@@ -291,7 +324,7 @@ const RPC = {
   // https://docs.zora.co/docs/zora-network/network
   ZORA: {
     ...EVM_DEFAULT,
-    chainId: 7777777,
+    chainId: zora.id,
     chainName: 'Zora',
     rpcUrls: ['https://rpc.zora.energy'],
     blockExplorerUrls: ['https://explorer.zora.energy'],
@@ -347,28 +380,6 @@ export function getChainBySymbol(tokenSymbol: string): IChainDetails | undefined
   return RPCList.find((rpc) => rpc.nativeCurrency.symbol === tokenSymbol);
 }
 
-const supportedChains: Blockchain[] = [
-  'ETHEREUM',
-  'POLYGON',
-  'AVALANCHE',
-  'XDAI',
-  'FANTOM',
-  'ARBITRUM',
-  'CELO',
-  'HARMONY',
-  'HARMONY_DEVNET',
-  'BSC',
-  'GOERLI',
-  'OPTIMISM',
-  'SEPOLIA',
-  'MUMBAI',
-  'ZKSYNC',
-  'MANTLE_TESTNET',
-  'MANTLE'
-];
-
-const supportedChainIds = supportedChains.map((_) => RPC[_].chainId);
-
 export function getChainExplorerLink(
   chainId: string | number,
   transactionOrContractId: string,
@@ -377,60 +388,11 @@ export function getChainExplorerLink(
   chainId = chainId.toString();
 
   const path = endpoint === 'transaction' ? 'tx' : 'token';
-
-  switch (chainId) {
-    case '1':
-      return `https://etherscan.io/${path}/${transactionOrContractId}`;
-
-    case '0x38':
-    case '56':
-      return `https://bscscan.com/${path}/${transactionOrContractId}`;
-
-    case '0x89':
-    case '137':
-      return `https://polygonscan.com/${path}/${transactionOrContractId}`;
-
-    case '43114':
-      return `https://snowtrace.io/${path}/${transactionOrContractId}`;
-
-    case '100':
-      return `https://explorer.poa.network/xdai/mainnet/${path}/${transactionOrContractId}`;
-
-    case '250':
-      return `https://ftmscan.com/${path}/${transactionOrContractId}`;
-
-    case '42161':
-      return `https://arbiscan.io/${path}/${transactionOrContractId}`;
-
-    case '42220':
-      return `https://explorer.celo.org/${path}/${transactionOrContractId}`;
-
-    case '1666600000':
-      return `https://explorer.harmony.one/${path}/${transactionOrContractId}`;
-
-    case '5':
-      return `https://goerli.etherscan.io/${path}/${transactionOrContractId}`;
-
-    case '4':
-      return `https://rinkeby.etherscan.io/${path}/${transactionOrContractId}`;
-
-    case '80001':
-      return `https://mumbai.polygonscan.com/${path}/${transactionOrContractId}`;
-
-    case '10':
-      return `https://optimistic.etherscan.io/${path}/${transactionOrContractId}`;
-
-    case '324':
-      return `https://explorer.zksync.io/${path}/${transactionOrContractId}`;
-
-    case '5000':
-      return `https://explorer.mantle.xyz/${path}/${transactionOrContractId}`;
-
-    case '5001':
-      return `https://explorer.testnet.mantle.xyz/${path}/${transactionOrContractId}`;
-    default:
-      return '';
+  const chainIdNum = typeof chainId === 'string' ? parseInt(chainId) : chainId;
+  const config = getChainById(chainIdNum);
+  if (config) {
+    return `${config.blockExplorerUrls[0]}/${path}/${transactionOrContractId}`;
   }
+  log.warn('Mising chain explorer link for network', { chainId, endpoint });
+  return '';
 }
-
-export { RPC, supportedChains, supportedChainIds };
