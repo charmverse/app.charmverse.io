@@ -20,7 +20,6 @@ import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
-import { Utils } from '../../utils';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -70,13 +69,9 @@ const KanbanCard = React.memo((props: Props) => {
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
   const handleDeleteCard = useCallback(async () => {
-    if (!card) {
-      Utils.assertFailure();
-      return;
-    }
     await mutator.deleteBlock({ id: card.id, type: card.type }, 'delete card');
     mutate(`pages/${space?.id}`);
-  }, [mutate, card.id, card.type]);
+  }, [card.id, card.type, space?.id]);
   const confirmDialogProps: {
     heading: string;
     subText?: string;
