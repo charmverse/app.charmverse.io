@@ -18,7 +18,18 @@ export interface IChainDetails {
   shortName: string;
 }
 
-// Gnosis endpoints: https://docs.gnosis-safe.io/backend/available-services
+// Retrieve Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
+
+const EVM_DEFAULT = {
+  nativeCurrency: {
+    name: 'Ether',
+    symbol: 'ETH',
+    decimals: 18,
+    address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
+    logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
+  },
+  iconUrl: '/images/cryptoLogos/eth-diamond-purple.png'
+};
 
 /**
  * EIP-155 specifies developer and transaction shortnames for each network. You can find the list here
@@ -26,18 +37,11 @@ export interface IChainDetails {
  */
 const RPC = {
   ETHEREUM: {
+    ...EVM_DEFAULT,
     chainId: 1,
     chainName: 'Ethereum',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
-    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth'
   },
@@ -121,15 +125,9 @@ const RPC = {
     shortName: 'ftm'
   },
   ARBITRUM: {
+    ...EVM_DEFAULT,
     chainId: 42161,
     chainName: 'Arbitrum One',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
     blockExplorerUrls: ['https://arbiscan.io'],
     gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
@@ -179,38 +177,25 @@ const RPC = {
     rpcUrls: ['https://api.s0.ps.hmny.io'],
     blockExplorerUrls: ['https://explorer.ps.hmny.io/'],
     iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
-    shortName: 'hmy-ps-s0'
+    shortName: 'hmy-ps-s0',
+    testnet: true
   },
   GOERLI: {
+    ...EVM_DEFAULT,
     chainId: 5,
     chainName: 'Ethereum - Goerli',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
     gnosisUrl: 'https://safe-transaction-goerli.safe.global',
-    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'gor'
   },
   SEPOLIA: {
+    ...EVM_DEFAULT,
     chainId: 11155111,
     chainName: 'Ethereum - Sepolia',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
-      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
     blockExplorerUrls: ['https://sepolia.etherscan.io/'],
-    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
     testnet: true,
     shortName: 'sep'
   },
@@ -231,32 +216,18 @@ const RPC = {
     shortName: 'maticmum'
   },
   OPTIMISM: {
+    ...EVM_DEFAULT,
     chainId: 10,
     chainName: 'Optimism',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
     rpcUrls: ['https://mainnet.optimism.io'],
     gnosisUrl: 'https://safe-transaction-optimism.safe.global',
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
-    iconUrl: '/images/cryptoLogos/eth-diamond-purple.png',
-    testnet: true,
     shortName: 'oeth'
   },
   ZKSYNC: {
+    ...EVM_DEFAULT,
     chainId: 324,
     chainName: 'zkSync Era',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-    },
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
@@ -292,7 +263,40 @@ const RPC = {
     gnosisUrl: 'https://gateway.multisig.mantle.xyz',
     blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
     iconUrl: '/images/cryptoLogos/mantle-logo.svg',
-    shortName: 'mantle-testnet'
+    shortName: 'mantle-testnet',
+    testnet: true
+  },
+  // https://docs.base.org/network-information/
+  BASE: {
+    ...EVM_DEFAULT,
+    chainId: 8453,
+    chainName: 'Base',
+    rpcUrls: ['https://mainnet.base.org'],
+    gnosisUrl: 'https://safe-transaction-base.safe.global',
+    blockExplorerUrls: ['https://basescan.org'],
+    iconUrl: '/images/cryptoLogos/base-logo.svg',
+    shortName: 'base'
+  },
+  BASE_TESTNET: {
+    ...EVM_DEFAULT,
+    chainId: 84531,
+    chainName: 'Base - Testnet',
+    rpcUrls: ['https://goerli.base.org'],
+    gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
+    blockExplorerUrls: ['https://goerli.basescan.org'],
+    iconUrl: '/images/cryptoLogos/base-logo.svg',
+    shortName: 'base-testnet',
+    testnet: true
+  },
+  // https://docs.zora.co/docs/zora-network/network
+  ZORA: {
+    ...EVM_DEFAULT,
+    chainId: 7777777,
+    chainName: 'Zora',
+    rpcUrls: ['https://rpc.zora.energy'],
+    blockExplorerUrls: ['https://explorer.zora.energy'],
+    iconUrl: '/images/cryptoLogos/zora-logo.svg',
+    shortName: 'zora'
   }
 } as const;
 
