@@ -1,5 +1,5 @@
 // @ts-nocheck
-import * as LitJsSdk from '@lit-protocol/lit-node-client';
+
 import type { SigningConditions } from '@lit-protocol/types';
 import { useEffect, useState } from 'react';
 
@@ -38,6 +38,8 @@ interface Token {
   standard: 'ERC20' | 'ERC721' | 'ERC1155';
 }
 
+const chainsAllowed = chainConfig.map((chain) => chain.value) as string[];
+
 function ShareModal(props: {
   isModal?: boolean;
   onClose?: () => void;
@@ -47,7 +49,6 @@ function ShareModal(props: {
   injectCSS?: boolean;
   permanentDefault?: boolean;
   onUnifiedAccessControlConditionsSelected(result: ConditionsModalResult): void;
-  chainsAllowed?: string[];
 }) {
   const [displayedPage, setDisplayedPage] = useState('single');
   const [loading, setLoading] = useState(true);
@@ -77,7 +78,6 @@ function ShareModal(props: {
     allowChainSelector = true,
     allowMultipleConditions = true,
     permanentDefault = false,
-    chainsAllowed = Object.keys(chainConfig),
     conditionsAllowed = {},
     isModal = true,
     darkMode = false,
@@ -85,13 +85,14 @@ function ShareModal(props: {
   } = props;
 
   useEffect(() => {
-    // const allChains = LitJsSdk.ALL_LIT_CHAINS
-    //
-    // console.log('ALL CHAINS', allChains)
+    const chainMap = chainConfig.reduce((acc, chain) => {
+      acc[chain.value] = chain;
+      return acc;
+    }, {});
     checkPropTypes(props);
     setDevModeIsAllowed(allowDevMode);
     // check and set allowed conditions per chain
-    const chainsWithAllowedConditions = getAllowedConditions(chainsAllowed, conditionsAllowed, chainConfig);
+    const chainsWithAllowedConditions = getAllowedConditions(chainsAllowed, conditionsAllowed, chainMap);
     setChainList(chainsWithAllowedConditions);
 
     setInitialChain(chainsWithAllowedConditions);

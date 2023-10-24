@@ -41,10 +41,12 @@ export interface IChainDetails {
   iconUrl: string;
   testnet?: boolean;
   shortName: string;
+  litNetwork?: string;
 }
 
 // Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
 // Alchemy endpoints: https://docs.alchemy.com/reference/nft-api-endpoints
+// Lit networks: https://developer.litprotocol.com/v2/resources/supportedChains
 
 const EVM_DEFAULT = {
   nativeCurrency: {
@@ -70,7 +72,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     rpcUrls: ['https://eth.llamarpc.com'],
-    shortName: 'eth'
+    shortName: 'eth',
+    litNetwork: 'ethereum'
   },
   BSC: {
     chainId: bsc.id,
@@ -86,7 +89,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://bscscan.com'],
     gnosisUrl: 'https://safe-transaction-bsc.safe.global',
     iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg',
-    shortName: 'bnb'
+    shortName: 'bnb',
+    litNetwork: 'bsc'
   },
   POLYGON: {
     chainId: polygon.id,
@@ -103,6 +107,7 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    litNetwork: 'polygon',
     shortName: 'matic'
   },
   AVALANCHE: {
@@ -119,7 +124,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://snowtrace.io'],
     gnosisUrl: 'https://safe-transaction-avalanche.safe.global',
     iconUrl: '/images/cryptoLogos/avalanche-avax-logo.svg',
-    shortName: 'avax'
+    shortName: 'avax',
+    litNetwork: 'avalanche'
   },
   XDAI: {
     chainId: gnosis.id,
@@ -135,7 +141,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
     gnosisUrl: 'https://safe-transaction-gnosis-chain.safe.global',
     iconUrl: '/images/cryptoLogos/gnosis-xdai-logo.svg',
-    shortName: 'gno'
+    shortName: 'gno',
+    litNetwork: 'xdai'
   },
   FANTOM: {
     chainId: fantom.id,
@@ -150,7 +157,8 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://rpc.ftm.tools'],
     blockExplorerUrls: ['https://ftmscan.com'],
     iconUrl: '/images/cryptoLogos/fantom.svg',
-    shortName: 'ftm'
+    shortName: 'ftm',
+    litNetwork: 'fantom'
   },
   ARBITRUM: {
     ...EVM_DEFAULT,
@@ -161,7 +169,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://arbiscan.io'],
     gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
     iconUrl: '/images/cryptoLogos/arbitrum.svg',
-    shortName: 'arb1'
+    shortName: 'arb1',
+    litNetwork: 'arbitrum'
   },
   CELO: {
     chainId: celo.id,
@@ -176,7 +185,8 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://forno.celo.org'],
     blockExplorerUrls: ['https://explorer.celo.org'],
     iconUrl: '/images/cryptoLogos/celo-celo-logo.svg',
-    shortName: 'celo'
+    shortName: 'celo',
+    litNetwork: 'celo'
   },
   HARMONY: {
     chainId: harmonyOne.id,
@@ -191,7 +201,8 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://api.harmony.one'],
     blockExplorerUrls: ['https://explorer.harmony.one'],
     iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
-    shortName: 'hmy-s0'
+    shortName: 'hmy-s0',
+    litNetwork: 'harmony'
   },
   HARMONY_DEVNET: {
     chainId: 1666900000,
@@ -218,7 +229,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
     gnosisUrl: 'https://safe-transaction-goerli.safe.global',
     testnet: true,
-    shortName: 'gor'
+    shortName: 'gor',
+    litNetwork: 'goerli'
   },
   SEPOLIA: {
     ...EVM_DEFAULT,
@@ -244,7 +256,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
-    shortName: 'maticmum'
+    shortName: 'maticmum',
+    litNetwork: 'mumbai'
   },
   OPTIMISM: {
     ...EVM_DEFAULT,
@@ -254,7 +267,8 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://mainnet.optimism.io'],
     gnosisUrl: 'https://safe-transaction-optimism.safe.global',
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
-    shortName: 'oeth'
+    shortName: 'oeth',
+    litNetwork: 'optimism'
   },
   ZKSYNC: {
     ...EVM_DEFAULT,
@@ -279,7 +293,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://explorer.mantle.xyz'],
     iconUrl: '/images/cryptoLogos/mantle-logo.svg',
     gnosisUrl: 'https://gateway.multisig.mantle.xyz',
-    shortName: 'mantle'
+    shortName: 'mantle',
+    litNetwork: 'mantle'
   },
   MANTLE_TESTNET: {
     chainId: mantleTestnet.id,
@@ -296,7 +311,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
     iconUrl: '/images/cryptoLogos/mantle-logo.svg',
     shortName: 'mantle-testnet',
-    testnet: true
+    testnet: true,
+    litNetwork: 'mantleTestnet'
   },
   // https://docs.base.org/network-information/
   BASE: {
@@ -308,7 +324,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-base.safe.global',
     blockExplorerUrls: ['https://basescan.org'],
     iconUrl: '/images/cryptoLogos/base-logo.svg',
-    shortName: 'base'
+    shortName: 'base',
+    litNetwork: 'base'
   },
   BASE_TESTNET: {
     ...EVM_DEFAULT,
@@ -329,7 +346,8 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://rpc.zora.energy'],
     blockExplorerUrls: ['https://explorer.zora.energy'],
     iconUrl: '/images/cryptoLogos/zora-logo.svg',
-    shortName: 'zora'
+    shortName: 'zora',
+    litNetwork: 'zora'
   }
 } as const;
 
