@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { updateAllowedPlaybackDomains } from 'lib/mux/updateAllowedPlaybackDomains';
 import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUniqueConstraintError } from 'lib/utilities/errors/prisma';
@@ -31,6 +32,9 @@ export async function updateSpaceCustomDomain(
         customDomain: data.customDomain || null
       }
     });
+
+    // update referrers to include all custom subdomains
+    await updateAllowedPlaybackDomains();
   } catch (error) {
     if (isUniqueConstraintError(error)) {
       throw new InvalidInputError(`Custom domain ${data.customDomain} is already in use`);
