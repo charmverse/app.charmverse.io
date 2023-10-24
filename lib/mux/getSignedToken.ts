@@ -1,5 +1,6 @@
 import Mux from '@mux/mux-node';
 
+import { playbackRestrictionId } from './config';
 import { mux } from './muxClient';
 
 type MuxJWTSignOptions = NonNullable<Parameters<typeof Mux.JWT.signPlaybackId>[1]>;
@@ -13,13 +14,6 @@ const baseOptions: MuxJWTSignOptions = {
   expiration: '7d' // E.g 60, "2 days", "10h", "7d", numeric value interpreted as seconds
 };
 
-// Playback Restriction restricts video to just charmverse domains. To generate a new restriction, use:
-// curl 'https://api.mux.com/video/v1/playback-restrictions' \
-//   -X POST \
-//   -d '{ "referrer": { "allowed_domains": ["*.charmverse.io", "*.charmverse.co"] } }' \
-//   -H "Content-Type: application/json" \
-//   -u $MUX_TOKEN_ID:$MUX_TOKEN_SECRET
-const playbackRestrictionId = process.env.MUX_PLAYBACK_RESTRICTION_ID as string | undefined;
 if (playbackRestrictionId) {
   baseOptions.params = {
     playback_restriction_id: playbackRestrictionId
