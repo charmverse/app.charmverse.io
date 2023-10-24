@@ -69,8 +69,10 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
   const rewards = await prisma.bounty
     .findMany({
       where: {
-        id: {
-          in: accessiblePageIds
+        page: {
+          id: {
+            in: accessiblePageIds
+          }
         }
       },
       include: rewardWithUsersInclude()

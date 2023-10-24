@@ -57,6 +57,9 @@ exports[`src/components/kanban/kanbanCard return kanbanCard and click on delete 
             Page 86382f29-b73b-42c2-b3bd-b69d2143e7f3
           </div>
         </div>
+        <div
+          class="css-1qh2y1i-MuiStack-root"
+        />
       </div>
     </a>
   </span>
@@ -118,6 +121,9 @@ exports[`src/components/kanban/kanbanCard should match snapshot 1`] = `
             Page 86382f29-b73b-42c2-b3bd-b69d2143e7f3
           </div>
         </div>
+        <div
+          class="css-1qh2y1i-MuiStack-root"
+        />
       </div>
     </a>
   </span>
@@ -158,6 +164,9 @@ exports[`src/components/kanban/kanbanCard should match snapshot with readonly 1`
             Page 86382f29-b73b-42c2-b3bd-b69d2143e7f3
           </div>
         </div>
+        <div
+          class="css-1qh2y1i-MuiStack-root"
+        />
       </div>
     </a>
   </span>

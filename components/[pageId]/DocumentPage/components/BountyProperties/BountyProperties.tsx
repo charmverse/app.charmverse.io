@@ -63,7 +63,6 @@ export default function BountyProperties(props: {
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(false);
   const { space } = useCurrentSpace();
-
   const { isFreeSpace } = useIsFreeSpace();
 
   const { user } = useUser();

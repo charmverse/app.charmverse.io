@@ -144,7 +144,9 @@ function CenterPanel(props: Props) {
 
   // filter cards by whats accessible
   const cardPages: CardPage[] = useMemo(() => {
-    return _cards
+    const result = _cards
+      // TODO: dont recreate the card objects, this causes re-rendering on all cards when any card/page is updated
+      // we need to figure another way to grab the page titles probably down-stream
       .map((card) => ({
         card: {
           ...card,
@@ -159,11 +161,11 @@ function CenterPanel(props: Props) {
         page: pages[card.id]!
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
-  }, [_cards, pages]);
-  const cards = useMemo(() => {
-    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
-    return sortedCardPages.map(({ card }) => card);
-  }, [cardPages, isActiveView]);
+
+    return isActiveView ? sortCards(result, activeBoard, activeView, members) : [];
+  }, [isActiveView, _cards, pages]);
+
+  const cards = cardPages.map(({ card }) => card);
 
   let groupByProperty = _groupByProperty;
   if (
