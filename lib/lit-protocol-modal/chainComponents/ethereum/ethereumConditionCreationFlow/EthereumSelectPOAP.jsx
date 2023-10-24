@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, useContext } from 'react';
-import Select from "react-select";
+import { MenuItem, Select } from '@mui/material';
 import { ShareModalContext } from "../../../shareModal/createShareContext";
 
 const typesOfPoapGate = [
@@ -30,12 +30,10 @@ const matchConditionOptions = [
 ];
 
 const EthereumSelectPOAP = ({updateUnifiedAccessControlConditions, submitDisabled, initialState = null}) => {
-  const [ poapGateType, setPoapGateType ] = useState(typesOfPoapGate[0]);
+  const [ poapGateTypeId, setPoapGateTypeId ] = useState(typesOfPoapGate[0].id);
   const [ poapId, setPoapId ] = useState("");
   const [ poapName, setPoapName ] = useState("");
-  const [ nameMatchCondition, setNameMatchCondition ] = useState(matchConditionOptions[0]);
-
-  const [ render, setRender ] = useState(false);
+  const [ nameMatchConditionValue, setNameMatchConditionValue ] = useState(matchConditionOptions[0].value);
 
   const {
     wipeInitialProps,
@@ -44,36 +42,35 @@ const EthereumSelectPOAP = ({updateUnifiedAccessControlConditions, submitDisable
   useEffect(() => {
     if (initialState) {
       if (initialState['poapName']) {
-        setPoapGateType(typesOfPoapGate[1]);
+        setPoapGateTypeId(typesOfPoapGate[1].id);
         setPoapName(initialState['poapName']);
         if (initialState['poapMatchCondition'] === 'contains') {
-          setNameMatchCondition(matchConditionOptions[0]);
+          setNameMatchConditionValue(matchConditionOptions[0].value);
         } else if (initialState['poapMatchCondition'] === 'equals') {
-          setNameMatchCondition(matchConditionOptions[1]);
+          setNameMatchConditionValue(matchConditionOptions[1].value);
         }
       } else if (initialState['poapId']) {
-        setPoapGateType(typesOfPoapGate[0]);
+        setPoapGateTypeId(typesOfPoapGate[0].id);
         setPoapId(initialState['poapId']);
-        setNameMatchCondition(matchConditionOptions[1]);
+        setNameMatchConditionValue(matchConditionOptions[1].value);
       }
     }
-    setRender(true);
     wipeInitialProps();
   }, []);
 
   useEffect(() => {
-    if (!poapId.length || (!poapName.length || !nameMatchCondition)) {
+    if (!poapId.length || (!poapName.length || !nameMatchConditionValue)) {
       handleSubmit();
     }
-    submitDisabled(poapGateType.id === 'eventId' ? !poapId.length : (!poapName.length || !nameMatchCondition));
-  }, [ poapGateType, poapId, poapName, nameMatchCondition ]);
+    submitDisabled(poapGateTypeId === 'eventId' ? !poapId.length : (!poapName.length || !nameMatchConditionValue));
+  }, [ poapGateTypeId, poapId, poapName, nameMatchConditionValue ]);
 
 
   const getComparator = (type) => {
     if (type === 'eventId') {
       return '=';
     } else {
-      return nameMatchCondition.value;
+      return nameMatchConditionValue;
     }
   }
 
@@ -84,11 +81,11 @@ const EthereumSelectPOAP = ({updateUnifiedAccessControlConditions, submitDisable
         contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
         standardContractType: "POAP",
         chain: "xdai",
-        method: poapGateType.id,
+        method: poapGateTypeId,
         parameters: [],
         returnValueTest: {
-          comparator: getComparator(poapGateType.id),
-          value: poapGateType.id === 'eventId' ? poapId : poapName,
+          comparator: getComparator(poapGateTypeId),
+          value: poapGateTypeId === 'eventId' ? poapId : poapName,
         },
       },
       {operator: "or"},
@@ -97,11 +94,11 @@ const EthereumSelectPOAP = ({updateUnifiedAccessControlConditions, submitDisable
         contractAddress: "0x22C1f6050E56d2876009903609a2cC3fEf83B415",
         standardContractType: "POAP",
         chain: "ethereum",
-        method: poapGateType.id,
+        method: poapGateTypeId,
         parameters: [],
         returnValueTest: {
-          comparator: getComparator(poapGateType.id),
-          value: poapGateType.id === 'eventId' ? poapId : poapName,
+          comparator: getComparator(poapGateTypeId),
+          value: poapGateTypeId === 'eventId' ? poapId : poapName,
         },
       },
     ] ];
@@ -109,21 +106,19 @@ const EthereumSelectPOAP = ({updateUnifiedAccessControlConditions, submitDisable
 
     updateUnifiedAccessControlConditions(unifiedAccessControlConditions);
   };
-
+  console.log({ poapGateTypeId})
   return (
     <div className={'lsm-condition-container'}>
       <h3 className={'lsm-condition-prompt-text'}>Which POAP
         should be able to access this asset?</h3>
       <h3 className={'lsm-condition-prompt-text'}>How would you like to reference this POAP?</h3>
       <Select
-        className={'lsm-reusable-select'}
-        classNamePrefix={'lsm'}
-        options={typesOfPoapGate}
-        defaultValue={typesOfPoapGate[0]}
-        isSeachable={false}
-        onChange={(c) => setPoapGateType(c)}
-      />
-      {poapGateType.id === 'eventId' && (
+        defaultValue={typesOfPoapGate[0].id}
+        onChange={(e) => setPoapGateTypeId(e.target.value)}
+      >
+        {typesOfPoapGate.map((t) => (<MenuItem key={t.id} value={t.id}>{t.label}</MenuItem>))}
+      </Select>
+      {poapGateTypeId === 'eventId' && (
         <Fragment>
           <h3
             className={'lsm-condition-prompt-text'}>
@@ -132,21 +127,19 @@ const EthereumSelectPOAP = ({updateUnifiedAccessControlConditions, submitDisable
                  className={'lsm-input'}/>
         </Fragment>
       )}
-      {poapGateType.id === 'tokenURI' && (
+      {poapGateTypeId === 'tokenURI' && (
         <Fragment>
-          <h3 className={'lsm-condition-prompt-text'}>POAP Name:</h3>
-          <input value={poapName} onChange={(e) => setPoapName(e.target.value)}
-                 className={'lsm-border-brand-4 lsm-input'}/>
           <h3 className={'lsm-condition-prompt-text'}>Match
             conditions:</h3>
           <Select
-            className={'lsm-reusable-select'}
-            classNamePrefix={'lsm'}
-            options={matchConditionOptions}
-            defaultValue={nameMatchCondition}
-            isSeachable={false}
-            onChange={(c) => setNameMatchCondition(c)}
-          />
+            defaultValue={matchConditionOptions[0].value}
+            onChange={(e) => setNameMatchConditionValue(e.target.value)}
+          >
+            {matchConditionOptions.map((t) => (<MenuItem key={t.id} value={t.value}>{t.label}</MenuItem>))}
+          </Select>
+          <h3 className={'lsm-condition-prompt-text'}>POAP Name:</h3>
+          <input value={poapName} onChange={(e) => setPoapName(e.target.value)}
+                 className={'lsm-border-brand-4 lsm-input'}/>
         </Fragment>
       )}
     </div>

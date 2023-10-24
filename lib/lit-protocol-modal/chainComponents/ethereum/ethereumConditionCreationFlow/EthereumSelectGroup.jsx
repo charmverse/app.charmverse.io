@@ -1,6 +1,4 @@
 import React, { useContext, useEffect, useState, Fragment } from 'react';
-import * as LitJsSdk from '@lit-protocol/lit-node-client';
-import LitTokenSelect from "../../../reusableComponents/litTokenSelect/LitTokenSelect";
 import LitInput from "../../../reusableComponents/litInput/LitInput";
 import { logDevError } from "../../../shareModal/helpers/helperFunctions";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
