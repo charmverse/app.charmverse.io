@@ -106,7 +106,6 @@ import 'lib/lit-protocol-modal/reusableComponents/litHeader/LitHeader.css';
 import 'lib/lit-protocol-modal/reusableComponents/litInput/LitInput.css';
 import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading';
 import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading.css';
-import 'lib/lit-protocol-modal/reusableComponents/litReusableSelect/LitReusableSelect.css';
 import 'lib/lit-protocol-modal/reusableComponents/litTokenSelect/LitTokenSelect.css';
 import 'lib/lit-protocol-modal/shareModal/devMode/DevModeContent.css';
 import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleAddCondition.css';

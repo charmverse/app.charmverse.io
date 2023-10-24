@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useContext } from 'react';
+import { Fragment, useEffect, useState, useContext } from 'react';
 import Select from "react-select";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
 

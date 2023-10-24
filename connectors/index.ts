@@ -22,6 +22,7 @@ import {
   zora
 } from '@wagmi/core/chains';
 
+import { isProdEnv } from 'config/constants';
 import { uniqueValues } from 'lib/utilities/array';
 
 export interface IChainDetails {
@@ -55,8 +56,7 @@ const EVM_DEFAULT = {
     decimals: 18,
     address: '0x0000000000000000000000000000000000000000', // needed for proper form handling in the TokenFormCard component
     logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
-  },
-  iconUrl: '/images/cryptoLogos/eth-diamond-purple.png'
+  }
 };
 
 /**
@@ -71,26 +71,80 @@ const RPC: Record<string, IChainDetails> = {
     alchemyUrl: 'https://eth-mainnet.g.alchemy.com',
     blockExplorerUrls: ['https://etherscan.io'],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
+    iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth',
     litNetwork: 'ethereum'
   },
-  BSC: {
-    chainId: bsc.id,
-    chainName: 'Binance Smart Chain',
-    nativeCurrency: {
-      name: 'Binance Coin',
-      symbol: 'BNB',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png?1547034615'
-    },
-    rpcUrls: ['https://bsc-dataseed.binance.org'],
-    blockExplorerUrls: ['https://bscscan.com'],
-    gnosisUrl: 'https://safe-transaction-bsc.safe.global',
-    iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg',
-    shortName: 'bnb',
-    litNetwork: 'bsc'
+  GOERLI: {
+    ...EVM_DEFAULT,
+    chainId: goerli.id,
+    chainName: 'Ethereum - Goerli',
+    alchemyUrl: 'https://eth-goerli.g.alchemy.com',
+    rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
+    blockExplorerUrls: ['https://goerli.etherscan.io/'],
+    gnosisUrl: 'https://safe-transaction-goerli.safe.global',
+    iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    testnet: true,
+    shortName: 'gor',
+    litNetwork: 'goerli'
+  },
+  SEPOLIA: {
+    ...EVM_DEFAULT,
+    chainId: sepolia.id,
+    chainName: 'Ethereum - Sepolia',
+    rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
+    blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+    iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    testnet: true,
+    shortName: 'sep'
+  },
+  OPTIMISM: {
+    ...EVM_DEFAULT,
+    chainId: optimism.id,
+    chainName: 'Optimism',
+    alchemyUrl: 'https://opt-mainnet.g.alchemy.com',
+    rpcUrls: ['https://mainnet.optimism.io'],
+    gnosisUrl: 'https://safe-transaction-optimism.safe.global',
+    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+    iconUrl: '/images/cryptoLogos/optimism.svg',
+    shortName: 'oeth',
+    litNetwork: 'optimism'
+  },
+  // https://docs.base.org/network-information/
+  BASE: {
+    ...EVM_DEFAULT,
+    chainId: base.id,
+    chainName: 'Base',
+    alchemyUrl: 'https://base-mainnet.g.alchemy.com',
+    rpcUrls: ['https://mainnet.base.org'],
+    gnosisUrl: 'https://safe-transaction-base.safe.global',
+    blockExplorerUrls: ['https://basescan.org'],
+    iconUrl: '/images/cryptoLogos/base-logo.svg',
+    shortName: 'base',
+    litNetwork: 'base'
+  },
+  BASE_TESTNET: {
+    ...EVM_DEFAULT,
+    chainId: baseGoerli.id,
+    chainName: 'Base - Testnet',
+    rpcUrls: ['https://goerli.base.org'],
+    gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
+    blockExplorerUrls: ['https://goerli.basescan.org'],
+    iconUrl: '/images/cryptoLogos/base-logo.svg',
+    shortName: 'base-testnet',
+    testnet: true
+  },
+  // https://docs.zora.co/docs/zora-network/network
+  ZORA: {
+    ...EVM_DEFAULT,
+    chainId: zora.id,
+    chainName: 'Zora',
+    rpcUrls: ['https://rpc.zora.energy'],
+    blockExplorerUrls: ['https://explorer.zora.energy'],
+    iconUrl: '/images/cryptoLogos/zora-logo.svg',
+    shortName: 'zora',
+    litNetwork: 'zora'
   },
   POLYGON: {
     chainId: polygon.id,
@@ -110,6 +164,36 @@ const RPC: Record<string, IChainDetails> = {
     litNetwork: 'polygon',
     shortName: 'matic'
   },
+  MUMBAI: {
+    chainId: polygonMumbai.id,
+    chainName: 'Polygon - Mumbai',
+    nativeCurrency: {
+      name: 'Polygon',
+      symbol: 'MATIC',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    alchemyUrl: 'https://polygon-mumbai.g.alchemy.com',
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com', 'https://polygon-mumbai-bor.publicnode.com'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    testnet: true,
+    shortName: 'maticmum',
+    litNetwork: 'mumbai'
+  },
+  ARBITRUM: {
+    ...EVM_DEFAULT,
+    chainId: arbitrum.id,
+    chainName: 'Arbitrum One',
+    alchemyUrl: 'https://arb-mainnet.g.alchemy.com',
+    rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+    blockExplorerUrls: ['https://arbiscan.io'],
+    gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
+    iconUrl: '/images/cryptoLogos/arbitrum.svg',
+    shortName: 'arb1',
+    litNetwork: 'arbitrum'
+  },
   AVALANCHE: {
     chainId: avalanche.id,
     chainName: 'Avalanche',
@@ -127,6 +211,23 @@ const RPC: Record<string, IChainDetails> = {
     shortName: 'avax',
     litNetwork: 'avalanche'
   },
+  BSC: {
+    chainId: bsc.id,
+    chainName: 'Binance Smart Chain',
+    nativeCurrency: {
+      name: 'Binance Coin',
+      symbol: 'BNB',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png?1547034615'
+    },
+    rpcUrls: ['https://bsc-dataseed.binance.org'],
+    blockExplorerUrls: ['https://bscscan.com'],
+    gnosisUrl: 'https://safe-transaction-bsc.safe.global',
+    iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg',
+    shortName: 'bnb',
+    litNetwork: 'bsc'
+  },
   XDAI: {
     chainId: gnosis.id,
     chainName: 'Gnosis',
@@ -140,7 +241,7 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://rpc.xdaichain.com'],
     blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
     gnosisUrl: 'https://safe-transaction-gnosis-chain.safe.global',
-    iconUrl: '/images/cryptoLogos/gnosis-xdai-logo.svg',
+    iconUrl: '/images/cryptoLogos/gnosis-logo.svg',
     shortName: 'gno',
     litNetwork: 'xdai'
   },
@@ -159,18 +260,6 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/fantom.svg',
     shortName: 'ftm',
     litNetwork: 'fantom'
-  },
-  ARBITRUM: {
-    ...EVM_DEFAULT,
-    chainId: arbitrum.id,
-    chainName: 'Arbitrum One',
-    alchemyUrl: 'https://arb-mainnet.g.alchemy.com',
-    rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-    blockExplorerUrls: ['https://arbiscan.io'],
-    gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
-    iconUrl: '/images/cryptoLogos/arbitrum.svg',
-    shortName: 'arb1',
-    litNetwork: 'arbitrum'
   },
   CELO: {
     chainId: celo.id,
@@ -220,56 +309,6 @@ const RPC: Record<string, IChainDetails> = {
     shortName: 'hmy-ps-s0',
     testnet: true
   },
-  GOERLI: {
-    ...EVM_DEFAULT,
-    chainId: goerli.id,
-    chainName: 'Ethereum - Goerli',
-    alchemyUrl: 'https://eth-goerli.g.alchemy.com',
-    rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
-    blockExplorerUrls: ['https://goerli.etherscan.io/'],
-    gnosisUrl: 'https://safe-transaction-goerli.safe.global',
-    testnet: true,
-    shortName: 'gor',
-    litNetwork: 'goerli'
-  },
-  SEPOLIA: {
-    ...EVM_DEFAULT,
-    chainId: sepolia.id,
-    chainName: 'Ethereum - Sepolia',
-    rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
-    blockExplorerUrls: ['https://sepolia.etherscan.io/'],
-    testnet: true,
-    shortName: 'sep'
-  },
-  MUMBAI: {
-    chainId: polygonMumbai.id,
-    chainName: 'Mumbai',
-    nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
-    },
-    alchemyUrl: 'https://polygon-mumbai.g.alchemy.com',
-    rpcUrls: ['https://rpc-mumbai.maticvigil.com', 'https://polygon-mumbai-bor.publicnode.com'],
-    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    testnet: true,
-    shortName: 'maticmum',
-    litNetwork: 'mumbai'
-  },
-  OPTIMISM: {
-    ...EVM_DEFAULT,
-    chainId: optimism.id,
-    chainName: 'Optimism',
-    alchemyUrl: 'https://opt-mainnet.g.alchemy.com',
-    rpcUrls: ['https://mainnet.optimism.io'],
-    gnosisUrl: 'https://safe-transaction-optimism.safe.global',
-    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
-    shortName: 'oeth',
-    litNetwork: 'optimism'
-  },
   ZKSYNC: {
     ...EVM_DEFAULT,
     chainId: zkSync.id,
@@ -313,47 +352,14 @@ const RPC: Record<string, IChainDetails> = {
     shortName: 'mantle-testnet',
     testnet: true,
     litNetwork: 'mantleTestnet'
-  },
-  // https://docs.base.org/network-information/
-  BASE: {
-    ...EVM_DEFAULT,
-    chainId: base.id,
-    chainName: 'Base',
-    alchemyUrl: 'https://base-mainnet.g.alchemy.com',
-    rpcUrls: ['https://mainnet.base.org'],
-    gnosisUrl: 'https://safe-transaction-base.safe.global',
-    blockExplorerUrls: ['https://basescan.org'],
-    iconUrl: '/images/cryptoLogos/base-logo.svg',
-    shortName: 'base',
-    litNetwork: 'base'
-  },
-  BASE_TESTNET: {
-    ...EVM_DEFAULT,
-    chainId: baseGoerli.id,
-    chainName: 'Base - Testnet',
-    rpcUrls: ['https://goerli.base.org'],
-    gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
-    blockExplorerUrls: ['https://goerli.basescan.org'],
-    iconUrl: '/images/cryptoLogos/base-logo.svg',
-    shortName: 'base-testnet',
-    testnet: true
-  },
-  // https://docs.zora.co/docs/zora-network/network
-  ZORA: {
-    ...EVM_DEFAULT,
-    chainId: zora.id,
-    chainName: 'Zora',
-    rpcUrls: ['https://rpc.zora.energy'],
-    blockExplorerUrls: ['https://explorer.zora.energy'],
-    iconUrl: '/images/cryptoLogos/zora-logo.svg',
-    shortName: 'zora',
-    litNetwork: 'zora'
   }
 } as const;
 
 export type Blockchain = keyof typeof RPC;
 
-export const RPCList = Object.values(RPC);
+export const RPCList = Object.values(RPC)
+  // filter out testnets in prod, except for Goerli
+  .filter((chain) => !isProdEnv || !chain.testnet || chain.chainId === goerli.id);
 
 export function getChainShortname(chainId: string | number): string {
   const parsedChainId = parseInt(chainId.toString());
