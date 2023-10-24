@@ -30,8 +30,6 @@ const jestConfig = {
   // The test environment that will be used for testing
   testEnvironment: 'jsdom',
 
-  // The glob patterns Jest uses to detect test files
-  testMatch: ['**/*.spec.ts?(x)'],
   moduleNameMapper: {
     // map SVG to something that Jest can read - could be used for other extensions as well?
     // source: https://github.com/vercel/next.js/discussions/42535#discussioncomment-4828013
@@ -43,6 +41,6 @@ export default function makeConfig(testDir: string) {
   return createJestConfig({
     ...jestConfig,
     rootDir: __dirname,
-    testMatch: [`${testDir}/**/*.spec.ts`]
+    testMatch: [`${testDir}/**/*.spec.ts?(x)`]
   });
 }
