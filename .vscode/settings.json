@@ -23,6 +23,6 @@
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
   "jestrunner.jestCommand": "npx dotenv -e .env.test.local -- node 'node_modules/.bin/jest'",
-  "jestrunner.configPath": "jest.config.all.ts",
+  // "jestrunner.configPath": "jest.config.all.ts",
   "typescript.tsdk": "node_modules/typescript/lib",
 }

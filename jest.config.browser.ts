@@ -1,4 +1,10 @@
-import createJestConfig from 'testing/createJestConfig';
+import nextJest from 'next/jest';
+
+const createJestConfig = nextJest({
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  dir: './'
+});
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
@@ -25,7 +31,7 @@ const jestConfig = {
   testEnvironment: 'jsdom',
 
   // The glob patterns Jest uses to detect test files
-  testMatch: ['**/components/**/?(*.)+(spec).[tj]s?(x)', '**/hooks/**/*.spec.ts'],
+  testMatch: ['**/*.spec.ts?(x)'],
   moduleNameMapper: {
     // map SVG to something that Jest can read - could be used for other extensions as well?
     // source: https://github.com/vercel/next.js/discussions/42535#discussioncomment-4828013
@@ -33,4 +39,10 @@ const jestConfig = {
   }
 };
 
-export default createJestConfig(jestConfig);
+export default function makeConfig(testDir: string) {
+  return createJestConfig({
+    ...jestConfig,
+    rootDir: __dirname,
+    testMatch: [`${testDir}/**/*.spec.ts`]
+  });
+}
