@@ -94,7 +94,7 @@ jobs:
         include:
           - test_name: 'Cron worker tests'
             test_command: 'npm run test:ci -- --config="./background/jest.config.ts"'
-          - test_name: 'Test worker tests'
+          - test_name: 'Tests for tests'
             test_command: 'npm run test:ci -- --config="./testing/jest.config.ts"'
           - test_name: 'Library tests #1'
             test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 2/4'
