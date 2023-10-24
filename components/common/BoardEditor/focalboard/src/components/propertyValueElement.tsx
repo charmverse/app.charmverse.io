@@ -272,6 +272,8 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'checkbox') {
     propertyValueElement = (
       <Switch
+        displayType={displayType}
+        label={propertyTemplate.name}
         isOn={propertyValue === 'true'}
         onChanged={(newBool) => {
           const newValue = newBool ? 'true' : '';
