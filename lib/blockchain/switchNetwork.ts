@@ -14,7 +14,8 @@ export async function switchActiveNetwork(chainId: number) {
       params: [{ chainId: toHex(chainId) }]
     });
   } catch (error: any) {
-    if (error.code === 4902) {
+    // -32603 is from Coinbase wallet
+    if (error.code === 4902 || error.code === -32603) {
       const chainInfo = getChainById(chainId);
 
       if (!chainInfo) {
