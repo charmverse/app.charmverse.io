@@ -1,4 +1,4 @@
-import { DataNotFoundError } from '@charmverse/core/dist/cjs/errors';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { removeMember } from './removeMember';

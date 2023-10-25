@@ -1,38 +1,63 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import InviteLinkPageError from 'components/invite/SpaceInviteError';
 import InviteLinkPage from 'components/invite/SpaceInviteLink';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import { getInviteLink } from 'lib/invites/getInviteLink';
+import { checkUserBanStatus } from 'lib/members/checkUserBanStatus';
+import { withSessionSsr } from 'lib/session/withSession';
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+type Props = { error: 'invalid' | 'banned' | null; invite: InviteLinkPopulated | null };
+
+export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(async (context) => {
   const inviteCode = context.query.inviteCode as string;
   const inviteLink = await getInviteLink(inviteCode);
+  const user = context.req.session?.user;
 
   if (!inviteLink) {
     return {
       props: {
-        error: 'Invitation not found'
+        error: 'invalid',
+        invite: null
       }
     };
   }
   if (!inviteLink.valid) {
     return {
       props: {
-        error: 'This link is invalid'
+        error: 'invalid',
+        invite: null
       }
     };
   }
 
+  if (user?.id) {
+    const isUserBanned = await checkUserBanStatus({
+      userId: user.id,
+      spaceId: inviteLink.invite.spaceId
+    });
+
+    if (isUserBanned) {
+      return {
+        props: {
+          invite: null,
+          error: 'banned'
+        }
+      };
+    }
+  }
+
   return {
     props: {
-      invite: inviteLink.invite
+      invite: inviteLink.invite,
+      error: null
     }
   };
-};
+});
 
-export default function InvitationPage({ invite }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function InvitationPage({ invite, error }: Props) {
   if (invite) {
     return (
       <>
@@ -43,7 +68,7 @@ export default function InvitationPage({ invite }: InferGetServerSidePropsType<t
       </>
     );
   }
-  return <InviteLinkPageError />;
+  return <InviteLinkPageError reason={error} />;
 }
 
 InvitationPage.getLayout = getBaseLayout;

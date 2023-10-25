@@ -6,7 +6,11 @@ import PrimaryButton from 'components/common/PrimaryButton';
 
 import { CenteredBox } from './components/CenteredBox';
 
-export default function InviteLinkPageError() {
+export default function InviteLinkPageError({ reason }: { reason?: 'invalid' | 'banned' | null }) {
+  const message =
+    reason === 'banned'
+      ? "You've been banned from this space."
+      : 'This invite may be expired, or you might not have permission to join.';
   return (
     <CenteredBox>
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
@@ -15,7 +19,7 @@ export default function InviteLinkPageError() {
             <strong>Invite Invalid</strong>
           </Typography>
           <Typography align='center' color='danger'>
-            This invite may be expired, or you might not have permission to join.
+            {message}
           </Typography>
         </Box>
         <PrimaryButton fullWidth size='large' href='/' external /* external=true avoids space domain being added */>
