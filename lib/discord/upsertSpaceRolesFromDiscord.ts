@@ -5,18 +5,19 @@ import { getGuildRoles } from 'lib/collabland/collablandClient';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 
 type Props = {
-  space: Space;
+  spaceId: string;
+  discordServerId?: string;
   userId: string;
 };
 
-export async function upsertSpaceRolesFromDiscord({ space, userId }: Props) {
-  if (!space.discordServerId) {
+export async function upsertSpaceRolesFromDiscord({ spaceId, discordServerId, userId }: Props) {
+  if (!discordServerId) {
     return;
   }
 
   try {
-    const roles = await getGuildRoles(space.discordServerId);
-    const cvRoles = await findOrCreateRoles(roles, space.id, userId, {
+    const roles = await getGuildRoles(discordServerId);
+    const cvRoles = await findOrCreateRoles(roles, spaceId, userId, {
       source: 'collabland',
       createRoles: true
     });
