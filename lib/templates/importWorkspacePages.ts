@@ -60,11 +60,7 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
           extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id, originalId: attrs.pollId });
           attrs.pollId = newPollId;
         }
-      } else if (
-        node.type === 'page' ||
-        node.type === 'linkedPage' ||
-        (node.type === 'mention' && node.attrs?.type === 'page')
-      ) {
+      } else if (node.type === 'page' || node.type === 'linkedPage') {
         const attrs = node.attrs as { id: string };
         const oldPageId = attrs.id;
         let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
@@ -74,9 +70,21 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
           oldNewPageIdHashMap[oldPageId] = newPageId;
           oldNewPageIdHashMap[newPageId] = oldPageId;
         }
-
         if (oldPageId && newPageId) {
           attrs.id = newPageId;
+        }
+      } else if (node.type === 'mention' && node.attrs?.type === 'page') {
+        const attrs = node.attrs as { value: string };
+        const oldPageId = attrs.value;
+        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+
+        if (oldPageId && !newPageId) {
+          newPageId = uuid();
+          oldNewPageIdHashMap[oldPageId] = newPageId;
+          oldNewPageIdHashMap[newPageId] = oldPageId;
+        }
+        if (oldPageId && newPageId) {
+          attrs.value = newPageId;
         }
       } else if (node.type === 'inlineDatabase') {
         const attrs = node.attrs as { pageId: string };
