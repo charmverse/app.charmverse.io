@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { findOrCreateRoles } from 'lib/roles/createRoles';
@@ -38,6 +39,10 @@ export async function createAndAssignRoles({
       roleIdsToAssign.push(role.id);
     }
   });
+
+  if (roleIdsToAssign.length) {
+    log.info(`Assigning roles to space member`, { userId, spaceId, roleIdsToAssign });
+  }
 
   await prisma.$transaction(
     roleIdsToAssign.map((roleId) => {

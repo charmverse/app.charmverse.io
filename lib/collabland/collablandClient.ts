@@ -117,6 +117,13 @@ export async function getDiscordUserState({
   discordServerId: string;
   discordUserId: string;
 }) {
+  if (!API_KEY) {
+    log.warn('No API Key provided for collab.land');
+    return {
+      isVerified: false,
+      roles: []
+    };
+  }
   try {
     await rateLimiter();
     const res = await GET<CollablandUserResult>(
@@ -150,6 +157,10 @@ export async function getDiscordUserState({
 }
 
 export async function getGuildRoles(discordServerId: string) {
+  if (!API_KEY) {
+    log.warn('No API Key provided for collab.land');
+    return [];
+  }
   await rateLimiter();
   const allRoles = await GET<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
     headers: getHeaders()

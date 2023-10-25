@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { findOrCreateCollablandRoles } from 'lib/collabland/findOrCreateCollablandRoles';
@@ -52,8 +53,7 @@ async function createAndAssignCollablandRoles({
 
   const rolesRecord = await findOrCreateCollablandRoles({
     externalRoleIds: roles,
-    spaceId,
-    userId
+    spaceId
   });
 
   const roleIdsToAssign: string[] = [];
@@ -63,6 +63,10 @@ async function createAndAssignCollablandRoles({
       roleIdsToAssign.push(role.id);
     }
   });
+
+  if (roleIdsToAssign.length) {
+    log.info(`Assigning roles to space member`, { userId, spaceId, roleIdsToAssign });
+  }
 
   await prisma.$transaction(
     roleIdsToAssign.map((roleId) => {

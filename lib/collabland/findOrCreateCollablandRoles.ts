@@ -12,7 +12,6 @@ export async function findOrCreateCollablandRoles({
 }: {
   externalRoleIds: string[];
   spaceId: string;
-  userId: string;
 }): Promise<RolesRecord> {
   const rolesRecord: RolesRecord = {};
 
