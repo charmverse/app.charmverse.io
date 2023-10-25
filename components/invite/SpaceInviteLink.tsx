@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -6,6 +7,7 @@ import charmClient from 'charmClient';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
@@ -16,20 +18,33 @@ import { CenteredBox } from './components/CenteredBox';
 export default function InvitationPage({ invite }: { invite: InviteLinkPopulated }) {
   const { user } = useUser();
   const { walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
-
+  const { showMessage } = useSnackbar();
   async function joinSpace() {
-    if (!user && verifiableWalletDetected && walletAuthSignature) {
-      await charmClient.createUser({ address: walletAuthSignature.address, walletSignature: walletAuthSignature });
+    let loggedInUser = user;
+    try {
+      if (!user && verifiableWalletDetected && walletAuthSignature) {
+        loggedInUser = await charmClient.createUser({
+          address: walletAuthSignature.address,
+          walletSignature: walletAuthSignature
+        });
+      }
+      await charmClient.acceptInvite({ id: invite.id });
+
+      let redirectUrl = getSpaceUrl(invite.space);
+
+      if (invite.visibleOn) {
+        redirectUrl += '/proposals';
+      }
+
+      window.location.href = redirectUrl;
+    } catch (err: any) {
+      showMessage(err.message, 'error');
+      log.error(`Error accepting invite: ${err}`, {
+        inviteId: invite.id,
+        spaceId: invite.space.id,
+        userId: loggedInUser?.id
+      });
     }
-    await charmClient.acceptInvite({ id: invite.id });
-
-    let redirectUrl = getSpaceUrl(invite.space);
-
-    if (invite.visibleOn) {
-      redirectUrl += '/proposals';
-    }
-
-    window.location.href = redirectUrl;
   }
   return (
     <CenteredBox>

@@ -97,4 +97,8 @@ export class MembersApi {
   banMember({ spaceId, userId }: RemoveMemberInput) {
     return http.DELETE(`/api/spaces/${spaceId}/members/${userId}/ban`);
   }
+
+  checkSpaceBanStatus({ spaceId }: { spaceId: string }) {
+    return http.GET<{ isBanned: boolean }>(`/api/spaces/${spaceId}/members/ban-status`);
+  }
 }

@@ -6,7 +6,7 @@ import InviteLinkPageError from 'components/invite/SpaceInviteError';
 import InviteLinkPage from 'components/invite/SpaceInviteLink';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import { getInviteLink } from 'lib/invites/getInviteLink';
-import { checkUserBanStatus } from 'lib/members/checkUserBanStatus';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { withSessionSsr } from 'lib/session/withSession';
 
 type Props = { error: 'invalid' | 'banned' | null; invite: InviteLinkPopulated | null };
@@ -34,12 +34,12 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
   }
 
   if (user?.id) {
-    const isUserBanned = await checkUserBanStatus({
+    const isUserBannedFromSpace = await checkUserSpaceBanStatus({
       userId: user.id,
       spaceId: inviteLink.invite.spaceId
     });
 
-    if (isUserBanned) {
+    if (isUserBannedFromSpace) {
       return {
         props: {
           invite: null,

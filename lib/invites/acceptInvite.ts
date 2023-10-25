@@ -3,6 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logInviteAccepted } from 'lib/metrics/postToDiscord';
@@ -33,10 +34,19 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
     throw new DataNotFoundError(`Invite with id ${inviteLinkId} not found`);
   }
 
-  const validationResult = await validateInviteLink({ invite });
+  const validationResult = validateInviteLink({ invite });
 
   if (!validationResult.valid) {
     throw new UnauthorisedActionError(`You cannot accept this invite.`);
+  }
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceId: invite.spaceId,
+    userId
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(`You have been banned from this space.`);
   }
 
   const existingSpaceRole = await prisma.spaceRole.findFirst({

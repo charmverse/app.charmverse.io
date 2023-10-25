@@ -1,16 +1,22 @@
 import { Alert, Card, Typography, Box } from '@mui/material';
 import { useRouter } from 'next/router';
+import useSWR from 'swr';
 
+import charmClient from 'charmClient';
+import { Modal } from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login/components/WalletSign';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 import { getSpaceUrl } from 'lib/utilities/browser';
+
+import { Button } from '../Button';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
@@ -28,10 +34,17 @@ export function SpaceAccessGate({
   joinType?: TokenGateJoinType;
   onSuccess?: () => void;
 }) {
+  const { spaces } = useSpaces();
+
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
   const { account, loginFromWeb3Account } = useWeb3Account();
+  const { data, isLoading } = useSWR(user ? `${user.id}/${space.id}/ban-status` : null, () => {
+    return charmClient.members.checkSpaceBanStatus({
+      spaceId: space.id
+    });
+  });
 
   const discordGate = useDiscordGate({
     joinType,
@@ -92,76 +105,101 @@ export function SpaceAccessGate({
 
   const noGateConditions = !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled;
 
+  const isBanned = !!data?.isBanned;
   return (
     <>
-      <Card sx={{ p: 3, mb: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <Box mb={3}>
-          <WorkspaceAvatar image={space.spaceImage} name={space.name} variant='rounded' />
-        </Box>
-        <Box display='flex' flexDirection='column' alignItems='center'>
-          <Typography variant='h5'>{space.name}</Typography>
-        </Box>
-      </Card>
-      {walletGateEnabled && (
-        <Typography variant='body2' align='center' sx={{ mb: 2 }}>
-          The following criteria must be met to join this space:
+      <Modal title='You have been banned from this space' open={!isLoading && isBanned}>
+        <Typography>
+          You have been banned from this space. You can't join it. If you think this is a mistake, please contact the
+          space admins.
         </Typography>
-      )}
 
-      {discordGate.isEnabled && <DiscordGate {...discordGate} />}
-
-      {summonGate.isEnabled && <SummonGate {...summonGate} />}
-
-      {summonGate.isEnabled && tokenGate.isEnabled && (
-        <Typography color='secondary' align='center'>
-          OR
-        </Typography>
-      )}
-
-      {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
-
-      {isVerified && (
-        <Box mb={2}>
-          <PrimaryButton
-            data-test='join-space-button'
-            fullWidth
-            loading={isJoiningSpace}
-            disabled={isJoiningSpace}
-            onClick={joinSpace}
-          >
-            Join Space
-          </PrimaryButton>
+        <Box gap={3} sx={{ maxWidth: '200px', display: 'flex', flexDirection: 'column', pt: 2 }}>
+          {user && !!spaces?.length && (
+            <Button sx={{ width: '100%' }} href={`/${spaces[0].domain}`} color='primary'>
+              Go to my space
+            </Button>
+          )}
+          {user && !spaces?.length && (
+            <Button sx={{ width: '100%' }} href='/createSpace' color='primary'>
+              Create a space
+            </Button>
+          )}
         </Box>
-      )}
+      </Modal>
 
-      {walletGateEnabled && !isVerified && (
-        <Box mb={2}>
-          <WalletSign
-            loading={summonGate.isVerifying}
-            signSuccess={onWalletSignature}
-            buttonStyle={{ width: '100%' }}
-          />
-        </Box>
-      )}
-      {walletGateEnabled &&
-        tokenGate.tokenGateResult &&
-        (!tokenGate.isVerified && !summonGate.isVerified ? (
-          <Alert severity='warning' data-test='token-gate-failure-alert'>
-            Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
-          </Alert>
-        ) : (
-          <Alert severity='success'>
-            You can join this space.{' '}
-            {tokenGate.tokenGateResult?.roles.length > 0
-              ? 'You will also receive the roles attached to each condition you passed.'
-              : ''}
-          </Alert>
-        ))}
+      {!isBanned && (
+        <>
+          <Card sx={{ p: 3, mb: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+            <Box mb={3}>
+              <WorkspaceAvatar image={space.spaceImage} name={space.name} variant='rounded' />
+            </Box>
+            <Box display='flex' flexDirection='column' alignItems='center'>
+              <Typography variant='h5'>{space.name}</Typography>
+            </Box>
+          </Card>
+          {walletGateEnabled && (
+            <Typography variant='body2' align='center' sx={{ mb: 2 }}>
+              The following criteria must be met to join this space:
+            </Typography>
+          )}
 
-      {noGateConditions && (
-        <Alert data-test='token-gate-empty-state' severity='info' sx={{ my: 1 }}>
-          No membership conditions were found for this space.
-        </Alert>
+          {discordGate.isEnabled && <DiscordGate {...discordGate} />}
+
+          {summonGate.isEnabled && <SummonGate {...summonGate} />}
+
+          {summonGate.isEnabled && tokenGate.isEnabled && (
+            <Typography color='secondary' align='center'>
+              OR
+            </Typography>
+          )}
+
+          {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
+
+          {isVerified && !isLoading && (
+            <Box mb={2}>
+              <PrimaryButton
+                data-test='join-space-button'
+                fullWidth
+                loading={isJoiningSpace}
+                disabled={isJoiningSpace}
+                onClick={joinSpace}
+              >
+                Join Space
+              </PrimaryButton>
+            </Box>
+          )}
+
+          {walletGateEnabled && !isVerified && (
+            <Box mb={2}>
+              <WalletSign
+                loading={summonGate.isVerifying}
+                signSuccess={onWalletSignature}
+                buttonStyle={{ width: '100%' }}
+              />
+            </Box>
+          )}
+          {walletGateEnabled &&
+            tokenGate.tokenGateResult &&
+            (!tokenGate.isVerified && !summonGate.isVerified ? (
+              <Alert severity='warning' data-test='token-gate-failure-alert'>
+                Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
+              </Alert>
+            ) : (
+              <Alert severity='success'>
+                You can join this space.{' '}
+                {tokenGate.tokenGateResult?.roles.length > 0
+                  ? 'You will also receive the roles attached to each condition you passed.'
+                  : ''}
+              </Alert>
+            ))}
+
+          {noGateConditions && (
+            <Alert data-test='token-gate-empty-state' severity='info' sx={{ my: 1 }}>
+              No membership conditions were found for this space.
+            </Alert>
+          )}
+        </>
       )}
     </>
   );
