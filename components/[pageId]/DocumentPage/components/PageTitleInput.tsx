@@ -1,9 +1,11 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField, Typography } from '@mui/material';
+import type { TextFieldProps } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 
+import { useIMEComposition } from 'hooks/useIMEComposition';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -62,14 +64,9 @@ export function PageTitleInput({
 }: PageTitleProps) {
   const view = useContext(EditorViewContext);
   const [title, setTitle] = useState(value);
-  const titleInput = useRef(null);
   const [updatedAt, setUpdatedAt] = useState(updatedAtExternal);
-
-  useEffect(() => {
-    if (updatedAtExternal && updatedAt && updatedAt < updatedAtExternal) {
-      setTitle(value);
-    }
-  }, [value, updatedAtExternal, updatedAt, setTitle]);
+  const titleInput = useRef<HTMLTextAreaElement>(null);
+  const { isOrWasComposing } = useIMEComposition(titleInput);
 
   function _onChange(event: ChangeEvent<HTMLInputElement>) {
     const newTitle = event.target.value;
@@ -78,27 +75,55 @@ export function PageTitleInput({
     setUpdatedAt(_updatedAt);
     onChange({ title: newTitle, updatedAt: _updatedAt });
   }
+  const onKeyUp: TextFieldProps['onKeyUp'] = (event) => {
+    // do not submit if user is/was entering Japanese characters
+    if (isOrWasComposing) {
+      return;
+    }
+    // Follow Notion where holding ctrlKey/shift does nothing
+    const metaKey = event.ctrlKey || event.shiftKey;
+    if (metaKey) {
+      return;
+    }
+    const pressedEnter = event.key === 'Enter';
+    if (pressedEnter) {
+      event.preventDefault();
+      insertAndFocusFirstLine(view);
+    }
+  };
+
+  // listen to keyDown to prevent "Enter" from being used to insert a new line
+  const onKeyDown: TextFieldProps['onKeyDown'] = (event) => {
+    const pressedEnter = event.key === 'Enter';
+    if (pressedEnter) {
+      event.preventDefault();
+    }
+  };
+
+  useEffect(() => {
+    if (updatedAtExternal && updatedAt && updatedAt < updatedAtExternal) {
+      setTitle(value);
+    }
+  }, [value, updatedAtExternal, updatedAt, setTitle]);
 
   if (readOnly) {
     return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
   }
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        insertAndFocusFirstLine(view);
-      }}
-    >
-      <StyledPageTitle
-        className='page-title'
-        data-test='editor-page-title'
-        inputRef={titleInput}
-        value={title}
-        placeholder={placeholder || 'Untitled'}
-        autoFocus={!value && !readOnly && !isTouchScreen()}
-        variant='standard'
-        onChange={_onChange}
-      />
-    </form>
+    <StyledPageTitle
+      className='page-title'
+      data-test='editor-page-title'
+      inputRef={titleInput}
+      value={title}
+      placeholder={placeholder || 'Untitled'}
+      autoFocus={!value && !readOnly && !isTouchScreen()}
+      variant='standard'
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      // Note: we use multiline/textarea to wrap long titles
+      // This means we can't use form submit events to respond to "Enter key"
+      multiline
+      onChange={_onChange}
+    />
   );
 }
