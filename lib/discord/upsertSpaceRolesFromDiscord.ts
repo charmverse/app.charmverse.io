@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { Space } from '@charmverse/core/prisma';
 
 import { getGuildRoles } from 'lib/collabland/collablandClient';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
