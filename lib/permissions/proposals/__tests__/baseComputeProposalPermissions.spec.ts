@@ -151,7 +151,7 @@ describe('computeProposalPermissions - base', () => {
       edit: false,
       make_public: false,
       delete: false,
-      create_vote: false,
+      create_vote: true,
       archive: false,
       unarchive: false
     });
