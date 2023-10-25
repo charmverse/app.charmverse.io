@@ -38,4 +38,16 @@ describe('getPagePath', () => {
     });
     expect(result).toEqual('/members');
   });
+
+  it('should append the original query params', () => {
+    const result = getPagePath({
+      spaceDomain: 'apples',
+      path: 'members',
+      hostName: 'work.foobar.com',
+      query: {
+        cardId: 'foobar'
+      }
+    });
+    expect(result).toEqual('/members?cardId=foobar');
+  });
 });
