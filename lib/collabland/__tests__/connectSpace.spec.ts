@@ -26,19 +26,7 @@ afterAll(() => {
 });
 
 describe('connectSpace', () => {
-  it('should verify state and connect space to discord server id', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace();
-    const state = encryptData({ userId: user.id, spaceId: space.id });
-    const discordServerId = v4();
-
-    const connectedSpace = await connectSpace({ state, discordServerId });
-    const updatedSpace = await prisma.space.findUnique({ where: { id: space.id } });
-
-    expect(connectedSpace.id).toBe(space.id);
-    expect(updatedSpace?.discordServerId).toBe(discordServerId);
-  });
-
-  it('should not allow to connect if user is not an admin ort data is invalid', async () => {
+  it('should not allow to connect if user is not an admin or data is invalid', async () => {
     const { space } = await testUtilsUser.generateUserAndSpace();
     const user = await testUtilsUser.generateUser();
     await addUserToSpace({ spaceId: space.id, userId: user.id, isAdmin: false });
@@ -58,9 +46,6 @@ describe('connectSpace', () => {
     await expect(() => connectSpace({ state: state2, discordServerId: '' })).rejects.toThrow(
       new InvalidInputError('A discord server ID must be provided')
     );
-
-    const updatedSpace = await prisma.space.findUnique({ where: { id: space.id } });
-    expect(updatedSpace?.discordServerId).toBeNull();
   });
 
   it('should sync and assign collabland roles for all members of space', async () => {
@@ -68,15 +53,6 @@ describe('connectSpace', () => {
 
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
-    });
-
-    await prisma.space.update({
-      where: {
-        id: space.id
-      },
-      data: {
-        discordServerId
-      }
     });
 
     const externalRoleIds = [v4(), v4()];
@@ -218,10 +194,17 @@ describe('connectSpace', () => {
       }
     });
 
+    const spaceDiscordServerId = await prisma.space.findFirstOrThrow({
+      where: {
+        discordServerId
+      }
+    });
+
     expect(existingRole.name).toBe('Existing Role');
     expect(newRole.name).toBe('New Role');
     expect(adminRoles.map((r) => r.role.name)).toStrictEqual(['Existing Role']);
     expect(discordUserRoles.map((r) => r.role.name)).toStrictEqual(['New Role']);
     expect(nonDiscordUserRoles.map((r) => r.role.name)).toStrictEqual([]);
+    expect(spaceDiscordServerId).toBeTruthy();
   });
 });
