@@ -19,22 +19,24 @@ export async function unassignRolesDiscord({
     return;
   }
 
-  const { user } = spacesAndUser[0];
+  for (const spaceAndUser of spacesAndUser) {
+    const { user } = spaceAndUser;
+    const removeRoles = await prisma?.role.findMany({
+      where: { externalId: { in: rolesToRemove.map((role) => String(role)) } }
+    });
 
-  const removeRoles = await prisma?.role.findMany({
-    where: { externalId: { in: rolesToRemove.map((role) => String(role)) } }
-  });
+    for (const role of removeRoles) {
+      try {
+        await unassignRole({ userId: user.id, roleId: role.id });
+      } catch (error) {
+        if (error instanceof InvalidInputError) {
+          return;
+        }
 
-  for (const role of removeRoles) {
-    try {
-      await unassignRole({ userId: user.id, roleId: role.id });
-    } catch (error) {
-      if (error instanceof InvalidInputError) {
-        return;
+        throw error;
       }
-
-      throw error;
     }
   }
-  return { userId: user.id, spaceId: spacesAndUser[0].space.id };
+
+  return { userId: spacesAndUser[0].user.id, spaceIds: spacesAndUser.map(({ space }) => space.id) };
 }

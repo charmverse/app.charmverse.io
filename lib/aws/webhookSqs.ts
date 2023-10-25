@@ -73,7 +73,7 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
 
       if (result.success) {
         log.info(`Message process successful: ${result.message}`, {
-          spaceId: result.spaceId,
+          spaceIds: result.spaceIds,
           receiptHandle: message.ReceiptHandle
         });
         try {
@@ -82,13 +82,13 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
           log.error('Could not delete message', {
             receiptHandle: message.ReceiptHandle,
             error: e,
-            spaceId: result.spaceId
+            spaceIds: result.spaceIds
           });
         }
       } else {
         log.warn(`Message process failed: ${result.message}`, {
           receiptHandle: message.ReceiptHandle,
-          spaceId: result.spaceId
+          spaceIds: result.spaceIds
         });
       }
     } catch (e) {

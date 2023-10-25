@@ -28,5 +28,5 @@ export type WebhookMessage = {
 export type WebhookMessageProcessResult = {
   success: boolean;
   message?: string;
-  spaceId?: string;
+  spaceIds?: string[];
 };
