@@ -74,6 +74,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
             destination: getPagePath({
               hostName: ctx.req.headers.host,
               path: page.path,
+              query: ctx.query,
               spaceDomain: domain
             }),
             permanent: false

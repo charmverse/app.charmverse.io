@@ -70,9 +70,21 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
           oldNewPageIdHashMap[oldPageId] = newPageId;
           oldNewPageIdHashMap[newPageId] = oldPageId;
         }
-
         if (oldPageId && newPageId) {
           attrs.id = newPageId;
+        }
+      } else if (node.type === 'mention' && node.attrs?.type === 'page') {
+        const attrs = node.attrs as { value: string };
+        const oldPageId = attrs.value;
+        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+
+        if (oldPageId && !newPageId) {
+          newPageId = uuid();
+          oldNewPageIdHashMap[oldPageId] = newPageId;
+          oldNewPageIdHashMap[newPageId] = oldPageId;
+        }
+        if (oldPageId && newPageId) {
+          attrs.value = newPageId;
         }
       } else if (node.type === 'inlineDatabase') {
         const attrs = node.attrs as { pageId: string };
