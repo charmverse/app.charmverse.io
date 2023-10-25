@@ -17,7 +17,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Member } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
-const roleActions = ['makeAdmin', 'makeMember', 'makeGuest', 'removeFromSpace'] as const;
+const roleActions = ['makeAdmin', 'makeMember', 'makeGuest', 'removeFromSpace', 'banFromSpace'] as const;
 export type RoleAction = (typeof roleActions)[number];
 
 export const StyledRow = styled(Box)`
@@ -71,12 +71,15 @@ function MemberActions({
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { unassignRole } = useRoles();
-  const { makeAdmin, makeGuest, makeMember, members, removeFromSpace, getMemberById } = useMembers();
+  const { makeAdmin, makeGuest, makeMember, members, banFromSpace, removeFromSpace, getMemberById } = useMembers();
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
-  const deletePopupState = usePopupState({ variant: 'popover', popupId: 'member-list' });
+  const deletePopupState = usePopupState({ variant: 'popover', popupId: 'delete-member' });
+  const banPopupState = usePopupState({ variant: 'popover', popupId: 'ban-member' });
   const [removedMemberId, setRemovedMemberId] = useState<string | null>(null);
+  const [bannedMemberId, setBannedMemberId] = useState<string | null>(null);
 
   const removedMember = removedMemberId ? getMemberById(removedMemberId) : null;
+  const bannedMember = bannedMemberId ? getMemberById(bannedMemberId) : null;
   const closed = deletePopupState.close;
 
   deletePopupState.close = () => {
@@ -99,6 +102,20 @@ function MemberActions({
       showMessage((error as Error).message || 'Something went wrong', 'error');
     }
     deletePopupState.close();
+  }
+
+  async function banFromSpaceHandler() {
+    if (!bannedMemberId) {
+      return;
+    }
+
+    try {
+      await banFromSpace(bannedMemberId);
+    } catch (error) {
+      log.warn('Error bakking member', { error });
+      showMessage((error as Error).message || 'Something went wrong', 'error');
+    }
+    banPopupState.close();
   }
 
   async function handleMenuItemClick(action: RoleAction) {
@@ -125,6 +142,11 @@ function MemberActions({
           deletePopupState.open();
           break;
 
+        case 'banFromSpace':
+          setBannedMemberId(member.id);
+          banPopupState.open();
+          break;
+
         default:
           throw new Error('Unknown action');
       }
@@ -143,6 +165,9 @@ function MemberActions({
       case 'makeMember':
         return !readOnly;
       case 'removeFromSpace': {
+        return !readOnly && spaceOwner !== member.id;
+      }
+      case 'banFromSpace': {
         return !readOnly && spaceOwner !== member.id;
       }
       default:
@@ -164,6 +189,14 @@ function MemberActions({
           onConfirm={removeFromSpaceHandler}
           question={`Are you sure you want to remove ${removedMember?.username} from space?`}
         />
+        <ConfirmDeleteModal
+          title='Ban member'
+          onClose={banPopupState.close}
+          open={banPopupState.isOpen}
+          buttonText={`Ban ${bannedMember?.isAdmin ? 'admin' : bannedMember?.isGuest ? 'guest' : 'member'}`}
+          onConfirm={banFromSpaceHandler}
+          question={`Are you sure you want to ban ${bannedMember?.username} from space? This will ban all of the wallets and accounts from this member, delete all of their content and remove them from the space.`}
+        />
       </>
     );
   }
@@ -179,6 +212,14 @@ function MemberActions({
         buttonText={`Remove ${removedMember?.isAdmin ? 'admin' : removedMember?.isGuest ? 'guest' : 'member'}`}
         onConfirm={removeFromSpaceHandler}
         question={`Are you sure you want to remove ${removedMember?.username} from space?`}
+      />
+      <ConfirmDeleteModal
+        title='Ban member'
+        onClose={banPopupState.close}
+        open={banPopupState.isOpen}
+        buttonText={`Ban ${bannedMember?.isAdmin ? 'admin' : bannedMember?.isGuest ? 'guest' : 'member'}`}
+        onConfirm={banFromSpaceHandler}
+        question={`Are you sure you want to ban ${bannedMember?.username} from space? This will ban all of the wallets and accounts from this member, delete all of their content and remove them from the space.`}
       />
       <Menu
         {...bindMenu(popupState)}
@@ -217,6 +258,13 @@ function MemberActions({
                     <StyledListItemText
                       primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
                       primary='Remove from space'
+                    />
+                  )}
+                  {action === 'banFromSpace' && (
+                    <StyledListItemText
+                      primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
+                      primary='Ban from space'
+                      secondary='Ban all of the wallets and accounts from this member, delete all of their content and remove them from the space'
                     />
                   )}
                   {action === activeRoleAction && (
