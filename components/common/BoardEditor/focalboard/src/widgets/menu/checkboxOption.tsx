@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Switch from '../switch';
+import Checkbox from '../checkbox';
 
 import type { MenuOptionProps } from './menuItem';
 
@@ -25,7 +25,7 @@ function SwitchOption(props: SwitchOptionProps): JSX.Element {
     >
       {icon && <div className='noicon' />}
       <div className='menu-name'>{name}</div>
-      <Switch isOn={isOn} onChanged={() => {}} />
+      <Checkbox isOn={isOn} onChanged={() => {}} />
     </div>
   );
 }

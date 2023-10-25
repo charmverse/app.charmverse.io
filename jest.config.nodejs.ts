@@ -1,6 +1,11 @@
+import nextJest from 'next/jest';
 import type { JestConfigWithTsJest } from 'ts-jest';
 
-import createJestConfig from 'testing/createJestConfig';
+const createJestConfig = nextJest({
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  dir: './'
+});
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
@@ -28,7 +33,6 @@ export const jestConfig: JestConfigWithTsJest = {
 
   // The test environment that will be used for testing
   testEnvironment: 'jest-environment-node',
-  testMatch: ['**/lib/**/*.spec.ts', '**/testing/**/*.spec.ts', '**/background/**/*.spec.ts'],
 
   // This is needed so CI environment does not attempt to run tests in the permissions_api folder
   testPathIgnorePatterns: ['<rootDir>/permissions_api'],
@@ -36,4 +40,10 @@ export const jestConfig: JestConfigWithTsJest = {
   testTimeout: 240000
 };
 
-export default createJestConfig(jestConfig);
+export default function makeConfig(testDir: string) {
+  return createJestConfig({
+    ...jestConfig,
+    rootDir: __dirname,
+    testMatch: [`${testDir}/**/*.spec.ts`]
+  });
+}

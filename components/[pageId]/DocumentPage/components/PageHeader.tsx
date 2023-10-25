@@ -72,9 +72,19 @@ type PageHeaderProps = {
   setPage: (p: PageHeaderValues) => void;
   updatedAt: string;
   readOnlyTitle?: boolean;
+  placeholder?: string;
 };
 
-function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, readOnlyTitle }: PageHeaderProps) {
+function PageHeader({
+  headerImage,
+  icon,
+  readOnly,
+  setPage,
+  title,
+  updatedAt,
+  readOnlyTitle,
+  placeholder
+}: PageHeaderProps) {
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
@@ -92,7 +102,13 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
         readOnly={readOnly}
         setPage={setPage}
       />
-      <PageTitleInput readOnly={readOnly || readOnlyTitle} value={title} onChange={updateTitle} updatedAt={updatedAt} />
+      <PageTitleInput
+        readOnly={readOnly || readOnlyTitle}
+        value={title}
+        onChange={updateTitle}
+        updatedAt={updatedAt}
+        placeholder={placeholder}
+      />
     </>
   );
 }

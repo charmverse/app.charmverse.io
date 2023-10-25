@@ -14,7 +14,7 @@ import charmClient from 'charmClient';
 import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import ButtonBoard from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
-import Switch from 'components/common/BoardEditor/focalboard/src/widgets/switch';
+import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
 import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
@@ -63,7 +63,6 @@ export default function BountyProperties(props: {
   const [isAmountInputEmpty, setIsAmountInputEmpty] = useState<boolean>(false);
   const [capSubmissions, setCapSubmissions] = useState(false);
   const { space } = useCurrentSpace();
-
   const { isFreeSpace } = useIsFreeSpace();
 
   const { user } = useUser();
@@ -418,7 +417,7 @@ export default function BountyProperties(props: {
           <div className='octo-propertyname octo-propertyname--readonly'>
             <ButtonBoard>Require applications</ButtonBoard>
           </div>
-          <Switch
+          <Checkbox
             isOn={Boolean(currentBounty?.approveSubmitters)}
             onChanged={(isOn) => {
               applyBountyUpdates({
@@ -488,7 +487,7 @@ export default function BountyProperties(props: {
           <div className='octo-propertyname octo-propertyname--readonly'>
             <ButtonBoard>Submission limit</ButtonBoard>
           </div>
-          <Switch
+          <Checkbox
             isOn={capSubmissions}
             onChanged={(isOn) => {
               setCapSubmissions(isOn);

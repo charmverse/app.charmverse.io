@@ -1,15 +1,13 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, Menu, Popover, Tooltip } from '@mui/material';
-import { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';
+import { Box, Popover, Tooltip } from '@mui/material';
+import { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
 
-import charmClient from 'charmClient';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
@@ -28,11 +26,9 @@ import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
-import ViewHeaderSortMenu from './viewHeaderSortMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {
-  currentRootPageId: string; // The current page ID from which this header is being viewed (Could be the database ID, or a page ID if this is an inline database )
   activeBoard?: Board;
   activeView?: BoardView;
   views: BoardView[];
@@ -70,22 +66,11 @@ function ViewHeader(props: Props) {
     toggleViewOptions,
     viewsBoard,
     activeBoard,
-    currentRootPageId,
     onClickNewView,
     activeView,
     cards,
     dateDisplayProperty
   } = props;
-
-  const { trigger: updateProposalSource } = useSWRMutation(
-    `/api/pages/${activeBoard?.id}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
-  );
-  useEffect(() => {
-    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
-      updateProposalSource({ pageId: currentRootPageId });
-    }
-  }, [currentRootPageId, activeBoard?.id]);
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
@@ -199,8 +184,8 @@ function ViewHeader(props: Props) {
 
         {/* <ViewHeaderSearch/> */}
 
-        {/* Link to view embedded table in full */}
-        {props.embeddedBoardPath && (
+        {/* Link to view embedded table in full - check that at least one view is created */}
+        {props.embeddedBoardPath && !!views.length && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
               <span>

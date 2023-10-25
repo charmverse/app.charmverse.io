@@ -82,7 +82,7 @@ describe('extractDatabaseProposalProperties', () => {
     ];
 
     const extractedProps = extractDatabaseProposalProperties({
-      database: {
+      boardBlock: {
         fields: {
           cardProperties: exampleProperties
         } as any
@@ -103,7 +103,7 @@ describe('extractDatabaseProposalProperties', () => {
     const exampleProperties: IPropertyTemplate[] = [categoryProp];
 
     const extractedProps = extractDatabaseProposalProperties({
-      database: {
+      boardBlock: {
         fields: {
           cardProperties: exampleProperties
         } as any

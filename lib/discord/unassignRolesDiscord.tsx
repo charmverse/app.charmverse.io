@@ -36,4 +36,5 @@ export async function unassignRolesDiscord({
       throw error;
     }
   }
+  return { userId: user.id, spaceId: spacesAndUser[0].space.id };
 }

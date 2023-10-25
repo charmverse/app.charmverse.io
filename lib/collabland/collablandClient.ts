@@ -87,7 +87,7 @@ export function getCredentials({ aeToken }: { aeToken: string }) {
     return [];
   }
 
-  return GET<AnyCredentialType[]>(`${COLLABLAND_API_URL}/veramo/vcs`, {
+  return GET<AnyCredentialType[]>(`${COLLABLAND_API_URL}/veramo/vcs`, null, {
     headers: getHeaders({
       Authorization: `AE ${aeToken}`
     })
@@ -121,6 +121,7 @@ export async function getDiscordUserState({
     await rateLimiter();
     const res = await GET<CollablandUserResult>(
       `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
+      null,
       {
         headers: getHeaders()
       }
@@ -151,7 +152,7 @@ export async function getDiscordUserState({
 
 export async function getGuildRoles(discordServerId: string) {
   await rateLimiter();
-  const allRoles = await GET<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
+  const allRoles = await GET<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, null, {
     headers: getHeaders()
   });
 

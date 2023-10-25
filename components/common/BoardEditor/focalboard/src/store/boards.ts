@@ -79,11 +79,15 @@ export const getSortedTemplates = createSelector(getTemplates, (templates) => {
   return Object.values(templates).sort((a, b) => a.title.localeCompare(b.title));
 });
 
-export function getBoard(boardId: string): (state: RootState) => Board | undefined {
-  return (state: RootState): Board | undefined => {
-    return state.boards.boards[boardId] || state.boards.templates[boardId] || undefined;
-  };
-}
+export const makeSelectBoard = () =>
+  createSelector(
+    getBoards,
+    getTemplates,
+    (state: RootState, boardId: string) => boardId,
+    (boards, templates, boardId: string) => {
+      return boards[boardId] || templates[boardId];
+    }
+  );
 
 export const getCurrentBoard = createSelector(
   (state: RootState) => state.boards.current,

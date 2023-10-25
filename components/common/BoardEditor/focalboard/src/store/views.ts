@@ -82,14 +82,16 @@ export const { updateViews, setCurrent, updateView, addView, deleteViews } = vie
 export const { reducer } = viewsSlice;
 
 export const getViews = (state: RootState): { [key: string]: BoardView } => state.views.views;
-export const getSortedViews = (boardId: string) =>
+
+// export a factory to be memoized, so multiple instances can be used at once
+export const makeSelectSortedViews = () =>
   createSelector(
-    (state: RootState) => state.boards.boards[boardId],
+    (state: RootState, boardId: string) => state.boards.boards[boardId],
     getViews,
     (board, views) => {
       const viewIds = board?.fields.viewIds ? board?.fields.viewIds : Object.keys(views);
       return Object.values(views)
-        .filter((v) => v.parentId === boardId)
+        .filter((v) => v.parentId === board?.id)
         .sort((a, b) => (viewIds.indexOf(a.id) > viewIds.indexOf(b.id) ? 1 : -1))
         .map((v) => createBoardView(v));
     }
@@ -100,6 +102,15 @@ export function getView(viewId: string | undefined): (state: RootState) => Board
     return viewId ? state.views.views[viewId] ?? null : null;
   };
 }
+
+export const makeSelectView = () =>
+  createSelector(
+    getViews,
+    (state: RootState, viewId: string) => viewId,
+    (views, viewId) => {
+      return views[viewId];
+    }
+  );
 
 export function getLoadedBoardViews(): (state: RootState) => Record<string, boolean> {
   return (state: RootState): Record<string, boolean> => {

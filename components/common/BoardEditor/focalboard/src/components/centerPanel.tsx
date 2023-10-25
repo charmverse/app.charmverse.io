@@ -15,14 +15,15 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
-import { getBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { makeSelectBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
-  getViewCardsSortedFilteredAndGrouped,
+  makeSelectViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -41,6 +42,7 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 
+import { Constants } from '../constants';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -62,7 +64,6 @@ type Props = WrappedComponentProps &
     board: Board;
     currentRootPageId: string;
     embeddedBoardPath?: string;
-    // cards: Card[]
     activeView?: BoardView;
     views: BoardView[];
     hideBanner?: boolean;
@@ -86,7 +87,7 @@ type State = {
 };
 
 function CenterPanel(props: Props) {
-  const { activeView, board, pageIcon, showView, views, page: boardPage } = props;
+  const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -114,38 +115,57 @@ function CenterPanel(props: Props) {
   const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
 
   const { keys } = useApiPageKeys(props.page?.id);
-  const activeBoard = useAppSelector(getBoard(activeBoardId ?? ''));
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const activeBoard = useAppSelector((state) => selectBoard(state, activeBoardId ?? ''));
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
 
-  const _cards = useAppSelector(
-    getViewCardsSortedFilteredAndGrouped({
+  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
+  const _cards = useAppSelector((state) =>
+    selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || '',
-      pages
+      viewId: activeView?.id || ''
     })
   );
+  const isActiveView = !!(activeView && activeBoard);
 
   useEffect(() => {
+    if (!isActiveView) {
+      return;
+    }
     if (views.length === 0) {
       setState((s) => ({ ...s, openSettings: 'create-linked-view' }));
     } else if (activeView) {
       setState((s) => ({ ...s, openSettings: null }));
     }
-  }, [activeView?.id, views.length, activePage]);
+  }, [activeView?.id, views.length, isActiveView]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = useMemo(
-    () => _cards.map((card) => ({ card, page: pages[card.id]! })).filter(({ page }) => !!page && !page.deletedAt),
-    [_cards, pages]
-  );
-  const isActiveView = !!(activeView && activeBoard);
-  const cards = useMemo(() => {
-    const sortedCardPages = isActiveView ? sortCards(cardPages, activeBoard, activeView, members) : [];
-    return sortedCardPages.map(({ card }) => card);
-  }, [cardPages, isActiveView]);
+  const cardPages: CardPage[] = useMemo(() => {
+    const result = _cards
+      // TODO: dont recreate the card objects, this causes re-rendering on all cards when any card/page is updated
+      // we need to figure another way to grab the page titles probably down-stream
+      .map((card) => ({
+        card: {
+          ...card,
+          fields: {
+            ...card.fields,
+            properties: {
+              ...card.fields.properties,
+              [Constants.titleColumnId]: pages[card.id]?.title ?? ''
+            }
+          }
+        },
+        page: pages[card.id]!
+      }))
+      .filter(({ page }) => !!page && !page.deletedAt);
+
+    return isActiveView ? sortCards(result, activeBoard, activeView, members) : [];
+  }, [isActiveView, _cards, pages]);
+
+  const cards = cardPages.map(({ card }) => card);
 
   let groupByProperty = _groupByProperty;
   if (
@@ -216,77 +236,81 @@ function CenterPanel(props: Props) {
     [props.showCard, state.selectedCardIds]
   );
 
-  const addCard = async (
-    groupByOptionId?: string,
-    show = false,
-    properties: Record<string, string> = {},
-    insertLast = true,
-    isTemplate = false
-  ) => {
-    if (!activeBoard) {
-      throw new Error('No active board');
-    }
-    if (!activeView) {
-      throw new Error('No active view');
-    }
+  const __addCard = props.addCard;
+  const _updateView = props.updateView;
 
-    const card = createCard();
-
-    // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateCard, {board: board.id, view: activeView.id, card: card.id})
-
-    card.parentId = activeBoard.id;
-    card.rootId = activeBoard.rootId;
-    const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
-      activeView.fields.filter,
-      activeBoard.fields.cardProperties
-    );
-
-    if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
-      if (groupByOptionId) {
-        propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
-      } else {
-        delete propertiesThatMeetFilters[groupByProperty.id];
+  const addCard = useCallback(
+    async (
+      groupByOptionId?: string,
+      show = false,
+      properties: Record<string, string> = {},
+      insertLast = true,
+      isTemplate = false
+    ) => {
+      if (!activeBoard) {
+        throw new Error('No active board');
       }
-    }
-    card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
+      if (!activeView) {
+        throw new Error('No active view');
+      }
 
-    card.fields.contentOrder = [];
-    card.fields.isTemplate = isTemplate;
+      const card = createCard();
 
-    mutator.performAsUndoGroup(async () => {
-      const newCardOrder = insertLast
-        ? [...activeView.fields.cardOrder, card.id]
-        : [card.id, ...activeView.fields.cardOrder];
-
-      // update view order first so that when we add the block it appears in the right spot
-      await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
-
-      await mutator.insertBlock(
-        card,
-        'add card',
-        async (block: Block) => {
-          if (space) {
-            await refreshPage(block.id);
-          }
-
-          if (isTemplate) {
-            showCard(block.id);
-          } else if (show) {
-            props.addCard(createCard(block));
-            props.updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
-            showCard(block.id);
-          } else {
-            // Focus on this card's title inline on next render
-            setState({ ...state, cardIdToFocusOnRender: card.id });
-            setTimeout(() => setState({ ...state, cardIdToFocusOnRender: '' }), 100);
-          }
-        },
-        async () => {
-          showCard(null);
-        }
+      card.parentId = activeBoard.id;
+      card.rootId = activeBoard.rootId;
+      const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
+        activeView.fields.filter,
+        activeBoard.fields.cardProperties
       );
-    });
-  };
+
+      if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
+        if (groupByOptionId) {
+          propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
+        } else {
+          delete propertiesThatMeetFilters[groupByProperty.id];
+        }
+      }
+      card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
+
+      card.fields.contentOrder = [];
+      card.fields.isTemplate = isTemplate;
+
+      mutator.performAsUndoGroup(async () => {
+        const newCardOrder = insertLast
+          ? [...activeView.fields.cardOrder, card.id]
+          : [card.id, ...activeView.fields.cardOrder];
+
+        // update view order first so that when we add the block it appears in the right spot
+        await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
+
+        await mutator.insertBlock(
+          card,
+          'add card',
+          async (block: Block) => {
+            if (space) {
+              await refreshPage(block.id);
+            }
+
+            if (isTemplate) {
+              showCard(block.id);
+            } else if (show) {
+              __addCard(createCard(block));
+              _updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
+              showCard(block.id);
+            } else {
+              // Focus on this card's title inline on next render
+              setState((_state) => ({ ..._state, cardIdToFocusOnRender: card.id }));
+              setTimeout(() => setState((_state) => ({ ..._state, cardIdToFocusOnRender: '' })), 100);
+            }
+          },
+          async () => {
+            showCard(null);
+          }
+        );
+      });
+    },
+    [activeBoard, activeView, __addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
+  );
 
   const editCardTemplate = (cardTemplateId: string) => {
     showCard(cardTemplateId);
@@ -334,6 +358,13 @@ function CenterPanel(props: Props) {
       }
     },
     [activeView]
+  );
+
+  const calendarAddCard = useCallback(
+    (properties: Record<string, string>) => {
+      addCard('', true, properties);
+    },
+    [addCard]
   );
 
   async function deleteSelectedCards() {
@@ -421,14 +452,26 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
+  const { trigger: updateProposalSource } = useSWRMutation(
+    `/api/pages/${activeBoard?.id}/proposal-source`,
+    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
+  );
+
+  // refresh proposals as a source
+  useEffect(() => {
+    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
+      updateProposalSource({ pageId: currentRootPageId });
+    }
+  }, [currentRootPageId, activeBoard?.id]);
+
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
-  const isLinkedDatabase = !!String(boardPage?.type).match('linked');
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
   const boardSourceType = activeView?.fields.sourceType ?? activeBoard?.fields.sourceType;
 
   const disableAddingNewCards = boardSourceType === 'proposals';
   const noBoardViewsYet = !isLoadingSourceData && views.length === 0;
+  const showNewLinkedBoardView = state.openSettings === 'create-linked-view' || noBoardViewsYet;
 
   return (
     <>
@@ -481,16 +524,11 @@ function CenterPanel(props: Props) {
           )}
           {(activePage || activeBoard) && (
             <ViewHeader
-              currentRootPageId={props.currentRootPageId}
               onDeleteView={props.onDeleteView}
               maxTabsShown={props.maxTabsShown}
               disableUpdatingUrl={props.disableUpdatingUrl}
               showView={props.showView}
-              onClickNewView={
-                boardPageType === 'inline_linked_board' || boardPageType === 'linked_board'
-                  ? addNewLinkedView
-                  : undefined
-              }
+              onClickNewView={activeView?.fields?.linkedSourceId ? addNewLinkedView : undefined}
               activeBoard={activeBoard}
               viewsBoard={board}
               activeView={props.activeView}
@@ -510,13 +548,13 @@ function CenterPanel(props: Props) {
         </div>
 
         <div className={`container-container ${state.openSettings ? 'sidebar-visible' : ''}`}>
-          <Box display='flex' sx={{ minHeight: state.openSettings ? 450 : 0 }}>
-            {(state.openSettings === 'create-linked-view' || noBoardViewsYet) && (
+          <Box display='flex' minHeight={state.openSettings ? 450 : 0}>
+            {showNewLinkedBoardView && (
               <Box width='100%'>
                 <CreateLinkedView rootBoard={board} views={views} showView={showView} />
               </Box>
             )}
-            {state.openSettings !== 'create-linked-view' && (
+            {!showNewLinkedBoardView && (
               <Box width='100%'>
                 {/* Show page title for inline boards */}
                 {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
@@ -528,7 +566,7 @@ function CenterPanel(props: Props) {
                   />
                 )}
                 {activeBoard && activeView?.fields.sourceType === 'google_form' && (
-                  <Typography sx={{ fontSize: 22, fontWeight: 500 }}>
+                  <Typography fontSize={22} fontWeight={500}>
                     Form responses to{' '}
                     <Link
                       target='_blank'
@@ -546,22 +584,20 @@ function CenterPanel(props: Props) {
                   </Typography>
                 )}
                 {/* Show page title for linked boards */}
-                {activePage &&
-                  activeView?.fields?.sourceType === 'board_page' &&
-                  boardPageType === 'inline_linked_board' && (
-                    <Button
-                      color='secondary'
-                      startIcon={<CallMadeIcon />}
-                      variant='text'
-                      size='large'
-                      href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
-                        activePage?.path
-                      }`}
-                      sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
-                    >
-                      {activePage?.title || 'Untitled'}
-                    </Button>
-                  )}
+                {activePage && activeView?.fields?.linkedSourceId && boardPageType === 'inline_linked_board' && (
+                  <Button
+                    color='secondary'
+                    startIcon={<CallMadeIcon />}
+                    variant='text'
+                    size='large'
+                    href={`${router.pathname.startsWith('/share') ? '/share' : ''}/${space?.domain}/${
+                      activePage?.path
+                    }`}
+                    sx={{ fontSize: 22, fontWeight: 700, py: 0 }}
+                  >
+                    {activePage?.title || 'Untitled'}
+                  </Button>
+                )}
                 {activeBoard && activeView?.fields.viewType === 'board' && (
                   <Kanban
                     board={activeBoard}
@@ -605,9 +641,7 @@ function CenterPanel(props: Props) {
                     readOnly={props.readOnly}
                     dateDisplayProperty={dateDisplayProperty}
                     showCard={showCard}
-                    addCard={(properties: Record<string, string>) => {
-                      addCard('', true, properties);
-                    }}
+                    addCard={calendarAddCard}
                     disableAddingCards={disableAddingNewCards}
                   />
                 )}

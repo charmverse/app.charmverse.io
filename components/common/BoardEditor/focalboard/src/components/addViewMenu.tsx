@@ -74,7 +74,6 @@ function AddViewMenu(props: AddViewProps) {
   const handleAddViewBoard = useCallback(async () => {
     const { board, activeView } = props;
     Utils.log('addview-board');
-    // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.CreateBoardView, {board: board.id, view: activeView.id})
     const view = createBoardView();
     view.title = '';
     view.fields.viewType = 'board';
