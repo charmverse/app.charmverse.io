@@ -75,6 +75,10 @@ export type CollablandDiscordRole = CollablandCredential<DiscordRoleSubject>;
 export type AnyCredentialType = CollablandBountyEvent | CollablandDiscordRole;
 
 function getHeaders(customHeaders: HeadersInit = {}) {
+  if (!API_KEY) {
+    log.warn('No API Key provided for collab.land');
+  }
+
   return {
     ...DEFAULT_HEADERS,
     ...customHeaders
@@ -82,11 +86,6 @@ function getHeaders(customHeaders: HeadersInit = {}) {
 }
 
 export function getCredentials({ aeToken }: { aeToken: string }) {
-  if (!API_KEY) {
-    log.warn('No API Key provided for collab.land');
-    return [];
-  }
-
   return GET<AnyCredentialType[]>(`${COLLABLAND_API_URL}/veramo/vcs`, {
     headers: getHeaders({
       Authorization: `AE ${aeToken}`
@@ -96,11 +95,6 @@ export function getCredentials({ aeToken }: { aeToken: string }) {
 
 // @ref: https://api-qa.collab.land/explorer/#/VeramoController/VeramoController.requestToIssueVcred
 export function createCredential<T = BountyEventSubject>({ subject }: { subject: T }) {
-  if (!API_KEY) {
-    log.warn('No API Key provided for collab.land');
-    return null;
-  }
-
   return POST<CollablandCredential<T>>(
     `${COLLABLAND_API_URL}/veramo/vcreds`,
     { credentialSubjects: [subject] },
@@ -117,13 +111,6 @@ export async function getDiscordUserState({
   discordServerId: string;
   discordUserId: string;
 }) {
-  if (!API_KEY) {
-    log.warn('No API Key provided for collab.land');
-    return {
-      isVerified: false,
-      roles: []
-    };
-  }
   try {
     await rateLimiter();
     const res = await GET<CollablandUserResult>(
@@ -157,10 +144,6 @@ export async function getDiscordUserState({
 }
 
 export async function getGuildRoles(discordServerId: string) {
-  if (!API_KEY) {
-    log.warn('No API Key provided for collab.land');
-    return [];
-  }
   await rateLimiter();
   const allRoles = await GET<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
     headers: getHeaders()
