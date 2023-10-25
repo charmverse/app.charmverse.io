@@ -94,7 +94,6 @@ export function PageTitleInput({
         data-test='editor-page-title'
         inputRef={titleInput}
         value={title}
-        multiline
         placeholder={placeholder || 'Untitled'}
         autoFocus={!value && !readOnly && !isTouchScreen()}
         variant='standard'
