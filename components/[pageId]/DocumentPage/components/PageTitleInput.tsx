@@ -1,8 +1,8 @@
 import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
-import type { TextFieldProps } from '@mui/material';
 import { TextField, Typography } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
 
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { isTouchScreen } from 'lib/utilities/browser';
@@ -69,31 +69,15 @@ export function PageTitleInput({
     if (updatedAtExternal && updatedAt && updatedAt < updatedAtExternal) {
       setTitle(value);
     }
-  }, [value, updatedAtExternal]);
+  }, [value, updatedAtExternal, updatedAt, setTitle]);
 
-  function updateTitle(newTitle: string) {
+  function _onChange(event: ChangeEvent<HTMLInputElement>) {
+    const newTitle = event.target.value;
     const _updatedAt = new Date().toISOString();
     setTitle(newTitle);
     setUpdatedAt(_updatedAt);
     onChange({ title: newTitle, updatedAt: _updatedAt });
   }
-
-  const handleKeyDown: TextFieldProps['onKeyDown'] = (event) => {
-    const pressedEnter = event.key === 'Enter';
-    const pressedCtrl = event.ctrlKey;
-    if (pressedEnter) {
-      if (!pressedCtrl) {
-        event.preventDefault();
-        // add a delay for Japanese keybaords, which for some reason copy the current text to the document
-        setTimeout(() => {
-          insertAndFocusFirstLine(view);
-        });
-      } else {
-        const inputElement = event.target as HTMLInputElement;
-        updateTitle(`${inputElement.value}\n`);
-      }
-    }
-  };
 
   if (readOnly) {
     return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
@@ -114,10 +98,7 @@ export function PageTitleInput({
         placeholder={placeholder || 'Untitled'}
         autoFocus={!value && !readOnly && !isTouchScreen()}
         variant='standard'
-        onKeyDown={handleKeyDown}
-        onChange={(e) => {
-          updateTitle(e.target.value);
-        }}
+        onChange={_onChange}
       />
     </form>
   );
