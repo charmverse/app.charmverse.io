@@ -1,9 +1,13 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
-export const client = new ApolloClient({
-  uri: 'https://hub.snapshot.org/graphql',
-  cache: new InMemoryCache({})
-});
+export function createSnapshotGraphqlClient(uri: string = 'https://hub.snapshot.org') {
+  return new ApolloClient({
+    uri: `${uri}/graphql`,
+    cache: new InMemoryCache({})
+  });
+}
+
+export const client = createSnapshotGraphqlClient();
 
 // Every 15 seconds, clear the cached values in the client
 setInterval(() => {

@@ -3,7 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import * as api from 'lib/summon/api';
 import type { SummonUserProfile } from 'lib/summon/interfaces';
 
-export async function getSummonProfile({ userId }: { userId: string }): Promise<null | SummonUserProfile> {
+export async function getSummonProfile({
+  userId,
+  summonApiUrl = api.SUMMON_BASE_URL
+}: {
+  summonApiUrl?: string;
+  userId: string;
+}): Promise<null | SummonUserProfile> {
   const user = await prisma.user.findUnique({
     where: {
       id: userId
@@ -37,12 +43,16 @@ export async function getSummonProfile({ userId }: { userId: string }): Promise<
     (await api.findUserXpsEngineId({
       discordUserAccount,
       userEmail,
-      walletAddresses
+      walletAddresses,
+      summonApiUrl
     }));
 
   if (!xpsEngineId) {
     return null;
   }
 
-  return api.getUserSummonProfile(xpsEngineId);
+  return api.getUserSummonProfile({
+    xpsEngineId,
+    summonApiUrl
+  });
 }
