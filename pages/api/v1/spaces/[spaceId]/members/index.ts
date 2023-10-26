@@ -1,4 +1,4 @@
-import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { isTestEnv } from 'config/constants';
@@ -55,8 +55,7 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   } catch (_) {
     const createdUser = await createUserFromWallet({
       address: payload.wallet,
-      email: payload.email,
-      skipTracking: true
+      email: payload.email
     });
     user = await searchUserProfile({
       userId: createdUser.id
