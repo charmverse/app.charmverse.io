@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 
 import LitChainSelector from '../../reusableComponents/litChainSelector/LitChainSelector.jsx';
 import LitChooseAccessButton from '../../reusableComponents/litChooseAccessButton/LitChooseAccessButton.jsx';

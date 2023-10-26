@@ -69,8 +69,6 @@ import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitFoote
 import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitNextButton.css';
 import 'components/common/LitProtocolModal/reusableComponents/litHeader/LitHeader.css';
 import 'components/common/LitProtocolModal/reusableComponents/litInput/LitInput.css';
-import 'components/common/LitProtocolModal/reusableComponents/litLoading/LitLoading';
-import 'components/common/LitProtocolModal/reusableComponents/litLoading/LitLoading.css';
 import 'components/common/LitProtocolModal/shareModal/devMode/DevModeContent.css';
 import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
 import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';

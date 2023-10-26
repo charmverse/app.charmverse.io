@@ -3,7 +3,7 @@ import { createContext } from 'react';
 export type Chain = { value: string };
 export type AccessCondition = any; // TODO!;
 export type HumanizedAccessCondition = any; // TODO!;
-export type DisplayedPage = 'single' | 'multiple' | 'review';
+export type DisplayedPage = 'single' | 'multiple' | 'multiple-add' | 'review';
 export type Flow = 'singleCondition' | 'multipleConditions';
 export type Token = {
   address: string;
@@ -24,7 +24,7 @@ type ModalContextType = {
   unifiedAccessControlConditions: any[];
   chain: Chain | null;
   chainList: Chain[];
-  setChain: (chain: null | Chain) => void;
+  setChain: (chain: Chain) => void;
   flow: Flow;
   setFlow: (flow: Flow) => void;
   setError: (error: any | null) => void;

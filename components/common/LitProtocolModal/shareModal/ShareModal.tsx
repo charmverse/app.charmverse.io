@@ -7,7 +7,6 @@ import { isProdEnv } from 'config/constants';
 import type { LitChainConfig } from '../chainConfig';
 import { chainConfig } from '../chainConfig';
 import LitHeader from '../reusableComponents/litHeader/LitHeader';
-import LitLoading from '../reusableComponents/litLoading/LitLoading';
 
 import type {
   AccessCondition,
@@ -20,13 +19,7 @@ import type {
 import { ShareModalContext } from './createShareContext';
 import DevModeContent from './devMode/DevModeContent';
 import DevModeHeader from './devMode/DevModeHeader';
-import {
-  checkPropTypes,
-  getAllowedConditions,
-  logDevError,
-  setDevModeIsAllowed,
-  stripNestedArray
-} from './helpers/helperFunctions.js';
+import { checkPropTypes, logDevError, setDevModeIsAllowed, stripNestedArray } from './helpers/helperFunctions.js';
 import {
   cleanUnifiedAccessControlConditions,
   getAllChains,
@@ -51,10 +44,6 @@ const ShareModalContainer = styled.div`
   width: 100%;
   min-height: 600px;
 
-  .lsm-single-select-condition-display {
-    overflow-y: scroll;
-  }
-
   .lsm-single-condition-select-container,
   .lsm-condition-display,
   .lsm-condition-container,
@@ -78,13 +67,14 @@ type Props = {
   onUnifiedAccessControlConditionsSelected(result: ConditionsModalResult): void;
 };
 
-const chainsAllowed = chainConfig.map((chain) => chain.value) as string[];
 const defaultChain = 'ethereum';
-const conditionsAllowed = {};
+const chainMap = chainConfig.reduce<Record<string, LitChainConfig>>((acc, _chain) => {
+  acc[_chain.value] = _chain;
+  return acc;
+}, {});
 
 function ShareModal(props: Props) {
   const [displayedPage, setDisplayedPage] = useState<DisplayedPage>('single');
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | any | null>(null);
   const [unifiedAccessControlConditions, setUnifiedAccessControlConditions] = useState<any[]>([]);
   const [humanizedUnifiedAccessControlConditions, setHumanizedUnifiedAccessControlConditions] = useState<
@@ -92,37 +82,16 @@ function ShareModal(props: Props) {
   >([]);
   const [flow, setFlow] = useState<Flow>('singleCondition');
   const [tokenList, setTokenList] = useState<Token[] | null>(null);
-  const [chain, setChain] = useState<Chain | null>(null);
-  const [chainList, setChainList] = useState<Chain[]>([]);
+  const [chain, setChain] = useState<Chain>(chainMap[defaultChain]);
   const [showDevMode, setShowDevMode] = useState(false);
 
   const { onUnifiedAccessControlConditionsSelected, darkMode = false } = props;
 
   useEffect(() => {
-    const chainMap = chainConfig.reduce<Record<string, LitChainConfig>>((acc, _chain) => {
-      acc[_chain.value] = _chain;
-      return acc;
-    }, {});
     checkPropTypes(props);
     setDevModeIsAllowed(allowDevMode);
-    // check and set allowed conditions per chain
-    const chainsWithAllowedConditions = getAllowedConditions(chainsAllowed, conditionsAllowed, chainMap);
-    setChainList(chainsWithAllowedConditions);
-
-    setInitialChain(chainsWithAllowedConditions);
-
     getTokens();
   }, []);
-
-  async function setInitialChain(_chainsAllowed: Chain[]) {
-    // get default chain
-    const initialChain = _chainsAllowed.find((c) => c.value === defaultChain);
-    if (!initialChain) {
-      logDevError('no default chain found.  Check defaultChain prop.');
-      return;
-    }
-    setChain(initialChain);
-  }
 
   async function getTokens() {
     // get token list and cache it
@@ -145,7 +114,6 @@ function ShareModal(props: Props) {
       setTokenList([]);
       setError(err);
     }
-    setLoading(false);
   }
 
   const handleDeleteAccessControlCondition = async (localIndex: number, nestedIndex: number) => {
@@ -241,7 +209,6 @@ function ShareModal(props: Props) {
     setDisplayedPage('single');
     clearAllAccessControlConditions();
     setError(null);
-    setInitialChain(chainList).then(() => {});
   };
 
   const sendUnifiedAccessControlConditions = async () => {
@@ -274,14 +241,6 @@ function ShareModal(props: Props) {
     }
   };
 
-  if (loading) {
-    return (
-      <span className='lsm-loading-display'>
-        <LitLoading />
-      </span>
-    );
-  }
-
   return (
     <ShareModalContainer>
       <div className={`lsm-share-modal-container ${getTheme()}`}>
@@ -297,7 +256,7 @@ function ShareModal(props: Props) {
               resetModal,
               wipeInitialProps: () => {},
               chain,
-              chainList,
+              chainList: chainConfig,
               setChain,
               setError,
               setDisplayedPage,

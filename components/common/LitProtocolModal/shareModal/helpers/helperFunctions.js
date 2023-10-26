@@ -40,38 +40,6 @@ const checkPropTypes = (props) => {
   }
 }
 
-const getAllowedConditionTypes = (chainData, conditionsAllowed = null) => {
-  if (!conditionsAllowed) {
-    return chainData;
-  } else {
-    const chainDataHolder = chainData;
-    const chainConditionsAllowed = {};
-    conditionsAllowed.forEach(c => {
-      if (!!chainData.types.conditionTypes[c]) {
-        chainConditionsAllowed[c] = chainData.types.conditionTypes[c];
-      } else {
-        logDevError(`condition '${c}' not found or not supported for this chain.`)
-      }
-    })
-    chainDataHolder.types.conditionTypes = chainConditionsAllowed;
-    return chainDataHolder;
-  }
-}
-
-const getAllowedConditions = (chainsAllowed, conditionsAllowed, defaultAllowedChainsObj) => {
-  const currentlyAllowedChains = [];
-  chainsAllowed.forEach(c => {
-    if (!!defaultAllowedChainsObj[c]) {
-      let chainData = defaultAllowedChainsObj[c];
-      chainData = getAllowedConditionTypes(chainData, conditionsAllowed[c]);
-      currentlyAllowedChains.push(chainData);
-    } else {
-      logDevError(`chain '${c}' not found. Check the spelling.`)
-    }
-  })
-  return currentlyAllowedChains;
-}
-
 const stripNestedArray = (unifiedAccessControlConditions) => {
   if (unifiedAccessControlConditions.length === 1 && Array.isArray(unifiedAccessControlConditions[0])) {
     return stripNestedArray(unifiedAccessControlConditions[0]);
@@ -83,7 +51,6 @@ const stripNestedArray = (unifiedAccessControlConditions) => {
 export {
   logDevError,
   checkPropTypes,
-  getAllowedConditions,
   stripNestedArray,
   setDevModeIsAllowed
 }
