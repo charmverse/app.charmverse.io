@@ -26,11 +26,24 @@ beforeAll(async () => {
 });
 
 describe('POST /api/v1/spaces/{spaceId}/members', () => {
+  it('should respond 400 when wallet is missing from payload', async () => {
+    const response = await request(baseUrl)
+      .post(`/api/v1/spaces/${space.id}/members`)
+      .set('Authorization', superApiKey.token)
+      .send({
+        email: 'john.doe@gmail.com'
+      });
+
+    expect(response.statusCode).toBe(400);
+  });
+
   it('should respond 401 when api token is missing or invalid', async () => {
     const response = await request(baseUrl)
       .post(`/api/v1/spaces/${space.id}/members`)
       .set('Authorization', 'Bearer invalid-token')
-      .send();
+      .send({
+        wallet: randomETHWalletAddress()
+      });
 
     expect(response.statusCode).toBe(401);
   });

@@ -516,7 +516,6 @@ export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
  *  schemas:
  *    CreateSpaceMemberRequestBody:
  *      required:
- *        - email
  *        - wallet
  *      type: object
  *      properties:
@@ -529,7 +528,7 @@ export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
  *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
  */
 export interface CreateSpaceMemberRequestBody {
-  email: string;
+  email?: string;
   wallet: string;
 }
 

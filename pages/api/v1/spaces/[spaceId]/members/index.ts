@@ -1,11 +1,12 @@
+import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { isTestEnv } from 'config/constants';
-import { InvalidStateError, NotFoundError, requireSuperApiKey } from 'lib/middleware';
+import { NotFoundError, requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { getSummonProfile } from 'lib/profile/getSummonProfile';
 import { defaultHandler } from 'lib/public-api/handler';
 import type { CreateSpaceMemberRequestBody, UserProfile } from 'lib/public-api/interfaces';
-import { searchUserProfile, searchUserProfileById } from 'lib/public-api/searchUserProfile';
+import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
 import { SUMMON_BASE_URL } from 'lib/summon/api';
@@ -14,7 +15,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 
 const handler = defaultHandler();
 
-handler.post(requireSuperApiKey, createSpaceMember);
+handler.use(requireKeys([{ key: 'wallet', truthy: true }], 'body')).post(requireSuperApiKey, createSpaceMember);
 
 /**
  * @swagger
@@ -44,20 +45,22 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   const spaceIds = req.spaceIdRange;
   const summonApiUrl = (isTestEnv ? req.query.summonApiUrl ?? SUMMON_BASE_URL : SUMMON_BASE_URL) as string;
   if (!spaceIds || !spaceIds.length) {
-    throw new InvalidStateError('Space ID is undefined');
+    throw new UnauthorisedActionError("API key doesn't have access to any spaces");
   }
 
   let user: UserProfile | null = null;
 
   try {
-    user = await searchUserProfile({ ...payload, spaceIds });
+    user = await searchUserProfile(payload);
   } catch (_) {
     const createdUser = await createUserFromWallet({
       address: payload.wallet,
       email: payload.email,
       skipTracking: true
     });
-    user = await searchUserProfileById(createdUser.id);
+    user = await searchUserProfile({
+      userId: createdUser.id
+    });
   }
 
   const summonProfile = await getSummonProfile({
