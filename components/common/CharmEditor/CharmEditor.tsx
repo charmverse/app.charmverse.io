@@ -1,6 +1,5 @@
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { Node } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
@@ -28,6 +27,7 @@ import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
+import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import Callout from './components/callout/components/Callout';
 import { CryptoPrice } from './components/CryptoPrice';
