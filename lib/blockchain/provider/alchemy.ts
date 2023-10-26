@@ -1,28 +1,21 @@
 import { GET } from '@charmverse/core/http';
+import { RPCList, getChainById } from 'connectors';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { paginatedCall } from 'lib/utilities/async';
-import { typedKeys } from 'lib/utilities/objects';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { NFTData } from '../getNFTs';
 
 import { toInt } from './ankr';
 
-// Find supported chains: https://docs.alchemy.com/docs/why-use-alchemy#-blockchains-supported
-const alchemyApis = {
-  1: 'eth-mainnet',
-  5: 'eth-goerli',
-  10: 'opt-mainnet',
-  137: 'polygon-mainnet',
-  80001: 'polygon-mumbai',
-  42161: 'arb-mainnet'
-} as const;
-
-export const supportedChainIds = typedKeys(alchemyApis);
+export const supportedChains = RPCList.filter((chain) => chain.alchemyUrl);
+export const supportedChainIds = RPCList.map((chain) => chain.chainId);
 export type SupportedChainId = (typeof supportedChainIds)[number];
 
-export const supportedMainnets: SupportedChainId[] = [1, 10, 137, 42161];
+export const supportedMainnets: SupportedChainId[] = supportedChains
+  .filter((chain) => !chain.testnet)
+  .map((chain) => chain.chainId);
 
 interface NftMedia {
   bytes: number;
@@ -77,15 +70,12 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
     throw new Error('No api key provided for Alchemy');
   }
 
-  const apiSubdomain = alchemyApis[chainId];
-  if (!apiSubdomain) throw new Error(`Chain id "${chainId}" not supported by Alchemy`);
+  const alchemyUrl = getChainById(chainId)?.alchemyUrl;
+  if (!alchemyUrl) throw new Error(`Chain id "${chainId}" not supported by Alchemy`);
+
   const apiSuffixPath = apiSuffix ? `${apiSuffix}/` : '';
 
-  if (!apiSubdomain) {
-    throw new Error('Chain not supported');
-  }
-
-  return `https://${apiSubdomain}.g.alchemy.com/${apiSuffixPath}v2/${apiKey}`;
+  return `${alchemyUrl}/${apiSuffixPath}v2/${apiKey}`;
 };
 
 // Docs: https://docs.alchemy.com/reference/getnfts

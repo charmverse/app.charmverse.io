@@ -126,41 +126,4 @@ describe('components/calculations/Calculation', () => {
     const { container } = render(component);
     expect(container).toMatchSnapshot();
   });
-
-  // test('should match snapshot - option change', () => {
-  //   const onMenuOpen = jest.fn();
-  //   const onMenuClose = jest.fn();
-  //   const onChange = jest.fn();
-
-  //   const component = wrapIntl(
-  //     <Calculation
-  //       style={{}}
-  //       // Test failing due to anchorEl not present in the dom
-  //       anchorEl={null}
-  //       class='fooClass'
-  //       value='none'
-  //       menuOpen={true}
-  //       onMenuClose={onMenuClose}
-  //       onMenuOpen={onMenuOpen}
-  //       onChange={onChange}
-  //       cards={[card, card2]}
-  //       hovered={true}
-  //       property={{
-  //         id: 'property_2',
-  //         name: '',
-  //         type: 'text',
-  //         options: []
-  //       }}
-  //       optionsComponent={TableCalculationOptions}
-  //     />
-  //   );
-
-  //   const { container } = render(component);
-  //   const countMenuOption = container.querySelector('#react-select-2-option-1');
-  //   userEvent.click(countMenuOption as Element);
-  //   expect(container).toMatchSnapshot();
-  //   expect(onMenuOpen).not.toBeCalled();
-  //   expect(onMenuClose).toBeCalled();
-  //   expect(onChange).toBeCalled();
-  // });
 });

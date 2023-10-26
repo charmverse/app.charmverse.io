@@ -45,6 +45,9 @@
       "adapters/*": [
         "./adapters/*"
       ],
+      "connectors": [
+        "./connectors"
+      ],
       "connectors/*": [
         "./connectors/*"
       ],
