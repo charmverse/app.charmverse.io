@@ -94,7 +94,8 @@ async function getDefaultPageForSpaceRaw({
       id: true,
       index: true,
       path: true,
-      type: true
+      type: true,
+      parentId: true
     }
   });
 
@@ -104,10 +105,12 @@ async function getDefaultPageForSpaceRaw({
   }, {});
 
   // Find the first top-level page that is not card and hasn't been deleted yet.
-  const topLevelPages = filterVisiblePages(pageMap);
+  const visiblePages = filterVisiblePages(pageMap);
+  const topLevelPages = visiblePages.filter((page) => !page.parentId);
+  const pagesToLookup = topLevelPages.length ? topLevelPages : visiblePages;
 
   // TODO: simplify types of sortNodes input to only be index and createdAt
-  const sortedPages = pageTree.sortNodes(topLevelPages as PageMeta[]);
+  const sortedPages = pageTree.sortNodes(pagesToLookup as PageMeta[]);
 
   const firstPage = sortedPages[0];
   if (firstPage) {
