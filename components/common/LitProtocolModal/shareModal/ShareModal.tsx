@@ -42,7 +42,7 @@ const allowDevMode = !isProdEnv;
 // Docs: https://www.npmjs.com/package/lit-share-modal-v3
 const ShareModalContainer = styled.div`
   width: 100%;
-  min-height: 600px;
+  min-height: 500px;
 
   .lsm-single-condition-select-container,
   .lsm-condition-display,
