@@ -1,0 +1,28 @@
+.lsm-multiple-condition-add-container {
+    overflow: hidden;
+    height: calc(100% - 4.5em);
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.lsm-multiple-condition-select-prompt {
+    color: var(--lsm-primary-color);
+    font-family: var(--lsm-primary-font);
+    font-weight: var(--lsm-primary-font-weight);
+    text-align: center;
+    font-size: 1.05em;
+}
+
+.lsm-multiple-select-condition-display {
+    flex: 1 1 auto;
+    /*min-height: calc(100% - 4.5em);*/
+    height: calc(100% - 4.5em);
+    width: 100%;
+    overflow-y: hidden;
+    box-sizing: border-box;
+}
+
+.lsm-multiple-condition-select-prompt {
+    margin: 1em 0;
+}
+
