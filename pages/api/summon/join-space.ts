@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
@@ -10,7 +11,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
 import { verifyMembership } from 'lib/summon/verifyMembership';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -29,6 +30,15 @@ async function joinSpaceEndpoint(req: NextApiRequest, res: NextApiResponse) {
 
   if (!result.isVerified) {
     throw new InvalidInputError('You are not a member of this space');
+  }
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceId,
+    userId
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(`You have been banned from this space.`);
   }
 
   await addUserToSpace({ spaceId, userId, userXpsEngineId: result.summonUserId });

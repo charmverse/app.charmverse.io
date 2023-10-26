@@ -12,10 +12,18 @@ handler.get(checkSpaceBanStatusHandler);
 async function checkSpaceBanStatusHandler(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
   const spaceId = req.query.id as string;
+  const { discordId, email, walletAddress } = req.query as {
+    discordId?: string;
+    walletAddress?: string;
+    email?: string;
+  };
 
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
     spaceId,
-    userId
+    userId,
+    discordId,
+    emails: email ? [email] : [],
+    walletAddresses: walletAddress ? [walletAddress] : []
   });
 
   res.status(200).json({ isBanned: isUserBannedFromSpace });

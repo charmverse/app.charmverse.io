@@ -25,7 +25,8 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
       if (!user && verifiableWalletDetected && walletAuthSignature) {
         loggedInUser = await charmClient.createUser({
           address: walletAuthSignature.address,
-          walletSignature: walletAuthSignature
+          walletSignature: walletAuthSignature,
+          spaceId: invite.space.id
         });
       }
       await charmClient.acceptInvite({ id: invite.id });
@@ -37,12 +38,13 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
       }
 
       window.location.href = redirectUrl;
-    } catch (err: any) {
-      showMessage(err.message, 'error');
-      log.error(`Error accepting invite: ${err}`, {
+    } catch (error: any) {
+      showMessage(error.message, 'error');
+      log.error('Error accepting invite', {
         inviteId: invite.id,
         spaceId: invite.space.id,
-        userId: loggedInUser?.id
+        userId: loggedInUser?.id,
+        error
       });
     }
   }

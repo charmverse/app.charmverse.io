@@ -1,15 +1,18 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -23,13 +26,23 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.post(requireWalletSignature, createUser).get(getUser).use(requireUser).put(updateUser);
 
 async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-  const { address } = req.body;
+  const { address, spaceId } = req.body as Web3LoginRequest;
 
   let user: LoggedInUser;
 
   try {
     user = await getUserProfile('addresses', address);
   } catch {
+    if (spaceId) {
+      const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+        spaceId,
+        walletAddresses: [address]
+      });
+
+      if (isUserBannedFromSpace) {
+        throw new UnauthorisedActionError('User has been banned from space');
+      }
+    }
     const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);

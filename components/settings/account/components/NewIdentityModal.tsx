@@ -9,6 +9,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
@@ -40,6 +41,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { account, isSigning, setAccountUpdatePaused } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
+  const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
@@ -91,6 +93,16 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
       sendingMagicLink.current = true;
       // console.log('Handling magic link request');
       try {
+        if (space) {
+          const isUserBannedFromSpace = await charmClient.members.checkSpaceBanStatus({
+            spaceId: space.id,
+            email
+          });
+
+          if (isUserBannedFromSpace.isBanned) {
+            throw new Error('You need to leave space before you can add this email to your account');
+          }
+        }
         await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
         showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
         onClose();
@@ -129,7 +141,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
       open={isOpen}
       onClose={!isUserWalletActive && identityToAdd === 'wallet' && !!account ? undefined : close}
       title={!identityToAdd ? 'Add an account' : modalTitles[identityToAdd]}
-      aria-labelledby='Conect an account modal'
+      aria-labelledby='Connect an account modal'
       size='600px'
     >
       {!identityToAdd && (

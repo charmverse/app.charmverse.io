@@ -195,7 +195,7 @@ function MemberActions({
           open={banPopupState.isOpen}
           buttonText={`Ban ${bannedMember?.isAdmin ? 'admin' : bannedMember?.isGuest ? 'guest' : 'member'}`}
           onConfirm={banFromSpaceHandler}
-          question={`Are you sure you want to ban ${bannedMember?.username} from space? This will ban all of the wallets and accounts from this member, delete all of their content and remove them from the space.`}
+          question={`Are you sure you want to ban ${bannedMember?.username} from space? This will ban all of the wallets and accounts from this member.`}
         />
       </>
     );
@@ -219,7 +219,7 @@ function MemberActions({
         open={banPopupState.isOpen}
         buttonText={`Ban ${bannedMember?.isAdmin ? 'admin' : bannedMember?.isGuest ? 'guest' : 'member'}`}
         onConfirm={banFromSpaceHandler}
-        question={`Are you sure you want to ban ${bannedMember?.username} from space? This will ban all of the wallets and accounts from this member, delete all of their content and remove them from the space.`}
+        question={`Are you sure you want to ban ${bannedMember?.username} from space? This will ban all of the wallets and accounts from this member.`}
       />
       <Menu
         {...bindMenu(popupState)}
@@ -264,7 +264,7 @@ function MemberActions({
                     <StyledListItemText
                       primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
                       primary='Ban from space'
-                      secondary='Ban all of the wallets and accounts from this member, delete all of their content and remove them from the space'
+                      secondary='Ban all of the wallets and accounts from this member'
                     />
                   )}
                   {action === activeRoleAction && (

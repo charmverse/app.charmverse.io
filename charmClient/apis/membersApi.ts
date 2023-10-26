@@ -98,7 +98,17 @@ export class MembersApi {
     return http.DELETE(`/api/spaces/${spaceId}/members/${userId}/ban`);
   }
 
-  checkSpaceBanStatus({ spaceId }: { spaceId: string }) {
-    return http.GET<{ isBanned: boolean }>(`/api/spaces/${spaceId}/members/ban-status`);
+  checkSpaceBanStatus({
+    spaceId,
+    ...payload
+  }: {
+    spaceId: string;
+    email?: string;
+    walletAddress?: string;
+    discordId?: string;
+  }) {
+    return http.GET<{ isBanned: boolean }>(`/api/spaces/${spaceId}/members/ban-status`, {
+      ...payload
+    });
   }
 }

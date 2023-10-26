@@ -4,8 +4,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import { validate } from 'uuid';
 
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { InvalidStateError } from 'lib/middleware';
-import { DataNotFoundError, MissingDataError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
 
@@ -46,6 +47,15 @@ export async function evaluateTokenGateEligibility({
 
   if (!space) {
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
+  }
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceId: space.id,
+    userId
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(`You have been banned from this space.`);
   }
 
   if (!litClient.ready) {

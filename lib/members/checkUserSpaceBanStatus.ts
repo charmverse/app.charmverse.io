@@ -13,7 +13,7 @@ export async function checkUserSpaceBanStatus({
   userId?: string;
   spaceId: string;
 }) {
-  if (!userId && !discordId && (!walletAddresses || walletAddresses.length === 0)) {
+  if (!userId && !discordId && (!walletAddresses || walletAddresses.length === 0) && (!emails || emails.length === 0)) {
     return false;
   }
 
@@ -49,27 +49,29 @@ export async function checkUserSpaceBanStatus({
 
   const blacklistedUserByIdentity = await prisma.blacklistedSpaceUser.findFirst({
     where: {
-      spaceId,
-      OR: [
-        {
-          userId
-        },
-        {
-          walletAddresses: {
-            hasSome: userWalletAddresses
+      AND: {
+        spaceId,
+        OR: [
+          {
+            userId
+          },
+          {
+            walletAddresses: {
+              hasSome: userWalletAddresses
+            }
+          },
+          {
+            discordId: {
+              in: userDiscordIds
+            }
+          },
+          {
+            emails: {
+              hasSome: userEmails
+            }
           }
-        },
-        {
-          discordId: {
-            in: userDiscordIds
-          }
-        },
-        {
-          emails: {
-            hasSome: userEmails
-          }
-        }
-      ]
+        ]
+      }
     }
   });
 
