@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 
@@ -11,13 +11,15 @@ import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';
+import { IDType, Utils } from '../../utils';
 import BoardIcon from '../../widgets/icons/board';
 import CalendarIcon from '../../widgets/icons/calendar';
 import GalleryIcon from '../../widgets/icons/gallery';
 import TableIcon from '../../widgets/icons/table';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 interface LayoutOptionsProps {
-  properties: readonly IPropertyTemplate[];
+  board?: Board;
   view: BoardView;
   intl: IntlShape;
 }
@@ -54,7 +56,8 @@ function LayoutOptions(props: LayoutOptionsProps) {
   }, [activeView]);
 
   const handleAddViewTable = useCallback(async () => {
-    const { properties } = props;
+    const { board } = props;
+    const properties = board?.fields.cardProperties ?? [];
     const newView = createBoardView(activeView);
     newView.fields.viewType = 'table';
     newView.fields.visiblePropertyIds = properties.map((o: IPropertyTemplate) => o.id) ?? [];
@@ -83,10 +86,29 @@ function LayoutOptions(props: LayoutOptionsProps) {
   }, [activeView]);
 
   const handleAddViewCalendar = useCallback(async () => {
+    const { board } = props;
     const newView = createBoardView(activeView);
     newView.fields.viewType = 'calendar';
     newView.fields.visiblePropertyIds = [Constants.titleColumnId];
     newView.fields.cardOrder = activeView?.fields.cardOrder ?? [];
+
+    // Find first date property
+    newView.fields.dateDisplayPropertyId = board!.fields.cardProperties.find(
+      (o: IPropertyTemplate) => o.type === 'date'
+    )?.id;
+
+    // Create one if it doesn't exist
+    if (!newView.fields.dateDisplayPropertyId) {
+      const template: IPropertyTemplate = {
+        id: Utils.createGuid(IDType.BlockID),
+        name: typeDisplayName(intl, 'date'),
+        type: 'date',
+        options: []
+      };
+      mutator.insertPropertyTemplate(board!, newView, -1, template);
+      newView.fields.dateDisplayPropertyId = template.id;
+    }
+
     try {
       dispatch(updateView(newView));
       await mutator.updateBlock(newView, activeView, 'change view type');
