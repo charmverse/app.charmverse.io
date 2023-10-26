@@ -63,7 +63,6 @@ const ShareModalContainer = styled.div`
 `;
 
 type Props = {
-  darkMode?: boolean;
   onUnifiedAccessControlConditionsSelected(result: ConditionsModalResult): void;
 };
 
@@ -85,7 +84,7 @@ function ShareModal(props: Props) {
   const [chain, setChain] = useState<Chain>(chainMap[defaultChain]);
   const [showDevMode, setShowDevMode] = useState(false);
 
-  const { onUnifiedAccessControlConditionsSelected, darkMode = false } = props;
+  const { onUnifiedAccessControlConditionsSelected } = props;
 
   useEffect(() => {
     checkPropTypes(props);
@@ -233,17 +232,9 @@ function ShareModal(props: Props) {
     resetModal();
   };
 
-  const getTheme = () => {
-    if (darkMode) {
-      return 'lsm-dark-theme';
-    } else {
-      return 'lsm-light-theme';
-    }
-  };
-
   return (
     <ShareModalContainer>
-      <div className={`lsm-share-modal-container ${getTheme()}`}>
+      <div className='lsm-share-modal-container'>
         {!error && (
           <ShareModalContext.Provider
             // eslint-disable-next-line react/jsx-no-constructed-context-values

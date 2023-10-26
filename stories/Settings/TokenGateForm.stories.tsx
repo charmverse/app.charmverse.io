@@ -1,5 +1,3 @@
-import { useTheme } from '@emotion/react';
-
 import { LitShareModal } from 'components/common/LitProtocolModal';
 
 export default {
@@ -8,11 +6,9 @@ export default {
 };
 
 export function TokenGateForm() {
-  const theme = useTheme();
-
   function onSubmit(conditions: any) {
     // console.log('Conditions, conditions', conditions);
   }
 
-  return <LitShareModal darkMode={theme.palette.mode === 'dark'} onUnifiedAccessControlConditionsSelected={onSubmit} />;
+  return <LitShareModal onUnifiedAccessControlConditionsSelected={onSubmit} />;
 }

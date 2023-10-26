@@ -1,5 +1,4 @@
 import type { TokenGate } from '@charmverse/core/prisma';
-import { useTheme } from '@emotion/react';
 import type { JsonSigningResourceId } from '@lit-protocol/types';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
@@ -30,7 +29,6 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
-  const theme = useTheme();
   const litClient = useLitProtocol();
   const { walletAuthSignature, sign, chainId } = useWeb3Account();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
@@ -100,10 +98,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
     <>
       <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />
       <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size='large'>
-        <LitShareModal
-          darkMode={theme.palette.mode === 'dark'}
-          onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any}
-        />
+        <LitShareModal onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any} />
       </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGate && (

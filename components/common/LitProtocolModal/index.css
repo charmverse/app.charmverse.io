@@ -1,4 +1,5 @@
-.lsm-light-theme {
+
+:root {
     --lsm-primary-color: #333;
     --lsm-contrast-color: #fff;
     --lsm-secondary-color: #c4c4c4;
@@ -20,7 +21,8 @@
     padding: 0;
 }
 
-.lsm-dark-theme {
+/* dark theme */
+:root[data-theme='dark'] {
     --lsm-primary-color: #efefef;
     --lsm-contrast-color: #333;
     --lsm-secondary-color: #777;
@@ -40,9 +42,4 @@
     --lsm-border-radius: 0.25em;
     margin: 0;
     padding: 0;
-}
-
-/*this is how dark mode works in vanilla css*/
-@media (prefers-color-scheme: dark) {
-
 }
