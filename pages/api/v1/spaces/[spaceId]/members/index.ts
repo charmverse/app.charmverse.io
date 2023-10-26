@@ -23,7 +23,7 @@ handler.use(requireKeys([{ key: 'wallet', truthy: true }], 'body')).post(require
  *   post:
  *     summary: Create user and add to space
  *     description: Create a new user and add to space. Requires a valid super API key.
- *      tags:
+ *     tags:
  *       - 'Partner API'
  *     requestBody:
  *       content:

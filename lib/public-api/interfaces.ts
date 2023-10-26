@@ -523,9 +523,8 @@ export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
  *          type: string
  *          example: john.doe@gmail.com
  *        wallet:
- *          required: false
  *          type: string
- *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *          example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
  */
 export interface CreateSpaceMemberRequestBody {
   email?: string;
