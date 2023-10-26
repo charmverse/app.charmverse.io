@@ -46,10 +46,15 @@ handler
  *       content:
  *          application/json:
  *             schema:
+ *                required:
+ *                  - address
+ *                  - data
+ *                  - sig
  *                type: object
  *                properties:
  *                  address:
  *                    type: string
+ *                    example: '0x1234567890123456789012345678901234567890'
  *                  data:
  *                    $ref: '#/components/schemas/GenerateSnapshotVoteMessageResponseBody'
  *                  sig:

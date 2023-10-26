@@ -39,7 +39,7 @@ handler
  *        message:
  *          $ref: '#/components/schemas/SnapshotProposalVoteMessage'
  *        types:
- *          type: '#/components/schemas/SnapshotProposalVoteType'
+ *          $ref: '#/components/schemas/SnapshotProposalVoteType'
  *        domain:
  *          type: object
  */
@@ -65,6 +65,9 @@ export interface GenerateSnapshotVoteMessageResponseBody {
  *                properties:
  *                  choice:
  *                    type: string
+ *                  address:
+ *                    type: string
+ *                    example: '0x1234567890123456789012345678901234567890'
  *     responses:
  *       200:
  *         description: Summary of casted vote
