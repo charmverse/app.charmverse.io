@@ -7,7 +7,7 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
-import { addUserGoogleAccount } from 'testing/utils/users';
+import { addUserGoogleAccount, generateUser } from 'testing/utils/users';
 
 let user: User;
 let user1Wallet: string;
@@ -96,5 +96,12 @@ describe('searchUserProfile', () => {
     await expect(searchUserProfile({ email: `${v4()}@gmail.com` })).rejects.toBeInstanceOf(DataNotFoundError);
     await expect(searchUserProfile({ wallet: randomETHWalletAddress() })).rejects.toBeInstanceOf(DataNotFoundError);
     await expect(searchUserProfile({ userId: v4() })).rejects.toBeInstanceOf(DataNotFoundError);
+  });
+
+  it('should throw error if user does not belong to the space', async () => {
+    const generatedUser = await generateUser();
+    await expect(searchUserProfile({ userId: generatedUser.id, spaceIds: [space.id] })).rejects.toBeInstanceOf(
+      DataNotFoundError
+    );
   });
 });

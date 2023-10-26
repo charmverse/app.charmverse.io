@@ -73,7 +73,7 @@ async function searchUser(req: NextApiRequest, res: NextApiResponse<SearchUserRe
     throw new InvalidStateError('Space ID is undefined');
   }
 
-  const result = await searchUserProfile({ email, wallet });
+  const result = await searchUserProfile({ email, wallet, spaceIds });
 
   return res.status(200).json(result);
 }
