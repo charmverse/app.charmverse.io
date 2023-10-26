@@ -26,7 +26,6 @@ const handler = nc({
 
 export interface ConnectDiscordPayload {
   code: string;
-  spaceId?: string;
 }
 
 export interface ConnectDiscordResponse {

@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { getUserProfile } from 'lib/users/getUser';
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { InvalidInputError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
@@ -26,6 +27,33 @@ export async function connectGoogleAccount({
 
   if (!email) {
     throw new InvalidInputError(`Email required to complete signup`);
+  }
+
+  const lastUserSpaceAction = await prisma.userSpaceAction.findFirst({
+    where: {
+      user: {
+        id: userId
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    },
+    select: {
+      spaceId: true
+    }
+  });
+
+  if (lastUserSpaceAction && lastUserSpaceAction.spaceId) {
+    const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+      spaceId: lastUserSpaceAction.spaceId,
+      emails: [email]
+    });
+
+    if (isUserBannedFromSpace) {
+      throw new UnauthorisedActionError(
+        'You need to leave space before you can add this google identity to your account'
+      );
+    }
   }
 
   const [user, googleAccount, verifiedEmail] = await Promise.all([
