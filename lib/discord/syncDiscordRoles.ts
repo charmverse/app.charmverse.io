@@ -36,6 +36,6 @@ export async function syncDiscordRoles({ spaceId }: Props) {
       createRoles: true
     });
   } catch (e) {
-    log.error('Failed to create space roles from disocrd', e);
+    log.error('Failed to create space roles from discord', e);
   }
 }
