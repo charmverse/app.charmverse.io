@@ -141,7 +141,7 @@ function UserOnboardingDialog({
   }
 
   return (
-    <DialogContainer fluidSize={currentStep === 'email_step'} onClose={handleClose} title={title}>
+    <DialogContainer fluidSize={currentStep === 'email_step'} title={title} hideCloseButton>
       {currentStep === 'email_step' ? (
         <OnboardingEmailForm onClick={goNextStep} />
       ) : currentStep === 'profile_step' ? (
