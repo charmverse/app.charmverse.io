@@ -91,6 +91,7 @@ export const voteString2Types = {
   ]
 };
 
+// reference: https://github.com/snapshot-labs/snapshot.js/blob/350a1efa523efae9e984aeb376ff92f582965c5f/src/sign/index.ts#L148
 export function generateSnapshotVoteMessage({ message, address }: { message: Vote; address: string }): {
   message: SnapshotProposalVoteMessage;
   types: SnapshotProposalVoteType;
