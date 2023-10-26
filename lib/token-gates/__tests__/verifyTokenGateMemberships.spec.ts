@@ -1,18 +1,14 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import * as LitJsSdk from '@lit-protocol/lit-node-client';
 
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { verifyTokenGateMemberships } from 'lib/token-gates/verifyTokenGateMemberships';
-import type { LoggedInUser } from 'models';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
-jest.mock('@lit-protocol/lit-node-client');
-
 // @ts-ignore
-const mockedLitJsSdk: jest.Mocked<typeof LitJsSdk> = LitJsSdk;
+let mockedLitJsSdk: jest.Mocked;
 
 async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: string }) {
   return prisma.spaceRole.findUnique({
@@ -26,15 +22,18 @@ async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: stri
 }
 
 describe('verifyTokenGateMemberships', () => {
-  let user: LoggedInUser;
-  let user2: LoggedInUser;
+  let user: User;
+  let user2: User;
   let space: Space;
   let space2: Space;
 
   beforeEach(async () => {
+    // must be mocked here since we import using await import()
+    jest.mock('@lit-protocol/lit-node-client');
+    mockedLitJsSdk = await import('@lit-protocol/lit-node-client');
     await clearTokenGateData();
-    const { user: u, space: s } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const { user: u2, space: s2 } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user: u, space: s } = await generateUserAndSpace(undefined);
+    const { user: u2, space: s2 } = await generateUserAndSpace(undefined);
     user = u;
     space = s;
     user2 = u2;

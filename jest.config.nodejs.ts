@@ -38,6 +38,8 @@ export const jestConfig: JestConfigWithTsJest = {
   testPathIgnorePatterns: ['<rootDir>/permissions_api'],
 
   testTimeout: 240000
+
+  // roots: ['<rootDir>', './testing/jest/']
 };
 
 export default function makeConfig(testDir: string) {
