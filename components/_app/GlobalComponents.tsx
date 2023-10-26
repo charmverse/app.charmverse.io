@@ -83,7 +83,6 @@ export function GlobalComponents() {
       <HexagonalAvatarMask id='hexagon-avatar' />
       <MemberProfileDialogGlobal />
       <UserOnboardingDialogGlobal />
-      <ApplicationDialog />
       <Snackbar />
     </>
   );
