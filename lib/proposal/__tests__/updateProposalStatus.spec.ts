@@ -70,7 +70,7 @@ describe('updateProposalStatus', () => {
     expect(proposal.reviewedAt).toBeNull();
   });
 
-  it('Throw error when trying to move a draft proposal to review', async () => {
+  it('Throw error when trying to move a reviewed proposal to review', async () => {
     const pageWithProposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
@@ -85,6 +85,64 @@ describe('updateProposalStatus', () => {
         userId: user.id
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
+  });
+
+  it('Should allow reviewer to move reviewed proposal back to review', async () => {
+    const pageWithProposal = await createProposalWithUsers({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [],
+      reviewers: [user.id],
+      proposalStatus: 'reviewed'
+    });
+
+    const proposal = await updateProposalStatus({
+      proposalId: pageWithProposal.proposal?.id as string,
+      newStatus: 'review',
+      userId: user.id
+    });
+
+    expect(proposal.status).toBe('review');
+    expect(proposal.reviewedBy).toBeNull();
+    expect(proposal.reviewedAt).toBeNull();
+  });
+
+  it('Should allow reviewer to move proposal from discussion to review', async () => {
+    const pageWithProposal = await createProposalWithUsers({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [],
+      reviewers: [user.id],
+      proposalStatus: 'discussion'
+    });
+
+    const proposal = await updateProposalStatus({
+      proposalId: pageWithProposal.proposal?.id as string,
+      newStatus: 'review',
+      userId: user.id
+    });
+
+    expect(proposal.status).toBe('review');
+    expect(proposal.reviewedBy).toBeNull();
+    expect(proposal.reviewedAt).toBeNull();
+  });
+
+  it('Should allow reviewer to move proposal from reviewed to vote_active', async () => {
+    const pageWithProposal = await createProposalWithUsers({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [],
+      reviewers: [user.id],
+      proposalStatus: 'reviewed'
+    });
+
+    const proposal = await updateProposalStatus({
+      proposalId: pageWithProposal.proposal?.id as string,
+      newStatus: 'vote_active',
+      userId: user.id
+    });
+
+    expect(proposal.status).toBe('vote_active');
   });
 
   it('Throw error when trying to move a discussion proposal to review without any reviewers attached', async () => {
