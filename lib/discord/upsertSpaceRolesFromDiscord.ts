@@ -20,8 +20,8 @@ export async function upsertSpaceRolesFromDiscord({ spaceId, discordServerId, us
       source: 'collabland',
       createRoles: true
     });
-    log.info('Retrieved Discord roles from Collab.land', { cvRoles, roles });
+    log.info('Retrieved Discord roles from Collab.land', { cvRoles, roles, spaceId: space.id, userId });
   } catch (e) {
-    log.error('Failed to create space roles from disocrd', e);
+    log.error('Failed to create space roles from disocrd', { error: e, spaceId: space.id, userId });
   }
 }
