@@ -11,7 +11,7 @@ describe('getDefaultPageForSpace()', () => {
     const { space, user } = await generateUserAndSpace();
     await createPage({
       createdAt: new Date(),
-      index: 1,
+      index: 2,
       path: 'second-page',
       spaceId: space.id,
       createdBy: user.id,
@@ -21,12 +21,24 @@ describe('getDefaultPageForSpace()', () => {
     // create a page that is first based on index
     const page = await createPage({
       createdAt: new Date(Date.now() + 100000),
-      index: 0,
+      index: 1,
       spaceId: space.id,
       path: 'first-page',
       createdBy: user.id,
       // add basic permission
       pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }]
+    });
+
+    // child page with lower index
+    await createPage({
+      createdAt: new Date(),
+      index: 0,
+      spaceId: space.id,
+      path: 'child-page',
+      createdBy: user.id,
+      // add basic permission
+      pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }],
+      parentId: page.id
     });
 
     const url = await getDefaultPageForSpace({ space, userId: user.id });
