@@ -87,7 +87,8 @@ async function getDefaultPageForSpaceRaw({
     where: {
       id: {
         in: accessiblePageIds
-      }
+      },
+      parentId: null
     },
     select: {
       createdAt: true,
