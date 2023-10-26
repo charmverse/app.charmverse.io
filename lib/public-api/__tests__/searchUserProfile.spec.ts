@@ -1,4 +1,5 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { v4 } from 'uuid';
 
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { createUserFromWallet } from 'lib/users/createUser';
@@ -6,7 +7,7 @@ import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
-import { addUserGoogleAccount } from 'testing/utils/users';
+import { addUserGoogleAccount, generateUser } from 'testing/utils/users';
 
 let user: User;
 let user1Wallet: string;
@@ -34,8 +35,19 @@ beforeAll(async () => {
 });
 
 describe('searchUserProfile', () => {
+  it('should find user by id', async () => {
+    const res = await searchUserProfile({ userId: user.id });
+
+    expect(res).toMatchObject(
+      expect.objectContaining({
+        id: user.id,
+        username: user.username
+      })
+    );
+  });
+
   it('should find user by wallet', async () => {
-    const res = await searchUserProfile({ spaceIds: [space.id], wallet: user2Wallet });
+    const res = await searchUserProfile({ wallet: user2Wallet });
 
     expect(res).toMatchObject(
       expect.objectContaining({
@@ -49,7 +61,7 @@ describe('searchUserProfile', () => {
   });
 
   it('should find user by email', async () => {
-    const res = await searchUserProfile({ spaceIds: [space.id], email: 'user3@example.com' });
+    const res = await searchUserProfile({ email: 'user3@example.com' });
 
     expect(res).toMatchObject(
       expect.objectContaining({
@@ -63,7 +75,7 @@ describe('searchUserProfile', () => {
   });
 
   it('should find user by email associated with google account', async () => {
-    const res = await searchUserProfile({ spaceIds: [space.id], email: 'user1@gmail.com' });
+    const res = await searchUserProfile({ email: 'user1@gmail.com' });
 
     expect(res).toMatchObject(
       expect.objectContaining({
@@ -77,20 +89,18 @@ describe('searchUserProfile', () => {
   });
 
   it('should throw error if search params are not provided', async () => {
-    await expect(searchUserProfile({ spaceIds: [space.id] })).rejects.toBeInstanceOf(InvalidInputError);
+    await expect(searchUserProfile({})).rejects.toBeInstanceOf(InvalidInputError);
   });
 
   it('should throw error if user does not exist', async () => {
-    await expect(searchUserProfile({ spaceIds: [space.id], email: 'user123@gmail.com' })).rejects.toBeInstanceOf(
-      DataNotFoundError
-    );
+    await expect(searchUserProfile({ email: `${v4()}@gmail.com` })).rejects.toBeInstanceOf(DataNotFoundError);
+    await expect(searchUserProfile({ wallet: randomETHWalletAddress() })).rejects.toBeInstanceOf(DataNotFoundError);
+    await expect(searchUserProfile({ userId: v4() })).rejects.toBeInstanceOf(DataNotFoundError);
   });
 
-  it('should throw error if user is not a member of searched space', async () => {
-    const randomEmail = 'random@example.com';
-    await createUserFromWallet({ email: randomEmail });
-
-    await expect(searchUserProfile({ spaceIds: [space.id], email: randomEmail })).rejects.toBeInstanceOf(
+  it('should throw error if user does not belong to the space', async () => {
+    const generatedUser = await generateUser();
+    await expect(searchUserProfile({ userId: generatedUser.id, spaceIds: [space.id] })).rejects.toBeInstanceOf(
       DataNotFoundError
     );
   });
