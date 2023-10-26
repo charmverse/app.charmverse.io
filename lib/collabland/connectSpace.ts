@@ -1,6 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { updateMemberRolesFromDiscord } from 'lib/discord/updateMemberRolesFromDiscord';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
 import { mapSpace } from 'lib/public-api/createWorkspaceApi';
 import { decryptData } from 'lib/utilities/dataEncryption';
@@ -86,6 +87,11 @@ export async function connectSpace({ state, discordServerId }: { state: string; 
       });
     }
   }
+
+  updateMemberRolesFromDiscord({
+    spaceId,
+    discordServerId
+  });
 
   return mapSpace(space);
 }

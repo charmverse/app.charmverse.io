@@ -6,6 +6,7 @@ import { v4 } from 'uuid';
 
 import { connectSpace } from 'lib/collabland/connectSpace';
 import { encryptData } from 'lib/utilities/dataEncryption';
+import { createDiscordUser } from 'testing/utils/discord';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
 
@@ -71,32 +72,14 @@ describe('connectSpace', () => {
 
     const discordUserIds = [v4(), v4()];
 
-    await prisma.user.update({
-      where: {
-        id: adminUser.id
-      },
-      data: {
-        discordUser: {
-          create: {
-            account: {},
-            discordId: discordUserIds[0]
-          }
-        }
-      }
+    await createDiscordUser({
+      discordUserId: discordUserIds[0],
+      userId: adminUser.id
     });
 
-    await prisma.user.update({
-      where: {
-        id: discordUser.id
-      },
-      data: {
-        discordUser: {
-          create: {
-            account: {},
-            discordId: discordUserIds[1]
-          }
-        }
-      }
+    await createDiscordUser({
+      discordUserId: discordUserIds[1],
+      userId: discordUser.id
     });
 
     mockSandbox.get(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, [
@@ -121,6 +104,11 @@ describe('connectSpace', () => {
     const state = encryptData({ userId: adminUser.id, spaceId: space.id });
 
     await connectSpace({ state, discordServerId });
+
+    // wait for 1 sec since there are some async operations in connectSpace fn
+    await new Promise((resolve) => {
+      setTimeout(resolve, 500);
+    });
 
     const existingRole = await prisma.role.findFirstOrThrow({
       where: {
@@ -194,7 +182,7 @@ describe('connectSpace', () => {
       }
     });
 
-    const spaceDiscordServerId = await prisma.space.findFirstOrThrow({
+    const discordConnectedSpace = await prisma.space.findFirstOrThrow({
       where: {
         discordServerId
       }
@@ -205,6 +193,6 @@ describe('connectSpace', () => {
     expect(adminRoles.map((r) => r.role.name)).toStrictEqual(['Existing Role']);
     expect(discordUserRoles.map((r) => r.role.name)).toStrictEqual(['New Role']);
     expect(nonDiscordUserRoles.map((r) => r.role.name)).toStrictEqual([]);
-    expect(spaceDiscordServerId).toBeTruthy();
+    expect(discordConnectedSpace).toBeTruthy();
   });
 });
