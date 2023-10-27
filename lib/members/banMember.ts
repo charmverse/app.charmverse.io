@@ -31,7 +31,7 @@ export async function banMember({ spaceId, userId }: { userId: string; spaceId: 
       spaceId,
       userId,
       emails: [...user.verifiedEmails.map(({ email }) => email), ...user.googleAccounts.map(({ email }) => email)],
-      walletAddresses: user.wallets.map(({ address }) => address)
+      walletAddresses: user.wallets.map(({ address }) => address.toLowerCase())
     }
   });
 }
