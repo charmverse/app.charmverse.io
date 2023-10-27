@@ -175,7 +175,12 @@ export function NotificationTypes() {
           <Grid container columnSpacing={4}>
             {notifications.map((notification) => (
               <Grid item xs={12} md={6} key={notification.id}>
-                <NotificationContent notification={notification} markNotifications={noop} onClose={noop} />
+                <NotificationContent
+                  notification={notification}
+                  markNotifications={noop}
+                  onClose={noop}
+                  actorUsername={notification.createdBy.username}
+                />
                 <Divider />
               </Grid>
             ))}

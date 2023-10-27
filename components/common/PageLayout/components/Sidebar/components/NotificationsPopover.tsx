@@ -1,3 +1,4 @@
+import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -24,6 +25,8 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useMemberProperties } from 'hooks/useMemberProperties';
+import { useMembers } from 'hooks/useMembers';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
@@ -57,7 +60,7 @@ export const NotificationCountBox = styled(Box)`
   color: white;
 `;
 
-export function NotificationUpdates() {
+export function NotificationUpdates({ closeSidebar }: { closeSidebar?: VoidFunction }) {
   const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
   const {
     currentSpaceNotifications,
@@ -65,6 +68,11 @@ export function NotificationUpdates() {
     isLoading,
     mutate: mutateNotifications
   } = useNotifications();
+
+  function close() {
+    notificationPopupState.close();
+    closeSidebar?.();
+  }
 
   return (
     <Box>
@@ -97,7 +105,7 @@ export function NotificationUpdates() {
           notifications={currentSpaceNotifications}
           mutateNotifications={mutateNotifications}
           isLoading={isLoading}
-          close={notificationPopupState.close}
+          close={close}
         />
       </Popover>
     </Box>
@@ -150,6 +158,8 @@ export function NotificationsPopover({
         readUnArchivedNotifications: _readUnArchivedNotifications
       };
     }, [notifications]);
+
+  const { membersRecord } = useMembers();
 
   const markNotifications = async (payload: MarkNotifications) => {
     await charmClient.notifications.markNotifications(payload);
@@ -279,16 +289,20 @@ export function NotificationsPopover({
               <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
                 <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
-                    targetNotifications.map((notification) => (
-                      <Fragment key={notification.id}>
-                        <NotificationContent
-                          notification={notification}
-                          markNotifications={markNotifications}
-                          onClose={close}
-                        />
-                        <Divider />
-                      </Fragment>
-                    ))
+                    targetNotifications.map((notification) => {
+                      const notificationMember = membersRecord[notification.createdBy.id];
+                      return (
+                        <Fragment key={notification.id}>
+                          <NotificationContent
+                            notification={notification}
+                            markNotifications={markNotifications}
+                            onClose={close}
+                            actorUsername={notificationMember?.username ?? notification.createdBy.username}
+                          />
+                          <Divider />
+                        </Fragment>
+                      );
+                    })
                   ) : (
                     <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
                       <FiInbox style={{ fontSize: 48, color: theme.palette.secondary.light }} />
@@ -306,16 +320,20 @@ export function NotificationsPopover({
               <LoadingComponent isLoading={isLoading} label='Fetching your notifications' minHeight={250} size={24}>
                 <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
-                    targetNotifications.map((notification) => (
-                      <Fragment key={notification.id}>
-                        <NotificationContent
-                          notification={notification}
-                          markNotifications={markNotifications}
-                          onClose={close}
-                        />
-                        <Divider />
-                      </Fragment>
-                    ))
+                    targetNotifications.map((notification) => {
+                      const notificationMember = membersRecord[notification.createdBy.id];
+                      return (
+                        <Fragment key={notification.id}>
+                          <NotificationContent
+                            notification={notification}
+                            markNotifications={markNotifications}
+                            onClose={close}
+                            actorUsername={notificationMember?.username ?? notification.createdBy.username}
+                          />
+                          <Divider />
+                        </Fragment>
+                      );
+                    })
                   ) : (
                     <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
                       <CheckOutlinedIcon sx={{ fontSize: 48 }} color='secondary' />
@@ -358,16 +376,20 @@ export function NotificationsPopover({
             >
               <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                 {archivedNotifications.length > 0 ? (
-                  archivedNotifications.map((notification) => (
-                    <Fragment key={notification.id}>
-                      <NotificationContent
-                        notification={notification}
-                        markNotifications={markNotifications}
-                        onClose={close}
-                      />
-                      <Divider />
-                    </Fragment>
-                  ))
+                  archivedNotifications.map((notification) => {
+                    const notificationMember = membersRecord[notification.createdBy.id];
+                    return (
+                      <Fragment key={notification.id}>
+                        <NotificationContent
+                          actorUsername={notificationMember?.username ?? notification.createdBy.username}
+                          notification={notification}
+                          markNotifications={markNotifications}
+                          onClose={close}
+                        />
+                        <Divider />
+                      </Fragment>
+                    );
+                  })
                 ) : (
                   <Stack justifyContent='center' alignItems='center' height='100%' my={2} gap={1} py={2} px={5}>
                     <FiInbox style={{ fontSize: 48, color: theme.palette.secondary.light }} />
@@ -396,8 +418,10 @@ export function NotificationsPopover({
 export function NotificationContent({
   notification,
   markNotifications,
-  onClose
+  onClose,
+  actorUsername
 }: {
+  actorUsername: string;
   notification: Notification;
   markNotifications: (payload: MarkNotifications) => Promise<void>;
   onClose: VoidFunction;
@@ -405,7 +429,7 @@ export function NotificationContent({
   const read = notification.read;
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
-  const { href, content, pageTitle } = getNotificationMetadata(notification);
+  const { href, content, pageTitle } = getNotificationMetadata(notification, actorUsername);
   const notificationContent = notification.group === 'document' ? notification.content : null;
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
@@ -454,7 +478,7 @@ export function NotificationContent({
               color='error'
               variant='dot'
             >
-              <Avatar size='small' name={createdBy.username} avatar={createdBy.avatar} />
+              <Avatar size='small' name={actorUsername} avatar={createdBy.avatar} />
             </Badge>
           </Box>
           <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>

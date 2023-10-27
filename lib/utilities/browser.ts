@@ -167,17 +167,21 @@ export function getCookie(name: string): string | undefined {
 export function setCookie({
   name,
   value,
-  expiresInDays = 10 * 365
+  expiresInDays = 10 * 365,
+  expiresAfterSession
 }: {
   name: string;
   value: string;
-  expiresInDays: number;
+  expiresInDays?: number;
+  expiresAfterSession?: boolean;
 }) {
   const expires = new Date();
   const secure = typeof baseUrl === 'string' && baseUrl.includes('https') ? 'secure;' : '';
 
   expires.setDate(expires.getDate() + expiresInDays);
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; ${secure}}`;
+  document.cookie = `${name}=${encodeURIComponent(value)};${
+    expiresAfterSession ? '' : ` expires=${expires.toUTCString()};`
+  } path=/; ${secure}}`;
 }
 
 export function deleteCookie(name: string) {

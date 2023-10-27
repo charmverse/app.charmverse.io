@@ -26,7 +26,7 @@ export type TokenGateState = {
   isVerified: boolean;
   isVerifying: boolean;
   evaluateEligibility: (sig: AuthSig) => void;
-  joinSpace: () => void;
+  joinSpace: (onError: (error: any) => void) => void;
   joiningSpace: boolean;
 };
 
@@ -77,7 +77,7 @@ export function useTokenGates({
       .finally(() => setIsVerifying(false));
   }
 
-  async function joinSpace() {
+  async function joinSpace(onError: (error: any) => void) {
     setJoiningSpace(true);
 
     try {
@@ -106,9 +106,8 @@ export function useTokenGates({
       }
       onSuccess?.();
     } catch (err: any) {
-      showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
+      onError(err);
     }
-
     setJoiningSpace(false);
   }
 
