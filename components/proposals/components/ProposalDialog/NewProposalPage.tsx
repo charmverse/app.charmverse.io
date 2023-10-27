@@ -12,7 +12,9 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
@@ -36,6 +38,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
+  const isAdmin = useIsAdmin();
 
   usePreventReload(contentUpdated);
 
@@ -53,6 +56,23 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
   const readOnlyReviewers = !!proposalTemplates?.some(
     (t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0
   );
+
+  const sourceTemplate = isFromTemplateSource
+    ? proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId)
+    : undefined;
+
+  // properties with values from templates should be read only
+  const readOnlyCustomProperties =
+    !isAdmin && sourceTemplate?.fields
+      ? Object.entries((sourceTemplate?.fields as ProposalFields).properties)?.reduce((acc, [key, value]) => {
+          if (!value) {
+            return acc;
+          }
+
+          acc.push(key);
+          return acc;
+        }, [] as string[])
+      : [];
 
   function updateProposalContent({ doc, rawText }: ICharmEditorOutput) {
     setFormInputs({
@@ -119,6 +139,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                         rubricCriteria
                       });
                     }}
+                    readOnlyCustomProperties={readOnlyCustomProperties}
                   />
                 </div>
               </div>
