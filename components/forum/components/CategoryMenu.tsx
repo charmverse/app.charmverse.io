@@ -18,7 +18,7 @@ import { postSortOptions } from 'lib/forums/posts/constants';
 import type { FilterProps } from './CategorySelect';
 import { ForumFilterListLink } from './ForumFilterListLink';
 
-export function CategoryMenu({ handleSort, selectedCategoryId, selectedSort = 'new' }: FilterProps) {
+export function CategoryMenu({ selectedCategoryId, selectedSort = 'new' }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = useIsAdmin();
