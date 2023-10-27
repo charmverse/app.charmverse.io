@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { ApplicationStatus } from '@charmverse/core/prisma';
-import { AlchemyProvider } from '@ethersproject/providers';
 import type { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
 import { BigNumber } from 'ethers';
 
@@ -60,6 +59,7 @@ export async function getSafeTxStatus({
 
       return { status: ApplicationStatus.processing, chainTxHash: txHash, safeTxHash };
     } else {
+      const { AlchemyProvider } = await import('@ethersproject/providers');
       const provider = new AlchemyProvider(chainId, process.env.ALCHEMY_API_KEY);
       const safeService = getGnosisService({ signer: provider, chainId });
       if (!safeService) {

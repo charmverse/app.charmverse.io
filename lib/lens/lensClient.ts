@@ -1,10 +1,11 @@
 import { LensClient, production, development } from '@lens-protocol/client';
+import { polygon, polygonMumbai } from '@wagmi/core/chains';
 
 import { isDevEnv } from 'config/constants';
 
 const isServer = typeof window === 'undefined';
 
-export const LensChain = isDevEnv ? 'MUMBAI' : 'POLYGON';
+export const LensChain = isDevEnv ? polygonMumbai.id : polygon.id;
 
 const lensClient = new LensClient({
   environment: isDevEnv ? development : production,

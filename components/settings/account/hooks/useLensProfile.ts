@@ -1,4 +1,3 @@
-import { RPC } from 'connectors/index';
 import useSWR from 'swr';
 import { useSignMessage } from 'wagmi';
 
@@ -10,7 +9,7 @@ import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { LensChain, lensClient } from 'lib/lens/lensClient';
 
 async function switchNetwork() {
-  return switchActiveNetwork(RPC[LensChain].chainId);
+  return switchActiveNetwork(LensChain);
 }
 
 export function useLensProfile() {
@@ -36,7 +35,7 @@ export function useLensProfile() {
       return null;
     }
 
-    if (chainId !== RPC[LensChain].chainId) {
+    if (chainId !== LensChain) {
       await switchNetwork();
     }
 

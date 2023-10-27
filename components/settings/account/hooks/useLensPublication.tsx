@@ -9,7 +9,6 @@ import type {
   RelayErrorFragment,
   Result
 } from '@lens-protocol/client';
-import { RPC } from 'connectors/index';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
@@ -35,7 +34,7 @@ type LensPublicationResponse =
 const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
 
 async function switchNetwork() {
-  return switchActiveNetwork(RPC[LensChain].chainId);
+  return switchActiveNetwork(LensChain);
 }
 
 export function useLensPublication({
@@ -73,7 +72,7 @@ export function useLensPublication({
       return null;
     }
 
-    if (chainId !== RPC[LensChain].chainId) {
+    if (chainId !== LensChain) {
       await switchNetwork();
     }
 

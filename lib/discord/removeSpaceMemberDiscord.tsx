@@ -26,5 +26,6 @@ export async function removeSpaceMemberDiscord({
       })
     )
   );
-  return { spaceId: spacesData[0].space.id, userId: spacesData[0].user.id };
+
+  return { spaceIds: spacesData.map(({ space }) => space.id), userId: spacesData[0].user.id };
 }

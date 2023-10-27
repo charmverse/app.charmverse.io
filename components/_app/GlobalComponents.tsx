@@ -2,11 +2,9 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { mutate } from 'swr';
 
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import Snackbar from 'components/common/Snackbar';
 import { MemberProfileDialogGlobal } from 'components/members/components/MemberProfileDialogGlobal';
-import { ApplicationDialog } from 'components/rewards/components/RewardApplicationDialog';
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -83,7 +81,6 @@ export function GlobalComponents() {
       <HexagonalAvatarMask id='hexagon-avatar' />
       <MemberProfileDialogGlobal />
       <UserOnboardingDialogGlobal />
-      <ApplicationDialog />
       <Snackbar />
     </>
   );

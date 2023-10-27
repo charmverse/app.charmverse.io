@@ -1,6 +1,5 @@
 import type { Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { verifyJwt } from '@lit-protocol/lit-node-client';
 import { v4 } from 'uuid';
 
 import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
@@ -88,6 +87,7 @@ export async function applyTokenGates({
   const verifiedTokenGates: (TokenGateWithRoles & TokenGateJwtResult)[] = (
     await Promise.all(
       tokens.map(async (tk) => {
+        const { verifyJwt } = await import('@lit-protocol/lit-node-client');
         const result = verifyJwt({ jwt: tk.signedToken });
         const matchingTokenGate = tokenGates.find((g) => g.id === tk.tokenGateId);
         const payload = result?.payload as any;

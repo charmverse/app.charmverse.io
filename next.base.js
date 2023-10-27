@@ -24,7 +24,6 @@ const esmModules = [
   'react-dnd-preview',
   'redux',
   '@hookform/resolvers',
-  'lit-share-modal-v3',
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',

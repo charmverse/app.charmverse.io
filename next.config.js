@@ -4,19 +4,16 @@ const next = require('next/dist/lib/is-serializable-props');
 
 const esmModules = require('./next.base').esmModules;
 
-// we can save time and skip code checks, which are handle in a special step by the CI
-const skipCodeChecks = process.env.CI === 'true';
-
 const config = {
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
     dirs: ['pages', 'components', 'lib', 'background', 'serverless', 'stories'],
-    ignoreDuringBuilds: skipCodeChecks
+    ignoreDuringBuilds: true
   },
   // types are tested separately from the build
   typescript: {
-    ignoreBuildErrors: skipCodeChecks,
+    ignoreBuildErrors: true,
     tsconfigPath: 'tsconfig.next.json'
   },
   compiler: {
