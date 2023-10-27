@@ -60,7 +60,7 @@ export const NotificationCountBox = styled(Box)`
   color: white;
 `;
 
-export function NotificationUpdates() {
+export function NotificationUpdates({ closeSidebar }: { closeSidebar?: VoidFunction }) {
   const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
   const {
     currentSpaceNotifications,
@@ -68,6 +68,11 @@ export function NotificationUpdates() {
     isLoading,
     mutate: mutateNotifications
   } = useNotifications();
+
+  function close() {
+    notificationPopupState.close();
+    closeSidebar?.();
+  }
 
   return (
     <Box>
@@ -100,7 +105,7 @@ export function NotificationUpdates() {
           notifications={currentSpaceNotifications}
           mutateNotifications={mutateNotifications}
           isLoading={isLoading}
-          close={notificationPopupState.close}
+          close={close}
         />
       </Popover>
     </Box>
@@ -118,7 +123,6 @@ export function NotificationsPopover({
   mutateNotifications: KeyedMutator<Notification[]>;
   isLoading: boolean;
 }) {
-  const { getDisplayProperties } = useMemberProperties();
   const theme = useTheme();
   const [inboxState, setInboxState] = useState<'unread' | 'unarchived'>('unarchived');
   const [activeTab, setActiveState] = useState<'Inbox' | 'Archived'>('Inbox');
