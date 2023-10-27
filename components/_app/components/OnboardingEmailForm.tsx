@@ -70,8 +70,8 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
   };
 
   return (
-    <Stack gap={2}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack gap={2}>
         <Typography>
           CharmVerse can use your email address to let you know when there is a conversation or activity you should be
           part of.
@@ -100,7 +100,7 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
             Next
           </Button>
         </Stack>
-      </form>
-    </Stack>
+      </Stack>
+    </form>
   );
 }
