@@ -93,16 +93,6 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
       sendingMagicLink.current = true;
       // console.log('Handling magic link request');
       try {
-        if (space) {
-          const isUserBannedFromSpace = await charmClient.members.checkSpaceBanStatus({
-            spaceId: space.id,
-            email
-          });
-
-          if (isUserBannedFromSpace.isBanned) {
-            throw new Error('You need to leave space before you can add this email to your account');
-          }
-        }
         await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
         showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
         onClose();

@@ -46,6 +46,7 @@ export default function Authenticate() {
     if (!emailForSignIn) {
       return;
     }
+
     setIsAuthenticating(true);
     validateMagicLink(emailForSignIn)
       .then(() => {
@@ -54,7 +55,10 @@ export default function Authenticate() {
       })
       .catch((err) => {
         if (user) {
-          redirectLoggedInUser();
+          showMessage(err.message ?? 'Invalid invite link', 'error');
+          setTimeout(() => {
+            redirectLoggedInUser();
+          }, 1500);
         } else {
           setIsAuthenticating(false);
           setLoginError(true);
