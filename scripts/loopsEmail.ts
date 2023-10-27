@@ -1,7 +1,8 @@
-import { registerNewUser } from 'lib/loopsEmail/registerNewUser';
+import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
+import { updateLoopsContact } from 'lib/loopsEmail/updateLoopsContact';
 
-export async function init() {
-  const result = await registerNewUser({
+async function register() {
+  const result = await registerLoopsContact({
     space: {
       name: 'Test'
     },
@@ -15,7 +16,15 @@ export async function init() {
   console.log(result);
 }
 
-init().catch((error) => {
+async function subscribe(enable = true) {
+  const result = await updateLoopsContact({
+    email: 'mattwad@gmail.com',
+    subscribed: false
+  });
+  console.log('result', result);
+}
+
+subscribe().catch((error) => {
   console.error('Error', error);
   process.exit(1);
 });

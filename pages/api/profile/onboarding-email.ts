@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { spaceTemplateCookie } from 'components/common/CreateSpaceForm/constants';
-import { registerNewUser as registerLoopUser } from 'lib/loopsEmail/registerNewUser';
+import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
@@ -39,7 +39,7 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
         }
       });
       const isAdmin = updatedUser.spaceRoles.some((role) => role.spaceId === payload.spaceId && role.isAdmin);
-      const result = await registerLoopUser({
+      const result = await registerLoopsContact({
         isAdmin,
         space,
         spaceTemplate,

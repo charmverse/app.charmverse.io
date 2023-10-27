@@ -3,19 +3,20 @@ import type { Space } from '@charmverse/core/prisma';
 import { stringToHumanFormat } from 'lib/metrics/mixpanel/utils';
 
 import { isEnabled, createContact } from './client';
-import type { LoopsUser, UserFields } from './client';
+import type { UserFields } from './client';
+import { getLoopsUser } from './utils';
 
 type SpaceFields = Pick<Space, 'name'>;
 
-export async function registerNewUser({
+export async function registerLoopsContact({
+  isAdmin,
   space,
   spaceTemplate,
-  isAdmin,
   user
 }: {
+  isAdmin: boolean;
   space: SpaceFields;
   spaceTemplate?: string;
-  isAdmin: boolean;
   user: UserFields;
 }) {
   if (!isEnabled) {
@@ -24,20 +25,8 @@ export async function registerNewUser({
   return createContact({
     ...getLoopsUser(user),
     source: 'Web App',
-    spaceRole: isAdmin ? 'Admin' : 'Member',
     spaceName: space.name,
+    spaceRole: isAdmin ? 'Admin' : 'Member',
     spaceTemplate: spaceTemplate ? stringToHumanFormat(spaceTemplate) : undefined
   });
-}
-
-// utils
-function getLoopsUser(user: UserFields): Pick<LoopsUser, 'email' | 'createdAt' | 'firstName'> {
-  if (!user.email) {
-    throw new Error('User does not have an email');
-  }
-  return {
-    firstName: user.username,
-    email: user.email,
-    createdAt: user.createdAt.toISOString()
-  };
 }
