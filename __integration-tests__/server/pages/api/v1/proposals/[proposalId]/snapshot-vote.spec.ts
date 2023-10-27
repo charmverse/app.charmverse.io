@@ -114,7 +114,7 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
       };
     });
 
-    const server = await listen(8500);
+    const server = await listen(8501);
 
     const response = await request(baseUrl)
       .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
@@ -139,7 +139,7 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
       };
     });
 
-    const server = await listen(8500);
+    const server = await listen(8502);
 
     const response = await request(baseUrl)
       .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
@@ -169,7 +169,7 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
       };
     });
 
-    const server = await listen(8500);
+    const server = await listen(8503);
 
     const response = await request(baseUrl)
       .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
@@ -206,7 +206,7 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
       };
     });
 
-    const server = await listen(8500);
+    const server = await listen(8504);
 
     const response = await request(baseUrl)
       .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
