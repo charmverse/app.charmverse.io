@@ -47,7 +47,6 @@ async function getDefaultPageForSpaceRaw({
 }) {
   const { id: spaceId } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
-
   const defaultSpaceUrl = getSpaceUrl(space, host);
   if (lastPageView) {
     // grab the original path a user was on to include query params like filters, etc.
@@ -68,9 +67,11 @@ async function getDefaultPageForSpaceRaw({
         return fullPathname;
       }
       return `${defaultSpaceUrl}/${lastPageView.page.path}`;
-    }
-    // handle static pages
-    else {
+    } else {
+      if (fullPathname) {
+        return fullPathname;
+      }
+      // handle static pages - this is probably not necessary since pathname is always defined now
       const staticPath = staticPagesToDirect[lastPageView.pageType as StaticPageType];
       if (staticPath) {
         return `${defaultSpaceUrl}${staticPath}`;
