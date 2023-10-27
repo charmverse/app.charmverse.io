@@ -7,7 +7,8 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { updateLoopsContact } from 'lib/loopsEmail/updateLoopsContact';
+import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
+import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
@@ -112,10 +113,12 @@ async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 
   if (original.email !== updatedUser.email || original.emailNewsletter !== updatedUser.emailNewsletter) {
     try {
-      // allow unsubscribing user if they remove their email address
-      const email = (updatedUser.email || original.email) as string;
-      const subscribed = !!updatedUser.email && !!updatedUser.emailNewsletter;
-      await updateLoopsContact({ email, subscribed });
+      if (!updatedUser.email) {
+        // remove from Loops
+        await deleteLoopsContact({ email: original.email! });
+      } else {
+        await registerLoopsContact(updatedUser);
+      }
     } catch (error) {
       log.error('Error updating contact with Loop', { error, userId });
     }

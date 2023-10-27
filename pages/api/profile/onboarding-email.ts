@@ -7,6 +7,7 @@ import nc from 'next-connect';
 
 import { spaceTemplateCookie } from 'components/common/CreateSpaceForm/constants';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
+import { sendSignupEvent as sendLoopSignupEvent } from 'lib/loopsEmail/sendSignupEvent';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
@@ -39,11 +40,12 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
         }
       });
       const isAdmin = updatedUser.spaceRoles.some((role) => role.spaceId === payload.spaceId && role.isAdmin);
-      const result = await registerLoopsContact({
+      const result = await registerLoopsContact(updatedUser);
+      await sendLoopSignupEvent({
+        email: updatedUser.email,
         isAdmin,
-        space,
-        spaceTemplate,
-        user: updatedUser
+        spaceName: space.name,
+        spaceTemplate
       });
       if (result.success) {
         log.info('Registered user with Loop', { userId });

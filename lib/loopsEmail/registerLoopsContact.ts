@@ -1,32 +1,30 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { User } from '@charmverse/core/prisma';
 
-import { stringToHumanFormat } from 'lib/metrics/mixpanel/utils';
+import type { LoopsUser } from './client';
+import { isEnabled, updateContact } from './client';
 
-import { isEnabled, createContact } from './client';
-import type { UserFields } from './client';
-import { getLoopsUser } from './utils';
+type UserFields = Pick<User, 'createdAt' | 'email' | 'username' | 'emailNewsletter'>;
 
-type SpaceFields = Pick<Space, 'name'>;
-
-export async function registerLoopsContact({
-  isAdmin,
-  space,
-  spaceTemplate,
-  user
-}: {
-  isAdmin: boolean;
-  space: SpaceFields;
-  spaceTemplate?: string;
-  user: UserFields;
-}) {
+// Creates a user if one does not exist
+// Call this whenever a user toggles subscriptions, ie. "emailNewsletter", or update their email
+export async function registerLoopsContact(user: UserFields) {
   if (!isEnabled) {
     return { success: false };
   }
-  return createContact({
+  return updateContact({
     ...getLoopsUser(user),
-    source: 'Web App',
-    spaceName: space.name,
-    spaceRole: isAdmin ? 'Admin' : 'Member',
-    spaceTemplate: spaceTemplate ? stringToHumanFormat(spaceTemplate) : undefined
+    source: 'Web App'
   });
+}
+
+function getLoopsUser(user: UserFields): Pick<LoopsUser, 'email' | 'createdAt' | 'firstName' | 'subscribed'> {
+  if (!user.email) {
+    throw new Error('User does not have an email');
+  }
+  return {
+    firstName: user.username,
+    email: user.email,
+    createdAt: user.createdAt.toISOString(),
+    subscribed: !!user.emailNewsletter
+  };
 }
