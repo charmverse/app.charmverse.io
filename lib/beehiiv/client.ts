@@ -44,7 +44,7 @@ export async function unsubscribeSubscription({ email }: BeehiivSubscription) {
   if (existing.data.length > 0) {
     return PUT(
       `${apiBaseUrl}/publications/${publicationId}/subscriptions/${existing.data[0].id}`,
-      { unsubscribe: false },
+      { unsubscribe: true },
       {
         headers
       }
