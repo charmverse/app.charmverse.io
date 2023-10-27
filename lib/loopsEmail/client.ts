@@ -1,5 +1,4 @@
 import { GET, POST, PUT } from '@charmverse/core/http';
-import type { User } from '@charmverse/core/prisma';
 import { RateLimit } from 'async-sema';
 
 // Loop manages onboarding emails
@@ -7,6 +6,9 @@ import { RateLimit } from 'async-sema';
 // API docs: https://loops.so/docs/api
 
 const apiBaseUrl = 'https://app.loops.so/api/v1';
+const apiToken = process.env.LOOPS_EMAIL_API_KEY as string | undefined;
+export const isEnabled = !!apiToken;
+
 // 10 requests/second - https://loops.so/docs/api
 const rateLimiter = RateLimit(10);
 
@@ -31,12 +33,8 @@ export type LoopsUser = {
   subscribed?: boolean;
 } & Partial<SignupEventProperties>;
 
-const apiToken = process.env.LOOPS_EMAIL_API_KEY as string | undefined;
-
-export const isEnabled = !!apiToken;
-
 const headers = {
-  Authorization: apiToken ? `Bearer ${apiToken}` : null
+  Authorization: `Bearer ${apiToken}`
 };
 
 // for testing api keys
