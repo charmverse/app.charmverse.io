@@ -9,7 +9,6 @@ import { MissingDataError } from '../utilities/errors';
 export type Web3LoginRequest = {
   address: string;
   walletSignature: AuthSig;
-  spaceId?: string;
 };
 
 export function requireWalletSignature(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {

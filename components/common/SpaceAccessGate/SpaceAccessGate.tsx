@@ -12,8 +12,6 @@ import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
-import { SpaceBanModal } from '../Modal/SpaceBanModal';
-
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
 import { useSummonGate } from './components/SummonGate/hooks/useSummonGate';
@@ -95,7 +93,7 @@ export function SpaceAccessGate({
   const noGateConditions = !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled;
 
   return (
-    <SpaceBanModal spaceId={space.id}>
+    <>
       <Card sx={{ p: 3, mb: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
           <WorkspaceAvatar image={space.spaceImage} name={space.name} variant='rounded' />
@@ -165,6 +163,6 @@ export function SpaceAccessGate({
           No membership conditions were found for this space.
         </Alert>
       )}
-    </SpaceBanModal>
+    </>
   );
 }

@@ -140,11 +140,10 @@ class CharmClient {
     return http.GET<LoggedInUser>('/api/profile');
   }
 
-  createUser({ address, walletSignature, spaceId }: Web3LoginRequest) {
+  createUser({ address, walletSignature }: Web3LoginRequest) {
     return http.POST<LoggedInUser>('/api/profile', {
       address,
-      walletSignature,
-      spaceId
+      walletSignature
     });
   }
 
