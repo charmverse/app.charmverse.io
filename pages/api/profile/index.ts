@@ -124,7 +124,7 @@ async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
         await registerBeehiivSubscription(updatedUser, original.email);
       }
     } catch (error) {
-      log.error('Error updating contact with Loop', { error, userId });
+      log.error('Error updating contact with Loop or Beehiiv', { error, userId });
     }
   }
 
