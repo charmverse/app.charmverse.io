@@ -26,7 +26,7 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
   const payload = req.body as EmailPreferences;
   const { id: userId } = req.session.user;
 
-  const updatedUser = await updateUserProfile(userId, req.body);
+  const updatedUser = await updateUserProfile(userId, payload);
 
   if (updatedUser.email && updatedUser.emailNewsletter && payload.spaceId) {
     try {

@@ -1,5 +1,3 @@
-import type { Space } from '@charmverse/core/prisma';
-
 import { isEnabled, findContact, updateContact } from './client';
 
 export async function updateLoopsContact({ email, subscribed }: { email: string; subscribed: boolean }) {
