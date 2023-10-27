@@ -1,7 +1,7 @@
 import type { User } from '@charmverse/core/prisma';
 
 import type { LoopsUser } from './client';
-import { isEnabled, updateContact } from './client';
+import { isEnabled, createOrUpdateContact } from './client';
 
 type UserFields = Pick<User, 'createdAt' | 'email' | 'username' | 'emailNewsletter'>;
 
@@ -9,9 +9,9 @@ type UserFields = Pick<User, 'createdAt' | 'email' | 'username' | 'emailNewslett
 // Call this whenever a user toggles subscriptions, ie. "emailNewsletter", or update their email
 export async function registerLoopsContact(user: UserFields) {
   if (!isEnabled) {
-    return { success: false };
+    return { success: false, isNewContact: false };
   }
-  return updateContact({
+  return createOrUpdateContact({
     ...getLoopsUser(user),
     source: 'Web App'
   });

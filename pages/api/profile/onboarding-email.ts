@@ -41,20 +41,20 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
       });
       const isAdmin = updatedUser.spaceRoles.some((role) => role.spaceId === payload.spaceId && role.isAdmin);
       const result = await registerLoopsContact(updatedUser);
-      await sendLoopSignupEvent({
-        email: updatedUser.email,
-        isAdmin,
-        spaceName: space.name,
-        spaceTemplate
-      });
-      if (result.success) {
-        log.info('Registered user with Loop', { userId });
+      if (result.isNewContact) {
+        await sendLoopSignupEvent({
+          email: updatedUser.email,
+          isAdmin,
+          spaceName: space.name,
+          spaceTemplate
+        });
+        log.info('Sent signup to Loop', { userId });
       }
     } catch (error) {
       log.error('Could not register user with Loop', { error, userId });
     }
   }
-  return res.status(200);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

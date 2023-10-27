@@ -44,30 +44,36 @@ export function testApiKey() {
   return GET<{ success: true }>(`${apiBaseUrl}/api-key`, null, { headers });
 }
 
-// type CreateContactResponse = {
-//   success: boolean;
-//   id: string; // user id
-//   status?: 409; // 409 means already exists
-// };
+type CreateContactResponse = {
+  success: boolean;
+  id: string; // user id
+  status?: 409; // 409 means already exists
+};
 
-// export async function createContact(payload: Omit<LoopsUser, 'id'>) {
-//   await rateLimiter();
-//   return POST<CreateContactResponse>(`${apiBaseUrl}/contacts/create`, payload, {
-//     headers
-//   });
-// }
+export async function createContact(payload: Omit<LoopsUser, 'id'>) {
+  await rateLimiter();
+  return POST<CreateContactResponse>(`${apiBaseUrl}/contacts/create`, payload, {
+    headers
+  });
+}
 
 type UpdateContactResponse = {
   success: boolean;
   id: string; // user id
 };
 
-// Note, this endpoint will create a user if they don't already exist
 export async function updateContact(payload: Omit<LoopsUser, 'id'>) {
   await rateLimiter();
   return PUT<UpdateContactResponse>(`${apiBaseUrl}/contacts/update`, payload, {
     headers
   });
+}
+
+// Note: teh docs say that update will create a user if they don't exist, but it doesn't seem to work
+export async function createOrUpdateContact(payload: Omit<LoopsUser, 'id'>) {
+  const [existing] = await findContact(payload);
+  const result = await (existing ? updateContact(payload) : createContact(payload));
+  return { ...result, isNewContact: !existing };
 }
 
 // when a user deletes their email, delete them from Loops as well

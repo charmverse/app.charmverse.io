@@ -148,7 +148,7 @@ function UserOnboardingDialog({
       hideCloseButton={currentStep === 'email_step'}
     >
       {currentStep === 'email_step' ? (
-        <OnboardingEmailForm onClick={goNextStep} />
+        <OnboardingEmailForm onClick={goNextStep} spaceId={currentSpace.id} />
       ) : currentStep === 'profile_step' ? (
         <>
           <UserDetailsForm
