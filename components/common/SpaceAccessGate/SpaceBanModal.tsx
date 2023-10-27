@@ -12,10 +12,10 @@ export function SpaceBanModal({ open, onClose }: { onClose: VoidFunction; open: 
   const { spaces } = useSpaces();
 
   return (
-    <Modal title='You have been banned from this space' open={open} onClose={onClose}>
+    <Modal title='You are no longer allowed to join this space' open={open} onClose={onClose}>
       <Typography>
-        You have been banned from this space. You can't join it. If you think this is a mistake, please contact the
-        space admins.
+        You have been banned from this space and can no longer join it. If you believe this is a mistake, please contact
+        the space admins.
       </Typography>
 
       <Box gap={2} sx={{ maxWidth: '200px', display: 'flex', flexDirection: 'row', pt: 2 }}>

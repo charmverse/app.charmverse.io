@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
@@ -25,15 +24,6 @@ handler
 async function verifyDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { spaceId, joinType } = req.body as { spaceId: string; joinType: TokenGateJoinType };
   const userId = req.session.user?.id;
-
-  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId,
-    userId
-  });
-
-  if (isUserBannedFromSpace) {
-    throw new UnauthorisedActionError(`You have been banned from this space.`);
-  }
 
   const space = await applyDiscordGate({ spaceId, userId });
 

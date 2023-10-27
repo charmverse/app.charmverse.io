@@ -88,11 +88,11 @@ export function SpaceAccessGate({
 
   function joinSpace() {
     if (summonGate.isVerified) {
-      summonGate.joinSpace();
+      summonGate.joinSpace(onError);
     } else if (tokenGate.isVerified) {
       tokenGate.joinSpace(onError);
     } else if (discordGate.isVerified) {
-      discordGate.joinSpace();
+      discordGate.joinSpace(onError);
     } else {
       showMessage('You are not eligible to join this space', 'error');
     }

@@ -106,7 +106,6 @@ export function useTokenGates({
       }
       onSuccess?.();
     } catch (err: any) {
-      setJoiningSpace(false);
       onError(err);
     }
     setJoiningSpace(false);

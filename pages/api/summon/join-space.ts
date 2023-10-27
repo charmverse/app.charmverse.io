@@ -32,15 +32,6 @@ async function joinSpaceEndpoint(req: NextApiRequest, res: NextApiResponse) {
     throw new InvalidInputError('You are not a member of this space');
   }
 
-  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId,
-    userId
-  });
-
-  if (isUserBannedFromSpace) {
-    throw new UnauthorisedActionError(`You have been banned from this space.`);
-  }
-
   await addUserToSpace({ spaceId, userId, userXpsEngineId: result.summonUserId });
 
   trackUserAction('join_a_workspace', {
