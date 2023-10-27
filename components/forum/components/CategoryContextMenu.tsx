@@ -177,7 +177,14 @@ export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props
   return (
     <>
       <PopperPopup popupContent={popupContent} onClose={onSave}>
-        <IconButton data-test={`open-category-context-menu-${categoryId}`} size='small'>
+        <IconButton
+          data-test={`open-category-context-menu-${categoryId}`}
+          size='small'
+          onClick={(e) => {
+            // prevents triggering the href of the parent link
+            e.preventDefault();
+          }}
+        >
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
