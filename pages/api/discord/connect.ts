@@ -73,31 +73,30 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
       }
     });
 
-    const lastUserSpaceAction = await prisma.userSpaceAction.findFirst({
+    const spaceRoles = await prisma.spaceRole.findMany({
       where: {
-        user: {
-          id: userId
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
+        userId
       },
       select: {
-        spaceId: true
+        space: {
+          select: {
+            id: true
+          }
+        }
       }
     });
 
-    if (lastUserSpaceAction && lastUserSpaceAction.spaceId) {
-      const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-        spaceId: lastUserSpaceAction.spaceId,
-        discordId: existingDiscordUser?.discordId ?? id
-      });
+    const userSpaceIds = spaceRoles.map((role) => role.space.id);
 
-      if (isUserBannedFromSpace) {
-        return res.status(400).json({
-          error: 'You need to leave space before you can add this discord identity to your account'
-        });
-      }
+    const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+      spaceIds: userSpaceIds,
+      discordId: existingDiscordUser?.discordId ?? id
+    });
+
+    if (isUserBannedFromSpace) {
+      return res.status(401).json({
+        error: 'You need to leave space before you can add this discord identity to your account'
+      });
     }
 
     // If the entry exists we merge the user accounts

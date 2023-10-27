@@ -33,7 +33,7 @@ export async function applyTokenGates({
   }
 
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId,
+    spaceIds: [spaceId],
     userId
   });
 

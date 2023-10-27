@@ -21,7 +21,7 @@ export async function addUserToSpace({ spaceId, userId, userXpsEngineId }: Props
   });
 
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId,
+    spaceIds: [space.id],
     userId
   });
 

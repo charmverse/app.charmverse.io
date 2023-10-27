@@ -26,23 +26,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.post(requireWalletSignature, createUser).get(getUser).use(requireUser).put(updateUser);
 
 async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-  const { address, spaceId } = req.body as Web3LoginRequest;
+  const { address } = req.body as Web3LoginRequest;
 
   let user: LoggedInUser;
 
   try {
     user = await getUserProfile('addresses', address);
   } catch {
-    if (spaceId) {
-      const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-        spaceId,
-        walletAddresses: [address]
-      });
-
-      if (isUserBannedFromSpace) {
-        throw new UnauthorisedActionError('User has been banned from space');
-      }
-    }
     const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);

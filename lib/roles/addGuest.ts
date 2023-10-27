@@ -37,7 +37,7 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
   }
 
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId,
+    spaceIds: [spaceId],
     userId: userIdIsUuid ? userIdOrEmail : undefined,
     emails: userIdIsEmail ? [userIdOrEmail] : []
   });

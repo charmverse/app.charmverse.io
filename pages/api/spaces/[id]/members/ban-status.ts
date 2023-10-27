@@ -19,7 +19,7 @@ async function checkSpaceBanStatusHandler(req: NextApiRequest, res: NextApiRespo
   };
 
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId,
+    spaceIds: [spaceId],
     userId,
     discordId,
     emails: email ? [email] : [],

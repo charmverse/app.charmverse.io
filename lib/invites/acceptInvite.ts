@@ -41,7 +41,7 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
   }
 
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId: invite.spaceId,
+    spaceIds: [invite.spaceId],
     userId
   });
 

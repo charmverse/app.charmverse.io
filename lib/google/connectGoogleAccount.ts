@@ -29,31 +29,30 @@ export async function connectGoogleAccount({
     throw new InvalidInputError(`Email required to complete signup`);
   }
 
-  const lastUserSpaceAction = await prisma.userSpaceAction.findFirst({
+  const spaceRoles = await prisma.spaceRole.findMany({
     where: {
-      user: {
-        id: userId
-      }
-    },
-    orderBy: {
-      createdAt: 'desc'
+      userId
     },
     select: {
-      spaceId: true
+      space: {
+        select: {
+          id: true
+        }
+      }
     }
   });
 
-  if (lastUserSpaceAction && lastUserSpaceAction.spaceId) {
-    const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-      spaceId: lastUserSpaceAction.spaceId,
-      emails: [email]
-    });
+  const userSpaceIds = spaceRoles.map((role) => role.space.id);
 
-    if (isUserBannedFromSpace) {
-      throw new UnauthorisedActionError(
-        'You need to leave space before you can add this google identity to your account'
-      );
-    }
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: userSpaceIds,
+    emails: [email]
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(
+      'You need to leave space before you can add this google identity to your account'
+    );
   }
 
   const [user, googleAccount, verifiedEmail] = await Promise.all([

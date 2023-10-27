@@ -30,7 +30,7 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
   }
 
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId,
+    spaceIds: [space.id],
     userId
   });
 

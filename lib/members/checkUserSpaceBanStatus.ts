@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function checkUserSpaceBanStatus({
-  spaceId,
+  spaceIds,
   userId,
   discordId,
   walletAddresses,
@@ -11,7 +11,7 @@ export async function checkUserSpaceBanStatus({
   discordId?: string;
   emails?: string[];
   userId?: string;
-  spaceId: string;
+  spaceIds: string[];
 }) {
   if (!userId && !discordId && (!walletAddresses || walletAddresses.length === 0) && (!emails || emails.length === 0)) {
     return false;
@@ -50,7 +50,9 @@ export async function checkUserSpaceBanStatus({
   const blacklistedUserByIdentity = await prisma.blacklistedSpaceUser.findFirst({
     where: {
       AND: {
-        spaceId,
+        spaceId: {
+          in: spaceIds
+        },
         OR: [
           {
             userId

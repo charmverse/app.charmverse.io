@@ -10,7 +10,7 @@ import { checkUserSpaceBanStatus } from '../checkUserSpaceBanStatus';
 describe('checkUserSpaceBanStatus', () => {
   it('should return false if no valid argument is provided', async () => {
     const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-      spaceId: v4()
+      spaceIds: [v4()]
     });
 
     expect(isUserBannedFromSpace).toBe(false);
@@ -31,7 +31,7 @@ describe('checkUserSpaceBanStatus', () => {
     });
 
     const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-      spaceId: space.id,
+      spaceIds: [space.id],
       walletAddresses: [walletAddress]
     });
 
@@ -60,7 +60,7 @@ describe('checkUserSpaceBanStatus', () => {
     });
 
     const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-      spaceId: space.id,
+      spaceIds: [space.id],
       emails: [email]
     });
 
@@ -85,7 +85,7 @@ describe('checkUserSpaceBanStatus', () => {
     });
 
     const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-      spaceId: space.id,
+      spaceIds: [space.id],
       discordId
     });
 
@@ -103,7 +103,7 @@ describe('checkUserSpaceBanStatus', () => {
     });
 
     const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-      spaceId: space.id,
+      spaceIds: [space.id],
       discordId: v4(),
       walletAddresses: [randomETHWalletAddress()],
       emails: [`${v4()}@gmail.com`],
@@ -124,7 +124,7 @@ describe('checkUserSpaceBanStatus', () => {
     });
 
     const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-      spaceId: space2.id,
+      spaceIds: [space2.id],
       userId: user.id
     });
 
