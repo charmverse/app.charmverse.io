@@ -42,7 +42,7 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
     });
   }
 
-  log.info('Updated user information', { userId, update });
+  log.debug('Updated user information', { userId });
 
   return getUserProfile('id', userId);
 }

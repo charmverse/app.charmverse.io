@@ -1,11 +1,14 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
+import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
+import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
@@ -98,9 +101,28 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
 async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
   const { id: userId } = req.session.user;
 
+  const original = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId
+    }
+  });
+
   const updatedUser = await updateUserProfile(userId, req.body);
 
   updateTrackUserProfile(updatedUser);
+
+  if (original.email !== updatedUser.email || original.emailNewsletter !== updatedUser.emailNewsletter) {
+    try {
+      if (!updatedUser.email) {
+        // remove from Loops
+        await deleteLoopsContact({ email: original.email! });
+      } else {
+        await registerLoopsContact(updatedUser);
+      }
+    } catch (error) {
+      log.error('Error updating contact with Loop', { error, userId });
+    }
+  }
 
   return res.status(200).json(updatedUser);
 }

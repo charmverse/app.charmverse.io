@@ -4,7 +4,7 @@ import type { ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import charmClient from 'charmClient';
+import { useSaveOnboardingEmail } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 
@@ -28,7 +28,8 @@ export const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>;
 
-export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
+export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunction; spaceId: string }) {
+  const { trigger: saveForm, isMutating } = useSaveOnboardingEmail();
   const { updateUser, user } = useUser();
 
   const {
@@ -41,7 +42,7 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
   } = useForm<FormValues>({
     defaultValues: {
       email: user?.email || '',
-      emailNewsletter: false,
+      emailNewsletter: !!user?.emailNewsletter,
       emailNotifications: true
     },
     // mode: 'onChange',
@@ -60,10 +61,11 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
   const onSubmit = async (values: FormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const { email, emailNewsletter, emailNotifications } = values;
-    await charmClient.updateUser({
+    await saveForm({
       email: email || undefined,
       emailNewsletter,
-      emailNotifications
+      emailNotifications,
+      spaceId
     });
     updateUser({ ...user, email, emailNewsletter, emailNotifications });
     onClick();
@@ -96,7 +98,12 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
           />
         </FormGroup>
         <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
-          <Button data-test='member-email-next' type='submit' disabled={Object.keys(errors).length !== 0}>
+          <Button
+            loading={isMutating}
+            data-test='member-email-next'
+            type='submit'
+            disabled={Object.keys(errors).length !== 0}
+          >
             Next
           </Button>
         </Stack>
