@@ -279,7 +279,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                       label='Invites'
                     />
                   )}
-                  <NotificationUpdates />
+                  <NotificationUpdates closeSidebar={navAction} />
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
                     .filter((feat) => feat.path !== 'rewards' || isCharmverse) // hide Rewards behind feature flag
