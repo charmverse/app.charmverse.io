@@ -128,6 +128,7 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
     </>
   );
 }
+
 export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges

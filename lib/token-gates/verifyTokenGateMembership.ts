@@ -1,7 +1,6 @@
 import { getLogger } from '@charmverse/core/log';
 import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import * as lit from '@lit-protocol/lit-node-client';
 
 const log = getLogger('tg-verification');
 
@@ -40,6 +39,7 @@ export async function verifyTokenGateMembership({
       return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
     }
 
+    const lit = await import('@lit-protocol/lit-node-client');
     const result = lit.verifyJwt({ jwt: userTokenGate.jwt });
     const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
 

@@ -25,6 +25,16 @@ export const staticSpaceTemplates = [
     apiName: 'creator'
   },
   {
+    id: 'templateGrantor',
+    name: 'Grantor',
+    apiName: 'grantor'
+  },
+  {
+    id: 'templateGrantRecipient',
+    name: 'Grant Recipient',
+    apiName: 'grant_recipient'
+  },
+  {
     id: 'templateHackathon',
     name: 'Hackathon',
     apiName: 'hackathon'
@@ -38,11 +48,6 @@ export const staticSpaceTemplates = [
     id: 'templateImpactCommunity',
     name: 'Impact Community',
     apiName: 'impact_community'
-  },
-  {
-    id: 'templateGrantRecipient',
-    name: 'Grant Recipient',
-    apiName: 'grant_recipient'
   }
 ] as const;
 

@@ -56,14 +56,14 @@ export const StyledUserPropertyContainer = styled(Box, {
   overflow: ${(props) => (props.displayType === 'table' ? 'hidden' : 'initial')};
 `;
 
-function SelectedReviewers({
+function SelectedOptions({
   value,
   readOnly,
   readOnlyMessage,
   onRemove,
   wrapColumn
 }: {
-  wrapColumn: boolean;
+  wrapColumn?: boolean;
   readOnly: boolean;
   readOnlyMessage?: string;
   value: GroupedOptionPopulated[];
@@ -78,20 +78,20 @@ function SelectedReviewers({
         gap={1}
         flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
       >
-        {value.map((reviewer) => {
+        {value.map((option) => {
           return (
             <Stack
               alignItems='center'
               flexDirection='row'
-              key={reviewer.id}
+              key={option.id}
               gap={0.5}
               sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
             >
-              {reviewer.group === 'user' && (
+              {option.group === 'user' && (
                 <>
-                  <UserDisplay fontSize={14} avatarSize='xSmall' user={reviewer} wrapName={wrapColumn} />
+                  <UserDisplay fontSize={14} avatarSize='xSmall' user={option} wrapName={wrapColumn} />
                   {!readOnly && (
-                    <IconButton size='small' onClick={() => onRemove(reviewer.id)}>
+                    <IconButton size='small' onClick={() => onRemove(option.id)}>
                       <CloseIcon
                         sx={{
                           fontSize: 14
@@ -103,14 +103,14 @@ function SelectedReviewers({
                   )}
                 </>
               )}
-              {reviewer.group === 'role' && (
+              {option.group === 'role' && (
                 <Chip
                   sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
-                  label={reviewer.name}
-                  // color={reviewer.color}
-                  key={reviewer.id}
+                  label={option.name}
+                  // color={option.color}
+                  key={option.id}
                   size='small'
-                  onDelete={readOnly ? undefined : () => onRemove(reviewer.id)}
+                  onDelete={readOnly ? undefined : () => onRemove(option.id)}
                   deleteIcon={
                     <CloseIcon
                       sx={{
@@ -128,6 +128,7 @@ function SelectedReviewers({
     </Tooltip>
   );
 }
+
 type Props = {
   displayType?: 'details';
   onChange: (value: GroupedOptionPopulated[]) => void;
@@ -152,7 +153,7 @@ export function UserAndRoleSelect({
   variant = 'standard',
   value: inputValue,
   'data-test': dataTest,
-  wrapColumn = true,
+  wrapColumn,
   type = 'roleAndUser'
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
@@ -259,7 +260,7 @@ export function UserAndRoleSelect({
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
           ) : (
-            <SelectedReviewers
+            <SelectedOptions
               readOnlyMessage={readOnlyMessage}
               wrapColumn={wrapColumn}
               readOnly
@@ -333,7 +334,12 @@ export function UserAndRoleSelect({
           );
         }}
         renderTags={() => (
-          <SelectedReviewers wrapColumn readOnly={!!readOnly} value={populatedValue} onRemove={removeReviewer} />
+          <SelectedOptions
+            wrapColumn={wrapColumn}
+            readOnly={!!readOnly}
+            value={populatedValue}
+            onRemove={removeReviewer}
+          />
         )}
         value={populatedValue}
       />

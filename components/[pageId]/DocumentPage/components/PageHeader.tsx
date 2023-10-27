@@ -62,7 +62,7 @@ const EditorHeader = styled.div<{ pageType: 'page' | 'board' }>`
   }
 `;
 
-type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
+export type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
 
 type PageHeaderProps = {
   headerImage: string | null;
@@ -72,9 +72,19 @@ type PageHeaderProps = {
   setPage: (p: PageHeaderValues) => void;
   updatedAt: string;
   readOnlyTitle?: boolean;
+  placeholder?: string;
 };
 
-function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, readOnlyTitle }: PageHeaderProps) {
+function PageHeader({
+  headerImage,
+  icon,
+  readOnly,
+  setPage,
+  title,
+  updatedAt,
+  readOnlyTitle,
+  placeholder
+}: PageHeaderProps) {
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
@@ -92,7 +102,13 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt, re
         readOnly={readOnly}
         setPage={setPage}
       />
-      <PageTitleInput readOnly={readOnly || readOnlyTitle} value={title} onChange={updateTitle} updatedAt={updatedAt} />
+      <PageTitleInput
+        readOnly={readOnly || readOnlyTitle}
+        value={title}
+        onChange={updateTitle}
+        updatedAt={updatedAt}
+        placeholder={placeholder}
+      />
     </>
   );
 }
@@ -271,7 +287,7 @@ export function PageHeaderControls({
   );
 }
 
-export function getPageTop({ headerImage, icon }: Pick<Page, 'headerImage' | 'icon'>) {
+export function getPageTop({ headerImage, icon }: Partial<Pick<Page, 'headerImage' | 'icon'>>) {
   let pageTop = 100;
   if (headerImage) {
     pageTop = 50;

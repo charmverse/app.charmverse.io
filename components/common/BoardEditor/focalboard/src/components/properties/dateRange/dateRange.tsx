@@ -12,7 +12,7 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { Utils } from '../../../utils';
 import Button from '../../../widgets/buttons/button';
 import Editable from '../../../widgets/editable';
-import SwitchOption from '../../../widgets/menu/switchOption';
+import CheckboxOption from '../../../widgets/menu/checkboxOption';
 
 import 'react-day-picker/lib/style.css';
 
@@ -240,7 +240,7 @@ function DateRange(props: Props): JSX.Element {
               modifiers={dateTo ? { start: dateFrom, end: dateTo } : { start: dateFrom, end: dateFrom }}
             />
             <Divider sx={{ my: 1 }} />
-            <SwitchOption
+            <CheckboxOption
               key='EndDateOn'
               id='EndDateOn'
               name={intl.formatMessage({ id: 'DateRange.endDate', defaultMessage: 'End date' })}

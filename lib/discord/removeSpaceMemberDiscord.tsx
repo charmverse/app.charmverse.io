@@ -14,7 +14,7 @@ export async function removeSpaceMemberDiscord({
     return;
   }
 
-  return Promise.allSettled(
+  await Promise.allSettled(
     spacesData.map(({ space, user }) =>
       prisma.spaceRole.delete({
         where: {
@@ -26,4 +26,6 @@ export async function removeSpaceMemberDiscord({
       })
     )
   );
+
+  return { spaceIds: spacesData.map(({ space }) => space.id), userId: spacesData[0].user.id };
 }

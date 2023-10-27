@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
@@ -25,7 +26,6 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -36,7 +36,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
-import BountyProperties from './components/BountyProperties/BountyProperties';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -44,6 +43,12 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
+
+const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
+const RewardProperties = dynamic(
+  () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
+  { ssr: false }
+);
 
 export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} />)<{
   top: number;
@@ -165,6 +170,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
 
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const isRewardsPage = router.pathname.endsWith('/rewards');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
@@ -319,7 +325,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       proposalPage={page}
                     />
                   )}
-                  {(draftBounty || page.bountyId) && (
+                  {(draftBounty || page.bountyId) && !isRewardsPage && (
                     <BountyProperties
                       bountyId={page.bountyId}
                       pageId={page.id}
@@ -329,14 +335,14 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       refreshBountyPermissions={() => refreshBountyPermissions()}
                     />
                   )}
-                  {/* {(tempReward || page.bountyId) && (
+                  {page.bountyId && isRewardsPage && (
                     <RewardProperties
                       rewardId={page.bountyId}
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
                     />
-                  )} */}
+                  )}
                   {(page.type === 'card' || page.type === 'card_synced') && (
                     <CommentsList
                       comments={comments}

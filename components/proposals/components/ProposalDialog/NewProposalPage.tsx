@@ -99,6 +99,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                 setPage={(updatedPage) => {
                   setFormInputs(updatedPage);
                 }}
+                placeholder='Title (required)'
               />
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>

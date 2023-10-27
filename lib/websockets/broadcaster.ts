@@ -109,9 +109,6 @@ export class WebsocketBroadcaster implements AbstractWebsocketBroadcaster {
     if (!spaceRole) {
       socket.send(new SpaceMembershipRequiredError(`User ${userId} does not have access to ${roomId}`));
       return;
-    } else if (spaceRole.isGuest && roomId === spaceRole.spaceId) {
-      socket.send(new SpaceMembershipRequiredError(`Guests cannot subscribe to room events ${roomId}`));
-      return;
     }
 
     Object.keys(socket.rooms).forEach((room) => {

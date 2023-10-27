@@ -1,9 +1,11 @@
 import { baseUrl, isDevEnv } from 'config/constants';
-import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
-import { getAppOriginURL } from 'lib/utilities/getAppOriginURL';
+
+import { getAppApexDomain } from './domains/getAppApexDomain';
+import { getCustomDomainFromHost } from './domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from './domains/getSpaceDomainFromHost';
+import { isLocalhostAlias } from './domains/isLocalhostAlias';
+import { getAppOriginURL } from './getAppOriginURL';
+import { addQueryToUrl } from './url';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
@@ -112,20 +114,12 @@ function scrollIntoViewIfNeededPolyfill(element: HTMLElement, centerIfNeeded?: b
 
 // @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
 export function getNewUrl(params: Record<string, string | null>, currentUrl = window.location.href) {
-  const url = new URL(currentUrl, currentUrl.match('http') ? undefined : window.location.origin);
-  const urlParams: URLSearchParams = new URLSearchParams(url.search);
-  for (const key in params) {
-    if (params.hasOwnProperty(key)) {
-      const value = params[key];
-      if (typeof value === 'string') {
-        urlParams.set(key, value);
-      } else {
-        urlParams.delete(key);
-      }
-    }
-  }
-  url.search = urlParams.toString();
-  return url;
+  return addQueryToUrl({
+    url: currentUrl || window.location.href,
+    urlBase: window.location.origin,
+    query: params,
+    replace: true
+  });
 }
 
 /**

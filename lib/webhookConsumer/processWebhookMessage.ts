@@ -4,10 +4,12 @@ import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
+import { isTruthy } from 'lib/utilities/types';
 import type { MessageType, WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<WebhookMessageProcessResult>> = {
   guildMemberUpdate: async (message: WebhookMessage) => {
+    let spaceIds: string[] = [];
     try {
       const payload = message?.data?.payload;
       if (!payload || payload.length !== 2) {
@@ -27,20 +29,26 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       const rolesRemoved = oldRoles.filter((role) => !newRoles.includes(role));
 
       if (rolesAdded.length) {
-        await assignRolesCollabland({ discordUserId, discordServerId, roles: rolesAdded });
+        const result = await assignRolesCollabland({ discordUserId, discordServerId, roles: rolesAdded });
+        spaceIds = result?.map((r) => (r.status === 'fulfilled' ? r.value?.spaceId : undefined)).filter(isTruthy) ?? [];
       }
 
       if (rolesRemoved.length) {
-        await unassignRolesDiscord({ discordUserId, discordServerId, roles: rolesRemoved });
+        const result = await unassignRolesDiscord({ discordUserId, discordServerId, roles: rolesRemoved });
+        if (result?.spaceIds) {
+          spaceIds = result.spaceIds;
+        }
       }
 
       return {
+        spaceIds,
         success: true,
         message: 'Roles updated.'
       };
       // eslint-disable-next-line no-empty
     } catch (e: any) {
       return {
+        spaceIds,
         success: false,
         message: e?.message || 'Failed to process guildMemberUpdate event.'
       };
@@ -57,9 +65,10 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       }
 
       const { guildId: discordServerId, userId: discordUserId } = payload;
-      await removeSpaceMemberDiscord({ discordUserId, discordServerId });
+      const result = await removeSpaceMemberDiscord({ discordUserId, discordServerId });
 
       return {
+        spaceIds: result?.spaceIds ?? [],
         success: true,
         message: 'Member removed.'
       };

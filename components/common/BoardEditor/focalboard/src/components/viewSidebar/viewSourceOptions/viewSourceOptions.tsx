@@ -243,7 +243,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         open={typeformPopup.isOpen}
         onClose={typeformPopup.close}
         onConfirm={() => {
-          onCreateDatabase?.({ sourceType: 'board_page' });
+          onCreateDatabase?.();
           typeformPopup.close();
         }}
       />

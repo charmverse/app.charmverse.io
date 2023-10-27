@@ -5,7 +5,15 @@ import { getSummonProfile } from 'lib/profile/getSummonProfile';
 
 import { getSummonRoleLabel } from './getSummonRoleLabel';
 
-export async function syncSummonSpaceRoles({ spaceId, userId }: { userId?: string; spaceId: string }) {
+export async function syncSummonSpaceRoles({
+  spaceId,
+  userId,
+  summonApiUrl
+}: {
+  summonApiUrl?: string;
+  userId?: string;
+  spaceId: string;
+}) {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -100,9 +108,8 @@ export async function syncSummonSpaceRoles({ spaceId, userId }: { userId?: strin
 
   for (const spaceRole of spaceRoles) {
     try {
-      const summonProfile = await getSummonProfile({ userId: spaceRole.user.id });
+      const summonProfile = await getSummonProfile({ userId: spaceRole.user.id, summonApiUrl });
       const userRank = summonProfile ? Math.floor(summonProfile.meta.rank) : null;
-
       if (summonProfile && userRank) {
         if (!spaceRole.user.xpsEngineId) {
           await prisma.user.update({

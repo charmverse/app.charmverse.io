@@ -174,7 +174,7 @@ describe('getCSVColumns()', () => {
     const board = createMockBoard();
     board.fields.cardProperties = [];
     const boardProperties = getBoardProperties({
-      database: board,
+      boardBlock: board,
       proposalCategories: [{ id: 'category_id', title: 'MockCategory', color: 'red' }],
       spaceUsesRubrics: true
     });
@@ -183,7 +183,7 @@ describe('getCSVColumns()', () => {
     const proposalStatusProperty = boardProperties.find((prop) => prop.type === 'proposalStatus');
     const reviewStatusOptionId = proposalStatusProperty?.options?.find((opt) => opt.value === 'review')?.id;
     const databaseProperties = extractDatabaseProposalProperties({
-      database: board
+      boardBlock: board
     });
     const properties = {
       [databaseProperties.proposalCategory!.id]: 'category_id',

@@ -8,14 +8,14 @@ const achievementId = '354662534299517013'
 
 async function init () {
 
-  const user3 = await xps.findUserByIdentity({ walletAddress, discordHandle });
-  console.log('user', user3);
+  // const user3 = await xps.findUserByIdentity({ walletAddress, discordHandle });
+  // console.log('user', user3);
 
   // const inventory = await xps.getUserInventory(userId);
   // console.log('inventory', inventory?.achievements);
 
-  const achievement = await xps.getAchievementById(achievementId);
-  console.log('achievement', achievement);
+  // const achievement = await xps.getAchievementById(achievementId);
+  // console.log('achievement', achievement);
 
 }
 

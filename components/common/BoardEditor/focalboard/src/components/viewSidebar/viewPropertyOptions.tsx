@@ -75,8 +75,10 @@ function PropertyOptions(props: LayoutOptionsProps) {
 
   const { visiblePropertyIds } = view.fields;
   const titlePropertyIndex = visiblePropertyIds.indexOf(Constants.titleColumnId);
-  const visiblePropertyIdsWithTitle =
-    titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds;
+  const visiblePropertyIdsWithTitle = useMemo(
+    () => (titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds),
+    [titlePropertyIndex, visiblePropertyIds]
+  );
 
   const propertiesWithTitle = properties.find((property) => property.id === Constants.titleColumnId)
     ? properties

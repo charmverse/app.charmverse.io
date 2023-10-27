@@ -88,33 +88,28 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/separatorOptio
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/BoardEditor/focalboard/src/widgets/checkbox.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
-import 'lib/lit-protocol-modal/index.css';
-import 'lib/lit-protocol-modal/reusableComponents/litChainSelector/LitChainSelector.css';
-import 'lib/lit-protocol-modal/reusableComponents/litCheckbox/LitCheckbox.css';
-import 'lib/lit-protocol-modal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
-import 'lib/lit-protocol-modal/reusableComponents/litConfirmationModal/LitConfirmationModal';
-import 'lib/lit-protocol-modal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
-import 'lib/lit-protocol-modal/reusableComponents/litDeleteModal/LitDeleteModal.css';
-import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitBackButton.css';
-import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitFooter.css';
-import 'lib/lit-protocol-modal/reusableComponents/litFooter/LitNextButton.css';
-import 'lib/lit-protocol-modal/reusableComponents/litHeader/LitHeader.css';
-import 'lib/lit-protocol-modal/reusableComponents/litInput/LitInput.css';
-import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading';
-import 'lib/lit-protocol-modal/reusableComponents/litLoading/LitLoading.css';
-import 'lib/lit-protocol-modal/reusableComponents/litReusableSelect/LitReusableSelect.css';
-import 'lib/lit-protocol-modal/reusableComponents/litTokenSelect/LitTokenSelect.css';
-import 'lib/lit-protocol-modal/shareModal/devMode/DevModeContent.css';
-import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
-import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
-import 'lib/lit-protocol-modal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
-import 'lib/lit-protocol-modal/shareModal/reviewConditions/ReviewConditions.css';
-import 'lib/lit-protocol-modal/shareModal/ShareModal.css';
-import 'lib/lit-protocol-modal/shareModal/singleConditionSelect/SingleConditionSelect.css';
+import 'components/common/LitProtocolModal/index.css';
+import 'components/common/LitProtocolModal/reusableComponents/litChainSelector/LitChainSelector.css';
+import 'components/common/LitProtocolModal/reusableComponents/litCheckbox/LitCheckbox.css';
+import 'components/common/LitProtocolModal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
+import 'components/common/LitProtocolModal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
+import 'components/common/LitProtocolModal/reusableComponents/litDeleteModal/LitDeleteModal.css';
+import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitBackButton.css';
+import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitFooter.css';
+import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitNextButton.css';
+import 'components/common/LitProtocolModal/reusableComponents/litHeader/LitHeader.css';
+import 'components/common/LitProtocolModal/reusableComponents/litInput/LitInput.css';
+import 'components/common/LitProtocolModal/shareModal/devMode/DevModeContent.css';
+import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
+import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
+import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
+import 'components/common/LitProtocolModal/shareModal/reviewConditions/ReviewConditions.css';
+import 'components/common/LitProtocolModal/shareModal/ShareModal.css';
+import 'components/common/LitProtocolModal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 import 'prosemirror-menu/style/menu.css';
 import 'react-resizable/css/styles.css';
 import 'theme/@bangle.dev/styles.scss';
@@ -189,36 +184,34 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
           <DataProviders>
             <SettingsDialogProvider>
               <LocalizationProvider>
-                <ApplicationDialogProvider>
-                  <FocalBoardProvider>
-                    <NotionProvider>
-                      <IntlProvider>
-                        <PageHead {...pageProps} />
+                <FocalBoardProvider>
+                  <NotionProvider>
+                    <IntlProvider>
+                      <PageHead {...pageProps} />
 
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
 
-                            {getLayout(<Component {...pageProps} />)}
+                          {getLayout(<Component {...pageProps} />)}
 
-                            <GlobalComponents />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </IntlProvider>
-                    </NotionProvider>
-                  </FocalBoardProvider>
-                </ApplicationDialogProvider>
+                          <GlobalComponents />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </IntlProvider>
+                  </NotionProvider>
+                </FocalBoardProvider>
               </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>

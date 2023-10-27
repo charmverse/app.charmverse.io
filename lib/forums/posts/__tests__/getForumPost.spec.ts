@@ -2,7 +2,7 @@ import type { Post, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
 import { PostNotFoundError } from '../errors';
@@ -12,8 +12,10 @@ import type { PostWithVotes } from '../interfaces';
 let space: Space;
 let user: User;
 
+const spaceCustomDomain = 'test-domain.com';
+
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace({ spaceCustomDomain });
   space = generated.space;
   user = generated.user;
 });
@@ -50,6 +52,27 @@ describe('getForumPost', () => {
       title: postTitle
     });
     const retrievedPost = await getForumPost({ postId: createdPost.path, spaceDomain: space.domain });
+
+    expect(retrievedPost).toMatchObject(
+      expect.objectContaining<Partial<Post>>({
+        id: expect.any(String),
+        content: expect.any(Object),
+        locked: false,
+        pinned: false,
+        title: postTitle
+      })
+    );
+  });
+
+  it('should support looking up the post by post path + custom domain', async () => {
+    const postTitle = `Test Title-${v4()}`;
+
+    const createdPost = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id,
+      title: postTitle
+    });
+    const retrievedPost = await getForumPost({ postId: createdPost.path, spaceDomain: spaceCustomDomain });
 
     expect(retrievedPost).toMatchObject(
       expect.objectContaining<Partial<Post>>({

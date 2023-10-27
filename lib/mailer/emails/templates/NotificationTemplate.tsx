@@ -14,7 +14,7 @@ import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 
 const MAX_CHAR = 60;
 
-export function PendingNotification(notification: Notification) {
+export function PendingNotification({ notification }: { notification: Notification }) {
   return (
     <EmailWrapper title='Your open notifications' preview='Your open notifications'>
       <NotificationSection notification={notification} />
@@ -86,15 +86,15 @@ function NotificationSection({ notification }: { notification: Notification }) {
           </Text>
         </Column>
       </Row>
-      <Button
+      <Row
         style={{
-          width: '75%',
-          margin: '10px auto'
+          margin: '6px auto'
         }}
-        href={link}
       >
-        View
-      </Button>
+        <Column style={{ width: 50 }} />
+        <Button href={link}>View</Button>
+        <Column style={{ width: 50 }} />
+      </Row>
     </Section>
   );
 }

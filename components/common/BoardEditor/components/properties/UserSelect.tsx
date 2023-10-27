@@ -73,7 +73,7 @@ function MembersDisplay({
   const members = memberIds.map((memberId) => membersRecord[memberId]).filter(isTruthy);
 
   return memberIds.length === 0 ? null : (
-    <Stack flexDirection='row' gap={1} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
+    <Stack flexDirection='row' gap={1} rowGap={0.5} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
       {members.map((user) => {
         return (
           <Stack

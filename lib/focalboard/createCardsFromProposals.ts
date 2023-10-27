@@ -68,8 +68,8 @@ export async function createCardsFromProposals({
     }
   });
 
-  const database = await setDatabaseProposalProperties({
-    databaseId: boardId
+  const boardBlock = await setDatabaseProposalProperties({
+    boardId
   });
 
   const views = await prisma.block.findMany({
@@ -116,7 +116,7 @@ export async function createCardsFromProposals({
     return acc;
   }, {} as Record<string, ProposalRubricCriteriaAnswer[]>);
 
-  const proposalProps = extractDatabaseProposalProperties({ database });
+  const proposalProps = extractDatabaseProposalProperties({ boardBlock });
 
   const updatedViewBlocks = await prisma.$transaction(
     views.map((block) => {
@@ -128,7 +128,7 @@ export async function createCardsFromProposals({
             visiblePropertyIds: [
               ...new Set([
                 ...(block.fields as BoardViewFields).visiblePropertyIds,
-                ...(database.fields as any as BoardFields).cardProperties.map((p) => p.id)
+                ...(boardBlock.fields as any as BoardFields).cardProperties.map((p) => p.id)
               ])
             ],
             sourceType: 'proposals'
@@ -143,7 +143,7 @@ export async function createCardsFromProposals({
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: updatedViewBlocks.map(prismaToBlock).concat(prismaToBlock(database as any))
+      payload: updatedViewBlocks.map(prismaToBlock).concat(prismaToBlock(boardBlock as any))
     },
     spaceId
   );
@@ -151,7 +151,7 @@ export async function createCardsFromProposals({
   const cards: { page: Page; block: Block }[] = [];
 
   const databaseProposalProps = extractDatabaseProposalProperties({
-    database
+    boardBlock
   });
 
   for (const pageProposal of pageProposals) {

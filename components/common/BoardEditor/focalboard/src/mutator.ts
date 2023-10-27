@@ -177,7 +177,7 @@ export class Mutator {
   }
 
   async deleteBlock(
-    block: Block,
+    block: Pick<Block, 'type' | 'id'>,
     description?: string,
     beforeRedo?: () => Promise<void>,
     afterUndo?: () => Promise<void>
@@ -595,7 +595,6 @@ export class Mutator {
       delete newCard.fields.properties[propertyId];
     }
     if (mutate) {
-      // TelemetryClient.trackEvent(TelemetryCategory, TelemetryActions.EditCardProperty, {board: card.rootId, card: card.id})
       return this.updateBlock(newCard, card, description);
     } else {
       return { newBlock: newCard, block: card };
