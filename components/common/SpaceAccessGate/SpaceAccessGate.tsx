@@ -1,5 +1,6 @@
 import { Alert, Box, Card, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login/components/WalletSign';
@@ -18,6 +19,7 @@ import { useSummonGate } from './components/SummonGate/hooks/useSummonGate';
 import { SummonGate } from './components/SummonGate/SummonGate';
 import { useTokenGates } from './components/TokenGate/hooks/useTokenGates';
 import { TokenGate } from './components/TokenGate/TokenGate';
+import { SpaceBanModal } from './SpaceBanModal';
 
 export function SpaceAccessGate({
   space,
@@ -28,6 +30,8 @@ export function SpaceAccessGate({
   joinType?: TokenGateJoinType;
   onSuccess?: () => void;
 }) {
+  const [isBannedFromSpace, setIsBannedFromSpace] = useState(false);
+
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { user } = useUser();
@@ -74,11 +78,19 @@ export function SpaceAccessGate({
     await tokenGate.evaluateEligibility(authSig);
   }
 
+  function onError(error: any) {
+    if (error.status === 401 && error.message?.includes('banned')) {
+      setIsBannedFromSpace(true);
+    } else {
+      showMessage(error?.message ?? error ?? 'An unknown error occurred', 'error');
+    }
+  }
+
   function joinSpace() {
     if (summonGate.isVerified) {
       summonGate.joinSpace();
     } else if (tokenGate.isVerified) {
-      tokenGate.joinSpace();
+      tokenGate.joinSpace(onError);
     } else if (discordGate.isVerified) {
       discordGate.joinSpace();
     } else {
@@ -94,6 +106,12 @@ export function SpaceAccessGate({
 
   return (
     <>
+      <SpaceBanModal
+        onClose={() => {
+          setIsBannedFromSpace(false);
+        }}
+        open={isBannedFromSpace}
+      />
       <Card sx={{ p: 3, mb: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
           <WorkspaceAvatar image={space.spaceImage} name={space.name} variant='rounded' />

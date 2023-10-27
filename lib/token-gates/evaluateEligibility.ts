@@ -49,15 +49,6 @@ export async function evaluateTokenGateEligibility({
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
   }
 
-  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
-    spaceId: space.id,
-    userId
-  });
-
-  if (isUserBannedFromSpace) {
-    throw new UnauthorisedActionError(`You have been banned from this space.`);
-  }
-
   if (!litClient.ready) {
     throw new InvalidStateError('Lit client is not available');
   }
