@@ -43,6 +43,7 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
         spaceTemplate: spaceTemplateCookie,
         user: updatedUser
       });
+      log.info('Registered user with Loop', { userId });
     } catch (error) {
       log.error('Could not register user with Loop', { error, userId });
     }
