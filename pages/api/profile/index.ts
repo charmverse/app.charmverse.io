@@ -120,8 +120,8 @@ async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
         await deleteLoopsContact({ email: original.email! });
         await deleteBeehiivSubscription({ email: original.email! });
       } else {
-        await registerLoopsContact(updatedUser);
-        await registerBeehiivSubscription(updatedUser);
+        await registerLoopsContact(updatedUser, original.email);
+        await registerBeehiivSubscription(updatedUser, original.email);
       }
     } catch (error) {
       log.error('Error updating contact with Loop', { error, userId });
