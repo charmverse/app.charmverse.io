@@ -119,8 +119,6 @@ export function NotificationsPopover({
   isLoading: boolean;
 }) {
   const { getDisplayProperties } = useMemberProperties();
-  const visibleProperties = getDisplayProperties('profile');
-
   const theme = useTheme();
   const [inboxState, setInboxState] = useState<'unread' | 'unarchived'>('unarchived');
   const [activeTab, setActiveState] = useState<'Inbox' | 'Archived'>('Inbox');
@@ -157,12 +155,7 @@ export function NotificationsPopover({
       };
     }, [notifications]);
 
-  const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
-    record[prop.type] = prop;
-    return record;
-  }, {} as any);
-
-  const { members } = useMembers();
+  const { membersRecord } = useMembers();
 
   const markNotifications = async (payload: MarkNotifications) => {
     await charmClient.notifications.markNotifications(payload);
@@ -293,18 +286,14 @@ export function NotificationsPopover({
                 <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
                     targetNotifications.map((notification) => {
-                      const notificationMember = members.find((member) => member.id === notification.createdBy.id);
+                      const notificationMember = membersRecord[notification.createdBy.id];
                       return (
                         <Fragment key={notification.id}>
                           <NotificationContent
                             notification={notification}
                             markNotifications={markNotifications}
                             onClose={close}
-                            actorUsername={
-                              (notificationMember?.properties.find(
-                                (memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id
-                              )?.value as string) ?? notification.createdBy.username
-                            }
+                            actorUsername={notificationMember?.username ?? notification.createdBy.username}
                           />
                           <Divider />
                         </Fragment>
@@ -328,18 +317,14 @@ export function NotificationsPopover({
                 <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                   {targetNotifications.length > 0 ? (
                     targetNotifications.map((notification) => {
-                      const notificationMember = members.find((member) => member.id === notification.createdBy.id);
+                      const notificationMember = membersRecord[notification.createdBy.id];
                       return (
                         <Fragment key={notification.id}>
                           <NotificationContent
                             notification={notification}
                             markNotifications={markNotifications}
                             onClose={close}
-                            actorUsername={
-                              (notificationMember?.properties.find(
-                                (memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id
-                              )?.value as string) ?? notification.createdBy.username
-                            }
+                            actorUsername={notificationMember?.username ?? notification.createdBy.username}
                           />
                           <Divider />
                         </Fragment>
@@ -388,15 +373,11 @@ export function NotificationsPopover({
               <Box maxHeight={500} sx={{ overflowY: 'auto' }}>
                 {archivedNotifications.length > 0 ? (
                   archivedNotifications.map((notification) => {
-                    const notificationMember = members.find((member) => member.id === notification.createdBy.id);
+                    const notificationMember = membersRecord[notification.createdBy.id];
                     return (
                       <Fragment key={notification.id}>
                         <NotificationContent
-                          actorUsername={
-                            (notificationMember?.properties.find(
-                              (memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id
-                            )?.value as string) ?? notification.createdBy.username
-                          }
+                          actorUsername={notificationMember?.username ?? notification.createdBy.username}
                           notification={notification}
                           markNotifications={markNotifications}
                           onClose={close}

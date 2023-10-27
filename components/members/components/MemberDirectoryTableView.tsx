@@ -1,3 +1,4 @@
+import type { MemberProperty } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import {
@@ -39,14 +40,19 @@ const StyledTableRow = styled(TableRow)`
   ${hoverIconsStyle()}
 `;
 
-function MemberDirectoryTableRow({ member }: { member: Member }) {
+function MemberDirectoryTableRow({
+  member,
+  visibleProperties
+}: {
+  visibleProperties: MemberProperty[];
+
+  member: Member;
+}) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-  const { getDisplayProperties } = useMemberProperties();
-  const visibleProperties = getDisplayProperties('table');
   const { showUserId } = useMemberDialog();
   const { openSettings } = useSettingsDialog();
   const { formatDate } = useDateFormatter();
@@ -258,7 +264,7 @@ export function MemberDirectoryTableView({ members }: { members: Member[] }) {
       </TableHead>
       <TableBody>
         {members.map((member) => (
-          <MemberDirectoryTableRow member={member} key={member.id} />
+          <MemberDirectoryTableRow visibleProperties={visibleProperties} member={member} key={member.id} />
         ))}
       </TableBody>
     </Table>
