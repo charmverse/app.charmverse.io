@@ -177,7 +177,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         {favoritePageIds.length > 0 && (
           <Box mb={2}>
             <SectionName mb={1}>FAVORITES</SectionName>
-            <PageNavigation isFavorites rootPageIds={favoritePageIds} />
+            <PageNavigation isFavorites rootPageIds={favoritePageIds} onClick={navAction} />
           </Box>
         )}
         <WorkspaceLabel data-test='page-sidebar-header'>
@@ -229,7 +229,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         </Box>
       </>
     );
-  }, [favoritePageIds, userSpacePermissions, navAction, addPage, showMemberFeatures]);
+  }, [favoritePageIds, userSpacePermissions, isMobile, navAction, addPage, showMemberFeatures]);
 
   const { features } = useFeaturesAndMembers();
   const isCharmverse = useIsCharmverseSpace();
