@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { connectAcctountWithGoogleCode } from 'lib/google/connectGoogleAccountWithCode';
+import { connectAccountWithGoogleCode } from 'lib/google/connectGoogleAccountWithCode';
 import { loginWithGoogleCode } from 'lib/google/loginWithGoogleCode';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
@@ -25,7 +25,7 @@ async function connectAccountWithGoogleCodeHandler(req: NextApiRequest, res: Nex
       signupAnalytics
     });
   } else if (type === 'connect') {
-    loggedInUser = await connectAcctountWithGoogleCode({ code, userId: req.session.user.id });
+    loggedInUser = await connectAccountWithGoogleCode({ code, userId: req.session.user.id });
   }
 
   if (loggedInUser) {

@@ -3,10 +3,16 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import {
+  DataNotFoundError,
+  InsecureOperationError,
+  InvalidInputError,
+  UnauthorisedActionError
+} from 'lib/utilities/errors';
 
 import type {
   TokenGateJwtResult,
@@ -24,6 +30,16 @@ export async function applyTokenGates({
 }: TokenGateVerification): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
+  }
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: [spaceId],
+    userId
+  });
+
+  if (isUserBannedFromSpace) {
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
+    throw new UnauthorisedActionError(`You have been banned from this space.`);
   }
 
   const space = await prisma.space.findUnique({

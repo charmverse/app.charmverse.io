@@ -18,6 +18,7 @@ type Context = {
   makeGuest: (userIds: string[]) => Promise<void>;
   makeMember: (userIds: string[]) => Promise<void>;
   removeFromSpace: (userId: string) => Promise<void>;
+  banFromSpace: (userId: string) => Promise<void>;
   isLoading: boolean;
   isValidating: boolean;
   getMemberById: (id?: string | null) => Member | undefined;
@@ -35,6 +36,7 @@ const MembersContext = createContext<Readonly<Context>>({
   makeGuest: () => Promise.resolve(),
   makeMember: () => Promise.resolve(),
   removeFromSpace: () => Promise.resolve(),
+  banFromSpace: () => Promise.resolve(),
   getMemberById: () => undefined
 });
 
@@ -109,11 +111,20 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       );
     }
   }
+
   async function removeFromSpace(userId: string) {
     if (!space) {
       throw new Error('Space not found');
     }
     await charmClient.members.removeMember({ spaceId: space.id, userId });
+    mutateMembers((_members) => _members?.filter((c) => c.id !== userId), { revalidate: false });
+  }
+
+  async function banFromSpace(userId: string) {
+    if (!space) {
+      throw new Error('Space not found');
+    }
+    await charmClient.members.banMember({ spaceId: space.id, userId });
     mutateMembers((_members) => _members?.filter((c) => c.id !== userId), { revalidate: false });
   }
 
@@ -140,7 +151,8 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       removeFromSpace,
       isLoading,
       isValidating,
-      getMemberById
+      getMemberById,
+      banFromSpace
     }),
     [members, membersRecord, getMemberById]
   );

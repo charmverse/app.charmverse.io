@@ -4,13 +4,14 @@ import nc from 'next-connect';
 
 import { firebaseApp } from 'lib/google/firebaseApp';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -26,6 +27,29 @@ async function connectEmailAccount(req: NextApiRequest, res: NextApiResponse<Log
 
   if (!verificationResult.email) {
     throw new InvalidInputError(`No email found in verification result`);
+  }
+
+  const spaceRoles = await prisma.spaceRole.findMany({
+    where: {
+      userId
+    },
+    select: {
+      space: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+  const userSpaceIds = spaceRoles.map((role) => role.space.id);
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: userSpaceIds,
+    emails: [verificationResult.email]
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError('You need to leave space before you can add this email to your account');
   }
 
   const existingVerifiedEmailAccount = await prisma.verifiedEmail.findUnique({
