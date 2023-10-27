@@ -1,3 +1,4 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import Cookies from 'cookies';
@@ -13,6 +14,7 @@ import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -26,7 +28,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.post(requireWalletSignature, createUser).get(getUser).use(requireUser).put(updateUser);
 
 async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-  const { address } = req.body;
+  const { address } = req.body as Web3LoginRequest;
 
   let user: LoggedInUser;
 

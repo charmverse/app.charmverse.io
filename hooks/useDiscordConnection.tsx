@@ -88,12 +88,16 @@ export function DiscordProvider({ children }: Props) {
 
       try {
         if (type === 'connect') {
-          const updatedUser = await charmClient.discord.connectDiscord(
-            {
-              code
-            },
-            'popup'
-          );
+          const updatedUser = await charmClient.discord
+            .connectDiscord(
+              {
+                code
+              },
+              'popup'
+            )
+            .catch((err) => {
+              setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
+            });
 
           setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser }));
         } else {
@@ -111,9 +115,16 @@ export function DiscordProvider({ children }: Props) {
   useEffect(() => {
     if (authError) {
       deleteCookie(AUTH_ERROR_COOKIE);
-      showMessage('Failed to connect to discord');
+      showMessage('Failed to connect to discord', 'error');
     }
   }, [authError]);
+
+  useEffect(() => {
+    if (discordError) {
+      showMessage(discordError, 'error');
+      setDiscordError('');
+    }
+  }, [discordError]);
 
   // It can either be fail or success
   useEffect(() => {

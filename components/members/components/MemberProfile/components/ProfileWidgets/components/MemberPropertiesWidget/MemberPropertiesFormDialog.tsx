@@ -41,25 +41,20 @@ export function DialogContainer({
   children,
   onClose,
   title,
-  fluidSize
+  fluidSize,
+  hideCloseButton
 }: {
-  onClose: VoidFunction;
+  onClose?: VoidFunction;
   title: string;
   children?: ReactNode;
   fluidSize?: boolean;
+  hideCloseButton?: boolean;
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
-  const { mutateMembers } = useMembers();
-
-  function onClickClose() {
-    // refresh members only after all the editing is finished
-    onClose();
-    mutateMembers();
-  }
 
   return (
-    <StyledDialog toolbar={<div />} fluidSize={fluidSize} onClose={onClickClose}>
+    <StyledDialog toolbar={<div />} fluidSize={fluidSize} hideCloseButton={hideCloseButton} onClose={onClose}>
       <ScrollableWindow>
         <ContentContainer fullWidth={fullWidth} top={20}>
           {title && <Legend wrap>{title}</Legend>}
@@ -73,6 +68,7 @@ export function DialogContainer({
 export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) {
   const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
+  const { mutateMembers } = useMembers();
 
   async function saveForm() {
     await updateSpaceValues(spaceId, memberDetails);
@@ -92,9 +88,15 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
     [memberPropertyValues, spaceId]
   );
 
+  function onClickClose() {
+    // refresh members only after all the editing is finished
+    onClose();
+    mutateMembers();
+  }
+
   const isFormClean = memberDetails.length === 0;
   return (
-    <DialogContainer title='Edit profile' onClose={onClose}>
+    <DialogContainer title='Edit profile' onClose={onClickClose}>
       <MemberPropertiesForm
         properties={memberProperties}
         userId={userId}

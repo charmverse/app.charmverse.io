@@ -9,7 +9,7 @@ export type ConnectAccountRequest = {
   code: string;
   userId: string;
 };
-export async function connectAcctountWithGoogleCode({ code, userId }: ConnectAccountRequest): Promise<LoggedInUser> {
+export async function connectAccountWithGoogleCode({ code, userId }: ConnectAccountRequest): Promise<LoggedInUser> {
   const redirectUri = `${getCallbackDomain()}/authenticate/google`;
   const oauthParams = {
     audience: googleOAuthClientIdSensitive,
