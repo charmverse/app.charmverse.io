@@ -4,7 +4,7 @@ import type { ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import charmClient from 'charmClient';
+import { useSaveOnboardingEmail } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 
@@ -17,6 +17,7 @@ export const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
+  const { trigger: saveForm } = useSaveOnboardingEmail();
   const { updateUser, user } = useUser();
 
   const {
@@ -49,7 +50,7 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
     const validate = await trigger();
 
     if (validate) {
-      await charmClient.updateUser({
+      await saveForm({
         email,
         emailNewsletter,
         emailNotifications
