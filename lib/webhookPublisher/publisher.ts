@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
+import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotificationEmail';
 import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;
@@ -74,7 +75,16 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
     }
 
-    await createNotificationsFromEvent(webhookPayload);
+    // Create and save notifications
+    const notifications = await createNotificationsFromEvent(webhookPayload);
+
+    let notificationCount = 0;
+    for (const notification of notifications) {
+      const sent = await sendNotificationEmail(notification);
+      if (sent) {
+        notificationCount += 1;
+      }
+    }
 
     log.debug(`Sent webhook event to SQS: "${event.scope}"`, {
       spaceId,

@@ -171,6 +171,35 @@ async function sendEmail({
   notification: Notification;
   user: { username: string; email: string; id: string };
 }) {
+  const notificationSpaceId = notification.spaceId;
+  const userId = notification.createdBy.id;
+
+  const memberProperty = await prisma.memberProperty.findFirst({
+    where: {
+      spaceId: notificationSpaceId,
+      type: 'name'
+    },
+    select: {
+      id: true
+    }
+  });
+
+  if (memberProperty) {
+    const memberPropertyValue = await prisma.memberPropertyValue.findFirst({
+      where: {
+        spaceId: notificationSpaceId,
+        userId,
+        memberPropertyId: memberProperty.id
+      },
+      select: {
+        value: true
+      }
+    });
+    if (memberPropertyValue?.value) {
+      notification.createdBy.username = memberPropertyValue.value as string;
+    }
+  }
+
   const template = emails.getPendingNotificationEmail(notification);
   const result = await mailer.sendEmail({
     to: {
