@@ -50,15 +50,6 @@ export function ForumPage() {
     disabledCreatePostTooltip = `You do not have permission to create posts in the ${currentCategory.name} category`;
   }
 
-  useEffect(() => {
-    if (currentCategory?.name) {
-      setTitle(currentCategory.name);
-    }
-  }, [currentCategory?.name]);
-
-  useEffect(() => {
-    setCategoryFromPath();
-  }, [categories, router.query]);
   function setCategoryFromPath() {
     const categoryPath = router.query.categoryPath as string | undefined;
     const category = !categoryPath
@@ -73,37 +64,6 @@ export function ForumPage() {
       charmClient.track.trackAction('main_feed_filtered', {
         categoryName: category.name,
         spaceId: currentSpace.id
-      });
-    }
-  }
-
-  function handleSortUpdate(sortName?: PostSortOption) {
-    const pathname = `/${currentSpace?.domain}/forum`;
-
-    if (sortName) {
-      router.push({
-        pathname,
-        query: { sort: sortName }
-      });
-    } else {
-      router.push({
-        pathname
-      });
-    }
-  }
-
-  function handleCategoryUpdate(newCategoryId?: string) {
-    const pathname = `/${currentSpace?.domain}/forum`;
-
-    const newCategory = newCategoryId ? categories.find((category) => category.id === newCategoryId) : null;
-
-    if (newCategory) {
-      router.push({
-        pathname: `${pathname}/${newCategory.path ?? newCategory.name}`
-      });
-    } else {
-      router.push({
-        pathname
       });
     }
   }
@@ -134,6 +94,16 @@ export function ForumPage() {
       debounceSearch.cancel();
     };
   }, [debounceSearch]);
+
+  useEffect(() => {
+    if (currentCategory?.name) {
+      setTitle(currentCategory.name);
+    }
+  }, [currentCategory?.name]);
+
+  useEffect(() => {
+    setCategoryFromPath();
+  }, [categories, router.query]);
 
   return (
     <CenteredPageContent style={{ width: 1100 }}>
@@ -174,11 +144,7 @@ export function ForumPage() {
           }}
         >
           <Box display={{ md: 'none' }}>
-            <CategorySelect
-              selectedCategoryId={currentCategory?.id}
-              selectedSort={sort}
-              handleSort={handleSortUpdate}
-            />
+            <CategorySelect selectedCategoryId={currentCategory?.id} selectedSort={sort} />
           </Box>
           <CreateForumPost
             disabled={disableCreatePost}
