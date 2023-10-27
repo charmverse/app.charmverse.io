@@ -119,6 +119,20 @@ describe('getDefaultPageForSpace()', () => {
     const url = await getDefaultPageForSpace({ space, userId: user.id, host: customDomain });
     expect(url).toEqual(`/proposals%20?id=123`);
   });
+
+  it('should take user to the canonical page if it was displayed in a card originally', async () => {
+    const { space, user } = await generateUserAndSpace();
+    const page = await createPage({ spaceId: space.id, createdBy: user.id });
+    await savePageView({
+      createdBy: user.id,
+      spaceId: space.id,
+      pageId: page.id,
+      pageType: 'page',
+      meta: { pathname: `/parent-database-path?cardId=${page.id}` }
+    });
+    const url = await getDefaultPageForSpace({ space, userId: user.id });
+    expect(url).toEqual(`/${space.domain}/${page.path}`);
+  });
 });
 
 type EventData = Pick<UserSpaceAction, 'pageType' | 'createdBy' | 'spaceId'> & {

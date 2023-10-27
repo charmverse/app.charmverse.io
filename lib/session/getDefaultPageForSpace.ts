@@ -50,17 +50,23 @@ async function getDefaultPageForSpaceRaw({
 
   const defaultSpaceUrl = getSpaceUrl(space, host);
   if (lastPageView) {
+    // grab the original path a user was on to include query params like filters, etc.
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
-    if (pathname) {
-      return getSubdomainPath(pathname, space, host);
-    }
-    // reconstruct the URL if no pathname is saved (should not be an issue a few weeks after the release of this code on Sep 12 2023)
+    const fullPathname = pathname && getSubdomainPath(pathname, space, host);
     // handle forum posts
     if (lastPageView.post) {
-      return `${defaultSpaceUrl}/forum?postId=${lastPageView.post.id}`;
+      // use the original path if it was the actual post page
+      if (fullPathname?.includes(lastPageView.post.path)) {
+        return fullPathname;
+      }
+      return `${defaultSpaceUrl}/forum/post/${lastPageView.post.path}`;
     }
     // handle pages
     else if (lastPageView.page) {
+      // use the original path if it was the actual post page
+      if (fullPathname?.includes(lastPageView.page.path)) {
+        return fullPathname;
+      }
       return `${defaultSpaceUrl}/${lastPageView.page.path}`;
     }
     // handle static pages
