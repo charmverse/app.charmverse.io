@@ -6,6 +6,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
+import { deleteBeehiivSubscription } from 'lib/beehiiv/deleteBeehiivSubscription';
+import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
@@ -114,10 +116,12 @@ async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
   if (original.email !== updatedUser.email || original.emailNewsletter !== updatedUser.emailNewsletter) {
     try {
       if (!updatedUser.email) {
-        // remove from Loops
+        // remove from Loops and Beehiiv
         await deleteLoopsContact({ email: original.email! });
+        await deleteBeehiivSubscription({ email: original.email! });
       } else {
         await registerLoopsContact(updatedUser);
+        await registerBeehiivSubscription(updatedUser);
       }
     } catch (error) {
       log.error('Error updating contact with Loop', { error, userId });

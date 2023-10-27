@@ -1,4 +1,4 @@
-import { GET, POST, DELETE } from '@charmverse/core/http';
+import { GET, PUT, POST, DELETE } from '@charmverse/core/http';
 
 // Beehiiv manages our newsletters
 // Visit the dashboard: https://app.beehiiv.com/settings/integrations/api
@@ -37,4 +37,17 @@ export async function deleteSubscription({ id }: { id: string }) {
   return DELETE(`${apiBaseUrl}/publications/${publicationId}/subscriptions/${id}`, {
     headers
   });
+}
+
+export async function unsubscribeSubscription({ email }: BeehiivSubscription) {
+  const existing = await findSubscriptions({ email });
+  if (existing.data.length > 0) {
+    return PUT(
+      `${apiBaseUrl}/publications/${publicationId}/subscriptions/${existing.data[0].id}`,
+      { unsubscribe: false },
+      {
+        headers
+      }
+    );
+  }
 }
