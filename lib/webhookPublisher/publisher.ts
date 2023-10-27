@@ -75,17 +75,6 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
     }
 
-    // Create and save notifications
-    const notifications = await createNotificationsFromEvent(webhookPayload);
-
-    let notificationCount = 0;
-    for (const notification of notifications) {
-      const sent = await sendNotificationEmail(notification);
-      if (sent) {
-        notificationCount += 1;
-      }
-    }
-
     log.debug(`Sent webhook event to SQS: "${event.scope}"`, {
       spaceId,
       queueUrl: SQS_QUEUE_NAME,
