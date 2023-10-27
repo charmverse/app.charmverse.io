@@ -9,7 +9,19 @@ import { Button } from 'components/common/Button';
 import { useUser } from 'hooks/useUser';
 
 export const schema = yup.object({
-  email: yup.string().ensure().trim().email(),
+  email: yup
+    .string()
+    .ensure()
+    .trim()
+    .email()
+    .when('emailNewsletter', {
+      is: true,
+      then: yup.string().required('Unselect email options to proceed without email')
+    })
+    .when('emailNotifications', {
+      is: true,
+      then: yup.string().required('Unselect email options to proceed without email')
+    }),
   emailNotifications: yup.boolean(),
   emailNewsletter: yup.boolean()
 });
@@ -21,85 +33,74 @@ export function OnboardingEmailForm({ onClick }: { onClick: VoidFunction }) {
 
   const {
     register,
-    trigger,
     setValue,
+    trigger,
     getValues,
+    handleSubmit,
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
       email: user?.email || '',
       emailNewsletter: false,
-      emailNotifications: false
+      emailNotifications: true
     },
-    mode: 'onChange',
+    // mode: 'onChange',
     resolver: yupResolver(schema)
   });
 
-  const email = getValues('email');
   const emailNewsletter = getValues('emailNewsletter');
   const emailNotifications = getValues('emailNotifications');
 
   const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     setValue(event.target.name as keyof FormValues, value);
-    await trigger();
+    return trigger();
   };
 
-  const onSave = async () => {
-    const validate = await trigger();
-
-    if (validate) {
-      await charmClient.updateUser({
-        email,
-        emailNewsletter,
-        emailNotifications
-      });
-      updateUser({ ...user, email, emailNewsletter, emailNotifications });
-    }
+  const onSubmit = async (values: FormValues) => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const { email, emailNewsletter, emailNotifications } = values;
+    await charmClient.updateUser({
+      email: email || undefined,
+      emailNewsletter,
+      emailNotifications
+    });
+    updateUser({ ...user, email, emailNewsletter, emailNotifications });
+    onClick();
   };
 
   return (
-    <Stack gap={2}>
-      <Typography>
-        CharmVerse can use your email address to let you know when there is a conversation or activity you should be
-        part of.
-      </Typography>
-      <TextField
-        {...register('email')}
-        autoFocus
-        data-test='member-email-input'
-        error={!!errors.email}
-        helperText={errors.email?.message}
-        placeholder='me@gmail.com'
-        onChange={onChange}
-      />
-      <FormGroup>
-        <FormControlLabel
-          disabled={!!errors.email || email.length === 0}
-          control={<Checkbox {...register('emailNotifications')} checked={emailNotifications} onChange={onChange} />}
-          label='Receive email updates on mentions, comments, post and other things.'
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack gap={2}>
+        <Typography>
+          CharmVerse can use your email address to let you know when there is a conversation or activity you should be
+          part of.
+        </Typography>
+        <TextField
+          {...register('email')}
+          autoFocus
+          data-test='member-email-input'
+          error={!!errors.email}
+          helperText={errors.email?.message}
+          placeholder='me@gmail.com'
+          onChange={onChange}
         />
-        <FormControlLabel
-          disabled={!!errors.email || email.length === 0}
-          control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
-          label="Keep me up to date on what's new with CharmVerse."
-        />
-      </FormGroup>
-      <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
-        <Button onClick={onClick} variant='outlined' color='secondary'>
-          Skip
-        </Button>
-        <Button
-          data-test='member-email-next'
-          disabled={Object.keys(errors).length !== 0}
-          onClick={() => {
-            onSave();
-            onClick();
-          }}
-        >
-          Next
-        </Button>
+        <FormGroup>
+          <FormControlLabel
+            control={<Checkbox {...register('emailNotifications')} checked={emailNotifications} onChange={onChange} />}
+            label='Notify me about key activities (e.g., proposal feedback, reward status, mentions, comments)'
+          />
+          <FormControlLabel
+            control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
+            label="Keep me up to date on what's new with CharmVerse."
+          />
+        </FormGroup>
+        <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
+          <Button data-test='member-email-next' type='submit' disabled={Object.keys(errors).length !== 0}>
+            Next
+          </Button>
+        </Stack>
       </Stack>
-    </Stack>
+    </form>
   );
 }
