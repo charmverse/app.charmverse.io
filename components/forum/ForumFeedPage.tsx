@@ -177,7 +177,6 @@ export function ForumPage() {
             <CategorySelect
               selectedCategoryId={currentCategory?.id}
               selectedSort={sort}
-              handleCategory={handleCategoryUpdate}
               handleSort={handleSortUpdate}
             />
           </Box>
@@ -193,12 +192,7 @@ export function ForumPage() {
           )}
         </Box>
         <Box flexGrow={1} display={{ xs: 'none', md: 'initial' }}>
-          <CategoryMenu
-            handleCategory={handleCategoryUpdate}
-            handleSort={handleSortUpdate}
-            selectedSort={sort}
-            selectedCategoryId={currentCategory?.id}
-          />
+          <CategoryMenu selectedSort={sort} selectedCategoryId={currentCategory?.id} />
         </Box>
       </Box>
     </CenteredPageContent>

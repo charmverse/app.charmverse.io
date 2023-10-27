@@ -13,18 +13,18 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { PostSortOption } from 'lib/forums/posts/constants';
 import { postSortOptions } from 'lib/forums/posts/constants';
 
 import type { FilterProps } from './CategorySelect';
 import { ForumFilterListLink } from './ForumFilterListLink';
 
-export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, selectedSort = 'new' }: FilterProps) {
+export function CategoryMenu({ handleSort, selectedCategoryId, selectedSort = 'new' }: FilterProps) {
   const { categories, error, createForumCategory } = useForumCategories();
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
   const admin = useIsAdmin();
-
   const [newForumCategoryName, setNewForumCategoryName] = useState('');
+
+  const currentCategory = categories.find((category) => category.id === selectedCategoryId);
 
   function createCategory() {
     createForumCategory(newForumCategoryName);
@@ -49,20 +49,20 @@ export function CategoryMenu({ handleCategory, handleSort, selectedCategoryId, s
             label={startCase(_sort.replace('_', ' '))}
             isSelected={_sort === selectedSort}
             value={_sort}
-            handleSelect={handleSort as (value?: string | PostSortOption) => void}
+            href={`/forum${currentCategory ? `/${currentCategory.path}` : ''}?sort=${_sort}`}
           />
         ))}
 
         <Divider sx={{ my: 2 }} />
         <Stack mb={2}>
-          <ForumFilterListLink label='All categories' isSelected={!selectedCategoryId} handleSelect={handleCategory} />
+          <ForumFilterListLink label='All categories' isSelected={!selectedCategoryId} href='/forum' />
           {categories.map((category) => (
             <ForumFilterListLink
               key={category.id}
+              href={`/forum/${category.path}`}
               label={category.name}
               value={category.id}
               isSelected={selectedCategoryId === category.id}
-              handleSelect={handleCategory}
             />
           ))}
         </Stack>
