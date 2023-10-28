@@ -78,7 +78,7 @@ export function ForumFilterListLink({ label, value, isSelected, href }: ForumSor
           className='icons'
           onClick={(e) => {
             // prevents triggering the href of the parent link
-            e.preventDefault();
+            e.stopPropagation();
           }}
         >
           <CategoryContextMenu permissions={permissions} categoryId={value} onDelete={deleteCategory} />
