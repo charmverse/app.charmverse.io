@@ -1,9 +1,10 @@
 import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
 import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
-import type { EditorState, EditorView } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Node } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
 import type { PageType } from '@charmverse/core/prisma-client';
+import { Selection } from 'prosemirror-state';
 
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 
@@ -36,6 +37,7 @@ import * as nft from './components/nft/nft.plugins';
 import paragraph from './components/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
+import { dropCursor } from './components/prosemirror/prosemirror-dropcursor/dropcursor';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -58,14 +60,7 @@ const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const suggestionsPluginKey = new PluginKey('suggestions');
 
-function removeSelectedNodeClass() {
-  setTimeout(() => {
-    const selectedDomNode = document.querySelector('.ProseMirror-selectednode');
-    if (selectedDomNode) {
-      selectedDomNode.classList.remove('ProseMirror-selectednode');
-    }
-  }, 0);
-}
+const dragPluginKey = new PluginKey('dragPlugin');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -98,97 +93,117 @@ export function charmEditorPlugins({
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
     new Plugin({
+      key: dragPluginKey,
+      state: {
+        init: () => {
+          return {
+            draggedNode: null,
+            dragStartPos: null
+          };
+        },
+        apply: (tr, pluginState: { draggedNode: Node | null }) => {
+          const newPluginState = tr.getMeta(dragPluginKey);
+          if (newPluginState) {
+            return { ...pluginState, ...newPluginState };
+          }
+          return pluginState;
+        }
+      },
       props: {
         handleDOMEvents: {
+          dragenter(view) {
+            const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
+            const currentPluginState = dragPluginKey.getState(view.state);
+            if (draggedNode?.type.name === 'page' && !currentPluginState?.draggedNode) {
+              view.dispatch(
+                view.state.tr.setMeta(dragPluginKey, { draggedNode, dragStartPos: view.state.selection.$anchor.pos })
+              );
+            }
+          },
           drop(view, ev) {
             if (!ev.dataTransfer || !pageId) {
               return false;
             }
 
-            const coordinates = view.posAtCoords({
-              left: ev.clientX,
-              top: ev.clientY
-            });
+            const sidebarPageData = ev.dataTransfer.getData('sidebar-page');
+            const dragPluginState = dragPluginKey.getState(view.state) as {
+              draggedNode: Node | null;
+              dragStartPos: number | null;
+            };
+            const draggedNode = dragPluginState.draggedNode as Node;
 
-            if (!coordinates) {
-              return false;
-            }
+            if (draggedNode && dragPluginState.dragStartPos !== null) {
+              const droppedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
 
-            const data = ev.dataTransfer.getData('sidebar-page');
-            if (!data) {
-              const domElementAtCoords = document.elementFromPoint(ev.clientX, ev.clientY);
-              if (domElementAtCoords?.classList.contains('nested-page-separator')) {
-                removeSelectedNodeClass();
-                return false;
-              }
-              const domElementAtPos = view.nodeDOM(coordinates.pos);
-              const droppedNode = view.state.doc.nodeAt(coordinates.pos);
-              const draggedNode = view.state.doc.nodeAt(view.state.tr.selection.$anchor.pos);
               const validOperation =
                 droppedNode &&
-                draggedNode &&
-                domElementAtPos &&
                 (droppedNode.type.name === 'page' ||
-                  (droppedNode.type.name === 'linkedPage' && droppedNode.attrs.type === 'page')) &&
-                (draggedNode.type.name === 'page' || draggedNode.type.name === 'linkedPage');
+                  (droppedNode.type.name === 'linkedPage' && droppedNode.attrs.type === 'page'));
 
               if (!validOperation) {
                 return false;
               }
 
-              const draggedPageId = draggedNode.attrs.id;
               const droppedPageId = droppedNode.attrs.id;
+              const draggedPageId = draggedNode.attrs.id;
 
               if (droppedPageId === draggedPageId) {
                 return false;
               }
 
-              if (domElementAtPos instanceof HTMLElement) {
-                const droppedDOMNode = domElementAtPos.querySelector(`[data-id="page-${droppedPageId}"]`);
-                if (!droppedDOMNode || droppedDOMNode.getAttribute('data-page-type') !== 'page') {
-                  return false;
-                }
+              view.dispatch(view.state.tr.setMeta(dragPluginKey, { draggedNode: null, dragStartPos: null }));
 
-                ev.preventDefault();
-                emitSocketMessage({
-                  type: 'page_reordered',
-                  payload: {
-                    pageId: draggedPageId,
-                    newParentId: droppedPageId,
-                    newIndex: -1,
-                    trigger: 'editor-to-editor',
-                    isLinkedPage: draggedNode.type.name === 'linkedPage',
-                    dragPos: view.state.tr.selection.$anchor.pos,
-                    currentParentId: pageId
-                  }
-                });
-                removeSelectedNodeClass();
-              }
-              return false;
-            }
-
-            try {
-              const parsedData = JSON.parse(data) as { pageId: string | null; pageType: PageType };
-              if (!parsedData.pageId) {
-                return false;
-              }
               ev.preventDefault();
               emitSocketMessage({
                 type: 'page_reordered',
                 payload: {
-                  pageId: parsedData.pageId,
-                  newParentId: pageId,
+                  pageId: draggedPageId,
+                  newParentId: droppedPageId,
                   newIndex: -1,
-                  trigger: 'sidebar-to-editor',
-                  dropPos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
+                  trigger: 'editor-to-editor',
+                  isLinkedPage: droppedNode.type.name === 'linkedPage',
+                  dragPos: dragPluginState.dragStartPos,
+                  currentParentId: pageId
                 }
               });
-              // + 1 for dropping in non empty node
-              // + 0 for dropping in empty node (blank line)
-              return false;
-            } catch (_) {
               return false;
             }
+
+            if (sidebarPageData) {
+              const coordinates = view.posAtCoords({
+                left: ev.clientX,
+                top: ev.clientY
+              });
+
+              if (!coordinates) {
+                return false;
+              }
+
+              try {
+                const parsedData = JSON.parse(sidebarPageData) as { pageId: string | null; pageType: PageType };
+                if (!parsedData.pageId) {
+                  return false;
+                }
+                ev.preventDefault();
+                emitSocketMessage({
+                  type: 'page_reordered',
+                  payload: {
+                    pageId: parsedData.pageId,
+                    newParentId: pageId,
+                    newIndex: -1,
+                    trigger: 'sidebar-to-editor',
+                    dropPos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
+                  }
+                });
+                // + 1 for dropping in non empty node
+                // + 0 for dropping in empty node (blank line)
+                return false;
+              } catch (_) {
+                return false;
+              }
+            }
+
+            return false;
           }
         }
       }

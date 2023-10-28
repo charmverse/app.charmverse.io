@@ -2,8 +2,7 @@ import type { NodeViewProps } from '@bangle.dev/core';
 import { useEditorViewContext } from '@bangle.dev/react';
 import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Typography } from '@mui/material';
 
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
@@ -58,7 +57,6 @@ export default function NestedPage({
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
   const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
-  const [isHoveredOver, setIsHoveredOver] = useState(false);
   let pageTitle = '';
   if (documentPage || staticPage) {
     pageTitle = (documentPage || staticPage)?.title || 'Untitled';
@@ -79,45 +77,30 @@ export default function NestedPage({
   const _isLinkedPage = isLinkedPage ?? (currentPageId ? parentPage?.id !== currentPageId : false);
 
   return (
-    <>
-      <Box py={0.125} className='nested-page-separator' />
-      <NestedPageContainer
-        onDragEnter={() => {
-          if (!isHoveredOver) {
-            setIsHoveredOver(true);
-          }
-        }}
-        onDragLeave={() => {
-          if (isHoveredOver) {
-            setIsHoveredOver(false);
-          }
-        }}
-        data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
-        data-page-type={node.attrs.type ?? documentPage?.type}
-        href={appPath ? `/${appPath}` : undefined}
-        color='inherit'
-        data-id={`page-${pageId}`}
-        data-title={pageTitle}
-        data-path={fullPath}
-        className={isHoveredOver ? 'ProseMirror-selectednode' : ''}
-        onDragStart={() => {
-          const nodePos = getPos();
-          enableDragAndDrop(view, nodePos);
-        }}
-        data-type={node.attrs.type}
-      >
-        <div>
-          <LinkIcon
-            isLinkedPage={_isLinkedPage}
-            documentPage={documentPage}
-            staticPage={staticPage}
-            isCategoryPage={!!forumCategoryPage}
-          />
-        </div>
-        <StyledTypography>{pageTitle}</StyledTypography>
-      </NestedPageContainer>
-      <Box py={0.125} className='nested-page-separator' />
-    </>
+    <NestedPageContainer
+      data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
+      data-page-type={node.attrs.type ?? documentPage?.type}
+      href={appPath ? `/${appPath}` : undefined}
+      color='inherit'
+      data-id={`page-${pageId}`}
+      data-title={pageTitle}
+      data-path={fullPath}
+      onDragStart={() => {
+        const nodePos = getPos();
+        enableDragAndDrop(view, nodePos);
+      }}
+      data-type={node.attrs.type}
+    >
+      <div>
+        <LinkIcon
+          isLinkedPage={_isLinkedPage}
+          documentPage={documentPage}
+          staticPage={staticPage}
+          isCategoryPage={!!forumCategoryPage}
+        />
+      </div>
+      <StyledTypography>{pageTitle}</StyledTypography>
+    </NestedPageContainer>
   );
 }
 

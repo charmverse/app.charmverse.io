@@ -1,5 +1,6 @@
+import type { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
-import { Plugin } from 'prosemirror-state';
+import { Plugin, Selection, TextSelection } from 'prosemirror-state';
 import { dropPoint } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 
@@ -73,6 +74,7 @@ class DropCursorView {
     const editorRect = editorDOM.getBoundingClientRect();
     const scaleX = editorRect.width / editorDOM.offsetWidth;
     const scaleY = editorRect.height / editorDOM.offsetHeight;
+
     if (isBlock) {
       const before = $pos.nodeBefore;
       const after = $pos.nodeAfter;
@@ -131,10 +133,35 @@ class DropCursorView {
   }
 
   dragover(event: DragEvent) {
+    if (this.cursorPos) {
+      const view = this.editorView;
+      const domElementAtCoords = document.elementFromPoint(event.clientX, event.clientY);
+
+      if (
+        domElementAtCoords &&
+        (domElementAtCoords.getAttribute('data-page-type')?.match(/page|board/) ||
+          domElementAtCoords.parentElement?.getAttribute('data-page-type')?.match(/page|board/))
+      ) {
+        const nodeAtCursor = view.state.doc.nodeAt(this.cursorPos);
+        if (nodeAtCursor?.type.name === 'page') {
+          const resolvedPos = view.state.doc.resolve(this.cursorPos);
+          const selection = Selection.findFrom(resolvedPos, 1);
+          if (selection) {
+            view.dispatch(view.state.tr.setSelection(selection));
+            return;
+          }
+        }
+      } else {
+        this.editorView.dispatch(
+          this.editorView.state.tr.setSelection(TextSelection.create(this.editorView.state.doc, 0))
+        );
+      }
+    }
+
     if (!this.editorView.editable) return;
     const pos = this.editorView.posAtCoords({ left: event.clientX, top: event.clientY });
 
-    const node = pos && pos.inside >= 0 && this.editorView.state.doc.nodeAt(pos.inside);
+    const node = pos && pos.inside >= 0 ? this.editorView.state.doc.nodeAt(pos.inside) : null;
     const disableDropCursor = node && node.type.spec.disableDropCursor;
     const disabled =
       typeof disableDropCursor === 'function' ? disableDropCursor(this.editorView, pos, event) : disableDropCursor;
