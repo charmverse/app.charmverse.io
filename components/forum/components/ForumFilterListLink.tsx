@@ -74,7 +74,13 @@ export function ForumFilterListLink({ label, value, isSelected, href }: ForumSor
       </Typography>
 
       {value && (permissions?.edit_category || permissions?.delete_category || permissions?.manage_permissions) && (
-        <span className='icons'>
+        <span
+          className='icons'
+          onClick={(e) => {
+            // prevents triggering the href of the parent link
+            e.preventDefault();
+          }}
+        >
           <CategoryContextMenu permissions={permissions} categoryId={value} onDelete={deleteCategory} />
         </span>
       )}
