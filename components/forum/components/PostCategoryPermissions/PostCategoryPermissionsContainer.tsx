@@ -1,7 +1,5 @@
-import type { PostCategory } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 
 import Loader from 'components/common/LoadingComponent';
@@ -20,12 +18,9 @@ import { PaidSharePostCategoryToWeb } from './PaidPostCategoryPermissions/PaidSh
  *
  * @abstract All other permissions inside this component are the actual assigned list of permissions to various groups for this post category
  */
-type Props = {
-  postCategory: PostCategory;
-};
-function PostCategoryPermissionsContainer({ postCategory }: Props) {
+function PostCategoryPermissionsContainer({ postCategoryId }: { postCategoryId: string }) {
   const { permissionsList } = usePostCategoryPermissionsList({
-    postCategoryId: postCategory.id
+    postCategoryId
   });
   const { isFreeSpace } = useIsFreeSpace();
   const { roles } = useRoles();
@@ -41,28 +36,29 @@ function PostCategoryPermissionsContainer({ postCategory }: Props) {
   return (
     <Box data-test='category-permissions-dialog'>
       <Stack spacing={2}>
-        {isFreeSpace ? <FreeSharePostCategoryToWeb /> : <PaidSharePostCategoryToWeb postCategoryId={postCategory.id} />}
+        {isFreeSpace ? <FreeSharePostCategoryToWeb /> : <PaidSharePostCategoryToWeb postCategoryId={postCategoryId} />}
         <Divider sx={{ my: 2 }} />
 
         {isFreeSpace ? (
-          <FreePostCategoryPermissions postCategoryId={postCategory.id} />
+          <FreePostCategoryPermissions postCategoryId={postCategoryId} />
         ) : (
-          <PaidPostCategoryPermissions postCategoryId={postCategory.id} />
+          <PaidPostCategoryPermissions postCategoryId={postCategoryId} />
         )}
       </Stack>
     </Box>
   );
 }
 
-type PostCategoryDialogProps = Props & {
+type PostCategoryDialogProps = {
+  category: { id: string; name: string };
   onClose: () => void;
   open: boolean;
 };
 
-export function PostCategoryPermissionsDialog({ postCategory, onClose, open }: PostCategoryDialogProps) {
+export function PostCategoryPermissionsDialog({ category, onClose, open }: PostCategoryDialogProps) {
   return (
-    <Modal mobileDialog onClose={onClose} title={`${postCategory.name} permissions`} open={open}>
-      <PostCategoryPermissionsContainer postCategory={postCategory} />
+    <Modal mobileDialog onClose={onClose} title={`${category.name} permissions`} open={open}>
+      <PostCategoryPermissionsContainer postCategoryId={category.id} />
     </Modal>
   );
 }
