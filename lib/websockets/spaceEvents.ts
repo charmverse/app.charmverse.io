@@ -6,6 +6,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
 import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
@@ -126,13 +127,15 @@ export class SpaceEventHandler {
             });
           }
 
-          await archivePages({
-            pageIds: [pageId],
-            userId: this.userId,
-            spaceId,
-            archive: false,
-            relay: this.relay
-          });
+          if (spaceId) {
+            await archivePages({
+              pageIds: [pageId],
+              userId: this.userId,
+              spaceId,
+              archive: false,
+              relay: this.relay
+            });
+          }
         }
       } catch (error) {
         const errorMessage = 'Error restoring a page from archive state';
@@ -231,37 +234,46 @@ export class SpaceEventHandler {
     } else if (message.type === 'page_reordered' && this.userId) {
       const {
         currentParentId: _currentParentId,
-        dragPos,
-        isLinkedPage,
+        dragNodePos,
         pageId,
         newParentId,
         newIndex,
         trigger,
-        dropPos
+        dropPos,
+        draggedNode
       } = message.payload;
+
+      const isLinkedPage = draggedNode?.type === 'linkedPage';
+      const isStaticPage = !!STATIC_PAGES.find((c) => c.path === pageId);
+      const isForumCategory = draggedNode?.attrs?.type === 'forum_category';
 
       if (pageId === newParentId) {
         return null;
       }
 
-      const page = await prisma.page.findFirst({
-        where: {
-          id: pageId
-        },
-        select: {
-          id: true,
-          spaceId: true,
-          parentId: true,
-          type: true,
-          path: true
-        }
-      });
+      const page = isStaticPage
+        ? null
+        : await prisma.page.findFirst({
+            where: {
+              id: pageId
+            },
+            select: {
+              id: true,
+              spaceId: true,
+              parentId: true,
+              type: true,
+              path: true
+            }
+          });
 
-      if (!page) {
+      if (!page && !isStaticPage && !isForumCategory) {
         return null;
       }
 
-      const currentParentId = _currentParentId ?? page.parentId ?? null;
+      const pagePath = (isStaticPage ? pageId : isForumCategory ? draggedNode?.attrs?.path : page?.path) ?? null;
+      const pageType = (isStaticPage ? pageId : isForumCategory ? draggedNode?.attrs?.type : page?.type) ?? null;
+
+      const currentParentId = _currentParentId ?? page?.parentId ?? null;
 
       // If the page is dropped on the same parent page or on itself, do nothing
       if (currentParentId === newParentId) {
@@ -305,16 +317,19 @@ export class SpaceEventHandler {
             sendError: this.sendError,
             event: 'page_reordered',
             relay: this.relay,
-            nodePos: dragPos
+            nodePos: dragNodePos,
+            isStaticPage: isStaticPage || isForumCategory
           });
         }
 
+        // Add reference to page in the new parent page content
         if (newParentId) {
           const pageDetails = await getPageDetails({
             id: pageId,
             userId: this.userId,
             docRooms: this.docRooms,
-            parentId: newParentId
+            parentId: newParentId,
+            isStaticPage: isStaticPage || isForumCategory
           });
 
           if (!pageDetails) {
@@ -334,8 +349,8 @@ export class SpaceEventHandler {
                     pageId,
                     pos: lastValidPos,
                     isLinkedPage,
-                    path: page.path,
-                    type: page.type
+                    path: pagePath,
+                    type: pageType
                   }),
                   doc: documentRoom.doc.content,
                   c: participant.messages.client,
@@ -357,14 +372,14 @@ export class SpaceEventHandler {
                   pageId,
                   pos: lastValidPos,
                   isLinkedPage,
-                  path: page.path,
-                  type: page.type
+                  path: pagePath,
+                  type: pageType
                 })
               });
             }
 
             // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
-            if ((trigger === 'sidebar-to-editor' || trigger === 'editor-to-editor') && !isLinkedPage) {
+            if ((trigger === 'sidebar-to-editor' || trigger === 'editor-to-editor') && !isLinkedPage && page) {
               await prisma.page.update({
                 where: {
                   id: pageId
@@ -419,8 +434,10 @@ async function handlePageRemoveMessage({
   sendError,
   relay,
   nodePos,
-  parentId: _parentId
+  parentId: _parentId,
+  isStaticPage
 }: {
+  isStaticPage?: boolean;
   parentId?: string;
   event: 'page_deleted' | 'page_reordered';
   userId: string;
@@ -436,7 +453,8 @@ async function handlePageRemoveMessage({
       id: pageId,
       userId,
       docRooms,
-      parentId: _parentId
+      parentId: _parentId,
+      isStaticPage
     });
 
     if (!pageDetails) {
@@ -481,7 +499,7 @@ async function handlePageRemoveMessage({
         });
         // If the user is not in the document or the position of the page node is not found (present in sidebar)
 
-        if (event === 'page_deleted') {
+        if (event === 'page_deleted' && spaceId) {
           await archivePages({
             pageIds: [pageId],
             userId,
@@ -568,25 +586,29 @@ async function getPageDetails({
   id,
   userId,
   docRooms,
-  parentId
+  parentId,
+  isStaticPage
 }: {
   docRooms: Map<string | undefined, DocumentRoom>;
   userId: string;
   id: string;
   parentId?: string;
+  isStaticPage?: boolean;
 }) {
-  const page = await prisma.page.findUniqueOrThrow({
-    where: {
-      id
-    },
-    select: {
-      parentId: true,
-      spaceId: true,
-      type: true
-    }
-  });
+  const page = !isStaticPage
+    ? await prisma.page.findUniqueOrThrow({
+        where: {
+          id
+        },
+        select: {
+          parentId: true,
+          spaceId: true,
+          type: true
+        }
+      })
+    : null;
 
-  const _parentId = parentId ?? page.parentId;
+  const _parentId = parentId ?? page?.parentId;
 
   const parentPage = _parentId
     ? await prisma.page.findUniqueOrThrow({
@@ -604,7 +626,7 @@ async function getPageDetails({
     return null;
   }
 
-  const { spaceId } = page;
+  const spaceId = page?.spaceId;
 
   const documentRoom = _parentId ? docRooms.get(_parentId) : null;
   const content: PageContent =

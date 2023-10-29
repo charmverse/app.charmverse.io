@@ -1,12 +1,13 @@
 import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
 import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
-import type { EditorState, EditorView, Node } from '@bangle.dev/pm';
+import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
 import type { PageType } from '@charmverse/core/prisma-client';
-import { Selection } from 'prosemirror-state';
 
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
+
+import { STATIC_PAGES } from '../PageLayout/components/Sidebar/utils/staticPages';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -37,7 +38,7 @@ import * as nft from './components/nft/nft.plugins';
 import paragraph from './components/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
-import { dropCursor } from './components/prosemirror/prosemirror-dropcursor/dropcursor';
+import { dragPluginKey } from './components/prosemirror/prosemirror-dropcursor/dropcursor';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -59,8 +60,6 @@ const columnsPluginKey = new PluginKey('columns');
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const suggestionsPluginKey = new PluginKey('suggestions');
-
-const dragPluginKey = new PluginKey('dragPlugin');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -97,11 +96,10 @@ export function charmEditorPlugins({
       state: {
         init: () => {
           return {
-            draggedNode: null,
-            dragStartPos: null
+            hoveredDomNode: null
           };
         },
-        apply: (tr, pluginState: { draggedNode: Node | null }) => {
+        apply: (tr, pluginState: { hoveredDomNode: Element | null }) => {
           const newPluginState = tr.getMeta(dragPluginKey);
           if (newPluginState) {
             return { ...pluginState, ...newPluginState };
@@ -111,48 +109,30 @@ export function charmEditorPlugins({
       },
       props: {
         handleDOMEvents: {
-          dragenter(view) {
-            const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
-            const currentPluginState = dragPluginKey.getState(view.state);
-            if (draggedNode?.type.name === 'page' && !currentPluginState?.draggedNode) {
-              view.dispatch(
-                view.state.tr.setMeta(dragPluginKey, { draggedNode, dragStartPos: view.state.selection.$anchor.pos })
-              );
-            }
-          },
           drop(view, ev) {
             if (!ev.dataTransfer || !pageId) {
               return false;
             }
 
             const sidebarPageData = ev.dataTransfer.getData('sidebar-page');
-            const dragPluginState = dragPluginKey.getState(view.state) as {
-              draggedNode: Node | null;
-              dragStartPos: number | null;
-            };
-            const draggedNode = dragPluginState.draggedNode as Node;
+            const hoveredDomNode = dragPluginKey.getState(view.state).hoveredDomNode as Element;
 
-            if (draggedNode && dragPluginState.dragStartPos !== null) {
-              const droppedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
+            if (hoveredDomNode) {
+              const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
 
-              const validOperation =
-                droppedNode &&
-                (droppedNode.type.name === 'page' ||
-                  (droppedNode.type.name === 'linkedPage' && droppedNode.attrs.type === 'page'));
-
-              if (!validOperation) {
+              if (!draggedNode || hoveredDomNode.getAttribute('data-page-type') !== 'page') {
                 return false;
               }
 
-              const droppedPageId = droppedNode.attrs.id;
+              const droppedPageId = hoveredDomNode.getAttribute('data-id')?.split('page-')[1];
               const draggedPageId = draggedNode.attrs.id;
 
-              if (droppedPageId === draggedPageId) {
+              if (!droppedPageId || droppedPageId === draggedPageId) {
                 return false;
               }
 
-              view.dispatch(view.state.tr.setMeta(dragPluginKey, { draggedNode: null, dragStartPos: null }));
-
+              view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
+              hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
               ev.preventDefault();
               emitSocketMessage({
                 type: 'page_reordered',
@@ -161,8 +141,8 @@ export function charmEditorPlugins({
                   newParentId: droppedPageId,
                   newIndex: -1,
                   trigger: 'editor-to-editor',
-                  isLinkedPage: droppedNode.type.name === 'linkedPage',
-                  dragPos: dragPluginState.dragStartPos,
+                  draggedNode: draggedNode.toJSON(),
+                  dragNodePos: view.state.selection.$anchor.pos,
                   currentParentId: pageId
                 }
               });

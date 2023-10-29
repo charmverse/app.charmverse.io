@@ -2,6 +2,7 @@
 
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Node } from 'prosemirror-model';
 import type { Server, Socket } from 'socket.io';
 
 import type { Block } from 'lib/focalboard/block';
@@ -130,8 +131,11 @@ type PageReordered = {
     newIndex: number;
     trigger: 'sidebar-to-sidebar' | 'sidebar-to-editor' | 'editor-to-editor';
     dropPos?: number;
-    isLinkedPage?: boolean;
-    dragPos?: number;
+    draggedNode?: {
+      type: string;
+      attrs?: Record<string, any>;
+    };
+    dragNodePos?: number;
     currentParentId?: string | null;
   };
 };

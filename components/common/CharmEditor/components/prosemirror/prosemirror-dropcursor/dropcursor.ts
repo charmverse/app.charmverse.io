@@ -1,8 +1,10 @@
-import type { Node } from 'prosemirror-model';
+// Reference: https://github.com/ProseMirror/prosemirror-dropcursor/blob/master/src/dropcursor.ts
 import type { EditorState } from 'prosemirror-state';
-import { Plugin, Selection, TextSelection } from 'prosemirror-state';
+import { Plugin, PluginKey } from 'prosemirror-state';
 import { dropPoint } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
+
+export const dragPluginKey = new PluginKey('dragPlugin');
 
 interface DropCursorOptions {
   /// The color of the cursor. Defaults to `black`. Use `false` to apply no color and rely only on class.
@@ -133,27 +135,38 @@ class DropCursorView {
   }
 
   dragover(event: DragEvent) {
-    if (this.cursorPos) {
-      const view = this.editorView;
-      const domElementAtCoords = document.elementFromPoint(event.clientX, event.clientY);
-
-      if (
-        domElementAtCoords &&
-        (domElementAtCoords.getAttribute('data-page-type')?.match(/page|board/) ||
-          domElementAtCoords.parentElement?.getAttribute('data-page-type')?.match(/page|board/))
-      ) {
-        const nodeAtCursor = view.state.doc.nodeAt(this.cursorPos);
-        if (nodeAtCursor?.type.name === 'page') {
-          const resolvedPos = view.state.doc.resolve(this.cursorPos);
-          const selection = Selection.findFrom(resolvedPos, 1);
-          if (selection) {
-            view.dispatch(view.state.tr.setSelection(selection));
-            return;
-          }
-        }
-      } else {
-        this.editorView.dispatch(
-          this.editorView.state.tr.setSelection(TextSelection.create(this.editorView.state.doc, 0))
+    const domElementAtCoords = document.elementFromPoint(event.clientX, event.clientY);
+    const view = this.editorView;
+    const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
+    const hoveredPageDomNode =
+      domElementAtCoords?.getAttribute('data-page-type') === 'page'
+        ? domElementAtCoords
+        : domElementAtCoords?.parentElement?.getAttribute('data-page-type') === 'page'
+        ? domElementAtCoords.parentElement
+        : null;
+    const hoveredPageDomNodeId = hoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1];
+    const currentHoveredPageDomNode = document.querySelector('.Prosemirror-hovered-page-node');
+    if (currentHoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1] !== hoveredPageDomNodeId) {
+      currentHoveredPageDomNode?.classList.remove('Prosemirror-hovered-page-node');
+    }
+    if (hoveredPageDomNode) {
+      if (draggedNode?.attrs.id !== hoveredPageDomNodeId) {
+        hoveredPageDomNode.classList.add('Prosemirror-hovered-page-node');
+        view.dispatch(
+          view.state.tr.setMeta(dragPluginKey, {
+            hoveredDomNode: hoveredPageDomNode
+          })
+        );
+      }
+      return;
+    } else {
+      const hoveredDomNode = dragPluginKey.getState(view.state)?.hoveredDomNode;
+      if (hoveredDomNode) {
+        hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
+        view.dispatch(
+          view.state.tr.setMeta(dragPluginKey, {
+            hoveredDomNode: null
+          })
         );
       }
     }
