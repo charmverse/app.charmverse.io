@@ -123,20 +123,37 @@ export type PageCreated = {
     >;
 };
 
-type PageReordered = {
-  type: 'page_reordered';
+type PageReorderedSidebarToSidebar = {
+  type: 'page_reordered_sidebar_to_sidebar';
   payload: {
     pageId: string;
     newParentId: string | null;
     newIndex: number;
-    trigger: 'sidebar-to-sidebar' | 'sidebar-to-editor' | 'editor-to-editor';
-    dropPos?: number;
-    draggedNode?: {
+  };
+};
+
+type PageReorderedSidebarToEditor = {
+  type: 'page_reordered_sidebar_to_editor';
+  payload: {
+    pageId: string;
+    newParentId: string | null;
+    newIndex: number;
+    dropPos: number;
+  };
+};
+
+type PageReorderedEditorToEditor = {
+  type: 'page_reordered_editor_to_editor';
+  payload: {
+    pageId: string;
+    newParentId: string | null;
+    newIndex: number;
+    draggedNode: {
       type: string;
       attrs?: Record<string, any>;
     };
-    dragNodePos?: number;
-    currentParentId?: string | null;
+    dragNodePos: number;
+    currentParentId: string | null;
   };
 };
 
@@ -170,7 +187,14 @@ type PagesRestored = {
   payload: Resource[];
 };
 
-export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated | PageReordered;
+export type ClientMessage =
+  | SubscribeToWorkspace
+  | PageDeleted
+  | PageRestored
+  | PageCreated
+  | PageReorderedSidebarToSidebar
+  | PageReorderedSidebarToEditor
+  | PageReorderedEditorToEditor;
 
 export type ServerMessage =
   | BlocksUpdated

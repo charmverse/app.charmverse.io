@@ -6,6 +6,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
+import { documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
@@ -21,8 +22,6 @@ import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
 import type { AbstractWebsocketBroadcaster } from './interfaces';
-
-const nonContentPageTypes = ['board', 'board_template', 'inline_board', 'linked_board', 'inline_linked_board'];
 
 export class SpaceEventHandler {
   socketEvent = 'message';
@@ -231,15 +230,318 @@ export class SpaceEventHandler {
         });
         this.sendError(errorMessage);
       }
-    } else if (message.type === 'page_reordered' && this.userId) {
+    } else if (message.type === 'page_reordered_sidebar_to_sidebar' && this.userId) {
+      const { pageId, newParentId, newIndex } = message.payload;
+
+      // don't continue if the page is being nested under itself
+      if (pageId === newParentId) {
+        return null;
+      }
+
+      const page = await prisma.page.findFirst({
+        where: {
+          id: pageId
+        },
+        select: {
+          id: true,
+          spaceId: true,
+          parentId: true,
+          type: true,
+          path: true
+        }
+      });
+
+      if (!page) {
+        return null;
+      }
+
+      const pagePath = page.path;
+      const pageType = page.type;
+
+      const currentParentId = page.parentId;
+
+      // If the page is dropped on the same parent page or on itself, do nothing
+      if (currentParentId === newParentId) {
+        return null;
+      }
+
+      try {
+        const { flatChildren } = await resolvePageTree({
+          pageId,
+          flattenChildren: true
+        });
+
+        if (flatChildren.some((p) => p.id === newParentId)) {
+          throw new UndesirableOperationError(`You cannot reposition a page to be a child of one of its child pages`);
+        }
+
+        // Remove reference from parent's content
+        if (currentParentId) {
+          const parentPage = newParentId
+            ? await prisma.page.findUnique({
+                where: { id: newParentId },
+                select: {
+                  type: true
+                }
+              })
+            : null;
+
+          if (parentPage && !documentTypes.includes(parentPage.type)) {
+            return;
+          }
+
+          await handlePageRemoveMessage({
+            userId: this.userId,
+            docRooms: this.docRooms,
+            payload: {
+              id: pageId
+            },
+            parentId: currentParentId,
+            sendError: this.sendError,
+            event: 'page_reordered',
+            relay: this.relay
+          });
+        }
+
+        // Add reference to page in the new parent page content
+        if (newParentId) {
+          const pageDetails = await getPageDetails({
+            id: pageId,
+            userId: this.userId,
+            docRooms: this.docRooms,
+            parentId: newParentId
+          });
+
+          if (!pageDetails) {
+            return;
+          }
+
+          const { parentDocumentNode, documentRoom, participant, position, content: parentPageContent } = pageDetails;
+          const lastValidPos = parentDocumentNode.content.size;
+
+          // If position is not null then the page is present in the parent page content
+          if (position === null) {
+            if (documentRoom && participant) {
+              await participant.handleDiff(
+                {
+                  type: 'diff',
+                  ds: generateInsertNestedPageDiffs({
+                    pageId,
+                    pos: lastValidPos,
+                    path: pagePath,
+                    type: pageType
+                  }),
+                  doc: documentRoom.doc.content,
+                  c: participant.messages.client,
+                  s: participant.messages.server,
+                  v: documentRoom.doc.version,
+                  rid: 0,
+                  cid: -1
+                },
+                {
+                  socketEvent: 'page_reordered'
+                }
+              );
+            } else {
+              await applyDiffAndSaveDocument({
+                content: parentPageContent,
+                userId: this.userId,
+                parentId: newParentId,
+                diffs: generateInsertNestedPageDiffs({
+                  pageId,
+                  pos: lastValidPos,
+                  path: pagePath,
+                  type: pageType
+                })
+              });
+            }
+          }
+        }
+
+        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          event: 'repositioned',
+          pageId
+        });
+      } catch (error) {
+        const errorMessage = 'Error repositioning a page from the sidebar to another page in the sidebar';
+        log.error(errorMessage, {
+          error,
+          pageId,
+          newParentId,
+          currentParentId,
+          newIndex,
+          userId: this.userId
+        });
+        this.sendError(errorMessage);
+      }
+    } else if (message.type === 'page_reordered_sidebar_to_editor' && this.userId) {
+      const { pageId, newParentId, newIndex, dropPos } = message.payload;
+
+      // don't continue if the page is being nested under itself
+      if (pageId === newParentId) {
+        return null;
+      }
+
+      const page = await prisma.page.findFirst({
+        where: {
+          id: pageId
+        },
+        select: {
+          id: true,
+          spaceId: true,
+          parentId: true,
+          type: true,
+          path: true
+        }
+      });
+
+      if (!page) {
+        return null;
+      }
+
+      const pagePath = page.path;
+      const pageType = page.type;
+
+      const currentParentId = page.parentId;
+
+      // If the page is dropped on the same parent page or on itself, do nothing
+      if (currentParentId === newParentId) {
+        return null;
+      }
+
+      try {
+        const { flatChildren } = await resolvePageTree({
+          pageId,
+          flattenChildren: true
+        });
+
+        if (flatChildren.some((p) => p.id === newParentId)) {
+          throw new UndesirableOperationError(`You cannot reposition a page to be a child of one of its child pages`);
+        }
+
+        // Remove reference from parent's content
+        if (currentParentId) {
+          const parentPage = newParentId
+            ? await prisma.page.findUnique({
+                where: { id: newParentId },
+                select: {
+                  type: true
+                }
+              })
+            : null;
+
+          if (parentPage && !documentTypes.includes(parentPage.type)) {
+            return;
+          }
+
+          await handlePageRemoveMessage({
+            userId: this.userId,
+            docRooms: this.docRooms,
+            payload: {
+              id: pageId
+            },
+            parentId: currentParentId,
+            sendError: this.sendError,
+            event: 'page_reordered',
+            relay: this.relay
+          });
+        }
+
+        // Add reference to page in the new parent page content
+        if (newParentId) {
+          const pageDetails = await getPageDetails({
+            id: pageId,
+            userId: this.userId,
+            docRooms: this.docRooms,
+            parentId: newParentId
+          });
+
+          if (!pageDetails) {
+            return;
+          }
+
+          const { parentDocumentNode, documentRoom, participant, position, content: parentPageContent } = pageDetails;
+          const lastValidPos = dropPos ?? parentDocumentNode.content.size;
+
+          // If position is not null then the page is present in the parent page content
+          if (position === null) {
+            if (documentRoom && participant) {
+              await participant.handleDiff(
+                {
+                  type: 'diff',
+                  ds: generateInsertNestedPageDiffs({
+                    pageId,
+                    pos: lastValidPos,
+                    path: pagePath,
+                    type: pageType
+                  }),
+                  doc: documentRoom.doc.content,
+                  c: participant.messages.client,
+                  s: participant.messages.server,
+                  v: documentRoom.doc.version,
+                  rid: 0,
+                  cid: -1
+                },
+                {
+                  socketEvent: 'page_reordered'
+                }
+              );
+            } else {
+              await applyDiffAndSaveDocument({
+                content: parentPageContent,
+                userId: this.userId,
+                parentId: newParentId,
+                diffs: generateInsertNestedPageDiffs({
+                  pageId,
+                  pos: lastValidPos,
+                  path: pagePath,
+                  type: pageType
+                })
+              });
+            }
+
+            // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
+            await prisma.page.update({
+              where: {
+                id: pageId
+              },
+              data: {
+                parentId: newParentId
+              }
+            });
+
+            this.relay.broadcast(
+              {
+                type: 'pages_meta_updated',
+                payload: [{ id: pageId, parentId: newParentId, spaceId: page.spaceId }]
+              },
+              page.spaceId
+            );
+          }
+        }
+        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          event: 'repositioned',
+          pageId
+        });
+      } catch (error) {
+        const errorMessage = 'Error repositioning a page from the sidebar to another page in the editor';
+        log.error(errorMessage, {
+          error,
+          pageId,
+          newParentId,
+          currentParentId,
+          newIndex,
+          userId: this.userId
+        });
+        this.sendError(errorMessage);
+      }
+    } else if (message.type === 'page_reordered_editor_to_editor' && this.userId) {
       const {
         currentParentId: _currentParentId,
         dragNodePos,
         pageId,
         newParentId,
         newIndex,
-        trigger,
-        dropPos,
         draggedNode
       } = message.payload;
 
@@ -303,7 +605,7 @@ export class SpaceEventHandler {
               })
             : null;
 
-          if (parentPage && nonContentPageTypes.includes(parentPage.type)) {
+          if (parentPage && !documentTypes.includes(parentPage.type)) {
             return;
           }
 
@@ -337,7 +639,7 @@ export class SpaceEventHandler {
           }
 
           const { parentDocumentNode, documentRoom, participant, position, content: parentPageContent } = pageDetails;
-          const lastValidPos = dropPos ?? parentDocumentNode.content.size;
+          const lastValidPos = parentDocumentNode.content.size;
 
           // If position is not null then the page is present in the parent page content
           if (position === null) {
@@ -379,7 +681,7 @@ export class SpaceEventHandler {
             }
 
             // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
-            if ((trigger === 'sidebar-to-editor' || trigger === 'editor-to-editor') && !isLinkedPage && page) {
+            if (!isLinkedPage && page) {
               await prisma.page.update({
                 where: {
                   id: pageId
@@ -622,7 +924,7 @@ async function getPageDetails({
       })
     : null;
 
-  if (parentPage && nonContentPageTypes.includes(parentPage.type)) {
+  if (parentPage && !documentTypes.includes(parentPage.type)) {
     return null;
   }
 

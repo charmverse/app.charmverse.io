@@ -135,12 +135,11 @@ export function charmEditorPlugins({
               hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
               ev.preventDefault();
               emitSocketMessage({
-                type: 'page_reordered',
+                type: 'page_reordered_editor_to_editor',
                 payload: {
                   pageId: draggedPageId,
                   newParentId: droppedPageId,
                   newIndex: -1,
-                  trigger: 'editor-to-editor',
                   draggedNode: draggedNode.toJSON(),
                   dragNodePos: view.state.selection.$anchor.pos,
                   currentParentId: pageId
@@ -166,12 +165,11 @@ export function charmEditorPlugins({
                 }
                 ev.preventDefault();
                 emitSocketMessage({
-                  type: 'page_reordered',
+                  type: 'page_reordered_sidebar_to_editor',
                   payload: {
                     pageId: parsedData.pageId,
                     newParentId: pageId,
                     newIndex: -1,
-                    trigger: 'sidebar-to-editor',
                     dropPos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
                   }
                 });

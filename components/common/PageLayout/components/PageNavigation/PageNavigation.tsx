@@ -142,12 +142,11 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         // dropped on root level, so remove child page reference in parent's content
         if (droppedItem.parentId !== containerItem.parentId) {
           emitSocketMessage({
-            type: 'page_reordered',
+            type: 'page_reordered_sidebar_to_sidebar',
             payload: {
               pageId: droppedItem.id,
               newParentId: containerItem.parentId,
-              newIndex: droppedItem.index,
-              trigger: 'sidebar-to-sidebar'
+              newIndex: droppedItem.index
             }
           });
         }
@@ -190,12 +189,11 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
       if (parentId) {
         emitSocketMessage({
-          type: 'page_reordered',
+          type: 'page_reordered_sidebar_to_sidebar',
           payload: {
             pageId: droppedItem.id,
             newParentId: containerItem.id,
-            newIndex: droppedItem.index,
-            trigger: 'sidebar-to-sidebar'
+            newIndex: droppedItem.index
           }
         });
       }
