@@ -2,10 +2,7 @@ import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/ba
 import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
-import { PluginKey, TextSelection } from '@bangle.dev/pm';
-import type { PageType } from '@charmverse/core/prisma-client';
-
-import { emitSocketMessage } from 'hooks/useWebSocketClient';
+import { PluginKey } from '@bangle.dev/pm';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -31,12 +28,11 @@ import * as listItem from './components/listItem/listItem';
 import { plugins as listPlugins } from './components/listItemNew/listItemPlugins';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
-import { nestedPagePlugins } from './components/nestedPage';
+import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage';
 import * as nft from './components/nft/nft.plugins';
 import paragraph from './components/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
-import { HOVERED_PAGE_NODE_CLASS, dragPluginKey } from './components/prosemirror/prosemirror-dropcursor/dropcursor';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -89,112 +85,8 @@ export function charmEditorPlugins({
   placeholderText?: string;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
-    new Plugin({
-      key: dragPluginKey,
-      state: {
-        init: () => {
-          return {
-            hoveredDomNode: null
-          };
-        },
-        apply: (tr, pluginState: { hoveredDomNode: Element | null }) => {
-          const newPluginState = tr.getMeta(dragPluginKey);
-          if (newPluginState) {
-            return { ...pluginState, ...newPluginState };
-          }
-          return pluginState;
-        }
-      },
-      props: {
-        handleDOMEvents: {
-          drop(view, ev) {
-            if (!ev.dataTransfer || !pageId) {
-              return false;
-            }
-
-            const sidebarPageData = ev.dataTransfer.getData('sidebar-page');
-
-            const hoveredDomNode = dragPluginKey.getState(view.state).hoveredDomNode as Element;
-            const hoveredPageId = hoveredDomNode?.getAttribute('data-id')?.split('page-')[1];
-
-            view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
-            hoveredDomNode?.classList.remove(HOVERED_PAGE_NODE_CLASS);
-            const currentGapCursorDomNode = document.querySelector('.ProseMirror-gapcursor');
-            currentGapCursorDomNode?.classList.remove('ProseMirror-gapcursor');
-
-            if (sidebarPageData) {
-              const coordinates = view.posAtCoords({
-                left: ev.clientX,
-                top: ev.clientY
-              });
-
-              if (!coordinates) {
-                return false;
-              }
-
-              try {
-                const parsedData = JSON.parse(sidebarPageData) as { pageId: string | null; pageType: PageType };
-                if (!parsedData.pageId) {
-                  return false;
-                }
-                ev.preventDefault();
-                emitSocketMessage(
-                  {
-                    type: 'page_reordered_sidebar_to_editor',
-                    payload: {
-                      pageId: parsedData.pageId,
-                      newParentId: hoveredPageId ?? pageId,
-                      newIndex: -1,
-                      dropPos: hoveredPageId ? null : coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
-                    }
-                  },
-                  () => {
-                    view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 0)));
-                  }
-                );
-                // + 1 for dropping in non empty node
-                // + 0 for dropping in empty node (blank line)
-                return false;
-              } catch (_) {
-                return false;
-              }
-            } else if (hoveredDomNode) {
-              const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
-
-              if (!draggedNode || hoveredDomNode.getAttribute('data-page-type') !== 'page') {
-                return false;
-              }
-
-              const draggedPageId = draggedNode.attrs.id;
-
-              if (!hoveredPageId || hoveredPageId === draggedPageId) {
-                return false;
-              }
-
-              ev.preventDefault();
-              emitSocketMessage(
-                {
-                  type: 'page_reordered_editor_to_editor',
-                  payload: {
-                    pageId: draggedPageId,
-                    newParentId: hoveredPageId,
-                    newIndex: -1,
-                    draggedNode: draggedNode.toJSON(),
-                    dragNodePos: view.state.selection.$anchor.pos,
-                    currentParentId: pageId
-                  }
-                },
-                () => {
-                  view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 0)));
-                }
-              );
-              return false;
-            }
-
-            return false;
-          }
-        }
-      }
+    pageNodeDropPlugin({
+      pageId
     }),
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?

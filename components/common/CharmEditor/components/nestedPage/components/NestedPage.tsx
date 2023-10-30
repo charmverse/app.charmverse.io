@@ -3,6 +3,7 @@ import { useEditorViewContext } from '@bangle.dev/react';
 import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
+import type { EditorView } from 'prosemirror-view';
 
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
@@ -13,7 +14,7 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 
 import { enableDragAndDrop } from '../../../utils';
-import { HOVERED_PAGE_NODE_CLASS, dragPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
+import { HOVERED_PAGE_NODE_CLASS, pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -44,6 +45,14 @@ const StyledTypography = styled(Typography)`
   font-weight: 600;
   border-bottom: 0.05em solid var(--link-underline);
 `;
+
+function resetHoverPluginState(view: EditorView) {
+  const pluginState = pageNodeDropPluginKey.getState(view.state);
+  if (pluginState.hoveredDomNode) {
+    view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredDomNode: null }));
+    pluginState.hoveredDomNode.classList.remove(HOVERED_PAGE_NODE_CLASS);
+  }
+}
 
 export default function NestedPage({
   isLinkedPage,
@@ -92,11 +101,15 @@ export default function NestedPage({
         enableDragAndDrop(view, nodePos);
       }}
       data-type={node.attrs.type}
+      // Only works for firefox
+      onDragExitCapture={() => {
+        resetHoverPluginState(view);
+      }}
+      // Should only works for chrome, firefox also handles it but for ff we have onDragExitCapture
       onDragLeaveCapture={() => {
-        const pluginState = dragPluginKey.getState(view.state);
-        if (pluginState.hoveredDomNode) {
-          view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
-          pluginState.hoveredDomNode.classList.remove(HOVERED_PAGE_NODE_CLASS);
+        const isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        if (isChrome) {
+          resetHoverPluginState(view);
         }
       }}
     >

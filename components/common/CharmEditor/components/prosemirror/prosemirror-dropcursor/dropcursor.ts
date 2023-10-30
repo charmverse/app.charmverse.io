@@ -4,7 +4,7 @@ import { Plugin, PluginKey } from 'prosemirror-state';
 import { dropPoint } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 
-export const dragPluginKey = new PluginKey('dragPlugin');
+export const pageNodeDropPluginKey = new PluginKey('dragPlugin');
 export const HOVERED_PAGE_NODE_CLASS = 'Prosemirror-hovered-page-node';
 
 interface DropCursorOptions {
@@ -156,7 +156,7 @@ class DropCursorView {
       if (draggedNode?.attrs.id !== hoveredPageDomNodeId) {
         hoveredPageDomNode.classList.add(HOVERED_PAGE_NODE_CLASS);
         view.dispatch(
-          view.state.tr.setMeta(dragPluginKey, {
+          view.state.tr.setMeta(pageNodeDropPluginKey, {
             hoveredDomNode: hoveredPageDomNode
           })
         );
@@ -166,11 +166,11 @@ class DropCursorView {
       }
       return;
     } else {
-      const hoveredDomNode = dragPluginKey.getState(view.state)?.hoveredDomNode;
+      const hoveredDomNode = pageNodeDropPluginKey.getState(view.state)?.hoveredDomNode;
       if (hoveredDomNode) {
         hoveredDomNode.classList.remove(HOVERED_PAGE_NODE_CLASS);
         view.dispatch(
-          view.state.tr.setMeta(dragPluginKey, {
+          view.state.tr.setMeta(pageNodeDropPluginKey, {
             hoveredDomNode: null
           })
         );
