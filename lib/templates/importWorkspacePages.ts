@@ -16,10 +16,10 @@ import type { Reward } from 'lib/rewards/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { WorkspaceExport, ExportedPage } from './exportWorkspacePages';
+import type { WorkspacePagesExport, ExportedPage } from './exportWorkspacePages';
 
 type WorkspaceImportOptions = {
-  exportData?: WorkspaceExport;
+  exportData?: WorkspacePagesExport;
   exportName?: string;
   targetSpaceIdOrDomain: string;
   // Parent id of root pages, could be another page or null if space is parent
@@ -152,7 +152,7 @@ export async function generateImportWorkspacePages({
     }
   });
   const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${exportName}.json`));
-  const dataToImport: WorkspaceExport = exportData ?? JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
+  const dataToImport: WorkspacePagesExport = exportData ?? JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
   if (!dataToImport) {
     throw new InvalidInputError('Please provide the source export data, or export path');
