@@ -141,6 +141,7 @@ async function socketSetup({
     docRooms
   );
   spaceEventHandler.userId = userId;
+  spaceEventHandler.spaceId = spaceId;
 
   return {
     docRooms,
@@ -292,6 +293,7 @@ describe('page delete event handler', () => {
       },
       parentPage.spaceId
     );
+
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       2,
       {
@@ -716,6 +718,7 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       new Map()
     );
     spaceEventHandler.userId = userId;
+    spaceEventHandler.spaceId = spaceId;
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_sidebar',

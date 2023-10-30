@@ -739,7 +739,7 @@ export class SpaceEventHandler {
 
         if (event === 'page_deleted') {
           await archivePages({
-            pageIds: [pageId],
+            pageIds: [childPageId],
             userId: this.userId!,
             spaceId: this.spaceId!,
             archive: true,
