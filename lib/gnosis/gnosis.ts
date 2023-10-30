@@ -3,7 +3,7 @@ import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
-import { getChainById, RPCList } from 'connectors';
+import { getChainById, RPCList } from 'connectors/chains';
 import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';

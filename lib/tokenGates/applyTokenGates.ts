@@ -6,7 +6,7 @@ import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
-import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
+import { updateUserTokenGates } from 'lib/tokenGates/updateUserTokenGates';
 import {
   DataNotFoundError,
   InsecureOperationError,

@@ -13,7 +13,7 @@ import type {
   UserDetails,
   UserWallet
 } from '@charmverse/core/prisma';
-import type { FiatCurrency, IPairQuote } from 'connectors';
+import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';

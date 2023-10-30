@@ -9,9 +9,9 @@ import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { addDaylightAbility } from 'lib/token-gates/daylight';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { getAccessTypes } from 'lib/token-gates/utils';
+import { addDaylightAbility } from 'lib/tokenGates/daylight';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import { getAccessTypes } from 'lib/tokenGates/utils';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 

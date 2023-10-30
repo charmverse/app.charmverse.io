@@ -6,8 +6,8 @@ import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUser
 import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
-import type { TokenGateVerification } from 'lib/token-gates/interfaces';
+import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
+import type { TokenGateVerification } from 'lib/tokenGates/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 

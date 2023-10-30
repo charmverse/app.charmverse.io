@@ -5,7 +5,7 @@ import { IconButton, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import millify from 'millify';
 import Link from 'next/link';
 

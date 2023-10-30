@@ -6,7 +6,7 @@ import { Divider, Menu, MenuItem } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import ERC20ABI from 'abis/ERC20.json';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';

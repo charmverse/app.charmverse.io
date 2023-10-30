@@ -10,7 +10,7 @@ import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
 import { verifyMembership } from 'lib/summon/verifyMembership';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';

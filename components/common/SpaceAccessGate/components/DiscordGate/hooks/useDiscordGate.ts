@@ -7,7 +7,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 
 type Props = {
   joinType?: TokenGateJoinType;

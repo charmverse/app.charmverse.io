@@ -1,4 +1,4 @@
-import type { TokenGateAccessType } from 'lib/token-gates/interfaces';
+import type { TokenGateAccessType } from 'lib/tokenGates/interfaces';
 
 export const accessTypeDict: Record<TokenGateAccessType, string> = {
   individual_wallet: 'Individual Wallet',

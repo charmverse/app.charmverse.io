@@ -1,6 +1,6 @@
 import type { AccsDefaultParams } from '@lit-protocol/types';
 
-import type { TokenGateAccessType } from 'lib/token-gates/interfaces';
+import type { TokenGateAccessType } from 'lib/tokenGates/interfaces';
 
 export function getAccessType(condition: AccsDefaultParams): TokenGateAccessType {
   const { method, parameters } = condition;

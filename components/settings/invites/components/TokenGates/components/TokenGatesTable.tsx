@@ -24,7 +24,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 

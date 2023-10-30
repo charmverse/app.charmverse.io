@@ -1,7 +1,7 @@
 import type { Application } from '@charmverse/core/prisma';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Tooltip, Typography } from '@mui/material';
-import { getChainExplorerLink } from 'connectors';
+import { getChainExplorerLink } from 'connectors/chains';
 
 import Link from 'components/common/Link';
 import { useGnosisTransaction } from 'hooks/useGnosisTransaction';

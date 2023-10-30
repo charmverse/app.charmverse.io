@@ -1,5 +1,5 @@
 import env from '@beam-australia/react-env';
-import { RPCList } from 'connectors/index';
+import { RPCList } from 'connectors/chains';
 import type { Address } from 'viem';
 import { createPublicClient, custom, createWalletClient, http } from 'viem';
 import type { Connector } from 'wagmi';

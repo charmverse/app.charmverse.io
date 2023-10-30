@@ -7,7 +7,7 @@ import type {
   TokenGateEvaluationResult,
   TokenGateVerification,
   TokenGateWithRoles
-} from 'lib/token-gates/interfaces';
+} from 'lib/tokenGates/interfaces';
 
 export class TokenGatesApi {
   // Token Gates
