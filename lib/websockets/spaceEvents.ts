@@ -231,7 +231,7 @@ export class SpaceEventHandler {
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered_sidebar_to_sidebar' && this.userId) {
-      const { pageId, newParentId, newIndex } = message.payload;
+      const { pageId, newParentId } = message.payload;
 
       // don't continue if the page is being nested under itself
       if (pageId === newParentId) {
@@ -369,13 +369,12 @@ export class SpaceEventHandler {
           pageId,
           newParentId,
           currentParentId,
-          newIndex,
           userId: this.userId
         });
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered_sidebar_to_editor' && this.userId) {
-      const { pageId, newParentId, newIndex, dropPos } = message.payload;
+      const { pageId, newParentId, dropPos } = message.payload;
 
       // don't continue if the page is being nested under itself
       if (pageId === newParentId) {
@@ -530,20 +529,12 @@ export class SpaceEventHandler {
           pageId,
           newParentId,
           currentParentId,
-          newIndex,
           userId: this.userId
         });
         this.sendError(errorMessage);
       }
     } else if (message.type === 'page_reordered_editor_to_editor' && this.userId) {
-      const {
-        currentParentId: _currentParentId,
-        dragNodePos,
-        pageId,
-        newParentId,
-        newIndex,
-        draggedNode
-      } = message.payload;
+      const { currentParentId: _currentParentId, dragNodePos, pageId, newParentId, draggedNode } = message.payload;
 
       const isLinkedPage = draggedNode?.type === 'linkedPage';
       const isStaticPage = !!STATIC_PAGES.find((c) => c.path === pageId);
@@ -715,7 +706,6 @@ export class SpaceEventHandler {
           pageId,
           newParentId,
           currentParentId,
-          newIndex,
           userId: this.userId
         });
         this.sendError(errorMessage);

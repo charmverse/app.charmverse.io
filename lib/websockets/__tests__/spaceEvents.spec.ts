@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import type { Page, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
@@ -6,6 +7,7 @@ import { v4 } from 'uuid';
 import { getPagePath } from 'lib/pages';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { builders as _ } from 'testing/prosemirror/builders';
 
 import { WebsocketBroadcaster } from '../broadcaster';
 import type { DocumentRoom } from '../documentEvents/docRooms';
@@ -18,37 +20,39 @@ async function createPageAndSetupDocRooms({
   content,
   docRooms,
   spaceId,
-  user,
-  createChildPage = true
+  user
 }: {
-  createChildPage?: boolean;
   spaceId: string;
   user: User;
   participants?: boolean;
-  content: (childPageId: string) => PageContent;
+  content: (childPage: Page) => PageContent;
   docRooms: Map<string | undefined, DocumentRoom>;
 }) {
   const userId = user.id;
   const childPageId = v4();
-  const parentContent = content(childPageId);
+  const childPage: Page = await testUtilsPages.generatePage({
+    id: childPageId,
+    spaceId,
+    createdBy: userId
+  });
+  const parentContent = content(childPage);
+
   const parentPage = await testUtilsPages.generatePage({ spaceId, createdBy: userId, content: parentContent });
+  await prisma.page.update({
+    where: {
+      id: childPage.id
+    },
+    data: {
+      parentId: parentPage.id
+    }
+  });
   const socketEmitMockFn = jest.fn();
-  let childPage: Page | null = null;
 
   const relayBroadcastMockFn = jest.fn();
 
   const websocketBroadcaster = new WebsocketBroadcaster();
 
   websocketBroadcaster.broadcast = relayBroadcastMockFn;
-
-  if (createChildPage) {
-    childPage = await testUtilsPages.generatePage({
-      id: childPageId,
-      spaceId,
-      createdBy: userId,
-      parentId: parentPage.id
-    });
-  }
 
   if (participants) {
     docRooms.set(parentPage.id, {
@@ -99,12 +103,10 @@ async function createPageAndSetupDocRooms({
 
 async function socketSetup({
   participants = false,
-  createChildPage = true,
   content
 }: {
-  createChildPage?: boolean;
   participants?: boolean;
-  content: (childPageId: string) => PageContent;
+  content: (childPage: Page) => PageContent;
 }) {
   const { space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
@@ -113,7 +115,6 @@ async function socketSetup({
 
   const { docRooms, childPage, childPageId, parentPage, socketEmitMockFn, websocketBroadcaster, relayBroadcastMockFn } =
     await createPageAndSetupDocRooms({
-      createChildPage,
       participants,
       content,
       docRooms: new Map(),
@@ -138,7 +139,6 @@ async function socketSetup({
     userId,
     space,
     user,
-    childPageId,
     parentPage,
     spaceEventHandler,
     childPage,
@@ -146,23 +146,31 @@ async function socketSetup({
   };
 }
 
+function contentWithChildPageNode(childPage: Page) {
+  return _.doc(
+    _.p('1'),
+    _.page({
+      id: childPage.id,
+      path: childPage.path,
+      type: childPage.type
+    }),
+    _.p('2')
+  ).toJSON();
+}
+
+const regularContent = _.doc(_.p('1'), _.p('2')).toJSON();
+
 describe('page delete event handler', () => {
   it(`Archive nested pages and remove it from parent document content when it have the nested page in its content and it is being viewed`, async () => {
-    const { relayBroadcastMockFn, socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
+    const { relayBroadcastMockFn, socketEmitMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
       participants: true,
-      content: (_childPageId) => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'page', attrs: { id: _childPageId } },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: (childPage) => contentWithChildPageNode(childPage)
     });
+
     const message: ClientMessage = {
       type: 'page_deleted',
       payload: {
-        id: childPageId
+        id: childPage.id
       }
     };
 
@@ -177,43 +185,24 @@ describe('page delete event handler', () => {
       }
     });
 
-    const childPage = await prisma.page.findUniqueOrThrow({
+    const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPageId
+        id: childPage.id
       },
       select: {
         deletedAt: true
       }
     });
 
-    expect(parentPageWithContent.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        }
-      ]
-    });
-
-    expect(childPage.deletedAt).toBeTruthy();
+    expect(parentPageWithContent.content).toMatchObject(regularContent);
+    expect(childPageDb.deletedAt).toBeTruthy();
     expect(socketEmitMockFn).toHaveBeenCalled();
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
         type: 'pages_meta_updated',
         payload: [
-          { id: childPageId, deletedAt: expect.any(Date), spaceId: parentPage.spaceId, deletedBy: expect.any(String) }
+          { id: childPage.id, deletedAt: expect.any(Date), spaceId: parentPage.spaceId, deletedBy: expect.any(String) }
         ]
       },
       parentPage.spaceId
@@ -222,28 +211,21 @@ describe('page delete event handler', () => {
       2,
       {
         type: 'pages_deleted',
-        payload: [{ id: childPageId }]
+        payload: [{ id: childPage.id }]
       },
       parentPage.spaceId
     );
   });
 
   it(`Archive nested pages and remove it from parent documents content when it have the nested page in its content and it is not being viewed`, async () => {
-    const { socketEmitMockFn, relayBroadcastMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
-      content: (_childPageId) => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'page', attrs: { id: _childPageId } },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+    const { socketEmitMockFn, relayBroadcastMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
+      content: (childPage) => contentWithChildPageNode(childPage)
     });
 
     const message: ClientMessage = {
       type: 'page_deleted',
       payload: {
-        id: childPageId
+        id: childPage.id
       }
     };
 
@@ -258,43 +240,24 @@ describe('page delete event handler', () => {
       }
     });
 
-    const childPage = await prisma.page.findUniqueOrThrow({
+    const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPageId
+        id: childPage.id
       },
       select: {
         deletedAt: true
       }
     });
 
-    expect(parentPageWithContent.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        }
-      ]
-    });
-
-    expect(childPage.deletedAt).toBeTruthy();
+    expect(parentPageWithContent.content).toMatchObject(regularContent);
+    expect(childPageDb.deletedAt).toBeTruthy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
         type: 'pages_meta_updated',
         payload: [
-          { id: childPageId, deletedAt: expect.any(Date), spaceId: parentPage.spaceId, deletedBy: expect.any(String) }
+          { id: childPage.id, deletedAt: expect.any(Date), spaceId: parentPage.spaceId, deletedBy: expect.any(String) }
         ]
       },
       parentPage.spaceId
@@ -303,7 +266,7 @@ describe('page delete event handler', () => {
       2,
       {
         type: 'pages_deleted',
-        payload: [{ id: childPageId }]
+        payload: [{ id: childPage.id }]
       },
       parentPage.spaceId
     );
@@ -312,19 +275,13 @@ describe('page delete event handler', () => {
 
 describe('page_restored event handler', () => {
   it('Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed', async () => {
-    const { socketEmitMockFn, relayBroadcastMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
-      content: () => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+    const { socketEmitMockFn, relayBroadcastMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
+      content: () => regularContent
     });
     const message: ClientMessage = {
       type: 'page_restored',
       payload: {
-        id: childPageId
+        id: childPage.id
       }
     };
 
@@ -337,49 +294,30 @@ describe('page_restored event handler', () => {
         content: true
       }
     });
-    const childPage = await prisma.page.findUniqueOrThrow({
+    const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPageId
+        id: childPage.id
       },
       select: {
         deletedAt: true
       }
     });
-    expect(parentPageWithContent.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            track: [],
-            id: childPageId,
-            path: null,
-            type: null
-          }
-        }
-      ]
-    });
-    expect(childPage.deletedAt).toBeFalsy();
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPage.id
+        })
+      ).toJSON()
+    );
+    expect(childPageDb.deletedAt).toBeFalsy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
         type: 'pages_meta_updated',
-        payload: [{ id: childPageId, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
+        payload: [{ id: childPage.id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
       },
       parentPage.spaceId
     );
@@ -387,27 +325,21 @@ describe('page_restored event handler', () => {
       2,
       {
         type: 'pages_restored',
-        payload: [{ id: childPageId }]
+        payload: [{ id: childPage.id }]
       },
       parentPage.spaceId
     );
   });
 
-  it(`Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed`, async () => {
-    const { relayBroadcastMockFn, socketEmitMockFn, childPageId, spaceEventHandler, parentPage } = await socketSetup({
-      content: () => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+  it(`Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is being viewed`, async () => {
+    const { relayBroadcastMockFn, socketEmitMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
+      content: () => regularContent
     });
 
     const message: ClientMessage = {
       type: 'page_restored',
       payload: {
-        id: childPageId
+        id: childPage.id
       }
     };
 
@@ -422,51 +354,32 @@ describe('page_restored event handler', () => {
       }
     });
 
-    const childPage = await prisma.page.findUniqueOrThrow({
+    const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPageId
+        id: childPage.id
       },
       select: {
         deletedAt: true
       }
     });
 
-    expect(parentPageWithContent.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            track: [],
-            id: childPageId,
-            path: null,
-            type: null
-          }
-        }
-      ]
-    });
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPage.id
+        })
+      ).toJSON()
+    );
 
-    expect(childPage.deletedAt).toBeFalsy();
+    expect(childPageDb.deletedAt).toBeFalsy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
         type: 'pages_meta_updated',
-        payload: [{ id: childPageId, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
+        payload: [{ id: childPage.id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
       },
       parentPage.spaceId
     );
@@ -474,7 +387,7 @@ describe('page_restored event handler', () => {
       2,
       {
         type: 'pages_restored',
-        payload: [{ id: childPageId }]
+        payload: [{ id: childPage.id }]
       },
       parentPage.spaceId
     );
@@ -484,13 +397,7 @@ describe('page_restored event handler', () => {
 describe('page_created event handler', () => {
   it(`Create nested page and add it to parent page content when parent document is not being viewed`, async () => {
     const { relayBroadcastMockFn, spaceEventHandler, parentPage, socketEmitMockFn } = await socketSetup({
-      content: () => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: () => regularContent
     });
 
     const childPageId = v4();
@@ -530,34 +437,15 @@ describe('page_created event handler', () => {
       }
     });
 
-    expect(parentPageWithContent.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            track: [],
-            id: childPageId,
-            path: null,
-            type: null
-          }
-        }
-      ]
-    });
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPageId
+        })
+      ).toJSON()
+    );
 
     expect(childPage).toBeTruthy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
@@ -567,13 +455,7 @@ describe('page_created event handler', () => {
   it(`Create nested page and add it to parent page content when parent document is being viewed`, async () => {
     const { relayBroadcastMockFn, socketEmitMockFn, spaceEventHandler, parentPage } = await socketSetup({
       participants: true,
-      content: () => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: () => regularContent
     });
 
     const childPageId = v4();
@@ -613,34 +495,15 @@ describe('page_created event handler', () => {
       }
     });
 
-    expect(parentPageWithContent.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            track: [],
-            id: childPageId,
-            path: null,
-            type: null
-          }
-        }
-      ]
-    });
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPageId
+        })
+      ).toJSON()
+    );
 
     expect(childPage).toBeTruthy();
     expect(socketEmitMockFn).toHaveBeenCalled();
@@ -652,20 +515,7 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
   it(`Move page from one parent page to another parent page when both documents are being viewed`, async () => {
     const { spaceEventHandler, socketEmitMockFn, parentPage, childPage, docRooms, space, user } = await socketSetup({
       participants: true,
-      content: (_childPageId) => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          {
-            type: 'page',
-            attrs: {
-              track: [],
-              id: _childPageId
-            }
-          },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: (childPage) => contentWithChildPageNode(childPage)
     });
 
     const { parentPage: parentPage2, socketEmitMockFn: socketEmitMockFn2 } = await createPageAndSetupDocRooms({
@@ -673,19 +523,12 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       spaceId: space.id,
       user,
       participants: true,
-      content: () => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: () => regularContent
     });
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        newIndex: 1,
         newParentId: parentPage2.id,
         pageId: childPage!.id
       }
@@ -709,74 +552,24 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       }
     });
 
-    expect(previousParentPage.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        }
-      ]
-    });
+    expect(previousParentPage.content).toMatchObject(regularContent);
 
-    expect(newParentPage.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            track: [],
-            id: childPage!.id,
-            path: childPage!.path,
-            type: childPage!.type
-          }
-        }
-      ]
-    });
+    expect(newParentPage.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPage!.id
+        })
+      ).toJSON()
+    );
     expect(socketEmitMockFn).toHaveBeenCalled();
     expect(socketEmitMockFn2).toHaveBeenCalled();
   });
 
   it(`Move page from one parent page to another parent page (with children) when none of the documents are being viewed`, async () => {
     const { spaceEventHandler, childPage, parentPage, docRooms, space, user, socketEmitMockFn } = await socketSetup({
-      content: (_childPageId) => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          {
-            type: 'page',
-            attrs: {
-              track: [],
-              id: _childPageId
-            }
-          },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: (childPage) => contentWithChildPageNode(childPage)
     });
 
     const {
@@ -787,26 +580,12 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       docRooms,
       spaceId: space.id,
       user,
-      content: (_childPageId) => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          {
-            type: 'page',
-            attrs: {
-              track: [],
-              id: _childPageId
-            }
-          },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: (childPage) => contentWithChildPageNode(childPage)
     });
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        newIndex: 1,
         newParentId: parentPage2.id,
         pageId: childPage!.id
       }
@@ -830,92 +609,37 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       }
     });
 
-    expect(previousParentPage.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        }
-      ]
-    });
+    expect(previousParentPage.content).toMatchObject(regularContent);
 
-    expect(newParentPage.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            type: null,
-            path: null,
-            track: [],
-            id: childPage2!.id
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            track: [],
-            id: childPage!.id,
-            path: childPage!.path,
-            type: childPage!.type
-          }
-        }
-      ]
-    });
+    expect(newParentPage.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.page({
+          id: childPage2!.id
+        }),
+        _.p('2'),
+        _.page({
+          id: childPage!.id,
+          path: childPage!.path,
+          type: childPage!.type
+        })
+      ).toJSON()
+    );
     expect(socketEmitMockFn).not.toHaveBeenCalled();
     expect(socketEmitMockFn2).not.toHaveBeenCalled();
   });
 
   it(`Move page from parent page to root level and the parent document is being viewed`, async () => {
-    const { spaceEventHandler, parentPage, childPageId, socketEmitMockFn } = await socketSetup({
+    const { spaceEventHandler, parentPage, childPage, socketEmitMockFn } = await socketSetup({
       participants: true,
-      content: (_childPageId) => ({
-        type: 'doc',
-        content: [
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-          {
-            type: 'page',
-            attrs: {
-              track: [],
-              id: _childPageId
-            }
-          },
-          { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-        ]
-      })
+      content: (childPage) => contentWithChildPageNode(childPage)
     });
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        newIndex: 1,
         newParentId: null,
-        pageId: childPageId
+        pageId: childPage.id
       }
     });
 
@@ -928,25 +652,7 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       }
     });
 
-    expect(previousParentPage.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        }
-      ]
-    });
+    expect(previousParentPage.content).toMatchObject(regularContent);
 
     expect(socketEmitMockFn).toHaveBeenCalled();
   });
@@ -956,17 +662,10 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
     const userId = user.id;
     const spaceId = space.id;
 
-    const parentContent = {
-      type: 'doc',
-      content: [
-        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 1' }] },
-        { type: 'paragraph', content: [{ type: 'text', text: 'Text content 2' }] }
-      ]
-    };
     const parentPage = await testUtilsPages.generatePage({
       spaceId: space.id,
       createdBy: userId,
-      content: parentContent
+      content: regularContent
     });
     const childPage = await testUtilsPages.generatePage({
       spaceId,
@@ -987,7 +686,6 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        newIndex: 1,
         newParentId: parentPage.id,
         pageId: childPageId
       }
@@ -1002,33 +700,152 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       }
     });
 
-    expect(newParentPage.content).toStrictEqual({
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 1' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'paragraph',
-          content: [{ type: 'text', text: 'Text content 2' }],
-          attrs: {
-            track: []
-          }
-        },
-        {
-          type: 'page',
-          attrs: {
-            track: [],
-            id: childPageId,
-            path: childPage.path,
-            type: childPage.type
-          }
-        }
-      ]
+    expect(newParentPage.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPage!.id,
+          type: childPage!.type,
+          path: childPage!.path
+        })
+      ).toJSON()
+    );
+  });
+});
+
+describe('page_reordered_sidebar_to_editor event handler', () => {
+  it(`Move nested page from the sidebar to the editor (on top of another nested page)`, async () => {
+    const { spaceEventHandler, docRooms, space, user, parentPage, childPage } = await socketSetup({
+      participants: true,
+      content: (childPage) => contentWithChildPageNode(childPage)
     });
+
+    const { childPage: childPage2 } = await createPageAndSetupDocRooms({
+      docRooms,
+      spaceId: space.id,
+      user,
+      content: (childPage) => contentWithChildPageNode(childPage)
+    });
+
+    await spaceEventHandler.onMessage({
+      type: 'page_reordered_sidebar_to_editor',
+      payload: {
+        pageId: childPage!.id,
+        newParentId: childPage2!.id,
+        dropPos: null
+      }
+    });
+
+    const parentPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const parentPageContent = parentPageDb.content as PageContent;
+    const childPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPage!.id
+      },
+      select: {
+        parentId: true
+      }
+    });
+
+    const childPage2Db = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPage2!.id
+      },
+      select: {
+        content: true
+      }
+    });
+    const childPage2Content = childPage2Db.content as PageContent;
+
+    expect(childPageDb.parentId).toBe(childPage2!.id);
+    expect(parentPageContent).toMatchObject(regularContent);
+    expect(childPage2Content).toMatchObject(
+      _.doc(
+        _.p(),
+        _.page({
+          id: childPage!.id,
+          path: childPage!.path,
+          type: childPage!.type
+        })
+      ).toJSON()
+    );
+  });
+
+  it(`Move nested page from the sidebar to the editor (below a nested page)`, async () => {
+    const { spaceEventHandler, docRooms, space, user, parentPage, childPage } = await socketSetup({
+      participants: true,
+      content: (childPage) => contentWithChildPageNode(childPage)
+    });
+
+    const { parentPage: parentPage2, childPage: childPage2 } = await createPageAndSetupDocRooms({
+      docRooms,
+      spaceId: space.id,
+      user,
+      content: (childPage) => contentWithChildPageNode(childPage)
+    });
+
+    await spaceEventHandler.onMessage({
+      type: 'page_reordered_sidebar_to_editor',
+      payload: {
+        pageId: childPage!.id,
+        newParentId: parentPage2!.id,
+        dropPos: 3
+      }
+    });
+
+    const parentPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const parentPage2Db = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage2!.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const parentPageContent = parentPageDb.content as PageContent;
+    const parentPage2Content = parentPage2Db.content as PageContent;
+    const childPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPage!.id
+      },
+      select: {
+        parentId: true
+      }
+    });
+
+    expect(childPageDb.parentId).toBe(parentPage2.id);
+    expect(parentPageContent).toMatchObject(regularContent);
+    expect(parentPage2Content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.page({
+          id: childPage!.id,
+          path: childPage!.path,
+          type: childPage!.type
+        }),
+        _.page({
+          id: childPage2!.id
+        }),
+        _.p('2')
+      ).toJSON()
+    );
   });
 });

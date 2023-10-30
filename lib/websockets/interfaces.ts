@@ -128,7 +128,6 @@ type PageReorderedSidebarToSidebar = {
   payload: {
     pageId: string;
     newParentId: string | null;
-    newIndex: number;
   };
 };
 
@@ -137,7 +136,6 @@ type PageReorderedSidebarToEditor = {
   payload: {
     pageId: string;
     newParentId: string | null;
-    newIndex: number;
     dropPos: number | null;
   };
 };
@@ -147,7 +145,6 @@ type PageReorderedEditorToEditor = {
   payload: {
     pageId: string;
     newParentId: string | null;
-    newIndex: number;
     draggedNode: {
       type: string;
       attrs?: Record<string, any>;

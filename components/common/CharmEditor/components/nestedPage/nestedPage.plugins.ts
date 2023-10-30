@@ -73,7 +73,6 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
                       payload: {
                         pageId: parsedData.pageId,
                         newParentId: hoveredPageId ?? pageId,
-                        newIndex: -1,
                         dropPos: hoveredPageId
                           ? null
                           : coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
@@ -109,7 +108,6 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
                     payload: {
                       pageId: draggedPageId,
                       newParentId: hoveredPageId,
-                      newIndex: -1,
                       draggedNode: draggedNode.toJSON(),
                       dragNodePos: view.state.selection.$anchor.pos,
                       currentParentId: pageId

@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { archivePages } from 'lib/pages/archivePages';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
@@ -444,7 +445,7 @@ export class DocumentEventHandler {
                 if (node && node.type === 'page' && node.attrs) {
                   const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
                   // pagePath is null when the page is not a linked page
-                  if (pageId && pageType === null && pagePath === null) {
+                  if (pageId && pageType !== 'forum_category' && STATIC_PAGES.find((c) => c.path !== pagePath)) {
                     restoredPageIds.push(node.attrs?.id);
                   }
                 }
@@ -454,7 +455,7 @@ export class DocumentEventHandler {
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
               if (node && node.attrs && node.type === 'page') {
                 const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
-                if (pageId && pageType === null && pagePath === null) {
+                if (pageId && pageType !== 'forum_category' && STATIC_PAGES.find((c) => c.path !== pagePath)) {
                   deletedPageIds.push(pageId);
                 }
               }
@@ -465,7 +466,7 @@ export class DocumentEventHandler {
                 const jsonNode = _node.toJSON() as PageContent;
                 if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
                   const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
-                  if (pageId && pageType === null && pagePath === null) {
+                  if (pageId && pageType !== 'forum_category' && STATIC_PAGES.find((c) => c.path !== pagePath)) {
                     deletedPageIds.push(pageId);
                   }
                 }
