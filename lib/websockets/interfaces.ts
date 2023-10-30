@@ -135,7 +135,7 @@ type PageReorderedSidebarToEditor = {
   type: 'page_reordered_sidebar_to_editor';
   payload: {
     pageId: string;
-    newParentId: string | null;
+    newParentId: string;
     dropPos: number | null;
   };
 };
@@ -144,13 +144,13 @@ type PageReorderedEditorToEditor = {
   type: 'page_reordered_editor_to_editor';
   payload: {
     pageId: string;
-    newParentId: string | null;
+    newParentId: string;
     draggedNode: {
       type: string;
       attrs?: Record<string, any>;
     };
     dragNodePos: number;
-    currentParentId: string | null;
+    currentParentId: string;
   };
 };
 
