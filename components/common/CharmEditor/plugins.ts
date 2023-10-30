@@ -36,7 +36,7 @@ import * as nft from './components/nft/nft.plugins';
 import paragraph from './components/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
-import { dragPluginKey } from './components/prosemirror/prosemirror-dropcursor/dropcursor';
+import { HOVERED_PAGE_NODE_CLASS, dragPluginKey } from './components/prosemirror/prosemirror-dropcursor/dropcursor';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -118,7 +118,7 @@ export function charmEditorPlugins({
             const hoveredPageId = hoveredDomNode?.getAttribute('data-id')?.split('page-')[1];
 
             view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
-            hoveredDomNode?.classList.remove('Prosemirror-hovered-page-node');
+            hoveredDomNode?.classList.remove(HOVERED_PAGE_NODE_CLASS);
             const currentGapCursorDomNode = document.querySelector('.ProseMirror-gapcursor');
             currentGapCursorDomNode?.classList.remove('ProseMirror-gapcursor');
 

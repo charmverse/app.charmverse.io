@@ -5,6 +5,7 @@ import { dropPoint } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 
 export const dragPluginKey = new PluginKey('dragPlugin');
+export const HOVERED_PAGE_NODE_CLASS = 'Prosemirror-hovered-page-node';
 
 interface DropCursorOptions {
   /// The color of the cursor. Defaults to `black`. Use `false` to apply no color and rely only on class.
@@ -145,15 +146,15 @@ class DropCursorView {
         ? domElementAtCoords.parentElement
         : null;
     const hoveredPageDomNodeId = hoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1];
-    const currentHoveredPageDomNode = document.querySelector('.Prosemirror-hovered-page-node');
+    const currentHoveredPageDomNode = document.querySelector(`.${HOVERED_PAGE_NODE_CLASS}`);
     const currentGapCursorDomNode = document.querySelector('.ProseMirror-gapcursor');
     // Remove the class from the previous hovered page node
     if (currentHoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1] !== hoveredPageDomNodeId) {
-      currentHoveredPageDomNode?.classList.remove('Prosemirror-hovered-page-node');
+      currentHoveredPageDomNode?.classList.remove(HOVERED_PAGE_NODE_CLASS);
     }
     if (hoveredPageDomNode) {
       if (draggedNode?.attrs.id !== hoveredPageDomNodeId) {
-        hoveredPageDomNode.classList.add('Prosemirror-hovered-page-node');
+        hoveredPageDomNode.classList.add(HOVERED_PAGE_NODE_CLASS);
         view.dispatch(
           view.state.tr.setMeta(dragPluginKey, {
             hoveredDomNode: hoveredPageDomNode
@@ -167,7 +168,7 @@ class DropCursorView {
     } else {
       const hoveredDomNode = dragPluginKey.getState(view.state)?.hoveredDomNode;
       if (hoveredDomNode) {
-        hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
+        hoveredDomNode.classList.remove(HOVERED_PAGE_NODE_CLASS);
         view.dispatch(
           view.state.tr.setMeta(dragPluginKey, {
             hoveredDomNode: null
