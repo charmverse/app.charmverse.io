@@ -2,7 +2,8 @@ import * as pmHistory from '@bangle.dev/pm';
 import { keymap } from '@bangle.dev/pm';
 import { createObject } from '@bangle.dev/utils';
 
-import { PluginGroup, type RawPlugins } from './plugin-loader';
+import { PluginGroup } from './plugin-group';
+import { type RawPlugins } from './plugin-loader';
 
 export const plugins = pluginsFactory;
 export const commands = {

@@ -18,18 +18,12 @@ import { dropCursor } from '../../prosemirror/prosemirror-dropcursor/dropcursor'
 
 import * as editorStateCounter from './editor-state-counter';
 import * as history from './history';
+import { PluginGroup } from './plugin-group';
 
 export interface PluginPayload<T = any> {
   schema: Schema;
   specRegistry: SpecRegistry;
   metadata: T;
-}
-
-interface DeepPluginArray extends Array<Plugin | DeepPluginArray> {}
-
-export class PluginGroup {
-  // eslint-disable-next-line no-empty-function, no-useless-constructor
-  constructor(public name: string, public plugins: DeepPluginArray) {}
 }
 
 type BaseRawPlugins = false | null | Plugin | InputRule | PluginGroup | BaseRawPlugins[];
