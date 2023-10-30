@@ -7,7 +7,7 @@ import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
-import type { TokenGateVerification } from 'lib/tokenGates/interfaces';
+import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -16,7 +16,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(verifyWallet);
 
 async function verifyWallet(req: NextApiRequest, res: NextApiResponse) {
-  const tokenGateVerification: TokenGateVerification = {
+  const tokenGateVerification: TokenGateVerificationRequest = {
     ...req.body,
     userId: req.session.user.id
   };
