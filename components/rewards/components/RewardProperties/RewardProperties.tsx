@@ -26,8 +26,6 @@ export function RewardProperties(props: {
   const { updateReward, refreshReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
 
-  const { showApplication } = useApplicationDialog();
-
   const { data: initialReward } = useGetReward({
     rewardId: rewardId as string
   });
@@ -38,12 +36,6 @@ export function RewardProperties(props: {
     }
   }, [initialReward]);
 
-  /* TODO @Mo - permissions */
-  const { data: rewardPermissions } = useSWR(rewardId ? `/rewards-${rewardId}` : null, () =>
-    charmClient.rewards.computeRewardPermissions({
-      resourceId: rewardId as string
-    })
-  );
   const { data: rewardPagePermissions, mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 

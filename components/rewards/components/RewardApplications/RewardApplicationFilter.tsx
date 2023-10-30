@@ -1,9 +1,10 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
-import { MenuItem } from '@mui/material';
+import { MenuItem, Stack, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import Select from '@mui/material/Select';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { ViewOptions } from 'components/common/ViewOptions';
 import type { BrandColor } from 'theme/colors';
 
 import {
@@ -36,31 +37,36 @@ type FilterOptionProps = {
 
 function FilterOption({ status }: { status: ApplicationFilterStatus }) {
   if (status === 'all') {
-    return <Chip label={statusLabels.all} sx={{ fontWeight: 'bold' }} />;
+    return <Chip label={statusLabels.all} sx={{ fontWeight: 'bold' }} size='small' />;
   }
-  return <RewardApplicationStatusChip status={status} />;
+  return <RewardApplicationStatusChip status={status} size='small' />;
 }
 
 export function RewardApplicationFilter({ onStatusSelect, status = 'all' }: FilterOptionProps) {
   return (
-    <Select
-      value={status}
-      variant='outlined'
-      renderValue={(value) => {
-        return <FilterOption status={value as ApplicationFilterStatus} />;
-      }}
-      onChange={(ev) => {
-        const newValue = ev.target.value;
-        if (newValue && statusLabels[newValue as ApplicationFilterStatus]) {
-          onStatusSelect(newValue as ApplicationFilterStatus);
-        }
-      }}
-    >
-      {options.map((opt) => (
-        <MenuItem key={opt.id} value={opt.id}>
-          <FilterOption status={opt.id as ApplicationFilterStatus} />
-        </MenuItem>
-      ))}
-    </Select>
+    <Stack direction='row' spacing={1} alignItems='center'>
+      <ViewOptions label='Filter'>
+        <Select
+          sx={{ height: '32px' }}
+          value={status}
+          variant='outlined'
+          renderValue={(value) => {
+            return <FilterOption status={value as ApplicationFilterStatus} />;
+          }}
+          onChange={(ev) => {
+            const newValue = ev.target.value;
+            if (newValue && statusLabels[newValue as ApplicationFilterStatus]) {
+              onStatusSelect(newValue as ApplicationFilterStatus);
+            }
+          }}
+        >
+          {options.map((opt) => (
+            <MenuItem key={opt.id} value={opt.id}>
+              <FilterOption status={opt.id as ApplicationFilterStatus} />
+            </MenuItem>
+          ))}
+        </Select>
+      </ViewOptions>
+    </Stack>
   );
 }

@@ -26,6 +26,9 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
+import { RewardSubmissionsTable } from 'components/rewards/components/RewardApplications/RewardSubmissionsTable';
+import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -98,6 +101,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
   });
 
   const { draftBounty } = useBounties();
+  const { showApplication } = useApplicationDialog();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -170,6 +174,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
 
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  // TODO: this logic should be removed when we release rewards in place of bounties
   const isRewardsPage = router.pathname.endsWith('/rewards');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -354,14 +359,12 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {/** REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE
-                             {page.bountyId && (
+              {/* * REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE */}
+              {page.bountyId && (
                 <Box mt='-100px'>
-                  <RewardSubmissionsTable openApplication={showApplication} rewardId={page.bountyId} />
+                  <RewardApplications rewardId={page.bountyId} />
                 </Box>
               )}
-                 */}
-
               {page.type === 'proposal' && pagePermissions.comment && (
                 <Box mt='-100px'>
                   {/* add negative margin to offset height of .charm-empty-footer */}
