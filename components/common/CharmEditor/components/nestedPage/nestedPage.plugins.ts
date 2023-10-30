@@ -39,19 +39,17 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
         props: {
           handleDOMEvents: {
             drop(view, ev) {
+              const hoveredDomNode = pageNodeDropPluginKey.getState(view.state).hoveredDomNode as Element;
+              view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredDomNode: null }));
+              hoveredDomNode?.classList.remove(HOVERED_PAGE_NODE_CLASS);
+
               if (!ev.dataTransfer || !pageId) {
                 return false;
               }
 
               const sidebarPageData = ev.dataTransfer.getData('sidebar-page');
 
-              const hoveredDomNode = pageNodeDropPluginKey.getState(view.state).hoveredDomNode as Element;
               const hoveredPageId = hoveredDomNode?.getAttribute('data-id')?.split('page-')[1];
-
-              view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredDomNode: null }));
-              hoveredDomNode?.classList.remove(HOVERED_PAGE_NODE_CLASS);
-              const currentGapCursorDomNode = document.querySelector('.ProseMirror-gapcursor');
-              currentGapCursorDomNode?.classList.remove('ProseMirror-gapcursor');
 
               if (sidebarPageData) {
                 const coordinates = view.posAtCoords({
