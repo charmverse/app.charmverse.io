@@ -1,14 +1,19 @@
 import { log } from '@charmverse/core/log';
 import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import type { AuthSig } from '@lit-protocol/types';
+import { RateLimit } from 'async-sema';
+import promiseRetry from 'promise-retry';
 import { validate } from 'uuid';
 
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 import type { TokenGateWithRoles } from './interfaces';
+
+const { asyncSeries } = arrayUtils;
 
 type TokenGateJwt = {
   signedToken: string;
@@ -73,36 +78,41 @@ export async function evaluateTokenGateEligibility({
     throw new InvalidStateError('Lit client is not available');
   }
 
-  const tokenGateResults: (TokenGateJwt | null)[] = await Promise.all(
-    space.tokenGates.map((tokenGate) => {
-      return litClient
-        .getSignedToken({
-          authSig,
-          // note that we used to store 'chain' but now it is an array
-          // TODO: migrate old token gate conditions to all be an array?
-          chain: (tokenGate.conditions as any).chains?.[0],
-          resourceId: tokenGate.resourceId,
-          ...(tokenGate.conditions as any)
-        })
-        .then((signedToken: string) => {
-          return {
-            signedToken,
-            tokenGate
-          };
-        })
-        .catch((error) => {
-          if (error.errorCode === 'rpc_error') {
-            log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
-              error,
-              tokenGateId: tokenGate.id,
-              conditions: tokenGate.conditions,
-              unifiedAccessControlConditions: (tokenGate.conditions as any)?.unifiedAccessControlConditions
-            });
-          }
-          return null;
-        });
-    })
-  );
+  const tokenGateResults: (TokenGateJwt | null)[] = await asyncSeries(space.tokenGates, async (tokenGate) => {
+    return promiseRetry<TokenGateJwt | null>(
+      async (retry, retryCount): Promise<TokenGateJwt | null> => {
+        return litClient
+          .getSignedToken({
+            authSig,
+            // note that we used to store 'chain' but now it is an array
+            // TODO: migrate old token gate conditions to all be an array?
+            chain: (tokenGate.conditions as any).chains?.[0],
+            resourceId: tokenGate.resourceId,
+            ...(tokenGate.conditions as any)
+          })
+          .then((signedToken: string) => {
+            return {
+              signedToken,
+              tokenGate
+            };
+          })
+          .catch((error) => {
+            if (error.errorCode === 'rpc_error') {
+              log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
+                retryCount,
+                tokenGateId: tokenGate.id,
+                conditions: tokenGate.conditions
+              });
+              retry(error);
+            }
+            return null;
+          });
+      },
+      {
+        retries: 5
+      }
+    );
+  });
 
   const successGates = tokenGateResults.filter((result) => result !== null) as TokenGateJwt[];
 
