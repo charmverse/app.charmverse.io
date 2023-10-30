@@ -20,27 +20,35 @@ async function createPageAndSetupDocRooms({
   content,
   docRooms,
   spaceId,
-  user
+  user,
+  childCount = 1
 }: {
+  childCount?: number;
   spaceId: string;
   user: User;
   participants?: boolean;
-  content: (childPage: Page) => PageContent;
+  content: (...childPages: Page[]) => PageContent;
   docRooms: Map<string | undefined, DocumentRoom>;
 }) {
   const userId = user.id;
-  const childPageId = v4();
-  const childPage: Page = await testUtilsPages.generatePage({
-    id: childPageId,
-    spaceId,
-    createdBy: userId
-  });
-  const parentContent = content(childPage);
+  const childPages: Page[] = await Promise.all(
+    new Array(childCount).fill(0).map(() =>
+      testUtilsPages.generatePage({
+        id: v4(),
+        spaceId,
+        createdBy: userId
+      })
+    )
+  );
+
+  const parentContent = content(...childPages);
 
   const parentPage = await testUtilsPages.generatePage({ spaceId, createdBy: userId, content: parentContent });
-  await prisma.page.update({
+  await prisma.page.updateMany({
     where: {
-      id: childPage.id
+      id: {
+        in: childPages.map((page) => page.id)
+      }
     },
     data: {
       parentId: parentPage.id
@@ -93,9 +101,8 @@ async function createPageAndSetupDocRooms({
   return {
     docRooms,
     socketEmitMockFn,
-    childPageId,
     parentPage,
-    childPage,
+    childPages,
     websocketBroadcaster,
     relayBroadcastMockFn
   };
@@ -103,23 +110,26 @@ async function createPageAndSetupDocRooms({
 
 async function socketSetup({
   participants = false,
-  content
+  content,
+  childCount = 1
 }: {
+  childCount?: number;
   participants?: boolean;
-  content: (childPage: Page) => PageContent;
+  content: (...childPages: Page[]) => PageContent;
 }) {
   const { space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
   const spaceId = space.id;
   const userId = user.id;
 
-  const { docRooms, childPage, childPageId, parentPage, socketEmitMockFn, websocketBroadcaster, relayBroadcastMockFn } =
+  const { docRooms, childPages, parentPage, socketEmitMockFn, websocketBroadcaster, relayBroadcastMockFn } =
     await createPageAndSetupDocRooms({
       participants,
       content,
       docRooms: new Map(),
       spaceId,
-      user
+      user,
+      childCount
     });
 
   const spaceEventHandler = new SpaceEventHandler(
@@ -141,20 +151,30 @@ async function socketSetup({
     user,
     parentPage,
     spaceEventHandler,
-    childPage,
+    childPages,
     relayBroadcastMockFn
   };
 }
 
-function contentWithChildPageNode(childPage: Page) {
+function contentWithChildPageNode(...childPages: (Page & { isLinkedPage?: boolean })[]) {
   return _.doc(
-    _.p('1'),
-    _.page({
-      id: childPage.id,
-      path: childPage.path,
-      type: childPage.type
-    }),
-    _.p('2')
+    ...childPages
+      .map((childPage, index) => [
+        _.p(`${index + 1}`),
+        childPage.isLinkedPage
+          ? _.linkedPage({
+              id: childPage.id,
+              path: childPage.path,
+              type: childPage.type
+            })
+          : _.page({
+              id: childPage.id,
+              path: childPage.path,
+              type: childPage.type
+            })
+      ])
+      .flat(),
+    _.p(`${childPages.length + 1}`)
   ).toJSON();
 }
 
@@ -162,15 +182,15 @@ const regularContent = _.doc(_.p('1'), _.p('2')).toJSON();
 
 describe('page delete event handler', () => {
   it(`Archive nested pages and remove it from parent document content when it have the nested page in its content and it is being viewed`, async () => {
-    const { relayBroadcastMockFn, socketEmitMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
+    const { relayBroadcastMockFn, socketEmitMockFn, childPages, spaceEventHandler, parentPage } = await socketSetup({
       participants: true,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
     const message: ClientMessage = {
       type: 'page_deleted',
       payload: {
-        id: childPage.id
+        id: childPages[0].id
       }
     };
 
@@ -187,7 +207,7 @@ describe('page delete event handler', () => {
 
     const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPage.id
+        id: childPages[0].id
       },
       select: {
         deletedAt: true
@@ -202,7 +222,12 @@ describe('page delete event handler', () => {
       {
         type: 'pages_meta_updated',
         payload: [
-          { id: childPage.id, deletedAt: expect.any(Date), spaceId: parentPage.spaceId, deletedBy: expect.any(String) }
+          {
+            id: childPages[0].id,
+            deletedAt: expect.any(Date),
+            spaceId: parentPage.spaceId,
+            deletedBy: expect.any(String)
+          }
         ]
       },
       parentPage.spaceId
@@ -211,21 +236,21 @@ describe('page delete event handler', () => {
       2,
       {
         type: 'pages_deleted',
-        payload: [{ id: childPage.id }]
+        payload: [{ id: childPages[0].id }]
       },
       parentPage.spaceId
     );
   });
 
   it(`Archive nested pages and remove it from parent documents content when it have the nested page in its content and it is not being viewed`, async () => {
-    const { socketEmitMockFn, relayBroadcastMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
-      content: (childPage) => contentWithChildPageNode(childPage)
+    const { socketEmitMockFn, relayBroadcastMockFn, childPages, spaceEventHandler, parentPage } = await socketSetup({
+      content: contentWithChildPageNode
     });
 
     const message: ClientMessage = {
       type: 'page_deleted',
       payload: {
-        id: childPage.id
+        id: childPages[0].id
       }
     };
 
@@ -242,7 +267,7 @@ describe('page delete event handler', () => {
 
     const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPage.id
+        id: childPages[0].id
       },
       select: {
         deletedAt: true
@@ -257,7 +282,12 @@ describe('page delete event handler', () => {
       {
         type: 'pages_meta_updated',
         payload: [
-          { id: childPage.id, deletedAt: expect.any(Date), spaceId: parentPage.spaceId, deletedBy: expect.any(String) }
+          {
+            id: childPages[0].id,
+            deletedAt: expect.any(Date),
+            spaceId: parentPage.spaceId,
+            deletedBy: expect.any(String)
+          }
         ]
       },
       parentPage.spaceId
@@ -266,7 +296,7 @@ describe('page delete event handler', () => {
       2,
       {
         type: 'pages_deleted',
-        payload: [{ id: childPage.id }]
+        payload: [{ id: childPages[0].id }]
       },
       parentPage.spaceId
     );
@@ -275,13 +305,13 @@ describe('page delete event handler', () => {
 
 describe('page_restored event handler', () => {
   it('Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed', async () => {
-    const { socketEmitMockFn, relayBroadcastMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
+    const { socketEmitMockFn, relayBroadcastMockFn, childPages, spaceEventHandler, parentPage } = await socketSetup({
       content: () => regularContent
     });
     const message: ClientMessage = {
       type: 'page_restored',
       payload: {
-        id: childPage.id
+        id: childPages[0].id
       }
     };
 
@@ -296,7 +326,7 @@ describe('page_restored event handler', () => {
     });
     const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPage.id
+        id: childPages[0].id
       },
       select: {
         deletedAt: true
@@ -307,7 +337,7 @@ describe('page_restored event handler', () => {
         _.p('1'),
         _.p('2'),
         _.page({
-          id: childPage.id
+          id: childPages[0].id
         })
       ).toJSON()
     );
@@ -317,7 +347,7 @@ describe('page_restored event handler', () => {
       1,
       {
         type: 'pages_meta_updated',
-        payload: [{ id: childPage.id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
+        payload: [{ id: childPages[0].id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
       },
       parentPage.spaceId
     );
@@ -325,21 +355,21 @@ describe('page_restored event handler', () => {
       2,
       {
         type: 'pages_restored',
-        payload: [{ id: childPage.id }]
+        payload: [{ id: childPages[0].id }]
       },
       parentPage.spaceId
     );
   });
 
   it(`Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is being viewed`, async () => {
-    const { relayBroadcastMockFn, socketEmitMockFn, childPage, spaceEventHandler, parentPage } = await socketSetup({
+    const { relayBroadcastMockFn, socketEmitMockFn, childPages, spaceEventHandler, parentPage } = await socketSetup({
       content: () => regularContent
     });
 
     const message: ClientMessage = {
       type: 'page_restored',
       payload: {
-        id: childPage.id
+        id: childPages[0].id
       }
     };
 
@@ -356,7 +386,7 @@ describe('page_restored event handler', () => {
 
     const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPage.id
+        id: childPages[0].id
       },
       select: {
         deletedAt: true
@@ -368,7 +398,7 @@ describe('page_restored event handler', () => {
         _.p('1'),
         _.p('2'),
         _.page({
-          id: childPage.id
+          id: childPages[0].id
         })
       ).toJSON()
     );
@@ -379,7 +409,7 @@ describe('page_restored event handler', () => {
       1,
       {
         type: 'pages_meta_updated',
-        payload: [{ id: childPage.id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
+        payload: [{ id: childPages[0].id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
       },
       parentPage.spaceId
     );
@@ -387,7 +417,7 @@ describe('page_restored event handler', () => {
       2,
       {
         type: 'pages_restored',
-        payload: [{ id: childPage.id }]
+        payload: [{ id: childPages[0].id }]
       },
       parentPage.spaceId
     );
@@ -513,9 +543,9 @@ describe('page_created event handler', () => {
 
 describe('page_reordered_sidebar_to_sidebar event handler', () => {
   it(`Move page from one parent page to another parent page when both documents are being viewed`, async () => {
-    const { spaceEventHandler, socketEmitMockFn, parentPage, childPage, docRooms, space, user } = await socketSetup({
+    const { spaceEventHandler, socketEmitMockFn, parentPage, childPages, docRooms, space, user } = await socketSetup({
       participants: true,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
     const { parentPage: parentPage2, socketEmitMockFn: socketEmitMockFn2 } = await createPageAndSetupDocRooms({
@@ -530,7 +560,7 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       type: 'page_reordered_sidebar_to_sidebar',
       payload: {
         newParentId: parentPage2.id,
-        pageId: childPage!.id
+        pageId: childPages[0].id
       }
     });
 
@@ -559,9 +589,9 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
         _.p('1'),
         _.p('2'),
         _.page({
-          id: childPage!.id,
-          path: childPage!.path,
-          type: childPage!.type
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
         })
       ).toJSON()
     );
@@ -570,26 +600,26 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
   });
 
   it(`Move page from one parent page to another parent page (with children) when none of the documents are being viewed`, async () => {
-    const { spaceEventHandler, childPage, parentPage, docRooms, space, user, socketEmitMockFn } = await socketSetup({
-      content: (childPage) => contentWithChildPageNode(childPage)
+    const { spaceEventHandler, childPages, parentPage, docRooms, space, user, socketEmitMockFn } = await socketSetup({
+      content: contentWithChildPageNode
     });
 
     const {
       parentPage: parentPage2,
-      childPage: childPage2,
+      childPages: childPages2,
       socketEmitMockFn: socketEmitMockFn2
     } = await createPageAndSetupDocRooms({
       docRooms,
       spaceId: space.id,
       user,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_sidebar',
       payload: {
         newParentId: parentPage2.id,
-        pageId: childPage!.id
+        pageId: childPages[0].id
       }
     });
 
@@ -617,15 +647,15 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       _.doc(
         _.p('1'),
         _.page({
-          id: childPage2!.id,
-          path: childPage2!.path,
-          type: childPage2!.type
+          id: childPages2[0].id,
+          path: childPages2[0].path,
+          type: childPages2[0].type
         }),
         _.p('2'),
         _.page({
-          id: childPage!.id,
-          path: childPage!.path,
-          type: childPage!.type
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
         })
       ).toJSON()
     );
@@ -634,16 +664,16 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
   });
 
   it(`Move page from parent page to root level and the parent document is being viewed`, async () => {
-    const { spaceEventHandler, parentPage, childPage, socketEmitMockFn } = await socketSetup({
+    const { spaceEventHandler, parentPage, childPages, socketEmitMockFn } = await socketSetup({
       participants: true,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_sidebar',
       payload: {
         newParentId: null,
-        pageId: childPage.id
+        pageId: childPages[0].id
       }
     });
 
@@ -709,9 +739,9 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
         _.p('1'),
         _.p('2'),
         _.page({
-          id: childPage!.id,
-          type: childPage!.type,
-          path: childPage!.path
+          id: childPage.id,
+          type: childPage.type,
+          path: childPage.path
         })
       ).toJSON()
     );
@@ -720,23 +750,23 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
 
 describe('page_reordered_sidebar_to_editor event handler', () => {
   it(`Move nested page from the sidebar to the editor (on top of another nested page)`, async () => {
-    const { spaceEventHandler, docRooms, space, user, parentPage, childPage } = await socketSetup({
+    const { spaceEventHandler, docRooms, space, user, parentPage, childPages } = await socketSetup({
       participants: true,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
-    const { childPage: childPage2 } = await createPageAndSetupDocRooms({
+    const { childPages: childPages2 } = await createPageAndSetupDocRooms({
       docRooms,
       spaceId: space.id,
       user,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_editor',
       payload: {
-        pageId: childPage!.id,
-        newParentId: childPage2!.id,
+        pageId: childPages[0].id,
+        newParentId: childPages2[0].id,
         dropPos: null
       }
     });
@@ -753,7 +783,7 @@ describe('page_reordered_sidebar_to_editor event handler', () => {
     const parentPageContent = parentPageDb.content as PageContent;
     const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPage!.id
+        id: childPages[0].id
       },
       select: {
         parentId: true
@@ -762,7 +792,7 @@ describe('page_reordered_sidebar_to_editor event handler', () => {
 
     const childPage2Db = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPage2!.id
+        id: childPages2[0].id
       },
       select: {
         content: true
@@ -770,37 +800,37 @@ describe('page_reordered_sidebar_to_editor event handler', () => {
     });
     const childPage2Content = childPage2Db.content as PageContent;
 
-    expect(childPageDb.parentId).toBe(childPage2!.id);
+    expect(childPageDb.parentId).toBe(childPages2[0].id);
     expect(parentPageContent).toMatchObject(regularContent);
     expect(childPage2Content).toMatchObject(
       _.doc(
         _.p(),
         _.page({
-          id: childPage!.id,
-          path: childPage!.path,
-          type: childPage!.type
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
         })
       ).toJSON()
     );
   });
 
   it(`Move nested page from the sidebar to the editor (below a nested page)`, async () => {
-    const { spaceEventHandler, docRooms, space, user, parentPage, childPage } = await socketSetup({
+    const { spaceEventHandler, docRooms, space, user, parentPage, childPages } = await socketSetup({
       participants: true,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
-    const { parentPage: parentPage2, childPage: childPage2 } = await createPageAndSetupDocRooms({
+    const { parentPage: parentPage2, childPages: childPages2 } = await createPageAndSetupDocRooms({
       docRooms,
       spaceId: space.id,
       user,
-      content: (childPage) => contentWithChildPageNode(childPage)
+      content: contentWithChildPageNode
     });
 
     await spaceEventHandler.onMessage({
       type: 'page_reordered_sidebar_to_editor',
       payload: {
-        pageId: childPage!.id,
+        pageId: childPages[0].id,
         newParentId: parentPage2!.id,
         dropPos: 3
       }
@@ -828,7 +858,7 @@ describe('page_reordered_sidebar_to_editor event handler', () => {
     const parentPage2Content = parentPage2Db.content as PageContent;
     const childPageDb = await prisma.page.findUniqueOrThrow({
       where: {
-        id: childPage!.id
+        id: childPages[0].id
       },
       select: {
         parentId: true
@@ -841,16 +871,355 @@ describe('page_reordered_sidebar_to_editor event handler', () => {
       _.doc(
         _.p('1'),
         _.page({
-          id: childPage!.id,
-          path: childPage!.path,
-          type: childPage!.type
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
         }),
         _.page({
-          id: childPage2!.id,
-          path: childPage2!.path,
-          type: childPage2!.type
+          id: childPages2[0].id,
+          path: childPages2[0].path,
+          type: childPages2[0].type
         }),
         _.p('2')
+      ).toJSON()
+    );
+  });
+});
+
+describe('page_reordered_editor_to_editor event handler', () => {
+  it(`Move a nested page node from the editor to another nested page node in the editor`, async () => {
+    const { spaceEventHandler, parentPage, childPages } = await socketSetup({
+      participants: true,
+      content: contentWithChildPageNode,
+      childCount: 2
+    });
+
+    await spaceEventHandler.onMessage({
+      type: 'page_reordered_editor_to_editor',
+      payload: {
+        pageId: childPages[0].id,
+        newParentId: childPages[1].id,
+        currentParentId: parentPage.id,
+        draggedNode: {
+          type: 'page',
+          attrs: {
+            id: childPages[0].id
+          }
+        },
+        dragNodePos: 3
+      }
+    });
+
+    const parentPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const parentPageContent = parentPageDb.content as PageContent;
+    const childPage1 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[0].id
+      },
+      select: {
+        parentId: true
+      }
+    });
+
+    const childPage2 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[1].id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage2Content = childPage2.content as PageContent;
+
+    expect(childPage1.parentId).toBe(childPages[1].id);
+    expect(parentPageContent).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPages[1].id,
+          path: childPages[1].path,
+          type: childPages[1].type
+        }),
+        _.p('3')
+      ).toJSON()
+    );
+
+    expect(childPage2Content).toMatchObject(
+      _.doc(
+        _.p(),
+        _.page({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        })
+      ).toJSON()
+    );
+  });
+
+  it(`Move a linked page node from the editor to a nested page node in the editor`, async () => {
+    const { spaceEventHandler, parentPage, childPages } = await socketSetup({
+      participants: true,
+      content: (childPage1, childPage2) =>
+        contentWithChildPageNode(
+          {
+            ...childPage1,
+            isLinkedPage: true
+          },
+          childPage2
+        ),
+      childCount: 2
+    });
+
+    await spaceEventHandler.onMessage({
+      type: 'page_reordered_editor_to_editor',
+      payload: {
+        pageId: childPages[0].id,
+        newParentId: childPages[1].id,
+        currentParentId: parentPage.id,
+        draggedNode: {
+          type: 'linkedPage',
+          attrs: {
+            id: childPages[0].id
+          }
+        },
+        dragNodePos: 3
+      }
+    });
+
+    const parentPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const parentPageContent = parentPageDb.content as PageContent;
+    const childPage1 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[0].id
+      },
+      select: {
+        parentId: true
+      }
+    });
+
+    const childPage2 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[1].id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage2Content = childPage2.content as PageContent;
+
+    expect(childPage1.parentId).toBe(parentPage.id);
+    expect(parentPageContent).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.page({
+          id: childPages[1].id,
+          path: childPages[1].path,
+          type: childPages[1].type
+        }),
+        _.p('3')
+      ).toJSON()
+    );
+
+    expect(childPage2Content).toMatchObject(
+      _.doc(
+        _.p(),
+        _.linkedPage({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        })
+      ).toJSON()
+    );
+  });
+
+  it(`Move a nested page node from the editor to another linked page node in the editor`, async () => {
+    const { spaceEventHandler, parentPage, childPages } = await socketSetup({
+      participants: true,
+      content: (childPage1, childPage2) =>
+        contentWithChildPageNode(childPage1, {
+          ...childPage2,
+          isLinkedPage: true
+        }),
+      childCount: 2
+    });
+
+    await spaceEventHandler.onMessage({
+      type: 'page_reordered_editor_to_editor',
+      payload: {
+        pageId: childPages[0].id,
+        newParentId: childPages[1].id,
+        currentParentId: parentPage.id,
+        draggedNode: {
+          type: 'page',
+          attrs: {
+            id: childPages[0].id
+          }
+        },
+        dragNodePos: 3
+      }
+    });
+
+    const parentPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const parentPageContent = parentPageDb.content as PageContent;
+    const childPage1 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[0].id
+      },
+      select: {
+        parentId: true
+      }
+    });
+
+    const childPage2 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[1].id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage2Content = childPage2.content as PageContent;
+
+    expect(childPage1.parentId).toBe(childPages[1].id);
+    expect(parentPageContent).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.linkedPage({
+          id: childPages[1].id,
+          path: childPages[1].path,
+          type: childPages[1].type
+        }),
+        _.p('3')
+      ).toJSON()
+    );
+
+    expect(childPage2Content).toMatchObject(
+      _.doc(
+        _.p(),
+        _.page({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        })
+      ).toJSON()
+    );
+  });
+
+  it(`Move a linked page node from the editor to another linked page node in the editor`, async () => {
+    const { spaceEventHandler, parentPage, childPages } = await socketSetup({
+      participants: true,
+      content: (childPage1, childPage2) =>
+        contentWithChildPageNode(
+          {
+            ...childPage1,
+            isLinkedPage: true
+          },
+          {
+            ...childPage2,
+            isLinkedPage: true
+          }
+        ),
+      childCount: 2
+    });
+
+    await spaceEventHandler.onMessage({
+      type: 'page_reordered_editor_to_editor',
+      payload: {
+        pageId: childPages[0].id,
+        newParentId: childPages[1].id,
+        currentParentId: parentPage.id,
+        draggedNode: {
+          type: 'linkedPage',
+          attrs: {
+            id: childPages[0].id
+          }
+        },
+        dragNodePos: 3
+      }
+    });
+
+    const parentPageDb = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const parentPageContent = parentPageDb.content as PageContent;
+    const childPage1 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[0].id
+      },
+      select: {
+        parentId: true
+      }
+    });
+
+    const childPage2 = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: childPages[1].id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    const childPage2Content = childPage2.content as PageContent;
+
+    expect(childPage1.parentId).toBe(parentPage.id);
+    expect(parentPageContent).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.p('2'),
+        _.linkedPage({
+          id: childPages[1].id,
+          path: childPages[1].path,
+          type: childPages[1].type
+        }),
+        _.p('3')
+      ).toJSON()
+    );
+
+    expect(childPage2Content).toMatchObject(
+      _.doc(
+        _.p(),
+        _.linkedPage({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        })
       ).toJSON()
     );
   });
