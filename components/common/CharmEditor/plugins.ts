@@ -118,8 +118,9 @@ export function charmEditorPlugins({
             const hoveredPageId = hoveredDomNode?.getAttribute('data-id')?.split('page-')[1];
 
             view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
-            hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
-            view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 0)));
+            hoveredDomNode?.classList.remove('Prosemirror-hovered-page-node');
+            const currentGapCursorDomNode = document.querySelector('.ProseMirror-gapcursor');
+            currentGapCursorDomNode?.classList.remove('ProseMirror-gapcursor');
 
             if (sidebarPageData) {
               const coordinates = view.posAtCoords({
@@ -137,15 +138,20 @@ export function charmEditorPlugins({
                   return false;
                 }
                 ev.preventDefault();
-                emitSocketMessage({
-                  type: 'page_reordered_sidebar_to_editor',
-                  payload: {
-                    pageId: parsedData.pageId,
-                    newParentId: hoveredPageId ?? pageId,
-                    newIndex: -1,
-                    dropPos: hoveredPageId ? null : coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
+                emitSocketMessage(
+                  {
+                    type: 'page_reordered_sidebar_to_editor',
+                    payload: {
+                      pageId: parsedData.pageId,
+                      newParentId: hoveredPageId ?? pageId,
+                      newIndex: -1,
+                      dropPos: hoveredPageId ? null : coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
+                    }
+                  },
+                  () => {
+                    view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 0)));
                   }
-                });
+                );
                 // + 1 for dropping in non empty node
                 // + 0 for dropping in empty node (blank line)
                 return false;
@@ -166,17 +172,22 @@ export function charmEditorPlugins({
               }
 
               ev.preventDefault();
-              emitSocketMessage({
-                type: 'page_reordered_editor_to_editor',
-                payload: {
-                  pageId: draggedPageId,
-                  newParentId: hoveredPageId,
-                  newIndex: -1,
-                  draggedNode: draggedNode.toJSON(),
-                  dragNodePos: view.state.selection.$anchor.pos,
-                  currentParentId: pageId
+              emitSocketMessage(
+                {
+                  type: 'page_reordered_editor_to_editor',
+                  payload: {
+                    pageId: draggedPageId,
+                    newParentId: hoveredPageId,
+                    newIndex: -1,
+                    draggedNode: draggedNode.toJSON(),
+                    dragNodePos: view.state.selection.$anchor.pos,
+                    currentParentId: pageId
+                  }
+                },
+                () => {
+                  view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 0)));
                 }
-              });
+              );
               return false;
             }
 

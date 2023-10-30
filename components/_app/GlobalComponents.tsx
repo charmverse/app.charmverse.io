@@ -10,6 +10,7 @@ import { ApplicationDialog } from 'components/rewards/components/RewardApplicati
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import useKeydownPress from 'hooks/useKeydownPress';
 import { useMarkNotificationFromUrl } from 'hooks/useMarkNotificationFromUrl';
 import { getPagesListCacheKey, usePages } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';

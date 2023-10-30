@@ -13,6 +13,7 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 
 import { enableDragAndDrop } from '../../../utils';
+import { dragPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -91,6 +92,13 @@ export default function NestedPage({
         enableDragAndDrop(view, nodePos);
       }}
       data-type={node.attrs.type}
+      onDragLeaveCapture={() => {
+        const pluginState = dragPluginKey.getState(view.state);
+        if (pluginState.hoveredDomNode) {
+          view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
+          pluginState.hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
+        }
+      }}
     >
       <div>
         <LinkIcon
