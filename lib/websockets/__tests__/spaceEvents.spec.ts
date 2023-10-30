@@ -121,7 +121,14 @@ async function socketSetup({
       user
     });
 
-  const spaceEventHandler = new SpaceEventHandler(websocketBroadcaster, {} as any, docRooms);
+  const spaceEventHandler = new SpaceEventHandler(
+    websocketBroadcaster,
+    {
+      on: jest.fn(),
+      emit: jest.fn()
+    } as any,
+    docRooms
+  );
   spaceEventHandler.userId = userId;
 
   return {
@@ -641,9 +648,9 @@ describe('page_created event handler', () => {
   });
 });
 
-describe('page_reordered event handler', () => {
+describe('page_reordered_sidebar_to_sidebar event handler', () => {
   it(`Move page from one parent page to another parent page when both documents are being viewed`, async () => {
-    const { spaceEventHandler, socketEmitMockFn, parentPage, childPageId, docRooms, space, user } = await socketSetup({
+    const { spaceEventHandler, socketEmitMockFn, parentPage, childPage, docRooms, space, user } = await socketSetup({
       participants: true,
       content: (_childPageId) => ({
         type: 'doc',
@@ -676,12 +683,11 @@ describe('page_reordered event handler', () => {
     });
 
     await spaceEventHandler.onMessage({
-      type: 'page_reordered',
+      type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage2.id,
-        pageId: childPageId
+        pageId: childPage!.id
       }
     });
 
@@ -744,9 +750,9 @@ describe('page_reordered event handler', () => {
           type: 'page',
           attrs: {
             track: [],
-            id: childPageId,
-            path: null,
-            type: null
+            id: childPage!.id,
+            path: childPage!.path,
+            type: childPage!.type
           }
         }
       ]
@@ -756,7 +762,7 @@ describe('page_reordered event handler', () => {
   });
 
   it(`Move page from one parent page to another parent page (with children) when none of the documents are being viewed`, async () => {
-    const { spaceEventHandler, parentPage, childPageId, docRooms, space, user, socketEmitMockFn } = await socketSetup({
+    const { spaceEventHandler, childPage, parentPage, docRooms, space, user, socketEmitMockFn } = await socketSetup({
       content: (_childPageId) => ({
         type: 'doc',
         content: [
@@ -775,7 +781,7 @@ describe('page_reordered event handler', () => {
 
     const {
       parentPage: parentPage2,
-      childPageId: childPageId2,
+      childPage: childPage2,
       socketEmitMockFn: socketEmitMockFn2
     } = await createPageAndSetupDocRooms({
       docRooms,
@@ -798,12 +804,11 @@ describe('page_reordered event handler', () => {
     });
 
     await spaceEventHandler.onMessage({
-      type: 'page_reordered',
+      type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage2.id,
-        pageId: childPageId
+        pageId: childPage!.id
       }
     });
 
@@ -861,7 +866,7 @@ describe('page_reordered event handler', () => {
             type: null,
             path: null,
             track: [],
-            id: childPageId2
+            id: childPage2!.id
           }
         },
         {
@@ -875,9 +880,9 @@ describe('page_reordered event handler', () => {
           type: 'page',
           attrs: {
             track: [],
-            id: childPageId,
-            path: null,
-            type: null
+            id: childPage!.id,
+            path: childPage!.path,
+            type: childPage!.type
           }
         }
       ]
@@ -886,7 +891,7 @@ describe('page_reordered event handler', () => {
     expect(socketEmitMockFn2).not.toHaveBeenCalled();
   });
 
-  it(`Move page from parent page to root level the parent document is being viewed`, async () => {
+  it(`Move page from parent page to root level and the parent document is being viewed`, async () => {
     const { spaceEventHandler, parentPage, childPageId, socketEmitMockFn } = await socketSetup({
       participants: true,
       content: (_childPageId) => ({
@@ -906,9 +911,8 @@ describe('page_reordered event handler', () => {
     });
 
     await spaceEventHandler.onMessage({
-      type: 'page_reordered',
+      type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: null,
         pageId: childPageId
@@ -947,7 +951,7 @@ describe('page_reordered event handler', () => {
     expect(socketEmitMockFn).toHaveBeenCalled();
   });
 
-  it(`Move page from root level another parent when the parent document is not being viewed`, async () => {
+  it(`Move page from root level to another parent when the parent document is not being viewed`, async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     const userId = user.id;
     const spaceId = space.id;
@@ -970,13 +974,19 @@ describe('page_reordered event handler', () => {
     });
     const childPageId = childPage.id;
 
-    const spaceEventHandler = new SpaceEventHandler(new WebsocketBroadcaster(), {} as any, new Map());
+    const spaceEventHandler = new SpaceEventHandler(
+      new WebsocketBroadcaster(),
+      {
+        on: jest.fn(),
+        emit: jest.fn()
+      } as any,
+      new Map()
+    );
     spaceEventHandler.userId = userId;
 
     await spaceEventHandler.onMessage({
-      type: 'page_reordered',
+      type: 'page_reordered_sidebar_to_sidebar',
       payload: {
-        trigger: 'sidebar-to-sidebar',
         newIndex: 1,
         newParentId: parentPage.id,
         pageId: childPageId
@@ -1014,8 +1024,8 @@ describe('page_reordered event handler', () => {
           attrs: {
             track: [],
             id: childPageId,
-            path: null,
-            type: null
+            path: childPage.path,
+            type: childPage.type
           }
         }
       ]
