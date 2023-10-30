@@ -3,11 +3,8 @@ import type { AuthSig, JsonSigningResourceId } from '@lit-protocol/types';
 
 import * as http from 'adapters/http';
 import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
-import type {
-  TokenGateEvaluationAttempt,
-  TokenGateEvaluationResult,
-  TokenGateWithRoles
-} from 'lib/tokenGates/interfaces';
+import type { TokenGateEvaluationAttempt } from 'lib/tokenGates/evaluateEligibility';
+import type { TokenGateEvaluationResult, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 export class TokenGatesApi {
   // Token Gates

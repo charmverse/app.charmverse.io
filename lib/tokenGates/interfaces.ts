@@ -1,5 +1,4 @@
 import type { Role, Space, TokenGate, TokenGateToRole } from '@charmverse/core/prisma';
-import type { AuthSig } from '@lit-protocol/types';
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 
@@ -12,12 +11,6 @@ export type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; 
 export interface TokenGateJwt {
   signedToken: string;
   tokenGate: TokenGateWithRoles;
-}
-
-export interface TokenGateEvaluationAttempt {
-  userId: string;
-  authSig: AuthSig;
-  spaceIdOrDomain: string;
 }
 
 /**

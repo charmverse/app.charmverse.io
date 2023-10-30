@@ -2,17 +2,23 @@ import { log } from '@charmverse/core/log';
 import type { Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { LitNodeClient } from '@lit-protocol/lit-node-client';
+import type { AuthSig } from '@lit-protocol/types';
 import { validate } from 'uuid';
 
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { InvalidStateError } from 'lib/middleware';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
+import type { TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
 
 const litClient = new LitNodeClient({
   debug: false
 } as any);
+
+export type TokenGateEvaluationAttempt = {
+  userId: string;
+  authSig: AuthSig;
+  spaceIdOrDomain: string;
+};
 
 export async function evaluateTokenGateEligibility({
   authSig,
