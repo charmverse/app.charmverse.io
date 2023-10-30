@@ -19,7 +19,7 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
     case 'file':
       return intl.formatMessage({ id: 'PropertyType.File', defaultMessage: 'File or Media' });
     case 'checkbox':
-      return intl.formatMessage({ id: 'PropertyType.Toggle', defaultMessage: 'Toggle' });
+      return intl.formatMessage({ id: 'PropertyType.Toggle', defaultMessage: 'Checkbox' });
     case 'url':
       return intl.formatMessage({ id: 'PropertyType.URL', defaultMessage: 'URL' });
     case 'email':

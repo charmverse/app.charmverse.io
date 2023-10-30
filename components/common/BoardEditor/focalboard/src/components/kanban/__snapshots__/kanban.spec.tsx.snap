@@ -233,6 +233,9 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                     Page id1
                   </div>
                 </div>
+                <div
+                  class="css-1qh2y1i-MuiStack-root"
+                />
               </div>
             </a>
             <a
@@ -285,6 +288,9 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                     Page id2
                   </div>
                 </div>
+                <div
+                  class="css-1qh2y1i-MuiStack-root"
+                />
               </div>
             </a>
             <button
@@ -359,6 +365,9 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                     Untitled
                   </div>
                 </div>
+                <div
+                  class="css-1qh2y1i-MuiStack-root"
+                />
               </div>
             </a>
             <button
@@ -656,6 +665,9 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                     Page id1
                   </div>
                 </div>
+                <div
+                  class="css-1qh2y1i-MuiStack-root"
+                />
               </div>
             </a>
             <a
@@ -708,6 +720,9 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                     Page id2
                   </div>
                 </div>
+                <div
+                  class="css-1qh2y1i-MuiStack-root"
+                />
               </div>
             </a>
             <button
@@ -790,6 +805,9 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                     Page id3
                   </div>
                 </div>
+                <div
+                  class="css-1qh2y1i-MuiStack-root"
+                />
               </div>
             </a>
             <button

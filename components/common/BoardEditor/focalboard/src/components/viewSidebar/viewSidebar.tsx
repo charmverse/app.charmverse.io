@@ -62,7 +62,7 @@ function ViewSidebar(props: Props) {
               {sidebarView === 'layout' && (
                 <>
                   <DatabaseSidebarHeader goBack={goToSidebarHome} title='Layout' onClose={props.closeSidebar} />
-                  <ViewLayoutOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
+                  <ViewLayoutOptions board={props.board} view={props.view} />
                 </>
               )}
               {sidebarView === 'card-properties' && (

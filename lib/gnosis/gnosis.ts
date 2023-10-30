@@ -3,7 +3,7 @@ import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
-import { getChainById, RPC } from 'connectors';
+import { getChainById, RPCList } from 'connectors';
 import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
@@ -92,7 +92,7 @@ export async function getSafesForAddress({ signer, chainId, address }: GetSafesF
 
 export async function getSafesForAddresses(signer: ethers.Signer, addresses: string[]) {
   const safes = await Promise.all(
-    Object.values(RPC).map((network) => {
+    RPCList.map((network) => {
       return Promise.all(addresses.map((address) => getSafesForAddress({ signer, chainId: network.chainId, address })));
     })
   ).then((list) => list.flat().flat());

@@ -13,7 +13,6 @@ import KanbanCard from './kanbanCard';
 
 jest.mock('../../mutator');
 jest.mock('../../utils');
-// jest.mock('../../telemetry/telemetryClient')
 const mockedMutator = jest.mocked(Mutator, { shallow: true });
 
 jest.mock('next/router', () => ({
@@ -134,6 +133,6 @@ describe('src/components/kanban/kanbanCard', () => {
     const deleteButtonModal = screen.getByRole('button', { name: 'Delete' }) as Element;
     userEvent.click(deleteButtonModal, undefined, { skipPointerEventsCheck: true });
     expect(mockedMutator.deleteBlock).toBeCalledTimes(1);
-    expect(mockedMutator.deleteBlock).toBeCalledWith(card, 'delete card');
+    expect(mockedMutator.deleteBlock).toBeCalledWith({ id: card.id, type: card.type }, 'delete card');
   });
 });

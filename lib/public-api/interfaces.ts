@@ -1,9 +1,44 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
+import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { TypedDataField } from 'ethers/lib/ethers';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { APISpaceTemplateType } from 'lib/spaces/config';
 
 export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    UserProfile:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        avatar:
+ *          type: string
+ *          example: https://google.com/image.png
+ *        wallet:
+ *          type: string
+ *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *        username:
+ *          type: string
+ *          example: testuser
+ *        email:
+ *          type: string
+ *          example: johndoe@gmail.com
+ */
+
+export type UserProfile = {
+  id: string;
+  avatar: string | null;
+  wallet: string;
+  username: string;
+  email: string;
+};
 
 /**
  * @swagger
@@ -475,10 +510,74 @@ export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
   webhookSigningSecret?: string;
 }
 
-export type UserProfile = {
-  id: string;
-  avatar: string | null;
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    CreateSpaceMemberRequestBody:
+ *      required:
+ *        - wallet
+ *      type: object
+ *      properties:
+ *        email:
+ *          type: string
+ *          example: john.doe@gmail.com
+ *        wallet:
+ *          type: string
+ *          example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
+ */
+export interface CreateSpaceMemberRequestBody {
+  email?: string;
   wallet: string;
-  username: string;
-  email: string;
-};
+}
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    SnapshotProposalVoteMessage:
+ *      required:
+ *        - space
+ *        - proposal
+ *        - type
+ *        - choice
+ *      type: object
+ *      properties:
+ *        space:
+ *          type: string
+ *        proposal:
+ *          type: string
+ *        type:
+ *          type: string
+ *          enum: [single-choice, approval, quadratic, ranked-choice, weighted, basic]
+ *        choice:
+ *          type: string
+ *          example: Abstain
+ */
+export interface SnapshotProposalVoteMessage {
+  space: string;
+  proposal: string;
+  type: ProposalType;
+  choice: string | number;
+}
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    SnapshotProposalVoteType:
+ *      type: object
+ *      properties:
+ *        Vote:
+ *          type: array
+ *          items:
+ *            type: object
+ *            properties:
+ *              name:
+ *                type: string
+ *              type:
+ *                type: string
+ */
+export type SnapshotProposalVoteType = Record<string, TypedDataField[]>;

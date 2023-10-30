@@ -26,7 +26,7 @@ export async function assignRolesCollabland({
   );
 }
 
-async function createAndAssignCollablandRoles({
+export async function createAndAssignCollablandRoles({
   userId,
   spaceId,
   roles
@@ -91,4 +91,5 @@ async function createAndAssignCollablandRoles({
       });
     })
   );
+  return { userId, spaceId };
 }

@@ -1,26 +1,27 @@
 import { log } from '@charmverse/core/log';
-import type { Space } from '@charmverse/core/prisma';
 
 import { getGuildRoles } from 'lib/collabland/collablandClient';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 
 type Props = {
-  space: Space;
+  spaceId: string;
+  discordServerId?: string;
   userId: string;
 };
 
-export async function upsertSpaceRolesFromDiscord({ space, userId }: Props) {
-  if (!space.discordServerId) {
+export async function upsertSpaceRolesFromDiscord({ spaceId, discordServerId, userId }: Props) {
+  if (!discordServerId) {
     return;
   }
 
   try {
-    const roles = await getGuildRoles(space.discordServerId);
-    await findOrCreateRoles(roles, space.id, userId, {
+    const roles = await getGuildRoles(discordServerId);
+    const cvRoles = await findOrCreateRoles(roles, spaceId, userId, {
       source: 'collabland',
       createRoles: true
     });
+    log.info('Retrieved Discord roles from Collab.land', { cvRoles, roles, spaceId, userId });
   } catch (e) {
-    log.error('Failed to create space roles from disocrd', e);
+    log.error('Failed to create space roles from discord', { error: e, spaceId, userId });
   }
 }

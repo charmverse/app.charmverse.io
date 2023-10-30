@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 
-import { findUserByIdentity, getUserSummonProfile } from './api';
+import { SUMMON_BASE_URL, findUserByIdentity, getUserSummonProfile } from './api';
 
 export type VerificationResponse =
   | {
@@ -49,12 +49,15 @@ export async function verifyMembership({
     let summonUserId = user.xpsEngineId;
     if (!summonUserId) {
       const discordAccount = user.discordUser?.account as unknown as DiscordAccount;
-      summonUserId = await findUserByIdentity({
-        // walletAddress: '0x91d76d31080ca88339a4e506affb4ded4b192bcb',
-        walletAddress: user.wallets[0]?.address,
-        email: user.googleAccounts[0]?.email,
-        discordHandle: discordAccount?.username
-      });
+      summonUserId = await findUserByIdentity(
+        {
+          // walletAddress: '0x91d76d31080ca88339a4e506affb4ded4b192bcb',
+          walletAddress: user.wallets[0]?.address,
+          email: user.googleAccounts[0]?.email,
+          discordHandle: discordAccount?.username
+        },
+        SUMMON_BASE_URL
+      );
       // check another user isnt already using this Summon account
       if (summonUserId) {
         const existing = await prisma.user.findUnique({
@@ -70,7 +73,10 @@ export async function verifyMembership({
     if (!summonUserId) {
       return { isVerified: false, reason: 'User does not have a Summon ID' };
     }
-    const summonUserInfo = await getUserSummonProfile(summonUserId);
+    const summonUserInfo = await getUserSummonProfile({
+      xpsEngineId: summonUserId,
+      summonApiUrl: SUMMON_BASE_URL
+    });
     if (!summonUserInfo) {
       return { isVerified: false, reason: 'User does not have a Summon account' };
     }

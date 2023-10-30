@@ -90,6 +90,7 @@ type ProposalPropertiesProps = {
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   title: string;
+  readOnlyCustomProperties?: string[];
 };
 
 export function ProposalProperties({
@@ -120,7 +121,8 @@ export function ProposalProperties({
   userId,
   updateProposalStatus,
   title,
-  isPublishingToLens
+  isPublishingToLens,
+  readOnlyCustomProperties
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [rubricView, setRubricView] = useState<number>(0);
@@ -231,7 +233,8 @@ export function ProposalProperties({
           })),
           proposalTemplateId: templatePage.id,
           evaluationType: proposalTemplate.evaluationType,
-          rubricCriteria: proposalTemplate.rubricCriteria
+          rubricCriteria: proposalTemplate.rubricCriteria,
+          fields: (proposalTemplate.fields as ProposalFields) || {}
         });
       }
     }
@@ -571,6 +574,7 @@ export function ProposalProperties({
 
           <CustomPropertiesAdapter
             readOnly={readOnlyAuthors}
+            readOnlyProperties={readOnlyCustomProperties}
             proposal={proposalFormInputs}
             onChange={(properties: ProposalPropertiesField) => {
               setProposalFormInputs({

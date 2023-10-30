@@ -1,22 +1,19 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import * as litSDK from '@lit-protocol/lit-node-client';
 
 import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
 import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/token-gates/verifyTokenGateMemberships';
 import type { LoggedInUser } from 'models';
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
-jest.mock('@lit-protocol/lit-node-client');
-
 // @ts-ignore
-const mockedLitSDK: jest.Mocked<typeof litSDK> = litSDK;
+let mockedLitSDK: jest.Mocked;
 
 describe('verifyTokenGateMembership', () => {
-  let user: LoggedInUser;
+  let user: User;
   let space: Space;
 
   async function getSpaceUser() {
@@ -55,14 +52,15 @@ describe('verifyTokenGateMembership', () => {
   }
 
   beforeEach(async () => {
-    const { user: u, space: s } = await generateUserAndSpaceWithApiToken(undefined, true);
+    jest.mock('@lit-protocol/lit-node-client');
+    mockedLitSDK = await import('@lit-protocol/lit-node-client');
+    const { user: u, space: s } = await generateUserAndSpace(undefined);
     user = u;
     space = s;
   });
 
   afterEach(async () => {
     mockedLitSDK.verifyJwt.mockClear();
-    // jest.unmock('@lit-protocol/lit-node-client');
     jest.resetModules();
   });
 
@@ -210,7 +208,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }) => {
+    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }: { jwt: string }) => {
       // verify only one of token gates
       if (jwt === 'jwt1') {
         return verifiedJWTResponse({
@@ -418,7 +416,7 @@ describe('verifyTokenGateMembership', () => {
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
 
-    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }) => {
+    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }: { jwt: string }) => {
       // verify only one of token gates
       if (jwt === 'jwt2') {
         return verifiedJWTResponse({

@@ -33,6 +33,7 @@ type Props = {
   pageUpdatedBy: string;
   pageUpdatedAt: string;
   mutator?: Mutator;
+  readOnlyProperties?: string[];
 };
 
 function CardDetailProperties(props: Props) {
@@ -249,6 +250,8 @@ function CardDetailProperties(props: Props) {
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields?.cardProperties.map((propertyTemplate) => {
+        const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
+
         return (
           <CardDetailProperty
             syncWithPageId={syncWithPageId}
@@ -264,7 +267,7 @@ function CardDetailProperties(props: Props) {
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}
             property={propertyTemplate}
-            readOnly={props.readOnly}
+            readOnly={readOnly}
             mutator={mutator}
           />
         );

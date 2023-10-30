@@ -559,7 +559,9 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
         _.p('1'),
         _.p('2'),
         _.page({
-          id: childPage!.id
+          id: childPage!.id,
+          path: childPage!.path,
+          type: childPage!.type
         })
       ).toJSON()
     );
@@ -615,7 +617,9 @@ describe('page_reordered_sidebar_to_sidebar event handler', () => {
       _.doc(
         _.p('1'),
         _.page({
-          id: childPage2!.id
+          id: childPage2!.id,
+          path: childPage2!.path,
+          type: childPage2!.type
         }),
         _.p('2'),
         _.page({
@@ -842,7 +846,9 @@ describe('page_reordered_sidebar_to_editor event handler', () => {
           type: childPage!.type
         }),
         _.page({
-          id: childPage2!.id
+          id: childPage2!.id,
+          path: childPage2!.path,
+          type: childPage2!.type
         }),
         _.p('2')
       ).toJSON()

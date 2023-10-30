@@ -4,11 +4,13 @@ import styled from '@emotion/styled';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Popper from '@mui/material/Popper';
 import type { BaseEmoji } from 'emoji-mart';
-import { Picker } from 'emoji-mart';
+import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback } from 'react';
 
 import { selectEmoji } from './emojiSuggest.plugins';
+
+const Picker = dynamic(() => import('emoji-mart').then((r) => r.Picker), { ssr: false });
 
 const StyledPopper = styled(Popper)`
   z-index: var(--z-index-modal);

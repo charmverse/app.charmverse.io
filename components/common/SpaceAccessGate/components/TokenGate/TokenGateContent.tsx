@@ -1,7 +1,5 @@
 import { Box, Typography } from '@mui/material';
 
-import Link from 'components/common/Link';
-
 import type { TokenGateState } from './hooks/useTokenGates';
 import { TokenGateOption } from './TokenGateOption';
 

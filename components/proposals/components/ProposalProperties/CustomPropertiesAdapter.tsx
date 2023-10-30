@@ -10,9 +10,10 @@ type Props = {
   proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
   onChange?: (properties: ProposalPropertiesField) => void;
   readOnly?: boolean;
+  readOnlyProperties?: string[];
 };
 
-export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props) {
+export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnlyProperties }: Props) {
   const { user } = useUser();
   // TODO - use value from context instead of raw hook
   const { boardCustomProperties, card, cards, activeView, views, proposalPage, setBoardProposal } =
@@ -34,6 +35,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly }: Props)
       pageUpdatedAt={proposalPage?.updatedAt.toString() || new Date().toString()}
       pageUpdatedBy={proposalPage?.updatedBy || user?.id || ''}
       mutator={mutator ?? undefined}
+      readOnlyProperties={readOnlyProperties}
     />
   );
 }

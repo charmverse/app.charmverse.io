@@ -95,6 +95,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
   // Usually a userId, but can be an email
   const userIdAsEmail = permissionData.assignee.group === 'user' ? permissionData.assignee.id : null;
   const userEmail = userIdAsEmail && isValidEmail(userIdAsEmail) ? userIdAsEmail : null;
+
   // Handle case where we are sharing a page to a user by email
   if (userEmail) {
     const addGuestResult = await addGuest({

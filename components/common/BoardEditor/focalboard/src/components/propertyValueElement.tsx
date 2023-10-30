@@ -40,7 +40,7 @@ import { TextInput } from '../../../components/properties/TextInput';
 import type { Mutator } from '../mutator';
 import defaultMutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
-import Switch from '../widgets/switch';
+import Checkbox from '../widgets/checkbox';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -188,7 +188,7 @@ function PropertyValueElement(props: Props) {
       <TagSelect
         data-test='closed-select-input'
         canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
@@ -249,7 +249,7 @@ function PropertyValueElement(props: Props) {
             )
           );
         }}
-        wrapColumn={props.wrapColumn ?? false}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );
@@ -271,7 +271,9 @@ function PropertyValueElement(props: Props) {
     }
   } else if (propertyTemplate.type === 'checkbox') {
     propertyValueElement = (
-      <Switch
+      <Checkbox
+        displayType={displayType}
+        label={propertyTemplate.name}
         isOn={propertyValue === 'true'}
         onChanged={(newBool) => {
           const newValue = newBool ? 'true' : '';

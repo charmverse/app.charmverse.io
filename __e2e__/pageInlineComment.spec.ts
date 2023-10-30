@@ -1,33 +1,23 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { test as base, expect } from '@playwright/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { createThread, toggleThreadStatus } from 'lib/threads';
 
-import { DocumentPage } from './po/document.po';
 import { generateUserAndSpace, loginBrowserUser } from './utils/mocks';
 
-type Fixtures = {
-  documentPage: DocumentPage;
-};
-
-const test = base.extend<Fixtures>({
-  documentPage: async ({ page }, use) => use(new DocumentPage(page))
-});
-
-test.describe.serial('Create a inline comment thread and check if the page action sidebar toggles', async () => {
-  const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
-
-  const thread = await createThread({
-    comment: emptyDocument,
-    context: 'Context',
-    pageId: generatedPage.id,
-    userId: user.id
-  });
-
-  const threadId = thread.id;
-
+test.describe('Create a inline comment thread and check if the page action sidebar toggles', async () => {
   test('Check if the inline comment thread is visible after adding comment to text', async ({ documentPage }) => {
+    const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
+
+    const thread = await createThread({
+      comment: emptyDocument,
+      context: 'Context',
+      pageId: generatedPage.id,
+      userId: user.id
+    });
+
+    const threadId = thread.id;
     await prisma.page.update({
       where: {
         id: generatedPage.id
@@ -69,6 +59,16 @@ test.describe.serial('Create a inline comment thread and check if the page actio
   });
 
   test('Check if the inline comment thread is not visible after resolving it', async ({ documentPage }) => {
+    const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
+
+    const thread = await createThread({
+      comment: emptyDocument,
+      context: 'Context',
+      pageId: generatedPage.id,
+      userId: user.id
+    });
+
+    const threadId = thread.id;
     await toggleThreadStatus({
       id: threadId,
       status: 'closed'

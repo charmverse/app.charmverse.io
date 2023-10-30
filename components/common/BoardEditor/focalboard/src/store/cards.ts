@@ -12,9 +12,7 @@ import type { PagesMap } from 'lib/pages';
 import { Constants } from '../constants';
 import { Utils } from '../utils';
 
-import { getBoard } from './boards';
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
-import { getView } from './views';
 
 import type { RootState } from './index';
 
@@ -121,11 +119,6 @@ export const getCurrentBoardCards = createSelector(
     return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
   }
 );
-
-export const getBoardCards = (boardId: string) =>
-  createSelector(getCards, (cards: { [key: string]: Card }) => {
-    return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
-  });
 
 export const getCurrentBoardTemplates = createSelector(
   (state: RootState) => state.boards.current,
@@ -327,37 +320,25 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; boardId: string; pages: PagesMap }) =>
+type getViewCardsProps = { viewId: string; boardId: string };
+
+export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    getBoardCards(props.boardId),
-    getBoard(props.boardId),
-    getView(props.viewId),
-    () => null,
+    getCards,
+    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
+    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
     (cards, board, view) => {
       if (!view || !board || !cards) {
         return [];
       }
-      let result = cards;
+      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
       const cardProperties: IPropertyTemplate[] = hasTitleProperty
         ? board.fields.cardProperties
         : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
 
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(
-          view.fields.filter,
-          cardProperties,
-          result.map((card) => ({
-            ...card,
-            fields: {
-              ...card.fields,
-              properties: {
-                ...card.fields.properties,
-                [Constants.titleColumnId]: props.pages[card.id]?.title ?? ''
-              }
-            }
-          }))
-        );
+        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result);
       }
       return result;
     }

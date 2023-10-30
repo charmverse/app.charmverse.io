@@ -8,7 +8,6 @@ import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useApplication } from 'components/rewards/hooks/useApplication';
-import { useUser } from 'hooks/useUser';
 
 import { useApplicationDialog } from '../hooks/useApplicationDialog';
 

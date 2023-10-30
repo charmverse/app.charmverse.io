@@ -1,6 +1,6 @@
 import { NodeSelection } from '@bangle.dev/pm';
 import type { EditorView } from '@bangle.dev/pm';
-import { safeInsert } from '@bangle.dev/utils';
+import { safeInsert, GapCursorSelection } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 
@@ -29,9 +29,8 @@ export function insertNode(
 }
 
 export function isAtBeginningOfLine(state: EditorState) {
-  // @ts-ignore types package is missing $cursor property as of 1.2.8
-  const parentOffset = state.selection.$cursor?.parentOffset;
-  return parentOffset === 0;
+  const { empty, $from } = state.selection;
+  return empty && ($from.parentOffset === 0 || state.selection instanceof GapCursorSelection);
 }
 
 export const safeRequestAnimationFrame =

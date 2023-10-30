@@ -156,20 +156,7 @@ export class SpaceEventHandler {
           }
         });
 
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
-          event: 'created',
-          pageId: createdPage.id
-        });
-
         const { content, contentText, ...newPageToNotify } = createdPage;
-
-        this.relay.broadcast(
-          {
-            type: 'pages_created',
-            payload: [newPageToNotify]
-          },
-          createdPage.spaceId
-        );
 
         childPageId = createdPage.id;
 
@@ -185,38 +172,46 @@ export class SpaceEventHandler {
 
         const { parentDocumentNode, documentRoom, participant, parentId, content: parentPageContent } = pageDetails;
 
-        if (!parentId) {
-          if (typeof callback === 'function') {
-            callback(createdPage);
+        if (parentId) {
+          const lastValidPos = parentDocumentNode.content.size;
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: generateInsertNestedPageDiffs({ pageId: childPageId, pos: lastValidPos }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_created'
+              }
+            );
+          } else {
+            await applyDiffAndSaveDocument({
+              content: parentPageContent,
+              userId: this.userId,
+              parentId,
+              diffs: parentId ? generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos }) : []
+            });
           }
-          return null;
         }
 
-        const lastValidPos = parentDocumentNode.content.size;
-        if (documentRoom && participant) {
-          await participant.handleDiff(
-            {
-              type: 'diff',
-              ds: generateInsertNestedPageDiffs({ pageId: childPageId, pos: lastValidPos }),
-              doc: documentRoom.doc.content,
-              c: participant.messages.client,
-              s: participant.messages.server,
-              v: documentRoom.doc.version,
-              rid: 0,
-              cid: -1
-            },
-            {
-              socketEvent: 'page_created'
-            }
-          );
-        } else {
-          await applyDiffAndSaveDocument({
-            content: parentPageContent,
-            userId: this.userId,
-            parentId,
-            diffs: parentId ? generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos }) : []
-          });
-        }
+        this.relay.broadcast(
+          {
+            type: 'pages_created',
+            payload: [newPageToNotify]
+          },
+          createdPage.spaceId
+        );
+
+        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          event: 'created',
+          pageId: createdPage.id
+        });
 
         if (typeof callback === 'function') {
           callback(createdPage);

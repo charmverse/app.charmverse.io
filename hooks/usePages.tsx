@@ -60,7 +60,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       }
 
       const pagesRes = await charmClient.pages.getPages(currentSpace.id);
-
       const pagesDict: PagesContext['pages'] = {};
       pagesRes?.forEach((page) => {
         pagesDict[page.id] = page;
@@ -202,33 +201,36 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     return freshPageVersion;
   }
 
-  const handleUpdateEvent = useCallback((value: WebSocketPayload<'pages_meta_updated'>) => {
-    mutatePagesList(
-      (existingPages) => {
-        const _existingPages = existingPages || {};
-        const pagesToUpdate = value.reduce<PagesMap>((pageMap, updatedPageMeta) => {
-          const existingPage = _existingPages[updatedPageMeta.id];
+  const handleUpdateEvent = useCallback(
+    (value: WebSocketPayload<'pages_meta_updated'>) => {
+      mutatePagesList(
+        (existingPages) => {
+          const _existingPages = existingPages || {};
+          const pagesToUpdate = value.reduce<PagesMap>((pageMap, updatedPageMeta) => {
+            const existingPage = _existingPages[updatedPageMeta.id];
 
-          if (existingPage && updatedPageMeta.spaceId === currentSpaceId.current) {
-            pageMap[updatedPageMeta.id] = {
-              ...existingPage,
-              ...updatedPageMeta
-            };
-          }
+            if (existingPage && updatedPageMeta.spaceId === currentSpaceId.current) {
+              pageMap[updatedPageMeta.id] = {
+                ...existingPage,
+                ...updatedPageMeta
+              };
+            }
 
-          return pageMap;
-        }, {});
+            return pageMap;
+          }, {});
 
-        return {
-          ..._existingPages,
-          ...pagesToUpdate
-        };
-      },
-      {
-        revalidate: false
-      }
-    );
-  }, []);
+          return {
+            ..._existingPages,
+            ...pagesToUpdate
+          };
+        },
+        {
+          revalidate: false
+        }
+      );
+    },
+    [mutatePagesList]
+  );
 
   const handleNewPageEvent = useCallback(
     (value: WebSocketPayload<'pages_created'>) => {
@@ -251,25 +253,29 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         }
       );
     },
-    [spaceRole]
+    [mutatePagesList]
   );
 
-  const handleDeleteEvent = useCallback((value: WebSocketPayload<'pages_deleted'>) => {
-    mutatePagesList(
-      (existingPages) => {
-        const newValue = { ...existingPages };
+  const handleDeleteEvent = useCallback(
+    (value: WebSocketPayload<'pages_deleted'>) => {
+      mutatePagesList(
+        (existingPages) => {
+          const newValue = { ...existingPages };
 
-        value.forEach((deletedPage) => {
-          delete newValue[deletedPage.id];
-        });
+          value.forEach((deletedPage) => {
+            delete newValue[deletedPage.id];
+          });
 
-        return newValue;
-      },
-      {
-        revalidate: false
-      }
-    );
-  }, []);
+          return newValue;
+        },
+        {
+          revalidate: false
+        }
+      );
+    },
+    [mutatePagesList]
+  );
+
   useEffect(() => {
     currentSpaceId.current = currentSpace?.id;
   }, [currentSpace]);

@@ -47,24 +47,31 @@ async function getDefaultPageForSpaceRaw({
 }) {
   const { id: spaceId } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
-
   const defaultSpaceUrl = getSpaceUrl(space, host);
   if (lastPageView) {
+    // grab the original path a user was on to include query params like filters, etc.
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
-    if (pathname) {
-      return getSubdomainPath(pathname, space, host);
-    }
-    // reconstruct the URL if no pathname is saved (should not be an issue a few weeks after the release of this code on Sep 12 2023)
+    const fullPathname = pathname && getSubdomainPath(pathname, space, host);
     // handle forum posts
     if (lastPageView.post) {
-      return `${defaultSpaceUrl}/forum?postId=${lastPageView.post.id}`;
+      // use the original path if it was the actual post page
+      if (fullPathname?.includes(lastPageView.post.path)) {
+        return fullPathname;
+      }
+      return `${defaultSpaceUrl}/forum/post/${lastPageView.post.path}`;
     }
     // handle pages
     else if (lastPageView.page) {
+      // use the original path if it was the actual post page
+      if (fullPathname?.includes(lastPageView.page.path)) {
+        return fullPathname;
+      }
       return `${defaultSpaceUrl}/${lastPageView.page.path}`;
-    }
-    // handle static pages
-    else {
+    } else {
+      if (fullPathname) {
+        return fullPathname;
+      }
+      // handle static pages - this is probably not necessary since pathname is always defined now
       const staticPath = staticPagesToDirect[lastPageView.pageType as StaticPageType];
       if (staticPath) {
         return `${defaultSpaceUrl}${staticPath}`;
@@ -94,7 +101,8 @@ async function getDefaultPageForSpaceRaw({
       id: true,
       index: true,
       path: true,
-      type: true
+      type: true,
+      parentId: true
     }
   });
 
@@ -104,10 +112,12 @@ async function getDefaultPageForSpaceRaw({
   }, {});
 
   // Find the first top-level page that is not card and hasn't been deleted yet.
-  const topLevelPages = filterVisiblePages(pageMap);
+  const visiblePages = filterVisiblePages(pageMap);
+  const topLevelPages = visiblePages.filter((page) => !page.parentId);
+  const pagesToLookup = topLevelPages.length ? topLevelPages : visiblePages;
 
   // TODO: simplify types of sortNodes input to only be index and createdAt
-  const sortedPages = pageTree.sortNodes(topLevelPages as PageMeta[]);
+  const sortedPages = pageTree.sortNodes(pagesToLookup as PageMeta[]);
 
   const firstPage = sortedPages[0];
   if (firstPage) {
