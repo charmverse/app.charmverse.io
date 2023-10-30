@@ -123,7 +123,8 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
-        chain: (tokenGate.conditions as any).chain || 'ethereum',
+        chain: (tokenGate.conditions as any).chains?.[0],
+        // chain: (tokenGate.conditions as any).chain || 'ethereum',
         ...(tokenGate.conditions as any)
       });
 

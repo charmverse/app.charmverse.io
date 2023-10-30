@@ -127,13 +127,14 @@ const RPC: Record<string, IChainDetails> = {
   BASE_TESTNET: {
     ...EVM_DEFAULT,
     chainId: baseGoerli.id,
-    chainName: 'Base - Testnet',
+    chainName: 'Base - Goerli Testnet',
     rpcUrls: ['https://goerli.base.org'],
     gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
     blockExplorerUrls: ['https://goerli.basescan.org'],
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base-testnet',
-    testnet: true
+    testnet: true,
+    litNetwork: 'baseGoerli'
   },
   // https://docs.zora.co/docs/zora-network/network
   ZORA: {

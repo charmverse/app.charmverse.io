@@ -60,7 +60,7 @@ export async function evaluateTokenGateEligibility({
           authSig,
           // note that we used to store 'chain' but now it is an array
           // TODO: migrate old token gate conditions to all be an array?
-          chain: (tokenGate.conditions as any).chain || 'ethereum',
+          chain: (tokenGate.conditions as any).chains?.[0],
           resourceId: tokenGate.resourceId,
           ...(tokenGate.conditions as any)
         })
