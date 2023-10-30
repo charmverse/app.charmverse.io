@@ -100,8 +100,7 @@ export async function evaluateTokenGateEligibility({
             if (error.errorCode === 'rpc_error') {
               log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
                 retryCount,
-                tokenGateId: tokenGate.id,
-                conditions: tokenGate.conditions
+                tokenGateId: tokenGate.id
               });
               retry(error);
             }
@@ -111,7 +110,15 @@ export async function evaluateTokenGateEligibility({
       {
         retries: 5
       }
-    );
+    ).catch((error) => {
+      log.warn('Error verifying token gate', {
+        error,
+        spaceId: space.id,
+        tokenGateId: tokenGate.id,
+        conditions: (tokenGate.conditions as any)?.unifiedAccessControlConditions?.[0]
+      });
+      return null;
+    });
   });
 
   const successGates = tokenGateResults.filter((result) => result !== null) as TokenGateJwt[];
