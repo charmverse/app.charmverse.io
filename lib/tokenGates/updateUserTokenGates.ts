@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { TokenGateJwtResult } from 'lib/tokenGates/interfaces';
+import type { TokenGateJwtResult } from 'lib/tokenGates/verifyTokenGates';
 
 type UpdateUserTokenGatesProps = { tokenGates: TokenGateJwtResult[]; spaceId: string; userId: string };
 type UpsertTokenGateProps = {

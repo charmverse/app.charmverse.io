@@ -4,7 +4,9 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { TokenGateJwtResult, TokenGateWithRoles } from './interfaces';
+import type { TokenGateWithRoles } from './interfaces';
+
+export type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
 
 type TokenGateResult = TokenGateWithRoles & TokenGateJwtResult;
 

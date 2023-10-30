@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { Role } from '@charmverse/core/prisma';
+import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import type { AuthSig } from '@lit-protocol/types';
@@ -8,7 +8,12 @@ import { validate } from 'uuid';
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { TokenGateEvaluationResult, TokenGateJwt } from './interfaces';
+import type { TokenGateWithRoles } from './interfaces';
+
+type TokenGateJwt = {
+  signedToken: string;
+  tokenGate: TokenGateWithRoles;
+};
 
 const litClient = new LitNodeClient({
   debug: false
@@ -18,6 +23,18 @@ export type TokenGateEvaluationAttempt = {
   userId: string;
   authSig: AuthSig;
   spaceIdOrDomain: string;
+};
+
+/**
+ * @gateTokens List of Lit-generated tokens we can verify when joining a space
+ */
+export type TokenGateEvaluationResult = {
+  userId: string;
+  space: Space;
+  walletAddress: string;
+  canJoinSpace: boolean;
+  gateTokens: TokenGateJwt[];
+  roles: Role[];
 };
 
 export async function evaluateTokenGateEligibility({
