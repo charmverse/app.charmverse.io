@@ -2,12 +2,9 @@ import type { TokenGate } from '@charmverse/core/prisma';
 import type { AuthSig, JsonSigningResourceId } from '@lit-protocol/types';
 
 import * as http from 'adapters/http';
-import type {
-  TokenGateEvaluationAttempt,
-  TokenGateEvaluationResult,
-  TokenGateVerification,
-  TokenGateWithRoles
-} from 'lib/token-gates/interfaces';
+import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
+import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 export class TokenGatesApi {
   // Token Gates
@@ -30,7 +27,9 @@ export class TokenGatesApi {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  verifyTokenGate(verification: Omit<TokenGateVerification, 'userId'>): Promise<{ error?: string; success?: boolean }> {
+  verifyTokenGate(
+    verification: Omit<TokenGateVerificationRequest, 'userId'>
+  ): Promise<{ error?: string; success?: boolean }> {
     return http.POST('/api/token-gates/verify', verification);
   }
 

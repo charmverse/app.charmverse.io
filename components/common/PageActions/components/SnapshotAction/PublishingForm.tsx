@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';

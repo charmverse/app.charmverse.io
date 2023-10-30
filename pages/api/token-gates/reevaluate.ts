@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { reevaluateRoles } from 'lib/token-gates/reevaluateRoles';
+import { reevaluateRoles } from 'lib/tokenGates/reevaluateRoles';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

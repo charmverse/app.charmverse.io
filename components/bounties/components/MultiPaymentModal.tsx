@@ -13,7 +13,7 @@ import {
   Typography
 } from '@mui/material';
 import Box from '@mui/material/Box';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 

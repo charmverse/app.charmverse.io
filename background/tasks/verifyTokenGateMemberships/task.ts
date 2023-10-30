@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import { count } from 'lib/metrics';
-import { verifyTokenGateMemberships } from 'lib/token-gates/verifyTokenGateMemberships';
+import { verifyTokenGateMemberships } from 'lib/tokenGates/verifyTokenGateMemberships';
 
 export async function task() {
   log.debug('Running Verify Token Gate memberships cron job');

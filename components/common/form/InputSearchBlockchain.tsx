@@ -3,8 +3,8 @@ import type { AutocompleteProps } from '@mui/material/Autocomplete';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import type { IChainDetails } from 'connectors';
-import { RPCList, getChainById } from 'connectors';
+import type { IChainDetails } from 'connectors/chains';
+import { RPCList, getChainById } from 'connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
 import { isTruthy } from 'lib/utilities/types';

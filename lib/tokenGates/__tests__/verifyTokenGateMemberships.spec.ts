@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
-import { verifyTokenGateMemberships } from 'lib/token-gates/verifyTokenGateMemberships';
+import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
+import { verifyTokenGateMemberships } from 'lib/tokenGates/verifyTokenGateMemberships';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
