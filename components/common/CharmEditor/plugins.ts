@@ -2,12 +2,10 @@ import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/ba
 import type { RawPlugins } from '@bangle.dev/core';
 import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
-import { PluginKey } from '@bangle.dev/pm';
+import { PluginKey, TextSelection } from '@bangle.dev/pm';
 import type { PageType } from '@charmverse/core/prisma-client';
 
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-
-import { STATIC_PAGES } from '../PageLayout/components/Sidebar/utils/staticPages';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -115,38 +113,13 @@ export function charmEditorPlugins({
             }
 
             const sidebarPageData = ev.dataTransfer.getData('sidebar-page');
+
             const hoveredDomNode = dragPluginKey.getState(view.state).hoveredDomNode as Element;
+            const hoveredPageId = hoveredDomNode?.getAttribute('data-id')?.split('page-')[1];
 
-            if (hoveredDomNode) {
-              const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
-
-              if (!draggedNode || hoveredDomNode.getAttribute('data-page-type') !== 'page') {
-                return false;
-              }
-
-              const droppedPageId = hoveredDomNode.getAttribute('data-id')?.split('page-')[1];
-              const draggedPageId = draggedNode.attrs.id;
-
-              if (!droppedPageId || droppedPageId === draggedPageId) {
-                return false;
-              }
-
-              view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
-              hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
-              ev.preventDefault();
-              emitSocketMessage({
-                type: 'page_reordered_editor_to_editor',
-                payload: {
-                  pageId: draggedPageId,
-                  newParentId: droppedPageId,
-                  newIndex: -1,
-                  draggedNode: draggedNode.toJSON(),
-                  dragNodePos: view.state.selection.$anchor.pos,
-                  currentParentId: pageId
-                }
-              });
-              return false;
-            }
+            view.dispatch(view.state.tr.setMeta(dragPluginKey, { hoveredDomNode: null }));
+            hoveredDomNode.classList.remove('Prosemirror-hovered-page-node');
+            view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 0)));
 
             if (sidebarPageData) {
               const coordinates = view.posAtCoords({
@@ -168,9 +141,9 @@ export function charmEditorPlugins({
                   type: 'page_reordered_sidebar_to_editor',
                   payload: {
                     pageId: parsedData.pageId,
-                    newParentId: pageId,
+                    newParentId: hoveredPageId ?? pageId,
                     newIndex: -1,
-                    dropPos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
+                    dropPos: hoveredPageId ? null : coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
                   }
                 });
                 // + 1 for dropping in non empty node
@@ -179,6 +152,32 @@ export function charmEditorPlugins({
               } catch (_) {
                 return false;
               }
+            } else if (hoveredDomNode) {
+              const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
+
+              if (!draggedNode || hoveredDomNode.getAttribute('data-page-type') !== 'page') {
+                return false;
+              }
+
+              const draggedPageId = draggedNode.attrs.id;
+
+              if (!hoveredPageId || hoveredPageId === draggedPageId) {
+                return false;
+              }
+
+              ev.preventDefault();
+              emitSocketMessage({
+                type: 'page_reordered_editor_to_editor',
+                payload: {
+                  pageId: draggedPageId,
+                  newParentId: hoveredPageId,
+                  newIndex: -1,
+                  draggedNode: draggedNode.toJSON(),
+                  dragNodePos: view.state.selection.$anchor.pos,
+                  currentParentId: pageId
+                }
+              });
+              return false;
             }
 
             return false;

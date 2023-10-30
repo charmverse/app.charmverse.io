@@ -138,7 +138,7 @@ type PageReorderedSidebarToEditor = {
     pageId: string;
     newParentId: string | null;
     newIndex: number;
-    dropPos: number;
+    dropPos: number | null;
   };
 };
 

@@ -21,6 +21,7 @@ const NestedPageContainer = styled(Link)`
   padding: 3px 3px 3px 2px;
   position: relative;
   transition: background 20ms ease-in 0s;
+  margin: ${({ theme }) => `${theme.spacing(0.5)} 0px`};
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {

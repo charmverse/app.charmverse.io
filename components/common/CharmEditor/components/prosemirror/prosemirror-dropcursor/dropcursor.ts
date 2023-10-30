@@ -146,6 +146,8 @@ class DropCursorView {
         : null;
     const hoveredPageDomNodeId = hoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1];
     const currentHoveredPageDomNode = document.querySelector('.Prosemirror-hovered-page-node');
+    const currentGapCursorDomNode = document.querySelector('.ProseMirror-gapcursor');
+    // Remove the class from the previous hovered page node
     if (currentHoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1] !== hoveredPageDomNodeId) {
       currentHoveredPageDomNode?.classList.remove('Prosemirror-hovered-page-node');
     }
@@ -157,6 +159,9 @@ class DropCursorView {
             hoveredDomNode: hoveredPageDomNode
           })
         );
+        if (currentGapCursorDomNode) {
+          currentGapCursorDomNode.classList.remove('ProseMirror-gapcursor');
+        }
       }
       return;
     } else {
