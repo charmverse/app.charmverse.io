@@ -11,7 +11,6 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
 import { getCardComments, hasLoadedCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
 import {
   blockLoad,
@@ -343,31 +342,24 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       readOnly={readOnly}
                     />
                   )}
-                  {(page.type === 'card' || page.type === 'card_synced') && (
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.id}
-                      cardId={card?.id ?? page.id}
-                      readOnly={cannotComment}
-                    />
-                  )}
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {/** REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE
-                             {page.bountyId && (
+              {/** REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE 
+               * {page.bountyId && (
                 <Box mt='-100px'>
                   <RewardSubmissionsTable openApplication={showApplication} rewardId={page.bountyId} />
                 </Box>
               )}
-                 */}
+              */}
 
-              {page.type === 'proposal' && pagePermissions.comment && (
-                <Box mt='-100px'>
-                  {/* add negative margin to offset height of .charm-empty-footer */}
-                  <PageComments page={page} permissions={pagePermissions} />
-                </Box>
-              )}
+              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') &&
+                pagePermissions.comment && (
+                  <Box mt='-100px'>
+                    {/* add negative margin to offset height of .charm-empty-footer */}
+                    <PageComments page={page} permissions={pagePermissions} />
+                  </Box>
+                )}
             </Container>
           </Box>
         </ScrollContainer>
