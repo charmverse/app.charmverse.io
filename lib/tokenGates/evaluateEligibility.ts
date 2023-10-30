@@ -20,7 +20,6 @@ const litClient = new LitNodeClient({
 } as any);
 
 export type TokenGateEvaluationAttempt = {
-  userId: string;
   authSig: AuthSig;
   spaceIdOrDomain: string;
 };
@@ -29,7 +28,6 @@ export type TokenGateEvaluationAttempt = {
  * @gateTokens List of Lit-generated tokens we can verify when joining a space
  */
 export type TokenGateEvaluationResult = {
-  userId: string;
   space: Space;
   walletAddress: string;
   canJoinSpace: boolean;
@@ -39,8 +37,7 @@ export type TokenGateEvaluationResult = {
 
 export async function evaluateTokenGateEligibility({
   authSig,
-  spaceIdOrDomain,
-  userId
+  spaceIdOrDomain
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
   if (!litClient.ready) {
     await litClient.connect().catch((err) => {
@@ -93,7 +90,15 @@ export async function evaluateTokenGateEligibility({
             tokenGate
           };
         })
-        .catch(() => {
+        .catch((error) => {
+          if (error.errorCode === 'rpc_error') {
+            log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
+              error,
+              tokenGateId: tokenGate.id,
+              conditions: tokenGate.conditions,
+              unifiedAccessControlConditions: (tokenGate.conditions as any)?.unifiedAccessControlConditions
+            });
+          }
           return null;
         });
     })
@@ -104,7 +109,6 @@ export async function evaluateTokenGateEligibility({
   if (successGates.length === 0) {
     return {
       canJoinSpace: false,
-      userId,
       space,
       gateTokens: [],
       walletAddress: authSig.address,
@@ -124,7 +128,6 @@ export async function evaluateTokenGateEligibility({
 
   return {
     canJoinSpace: true,
-    userId,
     space,
     walletAddress: authSig.address,
     gateTokens: successGates,

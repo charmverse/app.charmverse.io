@@ -30,8 +30,7 @@ export async function reevaluateRoles({
 
     const { gateTokens } = await evaluateTokenGateEligibility({
       spaceIdOrDomain: spaceId,
-      authSig,
-      userId
+      authSig
     });
 
     await applyTokenGates({
