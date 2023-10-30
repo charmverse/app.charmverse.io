@@ -29,7 +29,7 @@ import { shortenHex } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
-import TestConnectionModal from './TestConnectionModal';
+import { TestConnectionModal } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
 interface Props {
@@ -139,11 +139,14 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       log.warn('Error when verifying wallet', error);
       let message = '';
       switch ((error as any).errorCode) {
-        case 'not_authorized':
-          message = `Address does not meet requirements: ${shortenHex(account || '')}`;
+        case 'NodeNotAuthorized':
+          message = `Your address does not meet requirements: ${shortenHex(account || '')}`;
+          break;
+        case 'rpc_error':
+          message = 'Network error. Please check that the access control conditions are valid.';
           break;
         default:
-          message = (error as Error).message || 'Access denied. Please check your access control conditions.';
+          message = (error as Error).message || 'Unknown error. Please try again.';
       }
       setTestResult({ message, status: 'error' });
     }

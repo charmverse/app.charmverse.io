@@ -13,7 +13,7 @@ export interface TestResult {
 
 interface Props extends Omit<ComponentProps<typeof Modal>, 'children'>, TestResult {}
 
-export default function StatusModal({ status, message, ...props }: Props) {
+export function TestConnectionModal({ status, message, ...props }: Props) {
   if (!status) {
     return null;
   }
