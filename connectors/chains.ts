@@ -20,7 +20,7 @@ import {
   sepolia,
   zkSync,
   zora
-} from '@wagmi/core/chains';
+} from 'viem/chains';
 
 import { isProdEnv } from 'config/constants';
 import { uniqueValues } from 'lib/utilities/array';
