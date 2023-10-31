@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { useGetReward } from 'charmClient/hooks/rewards';
+import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -76,6 +77,8 @@ export function RewardProperties(props: {
         values={currentReward}
         onChange={applyRewardUpdates}
       />
+
+      {!!currentReward?.id && <RewardApplications rewardId={currentReward.id} />}
 
       <Divider
         sx={{

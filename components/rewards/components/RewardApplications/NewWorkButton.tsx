@@ -55,7 +55,7 @@ export function NewWorkButton({ rewardId, onShowApplication }: Props) {
 
   return (
     <Tooltip title={!permissions?.work ? 'You do not have permission to work on this reward' : ''}>
-      <Box alignItems='center' display='flex' flexDirection='column' justifyContent='center' sx={{ my: 1 }}>
+      <Box alignItems='center' display='flex' flexDirection='column' justifyContent='center'>
         <Button disabled={!permissions?.work} onClick={newApplication}>
           {reward.approveSubmitters ? 'Apply' : 'Submit'}
         </Button>

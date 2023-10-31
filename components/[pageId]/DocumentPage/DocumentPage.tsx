@@ -359,12 +359,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {/* * REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE */}
-              {page.bountyId && (
-                <Box mt='-100px'>
-                  <RewardApplications rewardId={page.bountyId} />
-                </Box>
-              )}
               {page.type === 'proposal' && pagePermissions.comment && (
                 <Box mt='-100px'>
                   {/* add negative margin to offset height of .charm-empty-footer */}
