@@ -1,6 +1,3 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
@@ -13,15 +10,13 @@ import { createPage } from 'lib/pages/server/createPage';
 import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
-import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { WorkspacePagesExport, ExportedPage } from './exportWorkspacePages';
+import type { ExportedPage } from './exportWorkspacePages';
+import { getImportData } from './getImportData';
+import type { ImportParams } from './interfaces';
 
-type WorkspaceImportOptions = {
-  exportData?: WorkspacePagesExport;
-  exportName?: string;
-  targetSpaceIdOrDomain: string;
+type WorkspaceImportOptions = ImportParams & {
   // Parent id of root pages, could be another page or null if space is parent
   parentId?: string | null;
   updateTitle?: boolean;
@@ -153,12 +148,9 @@ export async function generateImportWorkspacePages({
       proposalCategories: true
     }
   });
-  const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${exportName}.json`));
-  const dataToImport: WorkspacePagesExport = exportData ?? JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
-  if (!dataToImport) {
-    throw new InvalidInputError('Please provide the source export data, or export path');
-  }
+  const dataToImport = await getImportData({ exportData, exportName });
+
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
   const voteArgs: Prisma.VoteCreateManyInput[] = [];
