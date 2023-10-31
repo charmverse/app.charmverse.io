@@ -57,7 +57,7 @@ export function RewardSubmissionsTable({ rewardId, openApplication }: Props) {
 
   if (reward.applications.length === 0) {
     return (
-      <Stack mt={2}>
+      <Stack mt={2} mb={1}>
         <Stack>
           <Stack direction='row' alignItems='center' justifyContent='space-between'>
             <Typography fontWeight='bold'>Reward applications</Typography>
@@ -171,7 +171,7 @@ export function RewardSubmissionsTable({ rewardId, openApplication }: Props) {
           </>
         )}
 
-        <Stack flex={1} direction='row' justifyContent='flex-end'>
+        <Stack flex={1} direction='row' justifyContent='flex-end' mb={1}>
           <NewWorkButton rewardId={rewardId} />
         </Stack>
       </ExpandableSection>
