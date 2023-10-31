@@ -63,7 +63,7 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
 }
 
 export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account, walletAuthSignature, sign } = useWeb3Account();
+  const { account, walletAuthSignature, requestSignature } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
@@ -119,7 +119,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       if (!litClient) {
         throw new Error('Lit Protocol client not initialized');
       }
-      const authSig = walletAuthSignature ?? (await sign());
+      const authSig = walletAuthSignature ?? (await requestSignature());
       const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,

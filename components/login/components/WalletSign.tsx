@@ -33,7 +33,7 @@ export function WalletSign({
   onError
 }: Props) {
   const { isConnectingIdentity, connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
-  const { account, sign, isSigning, walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
+  const { account, requestSignature, isSigning, walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isVerifyingWallet, setIsVerifyingWallet] = useState(false);
   const showLoadingState = loading || isSigning || isVerifyingWallet;
@@ -50,10 +50,10 @@ export function WalletSign({
       await signSuccess(walletAuthSignature);
       setIsVerifyingWallet(false);
     } else {
-      sign()
+      requestSignature()
         .then(signSuccess)
         .catch((error) => {
-          log.error('Error requesting wallet signature in login page', error);
+          log.error('Error requesting wallet signature in login page', { error });
           showMessage('Wallet signature cancelled', 'info');
           onError?.(error);
         })
