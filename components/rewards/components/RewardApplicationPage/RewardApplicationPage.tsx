@@ -40,7 +40,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   const router = useRouter();
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId });
 
-  const { hideApplication } = useApplicationDialog();
+  const { hideApplication, openedFromModal } = useApplicationDialog();
 
   const { page: rewardPageContent } = usePage({ pageIdOrPath: reward?.id });
 
@@ -62,7 +62,11 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   function goToReward() {
     if (space && rewardPageContent) {
       hideApplication();
-      router.push(`/${space.domain}/${rewardPageContent.path}`);
+      if (openedFromModal && reward?.id) {
+        router.push({ pathname: `/${space.domain}/rewards`, query: { id: reward.id } });
+      } else {
+        router.push(`/${space.domain}/${rewardPageContent.path}`);
+      }
     }
   }
 
@@ -79,7 +83,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
         <Grid item xs={12} display='flex' flexDirection='column' justifyContent='space-between' sx={{ mb: 1 }}>
           <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
           {space && rewardPageContent && (
-            <Box onClick={goToReward}>
+            <Box onClick={goToReward} sx={{ cursor: 'pointer' }}>
               <Typography variant='body2' display='flex' gap={1} color='secondary'>
                 <LaunchIcon fontSize='small' sx={{ transform: 'rotate(270deg)' }} />
                 <span>Back to reward</span>

@@ -22,8 +22,9 @@ export function RewardProperties(props: {
   pageId: string;
   pagePath: string;
   rewardChanged?: () => void;
+  onClose?: () => void;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false, rewardChanged } = props;
+  const { rewardId, pageId, readOnly: parentReadOnly = false, rewardChanged, onClose } = props;
   const { updateReward, refreshReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
 
@@ -76,9 +77,10 @@ export function RewardProperties(props: {
         useDebouncedInputs
         values={currentReward}
         onChange={applyRewardUpdates}
+        readOnly={readOnly}
       />
 
-      {!!currentReward?.id && <RewardApplications rewardId={currentReward.id} />}
+      {!!currentReward?.id && <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />}
 
       <Divider
         sx={{

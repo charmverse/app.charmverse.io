@@ -14,7 +14,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
 
   const openApplication = (applicationId: string) => {
     showApplication(applicationId);
-    onShowApplication?.();
+    setTimeout(() => onShowApplication?.(), 50);
   };
 
   return (

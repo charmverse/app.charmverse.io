@@ -85,9 +85,10 @@ export interface DocumentPageProps {
   refreshPage: () => Promise<any>;
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
+  close?: VoidFunction;
 }
 
-function DocumentPage({ page, refreshPage, savePage, readOnly = false }: DocumentPageProps) {
+function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
   const { activeView: sidebarView, isInsideDialog } = usePageSidebar();
@@ -346,6 +347,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
+                      onClose={close}
                     />
                   )}
                   {(page.type === 'card' || page.type === 'card_synced') && (
