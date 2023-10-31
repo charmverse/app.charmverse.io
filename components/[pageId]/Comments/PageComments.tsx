@@ -127,7 +127,8 @@ export function PageComments({ page, permissions }: Props) {
         <>
           {comments.length > 0 && (
             <Stack gap={1}>
-              <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+              {/** Card comments don't have upvote capabilities */}
+              {isProposal && <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />}
               {comments.map((comment) => (
                 <Comment
                   permissions={commentPermissions}

@@ -11,12 +11,7 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { getCardComments, hasLoadedCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
-import {
-  blockLoad,
-  commentsLoad,
-  databaseViewsLoad
-} from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -114,10 +109,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
     }
   }, [printRef, _printRef]);
 
-  const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
-
-  const hasLoadedCardCommentsForCurrentCard = useAppSelector(hasLoadedCardComments(page.cardId ?? page.id));
-
   const cannotComment = readOnly || !pagePermissions.comment;
 
   const card = useAppSelector((state) => {
@@ -156,9 +147,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
         blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
         blocksDispatch(blockLoad({ blockId: page.id }));
         blocksDispatch(blockLoad({ blockId: page.parentId as string }));
-      }
-      if (!hasLoadedCardCommentsForCurrentCard) {
-        blocksDispatch(commentsLoad({ pageId: page.id }));
       }
     }
   }, [page.id]);

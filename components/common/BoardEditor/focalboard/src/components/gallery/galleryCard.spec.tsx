@@ -41,9 +41,6 @@ describe('src/components/gallery/GalleryCard', () => {
   contentImage.id = 'contentId-image';
   contentImage.fields.fileId = 'test.jpg';
 
-  const contentComment = TestBlockFactory.createComment(card);
-  contentComment.id = 'contentId-Comment';
-
   let store: MockStoreEnhanced<unknown, unknown>;
 
   beforeEach(() => {
@@ -149,47 +146,6 @@ describe('src/components/gallery/GalleryCard', () => {
       userEvent.click(deleteButton, undefined, { skipPointerEventsCheck: true });
       expect(mockedMutator.deleteBlock).toBeCalledTimes(1);
       expect(mockedMutator.deleteBlock).toBeCalledWith(card, 'delete card');
-    });
-  });
-
-  describe('with a comment content', () => {
-    beforeEach(() => {
-      card.fields.contentOrder = [contentComment.id];
-      const state = {
-        cards: {
-          cards: {
-            [card.id]: card
-          }
-        },
-        comments: {
-          comments: {}
-        }
-      };
-      store = mockStateStore([], state);
-    });
-
-    test('return GalleryCard with content readonly', () => {
-      const { container } = render(
-        wrapDNDIntl(
-          wrapPagesProvider(
-            [card.id],
-            <ReduxProvider store={store}>
-              <GalleryCard
-                board={board}
-                card={card}
-                onClick={jest.fn()}
-                visiblePropertyTemplates={[]}
-                visibleTitle={true}
-                isSelected={true}
-                readOnly={true}
-                isManualSort={true}
-                onDrop={jest.fn()}
-              />
-            </ReduxProvider>
-          )
-        )
-      );
-      expect(container).toMatchSnapshot();
     });
   });
 });
