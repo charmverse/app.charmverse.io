@@ -28,7 +28,7 @@ type IContext = {
   account?: string | null;
   walletAuthSignature?: AuthSig | null;
   chainId: any;
-  sign: () => Promise<AuthSig>;
+  requestSignature: () => Promise<AuthSig>;
   getStoredSignature: (account: string) => AuthSig | null;
   logoutWallet: () => void;
   disconnectWallet: (address: UserWallet['address']) => Promise<void>;
@@ -45,7 +45,7 @@ type IContext = {
 export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
-  sign: () => Promise.resolve({} as AuthSig),
+  requestSignature: () => Promise.resolve({} as AuthSig),
   getStoredSignature: () => null,
   logoutWallet: () => null,
   disconnectWallet: async () => {},
@@ -98,7 +98,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     [setLitAuthSignature, setLitProvider]
   );
 
-  const sign = useCallback(async (): Promise<AuthSig> => {
+  const requestSignature = useCallback(async (): Promise<AuthSig> => {
     if (!account || !chainId) {
       throw new MissingWeb3AccountError();
     }
@@ -155,7 +155,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       let signature = authSig ?? (account ? getStoredSignature(account) : null);
 
       if (!signature) {
-        signature = await sign();
+        signature = await requestSignature();
       }
 
       try {
@@ -177,7 +177,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         return newProfile;
       }
     },
-    [account, setSignature, setUser, sign, verifiableWalletDetected]
+    [account, setSignature, setUser, requestSignature, verifiableWalletDetected]
   );
 
   // Only expose account if current user and account match up
@@ -294,7 +294,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     () => ({
       account: storedAccount,
       walletAuthSignature,
-      sign,
+      requestSignature,
       getStoredSignature,
       disconnectWallet,
       logoutWallet,
@@ -317,7 +317,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       isDisconnectingWallet,
       loginFromWeb3Account,
       logoutWallet,
-      sign,
+      requestSignature,
       verifiableWalletDetected,
       signer,
       provider

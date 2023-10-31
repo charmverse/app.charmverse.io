@@ -1,8 +1,7 @@
 import type { User } from '@charmverse/core/prisma';
-import type { Block, Space } from '@charmverse/core/prisma-client';
+import type { PageComment, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { user } from '@guildxyz/sdk';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
@@ -28,7 +27,7 @@ const cardPropertyValues = {
   [boardSchema.checkbox.id]: true
 };
 
-let cardComment: Block;
+let cardComment: PageComment;
 
 const exampleText = 'User comment on card';
 
@@ -68,28 +67,21 @@ test.beforeAll(async () => {
 
   cardPagePath = card.path;
 
-  cardComment = await prisma.block.create({
+  cardComment = await prisma.pageComment.create({
     data: {
       id: uuid(),
-      parentId: card.id,
-      rootId: card.parentId as string,
-      schema: 1,
-      title: 'Comment',
-      type: 'comment',
-      updatedBy: spaceUser.id,
-      space: { connect: { id: space.id } },
-      user: { connect: { id: spaceUser.id } },
-      fields: {
-        content: {
-          type: 'doc',
-          content: [
-            {
-              type: 'paragraph',
-              content: [{ type: 'text', text: exampleText }]
-            }
-          ]
-        }
-      }
+      content: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: exampleText }]
+          }
+        ]
+      },
+      createdBy: spaceUser.id,
+      contentText: exampleText,
+      pageId: card.id
     }
   });
 });
