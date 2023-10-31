@@ -120,11 +120,7 @@ export function CommentForm({
               )}
             </>
           )}
-          <Button
-            data-test='post-comment-button'
-            disabled={!postContent.rawText || disabled}
-            onClick={createPostComment}
-          >
+          <Button data-test='comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
             Comment
           </Button>
         </Stack>

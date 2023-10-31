@@ -54,7 +54,7 @@ export class DocumentPage extends GlobalPage {
   }
 
   getCardCommentContent(commentId: string) {
-    return this.page.locator(`data-test=post-comment-${commentId} >> div[contenteditable]`).first();
+    return this.page.locator(`data-test=comment-${commentId} >> div[contenteditable]`).first();
   }
 
   async isPageEditable() {

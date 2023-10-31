@@ -28,16 +28,16 @@ export class BountyPage extends GlobalPage {
     this.bountyHeaderAmount = page.locator('data-test=bounty-header-amount >> data-test=bounty-amount');
     this.bountyApplicantForm = page.locator('data-test=bounty-applicant-form');
     this.bountyReviewButton = page.locator('data-test=review-bounty-button');
-    this.bountyCommentButton = page.locator('data-test=post-comment-button');
+    this.bountyCommentButton = page.locator('data-test=comment-button');
     this.bountyCommentArea = page.locator('data-test=comment-form').locator('div[contenteditable]').first();
   }
 
   getCommentLocator(commentId: string) {
-    return this.page.locator(`data-test=post-comment-${commentId}`);
+    return this.page.locator(`data-test=comment-${commentId}`);
   }
 
   getCommentMenuIcon(commentId: string) {
-    return this.page.locator(`data-test=post-comment-menu-${commentId}`);
+    return this.page.locator(`data-test=comment-menu-${commentId}`);
   }
 
   getEditCommentButton(commentId: string) {
@@ -45,7 +45,7 @@ export class BountyPage extends GlobalPage {
   }
 
   getEditCommentArea(commentId: string) {
-    return this.page.locator(`data-test=post-comment-charmeditor-${commentId}`).locator('div[contenteditable]').first();
+    return this.page.locator(`data-test=comment-charmeditor-${commentId}`).locator('div[contenteditable]').first();
   }
 
   getSaveCommentButton(commentId: string) {
