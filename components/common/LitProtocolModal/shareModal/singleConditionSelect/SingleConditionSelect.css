@@ -7,13 +7,6 @@
     overflow-y: scroll;
 }
 
-.lsm-single-select-condition-display {
-    flex: 1 1 auto;
-    min-height: calc(100% - 4.5em);
-    overflow-y: hidden;
-    box-sizing: border-box;
-}
-
 .lsm-single-condition-footer {
     /*align-self: flex-end;*/
 }

@@ -2,6 +2,7 @@
 
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Node } from 'prosemirror-model';
 import type { Server, Socket } from 'socket.io';
 
 import type { Block } from 'lib/focalboard/block';
@@ -122,14 +123,34 @@ export type PageCreated = {
     >;
 };
 
-type PageReordered = {
-  type: 'page_reordered';
+type PageReorderedSidebarToSidebar = {
+  type: 'page_reordered_sidebar_to_sidebar';
   payload: {
     pageId: string;
     newParentId: string | null;
-    newIndex: number;
-    trigger: 'sidebar-to-sidebar' | 'sidebar-to-editor';
-    pos?: number;
+  };
+};
+
+type PageReorderedSidebarToEditor = {
+  type: 'page_reordered_sidebar_to_editor';
+  payload: {
+    pageId: string;
+    newParentId: string;
+    dropPos: number | null;
+  };
+};
+
+type PageReorderedEditorToEditor = {
+  type: 'page_reordered_editor_to_editor';
+  payload: {
+    pageId: string;
+    newParentId: string;
+    draggedNode: {
+      type: string;
+      attrs?: Record<string, any>;
+    };
+    dragNodePos: number;
+    currentParentId: string;
   };
 };
 
@@ -163,7 +184,14 @@ type PagesRestored = {
   payload: Resource[];
 };
 
-export type ClientMessage = SubscribeToWorkspace | PageDeleted | PageRestored | PageCreated | PageReordered;
+export type ClientMessage =
+  | SubscribeToWorkspace
+  | PageDeleted
+  | PageRestored
+  | PageCreated
+  | PageReorderedSidebarToSidebar
+  | PageReorderedSidebarToEditor
+  | PageReorderedEditorToEditor;
 
 export type ServerMessage =
   | BlocksUpdated

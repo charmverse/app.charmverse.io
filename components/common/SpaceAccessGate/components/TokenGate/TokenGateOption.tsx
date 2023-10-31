@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 import { GateOption } from '../GateOption';
 

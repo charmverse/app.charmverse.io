@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import type { AuthSig } from '@lit-protocol/types';
 
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
-import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
-import { evaluateTokenGateEligibility } from 'lib/token-gates/evaluateEligibility';
+import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
+import { evaluateTokenGateEligibility } from 'lib/tokenGates/evaluateEligibility';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 export async function reevaluateRoles({
@@ -30,8 +30,7 @@ export async function reevaluateRoles({
 
     const { gateTokens } = await evaluateTokenGateEligibility({
       spaceIdOrDomain: spaceId,
-      authSig,
-      userId
+      authSig
     });
 
     await applyTokenGates({

@@ -1,5 +1,5 @@
 import { GET } from '@charmverse/core/http';
-import { RPCList, getChainById } from 'connectors';
+import { RPCList, getChainById } from 'connectors/chains';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { paginatedCall } from 'lib/utilities/async';

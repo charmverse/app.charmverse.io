@@ -15,7 +15,7 @@ import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
+import getLitChainFromChainId from 'lib/tokenGates/getLitChainFromChainId';
 
 import TokenGatesTable from './components/TokenGatesTable';
 

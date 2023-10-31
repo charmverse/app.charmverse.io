@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 

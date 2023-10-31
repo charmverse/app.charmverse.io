@@ -2,7 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 import * as litSDK from '@lit-protocol/lit-node-client';
 
 import { assignRole } from 'lib/roles';
-import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';
+import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
 import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';

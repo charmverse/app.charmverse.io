@@ -10,7 +10,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';

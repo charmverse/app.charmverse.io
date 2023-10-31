@@ -1,9 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { applyTokenGates } from 'lib/token-gates/applyTokenGates';
-import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
-import type { UserToVerifyMembership } from 'lib/token-gates/verifyTokenGateMemberships';
+import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
+import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
+import type { UserToVerifyMembership } from 'lib/tokenGates/verifyTokenGateMemberships';
 import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
