@@ -7,7 +7,7 @@ import webbrowser
 
 import time
 
-defaukt_api_test="""
+default_api_test="""
 import type { Application, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
@@ -483,19 +483,14 @@ def unit_test(code_to_test_path, example_tests):
     # Replace pyperclip.copy(prompt) with:
     return prompt
 
-def api_test(code_to_test_path, example_tests=""):
+def api_test(code_to_test_path, example_tests):
 
     with open(code_to_test_path, 'r') as file:
       code_to_test = file.read()
 
     # If example is not provided, attempt to read it from the file
     if not example_tests:
-        default_example_path = get_absolute_path("__integration-tests__/server/pages/api/reward-applications/work.spec.ts")
-
-        print("Using default API Test example", default_example_path)
-        with open(default_example_path, 'r') as file:
-            example = file.read()
-
+        example = default_api_test
 
 
     prompt = f"""
@@ -560,7 +555,7 @@ def main():
     
     link = input("Enter the link of the library to write tests for: ")
 
-    test_types = ["unit", "API", "E2E"]
+    test_types = ["unit", "API"]
     
     print("Available test types:")
 
@@ -596,7 +591,7 @@ def main():
 
     print("Copied prompt to clipboard")
 
-    confirm = input("Open ChatGPT? y/n")
+    confirm = input("Open ChatGPT? y/n: ")
 
     if confirm == "y" or confirm == "yes":
       print("Opening browser")
