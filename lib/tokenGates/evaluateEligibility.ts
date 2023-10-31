@@ -106,6 +106,9 @@ export async function evaluateTokenGateEligibility({
             });
         },
         {
+          factor: 1.1, // default is 2, but we don't want to wait that long because we are expecting 400 errors sometimes from the Lit network unrelated to capacity
+          maxTimeout: 5000,
+          minTimeout: 100,
           retries: 5
         }
       ).catch((error) => {
