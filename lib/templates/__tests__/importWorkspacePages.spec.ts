@@ -22,6 +22,7 @@ let root_1: PageWithPermissions;
 let page_1_1: PageWithPermissions;
 let page_1_1_1: PageWithPermissions;
 let boardPage: Page;
+let cardPages: Page[];
 let totalSourcePages = 0;
 let totalSourceBlocks = 0;
 
@@ -57,7 +58,15 @@ beforeAll(async () => {
 
   boardPage = await generateBoard({
     spaceId: space.id,
-    createdBy: user.id
+    createdBy: user.id,
+    cardCount: 2
+  });
+
+  cardPages = await prisma.page.findMany({
+    where: {
+      parentId: boardPage.id,
+      type: 'card'
+    }
   });
 
   totalSourcePages = await prisma.page.count({
@@ -104,6 +113,28 @@ describe('importWorkspacePages', () => {
     expect(boardBlock.fields.viewIds.sort()).toStrictEqual(viewBlocks.map((b) => b.id).sort());
     expect(pages.length).toBe(totalSourcePages);
     expect(blocks.length).toBe(totalSourceBlocks);
+  });
+
+  it('should return a hashmap of the source page ids and the page ids for their new versions', async () => {
+    const { space: targetSpace } = await generateUserAndSpace();
+
+    const data = await exportWorkspacePages({
+      sourceSpaceIdOrDomain: space.domain
+    });
+
+    const importResult = await importWorkspacePages({
+      targetSpaceIdOrDomain: targetSpace.domain,
+      exportData: data
+    });
+
+    expect(importResult.oldNewPageIdHashMap).toMatchObject({
+      [root_1.id]: expect.any(String),
+      [page_1_1.id]: expect.any(String),
+      [page_1_1_1.id]: expect.any(String),
+      [boardPage.id]: expect.any(String),
+      [cardPages[0].id]: expect.any(String),
+      [cardPages[1].id]: expect.any(String)
+    });
   });
 
   it('should accept a filename as the source data input', async () => {

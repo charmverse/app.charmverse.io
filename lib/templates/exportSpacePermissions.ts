@@ -12,11 +12,11 @@ export type ExportedPermissions = {
   rewardsWithReviewerPermission: string[];
 };
 
-export type ExportedPermissionsByGroup = {
+export type SpacePermissionsExport = {
   roles: { id: string; permissions: ExportedPermissions }[];
   space: { id: string; permissions: ExportedPermissions };
 };
-export async function exportSpacePermissions({ spaceId }: { spaceId: string }): Promise<ExportedPermissionsByGroup> {
+export async function exportSpacePermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissionsExport> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`Invalid space id: ${spaceId}`);
   }
@@ -94,7 +94,7 @@ export async function exportSpacePermissions({ spaceId }: { spaceId: string }): 
   });
 
   // Map the permissions into the expected output format
-  const exportedPermissionsByGroup: ExportedPermissionsByGroup = {
+  const SpacePermissionsExport: SpacePermissionsExport = {
     roles: Array.from(rolePermissions.keys()).map((roleId) => ({
       id: roleId,
       permissions: rolePermissions.get(roleId) as ExportedPermissions
@@ -111,5 +111,5 @@ export async function exportSpacePermissions({ spaceId }: { spaceId: string }): 
     }
   };
 
-  return exportedPermissionsByGroup;
+  return SpacePermissionsExport;
 }

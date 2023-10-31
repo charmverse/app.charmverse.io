@@ -122,6 +122,7 @@ type WorkspaceImportResult = {
   rootPageIds: string[];
   bounties: Reward[];
   blockIds: string[];
+  oldNewPageIdHashMap: Record<string, string>;
 };
 
 export async function generateImportWorkspacePages({
@@ -142,6 +143,7 @@ export async function generateImportWorkspacePages({
   proposalArgs: Prisma.ProposalCreateManyArgs;
   proposalCategoryArgs: Prisma.ProposalCategoryCreateManyArgs;
   proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyArgs;
+  oldNewPageIdHashMap: Record<string, string>;
 }> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
@@ -487,7 +489,8 @@ export async function generateImportWorkspacePages({
     },
     proposalCategoryPermissionArgs: {
       data: proposalCategoryPermissionArgs
-    }
+    },
+    oldNewPageIdHashMap
   };
 }
 
@@ -509,7 +512,8 @@ export async function importWorkspacePages({
     proposalArgs,
     proposalCategoryArgs,
     proposalCategoryPermissionArgs,
-    bountyPermissionArgs
+    bountyPermissionArgs,
+    oldNewPageIdHashMap
   } = await generateImportWorkspacePages({
     targetSpaceIdOrDomain,
     exportData,
@@ -553,6 +557,7 @@ export async function importWorkspacePages({
     totalPages: createdPages.length,
     pages: createdPages,
     totalBlocks: blockIds.length,
-    rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id)
+    rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id),
+    oldNewPageIdHashMap
   };
 }

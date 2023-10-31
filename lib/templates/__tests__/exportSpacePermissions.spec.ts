@@ -3,7 +3,7 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 
 import { generateBounty } from 'testing/setupDatabase';
 
-import type { ExportedPermissions, ExportedPermissionsByGroup } from '../exportSpacePermissions';
+import type { ExportedPermissions, SpacePermissionsExport } from '../exportSpacePermissions';
 import { exportSpacePermissions } from '../exportSpacePermissions';
 
 describe('exportSpacePermissions', () => {
@@ -41,7 +41,7 @@ describe('exportSpacePermissions', () => {
 
     expect(exportedPermissions.roles).toHaveLength(2);
 
-    expect(exportedPermissions).toMatchObject<ExportedPermissionsByGroup>({
+    expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
       roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
         {
           id: rewardReviewerRole.id,
@@ -131,7 +131,7 @@ describe('exportSpacePermissions', () => {
 
     expect(exportedPermissions.roles).toHaveLength(2);
 
-    expect(exportedPermissions).toMatchObject<ExportedPermissionsByGroup>({
+    expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
       roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
         {
           id: proposalReviewerRole.id,
