@@ -40,7 +40,7 @@ export type NFTData = {
 };
 
 export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
-  const [alchemyNFTs, ankrNFTs] = await Promise.all([
+  const [alchemyNFTs, ankrNFTs, zoraNFTs] = await Promise.all([
     (async (): Promise<NFTData[]> => {
       const nftsByChain = await Promise.all(
         supportedMainnetsByAlchemy
@@ -49,6 +49,23 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
               getNFTsFromAlchemy({ address, chainId, walletId: id }).catch((error) => {
                 if (!isTestEnv) {
                   log.error('Error requesting nfts from Alchemy', { address, chainId, error });
+                }
+                return [] as NFTData[];
+              })
+            )
+          )
+          .flat()
+      );
+      return nftsByChain.flat();
+    })(),
+    (async (): Promise<NFTData[]> => {
+      const nftsByChain = await Promise.all(
+        supportedMainnetsByAnkr
+          .map((chainId) =>
+            wallets.map(({ id, address }) =>
+              getNFTsFromAnkr({ address, chainId, walletId: id }).catch((error) => {
+                if (!isTestEnv) {
+                  log.error('Error requesting nfts from Ankr', { address, chainId, error });
                 }
                 return [] as NFTData[];
               })
