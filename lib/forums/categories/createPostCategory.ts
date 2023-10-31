@@ -1,8 +1,6 @@
 import type { PostCategory } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
-
 import { getPostCategoryPath } from './getPostCategoryPath';
 
 export type CreatePostCategoryInput = Pick<PostCategory, 'name' | 'spaceId'>;

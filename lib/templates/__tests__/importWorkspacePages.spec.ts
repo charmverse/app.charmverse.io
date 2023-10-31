@@ -127,7 +127,7 @@ describe('importWorkspacePages', () => {
       exportData: data
     });
 
-    expect(importResult.oldNewPageIdHashMap).toMatchObject({
+    expect(importResult.oldNewRecordIdHashMap).toMatchObject({
       [root_1.id]: expect.any(String),
       [page_1_1.id]: expect.any(String),
       [page_1_1_1.id]: expect.any(String),
