@@ -12,8 +12,6 @@ import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
 import type { CheckboxBlock } from '../blocks/checkboxBlock';
 import { createCheckboxBlock } from '../blocks/checkboxBlock';
-import type { CommentBlock } from '../blocks/commentBlock';
-import { createCommentBlock } from '../blocks/commentBlock';
 import type { DividerBlock } from '../blocks/dividerBlock';
 import { createDividerBlock } from '../blocks/dividerBlock';
 import type { ImageBlock } from '../blocks/imageBlock';
@@ -147,13 +145,6 @@ class TestBlockFactory {
     if (isContent) {
       card.fields.contentOrder.push(block.id);
     }
-    return block;
-  }
-
-  static createComment(card: Card): CommentBlock {
-    const block = this.addToCard(createCommentBlock(), card, false);
-    block.title = 'title';
-
     return block;
   }
 

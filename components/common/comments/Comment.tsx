@@ -165,7 +165,7 @@ export function Comment({
   return (
     <Stack my={1} position='relative' ref={commentContainerRef}>
       {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
-      <StyledStack id={`post-comment-${comment.id}`} data-test={`post-comment-${comment.id}`}>
+      <StyledStack id={`comment-${comment.id}`} data-test={`comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
@@ -192,7 +192,7 @@ export function Comment({
             <IconButton
               className='comment-actions'
               size='small'
-              data-test={`post-comment-menu-${comment.id}`}
+              data-test={`comment-menu-${comment.id}`}
               onClick={(event) => {
                 menuState.open(event.currentTarget);
               }}
@@ -211,7 +211,7 @@ export function Comment({
             left: 10
           }}
         />
-        <Box data-test={`post-comment-charmeditor-${comment.id}`} ml={3}>
+        <Box data-test={`comment-charmeditor-${comment.id}`} ml={3}>
           {isEditingComment ? (
             <Stack>
               {editor}

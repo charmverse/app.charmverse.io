@@ -73,16 +73,16 @@ export function PageComments({ page, permissions }: Props) {
   }
 
   useEffect(() => {
-    if (page.type === 'proposal' && proposal && proposal.lensPostLink) {
+    if (page.type === 'proposal' && proposal?.lensPostLink) {
       syncPageComments();
     }
-  }, [page.id, proposal?.lensPostLink]);
+  }, [page.id, proposal?.lensPostLink, page.type]);
 
   useEffect(() => {
     const commentId = router.query.commentId;
     if (commentId && typeof window !== 'undefined' && !isLoadingComments && comments.length) {
       setTimeout(() => {
-        const commentDomElement = window.document.getElementById(`post-comment-${commentId}`);
+        const commentDomElement = window.document.getElementById(`comment-${commentId}`);
         if (commentDomElement) {
           requestAnimationFrame(() => {
             commentDomElement.scrollIntoView({
@@ -127,7 +127,8 @@ export function PageComments({ page, permissions }: Props) {
         <>
           {comments.length > 0 && (
             <Stack gap={1}>
-              <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
+              {/** Card comments don't have upvote capabilities */}
+              {isProposal && <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />}
               {comments.map((comment) => (
                 <Comment
                   permissions={commentPermissions}
@@ -136,7 +137,7 @@ export function PageComments({ page, permissions }: Props) {
                   handleCreateComment={createComment}
                   handleUpdateComment={updateComment}
                   handleDeleteComment={deleteComment}
-                  handleVoteComment={voteComment}
+                  handleVoteComment={isProposal ? voteComment : undefined}
                   lensPostLink={proposal?.lensPostLink}
                 />
               ))}
