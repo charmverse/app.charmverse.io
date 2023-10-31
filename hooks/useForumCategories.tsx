@@ -12,7 +12,7 @@ import { useUser } from './useUser';
 
 type IContext = {
   createForumCategory: (categoryName: string) => Promise<void>;
-  deleteForumCategory: (option: PostCategory) => Promise<void>;
+  deleteForumCategory: (option: { id: string }) => Promise<void>;
   updateForumCategory: (option: PostCategory) => Promise<PostCategoryWithPermissions | undefined>;
   setDefaultPostCategory: (option: PostCategory) => Promise<void>;
   getForumCategoryById: (id?: string | null) => PostCategoryWithPermissions | undefined;
@@ -99,7 +99,7 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function deleteForumCategory(option: PostCategory) {
+  async function deleteForumCategory(option: { id: string }) {
     if (currentSpace) {
       await charmClient.forum.deletePostCategory({ id: option.id, spaceId: currentSpace.id });
       mutateForumCategories(

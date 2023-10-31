@@ -39,18 +39,21 @@ function getUrlSearchParamsFromNotificationType(notification: Notification): str
 function getCommentTypeNotificationContent({
   notificationType,
   createdBy,
-  pageType
+  pageType,
+  actorUsername
 }: {
+  actorUsername?: string;
   notificationType: InlineCommentNotificationType | CommentNotificationType | 'mention.created';
   createdBy: NotificationActor | null;
   pageType: PageType | 'post';
 }): string | ReactNode {
+  const username = actorUsername ?? createdBy?.username;
   switch (notificationType) {
     case 'inline_comment.created':
     case 'comment.created': {
-      return createdBy?.username ? (
+      return username ? (
         <span>
-          <strong>{createdBy?.username}</strong> left a comment in a {pageType}
+          <strong>{username}</strong> left a comment in a {pageType}
         </span>
       ) : (
         `New comment in a ${pageType}`
@@ -58,9 +61,9 @@ function getCommentTypeNotificationContent({
     }
     case 'inline_comment.replied':
     case 'comment.replied': {
-      return createdBy?.username ? (
+      return username ? (
         <span>
-          <strong>{createdBy?.username}</strong> replied to your comment in a {pageType}
+          <strong>{username}</strong> replied to your comment in a {pageType}
         </span>
       ) : (
         `New reply to your comment in a ${pageType}`
@@ -69,9 +72,9 @@ function getCommentTypeNotificationContent({
     case 'inline_comment.mention.created':
     case 'comment.mention.created':
     case 'mention.created': {
-      return createdBy?.username ? (
+      return username ? (
         <span>
-          <strong>{createdBy?.username}</strong> mentioned you in a {pageType}
+          <strong>{username}</strong> mentioned you in a {pageType}
         </span>
       ) : (
         `You were mentioned in a ${pageType}`
@@ -83,13 +86,14 @@ function getCommentTypeNotificationContent({
   }
 }
 
-function getPostContent(n: PostNotification): string | ReactNode {
+function getPostContent(n: PostNotification, actorUsername?: string): string | ReactNode {
   const { createdBy, type } = n;
+  const username = actorUsername ?? createdBy?.username;
   switch (type) {
     case 'created': {
-      return createdBy?.username ? (
+      return username ? (
         <span>
-          <strong>{createdBy?.username}</strong> created a new forum post
+          <strong>{username}</strong> created a new forum post
         </span>
       ) : (
         `New forum post created`
@@ -99,19 +103,21 @@ function getPostContent(n: PostNotification): string | ReactNode {
       return getCommentTypeNotificationContent({
         createdBy,
         notificationType: type,
-        pageType: 'post'
+        pageType: 'post',
+        actorUsername
       });
     }
   }
 }
 
-function getCardContent(n: CardNotification): string | ReactNode {
+function getCardContent(n: CardNotification, actorUsername?: string): string | ReactNode {
   const { createdBy, type } = n;
+  const username = actorUsername ?? createdBy?.username;
   switch (type) {
     case 'person_assigned': {
-      return createdBy.username ? (
+      return username ? (
         <span>
-          <strong>{createdBy.username}</strong> assigned you to a card
+          <strong>{username}</strong> assigned you to a card
         </span>
       ) : (
         `You were assigned to a card`
@@ -123,30 +129,31 @@ function getCardContent(n: CardNotification): string | ReactNode {
   }
 }
 
-function getDocumentContent(n: DocumentNotification): string | ReactNode {
+function getDocumentContent(n: DocumentNotification, actorUsername?: string): string | ReactNode {
   const { type, createdBy, pageType } = n;
   return getCommentTypeNotificationContent({
     createdBy,
     notificationType: type,
-    pageType
+    pageType,
+    actorUsername
   });
 }
 
-function getBountyContent(n: BountyNotification): string | ReactNode {
+function getBountyContent(n: BountyNotification, authorUsername?: string): string | ReactNode {
   const { createdBy, type } = n;
-
+  const username = authorUsername ?? createdBy?.username;
   switch (type) {
     case 'application.created': {
       return (
         <span>
-          <strong>{createdBy?.username}</strong> applied for a bounty
+          <strong>{username}</strong> applied for a bounty
         </span>
       );
     }
     case 'submission.created': {
       return (
         <span>
-          <strong>{createdBy?.username}</strong> applied for a bounty
+          <strong>{username}</strong> applied for a bounty
         </span>
       );
     }
@@ -166,9 +173,9 @@ function getBountyContent(n: BountyNotification): string | ReactNode {
       return `You have been paid for a bounty`;
     }
     case 'suggestion.created': {
-      return createdBy?.username ? (
+      return username ? (
         <span>
-          <strong>{createdBy?.username}</strong> suggested a new bounty
+          <strong>{username}</strong> suggested a new bounty
         </span>
       ) : (
         `New bounty suggestion`
@@ -180,15 +187,15 @@ function getBountyContent(n: BountyNotification): string | ReactNode {
   }
 }
 
-function getProposalContent(n: ProposalNotification): string | ReactNode {
+function getProposalContent(n: ProposalNotification, actorUsername?: string): string | ReactNode {
   const { type, createdBy } = n;
-
+  const username = actorUsername ?? createdBy?.username;
   switch (type) {
     case 'start_review':
     case 'start_discussion': {
-      return createdBy?.username ? (
+      return username ? (
         <span>
-          <strong>{createdBy?.username}</strong> requested feedback for a proposal
+          <strong>{username}</strong> requested feedback for a proposal
         </span>
       ) : (
         `Feedback requested for a proposal`
@@ -215,7 +222,10 @@ function getProposalContent(n: ProposalNotification): string | ReactNode {
   }
 }
 
-export function getNotificationMetadata(notification: Notification): {
+export function getNotificationMetadata(
+  notification: Notification,
+  actorUsername?: string
+): {
   href: string;
   content: ReactNode;
   pageTitle: string;
@@ -223,7 +233,7 @@ export function getNotificationMetadata(notification: Notification): {
   switch (notification.group) {
     case 'bounty': {
       return {
-        content: getBountyContent(notification as BountyNotification),
+        content: getBountyContent(notification as BountyNotification, actorUsername),
         href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };
@@ -231,7 +241,7 @@ export function getNotificationMetadata(notification: Notification): {
 
     case 'card': {
       return {
-        content: getCardContent(notification as CardNotification),
+        content: getCardContent(notification as CardNotification, actorUsername),
         href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };
@@ -240,7 +250,7 @@ export function getNotificationMetadata(notification: Notification): {
     case 'document': {
       const basePath = notification.pageType === 'post' ? '/forum/post' : '';
       return {
-        content: getDocumentContent(notification as DocumentNotification),
+        content: getDocumentContent(notification as DocumentNotification, actorUsername),
         href: `${basePath}/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };
@@ -248,7 +258,7 @@ export function getNotificationMetadata(notification: Notification): {
 
     case 'post': {
       return {
-        content: getPostContent(notification as PostNotification),
+        content: getPostContent(notification as PostNotification, actorUsername),
         href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.postTitle
       };
@@ -256,7 +266,7 @@ export function getNotificationMetadata(notification: Notification): {
 
     case 'proposal': {
       return {
-        content: getProposalContent(notification as ProposalNotification),
+        content: getProposalContent(notification as ProposalNotification, actorUsername),
         href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
         pageTitle: notification.pageTitle
       };

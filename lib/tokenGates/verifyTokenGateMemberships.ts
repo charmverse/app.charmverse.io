@@ -9,7 +9,7 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { verifyTokenGateMembership } from 'lib/token-gates/verifyTokenGateMembership';
+import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
 
 export type UserToVerifyMembership = SpaceRole & {
   user: User & {

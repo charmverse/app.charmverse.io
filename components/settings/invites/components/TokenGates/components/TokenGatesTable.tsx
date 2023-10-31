@@ -24,12 +24,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
-import TestConnectionModal from './TestConnectionModal';
+import { TestConnectionModal } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
 interface Props {
@@ -123,7 +123,8 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
-        chain: (tokenGate.conditions as any).chain || 'ethereum',
+        chain: (tokenGate.conditions as any).chains?.[0],
+        // chain: (tokenGate.conditions as any).chain || 'ethereum',
         ...(tokenGate.conditions as any)
       });
 
@@ -138,11 +139,14 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       log.warn('Error when verifying wallet', error);
       let message = '';
       switch ((error as any).errorCode) {
-        case 'not_authorized':
-          message = `Address does not meet requirements: ${shortenHex(account || '')}`;
+        case 'NodeNotAuthorized':
+          message = `Your address does not meet requirements: ${shortenHex(account || '')}`;
+          break;
+        case 'rpc_error':
+          message = 'Network error. Please check that the access control conditions are valid.';
           break;
         default:
-          message = (error as Error).message || 'Access denied. Please check your access control conditions.';
+          message = (error as Error).message || 'Unknown error. Please try again.';
       }
       setTestResult({ message, status: 'error' });
     }

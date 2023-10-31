@@ -1,6 +1,8 @@
 import { GET } from '@charmverse/core/http';
 
-import { loopApiUrl } from 'lib/subscription/constants';
+import { loopApiUrl } from '../subscription/constants';
+
+// Loop manages web3 subscription payments for CharmVerse
 
 export interface LoopItem {
   itemId: string;

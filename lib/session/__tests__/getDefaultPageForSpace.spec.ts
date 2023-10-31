@@ -75,7 +75,7 @@ describe('getDefaultPageForSpace()', () => {
     await savePageView({ createdBy: user.id, spaceId: space.id, postId: post.id, pageType: 'post' });
 
     const url = await getDefaultPageForSpace({ space, userId: user.id });
-    expect(url).toEqual(`/${space.domain}/forum?postId=${post.id}`);
+    expect(url).toEqual(`/${space.domain}/forum/post/${post.path}`);
   });
 
   it('should encode Japanese characters', async () => {
@@ -87,19 +87,19 @@ describe('getDefaultPageForSpace()', () => {
     expect(url).toEqual(encodeURI(`/${space.domain}/${page.path}`));
   });
 
-  it('should properly encode pathnames with encoded characters', async () => {
+  it('should not re-encode encoded characters in the original path', async () => {
     const { space, user } = await generateUserAndSpace();
-    const page = await createPage({ spaceId: space.id, createdBy: user.id, path: '日本語' });
+    const page = await createPage({ spaceId: space.id, createdBy: user.id });
     await savePageView({
       createdBy: user.id,
       spaceId: space.id,
       pageId: page.id,
       pageType: 'page',
-      meta: { pathname: `/proposals%20?id=123` }
+      meta: { pathname: `/${page.path}%20?id=123` }
     });
 
     const url = await getDefaultPageForSpace({ space, userId: user.id });
-    expect(url).toEqual(`/${space.domain}/proposals%20?id=123`);
+    expect(url).toEqual(`/${space.domain}/${page.path}%20?id=123`);
   });
 
   it('should not include subdomain when going to custom domain', async () => {
@@ -107,17 +107,29 @@ describe('getDefaultPageForSpace()', () => {
     const { space, user } = await generateUserAndSpace({
       spaceCustomDomain: customDomain
     });
-    const page = await createPage({ spaceId: space.id, createdBy: user.id, path: '日本語' });
     await savePageView({
       createdBy: user.id,
       spaceId: space.id,
-      pageId: page.id,
-      pageType: 'page',
+      pageType: 'proposals_list',
       meta: { pathname: `/proposals%20?id=123` }
     });
 
     const url = await getDefaultPageForSpace({ space, userId: user.id, host: customDomain });
     expect(url).toEqual(`/proposals%20?id=123`);
+  });
+
+  it('should take user to the canonical page if it was displayed in a card originally', async () => {
+    const { space, user } = await generateUserAndSpace();
+    const page = await createPage({ spaceId: space.id, createdBy: user.id });
+    await savePageView({
+      createdBy: user.id,
+      spaceId: space.id,
+      pageId: page.id,
+      pageType: 'page',
+      meta: { pathname: `/parent-database-path?cardId=${page.id}` }
+    });
+    const url = await getDefaultPageForSpace({ space, userId: user.id });
+    expect(url).toEqual(`/${space.domain}/${page.path}`);
   });
 });
 

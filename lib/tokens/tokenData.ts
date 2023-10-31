@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PaymentMethod } from '@charmverse/core/prisma';
-import type { IChainDetails } from 'connectors';
-import { getChainById, getChainBySymbol } from 'connectors';
+import type { IChainDetails } from 'connectors/chains';
+import { getChainById, getChainBySymbol } from 'connectors/chains';
 
 import type { SupportedChainId } from '../blockchain/provider/alchemy';
 

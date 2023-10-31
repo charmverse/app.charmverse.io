@@ -13,7 +13,7 @@ type Props = {
   toolbar?: React.ReactNode;
   hideCloseButton?: boolean;
   className?: string;
-  onClose: () => void;
+  onClose?: () => void;
   fullWidth?: boolean;
   footerActions?: React.ReactNode;
 };
@@ -50,7 +50,7 @@ const FooterActionsContainer = styled(Box)`
 function FBDialog(props: Props) {
   const { toolbar, toolsMenu, fullWidth = false, footerActions } = props;
 
-  useHotkeys('esc', () => props.onClose());
+  useHotkeys('esc', () => props.onClose?.());
 
   return (
     <Modal open={true}>
@@ -58,7 +58,7 @@ function FBDialog(props: Props) {
         <div
           className='wrapper'
           onClick={(e) => {
-            if (e.target === e.currentTarget) {
+            if (props.onClose && e.target === e.currentTarget) {
               props.onClose();
             }
           }}

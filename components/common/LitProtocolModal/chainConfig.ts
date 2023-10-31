@@ -1,4 +1,4 @@
-import { RPCList } from 'connectors';
+import { RPCList } from 'connectors/chains';
 import { isAddress } from 'viem';
 
 import { ethereumTypesConfig } from './chainComponents/ethereum/ethereumTypesConfig';

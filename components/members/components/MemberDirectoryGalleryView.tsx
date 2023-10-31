@@ -32,15 +32,17 @@ const StyledBox = styled(Box)`
   cursor: pointer;
 `;
 
-function MemberDirectoryGalleryCard({ member }: { member: Member }) {
-  const { getDisplayProperties } = useMemberProperties();
+function MemberDirectoryGalleryCard({
+  member,
+  propertiesRecord,
+  visibleProperties
+}: {
+  visibleProperties: MemberProperty[];
+  propertiesRecord: Record<MemberPropertyType, MemberProperty>;
+  member: Member;
+}) {
   const { formatDate } = useDateFormatter();
   const { openSettings } = useSettingsDialog();
-  const visibleProperties = getDisplayProperties('gallery');
-  const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
-    record[prop.type] = prop;
-    return record;
-  }, {} as any);
 
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
@@ -87,8 +89,7 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
       <Stack p={2} gap={1}>
         {!isNameHidden && (
           <Typography gutterBottom variant='h6' mb={0} component='div' noWrap>
-            {(member.properties.find((memberProperty) => memberProperty.memberPropertyId === propertiesRecord.name?.id)
-              ?.value as string) ?? member.username}
+            {member.username}
           </Typography>
         )}
         <SocialIcons
@@ -218,11 +219,22 @@ function MemberDirectoryGalleryCard({ member }: { member: Member }) {
 }
 
 export function MemberDirectoryGalleryView({ members }: { members: Member[] }) {
+  const { getDisplayProperties } = useMemberProperties();
+  const visibleProperties = getDisplayProperties('gallery');
+  const propertiesRecord = visibleProperties.reduce<Record<MemberPropertyType, MemberProperty>>((record, prop) => {
+    record[prop.type] = prop;
+    return record;
+  }, {} as any);
+
   return (
     <Grid container gap={2.5}>
       {members.map((member) => (
         <Grid item xs={12} sm={5} md={3.75} key={member.id}>
-          <MemberDirectoryGalleryCard member={member} />
+          <MemberDirectoryGalleryCard
+            member={member}
+            visibleProperties={visibleProperties}
+            propertiesRecord={propertiesRecord}
+          />
         </Grid>
       ))}
     </Grid>

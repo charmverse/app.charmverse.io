@@ -11,6 +11,7 @@ import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import type { DiscordServerRole } from 'lib/discord/interface';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
@@ -72,6 +73,32 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
       }
     });
 
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        userId
+      },
+      select: {
+        space: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    const userSpaceIds = spaceRoles.map((role) => role.space.id);
+
+    const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+      spaceIds: userSpaceIds,
+      discordId: existingDiscordUser?.discordId ?? id
+    });
+
+    if (isUserBannedFromSpace) {
+      return res.status(401).json({
+        error: 'You need to leave space before you can add this discord identity to your account'
+      });
+    }
+
     // If the entry exists we merge the user accounts
     if (existingDiscordUser) {
       discordUser = await mergeUserDiscordAccounts({
@@ -94,7 +121,9 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
       });
     }
   } catch (error) {
-    log.warn('Error while creating Discord record', error);
+    log.warn('Error while creating Discord record', {
+      error
+    });
     // If the discord user is already connected to a charmverse account this code will be run
     res.status(400).json({
       error: 'Connection to Discord failed.'

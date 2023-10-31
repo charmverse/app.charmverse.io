@@ -1,19 +1,36 @@
-import type { Role } from '@charmverse/core/prisma';
+import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
-import { updateUserTokenGates } from 'lib/token-gates/updateUserTokenGates';
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { updateUserTokenGates } from 'lib/tokenGates/updateUserTokenGates';
+import {
+  DataNotFoundError,
+  InsecureOperationError,
+  InvalidInputError,
+  UnauthorisedActionError
+} from 'lib/utilities/errors';
 
-import type {
-  TokenGateJwtResult,
-  TokenGateVerification,
-  TokenGateVerificationResult,
-  TokenGateWithRoles
-} from './interfaces';
+import type { TokenGateJoinType } from './interfaces';
+import { verifyTokenGates } from './verifyTokenGates';
+
+export type TokenGateVerificationRequest = {
+  userId: string;
+  spaceId: string;
+  tokens: { signedToken: string; tokenGateId: string }[];
+  commit: boolean;
+  joinType?: TokenGateJoinType;
+  reevaluate?: boolean;
+};
+
+type TokenGateVerificationResult = {
+  userId: string;
+  space: Space;
+  roles: Role[];
+};
 
 export async function applyTokenGates({
   spaceId,
@@ -21,9 +38,19 @@ export async function applyTokenGates({
   tokens,
   commit,
   reevaluate = false
-}: TokenGateVerification): Promise<TokenGateVerificationResult> {
+}: TokenGateVerificationRequest): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
+  }
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: [spaceId],
+    userId
+  });
+
+  if (isUserBannedFromSpace) {
+    trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
+    throw new UnauthorisedActionError(`You have been banned from this space.`);
   }
 
   const space = await prisma.space.findUnique({
@@ -68,36 +95,7 @@ export async function applyTokenGates({
     throw new DataNotFoundError('No token gates were found for this space.');
   }
 
-  const verifiedTokenGates: (TokenGateWithRoles & TokenGateJwtResult)[] = (
-    await Promise.all(
-      tokens.map(async (tk) => {
-        const { verifyJwt } = await import('@lit-protocol/lit-node-client');
-        const result = verifyJwt({ jwt: tk.signedToken });
-        const matchingTokenGate = tokenGates.find((g) => g.id === tk.tokenGateId);
-        const payload = result?.payload as any;
-        // Only check against existing token gates for this space
-        if (
-          matchingTokenGate &&
-          // Perform additional checks here as per https://github.com/LIT-Protocol/lit-minimal-jwt-example/blob/main/server.js
-          result?.verified &&
-          payload?.orgId === space.id
-        ) {
-          const embeddedTokenGateId = JSON.parse(payload.extraData).tokenGateId;
-
-          if (embeddedTokenGateId === tk.tokenGateId) {
-            return {
-              ...matchingTokenGate,
-              jwt: tk.signedToken,
-              verified: true,
-              grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.roleId)
-            };
-          }
-        }
-
-        return null;
-      })
-    )
-  ).filter((tk) => tk !== null) as (TokenGateWithRoles & TokenGateJwtResult)[];
+  const verifiedTokenGates = await verifyTokenGates({ spaceId, userId, tokens });
 
   if (verifiedTokenGates.length === 0) {
     trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
