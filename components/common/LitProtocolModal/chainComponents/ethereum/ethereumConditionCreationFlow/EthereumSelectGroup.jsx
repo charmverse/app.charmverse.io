@@ -94,7 +94,6 @@ const EthereumSelectGroup = ({
   useEffect(() => {
     const isDisabled = isInvalid();
     handleSubmit();
-    console.log('submitDisabled', { isDisabled })
     submitDisabled(isDisabled);
   }, [ amount, addressIsValid, contractAddress, chain, selectedToken, contractType, erc1155TokenId ]);
 
