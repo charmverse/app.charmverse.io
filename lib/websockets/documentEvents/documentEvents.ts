@@ -14,6 +14,7 @@ import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { isUUID } from 'lib/utilities/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -41,6 +42,17 @@ type SocketSessionData = AuthenticatedSocketData & {
   isOwner?: boolean;
   permissions: Partial<PagePermissionFlags>;
 };
+
+function isValidPageNode(node: PageContent): node is PageContent & { attrs: Record<string, string> } {
+  const { id: pageId, type: pageType = '', path: pagePath } = node.attrs ?? {};
+  return Boolean(
+    isUUID(pageId) &&
+      node.attrs &&
+      node.type === 'page' &&
+      pageType !== 'forum_category' &&
+      STATIC_PAGES.find((c) => c.path !== pagePath)
+  );
+}
 
 export class DocumentEventHandler {
   id: string;
@@ -442,33 +454,23 @@ export class DocumentEventHandler {
             // We don't need to restore the page if it was created by the user manually
             if (ds.slice?.content && ds.from === ds.to && socketEvent !== 'page_created') {
               ds.slice.content.forEach((node) => {
-                if (node && node.type === 'page' && node.attrs) {
-                  const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
-                  // pagePath is null when the page is not a linked page
-                  if (pageId && pageType !== 'forum_category' && STATIC_PAGES.find((c) => c.path !== pagePath)) {
-                    restoredPageIds.push(node.attrs?.id);
-                  }
+                if (isValidPageNode(node)) {
+                  restoredPageIds.push(node.attrs.id);
                 }
               });
             } else if (ds.from + 1 === ds.to) {
               // deleted using row action menu
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
-              if (node && node.attrs && node.type === 'page') {
-                const { id: pageId, type: pageType = '', path: pagePath } = node.attrs;
-                if (pageId && pageType !== 'forum_category' && STATIC_PAGES.find((c) => c.path !== pagePath)) {
-                  deletedPageIds.push(pageId);
-                }
+              if (isValidPageNode(node)) {
+                deletedPageIds.push(node.attrs.id);
               }
             } else {
               // deleted using multi line selection
               // This throws errors frequently "TypeError: Cannot read properties of undefined (reading 'nodeSize'"
               room.node.nodesBetween(ds.from, ds.to, (_node) => {
                 const jsonNode = _node.toJSON() as PageContent;
-                if (jsonNode && jsonNode.type === 'page' && jsonNode.attrs) {
-                  const { id: pageId, type: pageType = '', path: pagePath } = jsonNode.attrs;
-                  if (pageId && pageType !== 'forum_category' && STATIC_PAGES.find((c) => c.path !== pagePath)) {
-                    deletedPageIds.push(pageId);
-                  }
+                if (isValidPageNode(jsonNode)) {
+                  deletedPageIds.push(jsonNode.attrs.id);
                 }
               });
             }

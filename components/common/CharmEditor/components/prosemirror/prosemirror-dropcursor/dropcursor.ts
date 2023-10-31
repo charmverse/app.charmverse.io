@@ -5,7 +5,7 @@ import { dropPoint } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 
 export const pageNodeDropPluginKey = new PluginKey('dragPlugin');
-export const HOVERED_PAGE_NODE_CLASS = 'Prosemirror-hovered-page-node';
+export const HOVERED_PAGE_NODE_ID = 'Prosemirror-hovered-page-node';
 
 interface DropCursorOptions {
   /// The color of the cursor. Defaults to `black`. Use `false` to apply no color and rely only on class.
@@ -136,38 +136,50 @@ class DropCursorView {
   }
 
   dragover(event: DragEvent) {
-    const domElementAtCoords = document.elementFromPoint(event.clientX, event.clientY);
     const view = this.editorView;
+    const domElementAtCoords = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement;
+    // Assume that the dragged node is the selected node, this might not be the case if we are dragging from the sidebar
     const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
-    const hoveredPageDomNode =
-      domElementAtCoords?.getAttribute('data-page-type') === 'page'
+    // Check if the hovered dom node and dragged node are page nodes
+    // Dragged node might not exist if we are dragging from the sidebar
+    // Sometimes the hovered dom node is the text node inside the page node, so we need to check the parent element as well
+    const hoveredPageDomNode = (
+      domElementAtCoords?.dataset?.pageType === 'page' &&
+      (draggedNode ? draggedNode?.type.name === 'page' || draggedNode?.type.name === 'linkedPage' : true)
         ? domElementAtCoords
-        : domElementAtCoords?.parentElement?.getAttribute('data-page-type') === 'page'
+        : domElementAtCoords?.parentElement?.dataset?.pageType === 'page'
         ? domElementAtCoords.parentElement
-        : null;
-    const hoveredPageDomNodeId = hoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1];
-    const currentHoveredPageDomNode = document.querySelector(`.${HOVERED_PAGE_NODE_CLASS}`);
-    // Remove the class from the previous hovered page node
-    if (currentHoveredPageDomNode?.getAttribute('data-id')?.split('page-')[1] !== hoveredPageDomNodeId) {
-      currentHoveredPageDomNode?.classList.remove(HOVERED_PAGE_NODE_CLASS);
+        : null
+    ) as HTMLElement | null;
+
+    const hoveredPageDomNodeId = hoveredPageDomNode?.dataset.id;
+    const currentHoveredPageDomNode = document.getElementById(HOVERED_PAGE_NODE_ID);
+    // Remove the class from the previous hovered page node only if it is not the same as the current hovered page node
+    if (currentHoveredPageDomNode && currentHoveredPageDomNode.dataset.id !== hoveredPageDomNodeId) {
+      currentHoveredPageDomNode.removeAttribute('id');
     }
     if (hoveredPageDomNode) {
+      // Add the class to the current hovered page node only if it is not the same as the dragged node
+      // Also update the plugin state with the current hovered dom node
       if (draggedNode?.attrs.id !== hoveredPageDomNodeId) {
-        hoveredPageDomNode.classList.add(HOVERED_PAGE_NODE_CLASS);
+        hoveredPageDomNode.setAttribute('id', HOVERED_PAGE_NODE_ID);
         view.dispatch(
           view.state.tr.setMeta(pageNodeDropPluginKey, {
-            hoveredDomNode: hoveredPageDomNode
+            hoveredPageDomNode
           })
         );
       }
+      // Also return as to not show the drop cursor, with the thin line, when hovering over a page node
       return;
     } else {
-      const hoveredDomNode = pageNodeDropPluginKey.getState(view.state)?.hoveredDomNode;
-      if (hoveredDomNode) {
-        hoveredDomNode.classList.remove(HOVERED_PAGE_NODE_CLASS);
+      // Remove the class from the previous hovered page node
+      // Also update the plugin state with null as there is no hovered page dom node
+      const previousHoveredPageDomNode = pageNodeDropPluginKey.getState(view.state)?.hoveredPageDomNode;
+      if (previousHoveredPageDomNode) {
+        previousHoveredPageDomNode.removeAttribute('id');
         view.dispatch(
           view.state.tr.setMeta(pageNodeDropPluginKey, {
-            hoveredDomNode: null
+            hoveredPageDomNode: null
           })
         );
       }

@@ -4,7 +4,7 @@ import type { PageType } from '@charmverse/core/prisma-client';
 
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 
-import { HOVERED_PAGE_NODE_CLASS, pageNodeDropPluginKey } from '../prosemirror/prosemirror-dropcursor/dropcursor';
+import { pageNodeDropPluginKey } from '../prosemirror/prosemirror-dropcursor/dropcursor';
 
 export function nestedPagePlugins() {
   return () => {
@@ -25,10 +25,10 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
         state: {
           init: () => {
             return {
-              hoveredDomNode: null
+              hoveredPageDomNode: null
             };
           },
-          apply: (tr, pluginState: { hoveredDomNode: Element | null }) => {
+          apply: (tr, pluginState: { hoveredPageDomNode: HTMLElement | null }) => {
             const newPluginState = tr.getMeta(pageNodeDropPluginKey);
             if (newPluginState) {
               return { ...pluginState, ...newPluginState };
@@ -39,9 +39,10 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
         props: {
           handleDOMEvents: {
             drop(view, ev) {
-              const hoveredDomNode = pageNodeDropPluginKey.getState(view.state).hoveredDomNode as Element;
-              view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredDomNode: null }));
-              hoveredDomNode?.classList.remove(HOVERED_PAGE_NODE_CLASS);
+              const hoveredPageDomNode = pageNodeDropPluginKey.getState(view.state)
+                .hoveredPageDomNode as HTMLElement | null;
+              view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredPageDomNode: null }));
+              hoveredPageDomNode?.removeAttribute('id');
 
               if (!ev.dataTransfer || !pageId) {
                 return false;
@@ -49,7 +50,7 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
 
               const sidebarPageData = ev.dataTransfer.getData('sidebar-page');
 
-              const hoveredPageId = hoveredDomNode?.getAttribute('data-id')?.split('page-')[1];
+              const hoveredPageId = hoveredPageDomNode?.dataset.id;
 
               if (sidebarPageData) {
                 const coordinates = view.posAtCoords({
@@ -88,10 +89,10 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
                 } catch (_) {
                   return false;
                 }
-              } else if (hoveredDomNode) {
+              } else if (hoveredPageDomNode) {
                 const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
 
-                if (!draggedNode || hoveredDomNode.getAttribute('data-page-type') !== 'page') {
+                if (!draggedNode || hoveredPageDomNode.getAttribute('data-page-type') !== 'page') {
                   return false;
                 }
 

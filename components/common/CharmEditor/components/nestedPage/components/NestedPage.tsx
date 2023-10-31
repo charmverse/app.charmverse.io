@@ -14,7 +14,7 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 
 import { enableDragAndDrop } from '../../../utils';
-import { HOVERED_PAGE_NODE_CLASS, pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
+import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -46,11 +46,13 @@ const StyledTypography = styled(Typography)`
   border-bottom: 0.05em solid var(--link-underline);
 `;
 
-function resetHoverPluginState(view: EditorView) {
-  const pluginState = pageNodeDropPluginKey.getState(view.state);
-  if (pluginState.hoveredDomNode) {
-    view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredDomNode: null }));
-    pluginState.hoveredDomNode.classList.remove(HOVERED_PAGE_NODE_CLASS);
+function resetPageNodeDropPluginState(view: EditorView) {
+  const pluginState = pageNodeDropPluginKey.getState(view.state) as {
+    hoveredPageDomNode: HTMLElement | null;
+  };
+  if (pluginState.hoveredPageDomNode) {
+    view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredPageDomNode: null }));
+    pluginState.hoveredPageDomNode.removeAttribute('id');
   }
 }
 
@@ -93,7 +95,7 @@ export default function NestedPage({
       data-page-type={node.attrs.type ?? documentPage?.type}
       href={appPath ? `/${appPath}` : undefined}
       color='inherit'
-      data-id={`page-${pageId}`}
+      data-id={pageId}
       data-title={pageTitle}
       data-path={fullPath}
       onDragStart={() => {
@@ -103,13 +105,13 @@ export default function NestedPage({
       data-type={node.attrs.type}
       // Only works for firefox
       onDragExitCapture={() => {
-        resetHoverPluginState(view);
+        resetPageNodeDropPluginState(view);
       }}
-      // Should only works for chrome, firefox also handles it but for ff we have onDragExitCapture
+      // Should only works for chrome, opera and IE, firefox also handles it but for ff we have onDragExitCapture
       onDragLeaveCapture={() => {
-        const isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-        if (isChrome) {
-          resetHoverPluginState(view);
+        const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        if (!isFirefox) {
+          resetPageNodeDropPluginState(view);
         }
       }}
     >
