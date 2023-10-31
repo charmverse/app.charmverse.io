@@ -26,7 +26,7 @@ export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: str
 
             let index = 0;
 
-            if (startPos) {
+            if (typeof startPos === 'number') {
               // iterate the children of this node, which are 'columnBlock' type
               view.state.doc.nodesBetween(startPos, startPos + node.nodeSize, (child, pos) => {
                 if (child.type.name === 'columnBlock' && columnUpdates[index]) {
