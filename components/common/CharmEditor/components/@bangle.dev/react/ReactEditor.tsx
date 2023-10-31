@@ -1,6 +1,5 @@
 import { history } from '@bangle.dev/base-components';
 import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
-import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { EditorViewContext } from '@bangle.dev/react';
@@ -25,6 +24,7 @@ import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
