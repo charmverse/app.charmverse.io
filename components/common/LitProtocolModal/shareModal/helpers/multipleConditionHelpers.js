@@ -1,4 +1,4 @@
-import * as LitJsSdk from '@lit-protocol/lit-node-client';
+import { humanizeConditions } from 'lib/tokenGates/humanizeConditions';
 
 const checkAndCleanNested = (entry) => {
   if (entry.length === 1) {
@@ -23,7 +23,7 @@ const cleanUnifiedAccessControlConditions = (acc) => {
 }
 
 const humanizeUnifiedAccessControlConditions = async (unifiedAccessControlConditions) => {
-  return LitJsSdk.humanizeAccessControlConditions({
+  return humanizeConditions({
     unifiedAccessControlConditions,
   });
 };
