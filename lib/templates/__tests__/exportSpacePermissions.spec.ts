@@ -42,30 +42,33 @@ describe('exportSpacePermissions', () => {
     expect(exportedPermissions.roles).toHaveLength(2);
 
     expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
-      roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
-        {
-          id: rewardReviewerRole.id,
+      roles: [rewardReviewerRole, secondRewardReviewerRole],
+      permissions: {
+        roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
+          {
+            id: rewardReviewerRole.id,
+            permissions: {
+              proposalCategoryPermissions: [],
+              proposalsWithReviewerPermission: [],
+              rewardsWithReviewerPermission: [firstReward.id, secondReward.id]
+            }
+          },
+          {
+            id: secondRewardReviewerRole.id,
+            permissions: {
+              proposalCategoryPermissions: [],
+              proposalsWithReviewerPermission: [],
+              rewardsWithReviewerPermission: [secondReward.id]
+            }
+          }
+        ]),
+        space: {
+          id: space.id,
           permissions: {
             proposalCategoryPermissions: [],
             proposalsWithReviewerPermission: [],
-            rewardsWithReviewerPermission: [firstReward.id, secondReward.id]
+            rewardsWithReviewerPermission: []
           }
-        },
-        {
-          id: secondRewardReviewerRole.id,
-          permissions: {
-            proposalCategoryPermissions: [],
-            proposalsWithReviewerPermission: [],
-            rewardsWithReviewerPermission: [secondReward.id]
-          }
-        }
-      ]),
-      space: {
-        id: space.id,
-        permissions: {
-          proposalCategoryPermissions: [],
-          proposalsWithReviewerPermission: [],
-          rewardsWithReviewerPermission: []
         }
       }
     });
@@ -132,57 +135,60 @@ describe('exportSpacePermissions', () => {
     expect(exportedPermissions.roles).toHaveLength(2);
 
     expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
-      roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
-        {
-          id: proposalReviewerRole.id,
+      roles: [proposalReviewerRole, secondProposalReviewerRole],
+      permissions: {
+        roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
+          {
+            id: proposalReviewerRole.id,
+            permissions: {
+              proposalCategoryPermissions: [
+                {
+                  assignee: { group: 'role', id: proposalReviewerRole.id },
+                  permissionLevel: 'full_access',
+                  id: expect.any(String),
+                  proposalCategoryId: category2WithSpacePermissions.id
+                },
+                {
+                  assignee: { group: 'role', id: proposalReviewerRole.id },
+                  permissionLevel: 'full_access',
+                  id: expect.any(String),
+                  proposalCategoryId: category3WithRolePermissions.id
+                }
+              ],
+              proposalsWithReviewerPermission: [proposalInCategory1.id, proposalInCategory2.id],
+              rewardsWithReviewerPermission: []
+            }
+          },
+          {
+            id: secondProposalReviewerRole.id,
+            permissions: {
+              proposalCategoryPermissions: [
+                {
+                  assignee: { group: 'role', id: secondProposalReviewerRole.id },
+                  permissionLevel: 'view_comment_vote',
+                  id: expect.any(String),
+                  proposalCategoryId: category3WithRolePermissions.id
+                }
+              ],
+              proposalsWithReviewerPermission: [proposalInCategory2.id, proposalInCategory3.id],
+              rewardsWithReviewerPermission: []
+            }
+          }
+        ]),
+        space: {
+          id: space.id,
           permissions: {
             proposalCategoryPermissions: [
               {
-                assignee: { group: 'role', id: proposalReviewerRole.id },
-                permissionLevel: 'full_access',
+                assignee: { group: 'space', id: space.id },
+                permissionLevel: 'view_comment',
                 id: expect.any(String),
                 proposalCategoryId: category2WithSpacePermissions.id
-              },
-              {
-                assignee: { group: 'role', id: proposalReviewerRole.id },
-                permissionLevel: 'full_access',
-                id: expect.any(String),
-                proposalCategoryId: category3WithRolePermissions.id
               }
             ],
-            proposalsWithReviewerPermission: [proposalInCategory1.id, proposalInCategory2.id],
+            proposalsWithReviewerPermission: [],
             rewardsWithReviewerPermission: []
           }
-        },
-        {
-          id: secondProposalReviewerRole.id,
-          permissions: {
-            proposalCategoryPermissions: [
-              {
-                assignee: { group: 'role', id: secondProposalReviewerRole.id },
-                permissionLevel: 'view_comment_vote',
-                id: expect.any(String),
-                proposalCategoryId: category3WithRolePermissions.id
-              }
-            ],
-            proposalsWithReviewerPermission: [proposalInCategory2.id, proposalInCategory3.id],
-            rewardsWithReviewerPermission: []
-          }
-        }
-      ]),
-      space: {
-        id: space.id,
-        permissions: {
-          proposalCategoryPermissions: [
-            {
-              assignee: { group: 'space', id: space.id },
-              permissionLevel: 'view_comment',
-              id: expect.any(String),
-              proposalCategoryId: category2WithSpacePermissions.id
-            }
-          ],
-          proposalsWithReviewerPermission: [],
-          rewardsWithReviewerPermission: []
         }
       }
     });
@@ -191,7 +197,7 @@ describe('exportSpacePermissions', () => {
   it('returns an object with empty arrays for a valid space ID without data', async () => {
     const { space: newSpace } = await testUtilsUser.generateUserAndSpace();
 
-    const permissions = await exportSpacePermissions({ spaceId: newSpace.id });
+    const { permissions } = await exportSpacePermissions({ spaceId: newSpace.id });
 
     expect(permissions).toBeDefined();
     expect(permissions.roles).toEqual([]);
