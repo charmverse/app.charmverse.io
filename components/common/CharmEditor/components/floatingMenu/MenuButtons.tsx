@@ -1,6 +1,6 @@
 import { blockquote, bold, code, history, italic, link, strike, underline } from '@bangle.dev/base-components';
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubbleOutline';

@@ -1,4 +1,4 @@
-import { useEditorViewContext } from '@bangle.dev/react';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import SendIcon from '@mui/icons-material/Send';

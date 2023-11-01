@@ -1,4 +1,4 @@
-import { useEditorViewContext } from '@bangle.dev/react';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import styled from '@emotion/styled';
 import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';

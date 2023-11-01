@@ -1,10 +1,10 @@
-import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField, Typography } from '@mui/material';
 import type { TextFieldProps } from '@mui/material';
 import { useContext, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 
+import { EditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/ReactEditor';
 import { useIMEComposition } from 'hooks/useIMEComposition';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { isTouchScreen } from 'lib/utilities/browser';
