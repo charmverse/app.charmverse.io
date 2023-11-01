@@ -1,8 +1,9 @@
-import { createElement } from '@bangle.dev/core';
 import { ColumnResizer } from '@column-resizer/core';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { NodeView } from 'prosemirror-view';
+
+import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 
 export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: string; readOnly: boolean }) {
   return new Plugin({

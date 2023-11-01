@@ -1,4 +1,3 @@
-import type { PluginKey } from '@bangle.dev/core';
 import { safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import {
@@ -11,6 +10,7 @@ import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { TextSelection } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
 import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
 

@@ -1,6 +1,6 @@
-import type { NodeViewProps } from '@bangle.dev/core';
 import { Box } from '@mui/material';
 
+import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import PopperPopup from 'components/common/PopperPopup';
 
 import type { EmptyContentProps } from './EmptyEmbed';

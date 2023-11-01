@@ -1,10 +1,10 @@
-import type { NodeViewProps } from '@bangle.dev/core';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
 
+import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import type { StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
@@ -99,8 +99,10 @@ export default function NestedPage({
       data-title={pageTitle}
       data-path={fullPath}
       onDragStart={() => {
-        const nodePos = getPos();
-        enableDragAndDrop(view, nodePos);
+        const pos = getPos();
+        if (typeof pos === 'number') {
+          enableDragAndDrop(view, pos);
+        }
       }}
       data-type={node.attrs.type}
       // Only works for firefox

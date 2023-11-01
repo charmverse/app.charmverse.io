@@ -1,7 +1,9 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import { createElement } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { Plugin, PluginKey, keymap } from '@bangle.dev/pm';
+
+import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { backspaceCmd, moveDownCmd } from './commands';
 

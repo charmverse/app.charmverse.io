@@ -1,7 +1,7 @@
-import type { RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
-import { domSerializationHelpers } from '@bangle.dev/core';
 import { log } from '@charmverse/core/log';
 
+import { domSerializationHelpers } from 'components/common/CharmEditor/components/@bangle.dev/core/domSerializationHelpers';
+import type { RawSpecs, BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { getTwitterEmoji } from 'components/common/Emoji';
 
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';

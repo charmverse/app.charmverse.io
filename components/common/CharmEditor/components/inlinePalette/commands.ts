@@ -3,9 +3,8 @@ import { chainCommands } from '@bangle.dev/pm';
 
 import * as heading from '../heading';
 import * as listItem from '../listItemNew/commands';
-import paragraph from '../paragraph';
+import { insertEmptyParagraphAbove, insertEmptyParagraphBelow } from '../paragraph/paragraph';
 
-const { insertEmptyParagraphAbove, insertEmptyParagraphBelow } = paragraph;
 const { queryIsBulletListActive, queryIsOrderedListActive } = listItem;
 const { insertEmptyParaAbove: headingInsertEmptyParaAbove, insertEmptyParaBelow: headingInsertEmptyParaBelow } =
   heading;

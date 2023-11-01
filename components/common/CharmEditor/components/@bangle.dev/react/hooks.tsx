@@ -1,9 +1,11 @@
-import type { BangleEditorStateProps } from '@bangle.dev/core';
-import { BangleEditorState } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Plugin, PluginKey } from '@bangle.dev/pm';
 import { rafSchedule } from '@bangle.dev/utils';
 import { useContext, useEffect, useState } from 'react';
+
+import type { BangleEditorStateProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor-state';
+
+import { BangleEditorState } from '../core/bangle-editor-state';
 
 import { EditorViewContext } from './ReactEditor';
 

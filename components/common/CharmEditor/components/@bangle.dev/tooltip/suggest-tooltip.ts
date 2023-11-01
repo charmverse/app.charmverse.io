@@ -1,4 +1,3 @@
-import type { BaseRawMarkSpec, RawPlugins } from '@bangle.dev/core';
 import type { MarkType, Schema } from '@bangle.dev/pm';
 import { Fragment, keymap, Node } from '@bangle.dev/pm';
 import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
@@ -8,6 +7,9 @@ import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, 
 import { log } from '@charmverse/core/log';
 import type { Command, EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey, Selection } from 'prosemirror-state';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { triggerInputRule } from './trigger-input-rule';
 

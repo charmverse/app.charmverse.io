@@ -45,8 +45,10 @@ export const safeRequestAnimationFrame =
         (window as any).lastTime = currTime + timeToCall;
         return id;
       };
-export function enableDragAndDrop(view: EditorView, nodePos: number) {
-  view.dispatch(
-    view.state.tr.setMeta('row-handle-is-dragging', true).setSelection(NodeSelection.create(view.state.doc, nodePos))
-  );
+export function enableDragAndDrop(view: EditorView, nodePos: number | undefined) {
+  if (typeof nodePos === 'number') {
+    view.dispatch(
+      view.state.tr.setMeta('row-handle-is-dragging', true).setSelection(NodeSelection.create(view.state.doc, nodePos))
+    );
+  }
 }
