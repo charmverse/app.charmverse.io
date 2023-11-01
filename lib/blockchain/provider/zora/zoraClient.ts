@@ -1,11 +1,8 @@
-import { log } from '@charmverse/core/log';
 import { ZDK, ZDKNetwork, ZDKChain } from '@zoralabs/zdk';
 import { RateLimit } from 'async-sema';
-import { zora } from 'viem/chains/definitions/zora';
+import { zora } from 'viem/chains';
 
 import { isTestEnv } from 'config/constants';
-
-import type { NFTData } from '../../getNFTs';
 
 // Ref: https://docs.zora.co/docs/zora-api/zdk
 // NFT example: https://docs.zora.co/docs/guides/zdk-intro-guide
