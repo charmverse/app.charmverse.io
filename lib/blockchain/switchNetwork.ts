@@ -1,4 +1,4 @@
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { toHex } from 'viem';
 
 /**

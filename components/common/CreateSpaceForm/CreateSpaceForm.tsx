@@ -25,12 +25,13 @@ import { useSpaces } from 'hooks/useSpaces';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import { spaceTemplateIds } from 'lib/spaces/config';
 import type { SpaceTemplateType } from 'lib/spaces/config';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { setCookie, getSpaceUrl } from 'lib/utilities/browser';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
 import { SpaceAccessGateWithSearch } from '../SpaceAccessGate/SpaceAccessGateWithSearch';
 
+import { spaceTemplateCookie } from './constants';
 import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 
 const schema = yup.object({
@@ -143,6 +144,12 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
 
       setNewSpace(space);
 
+      // record for onboarding
+      setCookie({
+        name: spaceTemplateCookie,
+        value: values.spaceTemplateOption,
+        expiresAfterSession: true
+      });
       if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
         const notionUrl = generateNotionImportRedirectUrl({
           origin: window?.location.origin,

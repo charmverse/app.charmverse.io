@@ -14,35 +14,44 @@ import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-ico
 import PopperPopup from 'components/common/PopperPopup';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useForumCategories } from 'hooks/useForumCategories';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useForumCategoryNotification } from 'hooks/useUserSpaceNotifications';
 
 import { EditCategoryDialog } from './EditCategoryDialog';
 import { PostCategoryPermissionsDialog } from './PostCategoryPermissions/PostCategoryPermissionsContainer';
 
 type Props = {
-  category: PostCategory;
-  onChange: (category: PostCategory) => void;
+  categoryId: string;
   onDelete: (category: PostCategory) => void;
-  onSetNewDefaultCategory: (category: PostCategory) => void;
   permissions: PostCategoryPermissionFlags;
 };
 
-export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefaultCategory, permissions }: Props) {
-  const [tempName, setTempName] = useState(category.name || '');
+export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props) {
+  const [tempName, setTempName] = useState('');
+  const { updateForumCategory, setDefaultPostCategory, categories } = useForumCategories();
+  const category = categories.find((c) => c.id === categoryId);
+  const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
-  const notifications = useForumCategoryNotification(category.id);
+  function onChange(updatedCategory: PostCategory) {
+    updateForumCategory(updatedCategory)
+      .then(() => {
+        showMessage('Category updated');
+      })
+      .catch((err) => {
+        showMessage(err?.message || 'An error occurred while updating the category');
+      });
+  }
+
+  const notifications = useForumCategoryNotification(categoryId);
 
   const editDescriptionDialog = usePopupState({ variant: 'popover', popupId: 'add-roles-dialog' });
 
-  useEffect(() => {
-    setTempName(category.name || '');
-  }, [category.name]);
-
   function onSave() {
-    if (tempName !== category.name) {
+    if (category && tempName !== category.name) {
       onChange({ ...category, name: tempName });
     }
   }
@@ -53,7 +62,13 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
     setPermissionsDialogIsOpen(false);
   }
 
-  const isDefaultSpacePostCategory = space?.defaultPostCategoryId === category.id;
+  const isDefaultSpacePostCategory = space?.defaultPostCategoryId === categoryId;
+
+  useEffect(() => {
+    if (category) {
+      setTempName(category.name || '');
+    }
+  }, [!!category, setTempName]);
 
   const popupContent = useMemo(
     () => (
@@ -63,13 +78,15 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
             py: 1
           }}
         >
-          <Typography variant='subtitle1'>{category.name}</Typography>
+          <Typography variant='subtitle1'>{category?.name}</Typography>
         </MenuItem>
         {!isDefaultSpacePostCategory && (
           <MenuItem
             disabled={isDefaultSpacePostCategory || !isAdmin}
             onClick={() => {
-              onSetNewDefaultCategory(category);
+              if (category) {
+                setDefaultPostCategory(category);
+              }
             }}
             sx={{
               py: 1
@@ -83,7 +100,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
         )}
         <Tooltip title={!permissions.edit_category ? 'You do not have permissions to edit this category' : ''}>
           <MenuItem
-            data-test={`open-category-description-dialog-${category.id}`}
+            data-test={`open-category-description-dialog-${categoryId}`}
             disabled={!permissions.edit_category}
             onClick={editDescriptionDialog.open}
             sx={{
@@ -97,7 +114,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
           </MenuItem>
         </Tooltip>
         <MenuItem
-          data-test={`open-category-permissions-dialog-${category.id}`}
+          data-test={`open-category-permissions-dialog-${categoryId}`}
           onClick={() => setPermissionsDialogIsOpen(true)}
           sx={{
             py: 1,
@@ -139,7 +156,7 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
             <MenuItem
               disabled={isDefaultSpacePostCategory || !permissions.delete_category}
               onClick={() => {
-                onDelete(category);
+                if (category) onDelete(category);
               }}
               sx={{
                 py: 1
@@ -160,19 +177,30 @@ export function CategoryContextMenu({ category, onChange, onDelete, onSetNewDefa
   return (
     <>
       <PopperPopup popupContent={popupContent} onClose={onSave}>
-        <IconButton data-test={`open-category-context-menu-${category.id}`} size='small'>
+        <IconButton
+          data-test={`open-category-context-menu-${categoryId}`}
+          size='small'
+          onClick={(e) => {
+            // prevents triggering the href of the parent link
+            e.preventDefault();
+          }}
+        >
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>
 
-      <PostCategoryPermissionsDialog postCategory={category} onClose={closeDialog} open={permissionsDialogIsOpen} />
+      {category && (
+        <PostCategoryPermissionsDialog category={category} onClose={closeDialog} open={permissionsDialogIsOpen} />
+      )}
 
-      <EditCategoryDialog
-        onSave={(newValues) => onChange({ ...category, description: newValues.description, name: newValues.name })}
-        category={category}
-        onClose={editDescriptionDialog.close}
-        open={editDescriptionDialog.isOpen}
-      />
+      {category && (
+        <EditCategoryDialog
+          onSave={(newValues) => onChange({ ...category, description: newValues.description, name: newValues.name })}
+          category={category}
+          onClose={editDescriptionDialog.close}
+          open={editDescriptionDialog.isOpen}
+        />
+      )}
     </>
   );
 }

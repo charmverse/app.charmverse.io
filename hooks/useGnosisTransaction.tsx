@@ -1,7 +1,7 @@
 import type { Transaction } from '@charmverse/core/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { useMemo } from 'react';
 import useSWR from 'swr';

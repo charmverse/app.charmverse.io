@@ -1,8 +1,9 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { firebaseApp } from 'lib/google/firebaseApp';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
@@ -81,6 +82,31 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
       include: sessionUserRelations
     });
   } else {
+    const userId = user.id;
+
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        userId
+      },
+      select: {
+        space: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+    const userSpaceIds = spaceRoles.map((role) => role.space.id);
+
+    const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+      spaceIds: userSpaceIds,
+      emails: [verificationResult.email]
+    });
+
+    if (isUserBannedFromSpace) {
+      throw new UnauthorisedActionError('You need to leave space before you can add this email to your account');
+    }
+
     await prisma.verifiedEmail.update({
       where: {
         email: verificationResult.email

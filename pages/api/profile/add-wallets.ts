@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -32,6 +33,30 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
     ) {
       throw new InsecureOperationError('Could not verify wallet');
     }
+  }
+
+  const spaceRoles = await prisma.spaceRole.findMany({
+    where: {
+      userId
+    },
+    select: {
+      space: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+  const userSpaceIds = spaceRoles.map((role) => role.space.id);
+
+  const isBannedFromSpace = await checkUserSpaceBanStatus({
+    userId,
+    walletAddresses: addressesToAdd.map((s) => s.address),
+    spaceIds: userSpaceIds
+  });
+
+  if (isBannedFromSpace) {
+    throw new InvalidInputError('You need to leave space before you can add this wallet to your account');
   }
 
   try {

@@ -230,7 +230,7 @@ export function PostPage({
     const commentId = router.query.commentId;
     if (commentId && typeof window !== 'undefined' && !isValidating && postComments.length) {
       setTimeout(() => {
-        const commentDomElement = window.document.getElementById(`post-comment-${commentId}`);
+        const commentDomElement = window.document.getElementById(`comment-${commentId}`);
         if (commentDomElement) {
           requestAnimationFrame(() => {
             commentDomElement.scrollIntoView({

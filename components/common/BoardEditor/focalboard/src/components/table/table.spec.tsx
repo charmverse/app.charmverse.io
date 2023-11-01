@@ -278,11 +278,6 @@ describe('components/table/Table extended', () => {
     card2.updatedAt = Date.parse('20 Jun 2021 12:22:00');
     card2.id = 'card-id-2';
 
-    const card2Comment = TestBlockFactory.createCard(board);
-    card2Comment.parentId = card2.id;
-    card2Comment.type = 'comment';
-    card2Comment.updatedAt = Date.parse('21 Jun 2021 15:23:00');
-
     const card2Text = TestBlockFactory.createCard(board);
     card2Text.parentId = card2.id;
     card2Text.type = 'text';
@@ -301,11 +296,6 @@ describe('components/table/Table extended', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       ...state,
-      comments: {
-        comments: {
-          [card2Comment.id]: card2Comment
-        }
-      },
       contents: {
         contents: {
           [card2Text.id]: card2Text
@@ -467,10 +457,6 @@ describe('components/table/Table extended', () => {
     card2.updatedAt = Date.parse('15 Jun 2021 16:22:00');
     card2.id = 'card-id-2';
 
-    const card2Comment = TestBlockFactory.createCard(board);
-    card2Comment.parentId = card2.id;
-    card2Comment.type = 'comment';
-    card2Comment.updatedBy = 'user-id-3';
     card2.updatedAt = Date.parse('16 Jun 2021 16:22:00');
 
     const view = TestBlockFactory.createBoardView(board);
@@ -484,11 +470,6 @@ describe('components/table/Table extended', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       ...state,
-      comments: {
-        comments: {
-          [card2Comment.id]: card2Comment
-        }
-      },
       contents: {
         contents: {
           [card1Text.id]: card1Text

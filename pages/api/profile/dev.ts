@@ -11,9 +11,7 @@ import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-if (isTestEnv) {
-  handler.post(register);
-}
+handler.post(register);
 
 async function register(req: NextApiRequest, res: NextApiResponse) {
   const { address, userId } = req.body;

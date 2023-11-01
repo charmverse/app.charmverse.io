@@ -34,7 +34,7 @@ export const settingsHeaderBackgroundColorDarkMode = darken(backgroundLightColor
 export const scrollBarTrackBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.2);
 export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackgroundColorDarkMode, 0.1);
 export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
-export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
+export const inputBorderDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const linkUnderlineColorDarkMode = 'rgba(55, 55, 55, 1)';
 
 export const colors = {

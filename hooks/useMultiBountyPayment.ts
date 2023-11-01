@@ -1,6 +1,6 @@
 import type { Bounty } from '@charmverse/core/prisma';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';

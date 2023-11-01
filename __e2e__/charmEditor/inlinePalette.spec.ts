@@ -52,7 +52,7 @@ test('Create linkedPage using inline palette in the charmEditor', async ({ docum
 
   await linkedPageInlinePaletteLocator.click();
 
-  const linkedPageCharmEditorLocator = documentPage.page.locator(`[data-id="page-${linkedPage.id}"]`);
+  const linkedPageCharmEditorLocator = documentPage.page.locator(`[data-id="${linkedPage.id}"]`);
 
   await linkedPageCharmEditorLocator.click();
 

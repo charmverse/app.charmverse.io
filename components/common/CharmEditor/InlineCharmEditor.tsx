@@ -2,7 +2,6 @@ import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/ba
 import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
 import type { CSSProperties, ReactNode } from 'react';
@@ -12,6 +11,7 @@ import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
+import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';

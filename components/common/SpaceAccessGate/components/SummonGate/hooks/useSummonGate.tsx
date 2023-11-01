@@ -7,7 +7,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { VerificationResponse } from 'lib/summon/verifyMembership';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 
 type Props = {
   joinType?: TokenGateJoinType;
@@ -20,7 +20,7 @@ export type SummonGateState = {
   isVerifying: boolean;
   isVerified: boolean;
   verifyResult?: VerificationResponse;
-  joinSpace: () => void;
+  joinSpace: (onError: (error: any) => void) => void;
   joiningSpace: boolean;
 };
 
@@ -35,7 +35,7 @@ export function useSummonGate({ joinType = 'token_gate', space, onSuccess }: Pro
     () => charmClient.summon.verifyMembership({ spaceId: space.id })
   );
 
-  async function joinSpace() {
+  async function joinSpace(onError: (error: any) => void) {
     setJoiningSpace(true);
 
     try {
@@ -52,7 +52,7 @@ export function useSummonGate({ joinType = 'token_gate', space, onSuccess }: Pro
 
       onSuccess();
     } catch (err: any) {
-      showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
+      onError(err);
     }
 
     setJoiningSpace(false);
