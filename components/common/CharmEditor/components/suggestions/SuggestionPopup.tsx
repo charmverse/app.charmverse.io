@@ -1,9 +1,9 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { Box, ClickAwayListener, Grow } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
 import { createPortal } from 'react-dom';
 
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useUser } from 'hooks/useUser';
 
