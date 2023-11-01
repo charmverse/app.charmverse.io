@@ -31,7 +31,8 @@ const esmModules = [
   'formdata-polyfill',
   'jose',
   'nanoid',
-  '@charmverse/core'
+  '@charmverse/core',
+  '@lens-protocol'
 ];
 
 // this breaks the dev environment with an error when importing MUI icons: Cannot use 'import.meta' outside a module
