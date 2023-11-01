@@ -1,9 +1,9 @@
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { Check, Close } from '@mui/icons-material';
 import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { memo, useMemo } from 'react';
 
 import charmClient from 'charmClient';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';

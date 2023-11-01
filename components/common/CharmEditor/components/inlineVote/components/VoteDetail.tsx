@@ -1,4 +1,3 @@
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { VoteType, type UserVote } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
@@ -12,6 +11,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { CharmEditor } from 'components/common/CharmEditor';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { MultiChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/MultiChoiceForm';
 import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
 import Modal from 'components/common/Modal';

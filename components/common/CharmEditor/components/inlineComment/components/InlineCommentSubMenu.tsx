@@ -1,4 +1,3 @@
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import SendIcon from '@mui/icons-material/Send';
@@ -11,6 +10,7 @@ import React, { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
 import { Button } from 'components/common/Button';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';

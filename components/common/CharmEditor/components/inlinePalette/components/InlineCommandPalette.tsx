@@ -1,5 +1,4 @@
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import { ClickAwayListener } from '@mui/material';
@@ -11,6 +10,8 @@ import Popper from '@mui/material/Popper';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useMemo, useCallback, useEffect, useState } from 'react';
+
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 
 import type { NestedPagePluginState } from '../../nestedPage';
 import { GroupLabel } from '../../PopoverMenu';
