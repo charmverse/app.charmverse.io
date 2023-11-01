@@ -2,8 +2,6 @@ const esmModules = [
   '@bangle.dev/base-components',
   '@bangle.dev/tooltip',
   '@bangle.dev/utils',
-  '@bangle.dev/utils',
-  'prosemirror-utils-bangle',
   '@popperjs/core',
   '@fullcalendar/common',
   '@fullcalendar/core',
