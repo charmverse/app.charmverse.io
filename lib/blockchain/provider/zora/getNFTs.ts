@@ -11,6 +11,9 @@ export async function getNFTs({ wallets }: { wallets: Pick<UserWallet, 'address'
   if (!provider) {
     return [];
   }
+  // test wallet
+  // wallets = [{ id: 'foo', address: '0x462bc7960c1f928B49d82e5df372d7a7779abC95' }];
+
   const response = await provider.tokens({
     where: {
       ownerAddresses: wallets.map((wallet) => wallet.address)
@@ -19,16 +22,15 @@ export async function getNFTs({ wallets }: { wallets: Pick<UserWallet, 'address'
     includeFullDetails: false, // Optional, provides more data on the NFTs such as events
     includeSalesHistory: false // Optional, provides sales data on the NFTs}
   });
-  // console.log('tokens', response.tokens);
 
   return response.tokens.nodes.map(({ token }) => ({
     id: `${token.collectionAddress}:${token.tokenId}`,
     tokenId: token.tokenId,
     tokenIdInt: parseInt(token.tokenId),
     contract: token.collectionAddress,
-    imageRaw: token.image?.url || '',
-    image: token.image?.url || '',
-    imageThumb: token.image?.url || '',
+    imageRaw: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',
+    image: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',
+    imageThumb: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',
     title: token.name || '',
     description: token.description || '',
     chainId: token.tokenContract?.chain as number,

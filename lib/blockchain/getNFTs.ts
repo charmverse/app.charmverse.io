@@ -83,7 +83,7 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
       return [] as NFTData[];
     })
   ]);
-  const nfts = [...alchemyNFTs, ...ankrNFTs];
+  const nfts = [...zoraNFTs];
   const sortedNfts = orderBy(nfts, ['timeLastUpdated', 'title'], ['desc', 'asc']);
   return sortedNfts;
 }
