@@ -18,6 +18,7 @@ import {
   getNFTOwners as getNFTOwnersFromAnkr
 } from './provider/ankr';
 import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr';
+import { getNFTs as getNFTsFromZora } from './provider/zora/getNFTs';
 
 export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnkr;
 
@@ -75,23 +76,12 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
       );
       return nftsByChain.flat();
     })(),
-    (async (): Promise<NFTData[]> => {
-      const nftsByChain = await Promise.all(
-        supportedMainnetsByAnkr
-          .map((chainId) =>
-            wallets.map(({ id, address }) =>
-              getNFTsFromAnkr({ address, chainId, walletId: id }).catch((error) => {
-                if (!isTestEnv) {
-                  log.error('Error requesting nfts from Ankr', { address, chainId, error });
-                }
-                return [] as NFTData[];
-              })
-            )
-          )
-          .flat()
-      );
-      return nftsByChain.flat();
-    })()
+    getNFTsFromZora({ wallets }).catch((error) => {
+      if (!isTestEnv) {
+        log.error('Error requesting nfts from Zora', { address: wallets[0]?.address, error });
+      }
+      return [] as NFTData[];
+    })
   ]);
   const nfts = [...alchemyNFTs, ...ankrNFTs];
   const sortedNfts = orderBy(nfts, ['timeLastUpdated', 'title'], ['desc', 'asc']);
