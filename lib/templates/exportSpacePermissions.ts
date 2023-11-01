@@ -3,8 +3,11 @@ import {
   mapProposalCategoryPermissionToAssignee,
   type AssignedProposalCategoryPermission
 } from '@charmverse/core/permissions';
+import type { Role } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+
+import { exportRoles } from './exportRoles';
 
 export type ExportedPermissions = {
   proposalCategoryPermissions: AssignedProposalCategoryPermission[];
@@ -13,8 +16,11 @@ export type ExportedPermissions = {
 };
 
 export type SpacePermissionsExport = {
-  roles: { id: string; permissions: ExportedPermissions }[];
-  space: { id: string; permissions: ExportedPermissions };
+  roles: Role[];
+  permissions: {
+    roles: { id: string; permissions: ExportedPermissions }[];
+    space: { id: string; permissions: ExportedPermissions };
+  };
 };
 export async function exportSpacePermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissionsExport> {
   if (!stringUtils.isUUID(spaceId)) {
@@ -93,22 +99,27 @@ export async function exportSpacePermissions({ spaceId }: { spaceId: string }): 
     }
   });
 
+  const allSpaceRoles = await prisma.role.findMany({ where: { spaceId } });
+
   // Map the permissions into the expected output format
   const SpacePermissionsExport: SpacePermissionsExport = {
-    roles: Array.from(rolePermissions.keys()).map((roleId) => ({
-      id: roleId,
-      permissions: rolePermissions.get(roleId) as ExportedPermissions
-    })),
-    space: {
-      id: spaceId,
-      permissions: {
-        proposalCategoryPermissions: proposalCategoryPermissions
-          .filter((pcp) => pcp.spaceId)
-          .map(mapProposalCategoryPermissionToAssignee),
-        proposalsWithReviewerPermission: [],
-        rewardsWithReviewerPermission: []
+    permissions: {
+      roles: Array.from(rolePermissions.keys()).map((roleId) => ({
+        id: roleId,
+        permissions: rolePermissions.get(roleId) as ExportedPermissions
+      })),
+      space: {
+        id: spaceId,
+        permissions: {
+          proposalCategoryPermissions: proposalCategoryPermissions
+            .filter((pcp) => pcp.spaceId)
+            .map(mapProposalCategoryPermissionToAssignee),
+          proposalsWithReviewerPermission: [],
+          rewardsWithReviewerPermission: []
+        }
       }
-    }
+    },
+    roles: allSpaceRoles
   };
 
   return SpacePermissionsExport;
