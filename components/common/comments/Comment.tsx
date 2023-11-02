@@ -273,7 +273,7 @@ export function Comment({
               </Tooltip>
               {comment.lensCommentLink && (
                 <Link
-                  href={`https://${isDevEnv ? 'testnet.' : ''}lenster.xyz/posts/${comment.lensCommentLink}`}
+                  href={`https://${isDevEnv ? 'v2.' : ''}hey.xyz/posts/${comment.lensCommentLink}`}
                   target='_blank'
                   rel='noopener noreferrer'
                 >

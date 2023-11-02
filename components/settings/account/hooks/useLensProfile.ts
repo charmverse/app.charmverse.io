@@ -1,6 +1,5 @@
 import type { ProfileId } from '@lens-protocol/react-web';
 import { useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
-import { useCallback, useEffect } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -31,7 +30,7 @@ export function useLensProfile() {
   const { user } = useUser();
   const { space } = useCurrentSpace();
 
-  const setupLensProfile = useCallback(async () => {
+  const setupLensProfile = async () => {
     if (!user || !account) {
       return false;
     }
@@ -55,11 +54,7 @@ export function useLensProfile() {
     }
 
     return true;
-  }, [user?.id, account, chainId, LensChain, authenticated, lensProfile?.id]);
-
-  useEffect(() => {
-    setupLensProfile();
-  }, [setupLensProfile]);
+  };
 
   return {
     isAuthenticated: authenticated ?? false,
