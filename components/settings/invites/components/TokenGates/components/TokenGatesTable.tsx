@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { TokenGate } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import { humanizeAccessControlConditions } from '@lit-protocol/lit-node-client';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -24,6 +23,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import { humanizeConditions } from 'lib/tokenGates/humanizeConditions';
 import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
@@ -63,7 +63,7 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
 }
 
 export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account, walletAuthSignature, sign } = useWeb3Account();
+  const { account, walletAuthSignature, requestSignature } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
@@ -99,7 +99,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
     async function main() {
       const results = await Promise.all(
         tokenGates.map((tokenGate) =>
-          humanizeAccessControlConditions({
+          humanizeConditions({
             myWalletAddress: account || '',
             ...(tokenGate.conditions as any)
           }).catch((err) => {
@@ -119,7 +119,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       if (!litClient) {
         throw new Error('Lit Protocol client not initialized');
       }
-      const authSig = walletAuthSignature ?? (await sign());
+      const authSig = walletAuthSignature ?? (await requestSignature());
       const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,

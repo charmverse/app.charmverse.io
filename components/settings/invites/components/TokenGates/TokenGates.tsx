@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { TokenGate } from '@charmverse/core/prisma';
 import type { JsonSigningResourceId } from '@lit-protocol/types';
 import { debounce } from 'lodash';
@@ -15,7 +16,6 @@ import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import getLitChainFromChainId from 'lib/tokenGates/getLitChainFromChainId';
 
 import TokenGatesTable from './components/TokenGatesTable';
 
@@ -30,7 +30,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
   const litClient = useLitProtocol();
-  const { walletAuthSignature, sign, chainId } = useWeb3Account();
+  const { walletAuthSignature, requestSignature, chainId } = useWeb3Account();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
   const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () =>
@@ -46,6 +46,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
         closeTokenGateModal();
       })
       .catch((error) => {
+        log.warn('Error saving token gate', { error });
         setApiError(error.message || error);
         errorPopupState.open();
       });
@@ -70,13 +71,12 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
       })
     };
 
-    const chain = getLitChainFromChainId(chainId);
-
-    const authSig: AuthSig = walletAuthSignature ?? (await sign());
+    const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
 
     await litClient?.saveSigningCondition({
-      ...conditions,
-      chain,
+      unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
+      // not that we can use 'ethereum' for all EVM chains. this would need to be updated to support Solana
+      chain: 'ethereum',
       authSig,
       resourceId
     });

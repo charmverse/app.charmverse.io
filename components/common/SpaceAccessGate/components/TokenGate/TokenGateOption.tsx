@@ -1,10 +1,10 @@
-import { humanizeAccessControlConditions } from '@lit-protocol/lit-node-client';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import { humanizeConditions } from 'lib/tokenGates/humanizeConditions';
 import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 import { GateOption } from '../GateOption';
@@ -20,7 +20,7 @@ export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
   const [description, setDescription] = useState<string>('');
 
   useEffect(() => {
-    humanizeAccessControlConditions({
+    humanizeConditions({
       ...(tokenGate.conditions as any),
       myWalletAddress: account || ''
     }).then((result) => {

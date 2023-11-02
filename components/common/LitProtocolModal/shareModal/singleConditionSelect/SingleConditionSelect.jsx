@@ -62,7 +62,7 @@ const SingleConditionSelect = ({chain, initialState = null, initialCondition = n
       }
     }
   }
-  console.log({ selectPage})
+
   return (
     <div className={'lsm-single-condition-select-container'}>
       <LitChainSelector/>

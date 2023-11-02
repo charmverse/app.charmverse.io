@@ -1,4 +1,6 @@
 import type { StorybookConfig } from '@storybook/nextjs';
+import webpack from 'webpack';
+
 const config: StorybookConfig = {
   stories: ['../stories'],
   addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions'],
@@ -58,6 +60,19 @@ const config: StorybookConfig = {
         use: ['@svgr/webpack']
       });
     }
+    /**
+     * Add support for the `node:` scheme available since Node.js 16.
+     *
+     * `@lit-protocol/lit-node-client` imports from `node:buffer`
+     *
+     * @see https://github.com/webpack/webpack/issues/13290
+     */
+    config.plugins = config.plugins ?? [];
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+        resource.request = resource.request.replace(/^node:/, '');
+      })
+    );
 
     return config;
   }

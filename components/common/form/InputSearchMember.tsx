@@ -3,6 +3,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
 import { createRef, useEffect, useState } from 'react';
+import { v4 } from 'uuid';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -41,7 +42,7 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   inputVariant?: 'standard' | 'outlined' | 'filled';
 }
 
-export function InputSearchMemberBase({
+function InputSearchMemberBase({
   filter,
   options,
   placeholder,
@@ -60,10 +61,10 @@ export function InputSearchMemberBase({
       options={filteredOptions}
       autoHighlight
       // freeSolo={props.allowEmail}
-      getOptionDisabled={(option) => option.id === 'email' && !isValidEmail(option.username)}
+      getOptionDisabled={(option) => option.id.startsWith('email') && !isValidEmail(option.username)}
       onInputChange={(_event, value) => {
         if (allowEmail) {
-          const emailOption = filteredOptions.find((opt) => opt.id === 'email');
+          const emailOption = filteredOptions.find((opt) => opt.id.startsWith('email'));
 
           if (emailOption && !value) {
             filteredOptions.pop();
@@ -71,7 +72,7 @@ export function InputSearchMemberBase({
             emailOption.username = value;
           } else if (!emailOption && value) {
             filteredOptions.push({
-              id: 'email',
+              id: `email-${v4()}`,
               username: inputRef.current?.value,
               isBot: false,
               avatar: '/images/Google_G-grayscale.png'
@@ -87,7 +88,7 @@ export function InputSearchMemberBase({
           {...(_props as any)}
           user={user}
           avatarSize='small'
-          avatarIcon={user.id === 'email' ? <EmailIcon fontSize='large' /> : undefined}
+          avatarIcon={user.id.startsWith('email') ? <EmailIcon fontSize='large' /> : undefined}
         />
       )}
       noOptionsText='No options available'
@@ -107,49 +108,6 @@ export function InputSearchMemberBase({
           variant={inputVariant}
         />
       )}
-      {...props}
-    />
-  );
-}
-
-interface IInputSearchMemberProps {
-  onChange: (id: string) => void;
-  defaultValue?: string;
-  filter?: IMembersFilter;
-  onClear?: VoidFunction;
-  openOnFocus?: boolean;
-}
-
-export function InputSearchMember({ defaultValue, onChange, onClear, openOnFocus, ...props }: IInputSearchMemberProps) {
-  const { getMemberById, members } = useMembers();
-  const [value, setValue] = useState<Member | null>(null);
-
-  useEffect(() => {
-    if (defaultValue && !value) {
-      const member = getMemberById(defaultValue);
-      if (member) {
-        setValue(member);
-      }
-    }
-  }, [defaultValue, getMemberById]);
-
-  function emitValue(selectedUser: Member) {
-    if (selectedUser) {
-      onChange(selectedUser.id === 'email' ? selectedUser.username : selectedUser.id);
-    }
-    if (onClear && !selectedUser) {
-      onClear();
-    }
-    setValue(selectedUser);
-  }
-
-  return (
-    <InputSearchMemberBase
-      options={members}
-      onChange={(e, _value) => emitValue(_value as Member)}
-      placeholder='Select a user'
-      value={value}
-      openOnFocus={openOnFocus}
       {...props}
     />
   );
@@ -177,7 +135,7 @@ export function InputSearchMemberMultiple({
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
     onChange(
-      users.map((user) => (user.id === 'email' ? user.username : user.id)),
+      users.map((user) => (user.id.startsWith('email') ? user.username : user.id)),
       reason
     );
     setValue(users);
