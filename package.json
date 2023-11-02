@@ -248,7 +248,7 @@
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.6.0",
     "uuid": "^8.3.2",
-    "viem": "1.13.2",
+    "viem": "^1.18.3",
     "wagmi": "^1.4.1",
     "yup": "^0.32.11"
   },
