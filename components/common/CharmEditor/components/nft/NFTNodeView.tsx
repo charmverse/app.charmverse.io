@@ -19,7 +19,7 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { supportedMainnets as supportedMainnetsByAlchemy } from 'lib/blockchain/provider/alchemy/client';
+import { supportedMainnets as supportedMainnetsByAlchemy } from 'lib/blockchain/provider/alchemy/config';
 import { supportedMainnets as supportedMainnetsByAnkr } from 'lib/blockchain/provider/ankr/config';
 import { supportedNetworks as supportedNetworksByZora } from 'lib/blockchain/provider/zora/config';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
@@ -176,7 +176,7 @@ function NFTView({ nft }: { nft: { image: string; title: string; link: string } 
               {nft.title}
             </Typography>
             {nft.link && (
-              <Button href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
+              <Button external href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
                 View
               </Button>
             )}

@@ -5,11 +5,11 @@ import orderBy from 'lodash/orderBy';
 import { isTestEnv } from 'config/constants';
 
 import {
-  supportedMainnets as supportedMainnetsByAlchemy,
   getNFTs as getNFTsFromAlchemy,
   getNFT as getNFTFromAlchemy,
   getNFTOwners as getNFTOwnersFromAlchemy
 } from './provider/alchemy/client';
+import { supportedMainnets as supportedMainnetsByAlchemy } from './provider/alchemy/config';
 import type { SupportedChainId as SupportedChainIdByAlchemy } from './provider/alchemy/config';
 import {
   getNFTs as getNFTsFromAnkr,

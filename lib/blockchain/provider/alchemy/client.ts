@@ -9,11 +9,6 @@ import type { NFTData } from '../../getNFTs';
 import { toInt } from '../ankr/client';
 
 import type { SupportedChainId } from './config';
-import { supportedChains } from './config';
-
-export const supportedMainnets: SupportedChainId[] = supportedChains
-  .filter((chain) => !chain.testnet)
-  .map((chain) => chain.chainId);
 
 interface NftMedia {
   bytes: number;
