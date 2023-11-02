@@ -19,6 +19,9 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { supportedMainnets as supportedMainnetsByAlchemy } from 'lib/blockchain/provider/alchemy/config';
+import { supportedMainnets as supportedMainnetsByAnkr } from 'lib/blockchain/provider/ankr/config';
+import { supportedNetworks as supportedNetworksByZora } from 'lib/blockchain/provider/zora/config';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import { enableDragAndDrop } from '../../utils';
@@ -37,7 +40,7 @@ const StyledCard = styled(Card)`
   }
 `;
 
-const blockchains = [1, 10, 56, 137, 250, 5000, 42161, 43114];
+const blockchains = [...supportedMainnetsByAlchemy, ...supportedMainnetsByAnkr, ...supportedNetworksByZora];
 
 export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs, view, getPos }: CharmNodeViewProps) {
   const attrs = node.attrs as Partial<NodeAttrs>;
@@ -173,7 +176,7 @@ function NFTView({ nft }: { nft: { image: string; title: string; link: string } 
               {nft.title}
             </Typography>
             {nft.link && (
-              <Button href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
+              <Button external href={nft.link} target='_blank' size='small' color='secondary' variant='outlined'>
                 View
               </Button>
             )}

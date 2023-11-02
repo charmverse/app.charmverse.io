@@ -1,4 +1,4 @@
-import { getNFT } from 'lib/blockchain/provider/ankr';
+import { getNFT } from 'lib/blockchain/provider/ankr/client';
 
 async function init() {
   const nfts = await getNFT({
