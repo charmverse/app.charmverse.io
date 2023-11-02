@@ -525,7 +525,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'charmverse':
       return '/images/logos/charmverse_black.png';
     case 'collection':
-      return '/images/template_icons/nft_community_icon.svg';
+      return '/images/template_icons/nft_ape_icon.svg';
     case 'ens':
       return '/images/logos/ens_logo.svg';
     case 'lens':
