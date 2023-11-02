@@ -1,8 +1,10 @@
 import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
-import type { RawPlugins } from '@bangle.dev/core';
-import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
+import { Plugin } from 'prosemirror-state';
+
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
@@ -30,7 +32,7 @@ import { plugins as markdownPlugins } from './components/markdown/markdown.plugi
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
 import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage';
 import * as nft from './components/nft/nft.plugins';
-import paragraph from './components/paragraph';
+import { plugins as paragraphPlugins } from './components/paragraph/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as rowActions from './components/rowActions/rowActions';
@@ -152,7 +154,7 @@ export function charmEditorPlugins({
       key: columnsPluginKey,
       readOnly
     }),
-    paragraph.plugins(),
+    paragraphPlugins(),
     strike.plugins(),
     underline.plugins() as RawPlugins,
     emoji.plugins({

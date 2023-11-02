@@ -1,6 +1,6 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
-import { SpecRegistry } from '@bangle.dev/core';
 
+import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
@@ -10,7 +10,7 @@ import * as callout from './components/callout/callout';
 import * as columnLayout from './components/columnLayout/columnLayout.schema';
 import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
-import * as doc from './components/doc';
+import * as doc from './components/doc/doc';
 import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import { specs as fileSpecs } from './components/file/file.specs';
@@ -32,7 +32,7 @@ import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
 import * as nft from './components/nft/nft.specs';
 import * as orderedList from './components/orderedList';
-import paragraph from './components/paragraph';
+import { spec as paragraphSpec } from './components/paragraph/paragraph';
 import * as poll from './components/poll/pollSpec';
 import * as quote from './components/quote/quote';
 import * as image from './components/ResizableImage';
@@ -58,7 +58,7 @@ export const specRegistry = new SpecRegistry([
   //
   doc.spec(), // OK
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
-  paragraph.spec(), // OK
+  paragraphSpec(), // OK
   mentionSpecs(), // NO
   inlineVote.spec(),
   bold.spec(), // OK

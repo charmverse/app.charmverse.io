@@ -1,7 +1,7 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';

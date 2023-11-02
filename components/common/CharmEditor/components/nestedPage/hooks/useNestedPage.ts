@@ -1,9 +1,9 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useCallback } from 'react';
 
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { addPage } from 'lib/pages';

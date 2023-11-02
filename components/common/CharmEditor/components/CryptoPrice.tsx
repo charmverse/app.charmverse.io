@@ -1,4 +1,3 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec, EditorView } from '@bangle.dev/pm';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Autorenew from '@mui/icons-material/Autorenew';
@@ -9,6 +8,7 @@ import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
@@ -74,7 +74,7 @@ export function CryptoPrice({
   onQuoteCurrencyChange: (currency: FiatCurrency) => void;
   onBaseCurrencyChange: (currency: CryptoCurrency) => void;
   view: EditorView;
-  getPos: () => number;
+  getPos: () => number | undefined;
 }) {
   const [loading, setLoadingState] = useState(false);
   const [baseCurrency, setBaseCurrency] = useState<CryptoCurrency | null>(base);

@@ -89,6 +89,7 @@ export function VideoNodeView({
                     const embedType = extractIframeEmbedType(videoUrl);
                     if (embedType) {
                       const pos = getPos();
+                      if (!pos) return;
                       const newConfig = embeds[embedType] as Embed;
                       const width = attrs.width;
                       let height = width / VIDEO_ASPECT_RATIO;
@@ -129,7 +130,10 @@ export function VideoNodeView({
           readOnly={readOnly}
           onDelete={deleteNode}
           onDragStart={() => {
-            enableDragAndDrop(view, getPos());
+            const pos = getPos();
+            if (typeof pos === 'number') {
+              enableDragAndDrop(view, pos);
+            }
           }}
         >
           <MuxVideo
@@ -156,7 +160,10 @@ export function VideoNodeView({
     return (
       <Resizable
         onDragStart={() => {
-          enableDragAndDrop(view, getPos());
+          const pos = getPos();
+          if (typeof pos === 'number') {
+            enableDragAndDrop(view, pos);
+          }
         }}
         readOnly={readOnly}
         aspectRatio={VIDEO_ASPECT_RATIO}

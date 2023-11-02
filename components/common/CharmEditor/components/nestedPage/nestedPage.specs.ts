@@ -1,6 +1,7 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { nestedPageNodeName } from './nestedPage.constants';
 import { encloseNestedPage } from './nestedPage.utils';

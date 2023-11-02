@@ -1,6 +1,7 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type Token from 'markdown-it/lib/token';
 import type { Node, NodeSpec } from 'prosemirror-model';
+
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { ATTRIBUTE_INDENT, MIN_INDENT_LEVEL } from './bulletListSpecs';
 import { ATTRIBUTE_LIST_STYLE_TYPE } from './listItemSpecs';
