@@ -1,12 +1,13 @@
 import type { TokenResponseItem } from '@zoralabs/zdk';
 import { ZDKChain, ZDKNetwork } from '@zoralabs/zdk';
+import { zoraTestnet } from 'viem/chains';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 
 import type { NFTData } from '../../getNFTs';
 
-import type { SupportedChainId } from './zoraClient';
-import { getClient } from './zoraClient';
+import { getClient } from './client';
+import type { SupportedChainId } from './config';
 
 export async function getNFT({
   address,
@@ -29,7 +30,7 @@ export async function getNFT({
     },
     network: {
       network: ZDKNetwork.Zora,
-      chain: chainId === 999 ? ZDKChain.ZoraGoerli : ZDKChain.ZoraMainnet
+      chain: chainId === zoraTestnet.id ? ZDKChain.ZoraGoerli : ZDKChain.ZoraMainnet
     },
     // pagination: { limit: 3 }, // Optional, limits the response size to 3 NFTs
     includeFullDetails: false // Optional, provides more data on the NFTs such as events

@@ -2,8 +2,8 @@ import type { UserWallet } from '@charmverse/core/prisma';
 
 import type { NFTData } from '../../getNFTs';
 
+import { getClient } from './client';
 import { mapNFTData } from './getNFT';
-import { getClient } from './zoraClient';
 
 export async function getNFTs({ wallets }: { wallets: Pick<UserWallet, 'address' | 'id'>[] }): Promise<NFTData[]> {
   const provider = getClient();

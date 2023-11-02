@@ -1,4 +1,4 @@
-import { getClient } from './zoraClient';
+import { getClient } from './client';
 
 export async function verifyNFTOwner({
   ownerAddresses,

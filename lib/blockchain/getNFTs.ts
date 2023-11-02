@@ -9,20 +9,20 @@ import {
   getNFTs as getNFTsFromAlchemy,
   getNFT as getNFTFromAlchemy,
   getNFTOwners as getNFTOwnersFromAlchemy
-} from './provider/alchemy';
-import type { SupportedChainId as SupportedChainIdByAlchemy } from './provider/alchemy';
+} from './provider/alchemy/client';
+import type { SupportedChainId as SupportedChainIdByAlchemy } from './provider/alchemy/config';
 import {
-  supportedMainnets as supportedMainnetsByAnkr,
   getNFTs as getNFTsFromAnkr,
   getNFT as getNFTFromAnkr,
   getNFTOwners as getNFTOwnersFromAnkr
-} from './provider/ankr';
-import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr';
+} from './provider/ankr/client';
+import { supportedMainnets as supportedMainnetsByAnkr } from './provider/ankr/config';
+import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr/config';
+import type { SupportedChainId as SupportedChainIdByZora } from './provider/zora/config';
+import { supportedNetworks as supportedNetworksByZora } from './provider/zora/config';
 import { getNFT as getNFTFromZora } from './provider/zora/getNFT';
 import { getNFTs as getNFTsFromZora } from './provider/zora/getNFTs';
 import { verifyNFTOwner as verifyNFTOwnerFromZora } from './provider/zora/verifyNFTOwner';
-import type { SupportedChainId as SupportedChainIdByZora } from './provider/zora/zoraClient';
-import { supportedNetworks as supportedNetworksByZora } from './provider/zora/zoraClient';
 
 export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnkr;
 

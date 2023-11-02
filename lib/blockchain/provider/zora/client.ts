@@ -12,9 +12,6 @@ const networks = [
   { network: ZDKNetwork.Zora, chain: ZDKChain.ZoraGoerli }
 ];
 
-export const supportedNetworks = [zora.id, zoraTestnet.id];
-export type SupportedChainId = (typeof supportedNetworks)[number];
-
 const API_ENDPOINT = 'https://api.zora.co/graphql';
 
 // 30 requests/minute with no api key
