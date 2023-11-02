@@ -1,4 +1,3 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Comment } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
@@ -28,6 +27,7 @@ import type { MouseEvent } from 'react';
 import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';

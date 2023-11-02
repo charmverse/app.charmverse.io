@@ -1,5 +1,6 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import * as tables from 'prosemirror-tables';
+
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export function spec(): RawSpecs {
   const schemas = tables.tableNodes({

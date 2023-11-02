@@ -1,9 +1,11 @@
-import type { SpecRegistry } from '@bangle.dev/core';
-import { BangleEditor, BangleEditorState } from '@bangle.dev/core';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Selection } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
+
+import { BangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
+import { BangleEditorState } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor-state';
+import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 const mountedEditors = new Set<BangleEditor>();
 if (typeof afterEach === 'function') {

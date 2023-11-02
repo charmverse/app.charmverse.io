@@ -1,6 +1,7 @@
-import { type BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 const name = 'quote';
 

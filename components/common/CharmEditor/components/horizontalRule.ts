@@ -1,7 +1,9 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec, Schema } from '@bangle.dev/pm';
 import { InputRule } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;

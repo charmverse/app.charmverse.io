@@ -1,5 +1,5 @@
 diff --git a/node_modules/@bangle.dev/utils/dist/index.cjs b/node_modules/@bangle.dev/utils/dist/index.cjs
-index 277e7e6..472b7c2 100644
+index 277e7e6..0e44ad9 100644
 --- a/node_modules/@bangle.dev/utils/dist/index.cjs
 +++ b/node_modules/@bangle.dev/utils/dist/index.cjs
 @@ -3,7 +3,7 @@
@@ -8,6 +8,31 @@ index 277e7e6..472b7c2 100644
  var pm = require('@bangle.dev/pm');
 -var prosemirrorUtilsBangle = require('prosemirror-utils-bangle');
 +var prosemirrorUtilsBangle = require('prosemirror-utils');
+ 
+ const browser = {
+     mac: false,
+diff --git a/node_modules/@bangle.dev/utils/dist/index.d.ts b/node_modules/@bangle.dev/utils/dist/index.d.ts
+index ba88d3a..dde15ce 100644
+--- a/node_modules/@bangle.dev/utils/dist/index.d.ts
++++ b/node_modules/@bangle.dev/utils/dist/index.d.ts
+@@ -1,6 +1,6 @@
+ import { DOMOutputSpec, Node, MarkType, InputRule, Mark, Plugin, Selection, EditorView, Command, EditorState, NodeType, Schema, ResolvedPos, Fragment, Slice, PluginKey, Transaction } from '@bangle.dev/pm';
+ import * as prosemirror_model from 'prosemirror-model';
+-export { CellTransform, ContentNodeWithPos, DomAtPos, MovementOptions, NodeWithPos, Predicate, canInsert, contains, findBlockNodes, findChildren, findChildrenByAttr, findChildrenByMark, findChildrenByType, findDomRefAtPos, findInlineNodes, findParentDomRef, findParentDomRefOfType, findParentNode, findParentNodeClosestToPos, findParentNodeOfType, findParentNodeOfTypeClosestToPos, findPositionOfNodeBefore, findSelectedNodeOfType, findTextNodes, flatten, hasParentNode, hasParentNodeOfType, isNodeSelection, removeNodeBefore, removeParentNodeOfType, removeSelectedNode, replaceParentNodeOfType, replaceSelectedNode, safeInsert, selectParentNodeOfType, setParentNodeMarkup, setTextSelection } from 'prosemirror-utils-bangle';
++export { CellTransform, ContentNodeWithPos, DomAtPos, MovementOptions, NodeWithPos, Predicate, canInsert, contains, findBlockNodes, findChildren, findChildrenByAttr, findChildrenByMark, findChildrenByType, findDomRefAtPos, findInlineNodes, findParentDomRef, findParentDomRefOfType, findParentNode, findParentNodeClosestToPos, findParentNodeOfType, findParentNodeOfTypeClosestToPos, findPositionOfNodeBefore, findSelectedNodeOfType, findTextNodes, flatten, hasParentNode, hasParentNodeOfType, isNodeSelection, removeNodeBefore, removeParentNodeOfType, removeSelectedNode, replaceParentNodeOfType, replaceSelectedNode, safeInsert, selectParentNodeOfType, setParentNodeMarkup, setTextSelection } from 'prosemirror-utils';
+ 
+ declare const browser: {
+     mac: boolean;
+diff --git a/node_modules/@bangle.dev/utils/dist/index.js b/node_modules/@bangle.dev/utils/dist/index.js
+index b1620a7..a7e5456 100644
+--- a/node_modules/@bangle.dev/utils/dist/index.js
++++ b/node_modules/@bangle.dev/utils/dist/index.js
+@@ -1,6 +1,6 @@
+ import { DOMSerializer, InputRule, Plugin, Slice, Fragment, Selection, EditorState } from '@bangle.dev/pm';
+-import { findSelectedNodeOfType, findParentNode, safeInsert } from 'prosemirror-utils-bangle';
+-export { canInsert, contains, findBlockNodes, findChildren, findChildrenByAttr, findChildrenByMark, findChildrenByType, findDomRefAtPos, findInlineNodes, findParentDomRef, findParentDomRefOfType, findParentNode, findParentNodeClosestToPos, findParentNodeOfType, findParentNodeOfTypeClosestToPos, findPositionOfNodeBefore, findSelectedNodeOfType, findTextNodes, flatten, hasParentNode, hasParentNodeOfType, isNodeSelection, removeNodeBefore, removeParentNodeOfType, removeSelectedNode, replaceParentNodeOfType, replaceSelectedNode, safeInsert, selectParentNodeOfType, setParentNodeMarkup, setTextSelection } from 'prosemirror-utils-bangle';
++import { findSelectedNodeOfType, findParentNode, safeInsert } from 'prosemirror-utils';
++export { canInsert, contains, findBlockNodes, findChildren, findChildrenByAttr, findChildrenByMark, findChildrenByType, findDomRefAtPos, findInlineNodes, findParentDomRef, findParentDomRefOfType, findParentNode, findParentNodeClosestToPos, findParentNodeOfType, findParentNodeOfTypeClosestToPos, findPositionOfNodeBefore, findSelectedNodeOfType, findTextNodes, flatten, hasParentNode, hasParentNodeOfType, isNodeSelection, removeNodeBefore, removeParentNodeOfType, removeSelectedNode, replaceParentNodeOfType, replaceSelectedNode, safeInsert, selectParentNodeOfType, setParentNodeMarkup, setTextSelection } from 'prosemirror-utils';
  
  const browser = {
      mac: false,

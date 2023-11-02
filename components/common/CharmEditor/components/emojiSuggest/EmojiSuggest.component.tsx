@@ -1,4 +1,3 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -7,6 +6,8 @@ import type { BaseEmoji } from 'emoji-mart';
 import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback } from 'react';
+
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 
 import { selectEmoji } from './emojiSuggest.plugins';
 

@@ -1,4 +1,4 @@
-import { NodeView } from '@bangle.dev/core';
+import { NodeView } from '../@bangle.dev/core/node-view';
 
 export { spec } from './videoSpec';
 

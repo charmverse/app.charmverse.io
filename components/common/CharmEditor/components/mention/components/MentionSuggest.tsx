@@ -1,10 +1,10 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import type { PageMeta } from '@charmverse/core/pages';
 import { MoreHoriz } from '@mui/icons-material';
 import { Divider, ListItemIcon, MenuItem, Typography, Box } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';

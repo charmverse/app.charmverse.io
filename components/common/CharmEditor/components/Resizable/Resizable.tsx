@@ -1,7 +1,8 @@
-import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import type { ReactNode } from 'react';
 import { useCallback, useState, memo, useEffect, useRef } from 'react';
+
+import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
 import BlockAligner from '../BlockAligner';
 
