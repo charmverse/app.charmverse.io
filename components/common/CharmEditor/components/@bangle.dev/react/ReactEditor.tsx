@@ -1,11 +1,10 @@
 import { history } from '@bangle.dev/base-components';
-import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
-import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
+import type { EditorView } from 'prosemirror-view';
 import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
@@ -13,6 +12,7 @@ import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import type { BangleEditorProps as CoreBangleEditorProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -37,6 +37,11 @@ const StyledLoadingComponent = styled(LoadingComponent)`
   width: 100%;
   align-items: flex-end;
 `;
+
+export const EditorViewContext = React.createContext<EditorView>(
+  /* we have to provide a default value to createContext */
+  null as unknown as EditorView
+);
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;

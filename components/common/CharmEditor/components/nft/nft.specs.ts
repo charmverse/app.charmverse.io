@@ -1,6 +1,6 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
 
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { SupportedChainId } from 'lib/blockchain/getNFTs';
 
 import { name } from './config';

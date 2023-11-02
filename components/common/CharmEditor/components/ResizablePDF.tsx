@@ -1,5 +1,3 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/core';
 import type { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -9,9 +7,11 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { Box, ListItem, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import dynamic from 'next/dynamic';
+import { Plugin } from 'prosemirror-state';
 import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import BlockAligner from 'components/common/CharmEditor/components/BlockAligner';
 import type { CharmNodeViewProps } from 'components/common/CharmEditor/components/nodeView/nodeView';
 import PdfSelector from 'components/common/PdfSelector';

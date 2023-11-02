@@ -22,7 +22,7 @@ import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { linkedPageSuggestMarkName } from '../../linkedPage/linkedPage.constants';
 import * as listItemCommands from '../../listItemNew/commands';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
-import paragraph from '../../paragraph';
+import { convertToParagraph } from '../../paragraph/paragraph';
 import { isList } from '../commands';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
@@ -51,7 +51,6 @@ function createTableHeader(state: EditorState, text: string) {
   );
 }
 
-const { convertToParagraph } = paragraph;
 const {
   toggleTodoList,
   queryIsBulletListActive,

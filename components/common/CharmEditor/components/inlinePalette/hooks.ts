@@ -1,7 +1,8 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import type { EditorState, PluginKey, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import { useCallback, useEffect } from 'react';
+
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 
 import { suggestTooltip } from '../@bangle.dev/tooltip';
 

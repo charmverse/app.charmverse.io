@@ -1,9 +1,9 @@
-import type { RawPlugins } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/core';
 import type { EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
+import { Plugin } from 'prosemirror-state';
 import { createRoot } from 'react-dom/client';
 
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { highlightMarkedElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineVoteRows } from 'lib/prosemirror/plugins/inlineVotes/findTotalInlineVotes';
 

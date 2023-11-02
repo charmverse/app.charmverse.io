@@ -1,11 +1,11 @@
 /* eslint-disable react/no-unused-prop-types */
-import { usePluginState } from '@bangle.dev/react';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PluginKey } from 'prosemirror-state';
 import reactDOM from 'react-dom';
 
 import { InlinePalletteFloatingMenu } from 'components/common/CharmEditor/components/inlinePalette/InlinePalletteFloatingMenu';
 
+import { usePluginState } from '../@bangle.dev/react/hooks';
 import { InlineCommentSubMenu } from '../inlineComment/components/InlineCommentSubMenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 

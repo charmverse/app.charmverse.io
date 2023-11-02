@@ -39,7 +39,7 @@ const StyledStack = styled(Stack)`
   }
 `;
 
-type Props = {
+export type CommentProps = {
   replyingDisabled?: boolean;
   comment: CommentWithChildren;
   permissions?: CommentPermissions;
@@ -65,7 +65,7 @@ export function Comment({
   handleVoteComment,
   lensPostLink,
   isPublishingComments
-}: Props) {
+}: CommentProps) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);

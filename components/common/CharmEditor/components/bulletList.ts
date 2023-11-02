@@ -1,9 +1,11 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import type { Command, DOMOutputSpec, EditorState, Node, Schema } from '@bangle.dev/pm';
 import { chainCommands, keymap, wrappingInputRule } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { toggleList } from './listItem/commands';
 import { listIsTight } from './listItem/listIsTight';
