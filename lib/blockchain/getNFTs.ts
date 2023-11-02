@@ -18,7 +18,11 @@ import {
   getNFTOwners as getNFTOwnersFromAnkr
 } from './provider/ankr';
 import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr';
+import { getNFT as getNFTFromZora } from './provider/zora/getNFT';
 import { getNFTs as getNFTsFromZora } from './provider/zora/getNFTs';
+import { verifyNFTOwner as verifyNFTOwnerFromZora } from './provider/zora/verifyNFTOwner';
+import type { SupportedChainId as SupportedChainIdByZora } from './provider/zora/zoraClient';
+import { supportedNetworks as supportedNetworksByZora } from './provider/zora/zoraClient';
 
 export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnkr;
 
@@ -83,7 +87,7 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
       return [] as NFTData[];
     })
   ]);
-  const nfts = [...zoraNFTs];
+  const nfts = [...alchemyNFTs, ...ankrNFTs, ...zoraNFTs];
   const sortedNfts = orderBy(nfts, ['timeLastUpdated', 'title'], ['desc', 'asc']);
   return sortedNfts;
 }
@@ -99,6 +103,8 @@ export async function getNFT({ address, tokenId, chainId = 1 }: NFTRequest) {
     return getNFTFromAlchemy({ address, tokenId, chainId: chainId as SupportedChainIdByAlchemy });
   } else if (supportedMainnetsByAnkr.includes(chainId as SupportedChainIdByAnkr)) {
     return getNFTFromAnkr({ address, tokenId, chainId: chainId as SupportedChainIdByAnkr });
+  } else if (supportedNetworksByZora.includes(chainId as SupportedChainIdByZora)) {
+    return getNFTFromZora({ address, tokenId, chainId: chainId as SupportedChainIdByZora });
   }
   log.warn('NFT requested from unsupported chainId', { chainId });
   return null;
@@ -124,6 +130,12 @@ export async function verifyNFTOwner({
     // Note: Ankr does not require a tokenId, which means the list could be very long. Maybe we should request NFTs by owner instead?
     const owners = await getNFTOwnersFromAnkr({ address, chainId: chainId as SupportedChainIdByAnkr });
     return userAddresses.some((a) => owners.some((o) => o.toLowerCase() === a.toLowerCase()));
+  } else if (supportedNetworksByZora.includes(chainId as SupportedChainIdByZora)) {
+    return verifyNFTOwnerFromZora({
+      contractAddress: address,
+      ownerAddresses: userAddresses,
+      tokenId
+    });
   }
   log.warn('NFT verification requested from unsupported chainId', { chainId });
   return false;
