@@ -17,7 +17,7 @@ function databaseSpec(): BaseRawNodeSpec {
         }
       },
       atom: true,
-      selectable: true,
+      selectable: false,
       isolating: true,
       group: 'block',
       draggable: false,
