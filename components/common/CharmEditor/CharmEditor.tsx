@@ -405,10 +405,12 @@ function CharmEditor({
             const view = props.view;
             const tr = view.state.tr;
             const start = props.getPos();
-            const end = start + props.node.nodeSize;
-            tr.deleteRange(start, end);
-            tr.deleteSelection();
-            view.dispatch(tr);
+            if (typeof start === 'number') {
+              const end = start + props.node.nodeSize;
+              tr.deleteRange(start, end);
+              tr.deleteSelection();
+              view.dispatch(tr);
+            }
           }
         };
 

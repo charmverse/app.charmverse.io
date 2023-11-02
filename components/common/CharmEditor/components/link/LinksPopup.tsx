@@ -1,4 +1,3 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
@@ -18,6 +17,7 @@ import type { PluginKey } from 'prosemirror-state';
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useSnackbar } from 'hooks/useSnackbar';
 

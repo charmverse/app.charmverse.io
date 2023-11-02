@@ -1,6 +1,6 @@
-import { Plugin } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+import { Plugin } from 'prosemirror-state';
 
 const maxByteSize = 1000000; // 1MB
 

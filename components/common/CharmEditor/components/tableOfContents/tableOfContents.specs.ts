@@ -1,5 +1,6 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
+
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export function spec(): RawSpecs {
   return [

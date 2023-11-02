@@ -1,6 +1,7 @@
-import { Plugin, NodeView } from '@bangle.dev/core';
 import type { EditorView, Slice } from '@bangle.dev/pm';
+import { Plugin } from 'prosemirror-state';
 
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { insertNode } from 'lib/prosemirror/insertNode';
 
 import { name, extractTweetAttrs } from './tweetSpec';

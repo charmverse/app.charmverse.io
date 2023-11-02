@@ -1,4 +1,3 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -9,6 +8,7 @@ import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -145,8 +145,10 @@ function ResizableImage({
 
   function onDelete() {
     const start = getPos();
-    const end = start + 1;
-    view.dispatch(view.state.tr.deleteRange(start, end));
+    if (typeof start === 'number') {
+      const end = start + 1;
+      view.dispatch(view.state.tr.deleteRange(start, end));
+    }
   }
 
   useEffect(() => {
@@ -205,7 +207,9 @@ function ResizableImage({
         <StyledImage
           onDragStart={() => {
             const nodePos = getPos();
-            enableDragAndDrop(view, nodePos);
+            if (typeof nodePos === 'number') {
+              enableDragAndDrop(view, nodePos);
+            }
           }}
           src={node.attrs.src}
           alt={node.attrs.alt}

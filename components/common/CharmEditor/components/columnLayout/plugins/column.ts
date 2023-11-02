@@ -1,5 +1,6 @@
-import { createElement } from '@bangle.dev/core';
 import { Plugin, PluginKey } from 'prosemirror-state';
+
+import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 
 import { getColumnProperties } from '../columnLayout.schema';
 

@@ -1,9 +1,10 @@
-import { createElement } from '@bangle.dev/core';
 import { getNodeType } from '@bangle.dev/utils';
 import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import { findChildrenByType } from 'prosemirror-utils';
 import { Decoration, DecorationSet } from 'prosemirror-view';
+
+import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 
 const barWidth = 50;
 

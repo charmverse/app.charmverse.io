@@ -1,4 +1,3 @@
-import type { RawPlugins } from '@bangle.dev/core';
 import { wrappingInputRule, chainCommands } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject, filter } from '@bangle.dev/utils';
@@ -6,6 +5,7 @@ import { keymap } from 'prosemirror-keymap';
 import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { isMac } from 'lib/utilities/browser';
 
 import { updateNodeAttrs, indentCommand, listItemMergeCommand, backspaceKeyCommand, enterKeyCommand } from './commands';
