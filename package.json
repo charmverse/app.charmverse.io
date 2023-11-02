@@ -150,6 +150,7 @@
     "@typeform/api-client": "^1.7.0",
     "@uauth/js": "^2.4.0",
     "@wagmi/core": "^1.4.5-cjs",
+    "@zoralabs/zdk": "^2.4.0",
     "async-sema": "^3.1.1",
     "autosuggest-highlight": "^3.3.0",
     "clsx": "^1.1.1",

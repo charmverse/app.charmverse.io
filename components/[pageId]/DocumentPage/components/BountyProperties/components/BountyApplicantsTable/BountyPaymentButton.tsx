@@ -19,7 +19,7 @@ import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { BountyWithDetails } from 'lib/bounties';
 import { getSafesForAddress } from 'lib/gnosis';
