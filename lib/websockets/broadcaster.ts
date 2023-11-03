@@ -7,7 +7,7 @@ import { Server } from 'socket.io';
 
 import { getClient as getPostgresClient } from 'adapters/postgres/postgresClient';
 import { redisClient } from 'adapters/redis/redisClient';
-import { isDevEnv } from 'config/constants';
+import { isDevEnv, isTestEnv } from 'config/constants';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import { authOnConnect } from './authentication';
@@ -39,7 +39,7 @@ export class WebsocketBroadcaster implements AbstractWebsocketBroadcaster {
       log.debug('Enabled Redis adapter for socket.io');
     }
     // add support for passing messages in local dev
-    else if (typeof process.env.DATABASE_URL === 'string' && isDevEnv) {
+    else if (typeof process.env.DATABASE_URL === 'string' && (isDevEnv || isTestEnv)) {
       const pool = getPostgresClient(process.env.DATABASE_URL);
       io.adapter(createPostgresAdapter(pool));
       log.debug('Enabled Postgres adapter for socket.io');
