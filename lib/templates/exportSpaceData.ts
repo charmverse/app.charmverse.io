@@ -6,7 +6,9 @@ import type { ExportedPage } from './exportWorkspacePages';
 import { exportWorkspacePages } from './exportWorkspacePages';
 
 export type SpaceDataExport = {
-  pages?: ExportedPage[];
+  pages: ExportedPage[];
+  roles: Role[];
+  permissions: 
 } & Partial<SpacePermissionsExport>;
 export async function exportSpaceData({ spaceId }: { spaceId: string }): Promise<SpaceDataExport> {
   const spacePermissions = await exportSpacePermissions({ spaceId });

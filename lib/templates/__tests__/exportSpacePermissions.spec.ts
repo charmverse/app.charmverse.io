@@ -1,80 +1,13 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
-import { generateBounty } from 'testing/setupDatabase';
-
-import type { ExportedPermissions, SpacePermissionsExport } from '../exportSpacePermissions';
+import type { SpacePermissionsExport } from '../exportSpacePermissions';
 import { exportSpacePermissions } from '../exportSpacePermissions';
 
 describe('exportSpacePermissions', () => {
-  it('return reward reviewer permissions for roles', async () => {
-    const { space } = await testUtilsUser.generateUserAndSpace();
-
-    const rewardReviewerRole = await testUtilsMembers.generateRole({
-      createdBy: space.createdBy,
-      spaceId: space.id
-    });
-    const secondRewardReviewerRole = await testUtilsMembers.generateRole({
-      createdBy: space.createdBy,
-      spaceId: space.id
-    });
-
-    const firstReward = await generateBounty({
-      createdBy: space.createdBy,
-      spaceId: space.id,
-      bountyPermissions: {
-        reviewer: [{ group: 'role', id: rewardReviewerRole.id }]
-      }
-    });
-    const secondReward = await generateBounty({
-      createdBy: space.createdBy,
-      spaceId: space.id,
-      bountyPermissions: {
-        reviewer: [
-          { group: 'role', id: rewardReviewerRole.id },
-          { group: 'role', id: secondRewardReviewerRole.id }
-        ]
-      }
-    });
-
-    const exportedPermissions = await exportSpacePermissions({ spaceId: space.id });
-
-    expect(exportedPermissions.roles).toHaveLength(2);
-
-    expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
-      roles: [rewardReviewerRole, secondRewardReviewerRole],
-      permissions: {
-        roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
-          {
-            id: rewardReviewerRole.id,
-            permissions: {
-              proposalCategoryPermissions: [],
-              proposalsWithReviewerPermission: [],
-              rewardsWithReviewerPermission: [firstReward.id, secondReward.id]
-            }
-          },
-          {
-            id: secondRewardReviewerRole.id,
-            permissions: {
-              proposalCategoryPermissions: [],
-              proposalsWithReviewerPermission: [],
-              rewardsWithReviewerPermission: [secondReward.id]
-            }
-          }
-        ]),
-        space: {
-          id: space.id,
-          permissions: {
-            proposalCategoryPermissions: [],
-            proposalsWithReviewerPermission: [],
-            rewardsWithReviewerPermission: []
-          }
-        }
-      }
-    });
-  });
-
-  it('return proposal reviewer and proposal category permissions', async () => {
+  it('return roles, proposal category permissions and space permissions', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     const proposalReviewerRole = await testUtilsMembers.generateRole({
@@ -86,8 +19,20 @@ describe('exportSpacePermissions', () => {
       spaceId: space.id
     });
 
+    const spacePermissions = await prisma.$transaction([
+      prisma.spacePermission.create({
+        data: {
+          forSpace: { connect: { id: space.id } },
+          role: { connect: { id: proposalReviewerRole.id } }
+        }
+      })
+    ]);
+
     const category1WithoutPermissions = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
+      spaceId: space.id,
+      proposalCategoryPermissions: [
+        { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'view_comment_vote' }
+      ]
     });
 
     const category2WithSpacePermissions = await testUtilsProposals.generateProposalCategory({
@@ -137,59 +82,33 @@ describe('exportSpacePermissions', () => {
     expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
       roles: [proposalReviewerRole, secondProposalReviewerRole],
       permissions: {
-        roles: expect.arrayContaining<{ id: string; permissions: ExportedPermissions }>([
+        spacePermissions: [],
+        proposalCategoryPermissions: expect.arrayContaining<AssignedProposalCategoryPermission>([
           {
-            id: proposalReviewerRole.id,
-            permissions: {
-              proposalCategoryPermissions: [
-                {
-                  assignee: { group: 'role', id: proposalReviewerRole.id },
-                  permissionLevel: 'full_access',
-                  id: expect.any(String),
-                  proposalCategoryId: category2WithSpacePermissions.id
-                },
-                {
-                  assignee: { group: 'role', id: proposalReviewerRole.id },
-                  permissionLevel: 'full_access',
-                  id: expect.any(String),
-                  proposalCategoryId: category3WithRolePermissions.id
-                }
-              ],
-              proposalsWithReviewerPermission: [proposalInCategory1.id, proposalInCategory2.id],
-              rewardsWithReviewerPermission: []
-            }
+            assignee: { group: 'role', id: proposalReviewerRole.id },
+            permissionLevel: 'full_access',
+            id: expect.any(String),
+            proposalCategoryId: category2WithSpacePermissions.id
           },
           {
-            id: secondProposalReviewerRole.id,
-            permissions: {
-              proposalCategoryPermissions: [
-                {
-                  assignee: { group: 'role', id: secondProposalReviewerRole.id },
-                  permissionLevel: 'view_comment_vote',
-                  id: expect.any(String),
-                  proposalCategoryId: category3WithRolePermissions.id
-                }
-              ],
-              proposalsWithReviewerPermission: [proposalInCategory2.id, proposalInCategory3.id],
-              rewardsWithReviewerPermission: []
-            }
+            assignee: { group: 'role', id: proposalReviewerRole.id },
+            permissionLevel: 'full_access',
+            id: expect.any(String),
+            proposalCategoryId: category3WithRolePermissions.id
+          },
+          {
+            assignee: { group: 'role', id: secondProposalReviewerRole.id },
+            permissionLevel: 'view_comment_vote',
+            id: expect.any(String),
+            proposalCategoryId: category3WithRolePermissions.id
+          },
+          {
+            assignee: { group: 'space', id: space.id },
+            permissionLevel: 'view_comment',
+            id: expect.any(String),
+            proposalCategoryId: category2WithSpacePermissions.id
           }
-        ]),
-        space: {
-          id: space.id,
-          permissions: {
-            proposalCategoryPermissions: [
-              {
-                assignee: { group: 'space', id: space.id },
-                permissionLevel: 'view_comment',
-                id: expect.any(String),
-                proposalCategoryId: category2WithSpacePermissions.id
-              }
-            ],
-            proposalsWithReviewerPermission: [],
-            rewardsWithReviewerPermission: []
-          }
-        }
+        ])
       }
     });
   });
@@ -200,8 +119,8 @@ describe('exportSpacePermissions', () => {
     const { permissions } = await exportSpacePermissions({ spaceId: newSpace.id });
 
     expect(permissions).toBeDefined();
-    expect(permissions.roles).toEqual([]);
-    expect(permissions.space.id).toBe(newSpace.id);
+    expect(permissions.proposalCategoryPermissions).toEqual([]);
+    expect(permissions.spacePermissions).toEqual([]);
     // Assertions to verify that the arrays are empty
   });
 

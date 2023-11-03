@@ -295,7 +295,9 @@ The goal of this project is to allow space members to create rewards, have users
 common_generators = """
 For writing tests,
 
-These common generators can help you
+These common generators can help you.
+
+When generating IDs always use a v4 uuid as the generator
 
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
 

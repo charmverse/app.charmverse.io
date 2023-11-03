@@ -4,7 +4,8 @@ import {
   type AssignedProposalCategoryPermission,
   type TargetPermissionGroup
 } from '@charmverse/core/permissions';
-import { prisma, type Prisma } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
+import type { Prisma, Role } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { getImportData } from './getImportData';
@@ -13,6 +14,7 @@ import type { ImportParams } from './interfaces';
 
 export type ImportedPermissions = {
   proposalCategoryPermissions: AssignedProposalCategoryPermission[];
+  roles: Role[];
 };
 
 export async function importSpacePermissions({
@@ -113,6 +115,7 @@ export async function importSpacePermissions({
     .then((_permissions) => _permissions.map(mapProposalCategoryPermissionToAssignee));
 
   return {
-    proposalCategoryPermissions: createdProposalCategoryPermissions
+    proposalCategoryPermissions: createdProposalCategoryPermissions,
+    roles: importedRolesFromTemplate
   };
 }
