@@ -8,7 +8,7 @@ import { GlobalPage } from './global.po';
  * Used by a locator method to get a specific board when multiple coexist
  */
 type OptionalBoardId = {
-  boardId?: string;
+  boardId?: string | null;
 };
 
 export class DatabasePage extends GlobalPage {

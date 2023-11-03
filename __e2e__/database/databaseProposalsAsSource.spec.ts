@@ -148,7 +148,7 @@ test.describe.serial('Database with proposals as datasource', async () => {
     expect(syncedCards.map((c) => c.syncWithPageId)).toEqual(expect.arrayContaining(allTargetProposalIds));
 
     for (const card of syncedCards) {
-      const row = databasePage.getTableRowByCardId({ cardId: card.id });
+      const row = databasePage.getTableRowByCardId({ boardId: card.parentId, cardId: card.id });
 
       await expect(row).toBeVisible();
 
