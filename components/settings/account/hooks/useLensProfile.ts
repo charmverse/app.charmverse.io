@@ -1,5 +1,5 @@
 import type { ProfileId } from '@lens-protocol/react-web';
-import { useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
+import { SessionType, useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -15,17 +15,19 @@ async function switchNetwork() {
 export function useLensProfile() {
   const { account, chainId } = useWeb3Account();
   const { data: sessionData } = useSession();
+  const authenticated = sessionData?.authenticated ?? false;
+  const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
+
   const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
     where: {
       ownedBy: account ? [account] : null
     }
   });
+
   const { execute } = useLogin();
   const { showMessage } = useSnackbar();
 
-  const { authenticated } = sessionData ?? {};
-
-  const lensProfile = profilesData?.[0] ?? null;
+  const lensProfile = sessionProfile ?? profilesData?.[0] ?? null;
 
   const { user } = useUser();
   const { space } = useCurrentSpace();
@@ -57,7 +59,7 @@ export function useLensProfile() {
   };
 
   return {
-    isAuthenticated: authenticated ?? false,
+    isAuthenticated: authenticated,
     lensProfile: !isCyberConnect(space?.domain) && lensProfile,
     setupLensProfile,
     isLoadingProfiles

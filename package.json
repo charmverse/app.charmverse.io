@@ -113,7 +113,7 @@
     "@koa/router": "^10.1.1",
     "@lens-protocol/client": "^2.0.0-alpha.19",
     "@lens-protocol/metadata": "^1.0.3",
-    "@lens-protocol/react-web": "^2.0.0-alpha.16",
+    "@lens-protocol/react-web": "^2.0.0-alpha.17",
     "@lens-protocol/wagmi": "^3.0.0-alpha.13",
     "@lit-protocol/constants": "^2.2.61",
     "@lit-protocol/lit-node-client": "^2.2.61",

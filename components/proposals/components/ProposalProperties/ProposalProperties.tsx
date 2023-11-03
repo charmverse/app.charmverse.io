@@ -480,7 +480,7 @@ export function ProposalProperties({
                       Lens Post
                     </PropertyLabel>
                     <Link
-                      href={`https://${isDevEnv ? 'v2.' : ''}hey.xyz/posts/${proposalLensLink}`}
+                      href={`https://${isDevEnv ? 'testnet.' : ''}hey.xyz/posts/${proposalLensLink}`}
                       target='_blank'
                       rel='noopener noreferrer'
                     >

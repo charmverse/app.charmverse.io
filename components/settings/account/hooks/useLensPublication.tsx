@@ -61,7 +61,7 @@ function useHandleLensError() {
       }
     }
 
-    log.error(errorMessage, {
+    log.warn(errorMessage, {
       error
     });
     showMessage(errorMessage, 'error');
