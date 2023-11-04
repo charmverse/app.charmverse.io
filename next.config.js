@@ -4,6 +4,7 @@ const BundleAnalyzer = require('@next/bundle-analyzer');
 const esmModules = require('./next.base').esmModules;
 
 const config = {
+  webpackBuildWorker: true,
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
