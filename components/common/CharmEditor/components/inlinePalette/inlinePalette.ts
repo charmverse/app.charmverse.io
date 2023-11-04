@@ -31,6 +31,12 @@ function specFactory(): BaseRawMarkSpec {
     options: {
       ..._spec.options,
       trigger
+    },
+    markdown: {
+      toMarkdown: {
+        open: '',
+        close: ''
+      }
     }
   };
 }
