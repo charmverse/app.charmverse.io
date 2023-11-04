@@ -25,16 +25,14 @@ export function CommentReply({
   onCancelComment,
   setPublishToLens,
   publishToLens,
-  showPublishToLens,
-  lensCommentLink
+  showPublishToLens
 }: {
   isPublishingComments?: boolean;
-  lensCommentLink?: string | null;
   showPublishToLens?: boolean;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
   onCancelComment: () => void;
-  handleCreateComment: (comment: CreateCommentPayload, lensCommentLink?: string | null) => Promise<void>;
+  handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
   commentId: string;
 }) {
   const { user } = useUser();
@@ -48,14 +46,11 @@ export function CommentReply({
   }
 
   async function createCommentReply() {
-    await handleCreateComment(
-      {
-        content: postContent.doc,
-        contentText: postContent.rawText,
-        parentId: commentId
-      },
-      publishToLens ? lensCommentLink : undefined
-    );
+    await handleCreateComment({
+      content: postContent.doc,
+      contentText: postContent.rawText,
+      parentId: commentId
+    });
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);

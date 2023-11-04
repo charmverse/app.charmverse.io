@@ -38,7 +38,7 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: Profile }) {
         <Stack direction='row' spacing={1}>
           <Avatar
             size='large'
-            name={lensProfile.handle?.fullHandle ?? ''}
+            name={lensProfile.handle?.fullHandle ?? lensProfile.metadata?.displayName ?? lensProfile.id}
             avatar={
               lensProfile.metadata?.picture?.__typename === 'ImageSet'
                 ? lensProfile.metadata?.picture?.raw.uri

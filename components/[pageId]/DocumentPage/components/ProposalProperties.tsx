@@ -5,10 +5,10 @@ import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import {
-  useUpsertRubricCriteria,
   useGetAllReviewerUserIds,
+  useGetProposalDetails,
   useGetProposalFlowFlags,
-  useGetProposalDetails
+  useUpsertRubricCriteria
 } from 'charmClient/hooks/proposals';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
@@ -16,12 +16,15 @@ import { ProposalProperties as ProposalPropertiesBase } from 'components/proposa
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+import { CreateLensPublication } from './CreateLensPublication';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -50,15 +53,12 @@ export function ProposalProperties({
   const { mutate: mutateNotifications } = useNotifications();
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
-  const { createLensPost } = useLensPublication({
-    proposalId,
-    proposalPath: proposalPage.path,
-    proposalTitle: proposalPage.title
-  });
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
+  const { setupLensProfile } = useLensProfile();
   const { mutateProposals } = useProposals();
+  const { account } = useWeb3Account();
 
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
@@ -111,13 +111,9 @@ export function ProposalProperties({
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      // If proposal is being published for the first time and publish to lens is enabled, create a lens post
-      if (newStatus === 'discussion' && proposalPage && proposal.publishToLens && !proposal.lensPostLink) {
+      if (account && newStatus === 'discussion' && proposalPage && !proposal.lensPostLink) {
+        await setupLensProfile();
         setIsPublishingToLens(true);
-        await createLensPost({
-          proposalContent: proposalPage.content as PageContent
-        });
-        setIsPublishingToLens(false);
       }
       await Promise.all([
         refreshProposal(),
@@ -164,41 +160,59 @@ export function ProposalProperties({
   const readOnlyReviewers = readOnlyProperties || (!isAdmin && sourceTemplate && sourceTemplate.reviewers.length > 0);
 
   return (
-    <ProposalPropertiesBase
-      proposalLensLink={proposal?.lensPostLink ?? undefined}
-      archived={!!proposal?.archived}
-      isFromTemplate={!!proposal?.page?.sourceTemplateId}
-      proposalFlowFlags={proposalFlowFlags}
-      proposalStatus={proposal?.status}
-      proposalId={proposal?.id}
-      pageId={pageId}
-      readOnlyAuthors={readOnlyProperties}
-      readOnlyCategory={readOnlyCategory}
-      isAdmin={isAdmin}
-      readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
-      readOnlyProposalEvaluationType={
-        readOnlyProperties ||
-        // dont let users change type after status moves to Feedback, and forward
-        (proposal?.status !== 'draft' && !isTemplate) ||
-        isFromTemplateSource
-      }
-      readOnlyReviewers={readOnlyReviewers}
-      rubricAnswers={proposal?.rubricAnswers}
-      draftRubricAnswers={proposal?.draftRubricAnswers}
-      rubricCriteria={proposal?.rubricCriteria}
-      showStatus={!isTemplate}
-      userId={user?.id}
-      snapshotProposalId={snapshotProposalId}
-      updateProposalStatus={updateProposalStatus}
-      onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
-      onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
-      proposalFormInputs={proposalFormInputs}
-      setProposalFormInputs={onChangeProperties}
-      canAnswerRubric={canAnswerRubric}
-      canViewRubricAnswers={canViewRubricAnswers}
-      title={title || ''}
-      isPublishingToLens={isPublishingToLens}
-      readOnlyCustomProperties={readOnlyCustomProperties}
-    />
+    <>
+      <ProposalPropertiesBase
+        proposalLensLink={proposal?.lensPostLink ?? undefined}
+        archived={!!proposal?.archived}
+        isFromTemplate={!!proposal?.page?.sourceTemplateId}
+        proposalFlowFlags={proposalFlowFlags}
+        proposalStatus={proposal?.status}
+        proposalId={proposal?.id}
+        pageId={pageId}
+        readOnlyAuthors={readOnlyProperties}
+        readOnlyCategory={readOnlyCategory}
+        isAdmin={isAdmin}
+        readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
+        readOnlyProposalEvaluationType={
+          readOnlyProperties ||
+          // dont let users change type after status moves to Feedback, and forward
+          (proposal?.status !== 'draft' && !isTemplate) ||
+          isFromTemplateSource
+        }
+        readOnlyReviewers={readOnlyReviewers}
+        rubricAnswers={proposal?.rubricAnswers}
+        draftRubricAnswers={proposal?.draftRubricAnswers}
+        rubricCriteria={proposal?.rubricCriteria}
+        showStatus={!isTemplate}
+        userId={user?.id}
+        snapshotProposalId={snapshotProposalId}
+        updateProposalStatus={updateProposalStatus}
+        onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
+        onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
+        proposalFormInputs={proposalFormInputs}
+        setProposalFormInputs={onChangeProperties}
+        canAnswerRubric={canAnswerRubric}
+        canViewRubricAnswers={canViewRubricAnswers}
+        title={title || ''}
+        isPublishingToLens={isPublishingToLens}
+        readOnlyCustomProperties={readOnlyCustomProperties}
+      />
+      {isPublishingToLens && (
+        <CreateLensPublication
+          onError={() => {
+            setIsPublishingToLens(false);
+          }}
+          publicationType='post'
+          content={proposalPage.content as PageContent}
+          proposalId={proposalId}
+          proposalPath={proposalPage.path}
+          onSuccess={async () => {
+            await refreshProposal();
+            setIsPublishingToLens(false);
+          }}
+          proposalTitle={proposalPage.title}
+        />
+      )}
+    </>
   );
 }

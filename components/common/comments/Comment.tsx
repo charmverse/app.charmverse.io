@@ -292,7 +292,6 @@ export function Comment({
                 setPublishToLens={setPublishCommentsToLens}
                 showPublishToLens={Boolean(lensPostLink) && Boolean(lensProfile) && Boolean(comment.lensCommentLink)}
                 commentId={comment.id}
-                lensCommentLink={comment.lensCommentLink}
                 handleCreateComment={handleCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
               />
@@ -311,6 +310,7 @@ export function Comment({
             handleVoteComment={handleVoteComment}
             handleUpdateComment={handleUpdateComment}
             handleCreateComment={handleCreateComment}
+            lensPostLink={lensPostLink}
           />
         ))}
       </Box>

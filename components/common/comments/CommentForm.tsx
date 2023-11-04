@@ -28,17 +28,15 @@ export function CommentForm({
   placeholder,
   setPublishToLens,
   publishToLens,
-  lensPostLink,
-  isPublishingComments
+  isPublishingCommentsToLens
 }: {
-  isPublishingComments?: boolean;
-  lensPostLink?: string | null;
+  isPublishingCommentsToLens?: boolean;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
   showPublishToLens?: boolean;
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
-  handleCreateComment: (comment: CommentContent, lensPostLink?: string | null) => Promise<void>;
+  handleCreateComment: (comment: CommentContent) => Promise<void>;
   disabled?: boolean;
   placeholder?: string;
 }) {
@@ -55,13 +53,10 @@ export function CommentForm({
   }
 
   async function createPostComment() {
-    await handleCreateComment(
-      {
-        content: postContent.doc,
-        contentText: postContent.rawText
-      },
-      publishToLens ? lensPostLink : undefined
-    );
+    await handleCreateComment({
+      content: postContent.doc,
+      contentText: postContent.rawText
+    });
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);
@@ -106,9 +101,9 @@ export function CommentForm({
           {showPublishToLens && (
             <>
               <Typography variant='body2' color='text.secondary'>
-                {isPublishingComments ? 'Publishing to Lens...' : 'Publish to Lens'}
+                {isPublishingCommentsToLens ? 'Publishing to Lens...' : 'Publish to Lens'}
               </Typography>
-              {isPublishingComments ? (
+              {isPublishingCommentsToLens ? (
                 <LoadingIcon size={16} sx={{ mx: 1 }} />
               ) : (
                 <Switch

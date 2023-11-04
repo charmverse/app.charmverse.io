@@ -1,6 +1,6 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
-import { Divider, Typography, Box, Stack } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -11,13 +11,15 @@ import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
+import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+
+import { CreateLensPublication } from '../DocumentPage/components/CreateLensPublication';
 
 type Props = {
   page: PageWithContent;
@@ -26,9 +28,10 @@ type Props = {
 
 export function PageComments({ page, permissions }: Props) {
   const { user } = useUser();
-  const { lensProfile } = useLensProfile();
+  const { lensProfile, setupLensProfile } = useLensProfile();
   const router = useRouter();
   const {
+    nonNestedComments,
     comments,
     commentSort,
     setCommentSort,
@@ -41,16 +44,10 @@ export function PageComments({ page, permissions }: Props) {
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
-  const { createLensComment } = useLensPublication({
-    proposalId: page.proposalId ?? '',
-    proposalPath: page.path,
-    proposalTitle: page.title
-  });
-  const [isPublishingComments, setPublishingComments] = useState(false);
+  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
-
+  const [createdComment, setCreatedComment] = useState<PageCommentWithVote | null>(null);
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
-
   const commentPermissions: CommentPermissions = {
     add_comment: permissions.comment ?? false,
     upvote: permissions.comment ?? false,
@@ -58,17 +55,12 @@ export function PageComments({ page, permissions }: Props) {
     delete_comments: isAdmin
   };
 
-  // For root level comments lensPostId is the post's id and for replies it is the parent comment's id
-  async function createComment(comment: CommentContent, lensPostId?: string | null) {
-    const createdComment = await addComment(comment);
-    if (isProposal && proposal?.lensPostLink && lensPostId && !isPublishingComments) {
-      setPublishingComments(true);
-      await createLensComment({
-        commentContent: comment.content as PageContent,
-        commentId: createdComment.id,
-        lensPostId
-      });
-      setPublishingComments(false);
+  async function createComment(comment: CommentContent) {
+    const _createdComment = await addComment(comment);
+    setCreatedComment(_createdComment);
+    if (isProposal && proposal?.lensPostLink && !isPublishingToLens) {
+      await setupLensProfile();
+      setIsPublishingToLens(true);
     }
   }
 
@@ -96,6 +88,10 @@ export function PageComments({ page, permissions }: Props) {
   }, [router.query.commentId, isLoadingComments]);
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
+  const lensParentPublicationId =
+    createdComment?.parentId === null
+      ? proposal?.lensPostLink
+      : nonNestedComments.find((comment) => comment.id === createdComment?.parentId)?.lensCommentLink;
 
   if (hideComments) return null;
 
@@ -105,7 +101,7 @@ export function PageComments({ page, permissions }: Props) {
 
       {permissions.comment && (
         <CommentForm
-          isPublishingComments={isPublishingComments}
+          isPublishingCommentsToLens={isPublishingToLens && !!createdComment?.parentId}
           publishToLens={publishCommentsToLens}
           setPublishToLens={setPublishCommentsToLens}
           showPublishToLens={
@@ -114,7 +110,6 @@ export function PageComments({ page, permissions }: Props) {
             Boolean(proposal?.lensPostLink) &&
             Boolean(lensProfile)
           }
-          lensPostLink={proposal?.lensPostLink}
           handleCreateComment={createComment}
         />
       )}
@@ -155,6 +150,26 @@ export function PageComments({ page, permissions }: Props) {
             </Stack>
           )}
         </>
+      )}
+      {isPublishingToLens && createdComment && proposal?.lensPostLink && page.proposalId && lensParentPublicationId && (
+        <CreateLensPublication
+          publicationType='comment'
+          commentId={createdComment.id}
+          content={createdComment.content as PageContent}
+          parentPublicationId={lensParentPublicationId}
+          onSuccess={async () => {
+            await syncPageComments();
+            setIsPublishingToLens(false);
+            setCreatedComment(null);
+          }}
+          onError={() => {
+            setIsPublishingToLens(false);
+            setCreatedComment(null);
+          }}
+          proposalId={page.proposalId}
+          proposalPath={page.path}
+          proposalTitle={page.title}
+        />
       )}
     </>
   );

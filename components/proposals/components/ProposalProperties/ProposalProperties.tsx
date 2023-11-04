@@ -26,6 +26,7 @@ import { useLensProfile } from 'components/settings/account/hooks/useLensProfile
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isDevEnv } from 'config/constants';
 import { usePages } from 'hooks/usePages';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
 import {
@@ -134,7 +135,7 @@ export function ProposalProperties({
   const { lensProfile } = useLensProfile();
   const { proposalTemplates = [] } = useProposalTemplates();
   const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
-
+  const { account } = useWeb3Account();
   const previousConfirmationPopup = usePopupState({
     variant: 'popover',
     popupId: 'previous-proposal-status-change-confirmation'
@@ -270,7 +271,7 @@ export function ProposalProperties({
   if (proposalLensLink) {
     lensProposalPropertyState = 'show_link';
   } else {
-    lensProposalPropertyState = lensProfile ? 'show_toggle' : 'hide';
+    lensProposalPropertyState = lensProfile && account ? 'show_toggle' : 'hide';
   }
 
   const evaluationTabs = useMemo<TabConfig[]>(() => {

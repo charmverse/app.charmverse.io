@@ -8,26 +8,24 @@ import type {
   WalletConnectionError
 } from '@lens-protocol/react-web';
 import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
+import { useEffect } from 'react';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { LensChain } from 'lib/lens/lensClient';
 import { uploadToArweave } from 'lib/lens/uploadToArweave';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
-import { useLensProfile } from './useLensProfile';
-
-const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
-
 async function switchNetwork() {
   return switchActiveNetwork(LensChain);
 }
+
+const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
 
 function useHandleLensError() {
   const { showMessage } = useSnackbar();
@@ -72,61 +70,43 @@ function useHandleLensError() {
   };
 }
 
-export function useLensPublication({
-  proposalId,
-  proposalPath,
-  proposalTitle
-}: {
-  proposalId: string;
-  proposalPath: string;
-  proposalTitle: string;
-}) {
-  const { account, chainId } = useWeb3Account();
-  const { space } = useCurrentSpace();
-  const { showMessage } = useSnackbar();
-  const { lensProfile, isAuthenticated, setupLensProfile } = useLensProfile();
+export function CreateLensPublication(
+  params: {
+    onError: VoidFunction;
+    onSuccess: VoidFunction;
+    proposalTitle: string;
+    proposalPath: string;
+    proposalId: string;
+    content: PageContent;
+  } & (
+    | {
+        publicationType: 'post';
+      }
+    | {
+        commentId: string;
+        parentPublicationId: string;
+        publicationType: 'comment';
+      }
+  )
+) {
+  const { onError, onSuccess, proposalId, publicationType, proposalTitle, proposalPath, content } = params;
   const { execute: createPost } = useCreatePost();
-  const { execute: createComment } = useCreateComment();
-  const { handlerLensError } = useHandleLensError();
-  const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
   const { updateComment } = usePageComments(proposalId);
-  const { signer } = useWeb3Signer();
+  const { execute: createComment } = useCreateComment();
+  const { chainId } = useWeb3Account();
+  const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
+  const { space } = useCurrentSpace();
+  const { handlerLensError } = useHandleLensError();
+  const { showMessage } = useSnackbar();
 
-  async function createPublication(
-    params: { content: PageContent } & (
-      | {
-          publicationType: 'post';
-        }
-      | {
-          commentId: string;
-          lensPostId: string;
-          publicationType: 'comment';
-        }
-    )
-  ) {
+  async function createLensPublication() {
     try {
-      const { publicationType, content } = params;
-
-      if (!space || !account || !lensProfile || !signer) {
+      if (!space) {
         return null;
       }
 
       if (chainId !== LensChain) {
         await switchNetwork();
-      }
-
-      // If the user is not currently authenticated, try to authenticate them rather than doing nothing
-      if (!isAuthenticated) {
-        try {
-          const loginSuccessful = await setupLensProfile();
-          if (!loginSuccessful) {
-            return;
-          }
-        } catch (_) {
-          // User deliberately cancelled the auth process
-          showMessage('Publishing to Lens cancelled', 'warning');
-          return null;
-        }
       }
 
       const markdownContent = await generateMarkdown({
@@ -148,8 +128,6 @@ export function useLensPublication({
 
       const metadata = textOnly({ content: finalMarkdownContent });
 
-      metadata.name = `Post by @${lensProfile.handle?.localName}`;
-
       const uri = await uploadToArweave(metadata);
       const capitalizedPublicationType = publicationType.charAt(0).toUpperCase() + publicationType.slice(1);
       if (!uri) {
@@ -163,7 +141,7 @@ export function useLensPublication({
             })
           : await createComment({
               metadata: uri,
-              commentOn: params.lensPostId as any
+              commentOn: params.parentPublicationId as any
             });
 
       if (createPublicationResult.isFailure()) {
@@ -184,8 +162,23 @@ export function useLensPublication({
         ...params
       });
 
+      const createdPublication = completion.value;
+
+      if (publicationType === 'post') {
+        await updateProposalLensProperties({
+          lensPostLink: createdPublication.id
+        });
+      } else if (params.publicationType === 'comment') {
+        await updateComment({
+          id: params.commentId,
+          lensCommentLink: createdPublication.id
+        });
+      }
+
+      onSuccess();
       return completion.value;
     } catch (err) {
+      onError();
       log.error('Error creating publication', {
         err,
         ...params
@@ -195,47 +188,9 @@ export function useLensPublication({
     }
   }
 
-  async function createLensPost({ proposalContent }: { proposalContent: PageContent }) {
-    const createdPost = await createPublication({
-      publicationType: 'post',
-      content: proposalContent
-    });
+  useEffect(() => {
+    createLensPublication();
+  }, []);
 
-    if (createdPost) {
-      await updateProposalLensProperties({
-        lensPostLink: createdPost.id
-      });
-    }
-
-    return createdPost;
-  }
-
-  async function createLensComment({
-    commentId,
-    lensPostId,
-    commentContent
-  }: {
-    commentContent: PageContent;
-    commentId: string;
-    lensPostId: string;
-  }) {
-    const createdComment = await createPublication({
-      content: commentContent,
-      commentId,
-      lensPostId,
-      publicationType: 'comment'
-    });
-
-    if (createdComment) {
-      await updateComment({
-        id: commentId,
-        lensCommentLink: createdComment.id
-      });
-    }
-  }
-
-  return {
-    createLensPost,
-    createLensComment
-  };
+  return null;
 }
