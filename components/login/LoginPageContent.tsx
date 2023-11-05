@@ -10,11 +10,12 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
-import splashImage from 'public/images/artwork/world.png';
 
 import { LoginButton } from './components/LoginButton';
 import { LoginErrorModal } from './components/LoginErrorModal';
 import { Container } from './components/LoginLayout';
+
+const splashImage = '/images/artwork/world.png';
 
 type Props = {
   hideLoginOptions?: boolean;

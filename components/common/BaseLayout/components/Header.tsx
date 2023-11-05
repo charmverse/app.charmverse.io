@@ -9,8 +9,9 @@ import { useRouter } from 'next/router';
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
-import darkLogoImage from 'public/images/charmverse_logo_sm_black.png';
-import whiteLogoImage from 'public/images/charmverse_logo_sm_white.png';
+
+const darkLogoImage = '/images/charmverse_logo_sm_black.png';
+const whiteLogoImage = '/images/charmverse_logo_sm_white.png';
 
 const HeaderBox = styled.div`
   margin: ${({ theme }) => theme.spacing(3)};

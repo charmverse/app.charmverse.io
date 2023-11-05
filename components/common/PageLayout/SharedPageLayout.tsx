@@ -22,7 +22,8 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
-import darkLogoImage from 'public/images/charmverse_logo_icon.png';
+
+const darkLogoImage = '/images/charmverse_logo_icon.png';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -67,7 +68,6 @@ function JoinSpaceWithPublicProposals() {
 }
 
 export function SharedPageLayout({ children, basePageId, basePageType }: Props) {
-  const logo = darkLogoImage;
   const isMobile = useSmallScreen();
   const { publicPageType } = useSharedPage();
   const { user } = useUser();
@@ -130,7 +130,7 @@ export function SharedPageLayout({ children, basePageId, basePageType }: Props) 
                             style={{ position: 'absolute', top: 0 }}
                             width={32}
                             height={32}
-                            src={logo}
+                            src={darkLogoImage}
                             alt=''
                           />
                         </Box>

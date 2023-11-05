@@ -6,7 +6,8 @@ import Image from 'components/common/Image';
 import Footer from 'components/login/components/Footer';
 import { Container } from 'components/login/components/LoginLayout';
 import { useSpaces } from 'hooks/useSpaces';
-import splashImage from 'public/images/artwork/world.png';
+
+const splashImage = 'public/images/artwork/world.png';
 
 export default function CreateSpace() {
   const { spaces, isLoaded } = useSpaces();
