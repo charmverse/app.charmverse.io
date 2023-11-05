@@ -26,9 +26,6 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
-import { RewardSubmissionsTable } from 'components/rewards/components/RewardApplications/RewardSubmissionsTable';
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -102,7 +99,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   });
 
   const { draftBounty } = useBounties();
-  const { showApplication } = useApplicationDialog();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -348,6 +344,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       pagePath={page.path}
                       readOnly={readOnly}
                       onClose={close}
+                      showApplications
                     />
                   )}
                   {(page.type === 'card' || page.type === 'card_synced') && (

@@ -1,13 +1,10 @@
-import { Box, Divider, Stack } from '@mui/material';
+import { Divider, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
 
-import charmClient from 'charmClient';
 import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import type { RewardCreationData } from 'lib/rewards/createReward';
@@ -23,8 +20,9 @@ export function RewardProperties(props: {
   pagePath: string;
   rewardChanged?: () => void;
   onClose?: () => void;
+  showApplications?: boolean;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false, rewardChanged, onClose } = props;
+  const { rewardId, pageId, readOnly: parentReadOnly = false, rewardChanged, onClose, showApplications } = props;
   const { updateReward, refreshReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
 
@@ -80,7 +78,9 @@ export function RewardProperties(props: {
         readOnly={readOnly}
       />
 
-      {!!currentReward?.id && <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />}
+      {!!currentReward?.id && showApplications && (
+        <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+      )}
 
       <Divider
         sx={{

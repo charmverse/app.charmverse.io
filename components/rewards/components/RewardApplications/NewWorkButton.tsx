@@ -1,4 +1,4 @@
-import { Box, Divider, Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 
@@ -15,9 +15,9 @@ type Props = {
 };
 
 export function NewWorkButton({ rewardId, onShowApplication }: Props) {
-  const { rewards, refreshReward } = useRewards();
+  const { rewards } = useRewards();
   const { user } = useUser();
-  const { showApplication } = useApplicationDialog();
+  const { createApplication } = useApplicationDialog();
 
   const reward = useMemo(() => {
     return rewards?.find((r) => r.id === rewardId);
@@ -31,17 +31,13 @@ export function NewWorkButton({ rewardId, onShowApplication }: Props) {
     })
   );
 
-  const openApplication = (applicationId: string) => {
-    showApplication(applicationId);
-    onShowApplication?.();
-  };
-
   async function newApplication() {
     if (!reward) return;
 
-    const application = await charmClient.rewards.work({ rewardId: reward.id, message: '' });
-    refreshReward(reward.id);
-    openApplication(application.id);
+    // open modal with empty submission
+    createApplication(reward.id);
+
+    onShowApplication?.();
   }
 
   if (

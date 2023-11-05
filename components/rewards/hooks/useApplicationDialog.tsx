@@ -7,15 +7,17 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 type Context = {
   currentApplicationId: string | null;
+  currentRewardId: string | null;
   isOpen: boolean;
   hideApplication: () => void;
   showApplication: (applicationId: string) => void;
-  createApplication: () => void;
+  createApplication: (rewardId: string) => void;
   openedFromModal: boolean;
 };
 
 const ContextElement = createContext<Readonly<Context>>({
   currentApplicationId: null,
+  currentRewardId: null,
   isOpen: false,
   hideApplication: () => {},
   showApplication: () => {},
@@ -28,6 +30,7 @@ export const useApplicationDialog = () => useContext(ContextElement);
 export function ApplicationDialogProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
+  const [currentRewardId, setCurrentRewardId] = useState<string | null>(null);
   const [openedFromModal, setOpenedFromModal] = useState(false);
   const router = useRouter();
 
@@ -48,9 +51,15 @@ export function ApplicationDialogProvider({ children }: { children: ReactNode })
     }
   }
 
-  function createApplication() {
+  function createApplication(_rewardId: string) {
+    setCurrentRewardId(_rewardId);
     setCurrentApplicationId(null);
     setIsOpen(true);
+
+    // opened from modal
+    if (router.pathname !== '/[domain]/[pageId]') {
+      setOpenedFromModal(true);
+    }
   }
 
   const value = useMemo(
@@ -60,9 +69,10 @@ export function ApplicationDialogProvider({ children }: { children: ReactNode })
       showApplication,
       hideApplication,
       createApplication,
-      openedFromModal
+      openedFromModal,
+      currentRewardId
     }),
-    [isOpen, currentApplicationId, openedFromModal]
+    [isOpen, currentApplicationId, openedFromModal, currentRewardId]
   );
 
   return <ContextElement.Provider value={value}>{children}</ContextElement.Provider>;
