@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const BundleAnalyzer = require('@next/bundle-analyzer');
-const next = require('next/dist/lib/is-serializable-props');
 
 const esmModules = require('./next.base').esmModules;
 
 const config = {
-  webpackBuildWorker: true,
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
@@ -21,12 +19,12 @@ const config = {
     styledComponents: true
   },
   experimental: {
-    esmExternals: false
-    //    externalDir: true
+    esmExternals: false,
+    webpackBuildWorker: true
   },
-
   images: {
-    domains: ['cdn.charmverse.io']
+    // next image is broken in staging/production as of 14.0.1
+    unoptimized: true
   },
   transpilePackages: esmModules,
   modularizeImports: {
@@ -217,12 +215,6 @@ const removeUndefined = (obj) => {
     else if (obj[key] !== undefined) newObj[key] = obj[key];
   });
   return newObj;
-};
-
-// eslint-disable-next-line prefer-destructuring
-const isSerializableProps = next.isSerializableProps;
-next.isSerializableProps = function _isSerializableProps(page, method, input) {
-  return isSerializableProps(page, method, removeUndefined(input));
 };
 
 const withBundleAnalyzer = BundleAnalyzer({
