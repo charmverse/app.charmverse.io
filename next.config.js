@@ -22,6 +22,10 @@ const config = {
     esmExternals: false,
     webpackBuildWorker: true
   },
+  images: {
+    // next image is broken in staging/production as of 14.0.1
+    unoptimized: true
+  },
   transpilePackages: esmModules,
   modularizeImports: {
     '@mui/material': {
