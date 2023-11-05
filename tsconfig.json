@@ -2,7 +2,7 @@
   "ts-node": {
     "compilerOptions": {
       "jsx": "react-jsx",
-      "module": "esnext",
+      "module": "commonjs",
       "jsxImportSource": ""
     },
     "require": [
@@ -24,7 +24,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
