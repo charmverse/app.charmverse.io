@@ -223,7 +223,7 @@ function TableRow(props: Props) {
                   <TextInput {...commonProps} multiline={wrapColumn} />
                 </div>
 
-                <div className='open-button' data-test={`database-open-button-${card.id}`}>
+                <div className='open-button' data-test={`database-row-open-${card.id}`}>
                   <Button onClick={() => props.showCard(props.card.id || '', props.card.parentId)}>
                     <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                   </Button>

@@ -15,7 +15,7 @@ const createJestConfig = nextJest({
  * Configuration copied from
  * https://nextjs.org/docs/testing
  * */
-export const jestConfig: Omit<JestConfigWithTsJest, 'transform'> = {
+export const jestConfig: JestConfigWithTsJest = {
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
