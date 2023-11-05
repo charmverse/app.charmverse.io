@@ -2,7 +2,7 @@
   "ts-node": {
     "compilerOptions": {
       "jsx": "react-jsx",
-      "module": "commonjs",
+      "module": "esnext",
       "jsxImportSource": ""
     },
     "require": [
