@@ -4,7 +4,6 @@ const BundleAnalyzer = require('@next/bundle-analyzer');
 const esmModules = require('./next.base').esmModules;
 
 const config = {
-  webpackBuildWorker: true,
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
@@ -20,12 +19,8 @@ const config = {
     styledComponents: true
   },
   experimental: {
-    esmExternals: false
-    //    externalDir: true
-  },
-
-  images: {
-    domains: ['cdn.charmverse.io']
+    esmExternals: false,
+    webpackBuildWorker: true
   },
   transpilePackages: esmModules,
   modularizeImports: {
@@ -42,10 +37,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
-  assetPrefix:
-    process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'stating'
-      ? 'https://cdn.charmverse.io'
-      : undefined,
+  assetPrefix: process.env.REACT_APP_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async redirects() {
     return [
