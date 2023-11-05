@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const BundleAnalyzer = require('@next/bundle-analyzer');
+const next = require('next/dist/lib/is-serializable-props');
 
 const esmModules = require('./next.base').esmModules;
 
@@ -216,6 +217,12 @@ const removeUndefined = (obj) => {
     else if (obj[key] !== undefined) newObj[key] = obj[key];
   });
   return newObj;
+};
+
+// eslint-disable-next-line prefer-destructuring
+const isSerializableProps = next.isSerializableProps;
+next.isSerializableProps = function _isSerializableProps(page, method, input) {
+  return isSerializableProps(page, method, removeUndefined(input));
 };
 
 const withBundleAnalyzer = BundleAnalyzer({
