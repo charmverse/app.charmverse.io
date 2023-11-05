@@ -31,7 +31,9 @@ runs:
     - name: Build
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
-      run: npm run build
+      run: |
+        npm run build
+        npm run esbuild
 
     # building cache key takes almost a minute, so we only run this if we are saving the cache
     - name: Cache build
