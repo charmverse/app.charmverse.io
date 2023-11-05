@@ -144,6 +144,7 @@ function ViewTitle(props: ViewTitleProps) {
             onContentChange={(content: ICharmEditorOutput) => {
               onDescriptionChange(content.doc);
             }}
+            disableNestedPages
             pageId={board.id}
             readOnly={props.readOnly}
           />
