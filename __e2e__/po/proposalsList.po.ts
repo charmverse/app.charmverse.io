@@ -27,7 +27,7 @@ export class ProposalsListPage extends GlobalPage {
   }
 
   getProposalRowOpenLocator(proposalId: string): Locator {
-    return this.page.locator(`data-test=database-row-open-${proposalId}`);
+    return this.page.locator(`data-test=database-open-button-${proposalId}`);
   }
 
   getProposalCategoryLocator(categoryId: string) {

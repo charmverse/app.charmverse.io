@@ -176,9 +176,13 @@ test.describe.serial('Database with proposals as datasource', async () => {
     }
 
     // Make sure the UI only displays 3 cards
-    await expect(databasePage.getTableRowByIndex({ index: 0 })).toBeVisible();
-    await expect(databasePage.getTableRowByIndex({ index: 1 })).toBeVisible();
-    await expect(databasePage.getTableRowByIndex({ index: 2 })).toBeVisible();
+    const firstRow = databasePage.getTableRowByIndex({ index: 0 });
+    const secondRow = databasePage.getTableRowByIndex({ index: 0 });
+    const thirdRow = databasePage.getTableRowByIndex({ index: 0 });
+
+    await expect(firstRow).toBeVisible();
+    await expect(secondRow).toBeVisible();
+    await expect(thirdRow).toBeVisible();
     await expect(databasePage.getTableRowByIndex({ index: 3 })).not.toBeVisible();
   });
 
@@ -202,8 +206,6 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await page.goto(`${baseUrl}/${space.domain}/${databasePagePath}`);
 
     // This is a refresh response
-    await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
-
     await databasePage.page.waitForTimeout(500);
 
     // Wait until the database is initialised

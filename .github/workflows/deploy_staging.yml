@@ -58,7 +58,7 @@ jobs:
             sed -i 's/production/staging/g' $conf_file
           done
 
-          # modifying cloudformation alarm to send alerts to test sns topic. 
+          # modifying cloudformation alarm to send alerts to test sns topic.
           #  leaving it in even if we're deleting the config before deploying
           #  Useful to avoid accidental triggering to system-status channel.
           for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
@@ -182,4 +182,3 @@ jobs:
             --service=webapp                             \
             --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
             --minified-path-prefix=${{ steps.cdk_deploy.outputs.env_url }}_next/static
-
