@@ -152,7 +152,8 @@ export function Comment({
       placeholderText: 'What are your thoughts?',
       onContentChange: updateCommentContent,
       content: commentEditContent.doc,
-      isContentControlled: true
+      isContentControlled: true,
+      disableNestedPages: true
     };
 
     if (!inlineCharmEditor) {
@@ -247,6 +248,7 @@ export function Comment({
               key={isEditingComment.toString()}
               content={commentContent.doc}
               isContentControlled
+              disableNestedPages
             />
           )}
           {!comment.deletedAt && !replyingDisabled && (
