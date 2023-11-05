@@ -43,7 +43,7 @@ const config = {
     }
   },
   assetPrefix:
-    process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'stating'
+    process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging'
       ? 'https://cdn.charmverse.io'
       : undefined,
   productionBrowserSourceMaps: true,
