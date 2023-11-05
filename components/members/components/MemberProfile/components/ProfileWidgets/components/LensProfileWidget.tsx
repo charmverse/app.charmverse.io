@@ -30,7 +30,7 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
 export function LensProfileWidget({ lensProfile }: { lensProfile: Profile }) {
   return (
     <ProfileWidget
-      link={`https://www.lensfrens.xyz/${lensProfile.handle?.localName}.${lensProfile.handle?.namespace}`}
+      link={`https://www.lensfrens.xyz/${lensProfile.handle?.localName}`}
       title='Lens Protocol'
       avatarSrc='/images/logos/lens_logo.svg'
     >

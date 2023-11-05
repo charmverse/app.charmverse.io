@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
 import { textOnly } from '@lens-protocol/metadata';
 import type {
   BroadcastingError,
@@ -16,7 +17,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import { LensChain } from 'lib/lens/lensClient';
+import { LensChain, lensClient } from 'lib/lens/lensClient';
 import { uploadToArweave } from 'lib/lens/uploadToArweave';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
@@ -30,7 +31,14 @@ const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
 function useHandleLensError() {
   const { showMessage } = useSnackbar();
   const handlerLensError = (
-    error: BroadcastingError | PendingSigningRequestError | UserRejectedError | WalletConnectionError | TransactionError
+    error:
+      | BroadcastingError
+      | PendingSigningRequestError
+      | UserRejectedError
+      | WalletConnectionError
+      | TransactionError
+      | CredentialsExpiredError
+      | NotAuthenticatedError
   ) => {
     let errorMessage = '';
     switch (error.name) {
@@ -51,6 +59,21 @@ function useHandleLensError() {
 
       case 'UserRejectedError': {
         errorMessage = 'You rejected the transaction';
+        break;
+      }
+
+      case 'CredentialsExpiredError': {
+        errorMessage = 'Your credentials have expired. Please log in again.';
+        break;
+      }
+
+      case 'NotAuthenticatedError': {
+        errorMessage = 'You are not authenticated. Please log in.';
+        break;
+      }
+
+      case 'TransactionError': {
+        errorMessage = 'There was an error with the transaction';
         break;
       }
 
@@ -146,6 +169,7 @@ export function CreateLensPublication(
 
       if (createPublicationResult.isFailure()) {
         handlerLensError(createPublicationResult.error);
+        onError();
         return null;
       }
 
@@ -153,6 +177,7 @@ export function CreateLensPublication(
 
       if (completion.isFailure()) {
         handlerLensError(completion.error);
+        onError();
         return null;
       }
 
