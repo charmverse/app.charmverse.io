@@ -1,10 +1,10 @@
+import { AvailableProposalPermissions } from '@charmverse/core/permissions/flags';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { AvailableProposalPermissions } from 'lib/permissions/proposals/availableProposalPermissions.class';
 
 type Props = {
-  proposalIdOrPath: string;
+  proposalIdOrPath: string | null;
   spaceDomain?: string;
   isNewProposal?: boolean;
 };
@@ -14,7 +14,7 @@ export function useProposalPermissions({ proposalIdOrPath, spaceDomain, isNewPro
     !proposalIdOrPath ? null : `compute-proposal-category-permissions-${proposalIdOrPath}${spaceDomain ?? ''}`,
     () =>
       charmClient.permissions.proposals.computeProposalPermissions({
-        proposalIdOrPath,
+        proposalIdOrPath: proposalIdOrPath as string,
         spaceDomain
       })
   );

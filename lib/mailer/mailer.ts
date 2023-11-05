@@ -1,11 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { htmlToText } from 'html-to-text';
 
+import { getPageInviteEmail } from './emails';
+import type { PageInviteEmailProps } from './emails/templates/PageInviteEmail';
 import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
 
 export interface EmailRecipient {
   email: string;
   displayName?: string | null;
+  userId: string;
 }
 
 interface EmailProps {
@@ -20,6 +23,8 @@ export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
 
   if (!client) {
     log.debug('No mailgun client, not sending email');
+  } else {
+    log.debug('Sending email to Mailgun', { subject, userId: to.userId });
   }
 
   return client?.messages.create(DOMAIN, {
@@ -31,4 +36,9 @@ export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
     html,
     attachment: attachment ? { data: attachment.data, filename: attachment.name } : undefined
   });
+}
+
+export function sendPageInviteEmail({ to, ...variables }: { to: EmailRecipient } & PageInviteEmailProps) {
+  const template = getPageInviteEmail(variables);
+  return sendEmail({ ...template, to });
 }

@@ -1,23 +1,23 @@
 import type { Bounty } from '@charmverse/core/prisma';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';
+import { getAddress, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
-import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import useGnosisSigner from 'hooks/useWeb3Signer';
-import type { BountyWithDetails } from 'lib/bounties';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SafeData } from 'lib/gnosis';
 import { getSafesForAddress } from 'lib/gnosis';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
 
-import { useBounties } from './useBounties';
-import { useCurrentSpace } from './useCurrentSpace';
+import type { MultiPaymentResult } from './useGnosisPayment';
+import { usePages } from './usePages';
 
 const ERC20_ABI = ['function transfer(address to, uint256 value)'];
 
@@ -30,104 +30,100 @@ export interface TransactionWithMetadata
 }
 
 export function useMultiBountyPayment({
-  bounties,
+  rewards,
   postPaymentSuccess
 }: {
   postPaymentSuccess?: () => void;
-  bounties: BountyWithDetails[];
+  rewards: Pick<RewardWithUsers, 'applications' | 'chainId' | 'id' | 'rewardAmount' | 'rewardToken'>[];
   selectedApplicationIds?: string[];
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
-  const { setBounties, setCurrentBounty, currentBountyId } = useBounties();
-  const { account, chainId } = useWeb3AuthSig();
-  const currentSpace = useCurrentSpace();
+  const { mutateRewards: refreshRewards } = useRewards();
+  const { account, chainId, signer } = useWeb3Account();
+
+  const { pages } = usePages();
+
   const [paymentMethods] = usePaymentMethods();
-  const signer = useGnosisSigner();
   const { data: gnosisSafes } = useSWR(
     signer && account && chainId ? `/connected-gnosis-safes/${account}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
   );
 
-  const bountiesToPay = bounties.filter((bounty) => {
+  const bountiesToPay = rewards.filter((reward) => {
     return (
-      gnosisSafes?.some((safe) => bounty.chainId === safe.chainId) &&
-      isTruthy(bounty.rewardAmount) &&
-      isTruthy(bounty.rewardToken) &&
-      isTruthy(bounty.chainId)
+      gnosisSafes?.some((safe) => reward.chainId === safe.chainId) &&
+      isTruthy(reward.rewardAmount) &&
+      isTruthy(reward.rewardToken) &&
+      isTruthy(reward.chainId)
     );
   });
 
-  // If the bounty is on the same chain as the gnosis safe and the rewardToken of the bounty is the same as the native currency of the gnosis safe chain
+  // If the reward is on the same chain as the gnosis safe and the rewardToken of the reward is the same as the native currency of the gnosis safe chain
   const getTransactions: (safeAddress?: string) => TransactionWithMetadata[] = useCallback(
-    (safeAddress?: string) =>
-      bountiesToPay
-        .map((bounty) =>
-          bounty.applications
+    (safeAddress?: string) => {
+      return bountiesToPay
+        .map((reward) =>
+          reward.applications
             .filter((application) => application.walletAddress && application.status === 'complete')
             .map((application) => {
               let data = '0x';
               let to = application.walletAddress as string;
-              let value = ethers.utils.parseUnits(eToNumber(bounty.rewardAmount as number), 18).toString();
+              let value = parseUnits(eToNumber(reward.rewardAmount as number), 18).toString();
 
               // assume this is ERC20 if its not a native token
               const isERC20Token =
-                safeAddress && bounty.rewardToken !== getChainById(bounty.chainId as number)?.nativeCurrency.symbol;
+                safeAddress && reward.rewardToken !== getChainById(reward.chainId as number)?.nativeCurrency.symbol;
               if (isERC20Token) {
-                const paymentMethod = paymentMethods.find((method) => method.contractAddress === bounty.rewardToken);
+                const paymentMethod = paymentMethods.find((method) => method.contractAddress === reward.rewardToken);
                 const erc20 = new ethers.utils.Interface(ERC20_ABI);
-                const parsedAmount = ethers.utils
-                  .parseUnits(eToNumber(bounty.rewardAmount as number), paymentMethod?.tokenDecimals)
-                  .toString();
+                const parsedAmount = parseUnits(
+                  eToNumber(reward.rewardAmount as number),
+                  paymentMethod!.tokenDecimals
+                ).toString();
                 data = erc20.encodeFunctionData('transfer', [application.walletAddress, parsedAmount]);
                 // send the request to the token contract
-                to = bounty.rewardToken as string;
+                to = reward.rewardToken as string;
                 value = '0';
               }
 
               return {
                 // convert to checksum address, or else gnosis-safe will fail
-                to: ethers.utils.getAddress(to),
+                to: getAddress(to),
                 value,
                 data,
                 applicationId: application.id,
                 userId: application.createdBy,
-                chainId: bounty.chainId,
-                rewardAmount: bounty.rewardAmount,
-                rewardToken: bounty.rewardToken,
-                title: bounty.page?.title || 'Untitled'
+                chainId: reward.chainId,
+                rewardAmount: reward.rewardAmount,
+                rewardToken: reward.rewardToken,
+                title: pages[reward.id]?.title || 'Untitled'
               };
             })
         )
-        .flat(),
-    [bounties, gnosisSafes]
+        .flat();
+    },
+    [rewards, gnosisSafes]
   );
 
   async function onPaymentSuccess(result: MultiPaymentResult) {
     const safeData = gnosisSafes?.find((safe) => safe.address === result.safeAddress);
+
     if (safeData) {
       setIsLoading(true);
       await Promise.all(
         result.transactions.map(async (transaction) => {
-          await charmClient.bounties.recordTransaction({
+          await charmClient.rewards.recordTransaction({
             applicationId: transaction.applicationId,
             transactionId: result.txHash,
+            safeTxHash: result.txHash,
             chainId: safeData.chainId.toString()
           });
-          await charmClient.bounties.markSubmissionAsPaid(transaction.applicationId);
         })
       );
 
-      if (currentSpace) {
-        charmClient.bounties.listBounties(currentSpace.id).then((_bounties) => {
-          setBounties(_bounties);
-          const newCurrentBounty = _bounties.find((_bounty) => _bounty.id === currentBountyId);
-          if (newCurrentBounty) {
-            setCurrentBounty({ ...newCurrentBounty });
-          }
-        });
-      }
+      refreshRewards();
       setIsLoading(false);
       postPaymentSuccess?.();
     }

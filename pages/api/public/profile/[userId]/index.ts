@@ -1,11 +1,8 @@
-import { prisma } from '@charmverse/core';
 import type { User, UserDetails } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { NftData, ExtendedPoap } from 'lib/blockchain/interfaces';
-import { getNFTs } from 'lib/blockchain/nfts';
-import { getPOAPs } from 'lib/blockchain/poaps';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -13,8 +10,6 @@ import { isUUID } from 'lib/utilities/strings';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;
-  visiblePoaps: Partial<ExtendedPoap>[];
-  visibleNfts: NftData[];
 };
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -38,9 +33,7 @@ async function getUserProfile(req: NextApiRequest, res: NextApiResponse<PublicUs
   const users = await prisma.user.findMany({
     where: condition,
     include: {
-      profile: true,
-      profileItems: true,
-      wallets: true
+      profile: true
     }
   });
 
@@ -51,27 +44,7 @@ async function getUserProfile(req: NextApiRequest, res: NextApiResponse<PublicUs
     throw new DataNotFoundError('User not found');
   }
 
-  function isVisible(item: { id: string }): boolean {
-    return !userById.profileItems.some((profileItem) => profileItem.isHidden && profileItem.id === item.id);
-  }
-
-  const allPoaps = await getPOAPs(userById.wallets);
-  const allNfts = await getNFTs({
-    userId: userById.id,
-    wallets: userById.wallets
-  });
-
-  const visiblePoaps = allPoaps.filter(isVisible);
-  const visibleNfts = allNfts.filter(isVisible);
-
-  delete (userById as any).profileItems;
-  delete (userById as any).wallets;
-
-  res.status(200).json({
-    ...userById,
-    visiblePoaps,
-    visibleNfts
-  });
+  res.status(200).json(userById);
 }
 
 export default withSessionRoute(handler);

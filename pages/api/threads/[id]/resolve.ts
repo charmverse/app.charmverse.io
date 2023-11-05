@@ -1,14 +1,15 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -38,17 +39,20 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
     throw new DataNotFoundError(`Could not find thread with id ${threadId}`);
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    resourceId: thread.pageId,
-    userId
-  });
+  const permissionSet = await getPermissionsClient({ resourceId: thread.pageId, resourceIdType: 'page' }).then(
+    ({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: thread.pageId,
+        userId
+      })
+  );
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();
   }
 
   if (typeof req.body.resolved === 'boolean') {
-    const updated = await toggleThreadStatus({
+    const updatedThread = await toggleThreadStatus({
       id: threadId,
       status: req.body.resolved === true ? 'closed' : 'open'
     });
@@ -59,7 +63,18 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
         spaceId: thread.spaceId
       });
     }
-    return res.status(200).json(updated);
+
+    relay.broadcast(
+      {
+        type: 'threads_updated',
+        payload: {
+          pageId: thread.pageId,
+          threadId
+        }
+      },
+      thread.spaceId
+    );
+    return res.status(200).json(updatedThread);
   }
   // Empty update for now as we are only updating the resolved status
   else {

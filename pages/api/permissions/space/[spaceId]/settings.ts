@@ -1,9 +1,10 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 import { listPermissions } from 'lib/permissions/spaces/listPermissions';
 import { saveRoleAndSpacePermissions } from 'lib/permissions/spaces/saveRoleAndSpacePermissions';
@@ -13,6 +14,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSpaceMembership())
+  .use(
+    requirePaidPermissionsSubscription({
+      key: 'spaceId',
+      resourceIdType: 'space',
+      location: 'query'
+    })
+  )
   .get(listSpacePermissionsController)
   .use(requireSpaceMembership({ adminOnly: true }))
   .post(updateSpacePermissionsController);

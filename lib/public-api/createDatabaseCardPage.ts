@@ -1,193 +1,161 @@
-import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
-import { v4, validate } from 'uuid';
+import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
+import { emptyDocument } from 'lib/prosemirror/constants';
+import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
+import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
-import { DatabasePageNotFoundError } from './errors';
-import type { PageProperty } from './interfaces';
+import { getDatabaseWithSchema } from './getDatabaseWithSchema';
+import { handleMappedPropertyEdgeCases } from './handleMappedPropertyEdgeCases';
+import type { BoardPropertyValue } from './interfaces';
+import { mapPropertiesFromApiToSystem } from './mapPropertiesFromApiToSystemFormat';
 import { PageFromBlock } from './pageFromBlock.class';
 
-export async function createDatabase(
-  boardInfo: Record<keyof Pick<Page, 'title' | 'createdBy' | 'spaceId'>, string>,
-  boardSchema: PageProperty[] = []
-): Promise<Page> {
-  const boardId = v4();
+type CreateDatabaseInput = Record<keyof Pick<Page, 'boardId' | 'createdBy' | 'spaceId'>, string> & {
+  properties?: Record<string, BoardPropertyValue>;
+} & Partial<Pick<Page, 'title' | 'content' | 'hasContent' | 'contentText' | 'syncWithPageId'>> & {
+    contentMarkdown?: string;
+  };
 
-  const database = await createPage({
-    data: {
-      id: boardId,
-      title: 'Example title',
-      path: `path-${v4()}`,
-      type: 'board',
-      contentText: '',
-      boardId,
-      space: {
-        connect: {
-          id: boardInfo.spaceId
-        }
-      },
-      author: {
-        connect: {
-          id: boardInfo.createdBy
-        }
-      },
-      updatedBy: boardInfo.createdBy
-    }
+export async function createDatabaseCardPage({
+  boardId,
+  createdBy,
+  properties,
+  spaceId,
+  title,
+  content,
+  contentMarkdown,
+  contentText,
+  hasContent,
+  syncWithPageId
+}: CreateDatabaseInput): Promise<PageFromBlock> {
+  const databaseWithSchema = await getDatabaseWithSchema({
+    databaseId: boardId,
+    spaceId
   });
 
-  await prisma.block.create({
-    data: {
-      id: boardId,
-      user: {
-        connect: {
-          id: boardInfo.createdBy
-        }
-      },
-      updatedBy: boardInfo.createdBy,
-      type: 'board',
-      parentId: '',
-      rootId: boardId,
-      title: boardInfo.title,
-      space: {
-        connect: {
-          id: boardInfo.spaceId
-        }
-      },
-      schema: 1,
-      fields: {
-        icon: '',
-        isTemplate: false,
-        description: '',
-        headerImage: null,
-        cardProperties: boardSchema as any,
-        showDescription: false,
-        columnCalculations: []
-      }
-    }
+  const mappedProperties = await mapPropertiesFromApiToSystem({
+    properties: properties ?? {},
+    databaseIdOrSchema: databaseWithSchema.schema
   });
 
-  return database;
-}
+  const validatedProperties = handleMappedPropertyEdgeCases({
+    mapped: mappedProperties,
+    schema: databaseWithSchema.schema
+  });
 
-export async function createDatabaseCardPage(
-  pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-    properties: Record<string, string | string[]>;
-  }
-): Promise<PageFromBlock> {
-  const isValidUUid = validate(pageInfo.boardId);
+  let contentToInsert: any = content;
 
-  const domain = process.env.DOMAIN ?? 'https://app.charmverse.io';
-
-  if (!isValidUUid) {
-    throw new InvalidInputError(
-      `Please provide a valid database ID in the request query. Visit ${domain}/api-docs to find out how to get this`
-    );
+  if (contentMarkdown) {
+    try {
+      const parsedContent = parseMarkdown(contentMarkdown);
+      contentToInsert = parsedContent;
+    } catch (err) {
+      log.error(`Failed to parse markdown while creating page for board`, { boardId: databaseWithSchema.id, spaceId });
+      throw new InvalidInputError(`Failed to parse the provided markdown`);
+    }
   }
 
-  const board = await prisma.block.findFirst({
-    where: {
-      type: 'board',
-      id: pageInfo.boardId as string,
-      spaceId: pageInfo.spaceId
-    }
-  });
+  const createdCard = await prisma.$transaction(async (tx) => {
+    const pageId = uuid();
 
-  if (!board) {
-    throw new DatabasePageNotFoundError(pageInfo.boardId);
-  }
+    const pageTitle = title ?? 'Untitled';
 
-  const boardSchema = (board.fields as any).cardProperties as PageProperty[];
-
-  const cardBlock = await prisma.block.create({
-    data: {
-      id: v4(),
-      user: {
-        connect: {
-          id: pageInfo.createdBy
-        }
-      },
-      updatedBy: pageInfo.createdBy,
-      type: 'card',
-      rootId: pageInfo.boardId,
-      parentId: pageInfo.boardId,
-      title: pageInfo.title,
-      space: {
-        connect: {
-          id: pageInfo.spaceId
-        }
-      },
-      schema: 1,
-      fields: {
-        contentOrder: [],
-        headerImage: null,
-        icon: '',
-        isTemplate: false,
-        properties: pageInfo.properties ?? {}
-      }
-    }
-  });
-
-  const page = await createPage({
-    data: {
-      author: {
-        connect: {
-          id: cardBlock.createdBy
-        }
-      },
-      createdAt: cardBlock.createdAt,
-      updatedBy: cardBlock.updatedBy,
-      updatedAt: cardBlock.updatedAt,
-      card: {
-        connect: {
-          id: cardBlock.id
-        }
-      },
-      content: { type: 'doc', content: [] },
-      hasContent: false,
-      contentText: '',
-      path: getPagePath(),
-      type: 'card',
-      title: pageInfo.title || '',
-      parentId: pageInfo.boardId,
-      id: cardBlock.id,
-      space: {
-        connect: {
-          id: pageInfo.spaceId
-        }
-      },
-      permissions: {
-        create: [
-          {
-            permissionLevel: 'full_access',
-            spaceId: pageInfo.spaceId
+    const cardBlock = await tx.block.create({
+      data: {
+        id: pageId,
+        user: {
+          connect: {
+            id: createdBy
           }
-        ]
+        },
+        updatedBy: createdBy,
+        type: 'card',
+        rootId: databaseWithSchema.id,
+        parentId: databaseWithSchema.id,
+        title: pageTitle,
+        space: {
+          connect: {
+            id: spaceId
+          }
+        },
+        schema: 1,
+        fields: {
+          contentOrder: [],
+          headerImage: null,
+          icon: '',
+          isTemplate: false,
+          properties: validatedProperties as any
+        }
       }
-    }
+    });
+    const page = await createPage({
+      tx,
+      data: {
+        author: {
+          connect: {
+            id: cardBlock.createdBy
+          }
+        },
+        createdAt: cardBlock.createdAt,
+        updatedBy: cardBlock.updatedBy,
+        updatedAt: cardBlock.updatedAt,
+        card: {
+          connect: {
+            id: cardBlock.id
+          }
+        },
+        content: contentToInsert || emptyDocument,
+        hasContent: !!hasContent,
+        contentText: contentText || '',
+        path: getPagePath(),
+        type: 'card',
+        title: pageTitle,
+        parentId: databaseWithSchema.id,
+        id: cardBlock.id,
+        space: {
+          connect: {
+            id: spaceId
+          }
+        },
+        syncWithPageId
+      }
+    });
+
+    return { cardBlock, page };
   });
 
   relay.broadcast(
     {
       type: 'blocks_created',
-      payload: [prismaToBlock(cardBlock)]
+      payload: [prismaToBlock(createdCard.cardBlock)]
     },
-    cardBlock.spaceId
+    createdCard.cardBlock.spaceId
   );
 
   relay.broadcast(
     {
       type: 'pages_created',
-      payload: [page]
+      payload: [createdCard.page]
     },
-    page.spaceId
+    createdCard.page.spaceId
   );
 
-  const card = new PageFromBlock(cardBlock, boardSchema);
+  const card = new PageFromBlock(
+    { ...createdCard.cardBlock, title: createdCard.page.title },
+    databaseWithSchema.schema
+  );
+
+  if (contentMarkdown) {
+    card.content.markdown = await getMarkdownText(createdCard.page.content);
+  }
 
   return card;
 }

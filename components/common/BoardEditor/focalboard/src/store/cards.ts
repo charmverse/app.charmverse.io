@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
@@ -6,15 +7,12 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta, PagesMap } from 'lib/pages';
+import type { PagesMap } from 'lib/pages';
 
 import { Constants } from '../constants';
 import { Utils } from '../utils';
 
-import { getBoard } from './boards';
-import { initialLoad, initialReadOnlyLoad } from './initialLoad';
-import { getWorkspaceUsers } from './users';
-import { getView } from './views';
+import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
@@ -71,9 +69,9 @@ const cardsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(initialReadOnlyLoad.fulfilled, (state, action) => {
-      state.cards = {};
-      state.templates = {};
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
+      state.cards = state.cards ?? {};
+      state.templates = state.templates ?? {};
       for (const block of action.payload) {
         if (block.type === 'card' && block.fields.isTemplate) {
           state.templates[block.id] = block as Card;
@@ -82,33 +80,12 @@ const cardsSlice = createSlice({
         }
       }
     });
-    builder.addCase(initialLoad.fulfilled, (state, action) => {
-      state.cards = {};
-      state.templates = {};
-      const boardsRecord: { [key: string]: Board } = {};
 
-      action.payload.blocks.forEach((block) => {
-        if (block.type === 'board') {
-          boardsRecord[block.id] = block as Board;
-        }
-      });
-      for (const block of action.payload.blocks) {
-        const boardPage = boardsRecord[block.parentId];
-        // check boardPage exists, its possible a deleted card still exists. TODO: delete cards when a board is deleted!
-        if (boardPage) {
-          // If the parent board block has been deleted, then doesn't matter which card has been deleted, show them all
-          // Otherwise dont show the card that has been deleted by itself
-          if (
-            block.type === 'card' &&
-            ((boardPage.deletedAt === null && block.deletedAt === null) || boardPage.deletedAt !== null)
-          ) {
-            if (block.fields.isTemplate) {
-              state.templates[block.id] = block as Card;
-            } else {
-              state.cards[block.id] = block as Card;
-            }
-          }
-        }
+    builder.addCase(blockLoad.fulfilled, (state, action) => {
+      state.cards = state.cards ?? {};
+      const block = action.payload;
+      if (block.type === 'card') {
+        state.cards[block.id] = block as Card;
       }
     });
   }
@@ -142,11 +119,6 @@ export const getCurrentBoardCards = createSelector(
     return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
   }
 );
-
-export const getBoardCards = (boardId: string) =>
-  createSelector(getCards, (cards: { [key: string]: Card }) => {
-    return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
-  });
 
 export const getCurrentBoardTemplates = createSelector(
   (state: RootState) => state.boards.current,
@@ -269,6 +241,10 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
         } else {
           // Text-based sort
 
+          if (typeof aValue === 'number' || typeof bValue === 'number') {
+            return a > b ? -1 : 1;
+          }
+
           if (aValue.length > 0 && bValue.length <= 0) {
             return -1;
           }
@@ -344,36 +320,25 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-export const getViewCardsSortedFilteredAndGrouped = (props: { viewId: string; boardId: string; pages: PagesMap }) =>
+type getViewCardsProps = { viewId: string; boardId: string };
+
+export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    getBoardCards(props.boardId),
-    getBoard(props.boardId),
-    getView(props.viewId),
-    getWorkspaceUsers,
-    (cards, board, view, users) => {
-      if (!view || !board || !users || !cards) {
+    getCards,
+    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
+    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
+    (cards, board, view) => {
+      if (!view || !board || !cards) {
         return [];
       }
-      let result = cards;
+      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
       const cardProperties: IPropertyTemplate[] = hasTitleProperty
         ? board.fields.cardProperties
         : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(
-          view.fields.filter,
-          cardProperties,
-          result.map((card) => ({
-            ...card,
-            fields: {
-              ...card.fields,
-              properties: {
-                ...card.fields.properties,
-                [Constants.titleColumnId]: props.pages[card.id]?.title ?? ''
-              }
-            }
-          }))
-        );
+        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result);
       }
       return result;
     }

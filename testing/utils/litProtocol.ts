@@ -1,12 +1,12 @@
-import type * as litSDK from 'lit-js-sdk';
+import type * as LitJsSdk from '@lit-protocol/lit-node-client';
 
-type LitResponse = Awaited<ReturnType<typeof litSDK.verifyJwt>>;
+type LitResponse = Awaited<ReturnType<typeof LitJsSdk.verifyJwt>>;
 
 export function verifiedJWTResponse(
   response: Partial<Omit<LitResponse, 'payload'> & { payload: Partial<LitResponse['payload']> }>
 ): LitResponse {
   return {
-    header: '',
+    header: {},
     verified: true,
     signature: new Uint8Array(),
     ...response,

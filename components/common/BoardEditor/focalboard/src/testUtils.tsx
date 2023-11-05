@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -5,14 +6,42 @@ import { IntlProvider } from 'react-intl';
 import type { Middleware } from 'redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import configureStore from 'redux-mock-store';
+import { v4 } from 'uuid';
 
+import { PagesContext } from 'hooks/usePages';
 import type { Block } from 'lib/focalboard/block';
+import { pageStubToCreate } from 'testing/generatePageStub';
+import { AppThemeProvider } from 'theme/AppThemeProvider';
 
 export const wrapIntl = (children?: React.ReactNode): JSX.Element => (
-  <IntlProvider locale='en'>{children}</IntlProvider>
+  <AppThemeProvider>
+    <IntlProvider locale='en'>{children}</IntlProvider>
+  </AppThemeProvider>
 );
 export const wrapDNDIntl = (children?: React.ReactNode): JSX.Element => {
   return <DndProvider backend={HTML5Backend}>{wrapIntl(children)}</DndProvider>;
+};
+
+export const wrapPagesProvider = (cardId: string | string[], children: React.ReactNode) => {
+  const pages: Record<string, PageMeta> = {};
+
+  const cardIds = Array.isArray(cardId) ? cardId : [cardId];
+
+  cardIds.forEach((_cardId) => {
+    pages[_cardId] = pageStubToCreate({ spaceId: v4(), createdBy: v4(), id: _cardId, path: _cardId }) as PageMeta;
+  });
+
+  return (
+    <PagesContext.Provider
+      value={
+        {
+          pages
+        } as any
+      }
+    >
+      {children}
+    </PagesContext.Provider>
+  );
 };
 
 export function mockDOM(): void {

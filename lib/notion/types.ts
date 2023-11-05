@@ -1,14 +1,24 @@
 import type { Page, Prisma } from '@charmverse/core/prisma';
 import type { BlockObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
-export type BaseApiColor = 'gray' | 'turquoise' | 'orange' | 'yellow' | 'teal' | 'blue' | 'purple' | 'pink' | 'red';
+export type BaseApiColor =
+  | 'gray'
+  | 'turquoise'
+  | 'orange'
+  | 'yellow'
+  | 'green'
+  | 'teal'
+  | 'blue'
+  | 'purple'
+  | 'pink'
+  | 'red';
 export type ApiColor = 'default' & BaseApiColor & `${BaseApiColor}_background`;
 
 export interface FailedImportsError {
   pageId: string;
   type: 'page' | 'database';
   title: string;
-  blocks: [string, number][][];
+  blocks: [string, string][];
 }
 
 export type CreatePageInput = {

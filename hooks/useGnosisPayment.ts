@@ -1,16 +1,23 @@
+import { log } from '@charmverse/core/log';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
-import { getChainById } from 'connectors';
-import { ethers, utils } from 'ethers';
-import log from 'loglevel';
+import { getChainById } from 'connectors/chains';
+import { ethers } from 'ethers';
+import { getAddress } from 'viem';
 
-import type { MultiPaymentResult } from 'components/bounties/components/MultiPaymentButton';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+import { proposeTransaction } from 'lib/gnosis/mantleClient';
 
 import useGnosisSafes from './useGnosisSafes';
+
+export type MultiPaymentResult = {
+  safeAddress: string;
+  transactions: (MetaTransactionData & { applicationId: string })[];
+  txHash: string;
+};
 
 export type GnosisPaymentProps = {
   chainId?: number;
@@ -20,9 +27,8 @@ export type GnosisPaymentProps = {
 };
 
 export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
-  const { account, chainId: connectedChainId, library } = useWeb3AuthSig();
+  const { account, chainId: connectedChainId, signer } = useWeb3Account();
   const { showMessage } = useSnackbar();
-
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
@@ -34,7 +40,7 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       await switchActiveNetwork(chainId);
     }
 
-    if (!safe || !account || !network?.gnosisUrl) {
+    if (!safe || !account || !network?.gnosisUrl || !signer) {
       return;
     }
 
@@ -49,21 +55,44 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
 
     const txHash = await safe.getTransactionHash(safeTransaction);
     const senderSignature = await safe.signTransactionHash(txHash);
-    const signer = await library.getSigner(account);
     const ethAdapter = new EthersAdapter({
       ethers,
       signerOrProvider: signer
     });
 
+    const senderAddress = getAddress(account);
+
     const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-    await safeService.proposeTransaction({
-      safeAddress,
-      safeTransactionData: safeTransaction.data,
-      safeTxHash: txHash,
-      senderAddress: utils.getAddress(account),
-      senderSignature: senderSignature.data,
-      origin
-    });
+    if (chainId === 5001 || chainId === 5000) {
+      await proposeTransaction({
+        safeTransactionData: {
+          ...safeTransaction.data,
+          // Need to convert to string because mantle doesn't support big numbers
+          // @ts-ignore
+          baseGas: safeTransaction.data.baseGas.toString(),
+          // @ts-ignore
+          gasPrice: safeTransaction.data.gasPrice.toString(),
+          // @ts-ignore
+          nonce: safeTransaction.data.nonce.toString(),
+          // @ts-ignore
+          safeTxGas: safeTransaction.data.safeTxGas.toString()
+        },
+        txHash,
+        senderAddress,
+        safeAddress,
+        signature: senderSignature.data,
+        chainId
+      });
+    } else {
+      await safeService.proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash: txHash,
+        senderAddress,
+        senderSignature: senderSignature.data,
+        origin
+      });
+    }
     onSuccess({ safeAddress, transactions, txHash });
   }
 

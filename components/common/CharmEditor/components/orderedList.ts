@@ -1,9 +1,11 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import type { Command, EditorState, Schema } from '@bangle.dev/pm';
 import { keymap, wrappingInputRule } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { toggleList } from './listItem/commands';
 import { listIsTight } from './listItem/listIsTight';
@@ -45,35 +47,16 @@ function specFactory(): RawSpecs {
       group: 'block',
       parseDOM: [
         {
-          tag: 'ol',
+          tag: 'ol.old-list',
           getAttrs: (dom: any) => ({
             order: dom.hasAttribute('start') ? +dom.getAttribute('start')! : 1
           })
         }
       ],
-      toDOM: (node) => (node.attrs.order === 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0])
-    },
-    markdown: {
-      toMarkdown(state, node) {
-        const start = node.attrs.order || 1;
-        const maxW = String(start + node.childCount - 1).length;
-        const space = state.repeat(' ', maxW + 2);
-        state.renderList(node, space, (i) => {
-          const nStr = String(start + i);
-          return `${state.repeat(' ', maxW - nStr.length) + nStr}. `;
-        });
-      },
-      parseMarkdown: {
-        ordered_list: {
-          block: name,
-          getAttrs: (tok: Token, tokens: Token[], i: number) => {
-            return {
-              tight: listIsTight(tokens, i),
-              order: +(tok.attrGet('start') ?? 1)
-            };
-          }
-        }
-      }
+      toDOM: (node) =>
+        node.attrs.order === 1
+          ? ['ol', { class: 'old-list' }, 0]
+          : ['ol', { class: 'old-list', start: node.attrs.order }, 0]
     }
   };
 }

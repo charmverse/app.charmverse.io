@@ -1,7 +1,7 @@
-import type { RawSpecs, BaseRawMarkSpec } from '@bangle.dev/core';
-import { domSerializationHelpers } from '@bangle.dev/core';
 import { log } from '@charmverse/core/log';
 
+import { domSerializationHelpers } from 'components/common/CharmEditor/components/@bangle.dev/core/domSerializationHelpers';
+import type { RawSpecs, BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { getTwitterEmoji } from 'components/common/Emoji';
 
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
@@ -52,10 +52,12 @@ function emojiSpec({ defaultEmoji = '😃' }: { defaultEmoji?: string } = {}): R
     },
     markdown: {
       toMarkdown: (state, node) => {
-        try {
-          state.text(node.attrs.emoji);
-        } catch (err) {
-          log.warn('Conversion err', err);
+        if (node.attrs?.emoji) {
+          try {
+            state.text(node.attrs.emoji);
+          } catch (err) {
+            log.warn('Conversion err', err);
+          }
         }
       }
     }
@@ -71,6 +73,14 @@ function specMark({
 
   return {
     ..._spec,
+    markdown: {
+      toMarkdown: {
+        open: '',
+        close: '',
+        mixable: false,
+        expelEnclosingWhitespace: true
+      }
+    },
     options: {
       trigger
     }

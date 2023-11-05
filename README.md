@@ -8,7 +8,7 @@ There are several ways you can contribute:
 
 - Tweet us: [@charmverse](https://twitter.com/charmverse)
 - Email us: [hello@charmverse.io](mailto:hello@charmverse.io)
-- Join Discord: [Charmverse.io](https://discord.gg/ACYCzBGC2M)
+- Join Discord: [CharmVerse.io](https://discord.gg/ACYCzBGC2M)
 - Pull Requests are welcome! See developer setup below 🙌
 
 ## Developer Docs
@@ -282,8 +282,8 @@ If you are using VSCode, install the (Jest Runner plugin)[https://marketplace.vi
 
 In .vscode/settings.json, add:
 
-- for running server side tests: "jestrunner.configPath": "jest.config-server.ts"
-- for running client side tests: "jestrunner.configPath": "jest.config-browser.ts"
+- for running server side tests: "jestrunner.configPath": "jest.config.server.ts"
+- for running client side tests: "jestrunner.configPath": "jest.config.browser.ts"
 
 This will display a small "Run" button above each test suite and assertion.
 

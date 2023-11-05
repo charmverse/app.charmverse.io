@@ -1,3 +1,4 @@
+import type { MemberProperty } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import {
@@ -18,15 +19,16 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
-import { DiscordSocialIcon } from 'components/profile/components/UserDetails/DiscordSocialIcon';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
-import type { Social } from 'components/profile/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
+import type { Social, Member } from 'lib/members/interfaces';
 
+import { useMemberDialog } from '../hooks/useMemberDialog';
+
+import { DiscordSocialIcon } from './DiscordSocialIcon';
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
@@ -38,15 +40,21 @@ const StyledTableRow = styled(TableRow)`
   ${hoverIconsStyle()}
 `;
 
-function MemberDirectoryTableRow({ member }: { member: Member }) {
+function MemberDirectoryTableRow({
+  member,
+  visibleProperties
+}: {
+  visibleProperties: MemberProperty[];
+
+  member: Member;
+}) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
   const discordUsername = (member.profile?.social as Social)?.discordUsername;
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-  const { properties = [] } = useMemberProperties();
-  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
-  const { showMemberProfile } = useMemberProfile();
+  const { showUserId } = useMemberDialog();
+  const { openSettings } = useSettingsDialog();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -65,9 +73,8 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
             size='small'
             className='icons'
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
-              showMemberProfile(member.id);
+              openSettings('profile');
             }}
             style={{
               opacity: 1
@@ -97,11 +104,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
               return (
                 <TableCell key={property.id}>
                   <Stack gap={1} flexDirection='row' flexWrap='wrap'>
-                    {member.roles.length === 0
-                      ? '-'
-                      : member.roles.map((role) => (
-                          <Chip label={role.name} key={role.id} size='small' variant='outlined' />
-                        ))}
+                    {member.roles.map((role) => (
+                      <Chip label={role.name} key={role.id} size='small' variant='outlined' />
+                    ))}
                   </Stack>
                 </TableCell>
               );
@@ -163,18 +168,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
 
               return (
                 <TableCell key={property.id}>
-                  {member.id !== user?.id ? (
-                    <Link
-                      color='inherit'
-                      href={`/u/${member.path || member.id}${currentSpace ? `?workspace=${currentSpace.id}` : ''}`}
-                    >
-                      {content}
-                    </Link>
-                  ) : (
-                    <Box sx={{ cursor: 'pointer' }} onClick={() => showMemberProfile(member.id)}>
-                      {content}
-                    </Box>
-                  )}
+                  <Box sx={{ cursor: 'pointer' }} onClick={() => showUserId(member.id)}>
+                    {content}
+                  </Box>
                 </TableCell>
               );
             }
@@ -242,9 +238,9 @@ function MemberDirectoryTableRow({ member }: { member: Member }) {
 }
 
 export function MemberDirectoryTableView({ members }: { members: Member[] }) {
-  const { properties = [] } = useMemberProperties();
+  const { getDisplayProperties } = useMemberProperties();
 
-  const visibleProperties = properties.filter((property) => property.enabledViews.includes('table'));
+  const visibleProperties = getDisplayProperties('table');
   return (
     <Table
       size='small'
@@ -268,7 +264,7 @@ export function MemberDirectoryTableView({ members }: { members: Member[] }) {
       </TableHead>
       <TableBody>
         {members.map((member) => (
-          <MemberDirectoryTableRow member={member} key={member.id} />
+          <MemberDirectoryTableRow visibleProperties={visibleProperties} member={member} key={member.id} />
         ))}
       </TableBody>
     </Table>

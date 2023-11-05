@@ -35,6 +35,7 @@ export async function getSnapshotSpace(spaceDomain: string): Promise<SnapshotSpa
         voting {
           period
           delay
+          type
         }
       }
     }

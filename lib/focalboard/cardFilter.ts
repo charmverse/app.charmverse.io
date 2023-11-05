@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -38,6 +40,7 @@ class CardFilter {
       return false;
     }
     Utils.assert(filterGroup.operation === 'and');
+
     for (const filter of filters) {
       if (isAFilterGroupInstance(filter)) {
         if (!this.isFilterGroupMet(filter, templates, card)) {
@@ -53,13 +56,14 @@ class CardFilter {
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
-    const filterValue = filter.values[0]?.toLowerCase() ?? '';
+    const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
+    const valueArray = (Array.isArray(value) ? value : [value]).map((v) => v.toString());
 
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {
         const condition = filter.condition as (typeof TextDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
+        const sourceValue = valueArray[0]?.toLowerCase() ?? '';
         switch (condition) {
           case 'contains': {
             if (sourceValue.includes(filterValue)) {
@@ -92,12 +96,12 @@ class CardFilter {
             return sourceValue !== '';
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'boolean') {
         const condition = filter.condition as (typeof BooleanDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? 'false';
+        const sourceValue = valueArray[0]?.toLowerCase() ?? 'false';
         switch (condition) {
           case 'is': {
             return sourceValue === (filter.values[0] || 'false');
@@ -106,12 +110,12 @@ class CardFilter {
             return sourceValue !== (filter.values[0] || 'false');
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'number') {
         const condition = filter.condition as (typeof NumberDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
+        const sourceValue = valueArray[0]?.toLowerCase() ?? '';
         switch (condition) {
           case 'equal': {
             return sourceValue.length === 0 ? true : Number(sourceValue) === Number(filterValue);
@@ -138,34 +142,33 @@ class CardFilter {
             return Number(sourceValue) !== Number(filterValue);
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'multi_select') {
         const condition = filter.condition as (typeof MultiSelectDataTypeConditions)[number];
-        const sourceValues = Array.isArray(value) ? value : [value];
         switch (condition) {
           case 'contains': {
-            return sourceValues.length !== 0 && sourceValues.some((sourceValue) => filter.values.includes(sourceValue));
+            return valueArray.length !== 0 && valueArray.some((sourceValue) => filter.values.includes(sourceValue));
           }
           case 'does_not_contain': {
-            return sourceValues.length === 0
+            return valueArray.length === 0
               ? true
-              : sourceValues.every((sourceValue) => !filter.values.includes(sourceValue));
+              : valueArray.every((sourceValue) => !filter.values.includes(sourceValue));
           }
           case 'is_empty': {
-            return sourceValues.length === 0;
+            return valueArray.length === 0;
           }
           case 'is_not_empty': {
-            return sourceValues.length > 0;
+            return valueArray.length > 0;
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'select') {
         const condition = filter.condition as (typeof SelectDataTypeConditions)[number];
-        const sourceValue = (Array.isArray(value) ? value[0] : value)?.toLowerCase() ?? '';
+        const sourceValue = valueArray[0]?.toLowerCase() ?? '';
         switch (condition) {
           case 'is': {
             return sourceValue.length !== 0 && filterValue === sourceValue;
@@ -180,13 +183,18 @@ class CardFilter {
             return sourceValue !== '';
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       } else if (filterPropertyDataType === 'date') {
         const condition = filter.condition as (typeof DateDataTypeConditions)[number];
-        const propertyValue = Array.isArray(value) ? value[0] : value;
-        const sourceValue = propertyValue ? (JSON.parse(propertyValue) as { from: number }) : { from: undefined };
+        const propertyValue = valueArray[0];
+        let sourceValue: { from?: number } = {};
+        try {
+          sourceValue = propertyValue ? (JSON.parse(propertyValue) as { from: number }) : { from: undefined };
+        } catch (error) {
+          log.error('Could not parse card property value', { propertyValue, error });
+        }
         switch (condition) {
           case 'is': {
             return (
@@ -231,7 +239,7 @@ class CardFilter {
             );
           }
           default: {
-            Utils.assertFailure(`Invalid filter condition ${filter.condition}`);
+            Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
       }

@@ -1,7 +1,7 @@
 import type { EditorState, Transaction } from '@bangle.dev/pm';
-import { Fragment, setBlockType } from '@bangle.dev/pm';
+import { Fragment, setBlockType, findWrapping } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
-import type { PageType, SpaceOperation } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -13,17 +13,16 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
-import { TextSelection } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
+import { TextSelection } from 'prosemirror-state';
 
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
-import * as bulletList from '../../bulletList';
-import { nestedPageSuggestMarkName } from '../../nestedPage/nestedPage.constants';
+import { linkedPageSuggestMarkName } from '../../linkedPage/linkedPage.constants';
+import * as listItemCommands from '../../listItemNew/commands';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
-import * as orderedList from '../../orderedList';
-import paragraph from '../../paragraph';
+import { convertToParagraph } from '../../paragraph/paragraph';
 import { isList } from '../commands';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
 import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
@@ -31,7 +30,7 @@ import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 interface ItemsProps {
   addNestedPage: () => Promise<void>;
   disableNestedPage: boolean;
-  nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  linkedPagePluginKey?: PluginKey<NestedPagePluginState>;
   userSpacePermissions?: SpacePermissionFlags;
   pageType?: PageType;
 }
@@ -46,15 +45,20 @@ function createTableCell(state: EditorState, text: string) {
 }
 
 function createTableHeader(state: EditorState, text: string) {
-  return state.schema.nodes.table_cell.create(
-    { header: true },
+  return state.schema.nodes.table_header.create(
+    undefined,
     Fragment.fromArray([state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([state.schema.text(text)]))])
   );
 }
 
-const { convertToParagraph } = paragraph;
-const { toggleTodoList, queryIsBulletListActive, queryIsTodoListActive, toggleBulletList } = bulletList;
-const { toggleOrderedList, queryIsOrderedListActive } = orderedList;
+const {
+  toggleTodoList,
+  queryIsBulletListActive,
+  queryIsTodoListActive,
+  toggleBulletList,
+  toggleOrderedList,
+  queryIsOrderedListActive
+} = listItemCommands;
 
 const setHeadingBlockType =
   (level: number) => (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined) => {
@@ -63,7 +67,7 @@ const setHeadingBlockType =
   };
 
 export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
-  const { addNestedPage, disableNestedPage, nestedPagePluginKey, pageType, userSpacePermissions } = props;
+  const { addNestedPage, disableNestedPage, linkedPagePluginKey, pageType, userSpacePermissions } = props;
 
   const insertPageItem: PaletteItemTypeNoGroup[] =
     pageType !== 'card_template' && !disableNestedPage
@@ -246,6 +250,7 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
             setBlockType(_state.schema.nodes.paragraph)(_state, _dispatch);
             return toggleBulletList()(_view!.state, _view!.dispatch, _view);
           });
+
           return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
         };
       }
@@ -389,12 +394,12 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       description: 'Link to an existing page',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (async (state, dispatch, view) => {
-          if (nestedPagePluginKey) {
-            const nestedPagePluginState = nestedPagePluginKey.getState(state);
+          if (linkedPagePluginKey) {
+            const nestedPagePluginState = linkedPagePluginKey.getState(state);
             if (nestedPagePluginState) {
               replaceSuggestionMarkWith(
                 palettePluginKey,
-                state.schema.text(' ', [state.schema.marks[nestedPageSuggestMarkName].create({})]),
+                state.schema.text(' ', [state.schema.marks[linkedPageSuggestMarkName].create({})]),
                 true
               )(state, dispatch, view);
             }
@@ -419,14 +424,27 @@ export function items(props: ItemsProps): PaletteItemTypeNoGroup[] {
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {
           rafCommandExec(view!, (_state, _dispatch) => {
-            const node = _state.schema.nodes.blockquote.create(
+            const { $from } = _state.selection;
+            const nodeType = _state.schema.nodes.blockquote;
+            const isEmptySelection = _state.selection.empty;
+            const node = nodeType.create(
               undefined,
               Fragment.fromArray([_state.schema.nodes.paragraph.create(undefined, Fragment.fromArray([]))])
             );
 
-            if (_dispatch && isAtBeginningOfLine(_state)) {
+            if (_dispatch) {
               const tr = _state.tr;
-              tr.replaceSelectionWith(node);
+              let wrapping: ReturnType<typeof findWrapping> = null;
+              const range = $from.blockRange();
+              // if selection is not empty, try to wrap the node(s) with a callout instead of creating a new node
+              if (!isEmptySelection) {
+                wrapping = range && findWrapping(range, nodeType);
+              }
+              if (wrapping) {
+                tr.wrap(range!, wrapping);
+              } else {
+                tr.replaceSelectionWith(node);
+              }
               // move cursor to block
               const offset = tr.selection.$head.end(1); // param 1 is node deep
               const resolvedPos = tr.doc.resolve(offset);

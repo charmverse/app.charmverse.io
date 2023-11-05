@@ -1,20 +1,16 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BountyWithDetails } from 'lib/bounties';
-import { includePagePermissions } from 'lib/pages/server';
+import { includePagePermissionsWithSource } from 'lib/permissions/pages/includePagePermissionsWithSource';
 import { InvalidInputError } from 'lib/utilities/errors';
 
+import { paidBountyStatuses } from './constants';
 import { getBountyOrThrow } from './getBounty';
 
 export async function markBountyAsPaid(bountyId: string): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
-  if (
-    bounty.applications.some(
-      (application) =>
-        application.status !== 'paid' && application.status !== 'complete' && application.status !== 'rejected'
-    )
-  ) {
+  if (!bounty.applications.every((application) => paidBountyStatuses.includes(application.status))) {
     throw new InvalidInputError('All applications need to be either completed or paid in order to mark bounty as paid');
   }
 
@@ -41,7 +37,7 @@ export async function markBountyAsPaid(bountyId: string): Promise<BountyWithDeta
     include: {
       applications: true,
       page: {
-        include: includePagePermissions()
+        include: includePagePermissionsWithSource()
       }
     }
   }) as Promise<BountyWithDetails>;

@@ -1,5 +1,5 @@
 import { Prisma } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 const concurrent = 5;
 

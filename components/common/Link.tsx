@@ -5,6 +5,9 @@ import NextLink from 'next/link';
 import type { MouseEvent } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { getSubdomainPath } from 'lib/utilities/browser';
+import { isExternalUrl } from 'lib/utilities/isExternalUrl';
 
 const hoverStyle: { [key: string]: string } = {
   blue: 'color: #111',
@@ -35,10 +38,13 @@ const StyledMuiLink = styled(MuiLink)`
 interface Props extends Omit<LinkProps, 'href'> {
   external?: boolean;
   href?: string;
+  space?: { customDomain: string | null; domain: string };
   'data-test'?: string;
 }
 
-export default function Link({ external, href, onClick, children, color = 'primary', ...restProps }: Props) {
+export default function Link({ external, href, onClick, children, color = 'primary', space, ...restProps }: Props) {
+  const { space: currentSpace } = useCurrentSpace();
+
   if (!href) {
     return (
       <div className={restProps.className} onClick={onClick} data-test={restProps['data-test']}>
@@ -47,13 +53,15 @@ export default function Link({ external, href, onClick, children, color = 'prima
     );
   }
 
-  return external ? (
+  const isExternal = external || isExternalUrl(href);
+
+  return isExternal ? (
     <StyledMuiLink href={href} color={color} onClick={onClick} rel='noreferrer' underline='none' {...restProps}>
       {children}
     </StyledMuiLink>
   ) : (
     <StyledMuiLink
-      href={href}
+      href={getSubdomainPath(href, space ?? currentSpace ?? undefined)}
       // @ts-ignore
       component={NextLink}
       onClick={onClick}

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -8,16 +8,25 @@ import { publishUserProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { isVotingClosed } from './utils';
 
 export async function castVote(
-  choice: string,
+  choices: string[],
   vote: Vote & { voteOptions: VoteOptions[] },
   userId: string
 ): Promise<UserVote> {
   const voteId = vote.id;
+
   if (isVotingClosed(vote)) {
     throw new UndesirableOperationError(`Vote with id: ${voteId} is past deadline.`);
   }
 
-  if (!vote.voteOptions.find((option: VoteOptions) => option.name === choice)) {
+  if (vote.maxChoices && choices.length > vote.maxChoices) {
+    if (vote.maxChoices === 1) {
+      throw new InvalidInputError('Vote allows only one choice.');
+    }
+
+    throw new InvalidInputError(`Vote allows only ${vote.maxChoices} choices.`);
+  }
+
+  if (choices.some((choice) => !vote.voteOptions.find((option) => option.name === choice))) {
     throw new InvalidInputError('Voting choice is not a valid option.');
   }
 
@@ -30,6 +39,8 @@ export async function castVote(
     }
   }));
 
+  // TODO - delete user vote when choices.length === 0
+
   const userVote = await prisma.userVote.upsert({
     where: {
       voteId_userId: {
@@ -40,10 +51,10 @@ export async function castVote(
     create: {
       userId,
       voteId,
-      choice
+      choices
     },
     update: {
-      choice,
+      choices,
       updatedAt: new Date()
     },
     include: {

@@ -1,6 +1,7 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
+import { getSpaceByDomainWhere } from 'lib/spaces/getSpaceByDomain';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
 
@@ -20,9 +21,7 @@ export async function getForumPost({ postId, userId, spaceDomain }: GetForumPost
     query.id = postId;
   } else if (postId && spaceDomain) {
     query.path = postId;
-    query.space = {
-      domain: spaceDomain
-    };
+    query.space = getSpaceByDomainWhere(spaceDomain);
   } else {
     throw new InvalidInputError('Please provide a valid UUID or a post path and spaceId');
   }

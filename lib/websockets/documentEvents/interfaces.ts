@@ -47,15 +47,21 @@ export type ClientSelectionMessage = {
 };
 
 export type ProsemirrorJSONStep = {
-  stepType: 'replace';
+  stepType: 'replace' | 'addMark';
   from: number;
   to: number;
   slice?: {
     content?: {
       type: string;
+      attrs?: any;
       marks?: { type: string; attrs: any }[];
-      text: string;
+      content?: any[];
+      text?: string;
     }[];
+  };
+  mark?: {
+    type: string;
+    attrs: Record<string, any>;
   };
 };
 
@@ -99,7 +105,7 @@ type ServerConnectionsMessage = {
 export type ServerDocDataMessage = {
   type: 'doc_data';
   doc: { content: Node; v: number };
-  docInfo: { id: string; session_id: string; updated: any; version: number }; // TODO: do we need this?
+  docInfo: { id: string; session_id: string; version: number }; // TODO: do we need this?
   time: number;
   m?: ClientDiffMessage[];
 };
@@ -114,12 +120,17 @@ export type ServerErrorMessage = {
   message: string;
 };
 
+export type PatchError = {
+  type: 'patch_error';
+};
+
 export type ServerMessage =
   | StandardMessage
   | ServerConnectionsMessage
   | ServerDocDataMessage
   | ServerDiffMessage
   | ServerErrorMessage
+  | PatchError
   | { type: 'subscribed' | 'patch_error' | 'welcome' };
 
 export type SocketMessage = ClientMessage | ServerMessage;

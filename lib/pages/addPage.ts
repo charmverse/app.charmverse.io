@@ -1,20 +1,20 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import type { NextRouter } from 'next/router';
 import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
-import { createTableView } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
-import { createBoard } from 'lib/focalboard/board';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { Board } from 'lib/focalboard/board';
-import { createBoardView } from 'lib/focalboard/boardView';
+import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
 import type { Card } from 'lib/focalboard/card';
+import { createTableView } from 'lib/focalboard/tableView';
+import type { PageCreated } from 'lib/websockets/interfaces';
 
-import type { IPageWithPermissions } from './interfaces';
 import { getPagePath } from './utils';
 
 export type NewPageInput = Partial<Page> & {
@@ -26,14 +26,45 @@ interface AddPageResponse {
   board: Board | null;
   view: BoardView | null;
   cards: Card[];
-  page: IPageWithPermissions;
+  page: PageWithPermissions;
 }
 
-export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Promise<AddPageResponse> {
+type CreatedPage = Pick<Page, 'id' | 'path'>;
+
+async function addDatabasePage(newPage: PageWithPermissions) {
+  const isBoardPage = newPage.type?.match(/board/);
+  const result: AddPageResponse = {
+    board: null,
+    page: newPage,
+    cards: [],
+    view: null
+  };
+
+  if (isBoardPage) {
+    const { board } = createDefaultBoardData({ boardId: newPage.id });
+    result.board = board;
+    await mutator.insertBlocks([board]);
+  }
+
+  await mutate(
+    getPagesListCacheKey(newPage.spaceId),
+    (pages: Record<string, Page> | undefined) => {
+      return { ...pages, [newPage.id]: newPage };
+    },
+    {
+      revalidate: false
+    }
+  );
+
+  return result;
+}
+
+export async function addPage(
+  { createdBy, spaceId, ...page }: NewPageInput,
+  { cb, trigger }: { trigger: 'sidebar' | 'editor'; cb?: (page: CreatedPage) => void }
+) {
   const pageId = page?.id || v4();
-
   const isBoardPage = page.type?.match(/board/);
-
   const pageProperties: Partial<Page> = {
     id: pageId,
     boardId: isBoardPage ? pageId : undefined,
@@ -50,33 +81,34 @@ export async function addPage({ createdBy, spaceId, ...page }: NewPageInput): Pr
     ...page
   };
 
-  const newPage = await charmClient.createPage(pageProperties);
-
-  const result: AddPageResponse = {
-    board: null,
-    page: newPage,
-    cards: [],
-    view: null
-  };
-
-  if (isBoardPage) {
-    const { board, view } = createDefaultBoardData({ boardId: pageId });
-    result.board = board;
-    await mutator.insertBlocks([board]);
-  }
-
-  await mutate(
-    getPagesListCacheKey(spaceId),
-    (pages: Record<string, Page> | undefined) => {
-      return { ...pages, [newPage.id]: newPage };
-    },
-    {
-      // revalidate pages for board since we create 3 default ones
-      revalidate: Boolean(isBoardPage)
+  // Only emit socket message if we are creating a board or page from the sidebar
+  // Adding condition for checking page type since card pages can also be added from the sidebar but it should be created via the api
+  if (
+    (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') &&
+    trigger === 'sidebar' &&
+    page.parentId
+  ) {
+    emitSocketMessage<PageWithPermissions>(
+      {
+        type: 'page_created',
+        payload: pageProperties as PageCreated['payload']
+      },
+      async (newPage) => {
+        if (cb) {
+          cb(newPage);
+        }
+        await addDatabasePage(newPage);
+      }
+    );
+  } else {
+    // For creating board and other pages from the editor use the api
+    const newPage = await charmClient.createPage(pageProperties);
+    // call back immediately to update UI while db is created
+    if (cb) {
+      cb(newPage);
     }
-  );
-
-  return result;
+    await addDatabasePage(newPage);
+  }
 }
 
 interface DefaultBoardProps {
@@ -88,7 +120,7 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
   board.id = boardId;
   board.rootId = board.id;
 
-  const view = createTableView(board);
+  const view = createTableView({ board });
 
   return {
     board,
@@ -97,31 +129,13 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
   };
 }
 
-export function createDefaulBoardViewAndCards({ board }: { board: Board }) {
-  const view = createBoardView();
-  view.fields.viewType = 'board';
-  view.parentId = board.id;
-  view.rootId = board.rootId;
-  view.title = '';
-
-  const cards: Card[] = [];
-
-  for (let index = 0; index < 3; index++) {
-    const card = createCard();
-    card.parentId = board.id;
-    card.rootId = board.rootId;
-    card.title = `Card ${index + 1}`;
-    card.fields.contentOrder = [];
-    view.fields.cardOrder.push(card.id);
-    cards.push(card);
-  }
-
-  return { view, cards };
-}
-
 export async function addPageAndRedirect(page: NewPageInput, router: NextRouter) {
   if (page) {
-    const { page: newPage } = await addPage(page);
-    router.push(`/${router.query.domain}/${newPage.path}`);
+    await addPage(page, {
+      trigger: 'sidebar',
+      cb: (newPage) => {
+        router.push(`/${router.query.domain}/${newPage.path}`);
+      }
+    });
   }
 }

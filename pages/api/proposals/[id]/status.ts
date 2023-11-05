@@ -1,12 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidStateError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -17,12 +15,12 @@ handler
   .use(requireKeys(['newStatus'], 'body'))
   .put(updateProposalStatusController);
 
-async function updateProposalStatusController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
+async function updateProposalStatusController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
   const newStatus = req.body.newStatus as ProposalStatus;
 
-  const updatedProposal = await updateProposalStatus({
+  await updateProposalStatus({
     proposalId,
     newStatus,
     userId
@@ -46,7 +44,7 @@ async function updateProposalStatusController(req: NextApiRequest, res: NextApiR
     spaceId: proposalPage?.spaceId || ''
   });
 
-  return res.status(200).send(updatedProposal.proposal);
+  return res.status(200).json({ ok: true });
 }
 
 export default withSessionRoute(handler);

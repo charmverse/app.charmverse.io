@@ -8,7 +8,10 @@ const readOnly: SpacePermissionTemplate = {
     createPage: false,
     createForumCategory: false,
     moderateForums: false,
-    reviewProposals: false
+    reviewProposals: false,
+    deleteAnyBounty: false,
+    deleteAnyPage: false,
+    deleteAnyProposal: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'view',
@@ -23,7 +26,10 @@ const collaborative: SpacePermissionTemplate = {
     createBounty: true,
     createForumCategory: false,
     moderateForums: false,
-    reviewProposals: true
+    reviewProposals: true,
+    deleteAnyBounty: false,
+    deleteAnyPage: false,
+    deleteAnyProposal: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -38,7 +44,10 @@ const open: SpacePermissionTemplate = {
     createBounty: true,
     createForumCategory: false,
     moderateForums: false,
-    reviewProposals: true
+    reviewProposals: true,
+    deleteAnyBounty: false,
+    deleteAnyPage: false,
+    deleteAnyProposal: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',

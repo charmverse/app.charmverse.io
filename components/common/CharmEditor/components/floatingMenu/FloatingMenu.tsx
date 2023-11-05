@@ -1,20 +1,12 @@
 /* eslint-disable react/no-unused-prop-types */
-import { usePluginState, useEditorViewContext } from '@bangle.dev/react';
-import { selectionTooltip } from '@bangle.dev/tooltip';
-import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import { bindTrigger } from 'material-ui-popup-state';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PluginKey } from 'prosemirror-state';
-import { useState } from 'react';
 import reactDOM from 'react-dom';
 
-import Button from 'components/common/Button';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
+import { InlinePalletteFloatingMenu } from 'components/common/CharmEditor/components/inlinePalette/InlinePalletteFloatingMenu';
 
-import { InlineCommentSubMenu } from '../inlineComment/inlineComment.components';
-import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalette';
+import { usePluginState } from '../@bangle.dev/react/hooks';
+import { InlineCommentSubMenu } from '../inlineComment/components/InlineCommentSubMenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
 import type { SubMenu } from './floating-menu';
@@ -42,8 +34,8 @@ type MenuProps = {
   enableVoting?: boolean;
   pluginKey: PluginKey;
   inline?: boolean;
-  pagePermissions?: IPagePermissionFlags;
-  nestedPagePluginKey?: PluginKey<any>;
+  pagePermissions?: PagePermissionFlags;
+  linkedPagePluginKey?: PluginKey<any>;
   disableNestedPage?: boolean;
   palettePluginKey?: PluginKey;
   pageId?: string;
@@ -62,16 +54,12 @@ function MenuByType(props: MenuProps) {
     inline,
     pagePermissions,
     enableComments,
-    nestedPagePluginKey,
+    linkedPagePluginKey,
     disableNestedPage,
     pageId
   } = props;
-  const { type } = usePluginState(props.pluginKey) as { type: SubMenu };
-
-  const popupState = usePopupState({ variant: 'popover', popupId: 'commands-menu' });
+  const { type } = usePluginState(props.pluginKey) as { type: SubMenu; show: boolean };
   const displayInlineCommentButton = !inline && pagePermissions?.comment && enableComments;
-  const [activeItem, setActiveItem] = useState('Text');
-  const handleActiveItem = (item: string) => setActiveItem(item);
 
   if ((type as FloatingMenuVariant) === 'commentOnlyMenu' && pagePermissions?.comment) {
     return (
@@ -86,28 +74,12 @@ function MenuByType(props: MenuProps) {
       <Menu type={type} inline={inline}>
         {!inline && palettePluginKey && (
           <MenuGroup>
-            <Tooltip title={<Typography component='div'>Turn into</Typography>}>
-              <Button
-                {...bindTrigger(popupState)}
-                endIcon={<KeyboardArrowDown sx={{ marginLeft: '-4px' }} />}
-                disableElevation
-                variant='text'
-                color='inherit'
-                sx={{ padding: 0 }}
-              >
-                {activeItem}
-              </Button>
-            </Tooltip>
-            <InlineCommandPalette
+            <InlinePalletteFloatingMenu
               palettePluginKey={palettePluginKey}
-              menuKey={pluginKey}
-              nestedPagePluginKey={nestedPagePluginKey}
+              linkedPagePluginKey={linkedPagePluginKey}
+              pageId={pageId}
+              pluginKey={pluginKey}
               disableNestedPage={disableNestedPage}
-              externalPopupState={popupState}
-              filterItem={(item) => !!item.showInFloatingMenu}
-              isFloatingMenuList={true}
-              handleActiveItem={handleActiveItem}
-              pageId={props.pageId}
             />
           </MenuGroup>
         )}

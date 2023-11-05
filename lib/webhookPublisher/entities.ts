@@ -1,10 +1,22 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
 
-import type { BountyEntity, CommentEntity, PostEntity, ProposalEntity, SpaceEntity, UserEntity } from './interfaces';
+import type {
+  ApplicationEntity,
+  BlockCommentEntity,
+  RewardEntity,
+  CommentEntity,
+  DocumentEntity,
+  InlineCommentEntity,
+  PostEntity,
+  ProposalEntity,
+  SpaceEntity,
+  UserEntity,
+  VoteEntity
+} from './interfaces';
 
-export async function getBountyEntity(id: string): Promise<BountyEntity> {
+export async function getRewardEntity(id: string): Promise<RewardEntity> {
   const bounty = await prisma.bounty.findUniqueOrThrow({
     where: {
       id
@@ -22,22 +34,60 @@ export async function getBountyEntity(id: string): Promise<BountyEntity> {
     rewardChain: bounty.chainId,
     rewardAmount: bounty.rewardAmount,
     url: `${baseUrl}/${bounty.space.domain}/bounties/${bounty.id}`,
-    customReward: bounty.customReward
+    customReward: bounty.customReward,
+    author: await getUserEntity(bounty.createdBy)
   };
 }
 
-export async function getCommentEntity(id: string): Promise<CommentEntity> {
-  const comment = await prisma.postComment.findUniqueOrThrow({
-    where: {
-      id
-    }
-  });
+export async function getCommentEntity(id: string, isPostComment?: boolean): Promise<CommentEntity> {
+  const comment = isPostComment
+    ? await prisma.postComment.findUniqueOrThrow({
+        where: {
+          id
+        },
+        select: {
+          createdAt: true,
+          createdBy: true,
+          parentId: true
+        }
+      })
+    : await prisma.pageComment.findUniqueOrThrow({
+        where: {
+          id
+        },
+        select: {
+          createdAt: true,
+          createdBy: true,
+          parentId: true
+        }
+      });
   const author = await getUserEntity(comment.createdBy);
   return {
     id,
     author,
     createdAt: comment.createdAt.toISOString(),
     parentId: comment.parentId
+  };
+}
+
+export async function getInlineCommentEntity(id: string): Promise<InlineCommentEntity> {
+  const inlineComment = await prisma.comment.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdAt: true,
+      userId: true,
+      threadId: true
+    }
+  });
+
+  const author = await getUserEntity(inlineComment.userId);
+  return {
+    id,
+    author,
+    createdAt: inlineComment.createdAt.toISOString(),
+    threadId: inlineComment.threadId
   };
 }
 
@@ -101,6 +151,43 @@ export async function getSpaceEntity(id: string): Promise<SpaceEntity> {
   };
 }
 
+export async function getBlockCommentEntity(id: string): Promise<BlockCommentEntity> {
+  const blockComment = await prisma.block.findUniqueOrThrow({
+    where: {
+      id,
+      type: 'comment'
+    },
+    select: {
+      createdAt: true,
+      createdBy: true
+    }
+  });
+  return {
+    id,
+    createdAt: blockComment.createdAt.toISOString(),
+    author: await getUserEntity(blockComment.createdBy)
+  };
+}
+
+export async function getVoteEntity(id: string): Promise<VoteEntity> {
+  const vote = await prisma.vote.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      pageId: true,
+      postId: true,
+      title: true
+    }
+  });
+  return {
+    id,
+    page: vote.pageId ? await getDocumentEntity(vote.pageId) : null,
+    post: vote.postId ? await getPostEntity(vote.postId) : null,
+    title: vote.title
+  };
+}
+
 export async function getUserEntity(id: string): Promise<UserEntity> {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
@@ -119,5 +206,66 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
     googleEmail: user.googleAccounts[0]?.email,
     walletAddress: user.wallets[0]?.address,
     discordId: user.discordUser?.discordId
+  };
+}
+
+export async function getApplicationEntity(id: string): Promise<ApplicationEntity> {
+  const application = await prisma.application.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      bountyId: true,
+      createdAt: true,
+      createdBy: true
+    }
+  });
+
+  return {
+    id,
+    createdAt: application.createdAt.toISOString(),
+    user: await getUserEntity(application.createdBy),
+    bounty: await getRewardEntity(application.bountyId)
+  };
+}
+
+export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
+  const document = await prisma.page.findFirstOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdBy: true,
+      id: true,
+      title: true,
+      path: true,
+      type: true,
+      space: {
+        select: {
+          domain: true
+        }
+      },
+      proposal: {
+        select: {
+          authors: {
+            select: {
+              userId: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const authors = document.proposal
+    ? await Promise.all(document.proposal.authors.map(({ userId }) => getUserEntity(userId)))
+    : [await getUserEntity(document.createdBy)];
+
+  return {
+    id,
+    title: document.title,
+    url: `${baseUrl}/${document.space.domain}/${document.path}`,
+    type: document.type,
+    authors
   };
 }

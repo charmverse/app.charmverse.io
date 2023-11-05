@@ -1,10 +1,10 @@
+import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
 import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { InvalidPermissionGranteeError } from 'lib/permissions/errors';
 import { ExpectedAnError } from 'testing/errors';
 
-import type { AssignedProposalCategoryPermission } from '../interfaces';
 import { mapProposalCategoryPermissionToAssignee } from '../mapProposalCategoryPermissionToAssignee';
 
 describe('mapProposalCategoryPermissionToAssignee', () => {

@@ -45,7 +45,7 @@ export function deleteNode(tr: Transaction, node: Node, nodePos: number, map: Ma
     }
   } else if (node.isLeaf || ['figure', 'table'].includes(node.type.name)) {
     delStep = new ReplaceStep(newNodePos, map.map(nodePos + node.nodeSize), Slice.empty);
-  } else if (node.type === tr.doc.type.schema.nodes.listItem) {
+  } else if (node.type === tr.doc.type.schema.nodes.listItem || node.type === tr.doc.type.schema.nodes.list_item) {
     const state = EditorState.create({
       doc: tr.doc,
       selection: Selection.findFrom(tr.doc.resolve(newNodePos), 1) || undefined

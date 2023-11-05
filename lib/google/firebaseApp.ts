@@ -12,5 +12,7 @@ class FirebaseApp {
   }
 }
 
+export type DecodedIdToken = Awaited<ReturnType<ReturnType<firebase.app.App['auth']>['verifyIdToken']>>;
+
 // This enables us to import the firebase app as a singleton across the app and avoid errors linked to multiple initialisations
 export const firebaseApp = new FirebaseApp().app;

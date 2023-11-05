@@ -1,14 +1,14 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
-import type { DOMOutputSpec } from '@bangle.dev/pm';
+import type { DOMOutputSpec, EditorView } from '@bangle.dev/pm';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors';
-import { CryptoCurrencies, getChainById } from 'connectors';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors/chains';
+import { CryptoCurrencies, getChainById } from 'connectors/chains';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
@@ -17,6 +17,8 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { formatMoney } from 'lib/utilities/formatting';
 import { isTruthy } from 'lib/utilities/types';
+
+import { enableDragAndDrop } from '../utils';
 
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
@@ -43,6 +45,7 @@ export function cryptoPriceSpec() {
           default: []
         }
       },
+      draggable: true,
       group: 'block',
       parseDOM: [{ tag: 'div.charm-crypto-price' }],
       toDOM: (): DOMOutputSpec => {
@@ -61,13 +64,17 @@ export function CryptoPrice({
   quote,
   onQuoteCurrencyChange,
   onBaseCurrencyChange,
-  readOnly
+  readOnly,
+  view,
+  getPos
 }: {
   readOnly: boolean;
   base: CryptoCurrency | null;
   quote: FiatCurrency | null;
   onQuoteCurrencyChange: (currency: FiatCurrency) => void;
   onBaseCurrencyChange: (currency: CryptoCurrency) => void;
+  view: EditorView;
+  getPos: () => number | undefined;
 }) {
   const [loading, setLoadingState] = useState(false);
   const [baseCurrency, setBaseCurrency] = useState<CryptoCurrency | null>(base);
@@ -111,7 +118,10 @@ export function CryptoPrice({
 
     setLoadingState(true);
 
-    const symbol = getTokenInfo(paymentMethods, baseCurrency).tokenSymbol;
+    const symbol = getTokenInfo({
+      methods: paymentMethods,
+      symbolOrAddress: baseCurrency
+    }).tokenSymbol;
 
     charmClient
       .getPricing(symbol, quoteCurrency)
@@ -148,8 +158,10 @@ export function CryptoPrice({
 
   return (
     <Card
-      draggable={false}
       className='cryptoPrice'
+      onDragStart={() => {
+        enableDragAndDrop(view, getPos());
+      }}
       component='div'
       raised={true}
       // disable propagation for bangle.dev
@@ -176,7 +188,7 @@ export function CryptoPrice({
               active={selectionList === 'base'}
               onClick={() => toggleSelectionList('base')}
             >
-              <CoinLogoAndTicker {...getTokenInfo(paymentMethods, baseCurrency)} />
+              <CoinLogoAndTicker {...getTokenInfo({ methods: paymentMethods, symbolOrAddress: baseCurrency })} />
             </StyledButton>
             <Typography component='span' color='secondary'>
               /
@@ -186,7 +198,7 @@ export function CryptoPrice({
               active={selectionList === 'quote'}
               onClick={() => toggleSelectionList('quote')}
             >
-              {getTokenInfo(paymentMethods, quoteCurrency)?.tokenSymbol}
+              {getTokenInfo({ methods: paymentMethods, symbolOrAddress: quoteCurrency }).tokenSymbol}
             </StyledButton>
             <IconButton disabled={readOnly} size='small' onClick={() => refreshPrice()} sx={{ float: 'right' }}>
               <Autorenew color='secondary' fontSize='small' />

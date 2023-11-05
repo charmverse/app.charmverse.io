@@ -1,8 +1,6 @@
-import { prisma } from '@charmverse/core';
-import type { Role, Space, TokenGate, TokenGateToRole, User } from '@charmverse/core/prisma';
-import { SpaceRole } from '@charmverse/core/prisma';
+import type { Role, Space, TokenGate, TokenGateToRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
@@ -98,10 +96,10 @@ beforeAll(async () => {
   cookie2 = await loginUser(user2.id);
 });
 
-describe('POST /token-gates/{tokenGateId}/rolesn- assign roles to token gate', () => {
+describe('PUT /token-gates/{tokenGateId}/roles- assign roles to token gate', () => {
   it('Should fail if correct keys are not provided in body', async () => {
     const response = await request(baseUrl)
-      .post(`/api/token-gates/${tokenGate.id}/roles`)
+      .put(`/api/token-gates/${tokenGate.id}/roles`)
       .set('Cookie', cookie1)
       .send({});
     expect(response.statusCode).toBe(400);
@@ -110,7 +108,7 @@ describe('POST /token-gates/{tokenGateId}/rolesn- assign roles to token gate', (
 
   it('Should fail if the user is not an admin of the space', async () => {
     const response = await request(baseUrl)
-      .post(`/api/token-gates/${tokenGate.id}/roles`)
+      .put(`/api/token-gates/${tokenGate.id}/roles`)
       .set('Cookie', cookie2)
       .send({ spaceId: space.id, roleIds: [] });
     expect(response.statusCode).toBe(401);
@@ -119,7 +117,7 @@ describe('POST /token-gates/{tokenGateId}/rolesn- assign roles to token gate', (
 
   it('Should create & delete new tokeGateToRole records', async () => {
     const response = await request(baseUrl)
-      .post(`/api/token-gates/${tokenGate.id}/roles`)
+      .put(`/api/token-gates/${tokenGate.id}/roles`)
       .set('Cookie', cookie1)
       .send({ spaceId: space.id, roleIds: [role2.id] });
     expect(response.statusCode).toBe(200);

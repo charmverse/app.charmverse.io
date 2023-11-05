@@ -46,7 +46,7 @@ let socket: SocketConnection;
 export function WebSocketClientProvider({ children }: { children: ReactNode }) {
   const [messageLog, setMessageLog] = useState<LoggedMessage[]>([]);
 
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const { current: eventFeed } = useRef(new PubSub<ServerMessage['type'], ServerMessage['payload']>());
 
@@ -136,3 +136,8 @@ function isServerMessage(message: WebSocketMessage): message is ServerMessage {
 }
 
 export const useWebSocketClient = () => useContext(WebSocketClientContext);
+
+export function emitSocketMessage<Data = any>(message: ClientMessage, cb?: (data: Data) => void) {
+  // @ts-ignore cb can be passed
+  socket?.emit('message', message, cb);
+}

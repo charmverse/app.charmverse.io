@@ -1,7 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
+import type { Selection } from 'prosemirror-state';
 import { EditorState } from 'prosemirror-state';
+import type { StepMap } from 'prosemirror-transform';
 import { Mapping, Step, Transform } from 'prosemirror-transform';
 
 import type { ServerDocDataMessage } from 'lib/websockets/documentEvents/interfaces';
@@ -32,6 +34,11 @@ export class Merge {
     // Adjust the document when reconnecting after offline and many changes
     // happening on server.
     if (this.mod.editor.docInfo.version < data.doc.v && sendableSteps(this.mod.editor.view.state)) {
+      log.debug('Update document with server changes', {
+        messages: data.m?.length,
+        serverPageVersion: data.doc.v,
+        clientPageVersion: this.mod.editor.docInfo.version
+      });
       this.mod.doc.receiving = true;
       const confirmedState = EditorState.create({ doc: this.mod.editor.docInfo.confirmedDoc || undefined });
       const unconfirmedTr = confirmedState.tr;
@@ -51,17 +58,25 @@ export class Merge {
         receiveTransaction(
           this.mod.editor.view.state,
           unconfirmedTr.steps,
-          unconfirmedTr.steps.map((_step) => this.mod.editor.client_id)
+          unconfirmedTr.steps.map((_step) => this.mod.editor.client_id),
+          {
+            // add content inserted at the cursor after the cursor instead of before
+            mapSelectionBackward: true
+          }
         )
       );
       this.mod.editor.view.dispatch(
         receiveTransaction(
           this.mod.editor.view.state,
           rollbackTr.steps,
-          rollbackTr.steps.map((_step) => 'remote')
+          rollbackTr.steps.map((_step) => 'remote'),
+          {
+            // add content inserted at the cursor after the cursor instead of before
+            mapSelectionBackward: true
+          }
         ).setMeta('remote', true)
       );
-      const toDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [data.doc.content] });
+      const toDoc = this.mod.editor.schema.nodeFromJSON(data.doc.content);
       // Apply the online Transaction
       let lostTr: Transform;
       if (data.m) {
@@ -83,7 +98,11 @@ export class Merge {
         receiveTransaction(
           this.mod.editor.view.state,
           lostTr.steps,
-          lostTr.steps.map((_step) => 'remote')
+          lostTr.steps.map((_step) => 'remote'),
+          {
+            // add content inserted at the cursor after the cursor instead of before
+            mapSelectionBackward: true
+          }
         ).setMeta('remote', true)
       );
 
@@ -114,7 +133,7 @@ export class Merge {
         }
       } else {
         try {
-          this.autoMerge(unconfirmedTr, lostTr, data);
+          this.autoMerge(unconfirmedTr, lostTr, data, this.mod.editor.view.state.selection);
         } catch (error) {
           this.handleMergeFailure(error, unconfirmedTr.doc, toDoc);
         }
@@ -123,28 +142,31 @@ export class Merge {
       this.mod.doc.receiving = false;
       // this.mod.doc.sendToCollaborators()
     } else if (data.m) {
+      log.debug('Update document with server changes', {
+        messages: data.m.length,
+        version: data.doc.v
+      });
       // There are no local changes, so we can just receive all the remote messages directly
       data.m.forEach((message) => this.mod.doc.receiveDiff(message, true));
     } else {
       // The server seems to have lost some data. We reset.
       this.mod.doc.loadDocument(data);
+      log.error('Server has lost data, reset the document');
     }
   }
 
-  autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage) {
+  autoMerge(unconfirmedTr: Transform, lostTr: Transform, data: ServerDocDataMessage, selection?: Selection) {
     /* This automerges documents incase of no conflicts */
-    const toDoc = this.mod.editor.schema.nodeFromJSON({ type: 'doc', content: [data.doc.content] });
-    const rebasedTr = EditorState.create({ doc: toDoc }).tr.setMeta('remote', true);
+    const toDoc = this.mod.editor.schema.nodeFromJSON(data.doc.content);
+    const rebasedTr = EditorState.create({ doc: toDoc, selection }).tr.setMeta('remote', true);
     const maps = new Mapping(
-      []
+      ([] as StepMap[])
         .concat(
-          // @ts-ignore
           unconfirmedTr.mapping.maps
             .slice()
             .reverse()
             .map((map) => map.invert())
         )
-        // @ts-ignore
         .concat(lostTr.mapping.maps.slice())
     );
 
@@ -160,39 +182,45 @@ export class Merge {
       }
     });
 
-    let tracked;
-    let rebasedTrackedTr; // offline steps to be tracked
-    if (
-      // WRITE_ROLES.includes(this.mod.editor.docInfo.access_rights)
-      // &&
-      unconfirmedTr.steps.length > this.trackOfflineLimit ||
-      lostTr.steps.length > this.remoteTrackOfflineLimit
-    ) {
-      tracked = true;
-      // Either this user has made 50 changes since going offline,
-      // or the document has 20 changes to it. Therefore we add tracking
-      // to the changes of this user and ask user to clean up.
-      rebasedTrackedTr = trackedTransaction(
-        rebasedTr,
-        this.mod.editor.view.state,
-        this.mod.editor.user,
-        false,
-        new Date(Date.now() - this.mod.editor.clientTimeAdjustment)
-      );
-    } else {
-      tracked = false;
-      rebasedTrackedTr = rebasedTr;
-    }
+    // disable the following code which turns a users edits into suggestions.
+    // In testing, the user was not able to accept the suggesitons, and it might be better to just let them undo changes via history UI
+
+    // let tracked;
+    // let rebasedTrackedTr; // offline steps to be tracked
+    // if (
+    //   // WRITE_ROLES.includes(this.mod.editor.docInfo.access_rights)
+    //   // &&
+    //   unconfirmedTr.steps.length > this.trackOfflineLimit ||
+    //   lostTr.steps.length > this.remoteTrackOfflineLimit
+    // ) {
+    //   tracked = true;
+    //   // Either this user has made 50 changes since going offline,
+    //   // or the document has 20 changes to it. Therefore we add tracking
+    //   // to the changes of this user and ask user to clean up.
+    //   rebasedTrackedTr = trackedTransaction(
+    //     rebasedTr,
+    //     this.mod.editor.view.state,
+    //     this.mod.editor.user,
+    //     false,
+    //     new Date(Date.now() - this.mod.editor.clientTimeAdjustment)
+    //   );
+    // } else {
+    //   tracked = false;
+    //   rebasedTrackedTr = rebasedTr;
+    // }
 
     // this.mod.editor.docInfo.version = data.doc.v
-    rebasedTrackedTr.setMeta('remote', true);
-    this.mod.editor.view.dispatch(rebasedTrackedTr);
+    rebasedTr.setMeta('remote', true);
+    this.mod.editor.view.dispatch(rebasedTr);
 
-    if (tracked) {
-      alert(
-        'The document was modified substantially by other users while you were offline. We have merged your changes in as tracked changes. You should verify that your edits still make sense.'
-      );
-    }
+    // if (tracked) {
+    //   log.warn(
+    //     'Showed alert to user after auto-merge: The document was modified substantially by other users while you were offline'
+    //   );
+    //   alert(
+    //     'The document was modified substantially by other users while you were offline. We have merged your changes in as tracked changes. You should verify that your edits still make sense.'
+    //   );
+    // }
   }
 
   getDocData(offlineDoc: Node) {

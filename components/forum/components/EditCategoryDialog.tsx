@@ -1,14 +1,13 @@
 import type { PostCategory } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Box } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import Box from '@mui/system/Box';
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
@@ -16,7 +15,6 @@ type Props = {
   category: PostCategory;
   onClose: () => void;
   onSave: (data: Pick<PostCategory, 'name' | 'description'>) => void;
-  open: boolean;
 };
 
 export const schema = yup.object({
@@ -26,16 +24,10 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export function EditCategoryDialog({ category, onClose, onSave, open }: Props) {
+export function EditCategoryDialog({ category, onClose, onSave }: Props) {
   const { showMessage } = useSnackbar();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    setValue,
-    watch
-  } = useForm<FormValues>({
+  const { register, handleSubmit, watch } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
       // Default to saved message in local storage
@@ -61,7 +53,7 @@ export function EditCategoryDialog({ category, onClose, onSave, open }: Props) {
   }
 
   return (
-    <Modal title='Edit category information' open={open} onClose={onClose}>
+    <Modal title='Edit category information' open onClose={onClose}>
       <Stack>
         <InputLabel>Title</InputLabel>
         <TextField {...register('name')} data-test='category-description-name' autoFocus fullWidth />

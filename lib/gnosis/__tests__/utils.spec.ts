@@ -1,8 +1,8 @@
-import { Wallet } from 'ethers';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 
 import { getGnosisSafeUrl, getGnosisTransactionQueueUrl } from '../utils';
 
-const safeAddress = Wallet.createRandom().address;
+const safeAddress = randomETHWalletAddress();
 
 const baseUrl = 'https://app.safe.global';
 

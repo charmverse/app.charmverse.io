@@ -1,22 +1,30 @@
-import type { PluginKey } from '@bangle.dev/core';
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
-import { ContentCopy as DuplicateIcon, DragIndicator as DragIndicatorIcon, DeleteOutlined } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  ContentCopy as DuplicateIcon,
+  DragIndicator as DragIndicatorIcon,
+  DeleteOutlined
+} from '@mui/icons-material';
 import type { MenuProps } from '@mui/material';
-import { ListItemIcon, ListItemText, Menu, ListItemButton } from '@mui/material';
+import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { TextSelection } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
+import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
-import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import type { PagesMap } from 'lib/pages';
+import { isMac } from 'lib/utilities/browser';
 
-import type { PluginState } from './rowActions';
+import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
+
+import { getNodeForRowPosition, type PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -33,50 +41,11 @@ function Component({ menuState }: { menuState: PluginState }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'user-role' });
   const view = useEditorViewContext();
   const { deletePage, pages } = usePages();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
 
-  function _getNode() {
-    if (!menuState.rowPos || !menuState.rowDOM) {
-      return null;
-    }
-
-    // calculate the node at the mouse position. do it on click in case the content has changed
-    let topPos = view.state.doc.resolve(menuState.rowPos);
-    while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
-      const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
-      topPos = view.state.doc.resolve(parentOffset);
-    }
-
-    // console.log('Position of row', topPos, { node: topPos.node() });
-
-    let pmNode = topPos.node();
-    // handle top-level children, where pmNode === doc
-    if (menuState.rowNodeOffset && menuState.rowNodeOffset > 0) {
-      const child = pmNode.maybeChild(menuState.rowNodeOffset);
-      pmNode = child || pmNode;
-    }
-
-    const nodeStart = topPos.pos;
-    const nodeSize = pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : 0;
-    let nodeEnd = nodeStart + nodeSize; // nodeSize includes the start and end tokens, so we need to subtract 1
-
-    // dont delete past end of document - according to PM guide, use content.size not nodeSize for the doc
-    if (nodeEnd > view.state.doc.content.size) {
-      nodeEnd = view.state.doc.content.size;
-    }
-
-    log.debug('Row meta', { nodeStart, topPos: topPos.pos, pmNode, nodeEnd, nodeSize });
-
-    return {
-      node: pmNode,
-      nodeEnd,
-      nodeStart
-    };
-  }
-
   function deleteRow() {
-    const node = _getNode();
+    const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
     if (node) {
       let start = node.nodeStart;
       let end = node.nodeEnd;
@@ -84,7 +53,7 @@ function Component({ menuState }: { menuState: PluginState }) {
       if (start === 1) {
         start = 0;
         end -= 1;
-      } else if (node.node.type.name === 'disclosureDetails') {
+      } else if (node.node.type.name === 'disclosureDetails' || node.node.type.name === 'blockquote') {
         // This removes disclosureSummary node
         start -= 2;
       }
@@ -104,39 +73,92 @@ function Component({ menuState }: { menuState: PluginState }) {
   }
 
   async function duplicateRow() {
-    const node = _getNode();
+    const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
+    const nodeTypeName = node?.node.type.name;
     const tr = view.state.tr;
-    if (node?.node.type.name === 'page') {
+    if (nodeTypeName === 'page') {
       if (currentSpace && node?.node.attrs.id) {
         const { rootPageId } = await charmClient.pages.duplicatePage({
-          pageId: node?.node.attrs.id
+          pageId: node.node.attrs.id
         });
-        const newNode = view.state.schema.nodes.page.create({
+        const newNode = view.state.schema.nodes[nestedPageNodeName].create({
           id: rootPageId
         });
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
-        await mutate(
-          `pages/${currentSpace.id}`,
-          (_pages: PagesMap | undefined) => {
-            return _pages ?? {};
-          },
-          {
-            revalidate: true
-          }
-        );
+      }
+    } else if (nodeTypeName === 'inlineDatabase') {
+      if (currentSpace && node?.node.attrs.pageId) {
+        const { rootPageId: newPageId } = await charmClient.pages.duplicatePage({
+          pageId: node.node.attrs.pageId
+        });
+        const newNode = view.state.schema.nodes.inlineDatabase.create({
+          pageId: newPageId
+        });
+        const newTr = safeInsert(newNode, node.nodeEnd)(tr);
+        view.dispatch(newTr.scrollIntoView());
       }
     } else if (node) {
       const copy = node.node.copy(node.node.content);
-      const newTr = safeInsert(copy, node?.node.type.name === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd)(tr);
+      const newTr = safeInsert(copy, nodeTypeName === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd)(tr);
       view.dispatch(newTr.scrollIntoView());
     }
     popupState.close();
   }
 
+  function addNewRow(e: MouseEvent) {
+    const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
+    if (!node) {
+      log.warn('no node identified to add new row');
+      return;
+    }
+    let insertPos = -1;
+    // insert before
+    if (e.altKey) {
+      insertPos = node.nodeStart > 0 ? node.nodeStart - 1 : 0;
+    }
+    // insert after
+    else {
+      insertPos = node.node.type.name === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd;
+    }
+    const tr = view.state.tr;
+    // TODO: Trigger component select menu
+    // const emptyLine = view.state.schema.nodes.paragraph.create(
+    //   null,
+    //   Fragment.fromArray([
+    //     view.state.schema.text('', [view.state.schema.mark('inline-command-palette-paletteMark', { trigger: '/' })])
+    //   ])
+    // );
+    const emptyLine = view.state.schema.nodes.paragraph.create();
+    // const newTr = safeInsert(emptyLine, insertPos)(tr);
+
+    tr.setSelection(TextSelection.create(tr.doc, insertPos));
+    tr.replaceSelectionWith(emptyLine, false);
+    tr.setSelection(TextSelection.create(tr.doc, insertPos + 1));
+    view.dispatch(tr.scrollIntoView());
+    view.focus();
+  }
+
+  const optionKey = isMac() ? 'Option' : 'Alt';
+
   return (
     <>
       <span className='charm-drag-handle' draggable='true'>
+        <Tooltip
+          title={
+            <>
+              <Typography fontWeight='bold' variant='caption'>
+                Click<span style={{ color: 'lightgray' }}> to add below</span>
+              </Typography>
+              <br />
+              <Typography fontWeight='bold' variant='caption'>
+                {optionKey}-click<span style={{ color: 'lightgray' }}> to add above</span>
+              </Typography>
+            </>
+          }
+        >
+          <AddIcon style={{ cursor: 'text' }} onClick={addNewRow} />
+        </Tooltip>
         <DragIndicatorIcon color='secondary' {...bindTrigger(popupState)} />
       </span>
 

@@ -1,4 +1,4 @@
-import { shortWalletAddress } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utilities/blockchain';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { createUserFromWallet } from '../createUser';

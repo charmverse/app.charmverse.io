@@ -1,5 +1,4 @@
-import { prisma } from '@charmverse/core';
-import type { Role } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getSpaceMemberMetadata({
   spaceIds,
@@ -16,6 +15,8 @@ export async function getSpaceMemberMetadata({
       userId: memberId
     },
     select: {
+      isAdmin: true,
+      isGuest: true,
       createdAt: true,
       spaceId: true,
       spaceRoleToRole: {
@@ -26,14 +27,24 @@ export async function getSpaceMemberMetadata({
     }
   });
 
-  const metadataBySpaceMap = spaceRoles.reduce<Record<string, { roles: Role[]; joinDate: Date }>>((acc, spaceRole) => {
-    const roles = spaceRole.spaceRoleToRole?.map((spaceRoleToRole) => spaceRoleToRole.role);
-    acc[spaceRole.spaceId] = {
-      roles,
-      joinDate: spaceRole.createdAt
-    };
-    return acc;
-  }, {});
+  const metadataBySpaceMap = spaceRoles.reduce<Record<string, { roles: string[]; joinDate: Date }>>(
+    (acc, spaceRole) => {
+      const roles = spaceRole.spaceRoleToRole?.map((spaceRoleToRole) => spaceRoleToRole.role.name);
+      if (spaceRole.isAdmin) {
+        roles.unshift('Admin');
+      } else if (spaceRole.isGuest) {
+        roles.unshift('Guest');
+      } else {
+        roles.unshift('Member');
+      }
+      acc[spaceRole.spaceId] = {
+        roles,
+        joinDate: spaceRole.createdAt
+      };
+      return acc;
+    },
+    {}
+  );
 
   return metadataBySpaceMap;
 }

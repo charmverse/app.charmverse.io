@@ -1,20 +1,32 @@
-import type { Role, Space, User } from '@charmverse/core/prisma';
+import type { ProposalReviewerPool } from '@charmverse/core/permissions';
+import type { Proposal, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import type { ProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 let space: Space;
 let user: User;
+let proposal: Proposal;
+let role: Role;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpace({ isAdmin: false });
   space = generated.space;
   user = generated.user;
+  const proposalCategory = await generateProposalCategory({
+    spaceId: space.id
+  });
+  proposal = await generateProposal({
+    categoryId: proposalCategory.id,
+    spaceId: space.id,
+    userId: user.id
+  });
   await addSpaceOperations({
     forSpaceId: space.id,
     spaceId: space.id,
@@ -28,14 +40,18 @@ describe('GET /api/proposals/reviewer-pool - Return eligible reviewers', () => {
 
     const pool = (
       await request(baseUrl)
-        .get(`/api/proposals/reviewer-pool?spaceId=${space.id}`)
+        .get(`/api/proposals/reviewer-pool?resourceId=${proposal.categoryId}`)
         .set('Cookie', nonAdminCookie)
         .send()
         .expect(200)
     ).body as ProposalReviewerPool;
 
-    expect(pool.space).toBe(true);
-    expect(pool.roles).toEqual([]);
+    const computed = await premiumPermissionsApiClient.proposals.getProposalReviewerPool({
+      resourceId: proposal.categoryId as string
+    });
+
+    expect(pool.userIds).toEqual(expect.arrayContaining(computed.userIds));
+    expect(pool.roleIds).toEqual(expect.arrayContaining(computed.roleIds));
   });
 
   it('should not return eligible reviewers if user is not a space member and respond with 401', async () => {
@@ -45,7 +61,7 @@ describe('GET /api/proposals/reviewer-pool - Return eligible reviewers', () => {
     const outsideUserCookie = await loginUser(outsideUser.id);
 
     await request(baseUrl)
-      .get(`/api/proposals/reviewer-pool?spaceId=${space.id}`)
+      .get(`/api/proposals/reviewer-pool?resourceId=${proposal.categoryId}`)
       .set('Cookie', outsideUserCookie)
       .send()
       .expect(401);

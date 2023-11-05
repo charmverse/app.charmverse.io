@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Post, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { generatePostCategory } from './utils/forums';

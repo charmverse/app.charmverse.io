@@ -26,6 +26,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         value='count'
         property={board.fields.cardProperties[0]}
         readOnly={false}
+        anchorEl={null}
       />
     );
 
@@ -45,6 +46,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         value='count'
         property={board.fields.cardProperties[0]}
         readOnly={false}
+        anchorEl={null}
       />
     );
 
@@ -64,6 +66,7 @@ describe('components/kanban/calculation/KanbanCalculation', () => {
         value='count'
         property={board.fields.cardProperties[0]}
         readOnly={true}
+        anchorEl={null}
       />
     );
 

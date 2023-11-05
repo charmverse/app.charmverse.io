@@ -10,13 +10,13 @@ import { useUser } from './useUser';
 /**
  * @memberSpaces - Subset of spaces where user is not a guest (ie. they are normal member or admin)
  */
-type IContext = {
+export type IContext = {
   spaces: Space[];
   memberSpaces: Space[];
-  setSpace: (spaces: Space) => void;
+  setSpace: (space: Space) => void;
   setSpaces: (spaces: Space[]) => void;
   isLoaded: boolean;
-  createNewSpace: (data: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) => Promise<Space>;
+  createNewSpace: (data: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) => Promise<Space>;
   isCreatingSpace: boolean;
 };
 
@@ -39,7 +39,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (user) {
       setIsLoaded(false);
-      charmClient
+      charmClient.spaces
         .getSpaces()
         .then((_spaces) => {
           setSpaces(_spaces);
@@ -51,11 +51,11 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, isUserLoaded]);
 
-  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) => {
+  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) => {
     setIsCreatingSpace(true);
 
     try {
-      const space = await charmClient.createSpace(newSpace);
+      const space = await charmClient.spaces.createSpace(newSpace);
       setSpaces((s) => [...s, space]);
       // refresh user permissions
       const _user = await charmClient.getUser();

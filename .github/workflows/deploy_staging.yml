@@ -4,6 +4,12 @@ on:
   pull_request:
     types: [labeled, opened, synchronize]
 
+env:
+  SELECTED_PERMISSION_API_TAG: latest
+
+concurrency:
+  group: staging-${{ github.ref }}
+
 jobs:
   deploy:
     if: |
@@ -18,27 +24,24 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
+      - name: Calculate Build ID and Stage env var
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
+
+          echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+
       - name: Install dependencies
         uses: ./.github/actions/install
 
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_APP_ENV: 'staging'
-          # NEXT_PUBLIC_WEBSOCKETS_HOST: 'https://sockets.charmverse.co' - disabled so that each instance uses its own socket router by default
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_CLIENT_ID }}
-          NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_UNSTOPPABLE_DOMAINS_REDIRECT_URI }}
-          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_API_KEY_STG }}
-          NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_GOOGLE_AUTH_DOMAIN_STG }}
-          NEXT_PUBLIC_GOOGLE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_PROJECT_ID_STG }}
-          NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_GOOGLE_STORAGE_BUCKET_STG }}
-          NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_MESSAGING_SENDER_ID_STG }}
-          NEXT_PUBLIC_GOOGLE_APP_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_APP_ID_STG }}
-          NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE: ${{ secrets.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_SENSITIVE_STG }}
-          NEXT_PUBLIC_IFRAMELY_API_KEY: ${{ secrets.NEXT_PUBLIC_IFRAMELY_API_KEY }}
-          NEXT_PUBLIC_TELEGRAM_BOT_ID: ${{ secrets.NEXT_PUBLIC_TELEGRAM_BOT_ID_STG }}
+          REACT_APP_APP_ENV: 'staging'
 
       - name: Build and Push Docker image
+        id: docker_build_push
         uses: ./.github/actions/build_docker_image
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -47,10 +50,25 @@ jobs:
 
       - name: Replace env_var with staging settings
         run: |
-          sed -i 's/prod/staging/g' .ebextensions/00_env_vars.config
-          sed -i 's/prd/stg/g' .ebextensions/00_env_vars.config
-          sed -i 's/production/staging/g' .ebextensions_websockets/00_env_vars.config
-          sed -i 's/prd/stg/g' .ebextensions_websockets/00_env_vars.config
+          ebextension_files=$(ls .ebextensions*/00_env_vars.config)
+          ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
+
+          for conf_file in $ebextension_files $ebstalk_apps_env_files; do
+            sed -i 's/prd/stg/g' $conf_file
+            sed -i 's/production/staging/g' $conf_file
+          done
+
+          # modifying cloudformation alarm to send alerts to test sns topic.
+          #  leaving it in even if we're deleting the config before deploying
+          #  Useful to avoid accidental triggering to system-status channel.
+          for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
+            sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
+          done
+
+          rm .ebextensions*/06_cloudwatch_alarm.config
+
+          # substituting the websocket domain name
+          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env 
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -72,21 +90,29 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
+      - name: Run specific version of permission api if SELECTED_PERMISSION_API_TAG exists
+        if: env.SELECTED_PERMISSION_API_TAG && env.GITHUB_HEAD_REF_SLUG == env.SELECTED_PERMISSION_API_TAG
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .PERMISSION_IMGTAG = "${{ env.SELECTED_PERMISSION_API_TAG }}")
+              ' .ebextensions/00_env_vars.config
+
       - name: Parse compose profile to see if we need to enable datadog
         id: get_compose_profiles
         uses: mikefarah/yq@master
         with:
           cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config
 
-      - name: Set STAGE and DDENABLED variable in environment for build and deploy steps
+      - name: Set DDENABLED variable in environment for build and deploy steps
         run: |
-          echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
-
+          cat  .ebextensions/00_env_vars.config
           COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
           if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then
             echo "DDENABLED=true" >> $GITHUB_ENV
           fi
-          cat $GITHUB_ENV
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v0.5.2
@@ -107,7 +133,9 @@ jobs:
           aws-region: us-east-1
 
       - name: Package
-        run: cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+        run: |
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Deploy to staging
         id: cdk_deploy
@@ -144,3 +172,13 @@ jobs:
           deployment_package: deploy_websockets.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
+
+      - name: Use datadog ci package to upload js maps
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          npm install @datadog/datadog-ci
+          npx datadog-ci sourcemaps upload .next/static  \
+            --service=webapp                             \
+            --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
+            --minified-path-prefix=${{ steps.cdk_deploy.outputs.env_url }}_next/static

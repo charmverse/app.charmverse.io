@@ -1,9 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { updateApplication } from 'lib/applications/actions/updateApplication';
+import type { ApplicationWithReward } from 'lib/applications/interfaces';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -12,8 +13,26 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .get(getApplicationController)
   .use(requireKeys<Application>(['message'], 'body'))
   .put(updateApplicationController);
+
+async function getApplicationController(req: NextApiRequest, res: NextApiResponse<ApplicationWithReward>) {
+  const { id } = req.query;
+
+  const application = await prisma.application.findUniqueOrThrow({
+    where: {
+      id: id as string
+    },
+    include: {
+      bounty: true
+    }
+  });
+
+  (application as any as ApplicationWithReward).reward = { ...application.bounty };
+
+  return res.status(200).json(application as any as ApplicationWithReward);
+}
 
 async function updateApplicationController(req: NextApiRequest, res: NextApiResponse<Application>) {
   const { id } = req.query;

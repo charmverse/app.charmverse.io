@@ -1,8 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getBountyOrThrow } from 'lib/bounties';
 import { DuplicateDataError, LimitReachedError, StringTooShortError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { ApplicationCreationData } from '../interfaces';
 import { MINIMUM_APPLICATION_MESSAGE_CHARACTERS, submissionsCapReached } from '../shared';
@@ -35,7 +37,7 @@ export async function createApplication({
     );
   }
 
-  return prisma.application.create({
+  const application = await prisma.application.create({
     data: {
       status,
       message,
@@ -52,4 +54,13 @@ export async function createApplication({
       spaceId: bounty.spaceId
     }
   });
+
+  await publishBountyEvent({
+    scope: WebhookEventNames.RewardApplicationCreated,
+    bountyId,
+    spaceId: bounty.spaceId,
+    applicationId: application.id
+  });
+
+  return application;
 }

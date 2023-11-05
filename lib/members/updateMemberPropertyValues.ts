@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { READONLY_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';

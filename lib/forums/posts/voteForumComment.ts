@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { PostCommentUpDownVote } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -73,7 +73,7 @@ export async function voteForumComment({
 
     // Publish webhook event if needed
     await publishPostCommentVoteEvent({
-      scope: upvoted ? WebhookEventNames.CommentUpvoted : WebhookEventNames.CommentDownvoted,
+      scope: upvoted ? WebhookEventNames.ForumCommentUpvoted : WebhookEventNames.ForumCommentDownvoted,
       spaceId: post.spaceId,
       commentId,
       postId,

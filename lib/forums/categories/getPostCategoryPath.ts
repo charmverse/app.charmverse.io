@@ -7,5 +7,5 @@ const maxCategoryCharacters = 50;
 // Info for japanese title characters: https://gist.github.com/ryanmcgrath/982242
 
 export function getPostCategoryPath(categoryName: string): string {
-  return stringToValidPath(categoryName, maxCategoryCharacters);
+  return stringToValidPath({ input: categoryName, maxLength: maxCategoryCharacters });
 }

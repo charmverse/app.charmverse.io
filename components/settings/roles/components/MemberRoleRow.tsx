@@ -1,3 +1,4 @@
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 
 import { RolePermissions } from './RolePermissions/RolePermissions';
@@ -5,8 +6,15 @@ import { RoleRowBase } from './RoleRowBase';
 
 export function MemberRoleRow({ readOnly, spaceId }: { readOnly: boolean; spaceId: string }) {
   const { members, makeMember } = useMembers();
+  const { isFreeSpace } = useIsFreeSpace();
 
-  const assignedMembers = members.filter((member) => !member.isBot && !member.isAdmin && !member.isGuest);
+  const assignedMembers = members.filter(
+    (member) =>
+      !member.isBot &&
+      !member.isAdmin &&
+      // Ignore guest status for free spaces
+      (isFreeSpace ? true : !member.isGuest)
+  );
   // there must always be at least one admin
   const includeAdmins = members.filter((member) => !member.isBot && member.isAdmin).length > 1;
   const eligibleMembers = members.filter(

@@ -1,5 +1,6 @@
-import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
 import type { PageComment } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -75,6 +76,7 @@ async function deletePageCommentHandler(req: NextApiRequest, res: NextApiRespons
 
   if (pageComment.createdBy === userId || isAdmin) {
     await deletePageComment({ commentId, userId });
+    log.info('User deleted a page comment', { commentId, pageId, userId });
   } else {
     throw new ActionNotPermittedError('You do not have permission to delete this comment.');
   }

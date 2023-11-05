@@ -1,10 +1,12 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { keymap, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
 import { moveNode } from '@bangle.dev/pm-commands';
 import { createObject, filter, findParentNodeOfType, insertEmpty } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;

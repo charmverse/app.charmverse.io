@@ -1,4 +1,4 @@
-import { utils } from 'ethers';
+import { getAddress } from 'viem';
 
 /**
  * Checks if the format of a given Ethereum address is acceptable
@@ -9,7 +9,7 @@ export function isValidChainAddress(address?: string) {
     return false;
   }
   try {
-    utils.getAddress(address);
+    getAddress(address);
     return true;
   } catch (error) {
     return false;

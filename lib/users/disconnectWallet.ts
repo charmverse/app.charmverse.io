@@ -1,5 +1,7 @@
-import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
+import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
 import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
 
 import { updateUsedIdentity } from './updateUsedIdentity';
@@ -31,6 +33,45 @@ export const disconnectWallet = async ({ userId, address }: DisconnectWalletRequ
       address
     }
   });
+
+  const userSpaceRoles = await prisma.spaceRole.findMany({
+    where: {
+      userId,
+      isAdmin: false
+    },
+    include: {
+      user: {
+        include: {
+          userTokenGates: {
+            include: {
+              tokenGate: {
+                include: {
+                  tokenGateToRoles: {
+                    include: {
+                      role: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  for (const spaceRole of userSpaceRoles) {
+    const { removedRoles } = await verifyTokenGateMembership({
+      userTokenGates: spaceRole.user.userTokenGates,
+      userId,
+      spaceId: spaceRole.spaceId,
+      canBeRemovedFromSpace: true
+    });
+
+    if (removedRoles > 0) {
+      log.info(`Removed roles: ${removedRoles}`, { userId, spaceId: spaceRole.spaceId });
+    }
+  }
 
   return updateUsedIdentity(userId);
 };

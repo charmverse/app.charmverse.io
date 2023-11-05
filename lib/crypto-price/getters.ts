@@ -1,4 +1,4 @@
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import { getTimeDifference } from 'lib/utilities/dates';
 

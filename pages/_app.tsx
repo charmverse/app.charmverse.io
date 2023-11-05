@@ -1,39 +1,42 @@
-import { CacheProvider } from '@emotion/react';
+import env from '@beam-australia/react-env';
+import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
-import type { ExternalProvider, JsonRpcFetchFunc } from '@ethersproject/providers';
-import { Web3Provider } from '@ethersproject/providers';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { Web3ReactProvider } from '@web3-react/core';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import GlobalComponents from 'components/_app/GlobalComponents';
+import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
+import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
+import type { OpenGraphProps } from 'components/_app/OpenGraphData';
+import { OpenGraphData } from 'components/_app/OpenGraphData';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
+import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
-import { NotificationsProvider } from 'components/common/PageLayout/components/Header/components/NotificationPreview/useNotifications';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
-import { MemberProfileProvider } from 'components/profile/hooks/useMemberProfile';
+import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
+import { ApplicationDialogProvider } from 'components/rewards/hooks/useApplicationDialog';
+import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
+import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
+import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
-import { OnboardingProvider } from 'hooks/useOnboarding';
 import { PagesProvider } from 'hooks/usePages';
 import { PageTitleProvider, usePageTitle } from 'hooks/usePageTitle';
 import { PaymentMethodsProvider } from 'hooks/usePaymentMethods';
@@ -42,25 +45,14 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
-import { Web3AccountProvider } from 'hooks/useWeb3AuthSig';
+import { Web3AccountProvider } from 'hooks/useWeb3Account';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
-import { createEmotionCache } from 'theme/createEmotionCache';
+
 import '@bangle.dev/tooltip/style.css';
-import '@skiff-org/prosemirror-tables/style/table-filters.css';
-import '@skiff-org/prosemirror-tables/style/table-headers.css';
-import '@skiff-org/prosemirror-tables/style/table-popup.css';
-import '@skiff-org/prosemirror-tables/style/tables.css';
-import 'prosemirror-menu/style/menu.css';
-import 'theme/@bangle.dev/styles.scss';
-import 'theme/prosemirror-tables/prosemirror-tables.scss';
-import 'theme/print.scss';
-import 'components/common/BoardEditor/focalboard/src/components/blockIconSelector.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetail.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDetail/comment.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
@@ -81,8 +73,8 @@ import 'components/common/BoardEditor/focalboard/src/components/table/table.scss
 import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
 import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
+import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
@@ -94,29 +86,53 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/separatorOptio
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/switch.scss';
+import 'components/common/BoardEditor/focalboard/src/widgets/checkbox.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
+import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
+import 'components/common/LitProtocolModal/index.css';
+import 'components/common/LitProtocolModal/reusableComponents/litChainSelector/LitChainSelector.css';
+import 'components/common/LitProtocolModal/reusableComponents/litCheckbox/LitCheckbox.css';
+import 'components/common/LitProtocolModal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
+import 'components/common/LitProtocolModal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
+import 'components/common/LitProtocolModal/reusableComponents/litDeleteModal/LitDeleteModal.css';
+import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitBackButton.css';
+import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitFooter.css';
+import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitNextButton.css';
+import 'components/common/LitProtocolModal/reusableComponents/litHeader/LitHeader.css';
+import 'components/common/LitProtocolModal/reusableComponents/litInput/LitInput.css';
+import 'components/common/LitProtocolModal/shareModal/devMode/DevModeContent.css';
+import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
+import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
+import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
+import 'components/common/LitProtocolModal/shareModal/reviewConditions/ReviewConditions.css';
+import 'components/common/LitProtocolModal/shareModal/ShareModal.css';
+import 'components/common/LitProtocolModal/shareModal/singleConditionSelect/SingleConditionSelect.css';
+import 'prosemirror-menu/style/menu.css';
+import 'react-resizable/css/styles.css';
+import 'theme/@bangle.dev/styles.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'lit-share-modal-v3/dist/ShareModal.css';
-import 'react-resizable/css/styles.css';
 import 'theme/lit-protocol/lit-protocol.scss';
+import 'theme/print.scss';
+import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
-
-const getLibrary = (provider: ExternalProvider | JsonRpcFetchFunc) => new Web3Provider(provider);
-
-const clientSideEmotionCache = createEmotionCache();
+import { WagmiProvider } from '../components/_app/WagmiProvider';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
+};
+
+export type GlobalPageProps = {
+  openGraphData: OpenGraphProps;
 };
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
   emotionCache?: EmotionCache;
 };
-export default function App({ Component, emotionCache = clientSideEmotionCache, pageProps }: AppPropsWithLayout) {
+export default function App({ Component, pageProps, router }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
-  const router = useRouter();
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -131,8 +147,12 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
   // Check if a new version of the application is available every 5 minutes.
   useInterval(async () => {
     const data = await charmClient.getBuildId();
-    if (data.buildId !== process.env.NEXT_PUBLIC_BUILD_ID) {
+    if (!isOldBuild && data.buildId !== env('BUILD_ID')) {
       setIsOldBuild(true);
+      log.info('Requested user to refresh their browser to get new version', {
+        oldVersion: env('BUILD_ID'),
+        newVersion: data.buildId
+      });
     }
   }, 180000);
 
@@ -146,54 +166,56 @@ export default function App({ Component, emotionCache = clientSideEmotionCache, 
     }
   }, [router.isReady]);
 
-  // DO NOT REMOVE CacheProvider - it protects MUI from Tailwind CSS in settings
+  if (router.pathname.startsWith('/authenticate')) {
+    return (
+      <BaseAuthenticateProviders>
+        <Component {...pageProps} />
+        <Snackbar />
+      </BaseAuthenticateProviders>
+    );
+  }
+
   return (
-    <CacheProvider value={emotionCache}>
-      <AppThemeProvider>
-        <SnackbarProvider>
-          <ReactDndProvider>
-            <DataProviders>
-              <SettingsDialogProvider>
-                <NotificationsProvider>
-                  <LocalizationProvider>
-                    <OnboardingProvider>
-                      <FocalBoardProvider>
-                        <NotionProvider>
-                          <IntlProvider>
-                            <PageHead />
+    <AppThemeProvider>
+      <SnackbarProvider>
+        <ReactDndProvider>
+          <DataProviders>
+            <SettingsDialogProvider>
+              <LocalizationProvider>
+                <FocalBoardProvider>
+                  <NotionProvider>
+                    <IntlProvider>
+                      <PageHead {...pageProps} />
 
-                            <RouteGuard>
-                              <ErrorBoundary>
-                                <Snackbar
-                                  isOpen={isOldBuild}
-                                  message='New CharmVerse platform update available. Please refresh.'
-                                  actions={[
-                                    <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                      <RefreshIcon fontSize='small' />
-                                    </IconButton>
-                                  ]}
-                                  origin={{ vertical: 'top', horizontal: 'center' }}
-                                  severity='warning'
-                                  handleClose={() => setIsOldBuild(false)}
-                                />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
 
-                                {getLayout(<Component {...pageProps} />)}
+                          {getLayout(<Component {...pageProps} />)}
 
-                                <GlobalComponents />
-                              </ErrorBoundary>
-                            </RouteGuard>
-                          </IntlProvider>
-                        </NotionProvider>
-                      </FocalBoardProvider>
-                    </OnboardingProvider>
-                  </LocalizationProvider>
-                </NotificationsProvider>
-              </SettingsDialogProvider>
-            </DataProviders>
-          </ReactDndProvider>
-        </SnackbarProvider>
-      </AppThemeProvider>
-    </CacheProvider>
+                          <GlobalComponents />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </IntlProvider>
+                  </NotionProvider>
+                </FocalBoardProvider>
+              </LocalizationProvider>
+            </SettingsDialogProvider>
+          </DataProviders>
+        </ReactDndProvider>
+      </SnackbarProvider>
+    </AppThemeProvider>
   );
 }
 
@@ -208,38 +230,45 @@ function DataProviders({ children }: { children: ReactNode }) {
     >
       <UserProvider>
         <DiscordProvider>
-          <Web3ReactProvider getLibrary={getLibrary}>
+          <WagmiProvider>
             <Web3ConnectionManager>
+              <WalletSelectorModal />
               <Web3AccountProvider>
                 <SpacesProvider>
-                  <PostCategoriesProvider>
-                    <IsSpaceMemberProvider>
-                      <WebSocketClientProvider>
-                        <MembersProvider>
-                          <BountiesProvider>
-                            <PaymentMethodsProvider>
-                              <PagesProvider>
-                                <MemberProfileProvider>
-                                  <PageTitleProvider>{children}</PageTitleProvider>
-                                </MemberProfileProvider>
-                              </PagesProvider>
-                            </PaymentMethodsProvider>
-                          </BountiesProvider>
-                        </MembersProvider>
-                      </WebSocketClientProvider>
-                    </IsSpaceMemberProvider>
-                  </PostCategoriesProvider>
+                  <CurrentSpaceProvider>
+                    <PostCategoriesProvider>
+                      <IsSpaceMemberProvider>
+                        <WebSocketClientProvider>
+                          <MembersProvider>
+                            <BountiesProvider>
+                              <RewardsProvider>
+                                <PaymentMethodsProvider>
+                                  <PagesProvider>
+                                    <MemberPropertiesProvider>
+                                      <UserProfileProvider>
+                                        <PageTitleProvider>{children}</PageTitleProvider>
+                                      </UserProfileProvider>
+                                    </MemberPropertiesProvider>
+                                  </PagesProvider>
+                                </PaymentMethodsProvider>
+                              </RewardsProvider>
+                            </BountiesProvider>
+                          </MembersProvider>
+                        </WebSocketClientProvider>
+                      </IsSpaceMemberProvider>
+                    </PostCategoriesProvider>
+                  </CurrentSpaceProvider>
                 </SpacesProvider>
               </Web3AccountProvider>
             </Web3ConnectionManager>
-          </Web3ReactProvider>
+          </WagmiProvider>
         </DiscordProvider>
       </UserProvider>
     </SWRConfig>
   );
 }
 
-function PageHead() {
+function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   const [title] = usePageTitle();
   const prefix = isDevEnv ? 'DEV | ' : '';
 
@@ -250,6 +279,8 @@ function PageHead() {
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}
       <meta name='google-site-verification' content='AhWgWbPVQIsHKmPNTkUSI-hN38XbkpCIrt40-4IgaiM' />
+
+      <OpenGraphData {...openGraphData} />
     </Head>
   );
 }

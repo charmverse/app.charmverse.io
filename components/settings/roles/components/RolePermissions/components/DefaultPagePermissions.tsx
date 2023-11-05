@@ -1,17 +1,20 @@
 import type { PagePermissionLevel } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, FormControlLabel, Grid, Switch, Typography, Menu, MenuItem } from '@mui/material';
+import { Box, FormControlLabel, Menu, MenuItem, Switch, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { StyledListItemText } from 'components/common/StyledListItemText';
+import { CustomRolesInfoModal } from 'components/settings/roles/CustomRolesInfoModal';
+import { UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import { permissionLevels } from 'lib/permissions/pages/page-permission-mapping';
+import { pagePermissionLevels } from 'lib/permissions/pages/labels';
 import { typedKeys } from 'lib/utilities/objects';
 
 type PagePermissionLevelWithoutCustomAndProposalEditor = Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>;
@@ -21,11 +24,11 @@ const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProp
   view_comment: 'Space members can view and comment on pages.',
   view: 'Space members can only view pages.'
 };
-
 export function DefaultPagePermissions() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
-
+  const { isFreeSpace } = useIsFreeSpace();
+  const rolesInfoPopup = usePopupState({ variant: 'popover', popupId: 'role-info-popup' });
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
 
   const isAdmin = useIsAdmin();
@@ -38,9 +41,14 @@ export function DefaultPagePermissions() {
       (space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustomAndProposalEditor) ?? 'full_access'
     );
   const [defaultPublicPages, setDefaultPublicPages] = useState<boolean>(space?.defaultPublicPages ?? false);
+  const [requireProposalTemplate, setRequireProposalTemplate] = useState<boolean>(
+    space?.requireProposalTemplate ?? false
+  );
 
   const settingsChanged =
-    space?.defaultPublicPages !== defaultPublicPages || selectedPagePermission !== space?.defaultPagePermissionGroup;
+    space?.defaultPublicPages !== defaultPublicPages ||
+    selectedPagePermission !== space?.defaultPagePermissionGroup ||
+    space?.requireProposalTemplate !== requireProposalTemplate;
 
   async function updateSpaceDefaultPagePermission() {
     if (space && selectedPagePermission !== space?.defaultPagePermissionGroup) {
@@ -57,8 +65,19 @@ export function DefaultPagePermissions() {
 
   async function updateSpaceDefaultPublicPages() {
     if (space && defaultPublicPages !== space?.defaultPublicPages) {
-      const updatedSpace = await charmClient.setDefaultPublicPages({
+      const updatedSpace = await charmClient.spaces.setDefaultPublicPages({
         defaultPublicPages,
+        spaceId: space.id
+      });
+
+      setSpace(updatedSpace);
+    }
+  }
+
+  async function updateSpaceRequireProposalTemplate() {
+    if (space && requireProposalTemplate !== space?.requireProposalTemplate) {
+      const updatedSpace = await charmClient.spaces.setRequireProposalTemplate({
+        requireProposalTemplate,
         spaceId: space.id
       });
 
@@ -69,6 +88,7 @@ export function DefaultPagePermissions() {
   function updateSpaceDefaults() {
     updateSpaceDefaultPagePermission();
     updateSpaceDefaultPublicPages();
+    updateSpaceRequireProposalTemplate();
     setTouched(false);
   }
 
@@ -81,24 +101,31 @@ export function DefaultPagePermissions() {
   return (
     <>
       <Box mb={2}>
-        <Typography fontWeight='bold'>Default permissions for new pages</Typography>
+        <Typography fontWeight='bold' display='flex' alignItems='center' gap={2}>
+          Default permissions for new pages
+        </Typography>
         <Typography variant='caption'>
           This applies to top-level pages only. Subpages will inherit permissions from their parent.
         </Typography>
       </Box>
       <Box mb={2} display='flex' alignItems='center' justifyContent='space-between'>
         <Typography>Default access level for Members</Typography>
-        <Button
-          color='secondary'
-          variant='outlined'
-          disabled={isUpdatingPagePermission || !isAdmin}
-          loading={isUpdatingPagePermission}
-          endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
-          {...bindTrigger(popupState)}
-        >
-          {permissionLevels[selectedPagePermission]}
-        </Button>
+        <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
+          <Box display='flex' gap={1} alignItems='center'>
+            <Button
+              color='secondary'
+              variant='outlined'
+              disabled={isUpdatingPagePermission || !isAdmin || isFreeSpace}
+              loading={isUpdatingPagePermission}
+              endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
+              {...bindTrigger(popupState)}
+            >
+              {isFreeSpace ? pagePermissionLevels.editor : pagePermissionLevels[selectedPagePermission]}
+            </Button>
+          </Box>
+        </UpgradeWrapper>
       </Box>
+
       <FormControlLabel
         sx={{
           margin: 0,
@@ -106,17 +133,46 @@ export function DefaultPagePermissions() {
           justifyContent: 'space-between'
         }}
         control={
-          <Switch
-            disabled={!isAdmin}
-            onChange={(ev) => {
-              const { checked: publiclyAccessible } = ev.target;
-              setDefaultPublicPages(publiclyAccessible);
-              setTouched(true);
-            }}
-            defaultChecked={defaultPublicPages}
-          />
+          <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
+            <Box display='flex' gap={5.5} alignItems='center'>
+              <Switch
+                disabled={!isAdmin || isFreeSpace}
+                onChange={(ev) => {
+                  if (!isFreeSpace) {
+                    const { checked: publiclyAccessible } = ev.target;
+                    setDefaultPublicPages(publiclyAccessible);
+                    setTouched(true);
+                  }
+                }}
+                defaultChecked={defaultPublicPages || isFreeSpace}
+              />
+            </Box>
+          </UpgradeWrapper>
         }
         label='Accessible to public'
+        labelPlacement='start'
+      />
+      <FormControlLabel
+        sx={{
+          margin: 0,
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+        control={
+          <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
+            <Box display='flex' gap={5.5} alignItems='center'>
+              <Switch
+                disabled={!isAdmin || isFreeSpace}
+                onChange={(ev) => {
+                  setRequireProposalTemplate(ev.target.checked);
+                  setTouched(true);
+                }}
+                defaultChecked={requireProposalTemplate && !isFreeSpace}
+              />
+            </Box>
+          </UpgradeWrapper>
+        }
+        label='Require proposal template'
         labelPlacement='start'
       />
       {isAdmin && (
@@ -139,7 +195,7 @@ export function DefaultPagePermissions() {
         }}
       >
         {typedKeys(pagePermissionDescriptions).map((permissionLevel) => {
-          const permissionLevelLabel = permissionLevels[permissionLevel];
+          const permissionLevelLabel = pagePermissionLevels[permissionLevel];
           const isSelected = selectedPagePermission === permissionLevel;
           const description = pagePermissionDescriptions[permissionLevel];
 
@@ -158,6 +214,7 @@ export function DefaultPagePermissions() {
           );
         })}
       </Menu>
+      <CustomRolesInfoModal isOpen={rolesInfoPopup.isOpen} onClose={rolesInfoPopup.close} />
     </>
   );
 }

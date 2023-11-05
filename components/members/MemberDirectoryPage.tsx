@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useFilteredMembers } from 'components/members/hooks/useFilteredMembers';
@@ -34,13 +34,12 @@ function memberNamePropertyValue(member: Member) {
   return member.username.startsWith('0x') ? `zzzzzzzz${member.username}` : member.username;
 }
 
-export default function MemberDirectoryPage() {
+export default function MemberDirectoryPage({ title }: { title: string }) {
   const router = useRouter();
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const filteredMembers = useFilteredMembers(searchQuery);
-
   const { hasAccess: showDirectory, isLoadingAccess } = useHasMemberLevel('member');
 
   const sortedMembers = filteredMembers.sort((mem1, mem2) =>
@@ -58,7 +57,7 @@ export default function MemberDirectoryPage() {
   return (
     <CenteredPageContent>
       <Typography variant='h1' my={2}>
-        Member Directory
+        {title}
       </Typography>
       <MemberDirectorySearchBar onChange={setSearchQuery} />
       <Stack flexDirection='row' justifyContent='space-between' mb={1}>

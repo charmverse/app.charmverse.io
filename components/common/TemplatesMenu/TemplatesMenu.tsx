@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
@@ -7,8 +8,9 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import type { PageMeta } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
+
+import LoadingComponent from '../LoadingComponent';
 
 import { TemplatePageMenuActions } from './TemplatePageMenuActions';
 
@@ -16,7 +18,7 @@ import { TemplatePageMenuActions } from './TemplatePageMenuActions';
  * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
  */
 interface Props {
-  pages: PageMeta[];
+  pages?: PageMeta[];
   createTemplate: () => void;
   editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
@@ -26,6 +28,7 @@ interface Props {
   boardTitle?: string;
   enableItemOptions?: boolean;
   enableNewTemplates?: boolean;
+  isLoading?: boolean;
 }
 
 export function TemplatesMenu({
@@ -38,7 +41,8 @@ export function TemplatesMenu({
   popupState,
   boardTitle,
   enableItemOptions,
-  enableNewTemplates
+  enableNewTemplates,
+  isLoading
 }: Props) {
   const theme = useTheme();
 
@@ -64,42 +68,50 @@ export function TemplatesMenu({
         )}{' '}
       </MenuItem>
 
-      {pages.length === 0 && (
-        <MenuItem dense sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      {isLoading && !pages && (
+        <Box sx={{ my: 2 }}>
+          <LoadingComponent size={20} />
+        </Box>
+      )}
+
+      {pages?.length === 0 && (
+        <MenuItem disabled dense sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <ListItemText>No templates found</ListItemText>
         </MenuItem>
       )}
 
-      {pages.map((page) => {
-        return (
-          <MenuItem
-            key={page.id}
-            dense
-            sx={{ display: 'flex', justifyContent: 'space-between' }}
-            onClick={() => {
-              addPageFromTemplate(page.id);
-              popupState.close();
-            }}
-          >
-            <ListItemIcon>
-              <DescriptionOutlinedIcon />
-            </ListItemIcon>
-            <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
+      {pages &&
+        pages.map((page) => {
+          return (
+            <MenuItem
+              data-test={`select-option-${page.id}`}
+              key={page.id}
+              dense
+              sx={{ display: 'flex', justifyContent: 'space-between' }}
+              onClick={() => {
+                addPageFromTemplate(page.id);
+                popupState.close();
+              }}
+            >
+              <ListItemIcon>
+                <DescriptionOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
 
-            {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
-            <Box ml={1} onClick={(e) => e.stopPropagation()}>
-              {enableItemOptions && (
-                <TemplatePageMenuActions
-                  editTemplate={editTemplate}
-                  deleteTemplate={deleteTemplate}
-                  pageId={page.id}
-                  closeParentPopup={popupState.close}
-                />
-              )}
-            </Box>
-          </MenuItem>
-        );
-      })}
+              {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
+              <Box ml={1} onClick={(e) => e.stopPropagation()}>
+                {enableItemOptions && (
+                  <TemplatePageMenuActions
+                    editTemplate={editTemplate}
+                    deleteTemplate={deleteTemplate}
+                    pageId={page.id}
+                    closeParentPopup={popupState.close}
+                  />
+                )}
+              </Box>
+            </MenuItem>
+          );
+        })}
       {enableNewTemplates && [
         <Divider key='templates-menu-divider' />,
         <MenuItem

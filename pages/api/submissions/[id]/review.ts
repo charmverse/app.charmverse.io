@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -46,7 +46,6 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
   }
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: submission.bounty.id,
     userId
   });
@@ -61,13 +60,17 @@ async function reviewSubmissionController(req: NextApiRequest, res: NextApiRespo
     userId
   });
 
-  await rollupBountyStatus(updatedSubmission.bountyId);
+  await rollupBountyStatus({
+    bountyId: updatedSubmission.bountyId,
+    userId
+  });
 
   const { spaceId, rewardAmount, rewardToken, id, page, customReward } = submission.bounty;
   if (decision === 'approve') {
     trackUserAction('bounty_submission_reviewed', { userId, spaceId, pageId: page?.id || '', resourceId: id });
     await publishBountyEvent({
-      scope: WebhookEventNames.BountyCompleted,
+      scope: WebhookEventNames.RewardSubmissionApproved,
+      applicationId: submissionId as string,
       bountyId: submission.bounty.id,
       spaceId,
       userId

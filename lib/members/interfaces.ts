@@ -31,29 +31,32 @@ export type PropertyValueDetails = {
 
 export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;
 
+export type Social = {
+  twitterURL?: string;
+  githubURL?: string;
+  discordUsername?: string;
+  linkedinURL?: string;
+};
+
 export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> & {
   avatar?: string;
   isBot?: boolean;
-  path?: string;
+  path: string;
   deletedAt?: Date;
   avatarTokenId?: string;
   isAdmin?: boolean;
   isGuest?: boolean;
   joinDate: string;
   hasNftAvatar?: boolean;
-  profile?: UserDetails;
+  profile?: Omit<UserDetails, 'social'> & { social: Social | null };
   properties: PropertyValueWithDetails[];
   roles: Pick<Role, 'name' | 'id'>[];
-  onboarded?: boolean;
+  onboarded: boolean;
   searchValue: string;
 };
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;
 export type UpdateMemberPropertyValuePayload = Pick<MemberPropertyValue, 'memberPropertyId' | 'value'>;
-
-export type MemberPropertyWithSpace = MemberProperty & {
-  space: Space;
-};
 
 export type MemberPropertyValuesBySpace = {
   spaceId: string;

@@ -25,8 +25,11 @@ export const StyledIconButton = styled(IconButton)`
   svg {
     font-size: 16px;
   }
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    &:hover {
+      background-color: ${({ theme }) => theme.palette.action.hover};
+    }
   }
   ${({ theme }) => `
     ${theme.breakpoints.down('md')} {
@@ -64,7 +67,7 @@ function NewPageMenu({ addPage, tooltip }: Props) {
   return (
     <>
       <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='top' arrow>
-        <StyledIconButton onClick={handleClick}>
+        <StyledIconButton data-test='add-page' onClick={handleClick}>
           <AddIcon color='secondary' />
         </StyledIconButton>
       </Tooltip>
@@ -77,7 +80,7 @@ function NewPageMenu({ addPage, tooltip }: Props) {
           <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Add Page</Typography>
         </MenuItem>
         {/* create a linked board page by default, which can be changed to 'board' by the user */}
-        <MenuItem onClick={(e) => createPage(e, { type: 'linked_board' })}>
+        <MenuItem data-test='menu-add-database' onClick={(e) => createPage(e, { type: 'linked_board' })}>
           <ListItemIcon>
             <StyledDatabaseIcon fontSize='small' />
           </ListItemIcon>

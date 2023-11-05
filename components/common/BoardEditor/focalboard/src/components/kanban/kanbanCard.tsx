@@ -1,27 +1,25 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
-import Link from '@mui/material/Link';
-import type { CryptoCurrency } from 'connectors';
-import { TokenLogoPaths } from 'connectors';
+import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
-import { BountyStatusChip } from 'components/bounties/components/BountyStatusBadge';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { PageActions } from 'components/common/PageActions';
+import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import { useBounties } from 'hooks/useBounties';
+import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
-import { Utils } from '../../utils';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -46,15 +44,6 @@ const BountyFooter = styled.div`
   margin-top: ${({ theme }) => theme.spacing(1)};
 `;
 
-const CurrencyIcon = styled.span`
-  margin-right: ${({ theme }) => theme.spacing(0.5)};
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
@@ -62,32 +51,27 @@ const StyledBox = styled(Box)`
 const KanbanCard = React.memo((props: Props) => {
   const { card, board } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly, props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {
     className += ' dragover';
   }
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
-  const { bounties } = useBounties();
-  const linkedBounty = bounties.find((bounty) => bounty.page?.id === card.id);
-
+  const { rewards } = useRewards();
+  const router = useRouter();
   const { pages } = usePages();
   const cardPage = pages[card.id];
-  const router = useRouter();
+  const linkedBounty = rewards?.find((r) => r?.id === cardPage?.bountyId);
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = `/${domain}/${cardPage?.path}`;
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
-  const handleDeleteCard = async () => {
-    if (!card) {
-      Utils.assertFailure();
-      return;
-    }
-    await mutator.deleteBlock(card, 'delete card');
+  const handleDeleteCard = useCallback(async () => {
+    await mutator.deleteBlock({ id: card.id, type: card.type }, 'delete card');
     mutate(`pages/${space?.id}`);
-  };
+  }, [card.id, card.type, space?.id]);
   const confirmDialogProps: {
     heading: string;
     subText?: string;
@@ -108,7 +92,7 @@ const KanbanCard = React.memo((props: Props) => {
       setShowConfirmationDialogBox(false);
     }
   };
-  const deleteCard = () => {
+  const deleteCard = useCallback(() => {
     // user trying to delete a card with blank name
     // but content present cannot be deleted without
     // confirmation dialog
@@ -117,11 +101,11 @@ const KanbanCard = React.memo((props: Props) => {
       return;
     }
     setShowConfirmationDialogBox(true);
-  };
+  }, [handleDeleteCard, setShowConfirmationDialogBox]);
 
   return (
     <>
-      <Link href={fullPageUrl} draggable={false}>
+      <Link href={fullPageUrl} draggable={false} color='inherit'>
         <StyledBox
           ref={props.readOnly ? () => null : cardRef}
           className={className}
@@ -135,7 +119,7 @@ const KanbanCard = React.memo((props: Props) => {
           }}
           data-test={`kanban-card-${card.id}`}
         >
-          {!props.readOnly && cardPage && <PageActions page={cardPage} onClickDelete={deleteCard} />}
+          {!props.readOnly && <KanbanPageActionsMenuButton page={cardPage} onClickDelete={deleteCard} />}
 
           <div className='octo-icontitle'>
             <div>
@@ -147,43 +131,26 @@ const KanbanCard = React.memo((props: Props) => {
               {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
-          {visiblePropertyTemplates.map((template) => (
-            <PropertyValueElement
-              key={template.id}
-              board={board}
-              readOnly={true}
-              card={card}
-              updatedAt={cardPage?.updatedAt.toString() || ''}
-              updatedBy={cardPage?.updatedBy || ''}
-              propertyTemplate={template}
-              showEmptyPlaceholder={false}
-              displayType='kanban'
-              showTooltip
-            />
-          ))}
+          <Stack gap={0.5}>
+            {visiblePropertyTemplates.map((template) => (
+              <PropertyValueElement
+                key={template.id}
+                board={board}
+                readOnly={true}
+                card={card}
+                syncWithPageId={cardPage?.syncWithPageId}
+                updatedAt={cardPage?.updatedAt.toString() || ''}
+                updatedBy={cardPage?.updatedBy || ''}
+                propertyTemplate={template}
+                showEmptyPlaceholder={false}
+                displayType='kanban'
+                showTooltip
+              />
+            ))}
+          </Stack>
           {linkedBounty && (
             <BountyFooter>
-              <Box
-                sx={{
-                  display: 'flex',
-                  gap: 0.25
-                }}
-              >
-                <CurrencyIcon>
-                  {TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency] && (
-                    <img loading='lazy' height={20} src={TokenLogoPaths[linkedBounty.rewardToken as CryptoCurrency]} />
-                  )}
-                </CurrencyIcon>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 0.25
-                  }}
-                >
-                  <Box component='span'>{linkedBounty.rewardAmount}</Box>
-                </Box>
-              </Box>
-              <BountyStatusChip status={linkedBounty.status} />
+              <RewardStatusBadge reward={linkedBounty} truncate />
             </BountyFooter>
           )}
         </StyledBox>

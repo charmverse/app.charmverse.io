@@ -1,11 +1,12 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import { Check, Close } from '@mui/icons-material';
 import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { memo, useMemo } from 'react';
 
 import charmClient from 'charmClient';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
+import { usePages } from 'hooks/usePages';
 import type { Member } from 'lib/members/interfaces';
 
 import { accept } from '../fiduswriter/track/accept';
@@ -40,9 +41,11 @@ const ACTIONS: Record<string, string> = {
   insertion_horizontalRule: 'New horizontal rule',
   insertion_iframe: 'Added embed',
   insertion_image: 'Added image',
+  insertion_list_item: 'New list item',
   insertion_listItem: 'New list item',
   insertion_paragraph: 'New paragraph',
   insertion_pdf: 'Added pdf',
+  insertion_tabIndent: 'Add whitespace',
   insertion_table: 'Added table',
   deletion_blockquote: 'Unwrapped blockquote',
   deletion_codeBlock: 'Removed code block',
@@ -53,10 +56,14 @@ const ACTIONS: Record<string, string> = {
   deletion_heading: 'Merged heading',
   deletion_iframe: 'Removed embed',
   deletion_image: 'Removed image',
-  deletion_listItem: 'Lifted list item',
+  deletion_list_item: 'Removed list item',
+  deletion_listItem: 'Removed list item',
   deletion_paragraph: 'Merged paragraph',
   deletion_pdf: 'Removed pdf',
+  deletion_tabIndent: 'Remove whitespace',
   deletion_table: 'Revmoed table',
+  block_change_bullet_list: 'Added bullet list item',
+  block_change_ordered_list: 'Added ordered list item',
   block_change_bulletList: 'Added bullet list item',
   block_change_orderedList: 'Added ordered list item',
   block_change_listItem: 'Changed into list item',
@@ -65,7 +72,7 @@ const ACTIONS: Record<string, string> = {
   block_change_codeBlock: 'Changed into code block'
 };
 // For these types, the nodeType would be 'paragraph' but we want to show the container type instead
-const containerNodeTypes = ['listItem', 'columnBlock', 'disclosureSummary'];
+const containerNodeTypes = ['listItem', 'list_item', 'columnBlock', 'disclosureSummary'];
 
 // isOwner allows owners to always delete their own suggestions
 type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean; pageId: string; spaceId: string };
@@ -73,6 +80,19 @@ type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean; pageId: str
 function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type, pageId, spaceId }: Props) {
   const view = useEditorViewContext();
   const { getMemberById } = useMembers();
+  const { pages } = usePages();
+  let content = node.textContent;
+
+  if (node.type.name === 'emoji') {
+    content = node.attrs.emoji;
+  } else if (node.type.name === 'mention') {
+    if (node.attrs.type === 'user') {
+      content = getMemberById(node.attrs.value)?.username ?? '';
+    } else {
+      content = pages[node.attrs.value]?.title ?? 'Untitled';
+    }
+  }
+
   // get parentNode for lists
   const parentNode = useMemo(
     () => (pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null),
@@ -138,7 +158,7 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
               type={type}
               parentNodeType={parentNode?.type.name}
               nodeType={node.type.name}
-              content={node.textContent}
+              content={content}
             />
           )}
         </Typography>

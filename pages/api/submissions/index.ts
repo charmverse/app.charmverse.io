@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -41,7 +41,6 @@ async function createSubmissionController(req: NextApiRequest, res: NextApiRespo
   const userId = req.session.user.id;
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: bountyId,
     userId
   });
@@ -61,7 +60,10 @@ async function createSubmissionController(req: NextApiRequest, res: NextApiRespo
     customReward: isTruthy(bountySpace.customReward)
   });
 
-  await rollupBountyStatus(createdSubmission.bountyId);
+  await rollupBountyStatus({
+    bountyId,
+    userId
+  });
 
   return res.status(201).json(createdSubmission);
 }

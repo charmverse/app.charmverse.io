@@ -21,14 +21,17 @@ type Props = {
   selectedCardIds: string[];
   readOnly: boolean;
   cardIdToFocusOnRender: string;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string, parentId?: string) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
+  onDeleteCard?: (cardId: string) => Promise<void>;
+  readOnlyTitle?: boolean;
+  expandSubRowsOnLoad?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
-  const { board, cardPages: allCardPages, activeView } = props;
+  const { board, cardPages: allCardPages, activeView, onDeleteCard, expandSubRowsOnLoad } = props;
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
 
@@ -51,7 +54,7 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, card }) => (
+      {cardPages.map(({ page, card, subPages }) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
@@ -69,10 +72,14 @@ function TableRows(props: Props): JSX.Element {
           showCard={props.showCard}
           readOnly={props.readOnly}
           onDrop={props.onDrop}
+          onDeleteCard={onDeleteCard}
           offset={props.offset}
           resizingColumn={props.resizingColumn}
           columnRefs={props.columnRefs}
           cardPage={page}
+          readOnlyTitle={props.readOnlyTitle}
+          subPages={subPages}
+          expandSubRowsOnLoad={expandSubRowsOnLoad}
         />
       ))}
 

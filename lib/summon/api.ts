@@ -1,6 +1,6 @@
-import * as http from 'adapters/http';
+import * as http from '@charmverse/core/http';
 
-import type { XPSAchievement, XPSUserInventory } from './interfaces';
+import type { SummonAchievement, SummonUserInventory, SummonUserProfile } from './interfaces';
 
 const apiToken = process.env.XPS_API_TOKEN as string | undefined;
 
@@ -8,7 +8,7 @@ const headers = {
   Authorization: apiToken ? `Bearer ${apiToken}` : null
 };
 
-const baseUrl = 'https://g7p.io/v1/xps';
+export const SUMMON_BASE_URL = 'https://g7p.io/v1/xps';
 
 type ApiResponse<T> = {
   data: T;
@@ -21,13 +21,18 @@ type ApiResponse<T> = {
 // `/v1/xps/scan/identity?email=`
 // `/v1/xps/scan/identity?discordHandle=`
 
-export async function findUserByIdentity(query: {
-  walletAddress?: string;
-  email?: string;
-  discordHandle?: string;
-  githubUsername?: string;
-}): Promise<string | null> {
-  const result = await http.GET<ApiResponse<{ userId: string }>>(`${baseUrl}/scan/identity`, query, { headers });
+export async function findUserByIdentity(
+  query: {
+    walletAddress?: string;
+    email?: string;
+    discordHandle?: string;
+    githubUsername?: string;
+  },
+  summonApiUrl: string
+): Promise<string | null> {
+  const result = await http.GET<ApiResponse<{ userId: string }>>(`${summonApiUrl}/scan/identity`, query, {
+    headers
+  });
   // Note that an empty Apiresponse looks very similar to positive result: {
   //  status: 1,
   //  message: 'resource not found',
@@ -38,24 +43,22 @@ export async function findUserByIdentity(query: {
 
 // ### Read user information about achievements by userId
 // `/v1/xps/scan/inventory/{userId}`
-export function getUserInventory(userId: string) {
-  return http
-    .GET<ApiResponse<XPSUserInventory | null>>(`${baseUrl}/scan/inventory/${userId}`, {}, { headers })
-    .then(({ data }) => data);
+export async function getUserInventory({ summonApiUrl, xpsEngineId }: { xpsEngineId: string; summonApiUrl: string }) {
+  const { data } = await http.GET<ApiResponse<SummonUserInventory | null>>(
+    `${summonApiUrl}/scan/inventory/${xpsEngineId}`,
+    {},
+    { headers }
+  );
+  return data;
 }
 
-type XPSUserProfile = {
-  id: string;
-  tenantId: string;
-  // avatar: string;
-  // username: string;
-  meta: XPSUserInventory['meta'];
-};
-
-export async function getUserProfile(userId: string): Promise<XPSUserProfile | null> {
-  const inventory = await getUserInventory(userId);
+export async function getUserSummonProfile(props: {
+  xpsEngineId: string;
+  summonApiUrl: string;
+}): Promise<SummonUserProfile | null> {
+  const inventory = await getUserInventory(props);
   if (inventory) {
-    const { user, tenant, meta, achievements, ...profile } = inventory;
+    const { user, tenant, meta, ...profile } = inventory;
     return {
       id: user,
       tenantId: tenant,
@@ -67,14 +70,70 @@ export async function getUserProfile(userId: string): Promise<XPSUserProfile | n
 
 // ### User achievements
 // `/v1/xps/achievement/{achievementId}`
-export function getAchievementById(achievementId: string) {
-  return http
-    .GET<ApiResponse<XPSAchievement | null>>(`${baseUrl}/achievement/${achievementId}`, {}, { headers })
-    .then(({ data }) => data)
-    .catch((error) => {
-      if (error.message === 'resource not found') {
-        return null;
-      }
-      return Promise.reject(error);
-    });
+export async function getAchievementById({
+  achievementId,
+  summonApiUrl
+}: {
+  summonApiUrl: string;
+  achievementId: string;
+}) {
+  try {
+    const { data } = await http.GET<ApiResponse<SummonAchievement | null>>(
+      `${summonApiUrl}/achievement/${achievementId}`,
+      {},
+      { headers }
+    );
+    return data;
+  } catch (error: any) {
+    if (error.message === 'resource not found') {
+      return null;
+    }
+    return Promise.reject(error);
+  }
+}
+
+export async function findUserXpsEngineId({
+  walletAddresses,
+  userEmail,
+  discordUserAccount,
+  summonApiUrl
+}: {
+  summonApiUrl: string;
+  discordUserAccount: { username: string } | null;
+  userEmail: string | null;
+  walletAddresses: string[];
+}) {
+  let userXpsEngineId: string | null = null;
+  for (const walletAddress of walletAddresses) {
+    userXpsEngineId = await findUserByIdentity(
+      {
+        walletAddress
+      },
+      summonApiUrl
+    );
+
+    if (userXpsEngineId) {
+      break;
+    }
+  }
+
+  if (!userXpsEngineId && userEmail) {
+    userXpsEngineId = await findUserByIdentity(
+      {
+        email: userEmail
+      },
+      summonApiUrl
+    );
+  }
+
+  if (discordUserAccount && !userXpsEngineId) {
+    userXpsEngineId = await findUserByIdentity(
+      {
+        discordHandle: discordUserAccount.username
+      },
+      summonApiUrl
+    );
+  }
+
+  return userXpsEngineId;
 }

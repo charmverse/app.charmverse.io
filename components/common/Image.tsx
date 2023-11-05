@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
-import NextImage from 'next/legacy/image';
+import NextImage from 'next/image';
 import type { ComponentProps } from 'react';
 
 type Props = ComponentProps<typeof Box> & Pick<ComponentProps<typeof NextImage>, 'src'>;
@@ -12,7 +12,7 @@ const ImageWrapper = styled(Box)`
 export default function Image({ src, ...props }: Props) {
   return (
     <ImageWrapper {...props}>
-      <NextImage src={src} />
+      <NextImage alt='' src={src} layout='responsive' />
     </ImageWrapper>
   );
 }

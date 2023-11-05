@@ -1,0 +1,29 @@
+.lsm-dev-mode-container {
+    margin-top: 3.5em;
+    overflow-y: scroll;
+    height: calc(100% - 5em);
+    font-family: var(--lsm-primary-font);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lsm-dev-mode-container-label {
+    margin: 1em;
+    font-weight: var(--lsm-primary-font-weight);
+}
+
+.lsm-dev-mode-textarea {
+    width: 95%;
+    background-color: var(--lsm-background-color);
+    color: var(--lsm-primary-color);
+}
+
+.lsm-dev-mode-show-button {
+    background-color: var(--lsm-background-color);
+    border: var(--lsm-secondary-color) 1px solid;
+    border-radius: var(--lsm-border-radius);
+    padding: 0.5em;
+    color: var(--lsm-primary-color);
+}

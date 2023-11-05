@@ -1,15 +1,16 @@
-import { prisma } from '@charmverse/core';
-import type { TransactionClient } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
-import type { IPageWithPermissions } from '../interfaces';
+import { generatePageQuery } from './generatePageQuery';
 
 export async function getPage(
   pageIdOrPath: string,
   spaceId?: string,
-  tx: TransactionClient = prisma
-): Promise<IPageWithPermissions | null> {
+  tx: PrismaTransactionClient = prisma
+): Promise<PageWithPermissions | null> {
   const isValidUUid = validate(pageIdOrPath);
 
   // We need a spaceId if looking up by path
@@ -17,14 +18,10 @@ export async function getPage(
     return null;
   }
 
-  const searchQuery: Prisma.PageWhereInput = isValidUUid
-    ? {
-        id: pageIdOrPath
-      }
-    : {
-        path: pageIdOrPath,
-        spaceId
-      };
+  const searchQuery: Prisma.PageWhereInput = generatePageQuery({
+    pageIdOrPath,
+    spaceIdOrDomain: spaceId
+  });
 
   return tx.page.findFirst({
     where: searchQuery,

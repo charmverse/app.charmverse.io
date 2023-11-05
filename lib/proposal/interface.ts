@@ -1,6 +1,12 @@
-import type { Page, PageComment, Proposal, ProposalAuthor, ProposalReviewer } from '@charmverse/core/prisma';
+import type { Page, PageComment, Proposal } from '@charmverse/core/prisma';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+
+import type {
+  ProposalRubricCriteriaAnswerWithTypedResponse,
+  ProposalRubricCriteriaWithTypedParams
+} from './rubric/interfaces';
 
 export interface ProposalReviewerInput {
   group: Extract<AssignablePermissionGroups, 'role' | 'user'>;
@@ -21,10 +27,14 @@ export interface ProposalWithCategory extends Proposal {
   category: ProposalCategory | null;
 }
 
-export interface ProposalWithUsers extends Proposal, ProposalWithCategory {
-  authors: ProposalAuthor[];
-  reviewers: ProposalReviewer[];
-}
+export type ProposalRubricData = {
+  rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
+  rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
+};
+
+export type ProposalWithUsersAndRubric = ProposalWithUsers &
+  ProposalRubricData & { page?: { sourceTemplateId: string | null } | null };
 
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };

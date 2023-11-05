@@ -1,11 +1,11 @@
-import { AvailablePostCategoryPermissions, generatePostCategory } from '@charmverse/core';
-import type { PostCategoryPermissionFlags } from '@charmverse/core';
+import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
+import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory, Space, User } from '@charmverse/core/prisma';
+import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
 
@@ -18,46 +18,50 @@ let otherSpace: Space;
 let otherSpaceAdminUser: User;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace({ isAdmin: true });
+  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   adminUser = generated.user;
   space = generated.space;
-  spaceMemberUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+  spaceMemberUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
-  const secondGenerated = await generateUserAndSpace({ isAdmin: true });
+  const secondGenerated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   otherSpaceAdminUser = secondGenerated.user;
   otherSpace = secondGenerated.space;
 
-  postCategory = await generatePostCategory({
+  postCategory = await testUtilsForum.generatePostCategory({
     spaceId: space.id
   });
 });
 
 describe('computePostCategoryPermissions - public version', () => {
-  it('should return full permissions for the admin', async () => {
-    const permissions = await computePostCategoryPermissions({
+  it('should allow admins and space members to create posts and edit / delete a category', async () => {
+    const adminPermissions = await computePostCategoryPermissions({
       resourceId: postCategory.id,
       userId: adminUser.id
     });
 
-    const fullPermissions = new AvailablePostCategoryPermissions().full;
-
-    expect(permissions).toEqual(fullPermissions);
-  });
-
-  it('should only allow space members to create posts', async () => {
-    const permissions = await computePostCategoryPermissions({
+    const memberPermissions = await computePostCategoryPermissions({
       resourceId: postCategory.id,
       userId: spaceMemberUser.id
     });
 
-    const createPermissions: PostCategoryPermissionFlags = {
-      ...new AvailablePostCategoryPermissions().empty,
-      create_post: true
-    };
+    expect(adminPermissions).toMatchObject<PostCategoryPermissionFlags>({
+      create_post: true,
+      delete_category: true,
+      edit_category: true,
+      manage_permissions: false,
+      comment_posts: true,
+      view_posts: true
+    });
 
-    expect(permissions).toEqual(createPermissions);
+    expect(memberPermissions).toMatchObject<PostCategoryPermissionFlags>({
+      create_post: true,
+      delete_category: true,
+      edit_category: true,
+      manage_permissions: false,
+      comment_posts: true,
+      view_posts: true
+    });
   });
-
   it('should return empty permissions for people outside the space', async () => {
     const publicPermissions = await computePostCategoryPermissions({
       resourceId: postCategory.id

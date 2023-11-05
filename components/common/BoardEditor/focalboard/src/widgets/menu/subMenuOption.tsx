@@ -3,8 +3,6 @@ import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined
 import Popper from '@mui/material/Popper';
 import React, { useEffect, useRef, useState } from 'react';
 
-import Menu from '.';
-
 type SubMenuOptionProps = {
   id: string;
   name: string;
@@ -77,11 +75,6 @@ function SubMenuOption(props: SubMenuOptionProps): JSX.Element {
         <div ref={popperRef} style={{ maxHeight: maxHeight || 'none' }} className='SubMenu Menu noselect '>
           <div className='menu-contents'>
             <div className='menu-options'>{props.children}</div>
-            <div className='menu-spacer hideOnWidescreen' />
-
-            <div className='menu-options hideOnWidescreen'>
-              <Menu.Text id='menu-cancel' name='Cancel' className='menu-cancel' onClick={() => undefined} />
-            </div>
           </div>
         </div>
       </StyledPopper>

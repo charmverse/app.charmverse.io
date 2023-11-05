@@ -1,3 +1,1 @@
-import TokenGates from './TokenGates';
-
-export default TokenGates;
+export { TokenGates } from './TokenGates';

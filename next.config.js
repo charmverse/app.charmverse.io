@@ -1,34 +1,30 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
-const path = require('node:path');
-
 const BundleAnalyzer = require('@next/bundle-analyzer');
-const next = require('next/dist/lib/is-serializable-props');
-const webpack = require('webpack');
 
 const esmModules = require('./next.base').esmModules;
-
-// we can save time and skip code checks, which are handle in a special step by the CI
-const skipCodeChecks = process.env.CI === 'true';
 
 const config = {
   poweredByHeader: false,
   eslint: {
     // add background and serverless to the default list of pages for eslint
-    dirs: ['pages', 'components', 'lib', 'background', 'serverless'],
-    ignoreDuringBuilds: skipCodeChecks
+    dirs: ['pages', 'components', 'lib', 'background', 'serverless', 'stories'],
+    ignoreDuringBuilds: true
   },
   // types are tested separately from the build
   typescript: {
-    ignoreBuildErrors: skipCodeChecks,
+    ignoreBuildErrors: true,
     tsconfigPath: 'tsconfig.next.json'
   },
   compiler: {
     styledComponents: true
   },
   experimental: {
-    esmExternals: false
-    //    externalDir: true
+    esmExternals: false,
+    webpackBuildWorker: true
+  },
+  images: {
+    // next image is broken in staging/production as of 14.0.1
+    unoptimized: true
   },
   transpilePackages: esmModules,
   modularizeImports: {
@@ -38,10 +34,15 @@ const config = {
     '@mui/icons-material': {
       transform: '@mui/icons-material/{{member}}'
     },
+    '@mui/system': {
+      transform: '@mui/system/{{member}}'
+    },
     lodash: {
       transform: 'lodash/{{member}}'
     }
   },
+  assetPrefix: process.env.REACT_APP_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
+  productionBrowserSourceMaps: true,
   async redirects() {
     return [
       {
@@ -54,6 +55,16 @@ const config = {
         destination: '/:domain',
         permanent: true
       },
+      // {
+      //   source: '/:domain/bounties',
+      //   destination: '/:domain/rewards',
+      //   permanent: true
+      // },
+      // {
+      //   source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
+      //   destination: '/:domain/bounties?bountyId=:id',
+      //   permanent: false
+      // },
       {
         source: '/nexus',
         destination: '/',
@@ -65,14 +76,14 @@ const config = {
         permanent: true
       },
       {
-        source: '/integrations',
+        source: '/u/:path*',
         destination: '/',
         permanent: true
       },
       {
-        source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
-        destination: '/:domain/bounties?bountyId=:id',
-        permanent: false
+        source: '/integrations',
+        destination: '/',
+        permanent: true
       },
       {
         // strip out old /share prefix
@@ -94,7 +105,7 @@ const config = {
       }
     ];
   },
-  webpack(_config, { buildId, nextRuntime }) {
+  webpack(_config, { buildId, nextRuntime, webpack }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
 
@@ -170,18 +181,29 @@ const config = {
         return entry().then((_entry) => {
           return {
             ..._entry,
-            cron: './background/cron.ts',
-            websockets: './background/websockets.ts',
-            countSpaceData: './scripts/countSpaceData.ts'
+            cron: './background/cron.ts'
+            // websockets: './background/initWebsockets.ts'
+            // countSpaceData: './scripts/countSpaceData.ts',
+            // importFromDiscourse: './scripts/importFromDiscourse.ts',
           };
         });
       };
+    } else {
+      /**
+       * Add support for the `node:` scheme available since Node.js 16.
+       *
+       * `@lit-protocol/lit-node-client` imports from `node:buffer`
+       *
+       * @see https://github.com/webpack/webpack/issues/13290
+       */
+      _config.plugins = _config.plugins ?? [];
+      _config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+          resource.request = resource.request.replace(/^node:/, '');
+        })
+      );
     }
-    _config.plugins.push(
-      new webpack.DefinePlugin({
-        'process.env.NEXT_PUBLIC_BUILD_ID': `"${buildId}"`
-      })
-    );
+
     return _config;
   }
 };
@@ -196,12 +218,6 @@ const removeUndefined = (obj) => {
     else if (obj[key] !== undefined) newObj[key] = obj[key];
   });
   return newObj;
-};
-
-// eslint-disable-next-line prefer-destructuring
-const isSerializableProps = next.isSerializableProps;
-next.isSerializableProps = function _isSerializableProps(page, method, input) {
-  return isSerializableProps(page, method, removeUndefined(input));
 };
 
 const withBundleAnalyzer = BundleAnalyzer({

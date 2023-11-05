@@ -1,7 +1,7 @@
 import type { PluginKey } from 'prosemirror-state';
 import { useMemo } from 'react';
 
-import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
@@ -20,27 +20,28 @@ import type { PaletteItemTypeNoGroup } from './paletteItem';
 
 export function useEditorItems({
   disableNestedPage,
-  nestedPagePluginKey,
+  linkedPagePluginKey,
   enableVoting,
   pageId
 }: {
   disableNestedPage: boolean;
   // Defaults to true
   enableVoting?: boolean;
-  nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  linkedPagePluginKey?: PluginKey<NestedPagePluginState>;
   pageId?: string;
 }) {
   const { addNestedPage } = useNestedPage(pageId);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { user } = useUser();
   const { pages } = usePages();
   const [userSpacePermissions] = useCurrentSpacePermissions();
+  const view = useEditorViewContext();
 
   const pageType = pageId ? pages[pageId]?.type : undefined;
 
   const paletteItems = useMemo(() => {
     const itemGroups: [string, PaletteItemTypeNoGroup[]][] = [
-      ['text', textItems({ addNestedPage, disableNestedPage, nestedPagePluginKey, userSpacePermissions, pageType })],
+      ['text', textItems({ addNestedPage, disableNestedPage, linkedPagePluginKey, userSpacePermissions, pageType })],
       [
         'database',
         user && space && !disableNestedPage && pageId
@@ -49,7 +50,7 @@ export function useEditorItems({
       ],
       ['media', mediaItems()],
       ['embed', embedItems()],
-      ['advanced blocks', advancedBlocks({ enableVoting })]
+      ['advanced blocks', advancedBlocks({ view, enableVoting })]
     ];
 
     const itemList = itemGroups
@@ -64,7 +65,8 @@ export function useEditorItems({
       .flat();
 
     return itemList;
-  }, [addNestedPage, pageId, user, space]);
+    // include selection since we use cursor position as context, but we should find a way to only generate this when the popup appears
+  }, [addNestedPage, pageId, user, space, view.state.selection]);
 
   return paletteItems;
 }

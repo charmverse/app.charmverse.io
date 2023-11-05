@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { BountyStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
@@ -115,6 +115,8 @@ interface BountyVC {
  *   get:
  *     summary: Retrieve a list of bounties
  *     description: Retrieve bounties from your workspace.
+ *     tags:
+ *      - 'Space API'
  *     parameters:
  *      - in: query
  *        name: status

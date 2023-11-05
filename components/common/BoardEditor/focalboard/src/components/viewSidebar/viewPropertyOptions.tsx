@@ -1,11 +1,10 @@
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { IconButton, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { IconButton, ListItemIcon, ListItemText, MenuItem, Typography, Stack } from '@mui/material';
 import { useMemo } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
@@ -76,8 +75,10 @@ function PropertyOptions(props: LayoutOptionsProps) {
 
   const { visiblePropertyIds } = view.fields;
   const titlePropertyIndex = visiblePropertyIds.indexOf(Constants.titleColumnId);
-  const visiblePropertyIdsWithTitle =
-    titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds;
+  const visiblePropertyIdsWithTitle = useMemo(
+    () => (titlePropertyIndex === -1 ? [Constants.titleColumnId, ...visiblePropertyIds] : visiblePropertyIds),
+    [titlePropertyIndex, visiblePropertyIds]
+  );
 
   const propertiesWithTitle = properties.find((property) => property.id === Constants.titleColumnId)
     ? properties
@@ -85,19 +86,21 @@ function PropertyOptions(props: LayoutOptionsProps) {
 
   const { hiddenProperties, visibleProperties } = useMemo(() => {
     const propertyIds = properties.map((property) => property.id);
-    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>((__propertiesRecord, property) => {
-      __propertiesRecord[property.id] = property;
-      return __propertiesRecord;
-    }, {});
-
-    // Manually add __title column as its not present by default
-    if (!_propertiesRecord[Constants.titleColumnId]) {
-      _propertiesRecord[Constants.titleColumnId] = titleProperty;
-    }
-
-    const _visibleProperties = visiblePropertyIdsWithTitle.map(
-      (visiblePropertyId) => _propertiesRecord[visiblePropertyId]
+    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>(
+      (__propertiesRecord, property) => {
+        __propertiesRecord[property.id] = property;
+        return __propertiesRecord;
+      },
+      {
+        // Always include __title column as its not present by default
+        [Constants.titleColumnId]: titleProperty
+      }
     );
+
+    const _visibleProperties = visiblePropertyIdsWithTitle
+      .map((visiblePropertyId) => _propertiesRecord[visiblePropertyId])
+      // Hot fix - not sure why these dont always exist, maybe the property was deleted?
+      .filter(Boolean);
 
     const _hiddenProperties = propertyIds
       .filter((propertyId) => !visiblePropertyIdsWithTitle.includes(propertyId))

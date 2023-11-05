@@ -1,11 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { Vote } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api/routers';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { deleteVote as deleteVoteService, getVote as getVoteService, updateVote as updateVoteService } from 'lib/votes';
@@ -15,7 +14,18 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getVoteController).put(updateVote).delete(deleteVote);
+handler
+  .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'vote'
+    })
+  )
+  .get(getVoteController)
+  .put(updateVote)
+  .delete(deleteVote);
 
 async function getVoteController(req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
   const voteId = req.query.id as string;
@@ -40,7 +50,12 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
       spaceId: true,
       createdBy: true,
       pageId: true,
-      postId: true
+      postId: true,
+      page: {
+        select: {
+          proposalId: true
+        }
+      }
     }
   });
 
@@ -49,24 +64,30 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
   }
 
   if (vote.pageId) {
-    const pagePermissions = await computeUserPagePermissions({
-      userId,
-      resourceId: vote.pageId
-    });
+    if (vote.page?.proposalId) {
+      const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+        userId,
+        resourceId: vote.pageId
+      });
 
-    if (!pagePermissions.create_poll) {
-      throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      if (!proposalPermissions.create_vote) {
+        throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      }
+    } else {
+      const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+        userId,
+        resourceId: vote.pageId
+      });
+
+      if (!pagePermissions.create_poll) {
+        throw new UnauthorisedActionError('You do not have permissions to update the vote.');
+      }
     }
   } else if (vote.postId) {
-    const postPermissions = await getPermissionsClient({
-      resourceId: vote.postId,
-      resourceIdType: 'post'
-    }).then((client) =>
-      client.forum.computePostPermissions({
-        resourceId: vote.postId as string,
-        userId
-      })
-    );
+    const postPermissions = await req.basePermissionsClient.forum.computePostPermissions({
+      resourceId: vote.postId as string,
+      userId
+    });
 
     if (!postPermissions.edit_post) {
       throw new UnauthorisedActionError('You do not have permissions to update the vote.');
@@ -111,7 +132,7 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
   }
 
   if (vote.pageId) {
-    const pagePermissions = await computeUserPagePermissions({
+    const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
       userId,
       resourceId: vote.pageId
     });
@@ -120,15 +141,10 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
       throw new UnauthorisedActionError('You do not have permissions to delete the vote.');
     }
   } else if (vote.postId) {
-    const postPermissions = await getPermissionsClient({
-      resourceId: vote.postId,
-      resourceIdType: 'post'
-    }).then((client) =>
-      client.forum.computePostPermissions({
-        resourceId: vote.postId as string,
-        userId
-      })
-    );
+    const postPermissions = await req.basePermissionsClient.forum.computePostPermissions({
+      resourceId: vote.postId as string,
+      userId
+    });
 
     if (!postPermissions.edit_post) {
       throw new UnauthorisedActionError('You do not have permissions to delete the vote.');

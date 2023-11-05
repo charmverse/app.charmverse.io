@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { SpaceRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 
@@ -15,6 +15,10 @@ export async function unassignRole({ roleId, userId }: RoleAssignment) {
 
   if (role.source === 'guild_xyz') {
     throw new UndesirableOperationError('Cannot remove role as it is managed by Guild.xyz');
+  }
+
+  if (role.source === 'summon') {
+    throw new UndesirableOperationError('Cannot remove role as it is managed by Summon');
   }
 
   const targetSpaceRole = (await prisma.spaceRole.findFirst({

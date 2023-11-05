@@ -1,16 +1,25 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
+import { deleteBeehiivSubscription } from 'lib/beehiiv/deleteBeehiivSubscription';
+import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
+import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
+import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
+import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
@@ -22,7 +31,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.post(requireWalletSignature, createUser).get(getUser).use(requireUser).put(updateUser);
 
 async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-  const { address } = req.body;
+  const { address } = req.body as Web3LoginRequest;
 
   let user: LoggedInUser;
 
@@ -61,8 +70,12 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse) {
   if (!req.session.anonymousUserId) {
     req.session.anonymousUserId = v4();
+
     await req.session.save();
   }
+
+  await removeOldCookieFromResponse(req, res, false);
+
   return res.status(404).json({ error: 'No user found' });
 }
 
@@ -82,6 +95,7 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
   }
 
   res.setHeader('Cache-Control', 'no-store');
+  await removeOldCookieFromResponse(req, res, true);
 
   return res.status(200).json(profile);
 }
@@ -89,9 +103,30 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | 
 async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
   const { id: userId } = req.session.user;
 
+  const original = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId
+    }
+  });
+
   const updatedUser = await updateUserProfile(userId, req.body);
 
   updateTrackUserProfile(updatedUser);
+
+  if (original.email !== updatedUser.email || original.emailNewsletter !== updatedUser.emailNewsletter) {
+    try {
+      if (!updatedUser.email) {
+        // remove from Loops and Beehiiv
+        await deleteLoopsContact({ email: original.email! });
+        await deleteBeehiivSubscription({ email: original.email! });
+      } else {
+        await registerLoopsContact(updatedUser, original.email);
+        await registerBeehiivSubscription(updatedUser, original.email);
+      }
+    } catch (error) {
+      log.error('Error updating contact with Loop or Beehiiv', { error, userId });
+    }
+  }
 
   return res.status(200).json(updatedUser);
 }

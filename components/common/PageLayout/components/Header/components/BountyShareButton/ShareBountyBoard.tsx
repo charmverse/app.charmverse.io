@@ -16,6 +16,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaces } from 'hooks/useSpaces';
 import { configurationModeName } from 'lib/permissions/meta/preset-templates';
+import { getAbsolutePath } from 'lib/utilities/browser';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -48,7 +49,7 @@ interface Props {
 export default function ShareBountyBoard({ padding = 1 }: Props) {
   const [copied, setCopied] = useState<boolean>(false);
   const { setSpace } = useSpaces();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
 
   // Current values of the public permission
@@ -57,8 +58,8 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
   const bountiesArePublic = !!space?.publicBountyBoard;
 
   async function togglePublic() {
-    const updatedSpace = await charmClient.bounties.setPublicBountyBoard({
-      publicBountyBoard: !bountiesArePublic,
+    const updatedSpace = await charmClient.rewards.setPublicRewardBoard({
+      publicRewardBoard: !bountiesArePublic,
       spaceId: space?.id as string
     });
     setSpace(updatedSpace);
@@ -77,7 +78,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = `${window.location.origin}/${space?.domain}/bounties`;
+      const shareLinkToSet = getAbsolutePath('/bounties', space?.domain);
       setShareLink(shareLinkToSet);
     }
   }
@@ -96,16 +97,6 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
         </Box>
         <Switch checked={bountiesArePublic} disabled={!isAdmin} onChange={togglePublic} />
       </Box>
-      {space?.permissionConfigurationMode !== 'custom' && (
-        <Alert severity='info'>
-          Your space is using the
-          <b>{` ${configurationModeName[space?.permissionConfigurationMode as SpacePermissionConfigurationMode]} `}</b>
-          preset.
-          <br />
-          <br />
-          Manual updates here will change space permissions to <b>custom mode.</b>
-        </Alert>
-      )}
       <Collapse in={bountiesArePublic}>
         {shareLink && (
           <Box p={padding} sx={{ mt: padding === 0 ? 1 : undefined }}>

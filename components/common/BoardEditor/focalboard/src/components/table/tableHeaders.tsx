@@ -2,13 +2,13 @@ import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Menu } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import type { IPropertyTemplate, Board } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -19,8 +19,8 @@ import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { typeDisplayName } from '../../widgets/propertyMenu';
 import { PropertyTypes } from '../../widgets/propertyTypes';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 import TableHeader from './tableHeader';
 
@@ -30,7 +30,6 @@ type Props = {
   activeView: BoardView;
   views: BoardView[];
   readOnly: boolean;
-  readOnlySourceData: boolean;
   resizingColumn: string;
   offset: number;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
@@ -88,9 +87,14 @@ function TableHeaders(props: Props): JSX.Element {
           thisLen = Utils.getTextWidth(card.title, columnFontPadding.fontDescriptor) + columnFontPadding.padding;
         } else if (template) {
           const displayValue =
-            OctoUtils.propertyDisplayValue(card, card.fields.properties[columnID], template as IPropertyTemplate, {
-              date: formatDate,
-              dateTime: formatDateTime
+            OctoUtils.propertyDisplayValue({
+              block: card,
+              propertyValue: card.fields.properties[columnID],
+              propertyTemplate: template as IPropertyTemplate,
+              formatters: {
+                date: formatDate,
+                dateTime: formatDateTime
+              }
             }) || '';
           switch (template.type) {
             case 'select': {
@@ -184,11 +188,11 @@ function TableHeaders(props: Props): JSX.Element {
         }
         return (
           <TableHeader
+            data-test={`table-property-${template.type}`}
             type={template.type}
             name={template.name}
             sorted={sorted}
             readOnly={props.readOnly}
-            readOnlySourceData={props.readOnlySourceData}
             board={board}
             activeView={activeView}
             cards={cards}
@@ -203,10 +207,10 @@ function TableHeaders(props: Props): JSX.Element {
       })}
       {/* empty column for actions */}
       <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
-        {!props.readOnly && !props.readOnlySourceData && (
+        {!props.readOnly && (
           <>
             <Button {...bindTrigger(addPropertyPopupState)}>
-              <AddIcon fontSize='small' />
+              <AddIcon data-test='add-table-prop' fontSize='small' />
             </Button>
             {isSmallScreen ? (
               <MobileDialog

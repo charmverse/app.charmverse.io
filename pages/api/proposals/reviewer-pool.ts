@@ -1,25 +1,34 @@
+import type { ProposalReviewerPool, Resource } from '@charmverse/core/permissions';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
-import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
-import type { ProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
-import { getProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys<CreateProposalFromTemplateInput>(['spaceId'], 'query'))
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'spaceId' }))
+  .use(providePermissionClients({ key: 'resourceId', location: 'query', resourceIdType: 'proposalCategory' }))
   .get(getReviewerPoolController);
 
 async function getReviewerPoolController(req: NextApiRequest, res: NextApiResponse<ProposalReviewerPool>) {
-  const { spaceId } = req.query;
+  const { resourceId } = req.query as Resource;
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId: req.authorizedSpaceId,
+    userId: req.session.user.id
+  });
 
-  const reviewerPool = await getProposalReviewerPool({ spaceId: spaceId as string });
+  if (!spaceRole) {
+    throw new SpaceMembershipRequiredError();
+  }
 
+  const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
+    resourceId
+  });
   return res.status(200).json(reviewerPool);
 }
 

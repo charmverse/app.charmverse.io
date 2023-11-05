@@ -1,20 +1,19 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Page, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { logFirstProposal, logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
+import { logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import type { IPageWithPermissions, ModifyChildPagesResponse } from 'lib/pages/server';
 import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
-import { computeUserPagePermissions, setupPermissionsAfterPageCreated } from 'lib/permissions/pages';
-import { computeSpacePermissions } from 'lib/permissions/spaces';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -22,9 +21,19 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(createPageHandler).delete(deletePages);
+handler
+  .use(requireUser)
+  .post(
+    providePermissionClients({
+      key: 'spaceId',
+      location: 'body',
+      resourceIdType: 'space'
+    }),
+    createPageHandler
+  )
+  .delete(deletePages);
 
-async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>) {
   const data = req.body as Prisma.PageUncheckedCreateInput;
 
   const spaceId = data.spaceId;
@@ -41,7 +50,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 
   // When creating a nested page, check that a user can edit the parent page
   if (data.parentId) {
-    const permissions = await computeUserPagePermissions({
+    const permissions = await req.basePermissionsClient.pages.computePagePermissions({
       resourceId: data.parentId,
       userId
     });
@@ -50,7 +59,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
       throw new UnauthorisedActionError('You do not have permissions to create a page.');
     }
   } else {
-    const permissions = await computeSpacePermissions({
+    const permissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
       resourceId: spaceId,
       userId
     });
@@ -65,7 +74,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdBy, spaceId: droppedSpaceId, ...pageCreationData } = data;
 
-  const page: Page = await createPage({
+  const page = await createPage({
     data: {
       spaceId,
       createdBy,
@@ -74,7 +83,10 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
   });
 
   try {
-    await setupPermissionsAfterPageCreated(page.id);
+    await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+      event: 'created',
+      pageId: page.id
+    });
 
     const pageWithPermissions = await getPage(page.id);
 
@@ -84,16 +96,8 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 
     logFirstWorkspacePageCreation(page);
     logFirstUserPageCreation(page);
-
-    if (page.type === 'proposal') {
-      logFirstProposal({
-        userId,
-        spaceId
-      });
-    }
-
     updateTrackPageProfile(page.id);
-    trackUserAction('create_page', { userId, spaceId, pageId: page.id, type: page.type });
+    trackUserAction('create_page', { userId, spaceId, pageId: page.id });
 
     const { content, contentText, ...newPageToNotify } = pageWithPermissions;
     relay.broadcast(
@@ -116,11 +120,11 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<IPage
 }
 
 async function deletePages(req: NextApiRequest, res: NextApiResponse) {
-  const pageIds = (req.body || []) as string[];
+  const pageIds = req.query.pageIds as string[];
   const userId = req.session.user.id;
 
   for (const pageId of pageIds) {
-    const permissions = await computeUserPagePermissions({
+    const permissions = await req.basePermissionsClient.pages.computePagePermissions({
       resourceId: pageId,
       userId
     });

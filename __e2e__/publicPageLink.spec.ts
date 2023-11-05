@@ -34,7 +34,7 @@ test('click on link for another public page in same workspace and make sure that
     title: 'First Page',
     pagePermissions: [
       { permissionLevel: 'view', spaceId: space.id },
-      { permissionLevel: 'view', public: true }
+      { permissionLevel: 'view', public: true, allowDiscovery: true }
     ],
     linkedPageId: secondPageId
   });
@@ -46,7 +46,7 @@ test('click on link for another public page in same workspace and make sure that
     title: 'Second Page',
     pagePermissions: [
       { permissionLevel: 'view', spaceId: space.id },
-      { permissionLevel: 'view', public: true }
+      { permissionLevel: 'view', public: true, allowDiscovery: true }
     ],
     linkedPageId: firstPageId
   });

@@ -12,49 +12,35 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Countdown from 'react-countdown';
 
-import charmClient from 'charmClient';
 import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 
-interface Props {
-  isAdmin: boolean;
-  invites: InviteLinkPopulated[];
-  onDelete: (invite: InviteLinkPopulated) => void;
-  refetchInvites: VoidFunction;
-}
+import { ConfirmInviteLinkDeletion } from './ConfirmInviteLinkDeletion';
 
-export default function InvitesTable(props: Props) {
-  const { isAdmin, invites, onDelete, refetchInvites } = props;
-  const space = useCurrentSpace();
-
+export function InvitesTable() {
+  const isAdmin = useIsAdmin();
+  const { updateInviteLinkRoles, deleteInviteLink, privateInvites } = useSpaceInvitesList();
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
+
+  const [inviteToDelete, setInviteToDelete] = useState<InviteLinkWithRoles | null>(null);
 
   function onCopy(id: string) {
     setCopied({ [id]: true });
     setTimeout(() => setCopied({ [id]: false }), 1000);
   }
-
-  async function updateInviteLinkRoles(inviteLinkId: string, roleIds: string[]) {
-    if (space) {
-      await charmClient.updateInviteLinkRoles(inviteLinkId, space.id, roleIds);
-      refetchInvites();
-    }
-  }
-
-  async function deleteRoleFromInviteLink(inviteLinkId: string, roleId: string) {
-    const inviteLink = invites.find((invite) => invite.id === inviteLinkId);
-    if (inviteLink && space) {
-      const roleIds = inviteLink.inviteLinkToRoles
-        .map((inviteLinkToRole) => inviteLinkToRole.roleId)
-        .filter((inviteLinkRoleId) => inviteLinkRoleId !== roleId);
-      await updateInviteLinkRoles(inviteLinkId, roleIds);
-    }
-  }
-
   const padding = 32;
+
+  function triggerInviteDeletion(invite: InviteLinkWithRoles) {
+    if (invite.roleIds.length === 0) {
+      deleteInviteLink(invite.id);
+    } else {
+      setInviteToDelete(invite);
+    }
+  }
 
   return (
     <Box overflow='auto'>
@@ -72,16 +58,20 @@ export default function InvitesTable(props: Props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {invites.length === 0 && (
+          {privateInvites?.length === 0 && (
             <TableRow>
               <TableCell align='center' colSpan={6} sx={{ padding: '20px 16px' }}>
                 This Space has no Invite Links
               </TableCell>
             </TableRow>
           )}
-          {invites.map((invite) => (
+          {privateInvites?.map((invite) => (
             <TableRow key={invite.id}>
-              <TableCell sx={{ padding: '20px 16px' }}>Private Link</TableCell>
+              <TableCell sx={{ padding: '20px 16px' }}>
+                <Box display='flex' justifyContent='flex-start' gap={1}>
+                  Private Link
+                </Box>
+              </TableCell>
               <TableCell>
                 <Typography>
                   {invite.useCount}
@@ -92,12 +82,15 @@ export default function InvitesTable(props: Props) {
               <TableCell width={150}>
                 <TokenGateRolesSelect
                   isAdmin={isAdmin}
-                  selectedRoleIds={invite.inviteLinkToRoles.map((inviteLinkToRole) => inviteLinkToRole.roleId)}
+                  selectedRoleIds={invite.roleIds}
                   onChange={(roleIds) => {
-                    updateInviteLinkRoles(invite.id, roleIds);
+                    updateInviteLinkRoles({ inviteLinkId: invite.id, roleIds });
                   }}
                   onDelete={(roleId) => {
-                    deleteRoleFromInviteLink(invite.id, roleId);
+                    updateInviteLinkRoles({
+                      inviteLinkId: invite.id,
+                      roleIds: invite.roleIds.filter((role) => role !== roleId)
+                    });
                   }}
                 />
               </TableCell>
@@ -132,7 +125,7 @@ export default function InvitesTable(props: Props) {
                       color='secondary'
                       size='small'
                       variant='outlined'
-                      onClick={() => onDelete(invite)}
+                      onClick={() => triggerInviteDeletion(invite)}
                     />
                   </Tooltip>
                 )}
@@ -141,6 +134,14 @@ export default function InvitesTable(props: Props) {
           ))}
         </TableBody>
       </Table>
+      {inviteToDelete && (
+        <ConfirmInviteLinkDeletion
+          onClose={() => setInviteToDelete(null)}
+          open
+          invite={inviteToDelete}
+          onConfirm={() => setInviteToDelete(null)}
+        />
+      )}
     </Box>
   );
 }
@@ -149,7 +150,7 @@ function getInviteLink(code: string) {
   return `${window.location.origin}/invite/${code}`;
 }
 
-function getExpires(invite: InviteLinkPopulated) {
+function getExpires(invite: InviteLinkWithRoles) {
   if (invite.maxAgeMinutes > 0) {
     const expireDate = new Date(invite.createdAt).getTime() + invite.maxAgeMinutes * 60 * 1000;
     if (expireDate < Date.now()) {

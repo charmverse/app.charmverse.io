@@ -70,10 +70,22 @@
         cursor: pointer;
       }
     }
+  }
 
-    &.expanded {
-      .DisclosureTriangleIcon {
-        transform: rotate(90deg);
+  .octo-table-row, .octo-table-cell {
+    .icons {
+      opacity: 0;
+      position: absolute;
+      left: -35px;
+
+      &.row-actions {
+        padding: 10px;
+      }
+    }
+
+    &:hover {
+      .icons {
+        opacity: 1;
       }
     }
   }
@@ -92,18 +104,9 @@
     font-size: 14px;
     position: relative;
     text-overflow: ellipsis;
-    .icons {
-      opacity: 0;
-      position: absolute;
-      left: -40px;
-    }
 
     &:hover {
       background-color: rgba(var(--center-channel-color-rgb), 0.05);
-
-      .icons {
-        opacity: 1;
-      }
     }
 
     &.title-cell {

@@ -1,23 +1,32 @@
-import { prisma } from '@charmverse/core';
 import type { Page, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { Browser } from '@playwright/test';
-import { chromium, expect, test } from '@playwright/test';
+import { chromium, expect, test as base } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
-import { upsertPermission } from 'lib/permissions/pages/actions/upsert-permission';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 
-import { generateUserAndSpace } from './utils/mocks';
+import { DatabasePage } from './po/databasePage.po';
+import { PagePermissionsDialog } from './po/pagePermissions.po';
+import { generateUserAndSpace, logoutBrowserUser } from './utils/mocks';
 import { generatePage } from './utils/pages';
 import { login } from './utils/session';
 
 let browser: Browser;
+type Fixtures = {
+  pagePermissions: PagePermissionsDialog;
+  databasePage: DatabasePage;
+};
+
+const test = base.extend<Fixtures>({
+  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page)),
+  databasePage: ({ page }, use) => use(new DatabasePage(page))
+});
 
 test.beforeAll(async () => {
   // Set headless to false in chromium.launch to visually debug the test
   browser = await chromium.launch({});
 });
-
 test.describe.serial('Make a page public and visit it', async () => {
   // Will be set by the first test
   let shareUrl = '';
@@ -25,15 +34,15 @@ test.describe.serial('Make a page public and visit it', async () => {
   let cardPage: Page;
   let spaceUser: User;
 
-  test('make a page public', async () => {
+  test('make a page public', async ({ pagePermissions, page }) => {
     // Arrange ------------------
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-    const page = await userContext.newPage();
 
     const { space, user } = await generateUserAndSpace();
     boardPage = await generateBoard({
       spaceId: space.id,
-      createdBy: user.id
+      createdBy: user.id,
+      viewType: 'gallery'
     });
 
     spaceUser = user;
@@ -58,22 +67,31 @@ test.describe.serial('Make a page public and visit it', async () => {
     // Part A - Prepare the page as a logged in user
     // 1. Make sure the board page exists and cards are visible
 
-    await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
+    await await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
 
     // 2. Open the share dialog and make the page public
-    const permissionDialog = page.locator('data-test=toggle-page-permissions-dialog');
+    const permissionDialog = pagePermissions.permissionDialog;
 
     await permissionDialog.click();
 
-    const publicShareToggle = page.locator('data-test=toggle-public-page');
+    const publishTab = pagePermissions.publishTab;
 
-    await publicShareToggle.click();
+    await expect(publishTab).toBeVisible();
+
+    await publishTab.click({ force: true });
+
+    await pagePermissions.publicShareToggle.click();
+
     shareUrl = `${baseUrl}/${domain}/${boardPage.path}`;
 
     await page.waitForResponse(/\/api\/permissions/);
 
+    await pagePermissions.allowDiscoveryToggle.click();
+
     // 3. Copy the public link to the clipboard
     const shareLinkInput = page.locator('data-test=share-link').locator('input');
+
+    await expect(shareLinkInput).toBeVisible();
 
     const inputValue = await shareLinkInput.inputValue();
 
@@ -121,9 +139,12 @@ test.describe.serial('Make a page public and visit it', async () => {
       }
     });
 
-    await upsertPermission(createdPage.id, {
-      permissionLevel: 'view',
-      public: true
+    await prisma.pagePermission.create({
+      data: {
+        page: { connect: { id: createdPage.id } },
+        permissionLevel: 'view',
+        public: true
+      }
     });
 
     const domain = space.domain;
@@ -135,7 +156,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(page.locator(`data-test=view-poll-details-button`).first()).not.toBeDisabled();
   });
 
-  test('open a page with invalid domain and path', async () => {
+  test('open a page with invalid domain and path', async ({ databasePage }) => {
     const publicContext = await browser.newContext({});
 
     const page = await publicContext.newPage();
@@ -147,17 +168,15 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(loginPageContent).toBeVisible();
   });
 
-  test('visit the public page', async () => {
+  test('visit the public page', async ({ databasePage, page }) => {
     // Part B - Visit this page as a non logged in user
-    const publicContext = await browser.newContext({});
-
-    const page = await publicContext.newPage();
+    await logoutBrowserUser({ browserPage: page });
 
     // 1. Visit the page
     await page.goto(shareUrl);
 
     // 2. Make sure the board renders
-    const boardTitle = page.locator('data-test=board-title').locator('input');
+    const boardTitle = databasePage.boardTitle();
 
     await expect(boardTitle).toBeVisible();
 

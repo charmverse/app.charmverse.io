@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import type { InputProps } from 'components/common/Button';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFilePicker } from 'hooks/useFilePicker';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -17,7 +17,7 @@ type Props = InputProps & {
 };
 
 export function ImportZippedMarkdown({ onFile, ...props }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { mutatePagesList } = usePages();
   const [uploading, setIsUploading] = useState(false);
   const { showMessage } = useSnackbar();
@@ -56,7 +56,7 @@ export function ImportZippedMarkdown({ onFile, ...props }: Props) {
       <Button
         startIcon={
           <SvgIcon>
-            <DriveFolderUploadIcon sx={{ fontSize: 60 }} />
+            <DriveFolderUploadIcon />
           </SvgIcon>
         }
         // Default behaviour uploads to current space. Since onFile may upload to another space, we cannot rely on isAdmin hook
@@ -69,7 +69,6 @@ export function ImportZippedMarkdown({ onFile, ...props }: Props) {
       >
         {uploading ? 'Uploading...' : 'Import zipped Markdown files'}
       </Button>
-      <br />
       <input ref={inputRef} hidden onChange={onFileChange} accept='.zip' id='file' name='file' type='file' />
     </>
   );

@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import Image from 'components/common/Image';
@@ -11,16 +12,17 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
 import splashImage from 'public/images/artwork/world.png';
 
+import { LoginButton } from './components/LoginButton';
+import { LoginErrorModal } from './components/LoginErrorModal';
 import { Container } from './components/LoginLayout';
-import { LoginButton } from './LoginButton';
-import { LoginErrorModal } from './LoginErrorModal';
 
 type Props = {
   hideLoginOptions?: boolean;
   isLoggingIn?: boolean;
+  children?: ReactNode;
 };
 
-export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
+export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Props) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
 
@@ -36,14 +38,14 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
     if (router.query.discordError) {
       setDiscordLoginError(router.query.discordError as string);
     }
-  }, [router.query]);
+  }, [router.query.discordError]);
 
   useEffect(() => {
-    if (discordLoginError && (discordLoginError as ErrorType) !== 'Disabled account') {
+    if (discordLoginError && !isDisabledAccountError(discordLoginError)) {
       showMessage(discordLoginError, 'error');
       clearError();
     }
-  }, []);
+  }, [discordLoginError]);
 
   return (
     <Container px={3} data-test='login-page-content'>
@@ -63,6 +65,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
           <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             <Typography
               sx={{
+                display: { xs: 'none', md: 'block' },
                 fontSize: { xs: 30, md: 48 },
                 fontWeight: 'bold',
                 lineHeight: '1.1em',
@@ -73,7 +76,18 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
               Powering the Future <br />
               of Work through Web3
             </Typography>
-            <Typography sx={{ fontSize: 20, mb: 6, maxWidth: '520px' }}>
+
+            <Box display={{ xs: 'flex', md: 'none' }} mb={2} mx={2} justifyContent='center'>
+              <Image src={splashImage} maxWidth={400} />
+            </Box>
+            <Typography
+              sx={{
+                display: { xs: 'none', md: 'block' },
+                fontSize: 20,
+                mb: { sm: 2, md: 6 },
+                maxWidth: { md: '520px' }
+              }}
+            >
               The solution for token communities to build relationships, work together and vote
             </Typography>
             <Box
@@ -83,15 +97,20 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn }: Props) {
               justifyContent={{ xs: 'center', md: 'flex-start' }}
             >
               {isLoggingIn && <LoadingComponent label='Logging you in' />}
-              {!hideLoginOptions && <LoginButton />}
+              {!hideLoginOptions && <LoginButton showSignup />}
             </Box>
+            {children}
           </Box>
         </Grid>
-        <Grid item md={6} alignItems='center'>
-          <Image display={{ xs: 'none', md: 'block' }} px={3} src={splashImage} />
+        <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
+          <Image px={3} src={splashImage} />
         </Grid>
       </Grid>
-      <LoginErrorModal open={(discordLoginError as ErrorType) === 'Disabled account'} onClose={clearError} />
+      <LoginErrorModal open={isDisabledAccountError(discordLoginError)} onClose={clearError} />
     </Container>
   );
+}
+
+function isDisabledAccountError(error: string | null) {
+  return (error as ErrorType) === 'Disabled account';
 }

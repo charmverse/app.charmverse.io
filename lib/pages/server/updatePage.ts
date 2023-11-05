@@ -1,22 +1,25 @@
-import { prisma } from '@charmverse/core';
-import type { PageType, Prisma } from '@charmverse/core/prisma';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Prisma } from '@charmverse/core/prisma';
+import type { Page } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import type { IPageWithPermissions } from 'lib/pages/server';
+import { generatePagePathFromPathAndTitle } from '../utils';
 
-type CurrentPageData = {
-  id: string;
-  type: PageType;
-};
+import { pageMetaSelect } from './pageMetaSelect';
+
+type CurrentPageData = Pick<Page, 'id' | 'type' | 'path' | 'additionalPaths'>;
 
 export async function updatePage(
   page: CurrentPageData,
   userId: string,
   updates: Prisma.PageUpdateInput
-): Promise<IPageWithPermissions> {
+): Promise<PageMeta> {
   const data: Prisma.PageUpdateInput = {
     ...updates,
     updatedAt: new Date(),
-    updatedBy: userId
+    updatedBy: userId,
+    // Dont' enable manual path updates
+    path: undefined
   };
 
   if (data.id) {
@@ -24,17 +27,30 @@ export async function updatePage(
     delete data.id;
   }
 
+  // TODO - Figure out encoding edge cases (special chars / japanese chars)
+
+  if (data.title) {
+    const newPath = generatePagePathFromPathAndTitle({
+      existingPagePath: page.path,
+      title: data.title as string
+    });
+
+    if (!page.additionalPaths.includes(page.path)) {
+      page.additionalPaths.push(page.path);
+    }
+
+    if (!page.additionalPaths.includes(newPath)) {
+      data.additionalPaths = [newPath, ...page.additionalPaths];
+    }
+
+    data.path = newPath;
+  }
+
   return prisma.page.update({
     where: {
       id: page.id
     },
     data,
-    include: {
-      permissions: {
-        include: {
-          sourcePermission: true
-        }
-      }
-    }
-  });
+    select: pageMetaSelect()
+  }) as Promise<PageMeta>;
 }

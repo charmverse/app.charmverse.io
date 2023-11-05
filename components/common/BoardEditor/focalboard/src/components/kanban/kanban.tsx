@@ -8,13 +8,14 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { KanbanGroupColumn } from 'components/common/BoardEditor/components/kanban/KanbanGroupColumn';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
-import { typeDisplayName } from '../../widgets/propertyMenu';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
 import KanbanColumnHeader from './kanbanColumnHeader';
@@ -66,6 +67,8 @@ type Props = {
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
   showCard: (cardId: string | null) => void;
+  disableAddingCards?: boolean;
+  readOnlyTitle?: boolean;
 };
 
 function Kanban(props: Props) {
@@ -73,7 +76,6 @@ function Kanban(props: Props) {
   const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
   const propertyValues = groupByProperty?.options || [];
   Utils.log(`${propertyValues.length} propertyValues`);
-
   const visiblePropertyTemplates = activeView.fields.visiblePropertyIds
     .map((id) => board.fields.cardProperties.find((t) => t.id === id))
     .filter((i) => i) as IPropertyTemplate[];
@@ -187,7 +189,11 @@ function Kanban(props: Props) {
 
   const onDropToCard = useCallback(
     async (srcCard: Card, dstCard: Card) => {
-      if (srcCard.id === dstCard.id || !groupByProperty) {
+      if (
+        srcCard.id === dstCard.id ||
+        !groupByProperty ||
+        proposalPropertyTypesList.includes(groupByProperty.type as any)
+      ) {
         return;
       }
       Utils.log(`onDropToCard: ${dstCard.title}`);
@@ -292,26 +298,30 @@ function Kanban(props: Props) {
             onCalculationMenuOpen={(_anchorEl) => toggleOptions(group.option.id, _anchorEl)}
             onCalculationMenuClose={() => toggleOptions(group.option.id)}
             anchorEl={anchorEl}
+            readOnlyTitle={props.readOnlyTitle}
           />
         ))}
 
-        {!props.readOnly && (
-          <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
-            <Button size='small' variant='text' color='secondary'>
-              <FormattedMessage id='BoardComponent.add-a-group' defaultMessage='+ Add a group' />
-            </Button>
-          </div>
+        {!props.readOnly && !props.disableAddingCards ? (
+          <>
+            <div className='octo-board-header-cell narrow' {...menuTriggerProps}>
+              <Button size='small' variant='text' color='secondary'>
+                <FormattedMessage id='BoardComponent.add-a-group' defaultMessage='+ Add a group' />
+              </Button>
+            </div>
+            <Menu {...bindMenu(popupState)}>
+              <NewGroupTextField
+                onClick={(groupName) => {
+                  addGroupClicked(groupName);
+                  popupState.close();
+                }}
+              />
+            </Menu>
+          </>
+        ) : (
+          // Empty column to ensure hidden columns are aligned to the right
+          <div className='octo-board-header-cell narrow'></div>
         )}
-
-        <Menu {...bindMenu(popupState)}>
-          <NewGroupTextField
-            onClick={(groupName) => {
-              addGroupClicked(groupName);
-              popupState.close();
-            }}
-          />
-        </Menu>
-
         {/* Hidden column header */}
 
         {hiddenGroups.length > 0 && (
@@ -340,6 +350,7 @@ function Kanban(props: Props) {
               onDropToColumn={onDropToColumn}
               onCardClicked={props.onCardClicked}
               showCard={props.showCard}
+              disableAddingCards={props.disableAddingCards}
             />
           ))}
 

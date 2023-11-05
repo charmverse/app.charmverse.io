@@ -5,7 +5,6 @@ interface PageDialogContext {
   bountyId?: string;
   pageId?: string | null;
   readOnly?: boolean;
-  toolbar?: ReactNode;
   hideToolsMenu?: boolean;
   onClose?: () => void;
 }

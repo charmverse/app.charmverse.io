@@ -1,31 +1,29 @@
-import { prisma } from '@charmverse/core';
+import type { ProposalCategoryWithPermissions, SpaceResourcesRequest } from '@charmverse/core/permissions';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
-import { generateCategoryIdQuery } from 'lib/proposal/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
 
-import { filterAccessibleProposalCategories } from './filterAccessibleProposalCategories';
-import type { ProposalCategoryWithPermissions } from './interfaces';
-
-type ListAccessibleCategoriesRequest = {
-  userId?: string;
-  categoryIds?: string[];
-  spaceId: string;
-};
+import { buildProposalCategoryPermissions } from './computeProposalCategoryPermissions';
 
 export async function getAccessibleProposalCategories({
-  userId,
   spaceId,
-  categoryIds
-}: ListAccessibleCategoriesRequest): Promise<ProposalCategoryWithPermissions[]> {
-  if (!spaceId) {
+  userId
+}: SpaceResourcesRequest): Promise<ProposalCategoryWithPermissions[]> {
+  if (!spaceId || !stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`Cannot get accessible categories without a space id.`);
   }
   const categories = await prisma.proposalCategory.findMany({
     where: {
-      spaceId,
-      id: generateCategoryIdQuery(categoryIds)
+      spaceId
     }
   });
 
-  return filterAccessibleProposalCategories({ userId, proposalCategories: categories });
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId,
+    userId
+  });
+
+  return categories.map((c) => ({ ...c, permissions: buildProposalCategoryPermissions({ spaceRole }) }));
 }

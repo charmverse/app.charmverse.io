@@ -6,6 +6,7 @@ import { loginWithUnstoppableDomain } from 'lib/blockchain/unstoppableDomains/lo
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
+import { saveSession } from 'lib/middleware/saveSession';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { LoggedInUser } from 'models';
 
@@ -22,6 +23,8 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
     authSig,
     signupAnalytics
   });
+
+  await saveSession({ req, userId: loggedInUser.id });
 
   res.status(200).json(loggedInUser);
 }

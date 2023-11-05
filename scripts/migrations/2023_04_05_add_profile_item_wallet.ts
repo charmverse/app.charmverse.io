@@ -1,8 +1,8 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 async function init() {
   const profileItems = await prisma.profileItem.findMany({
-    select : {
+    select: {
       id: true,
       user: {
         select: {
@@ -14,7 +14,7 @@ async function init() {
         }
       }
     }
-  })
+  });
 
   for (const profileItem of profileItems) {
     if (profileItem.user.wallets.length === 1) {
@@ -23,9 +23,9 @@ async function init() {
           id: profileItem.id
         },
         data: {
-          walletId: profileItem.user.wallets[0].id,
+          walletId: profileItem.user.wallets[0].id
         }
-      })
+      });
     }
   }
 }

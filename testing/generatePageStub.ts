@@ -1577,8 +1577,10 @@ export function pageStubToCreate({
   createdBy,
   spaceId,
   deletedAt,
-  title
+  title,
+  path
 }: {
+  path?: string;
   id?: string;
   createdBy: string;
   spaceId: string;
@@ -1600,7 +1602,7 @@ export function pageStubToCreate({
     title: title ?? `Page ${pageId}`,
     headerImage: null,
     icon: '📚',
-    path: `page-${v4()}`,
+    path: path ?? `page-${v4()}`,
     isTemplate: false,
     parentId,
     type: 'page',

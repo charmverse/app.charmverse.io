@@ -46,7 +46,7 @@ describe('getVotesByPage', () => {
     expect(votes[0]).toMatchObject(
       expect.objectContaining({
         id: createdVote1.id,
-        userChoice: '1',
+        userChoice: ['1'],
         totalVotes: 1,
         aggregatedResult: {
           1: 1,
@@ -58,7 +58,7 @@ describe('getVotesByPage', () => {
     expect(votes[1]).toMatchObject(
       expect.objectContaining({
         id: createdVote2.id,
-        userChoice: 'a',
+        userChoice: ['a'],
         totalVotes: 1,
         aggregatedResult: {
           a: 1,

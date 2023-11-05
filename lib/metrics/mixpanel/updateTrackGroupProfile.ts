@@ -8,6 +8,7 @@ type MixPanelSpaceProfile = {
   $name: string;
   'Space Created By': string;
   'Space Updated At': string | Date;
+  'Space Block Quota': number;
   'Space Origin'?: string;
 };
 
@@ -24,7 +25,8 @@ export function getTrackGroupProfile(space: Space, spaceOrigin?: string) {
     $created: space.createdAt,
     $name: space.name,
     'Space Created By': space.createdBy,
-    'Space Updated At': space.updatedAt
+    'Space Updated At': space.updatedAt,
+    'Space Block Quota': space.blockQuota
   };
 
   if (spaceOrigin) {

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export async function createDiscordUser({ userId, discordUserId }: { userId: string; discordUserId: string }) {
   return prisma.discordUser.create({

@@ -38,6 +38,7 @@ function Calculation(props: Props): JSX.Element {
       onClose={props.onMenuClose}
       onChange={props.onChange}
       anchorEl={props.anchorEl}
+      property={props.property}
     />
   );
 

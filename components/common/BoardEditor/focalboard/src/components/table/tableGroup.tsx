@@ -26,6 +26,8 @@ type Props = {
   onDropToGroupHeader: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
   onDropToCard: (srcCard: Card, dstCard: Card) => void;
   onDropToGroup: (srcCard: Card, groupID: string, dstCardID: string) => void;
+  disableAddingCards?: boolean;
+  readOnlyTitle?: boolean;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -64,6 +66,8 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
         readOnly={props.readOnly}
         propertyNameChanged={props.propertyNameChanged}
         onDrop={props.onDropToGroupHeader}
+        disableAddingCards={props.disableAddingCards}
+        readOnlyTitle={props.readOnlyTitle}
       />
 
       {group.cards.length > 0 && (
@@ -81,6 +85,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           addCard={props.addCard}
           onCardClicked={props.onCardClicked}
           onDrop={props.onDropToCard}
+          readOnlyTitle={props.readOnlyTitle}
         />
       )}
     </div>

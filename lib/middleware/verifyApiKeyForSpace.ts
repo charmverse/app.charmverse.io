@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export async function verifyApiKeyForSpace({ apiKey, spaceId }: { apiKey: string; spaceId: string }) {
   if (!apiKey || !spaceId) {

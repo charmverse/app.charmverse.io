@@ -1,4 +1,4 @@
-import type { AssignedPostCategoryPermission } from '@charmverse/core';
+import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import request from 'supertest';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';

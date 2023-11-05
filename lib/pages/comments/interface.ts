@@ -1,6 +1,4 @@
-import type { PageComment, User } from '@charmverse/core/prisma';
-
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageComment } from '@charmverse/core/prisma';
 
 export type PageCommentWithVote = PageComment & {
   upvotes: number;

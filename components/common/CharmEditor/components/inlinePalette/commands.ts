@@ -1,14 +1,11 @@
 import { blockquote } from '@bangle.dev/base-components';
 import { chainCommands } from '@bangle.dev/pm';
 
-import * as bulletList from '../bulletList';
 import * as heading from '../heading';
-import * as orderedList from '../orderedList';
-import paragraph from '../paragraph';
+import * as listItem from '../listItemNew/commands';
+import { insertEmptyParagraphAbove, insertEmptyParagraphBelow } from '../paragraph/paragraph';
 
-const { insertEmptyParagraphAbove, insertEmptyParagraphBelow } = paragraph;
-const { queryIsBulletListActive } = bulletList;
-const { queryIsOrderedListActive } = orderedList;
+const { queryIsBulletListActive, queryIsOrderedListActive } = listItem;
 const { insertEmptyParaAbove: headingInsertEmptyParaAbove, insertEmptyParaBelow: headingInsertEmptyParaBelow } =
   heading;
 

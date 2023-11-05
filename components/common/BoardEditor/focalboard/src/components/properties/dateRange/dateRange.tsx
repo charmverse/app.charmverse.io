@@ -6,13 +6,13 @@ import { DateUtils } from 'react-day-picker';
 import DayPicker from 'react-day-picker/DayPicker';
 import { useIntl } from 'react-intl';
 
+import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 
 import { Utils } from '../../../utils';
 import Button from '../../../widgets/buttons/button';
 import Editable from '../../../widgets/editable';
-import Label from '../../../widgets/label';
-import SwitchOption from '../../../widgets/menu/switchOption';
+import CheckboxOption from '../../../widgets/menu/checkboxOption';
 
 import 'react-day-picker/lib/style.css';
 
@@ -21,6 +21,7 @@ type Props = {
   value: string;
   showEmptyPlaceholder?: boolean;
   onChange: (value: string) => void;
+  wrapColumn?: boolean;
 };
 
 export type DateProperty = {
@@ -154,11 +155,18 @@ function DateRange(props: Props): JSX.Element {
   }
 
   return (
-    <>
-      <div className='octo-propertyvalue' data-testid='select-non-editable' {...bindTrigger(popupState)}>
-        <Label color={displayValue ? 'propColorDefault' : 'empty'}>
-          <span className='Label-text'>{buttonText}</span>
-        </Label>
+    <div style={{ width: '100%' }}>
+      <div
+        className='octo-propertyvalue'
+        data-testid='select-non-editable'
+        {...bindTrigger(popupState)}
+        style={{ minHeight: '20px', minWidth: '25px' }}
+      >
+        {displayValue || (!displayValue && !showEmptyPlaceholder) ? (
+          <span style={{ whiteSpace: props.wrapColumn ? 'break-spaces' : undefined }}>{displayValue}</span>
+        ) : (
+          <EmptyPlaceholder>Empty</EmptyPlaceholder>
+        )}
       </div>
       <Popover {...bindPopover(popupState)} onClose={onClose} PaperProps={{ sx: { p: 2, fontSize: 14 } }}>
         <div className={`DateRange ${className}-overlayWrapper`}>
@@ -232,7 +240,7 @@ function DateRange(props: Props): JSX.Element {
               modifiers={dateTo ? { start: dateFrom, end: dateTo } : { start: dateFrom, end: dateFrom }}
             />
             <Divider sx={{ my: 1 }} />
-            <SwitchOption
+            <CheckboxOption
               key='EndDateOn'
               id='EndDateOn'
               name={intl.formatMessage({ id: 'DateRange.endDate', defaultMessage: 'End date' })}
@@ -248,7 +256,7 @@ function DateRange(props: Props): JSX.Element {
           </div>
         </div>
       </Popover>
-    </>
+    </div>
   );
 }
 

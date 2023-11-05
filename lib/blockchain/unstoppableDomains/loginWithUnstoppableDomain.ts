@@ -1,4 +1,5 @@
-import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -77,6 +78,8 @@ export async function loginWithUnstoppableDomain({
         domain: true
       }
     });
+
+    log.info(`User ${user.id} logged in with Unstoppable Domain`, { userId: user.id, method: 'unstoppable_domain' });
 
     // If the wallet didn't exist, there was no such user
     if (!userWallet) {

@@ -28,11 +28,11 @@ const convertToEventMap = (webhook: SetSpaceWebhookResponse | null | undefined) 
 };
 
 export default function useWebhookSubscription(spaceId: string) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const { data: spaceWebhook, isLoading } = useSWR(
     () => (space ? `webhook/${space.id}` : null),
-    () => space && charmClient.getSpaceWebhook(space.id)
+    () => space && charmClient.spaces.getSpaceWebhook(space.id)
   );
 
   async function updateSpaceWebhook(webhookOpts: SetSpaceWebhookBody): Promise<SetSpaceWebhookResponse> {
@@ -40,7 +40,7 @@ export default function useWebhookSubscription(spaceId: string) {
       throw new Error("Url isn't valid.");
     }
 
-    const updatedSpaceWebhook = await charmClient.updateSpaceWebhook(spaceId, webhookOpts);
+    const updatedSpaceWebhook = await charmClient.spaces.updateSpaceWebhook(spaceId, webhookOpts);
 
     if (space?.id) {
       mutate(`webhook/${space.id}`, updatedSpaceWebhook);

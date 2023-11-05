@@ -1,16 +1,20 @@
+import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { PageUpdates } from 'lib/pages';
-import type { PageWithContent, PageMeta } from 'lib/pages/interfaces';
+import type { PageWithContent } from 'lib/pages/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
+import { useCurrentSpace } from './useCurrentSpace';
 import { useWebSocketClient } from './useWebSocketClient';
 
 type Props = {
   spaceId?: string;
-  pageIdOrPath?: string;
+  pageIdOrPath?: string | null;
 };
 
 type PageResult = {
@@ -33,32 +37,47 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     charmClient.pages.getPage(pageIdOrPath as string, spaceId as string)
   );
 
-  const updatePage = useCallback((updates: PageUpdates) => {
+  const updatePage = useCallback(async (updates: PageUpdates) => {
     return charmClient.pages.updatePage(updates);
   }, []);
 
   useEffect(() => {
     function handleUpdateEvent(value: WebSocketPayload<'pages_meta_updated'>) {
-      mutate((_page): PageWithContent | undefined => {
-        if (_page) {
-          for (let i = 0; i < value.length; i++) {
-            if (value[i].id === pageWithContent?.id) {
-              return {
-                ..._page,
-                ...(value[i] as PageMeta)
-              };
+      mutate(
+        (_page): PageWithContent | undefined => {
+          if (_page) {
+            for (let i = 0; i < value.length; i++) {
+              if (value[i].id === _page.id) {
+                return {
+                  ..._page,
+                  ...(value[i] as PageMeta)
+                };
+              }
             }
           }
+          return _page;
+        },
+        {
+          revalidate: false
         }
-        return _page;
-      });
+      );
+    }
+    function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
+      if (value.some((page) => page.id === pageWithContent?.id)) {
+        log.debug('Page deleted, invalidating cache', { pageId: pageWithContent?.id });
+        mutate(undefined, {
+          rollbackOnError: false
+        });
+      }
     }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
+      unsubscribeFromPageDeletes();
     };
-  }, []);
+  }, [mutate, pageWithContent?.id]);
 
   if (pageWithContent) {
     return {

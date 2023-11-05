@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import {
   Edit as EditIcon,
@@ -6,7 +7,8 @@ import {
   ContentCopy as DuplicateIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { Typography, Box } from '@mui/material';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { Typography, Box, Stack } from '@mui/material';
 import type { ButtonProps } from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -17,6 +19,7 @@ import type { TabProps } from '@mui/material/Tab';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
+import { capitalize } from 'lodash';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -26,13 +29,17 @@ import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
-import Button from 'components/common/Button';
+import charmClient from 'charmClient';
+import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
+import { isTruthy } from 'lib/utilities/types';
 
+import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import AddViewMenu from '../addViewMenu';
@@ -70,6 +77,103 @@ interface ViewTabsProps {
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
   openViewOptions: () => void;
+  viewIds: string[];
+}
+
+function ViewMenuItem({
+  view,
+  onClick,
+  onDrop,
+  href,
+  selected
+}: {
+  selected?: boolean;
+  href: string;
+  onDrop: (currentView: BoardView, dropzoneView: BoardView) => void;
+  view: BoardView;
+  onClick: VoidFunction;
+}) {
+  const [isDragging, isOver, columnRef] = useSortable('view', view, true, onDrop);
+  return (
+    <Stack
+      ref={columnRef}
+      sx={{
+        overflow: 'unset',
+        opacity: isDragging ? 0.5 : 1,
+        transition: `background-color 150ms ease-in-out`,
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
+        flexDirection: 'row'
+      }}
+    >
+      <MenuItem
+        onClick={onClick}
+        href={href}
+        component={Link}
+        key={view.id}
+        dense
+        className={isOver ? 'dragover' : ''}
+        sx={{ width: '100%' }}
+        selected={selected}
+      >
+        <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
+        <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
+        <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
+      </MenuItem>
+    </Stack>
+  );
+}
+
+function ViewTab({
+  view,
+  onClick,
+  onDrop,
+  href,
+  isActive
+}: {
+  isActive: boolean;
+  href?: string;
+  onDrop: (currentView: BoardView, dropzoneView: BoardView) => void;
+  view: BoardView;
+  onClick: (event: MouseEvent<HTMLElement>) => void;
+}) {
+  const theme = useTheme();
+  const [isDragging, isOver, columnRef] = useSortable<BoardView, HTMLButtonElement>('view', view, true, onDrop);
+  return (
+    <TabButton
+      ref={columnRef as any}
+      disableRipple
+      href={href}
+      onClick={onClick}
+      variant='text'
+      size='small'
+      data-view-id={view.id}
+      sx={{
+        p: 0,
+        overflow: 'unset',
+        opacity: isDragging ? 0.5 : 1,
+        transition: `background-color 150ms ease-in-out`,
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
+        flexDirection: 'row',
+        // The tab indicator is not shown anymore since its located in a separate component
+        borderBottom: `1px solid ${isActive ? theme.palette.text.primary : 'transparent'}`
+      }}
+      label={
+        <StyledTabContent
+          color={isActive ? 'textPrimary' : 'secondary'}
+          display='flex'
+          alignItems='center'
+          fontSize='small'
+          fontWeight={500}
+          gap={1}
+        >
+          <span>
+            {iconForViewType(view.fields.viewType)}
+            {view.title || formatViewTitle(view)}
+          </span>
+        </StyledTabContent>
+      }
+    />
+  );
 }
 
 function ViewTabs(props: ViewTabsProps) {
@@ -95,8 +199,14 @@ function ViewTabs(props: ViewTabsProps) {
   const showViewsMenuState = bindMenu(hiddenViewsPopupState);
 
   const views = viewsProp.filter((view) => !view.fields.inline);
+  const viewIds = views.map((view) => view.id);
+  const viewsRecord = viewsProp.reduce((acc, view) => {
+    acc[view.id] = view;
+    return acc;
+  }, {} as Record<string, BoardView>);
+
   // Find the index of the current view
-  const currentViewIndex = views.findIndex((view) => view.id === activeView?.id);
+  const currentViewIndex = viewIds.findIndex((viewId) => viewId === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);
   let restViews = views.slice(maxTabsShown);
 
@@ -105,17 +215,9 @@ function ViewTabs(props: ViewTabsProps) {
     const replacedView = shownViews[maxTabsShown - 1];
     // Replace the current view as the last view of the shown views
     shownViews[maxTabsShown - 1] = views[currentViewIndex];
-    restViews = restViews.filter((restView) => restView.id !== activeView?.id);
+    restViews = restViews.filter((view) => view.id !== activeView?.id);
     restViews.unshift(replacedView);
   }
-  // make sure active view id is visible or the value for Tabs will be invalid
-  // during transition between boards, there is a period where activeView has not caught up with the new views
-  const activeShowViewId =
-    shownViews.find((view) => view.id === activeView?.id)?.id ??
-    // check viewId by the query, there is a period where activeView has not caught up
-    shownViews.find((view) => view.id === router.query.viewId)?.id ??
-    shownViews[0]?.id ??
-    false;
 
   const { register, handleSubmit, setValue } = useForm<{ title: string }>({
     defaultValues: { title: dropdownView?.title || '' }
@@ -124,16 +226,16 @@ function ViewTabs(props: ViewTabsProps) {
   function handleViewClick(event: MouseEvent<HTMLElement>) {
     event.stopPropagation();
     event.preventDefault();
-    const viewId = event.currentTarget.id;
-    const view = views.find((v) => v.id === viewId);
+    const selectedViewId = event.currentTarget.dataset.viewId;
+    const view = selectedViewId && viewsRecord[selectedViewId];
     if (!view) {
       return;
     }
-    if (view && !readOnly && event.currentTarget.id === activeView?.id) {
+    if (view && !readOnly && selectedViewId === activeView?.id) {
       setViewMenuAnchorEl(event.currentTarget);
       setDropdownView(view);
     } else {
-      showView(viewId);
+      showView(selectedViewId);
     }
   }
 
@@ -150,13 +252,12 @@ function ViewTabs(props: ViewTabsProps) {
     return `${pathWithoutQuery}?viewId=${viewId}`;
   }
 
-  const handleDuplicateView = useCallback(() => {
+  const handleDuplicateView = useCallback(async () => {
     if (!dropdownView) return;
-
     const newView = createBoardView(dropdownView);
-    newView.title = `${dropdownView.title} copy`;
+    newView.title = `${dropdownView.title || `${capitalize(dropdownView.fields.viewType)} view`} copy`;
     newView.id = Utils.createGuid(IDType.View);
-    mutator.insertBlock(
+    await mutator.insertBlock(
       newView,
       'duplicate view',
       async (block) => {
@@ -166,20 +267,33 @@ function ViewTabs(props: ViewTabsProps) {
         showView(dropdownView.id);
       }
     );
-  }, [dropdownView, showView]);
+
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: [...viewIds, newView.id] } },
+      publishIncrementalUpdate
+    );
+    closeViewMenu();
+    handleClose();
+  }, [dropdownView, showView, board.id, viewIds]);
 
   const handleDeleteView = useCallback(async () => {
     Utils.log('deleteView');
     if (!dropdownView) return;
 
     setViewMenuAnchorEl(null);
-    const nextView = views.find((o) => o !== dropdownView);
+    const nextViewId = viewIds.find((viewId) => viewId !== dropdownView.id);
     await mutator.deleteBlock(dropdownView, 'delete view');
+    await charmClient.patchBlock(
+      board.id,
+      { updatedFields: { viewIds: viewIds.filter((viewId) => viewId !== dropdownView.id) } },
+      publishIncrementalUpdate
+    );
     onDeleteView?.(dropdownView.id);
-    if (nextView) {
-      showView(nextView.id);
+    if (nextViewId) {
+      showView(nextViewId);
     }
-  }, [views, dropdownView, showView]);
+  }, [viewIds, dropdownView, showView, onDeleteView, board.id]);
 
   function resyncGoogleFormData() {
     if (dropdownView) {
@@ -210,6 +324,10 @@ function ViewTabs(props: ViewTabsProps) {
     }
   }
 
+  async function reorderViews(droppedView: BoardView, dropzoneView: BoardView) {
+    await mutator.changeBoardViewsOrder(board.id, viewIds, droppedView, dropzoneView);
+  }
+
   const duplicateViewText = intl.formatMessage({
     id: 'View.DuplicateView',
     defaultMessage: 'Duplicate view'
@@ -231,37 +349,23 @@ function ViewTabs(props: ViewTabsProps) {
         key={viewsProp[0]?.id}
         textColor='primary'
         indicatorColor='secondary'
-        value={activeShowViewId}
-        sx={{ minHeight: 0, mb: '-6px' }}
+        value={false} // use false to disable the indicator
+        sx={{ minHeight: 0, mb: '-5px' }}
       >
-        {shownViews.map((view) => (
-          <TabButton
-            disableRipple
-            key={view.id}
-            href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
-            onClick={handleViewClick}
-            variant='text'
-            size='small'
-            id={view.id}
-            sx={{ p: 0 }}
-            value={view.id}
-            label={
-              <StyledTabContent
-                color={activeView?.id === view.id ? 'textPrimary' : 'secondary'}
-                display='flex'
-                alignItems='center'
-                fontSize='small'
-                fontWeight={500}
-                gap={1}
-              >
-                <span>
-                  {iconForViewType(view.fields.viewType)}
-                  {view.title || formatViewTitle(view)}
-                </span>
-              </StyledTabContent>
-            }
-          />
-        ))}
+        {shownViews
+          .map((view) => {
+            return (
+              <ViewTab
+                onClick={handleViewClick}
+                onDrop={reorderViews}
+                view={view}
+                isActive={activeView?.id === view.id}
+                key={view.id}
+                href={activeView?.id === view.id ? undefined : getViewUrl(view.id)}
+              />
+            );
+          })
+          .filter(isTruthy)}
         {restViews.length !== 0 && (
           <TabButton
             disableRipple
@@ -308,7 +412,7 @@ function ViewTabs(props: ViewTabsProps) {
               <ListItemText>{duplicateViewText}</ListItemText>
             </MenuItem>
           ]}
-        {views.length !== 1 && (
+        {viewIds.length !== 1 && (
           <MenuItem dense onClick={handleDeleteView}>
             <ListItemIcon>
               <DeleteOutlineIcon fontSize='small' />
@@ -319,21 +423,22 @@ function ViewTabs(props: ViewTabsProps) {
       </Menu>
 
       <Menu {...showViewsMenuState}>
-        {restViews.map((view) => (
-          <MenuItem
-            onClick={() => {
-              showView(view.id);
-              showViewsMenuState.onClose();
-            }}
-            href={disableUpdatingUrl ? '' : getViewUrl(view.id)}
-            component={Link}
-            key={view.id}
-            dense
-          >
-            <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
-            <ListItemText>{view.title || formatViewTitle(view)}</ListItemText>
-          </MenuItem>
-        ))}
+        {viewIds.map(
+          (viewId) =>
+            viewsRecord[viewId] && (
+              <ViewMenuItem
+                selected={viewId === activeView?.id}
+                view={viewsRecord[viewId]}
+                key={viewsRecord[viewId].id}
+                href={disableUpdatingUrl ? '' : getViewUrl(viewsRecord[viewId].id)}
+                onClick={() => {
+                  showView(viewsRecord[viewId].id);
+                  showViewsMenuState.onClose();
+                }}
+                onDrop={reorderViews}
+              />
+            )
+        )}
         <Divider sx={{ my: 1 }} />
         <Box pl='14px'>
           {activeView && (
@@ -344,7 +449,7 @@ function ViewTabs(props: ViewTabsProps) {
               showView={showView}
               showLabel={true}
               onClose={handleClose}
-              onClickIcon={props.onClickNewView}
+              onClick={props.onClickNewView}
             />
           )}
         </Box>

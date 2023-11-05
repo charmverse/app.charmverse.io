@@ -1,7 +1,7 @@
+import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import type { AssignedProposalCategoryPermission } from 'lib/permissions/proposals/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import type { LoggedInUser } from 'models';
@@ -90,7 +90,7 @@ describe('DELETE /api/permissions/proposals - Delete proposal category permissio
     await request(baseUrl)
       .delete('/api/permissions/proposals')
       .set('Cookie', adminUserCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(200);
   });
   it('should fail if the user is not an admin and respond 401', async () => {
@@ -107,7 +107,7 @@ describe('DELETE /api/permissions/proposals - Delete proposal category permissio
     await request(baseUrl)
       .delete('/api/permissions/proposals')
       .set('Cookie', userCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(401);
   });
 });

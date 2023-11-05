@@ -1,5 +1,4 @@
-import type { CommunityDetails } from 'components/profile/components/CommunityRow';
-import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import type { ProfileProposalEvent, ProfileVoteEvent, CommunityDetails } from 'lib/profile/interfaces';
 
 import type { UserCommunity } from './interfaces';
 
@@ -9,8 +8,8 @@ export function sortCommunities({
   votes
 }: {
   communities: UserCommunity[];
-  proposals: DeepDaoProposal[];
-  votes: DeepDaoVote[];
+  proposals: ProfileProposalEvent[];
+  votes: ProfileVoteEvent[];
 }) {
   const organizationsRecord = communities.reduce<Record<string, CommunityDetails>>((acc, org) => {
     acc[org.id] = {
@@ -35,9 +34,9 @@ export function sortCommunities({
     const organization = organizationsRecord[event.organizationId];
     if (organization) {
       if (event.type === 'proposal') {
-        organization.proposals.push(event as DeepDaoProposal);
+        organization.proposals.push(event as ProfileProposalEvent);
       } else if (event.type === 'vote') {
-        organization.votes.push(event as DeepDaoVote);
+        organization.votes.push(event as ProfileVoteEvent);
       }
       if (!organization.joinDate) {
         organization.joinDate = event.createdAt;

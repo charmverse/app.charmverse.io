@@ -1,7 +1,10 @@
+import { randomIntFromInterval } from 'lib/utilities/random';
+
 class Constants {
-  static readonly menuColors: { [key: string]: string } = {
+  static readonly menuColors = {
     propColorDefault: 'Default',
     propColorGray: 'Gray',
+    propColorGreen: 'Green',
     propColorTurquoise: 'Turquoise',
     propColorOrange: 'Orange',
     propColorYellow: 'Yellow',
@@ -113,4 +116,25 @@ class Constants {
   ];
 }
 
-export { Constants };
+function randomBoardColor() {
+  const boardColors = Object.keys(Constants.menuColors);
+  const randomIndex = randomIntFromInterval(0, boardColors.length - 1);
+  return boardColors[randomIndex];
+}
+
+/**
+ * This function is useful for mapping existing theme colors back to our board colors
+ */
+function getBoardColorFromColor(color: string) {
+  const boardColors = Object.entries(Constants.menuColors);
+
+  for (const [boardColor, colorLabel] of boardColors) {
+    if (colorLabel.toLowerCase().match(color)) {
+      return boardColor;
+    }
+  }
+
+  return randomBoardColor();
+}
+
+export { Constants, randomBoardColor, getBoardColorFromColor };

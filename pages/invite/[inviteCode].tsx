@@ -1,43 +1,47 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 
-import getBaseLayout from 'components/common/BaseLayout/BaseLayout';
-import InviteLinkPage from 'components/invite/InviteLinkPage';
-import InviteLinkPageError from 'components/invite/InviteLinkPageError';
-import { getInviteLink } from 'lib/invites';
+import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
+import InviteLinkPageError from 'components/invite/SpaceInviteError';
+import InviteLinkPage from 'components/invite/SpaceInviteLink';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
+import { getInviteLink } from 'lib/invites/getInviteLink';
+import { withSessionSsr } from 'lib/session/withSession';
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+type Props = { invite?: InviteLinkPopulated };
+
+export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(async (context) => {
   const inviteCode = context.query.inviteCode as string;
-  const { invite, expired } = await getInviteLink(inviteCode);
+  const inviteLink = await getInviteLink(inviteCode);
 
-  if (!invite) {
+  if (!inviteLink) {
     return {
-      props: {
-        error: 'Invitation not found'
-      }
+      props: {}
     };
   }
-  if (expired) {
+  if (!inviteLink.valid) {
     return {
-      props: {
-        error: 'This link has expired'
-      }
+      props: {}
     };
   }
 
   return {
     props: {
-      invite
+      invite: inviteLink.invite
     }
   };
-};
+});
 
-export default function InvitationPage({ invite }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function InvitationPage({ invite }: Props) {
   if (invite) {
-    <Head>
-      <meta name='robots' content='noindex' />
-    </Head>;
-    return <InviteLinkPage invite={invite} />;
+    return (
+      <>
+        <Head>
+          <meta name='robots' content='noindex' />
+        </Head>
+        <InviteLinkPage invite={invite} />
+      </>
+    );
   }
   return <InviteLinkPageError />;
 }

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { PostCategory, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export type SetDefaultPostCategoryRequest = {
   spaceId: string;

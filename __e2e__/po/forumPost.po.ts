@@ -15,9 +15,8 @@ export class ForumPostPage {
   constructor(page: Page) {
     this.page = page;
     this.newTopLevelCommentInputLocator = this.page.locator('data-test=new-top-level-post-comment');
-    this.newTopLevelCommentSubmitButtonLocator = this.newTopLevelCommentInputLocator.locator(
-      'data-test=post-comment-button'
-    );
+    this.newTopLevelCommentSubmitButtonLocator =
+      this.newTopLevelCommentInputLocator.locator('data-test=comment-button');
     this.postCharmeditor = this.page.locator('data-test=post-charmeditor').locator('div[contenteditable]').first();
   }
 
@@ -42,7 +41,7 @@ export class ForumPostPage {
 
   // Comment-level utilities
   getCommentLocator(commentId: string) {
-    return this.page.locator(`data-test=post-comment-${commentId}`);
+    return this.page.locator(`data-test=comment-${commentId}`);
   }
 
   getDeletedCommentLocator(commentId: string) {
@@ -50,15 +49,13 @@ export class ForumPostPage {
   }
 
   async isCommentEditable(commentId: string) {
-    const commentEditor = await this.page.locator(
-      `data-test=post-comment-charmeditor-${commentId} >> div[contenteditable]`
-    );
+    const commentEditor = await this.page.locator(`data-test=comment-charmeditor-${commentId} >> div[contenteditable]`);
     const isEditable = await commentEditor.getAttribute('contenteditable');
     return isEditable === 'true';
   }
 
   getPostCommentMenuLocator(commentId: string) {
-    return this.page.locator(`data-test=post-comment-menu-${commentId}`);
+    return this.page.locator(`data-test=comment-menu-${commentId}`);
   }
 
   getPostEditCommentLocator(commentId: string) {

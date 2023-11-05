@@ -1,7 +1,6 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getSpacesFromDiscord } from 'lib/discord/getSpaceFromDiscord';
-import { InvalidInputError } from 'lib/utilities/errors';
 
 export async function getSpacesAndUserFromDiscord({
   discordServerId,
@@ -13,7 +12,7 @@ export async function getSpacesAndUserFromDiscord({
   const spaces = await getSpacesFromDiscord(discordServerId);
 
   if (!spaces.length) {
-    throw new InvalidInputError('Space not found');
+    return null;
   }
 
   const user = await prisma.user.findFirst({
@@ -25,7 +24,7 @@ export async function getSpacesAndUserFromDiscord({
   });
 
   if (!user) {
-    throw new InvalidInputError('User not found');
+    return null;
   }
 
   return spaces.map((space) => ({ space, user }));

@@ -1,7 +1,9 @@
-import { prisma } from '@charmverse/core';
 import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { DataNotFoundError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getApplication } from '../getApplication';
 import type { SubmissionUpdateData } from '../interfaces';
@@ -36,7 +38,7 @@ export async function updateSubmission({
     throw new MissingDataError('You must provide a wallet address in your submission');
   }
 
-  return prisma.application.update({
+  const updatedSubmission = await prisma.application.update({
     where: {
       id: submissionId
     },
@@ -50,4 +52,15 @@ export async function updateSubmission({
       walletAddress: submissionContent.walletAddress
     }
   });
+
+  if (existingSubmission.status === 'inProgress') {
+    await publishBountyEvent({
+      applicationId: submissionId,
+      bountyId: existingSubmission.bountyId,
+      scope: WebhookEventNames.RewardSubmissionCreated,
+      spaceId: existingSubmission.spaceId
+    });
+  }
+
+  return updatedSubmission;
 }

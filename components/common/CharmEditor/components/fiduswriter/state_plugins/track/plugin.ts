@@ -5,7 +5,6 @@ import type { FidusEditor } from '../../fiduseditor';
 import type { TrackAttribute } from '../../track/interfaces';
 
 import { findSelectedChanges } from './findSelectedChanges';
-import { deactivateAllSelectedChanges } from './helpers';
 
 export const key = new PluginKey('track');
 export const selectedInsertionSpec = {};
@@ -124,13 +123,6 @@ export function trackPlugin(options: Options) {
         const _state = this.getState(state) as { decos: any } | undefined;
         return _state?.decos;
       }
-      // handleDOMEvents: {
-      //   focus: (view, _event) => {
-      //     // const otherView = view === options.editor.view ? options.editor.mod.footnotes.fnEditor.view : options.editor.view;
-      //     // otherView.dispatch(deactivateAllSelectedChanges(otherView.state.tr));
-      //     return false;
-      //   }
-      // }
     }
   });
 }

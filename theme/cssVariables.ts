@@ -35,6 +35,7 @@ const globalCSS = css`
     --z-index-fab: 1050;
     --z-index-speedDial: 1050;
     --z-index-appBar: 1100;
+    --z-index-pageBar: 1150;
     --z-index-drawer: 1200;
     --z-index-modal: 1300;
     --z-index-snackbar: 1400;
@@ -59,6 +60,9 @@ const globalCSS = css`
 
     --charmeditor-active: rgba(46, 170, 220, 0.2);
     --charmeditor-active-hover: rgba(46, 170, 220, 0.1);
+
+    /* copied from MUI palette */
+    --mui-action-hover: rgba(22, 52, 71, 0.07);
 
     /* fullcalendar styles */
     --fc-event-text-color: var(--text-primary) !important;
@@ -107,6 +111,9 @@ const globalCSS = css`
     --center-channel-color-rgb: 220, 220, 220;
     --sidebar-text-rgb: 255, 255, 255;
     --sidebar-bg-rgb: 75, 73, 67;
+
+    /* copied from MUI palette */
+    --mui-action-hover: rgba(255, 255, 255, 0.055);
   }
 `;
 

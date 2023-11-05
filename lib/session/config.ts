@@ -7,6 +7,8 @@ declare module 'iron-session' {
     user: { id: string };
     // Used when we have a non signed in user
     anonymousUserId?: string;
+    // Used when logged is as a different user
+    isRemote?: boolean;
   }
 }
 
@@ -15,17 +17,6 @@ if (!_maybeAuthSecret && !isTestEnv) {
 }
 
 export const authSecret = _maybeAuthSecret as string;
-
-export const ironOptions = {
-  cookieName,
-  password: authSecret,
-  cookieOptions: {
-    sameSite: 'strict' as const,
-    // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
-    secure: typeof baseUrl === 'string' && baseUrl.includes('https')
-    // domain: cookieDomain TODO: change domain to subdomain without logging people out, so we can use them across subdomains
-  }
-};
 
 // a map of relationships we pull in for the logged-in user (try to keep this small)
 export const sessionUserRelations = {

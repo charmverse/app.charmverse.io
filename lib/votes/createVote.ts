@@ -1,14 +1,16 @@
-import { prisma } from '@charmverse/core';
+import { Prisma, VoteType, prisma } from '@charmverse/core/prisma-client';
 
 import { PageNotFoundError } from 'lib/pages/server';
 import { DuplicateDataError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishVoteEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
 export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<ExtendedVote> {
-  const { spaceId, createdBy, pageId, postId, title, threshold, description, deadline, type, voteOptions, context } =
+  const { spaceId, createdBy, pageId, postId, title, content, contentText, deadline, type, voteOptions, context } =
     vote;
 
   if (pageId) {
@@ -38,14 +40,20 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
   //   throw new Error('Either pageId or postId must be provided to create a vote');
   // }
 
+  const maxChoices = type !== VoteType.Approval && vote.maxChoices ? vote.maxChoices : 1;
+  const voteType = maxChoices > 1 ? VoteType.MultiChoice : type;
+  const threshold = voteType === VoteType.MultiChoice ? 0 : +vote.threshold ?? DEFAULT_THRESHOLD;
+
   const dbVote = await prisma.vote.create({
     data: {
-      description,
+      content: content ?? Prisma.DbNull,
+      contentText,
       title,
-      threshold: +threshold ?? DEFAULT_THRESHOLD,
+      threshold,
       deadline: new Date(deadline),
       status: VOTE_STATUS[0],
-      type,
+      type: voteType,
+      maxChoices,
       context,
       page: pageId
         ? {
@@ -81,6 +89,14 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
       voteOptions: true
     }
   });
+
+  if (vote.context === 'inline' && pageId) {
+    await publishVoteEvent({
+      scope: WebhookEventNames.VoteCreated,
+      spaceId,
+      voteId: dbVote.id
+    });
+  }
 
   const { aggregatedResult, userChoice } = aggregateVoteResult({
     userId: vote.createdBy,

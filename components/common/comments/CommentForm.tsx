@@ -1,13 +1,15 @@
-import { Stack, Box } from '@mui/material';
+import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useMemo, useState } from 'react';
 
-import Button from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor';
+import { Button } from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent } from 'lib/comments';
+
+import { LoadingIcon } from '../LoadingComponent';
 
 const defaultCharmEditorOutput: ICharmEditorOutput = {
   doc: {
@@ -18,13 +20,27 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 };
 
 export function CommentForm({
+  showPublishToLens,
   handleCreateComment,
   initialValue,
-  inlineCharmEditor
+  inlineCharmEditor,
+  disabled,
+  placeholder,
+  setPublishToLens,
+  publishToLens,
+  lensPostLink,
+  isPublishingComments
 }: {
+  isPublishingComments?: boolean;
+  lensPostLink?: string | null;
+  publishToLens?: boolean;
+  setPublishToLens?: (publishToLens: boolean) => void;
+  showPublishToLens?: boolean;
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
-  handleCreateComment: (comment: CommentContent) => Promise<void>;
+  handleCreateComment: (comment: CommentContent, lensPostLink?: string | null) => Promise<void>;
+  disabled?: boolean;
+  placeholder?: string;
 }) {
   const { user } = useUser();
   const [postContent, setPostContent] = useState<ICharmEditorOutput>(
@@ -39,10 +55,13 @@ export function CommentForm({
   }
 
   async function createPostComment() {
-    await handleCreateComment({
-      content: postContent.doc,
-      contentText: postContent.rawText
-    });
+    await handleCreateComment(
+      {
+        content: postContent.doc,
+        contentText: postContent.rawText
+      },
+      publishToLens ? lensPostLink : undefined
+    );
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);
@@ -61,17 +80,18 @@ export function CommentForm({
       key: editorKey,
       disableRowHandles: true,
       focusOnInit: true,
-      placeholderText: 'What are your thoughts?',
+      placeholderText: placeholder ?? 'What are your thoughts?',
       onContentChange: updatePostContent,
       content: postContent.doc,
-      isContentControlled: true
+      isContentControlled: true,
+      disableNestedPages: true
     };
 
     if (!inlineCharmEditor) {
-      return <CharmEditor {...editorCommentProps} />;
+      return <CharmEditor {...editorCommentProps} readOnly={disabled} />;
     }
 
-    return <InlineCharmEditor {...editorCommentProps} />;
+    return <InlineCharmEditor {...editorCommentProps} readOnly={disabled} />;
   }, [inlineCharmEditor, postContent, updatePostContent]);
 
   if (!user) {
@@ -79,21 +99,33 @@ export function CommentForm({
   }
 
   return (
-    <Stack gap={1}>
-      <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form'>
-        <UserDisplay user={user} hideName={true} />
+    <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form' my={1}>
+      <UserDisplay user={user} hideName={true} />
+      <Stack gap={1} width='100%'>
         {editor}
-      </Box>
-      <Button
-        data-test='post-comment-button'
-        sx={{
-          alignSelf: 'flex-end'
-        }}
-        disabled={!postContent.rawText}
-        onClick={createPostComment}
-      >
-        Comment
-      </Button>
-    </Stack>
+        <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
+          {showPublishToLens && (
+            <>
+              <Typography variant='body2' color='text.secondary'>
+                {isPublishingComments ? 'Publishing to Lens...' : 'Publish to Lens'}
+              </Typography>
+              {isPublishingComments ? (
+                <LoadingIcon size={16} sx={{ mx: 1 }} />
+              ) : (
+                <Switch
+                  sx={{ mr: 1, top: 2 }}
+                  size='small'
+                  checked={publishToLens}
+                  onChange={(e) => setPublishToLens?.(e.target.checked)}
+                />
+              )}
+            </>
+          )}
+          <Button data-test='comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
+            Comment
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
   );
 }

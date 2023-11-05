@@ -1,9 +1,11 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { addMessageToSQS } from 'lib/aws/SQS';
-import type { WebhookEventNames, WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
+import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
+import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotificationEmail';
+import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;
 
@@ -42,62 +44,37 @@ async function fetchSpaceWebhookSubscriptionStatus(spaceId: Space['id'], scope: 
   return webhookSubscription;
 }
 
-// export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string, event: WebhookEvent<T>) {
-//   try {
-//     if (!SQS_QUEUE_NAME) {
-//       throw new Error('Webhook SQS env var missing');
-//     }
-//     // Find if the space is subscribed to an event name or name space
-//     const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
-
-//     // If no subscription, we stop here
-//     if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
-//       return;
-//     }
-
-//     const webhookPayload: WebhookPayload = {
-//       event,
-//       createdAt: new Date().toISOString(),
-//       spaceId,
-//       webhookURL: subscription.space.webhookSubscriptionUrl,
-//       signingSecret: subscription.space.webhookSigningSecret
-//     };
-
-//     // Add the message to the queue
-//     await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
-//     log.debug(`Sent event to webhook queue: "${event.scope}"`, {
-//       spaceId,
-//       createdAt: webhookPayload.createdAt,
-//       webhookURL: webhookPayload.webhookURL
-//     });
-//   } catch (e) {
-//     log.warn('Error while publishing webhook event. Error occurred', { error: e, scope: event.scope, spaceId });
-//   }
-// }
-
-export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string, event: WebhookEvent<T>) {
+export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) {
   try {
     if (!SQS_QUEUE_NAME) {
       throw new Error('Webhook SQS env var missing');
-    }
-    // Find if the space is subscribed to an event name or name space
-    const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
-
-    // If no subscription, we stop here
-    if (!subscription || !subscription.space.webhookSubscriptionUrl || !subscription.space.webhookSigningSecret) {
-      return;
     }
 
     const webhookPayload: WebhookPayload = {
       event,
       createdAt: new Date().toISOString(),
       spaceId,
-      webhookURL: subscription.space.webhookSubscriptionUrl,
-      signingSecret: subscription.space.webhookSigningSecret
+      webhookURL: null,
+      signingSecret: null
     };
 
+    // Find if the space is subscribed to an event name or name space
+    const subscription = await fetchSpaceWebhookSubscriptionStatus(spaceId, event.scope);
+
+    if (subscription && subscription.space.webhookSubscriptionUrl && subscription.space.webhookSigningSecret) {
+      webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
+      webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
+    }
+
     // Add the message to the queue
-    await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+    if (event.scope === 'document.mention.created') {
+      setTimeout(() => {
+        addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+      }, 15000);
+    } else {
+      await addMessageToSQS(SQS_QUEUE_NAME, JSON.stringify(webhookPayload));
+    }
+
     log.debug(`Sent webhook event to SQS: "${event.scope}"`, {
       spaceId,
       queueUrl: SQS_QUEUE_NAME,
@@ -105,11 +82,13 @@ export async function publishWebhookEvent<T = WebhookEventNames>(spaceId: string
       webhookURL: webhookPayload.webhookURL
     });
   } catch (e) {
-    log.error('Error while publishing webhook event. Error occurred', {
-      queueUrl: SQS_QUEUE_NAME,
-      error: e,
-      scope: event.scope,
-      spaceId
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      log.error('Error while publishing webhook event. Error occurred', {
+        queueUrl: SQS_QUEUE_NAME,
+        error: e,
+        scope: event.scope,
+        spaceId
+      });
+    }
   }
 }

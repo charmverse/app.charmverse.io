@@ -1,6 +1,8 @@
-import { doc, p, heading, img } from 'testing/prosemirror';
+import { builders } from 'testing/prosemirror/builders';
 
 import { extractSummary } from '../extractSummary';
+
+const { doc, p, heading, img } = builders;
 
 describe('extractSummary()', () => {
   it('Should extract first few text blocks', () => {

@@ -18,6 +18,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
         menuOpen={false}
         onChange={() => {}}
         cardProperties={board.fields.cardProperties}
+        anchorEl={null}
       />
     );
 
@@ -33,6 +34,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
         menuOpen={true}
         onChange={() => {}}
         cardProperties={board.fields.cardProperties}
+        anchorEl={null}
       />
     );
 
@@ -48,6 +50,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
         menuOpen={true}
         onChange={() => {}}
         cardProperties={board.fields.cardProperties}
+        anchorEl={null}
       />
     );
 
@@ -80,6 +83,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
         menuOpen={true}
         onChange={() => {}}
         cardProperties={boardWithProps.fields.cardProperties}
+        anchorEl={null}
       />
     );
 
@@ -120,6 +124,7 @@ describe('components/kanban/calculations/KanbanCalculationOptions', () => {
         menuOpen={true}
         onChange={() => {}}
         cardProperties={boardWithProps.fields.cardProperties}
+        anchorEl={null}
       />
     );
 

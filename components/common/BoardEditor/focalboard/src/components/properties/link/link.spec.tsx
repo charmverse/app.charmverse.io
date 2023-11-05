@@ -12,9 +12,7 @@ describe('components/properties/link', () => {
         onChange={jest.fn()}
         onSave={jest.fn()}
         onCancel={jest.fn()}
-        validator={jest.fn(() => {
-          return true;
-        })}
+        validator={jest.fn(() => true)}
       />
     );
     const { container } = render(component);

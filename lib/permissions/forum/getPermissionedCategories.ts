@@ -1,5 +1,7 @@
-import type { CategoriesToFilter, PostCategoryWithPermissions } from '@charmverse/core';
-import { AvailablePostCategoryPermissions, hasAccessToSpace, InvalidInputError, arrayUtils } from '@charmverse/core';
+import { InvalidInputError } from '@charmverse/core/errors';
+import type { CategoriesToFilter, PostCategoryWithPermissions } from '@charmverse/core/permissions';
+import { AvailablePostCategoryPermissions, hasAccessToSpace } from '@charmverse/core/permissions';
+import { arrayUtils } from '@charmverse/core/utilities';
 
 export async function getPermissionedCategories({
   postCategories,
@@ -20,8 +22,7 @@ export async function getPermissionedCategories({
 
   const { isAdmin, spaceRole } = await hasAccessToSpace({
     spaceId,
-    userId,
-    disallowGuest: true
+    userId
   });
 
   const permissions = new AvailablePostCategoryPermissions();
@@ -29,7 +30,7 @@ export async function getPermissionedCategories({
   if (isAdmin) {
     return postCategories.map((c) => ({ ...c, permissions: permissions.full }));
   } else if (spaceRole) {
-    permissions.addPermissions(['create_post']);
+    permissions.addPermissions(['create_post', 'edit_category', 'delete_category', 'view_posts', 'comment_posts']);
   }
 
   return postCategories.map((c) => ({ ...c, permissions: permissions.operationFlags }));

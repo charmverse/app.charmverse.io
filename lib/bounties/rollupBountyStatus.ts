@@ -1,15 +1,23 @@
-import { prisma } from '@charmverse/core';
 import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { submissionsCapReached } from 'lib/applications/shared';
 import type { BountyWithDetails } from 'lib/bounties';
-import { includePagePermissions } from 'lib/pages/server';
+import { includePagePermissionsWithSource } from 'lib/permissions/pages/includePagePermissionsWithSource';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { countValueOccurrences } from '../utilities/numbers';
 
 import { getBountyOrThrow } from './getBounty';
 
-export async function rollupBountyStatus(bountyId: string): Promise<BountyWithDetails> {
+export async function rollupBountyStatus({
+  bountyId,
+  userId
+}: {
+  bountyId: string;
+  userId?: string;
+}): Promise<BountyWithDetails> {
   const bounty = await getBountyOrThrow(bountyId);
 
   // No-op on bounty suggestions. They need to be approved first
@@ -29,7 +37,7 @@ export async function rollupBountyStatus(bountyId: string): Promise<BountyWithDe
       include: {
         applications: true,
         page: {
-          include: includePagePermissions()
+          include: includePagePermissionsWithSource()
         }
       }
     }) as Promise<BountyWithDetails>;
@@ -49,7 +57,18 @@ export async function rollupBountyStatus(bountyId: string): Promise<BountyWithDe
   if (submissionSummary.inProgress > 0 || submissionSummary.review > 0) {
     return statusUpdate('inProgress');
   } else if (submissionSummary.complete > 0) {
-    return statusUpdate('complete');
+    const updatedBounty = await statusUpdate('complete');
+    // Function is sometimes called in a cron job, so userId is not always available
+    if (userId) {
+      await publishBountyEvent({
+        scope: WebhookEventNames.RewardCompleted,
+        bountyId: bounty.id,
+        spaceId: bounty.page.spaceId,
+        userId
+      });
+    }
+
+    return updatedBounty;
   } else if (submissionSummary.paid === bounty.maxSubmissions) {
     return statusUpdate('paid');
   }

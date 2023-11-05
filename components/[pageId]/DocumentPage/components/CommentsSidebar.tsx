@@ -1,17 +1,20 @@
-import { useEditorViewContext } from '@bangle.dev/react';
+import { isEmptyDocument } from '@bangle.dev/utils';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
-import type { BoxProps, SelectProps } from '@mui/material';
+import type { SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/PageThread';
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
+import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -45,7 +48,7 @@ const EmptyThreadContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; permissions?: IPagePermissionFlags }) {
+function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; permissions?: PagePermissionFlags }) {
   const router = useRouter();
   const { threads } = useThreads();
   const { user } = useUser();
@@ -59,7 +62,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   };
   const lastHighlightedCommentId = React.useRef<string | null>(null);
 
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { setActiveView } = usePageSidebar();
 
   let threadList: ThreadWithCommentsAndAuthors[] = [];
   if (threadFilter === 'resolved') {
@@ -76,13 +79,18 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   }
 
   const view = useEditorViewContext();
+  // view.state.doc stays the same (empty content) even when the document content changes
+  const extractedThreadIds = isEmptyDocument(view.state.doc)
+    ? new Set(Object.keys(threads))
+    : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
+
   // Making sure the position sort doesn't filter out comments that are not in the view
   const inlineThreadsIds = Array.from(
     new Set([
       ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
       ...allThreads.map((thread) => thread?.id)
     ])
-  );
+  ).filter((id) => extractedThreadIds.has(id));
 
   const threadListSet = new Set(threadList.map((thread) => thread.id));
   const sortedThreadList = inlineThreadsIds
@@ -93,10 +101,10 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   useLayoutEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
 
-    const highlightedCommentId = router.query.commentId;
+    const highlightedCommentId = router.query.inlineCommentId;
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
-      setCurrentPageActionDisplay('comments');
+      setActiveView('comments');
       const isHighlightedResolved = resolvedThreads.some((thread) =>
         thread.comments.some((comment) => comment.id === highlightedCommentId)
       );
@@ -105,7 +113,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
       }
 
       // Remove query parameters from url
-      setUrlWithoutRerender(router.pathname, { commentId: null });
+      setUrlWithoutRerender(router.pathname, { inlineCommentId: null });
 
       requestAnimationFrame(() => {
         const highlightedCommentElement = document.getElementById(`comment.${highlightedCommentId}`);
@@ -125,7 +133,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
         }, 250);
       });
     }
-  }, [router.query.commentId]);
+  }, [router.query.inlineCommentId]);
 
   return (
     <>

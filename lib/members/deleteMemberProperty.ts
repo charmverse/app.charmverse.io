@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 

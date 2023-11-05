@@ -1,7 +1,6 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
-import type { ConnectGoogleAccountRequest } from 'lib/google/connectGoogleAccount';
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
 import type { EmailAccountDisconnect } from 'lib/google/disconnectVerifiedEmail';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
@@ -15,12 +14,8 @@ export interface UpdateProfileItemRequest {
 }
 
 export class GoogleApi {
-  login(login: LoginWithGoogleRequest) {
-    return http.POST<LoggedInUser>('/api/google/login', login);
-  }
-
-  connectAccount(params: Omit<ConnectGoogleAccountRequest, 'userId'>) {
-    return http.POST<LoggedInUser>('/api/google/connect-account', params);
+  loginWithCode({ code, type, redirectUri }: { code: string; type?: 'login' | 'connect'; redirectUri?: string }) {
+    return http.POST<LoggedInUser>('/api/google/code', { code, type: type || 'login', redirectUri });
   }
 
   disconnectAccount(params: Omit<DisconnectGoogleAccountRequest, 'userId'>) {

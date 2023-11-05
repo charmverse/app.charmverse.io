@@ -1,4 +1,4 @@
-import { postCategoryOperations, postOperationsWithoutEdit } from '@charmverse/core';
+import { postCategoryOperations, postOperationsWithoutEdit } from '@charmverse/core/permissions';
 import type { PostCategoryOperation, PostCategoryPermissionLevel, PostOperation } from '@charmverse/core/prisma';
 
 export const postCategoryPermissionsMapping: Record<PostCategoryPermissionLevel, PostCategoryOperation[]> = {

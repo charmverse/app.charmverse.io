@@ -14,7 +14,7 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { usePostDialog } from '../../PostDialog/hooks/usePostDialog';
 
 export function CategoryPosts({ categoryId, postId }: { postId: string; categoryId: string }) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { categories } = useForumCategories();
   const category = categories.find((_category) => _category.id === categoryId);
   const [sort, setSort] = useState<ListForumPostsRequest['sort']>('new');

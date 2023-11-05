@@ -1,8 +1,6 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPostCommentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { CreatePostCommentInput } from './interface';
 
@@ -53,14 +51,6 @@ export async function createPostComment({
       userId
     });
   }
-
-  // Publish webhook event if needed
-  await publishPostCommentEvent({
-    scope: WebhookEventNames.CommentCreated,
-    spaceId: post.spaceId,
-    commentId: comment.id,
-    postId
-  });
 
   return comment;
 }

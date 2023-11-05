@@ -1,23 +1,28 @@
-import { prisma } from '@charmverse/core';
-import type { Role } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
+import { updateRole } from 'lib/roles/updateRole';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  // Delete role performs the check for whether the user can delete it
+  .use(
+    requirePaidPermissionsSubscription({
+      key: 'id',
+      resourceIdType: 'role',
+      location: 'query'
+    })
+  )
   .delete(deleteRole)
-  .use(requireSpaceMembership({ adminOnly: true }))
-  .put(updateRole);
+  .put(updateRoleController);
 
 async function deleteRole(req: NextApiRequest, res: NextApiResponse) {
   const roleId = req.query.id as string;
@@ -65,29 +70,36 @@ async function deleteRole(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).end();
 }
 
-async function updateRole(req: NextApiRequest, res: NextApiResponse) {
-  const { name } = req.body as Role;
+async function updateRoleController(req: NextApiRequest, res: NextApiResponse) {
+  const { id: roleId } = req.query;
 
-  const { id } = req.query;
-
-  if (!id) {
-    throw new ApiError({
-      message: 'Please provide a valid role id',
-      errorType: 'Invalid input'
-    });
-  }
-
-  // Can't update role that was imported from guild.xyz
-  const updatedRole = await prisma.role.updateMany({
+  const roleWithSpaceId = await prisma.role.findUnique({
     where: {
-      id: id as string,
-      source: null
+      id: roleId as string
     },
-    data: {
-      name
+    select: {
+      spaceId: true
     }
   });
 
+  if (!roleWithSpaceId) {
+    throw new DataNotFoundError(`Could not find role with id ${roleId}`);
+  }
+
+  const { error } = await hasAccessToSpace({
+    spaceId: roleWithSpaceId.spaceId,
+    adminOnly: true,
+    userId: req.session.user.id
+  });
+
+  if (error) {
+    throw new UnauthorisedActionError(`You cannot update roles for this space`);
+  }
+
+  const updatedRole = await updateRole({
+    id: roleId as string,
+    update: req.body
+  });
   return res.status(200).json(updatedRole);
 }
 

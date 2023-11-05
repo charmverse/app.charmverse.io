@@ -1,8 +1,8 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uid } from 'uuid';
 
-import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
+import { createPage, generateRole, generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { duplicatePage } from '../duplicatePage';
 
@@ -180,5 +180,46 @@ describe('duplicatePage', () => {
         ).toBe(true);
       }
     });
+  });
+
+  it('should duplicate a bounty with permissions', async () => {
+    const { space: _space, user: _user } = await generateUserAndSpace();
+
+    const role = await generateRole({
+      spaceId: _space.id,
+      createdBy: _user.id
+    });
+    // include a 2nd role to test that the permissions are duplicated correctly
+    const role2 = await generateRole({
+      spaceId: _space.id,
+      createdBy: _user.id
+    });
+
+    const bounty = await generateBounty({
+      createdBy: _user.id,
+      spaceId: _space.id,
+      bountyPermissions: {
+        reviewer: [
+          {
+            group: 'role',
+            id: role.id
+          },
+          {
+            group: 'role',
+            id: role2.id
+          }
+        ]
+      }
+    });
+
+    const { pages } = await duplicatePage({ pageId: bounty.id, parentId: null, spaceId: _space.id });
+    const bountyPage = pages[0];
+    expect(bountyPage).toBeTruthy();
+    const permissions = await prisma.bountyPermission.findMany({
+      where: {
+        bountyId: bountyPage.id
+      }
+    });
+    expect(permissions.length).toBe(3); // 1 is added by default for some reason
   });
 });

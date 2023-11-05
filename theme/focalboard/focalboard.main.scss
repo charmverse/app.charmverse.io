@@ -60,9 +60,6 @@
   /*-- Property list --*/
 
   .octo-propertyvalue {
-    font-size: 12px;
-    color: rgb(var(--center-channel-color-rgb));
-    margin: 2px 0;
 
     &.empty {
       color: rgba(var(--center-channel-color-rgb), 0.4);

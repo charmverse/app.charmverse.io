@@ -1,4 +1,4 @@
-import type { Comment, User, Prisma } from '@charmverse/core/prisma';
+import type { Comment, Prisma } from '@charmverse/core/prisma';
 
 import type { UserPermissionFlags } from 'lib/permissions/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -6,10 +6,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 export type CommentCreate = Pick<Comment, 'content' | 'threadId' | 'userId'>;
 
 export type CommentUpdate = Pick<Comment, 'content' | 'id'>;
-
-export interface CommentWithUser extends Comment {
-  user: { id: string; username: string; avatar: string };
-}
 
 export type GenericCommentVote = {
   upvotes: number;
@@ -27,10 +23,11 @@ export type GenericComment<T = object> = T & {
   deletedAt: Date | null;
   deletedBy: string | null;
   parentId: string | null;
+  lensCommentLink?: string | null;
 };
 
 export type GenericCommentWithVote<T = object> = GenericComment<T> & GenericCommentVote;
-export type CommentWithChildren<T = object> = GenericCommentWithVote<T> & {
+export type CommentWithChildren<T = object> = (GenericComment<T> | GenericCommentWithVote<T>) & {
   children: CommentWithChildren<T>[];
 };
 
@@ -45,7 +42,9 @@ export type CreateCommentInput = {
   parentId?: string;
 };
 
-export type UpdateCommentInput = CommentContent;
+export type UpdateCommentInput = Partial<CommentContent> & {
+  lensCommentLink?: string;
+};
 
 export type CommentOperations = 'add_comment' | 'delete_comments' | 'upvote' | 'downvote';
 

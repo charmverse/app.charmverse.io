@@ -23,6 +23,7 @@ type Props = {
   onDropToCard: (srcCard: Card, dstCard: Card) => Promise<void>;
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
+  disableAddingCards?: boolean;
 };
 
 export function KanbanGroupColumn({
@@ -36,7 +37,8 @@ export function KanbanGroupColumn({
   selectedCardIds,
   onDropToCard,
   showCard,
-  isManualSort
+  isManualSort,
+  disableAddingCards
 }: Props) {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
@@ -58,7 +60,6 @@ export function KanbanGroupColumn({
           isManualSort={isManualSort}
         />
       ))}
-
       {hasNextPage && (
         <Button
           size='small'
@@ -74,8 +75,7 @@ export function KanbanGroupColumn({
           </Box>
         </Button>
       )}
-
-      {!readOnly && (
+      {!readOnly && !disableAddingCards && (
         <Button
           size='small'
           variant='text'

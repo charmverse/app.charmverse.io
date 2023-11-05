@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
-import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@charmverse/core';
+import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
@@ -151,7 +151,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', userCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(200);
   });
 
@@ -168,7 +168,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', adminUserCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(200);
   });
 
@@ -186,7 +186,7 @@ describe('DELETE /api/permissions/forum - Delete post category permissions', () 
     await request(baseUrl)
       .delete('/api/permissions/forum')
       .set('Cookie', userCookie)
-      .send({ permissionId: permissionToDelete.id })
+      .query({ permissionId: permissionToDelete.id })
       .expect(401);
   });
 });

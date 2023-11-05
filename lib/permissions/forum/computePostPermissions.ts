@@ -2,14 +2,15 @@ import {
   defaultPostPolicies,
   hasAccessToSpace,
   postResolver,
-  prisma,
   AvailablePostPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies
-} from '@charmverse/core';
-import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core';
+} from '@charmverse/core/permissions';
+import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core/permissions';
+import { PostOperation, prisma } from '@charmverse/core/prisma-client';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { typedKeys } from 'lib/utilities/objects';
 import { isUUID } from 'lib/utilities/strings';
 
 export async function baseComputePostPermissions({
@@ -49,7 +50,8 @@ export async function baseComputePostPermissions({
     return permissions.full;
     // Always allow space members to interact with posts
   } else if (spaceRole) {
-    permissions.addPermissions(['view_post', 'add_comment', 'upvote', 'downvote']);
+    // Provide all permissions except edit post
+    permissions.addPermissions(typedKeys(PostOperation).filter((op) => op !== 'edit_post'));
   } else {
     permissions.addPermissions(['view_post']);
   }

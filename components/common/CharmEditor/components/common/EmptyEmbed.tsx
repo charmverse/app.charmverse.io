@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 
-import { BlockNodeContainer } from 'components/common/CharmEditor/components/common/BlockNodeContainer';
+import { BlockNodeContainer } from './BlockNodeContainer';
 
 export type EmptyContentProps = {
   onDelete: () => void;

@@ -9,7 +9,8 @@ type StandardFields =
   | 'updatedAt'
   | 'updatedBy'
   | 'fontFamily'
-  | 'fontSizeSmall';
+  | 'fontSizeSmall'
+  | 'syncWithPageId';
 
 function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPage {
   return {
@@ -22,6 +23,7 @@ function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPag
     deletedBy: null,
     fontFamily: 'default',
     fontSizeSmall: null,
+    syncWithPageId: null,
     ...template
   };
 }
@@ -29,6 +31,8 @@ function exportedPage(template: Omit<ExportedPage, StandardFields>): ExportedPag
 const templates: Omit<ExportedPage, StandardFields>[] = [
   {
     title: 'Grants',
+    sourceTemplateId: null,
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -484,29 +488,36 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'ab2fde3d-2a3c-420a-a460-cd106a0c289f',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
       reviewedBy: null,
+      archived: false,
       reviewedAt: null,
       categoryId: '4532b730-f8fa-4925-a056-4d1b175d0d67',
       snapshotProposalExpiry: null,
+      evaluationType: 'vote',
       category: {
         id: '4532b730-f8fa-4925-a056-4d1b175d0d67',
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Treasury',
         color: 'gray'
-      }
+      },
+      fields: null
     }
   },
   {
     title: 'Budget',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -1616,17 +1627,23 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
+    sourceTemplateId: null,
     children: [],
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: '648cd168-771a-40d9-a5c7-44699b8f1337',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
+      archived: false,
       categoryId: '4532b730-f8fa-4925-a056-4d1b175d0d67',
       snapshotProposalExpiry: null,
       category: {
@@ -1634,11 +1651,13 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Treasury',
         color: 'gray'
-      }
+      },
+      fields: null
     }
   },
   {
     title: 'Investments',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -2033,17 +2052,23 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
+    sourceTemplateId: null,
     children: [],
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'e4cad114-c6a4-4516-82a7-6eca8208f31e',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
+      archived: false,
       categoryId: '4532b730-f8fa-4925-a056-4d1b175d0d67',
       snapshotProposalExpiry: null,
       category: {
@@ -2051,11 +2076,13 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Treasury',
         color: 'gray'
-      }
+      },
+      fields: null
     }
   },
   {
     title: 'Protocol Changes',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -2376,17 +2403,23 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
+    sourceTemplateId: null,
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'a36b0073-7ebc-4c55-8d22-3918b5226e0a',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
+      archived: false,
       categoryId: 'f5527a96-4f10-4986-b5c5-7b4292d8c222',
       snapshotProposalExpiry: null,
       category: {
@@ -2394,11 +2427,13 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Protocol',
         color: 'pink'
-      }
+      },
+      fields: null
     }
   },
   {
     title: 'Metagov Changes',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -3063,17 +3098,23 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
+    sourceTemplateId: null,
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: '17fafdb0-6030-43b3-8a0c-c2f64b240810',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
+      archived: false,
       categoryId: 'fc1c1130-1f02-414a-86fb-505bc5061bb5',
       snapshotProposalExpiry: null,
       category: {
@@ -3081,11 +3122,13 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Metagoverance',
         color: 'pink'
-      }
+      },
+      fields: null
     }
   },
   {
     title: 'Delegate Governance',
+    additionalPaths: [],
     content: {
       type: 'doc',
       content: [
@@ -3750,17 +3793,23 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: null,
         inheritedFromPermission: null,
         public: null,
-        sourcePermission: null
+        sourcePermission: null,
+        allowDiscovery: false
       }
     ],
     children: [],
+    sourceTemplateId: null,
     proposal: {
+      lensPostLink: null,
+      publishToLens: null,
       id: 'b61aae93-96a0-4988-8aba-cc70bd968b37',
       createdBy: 'dc521ceb-495e-40cc-940e-3b1cafc7a2e1',
       spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
       status: 'draft',
+      evaluationType: 'vote',
       reviewedBy: null,
       reviewedAt: null,
+      archived: false,
       categoryId: 'fc1c1130-1f02-414a-86fb-505bc5061bb5',
       snapshotProposalExpiry: null,
       category: {
@@ -3768,7 +3817,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
         title: 'Metagoverance',
         color: 'pink'
-      }
+      },
+      fields: null
     }
   }
 ];

@@ -4,10 +4,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useTasks } from 'components/nexus/hooks/useTasks';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
-import type { GetTasksResponse } from 'pages/api/tasks/list';
 
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
@@ -22,19 +21,11 @@ type IContext = {
   isLoading: boolean;
   setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
-  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>) => Promise<ExtendedVote>;
-  castVote: (voteId: string, option: string) => Promise<UserVote>;
+  createVote: (votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>) => Promise<ExtendedVote>;
+  castVote: (voteId: string, choices: string[]) => Promise<UserVote>;
   deleteVote: (voteId: string) => Promise<void>;
   cancelVote: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
-};
-
-const EMPTY_TASKS: GetTasksResponse = {
-  bounties: { marked: [], unmarked: [] },
-  votes: { marked: [], unmarked: [] },
-  discussions: { marked: [], unmarked: [] },
-  proposals: { marked: [], unmarked: [] },
-  forum: { marked: [], unmarked: [] }
 };
 
 const VotesContext = createContext<Readonly<IContext>>({
@@ -53,9 +44,9 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const [parent, setParent] = useState<{ pageId?: string; postId?: string } | null>(null);
   const [votes, setVotes] = useState<IContext['votes']>({});
   const { user } = useUser();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(true);
-  const { mutate: mutateTasks, tasks: userTasks } = useTasks();
+  const { mutate: mutateNotifications } = useNotifications();
 
   const { subscribe } = useWebSocketClient();
 
@@ -74,15 +65,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
 
         return { ...prev, ...votesToAssign };
       });
-
-      // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
-      newVotes.forEach((newVote) => {
-        if (!mutatedTasks.votes.unmarked.find((vote) => vote.id === newVote.id)) {
-          mutatedTasks.votes.unmarked.push(newVote);
-        }
-      });
-      mutateTasks(mutatedTasks);
+      mutateNotifications();
     });
 
     const unsubscribeFromDeletedVotes = subscribe('votes_deleted', (deletedVotes) => {
@@ -95,17 +78,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      // Mutate the tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
-
-      const deletedVoteIds = deletedVotes.map((vote) => vote.id);
-
-      mutatedTasks.votes = {
-        marked: mutatedTasks.votes.marked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id)),
-        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !deletedVoteIds.includes(taskVote.id))
-      };
-
-      mutateTasks(mutatedTasks);
+      mutateNotifications();
     });
 
     const unsubscribeFromUpdatedVotes = subscribe('votes_updated', (updatedVotes) => {
@@ -120,17 +93,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         return { ..._votes };
       });
 
-      // Remove cancelled votes from tasks
-      const mutatedTasks: GetTasksResponse = userTasks ?? EMPTY_TASKS;
-
-      const cancelledVoteIds = updatedVotes.filter((v) => v.status === 'Cancelled').map((vote) => vote.id);
-
-      mutatedTasks.votes = {
-        marked: mutatedTasks.votes.marked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id)),
-        unmarked: mutatedTasks.votes.unmarked.filter((taskVote) => !cancelledVoteIds.includes(taskVote.id))
-      };
-
-      mutateTasks(mutatedTasks);
+      mutateNotifications();
     });
 
     return () => {
@@ -148,49 +111,45 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     }
   );
 
-  function removeVoteFromTask(voteId: string) {
-    mutateTasks(
-      (tasks) => {
-        return tasks
-          ? {
-              ...tasks,
-              votes: {
-                unmarked: tasks.votes.unmarked.filter((_vote) => _vote.id !== voteId),
-                marked: tasks.votes.marked.filter((_vote) => _vote.id !== voteId)
-              }
-            }
-          : undefined;
-      },
-      {
-        revalidate: false
-      }
-    );
-  }
+  async function castVote(voteId: string, choices: string[]) {
+    const userVote = await charmClient.votes.castVote(voteId, choices);
 
-  async function castVote(voteId: string, choice: string) {
-    const userVote = await charmClient.votes.castVote(voteId, choice);
     setVotes((_votes) => {
-      const vote = _votes[voteId];
+      const vote = { ..._votes[voteId] };
       if (vote && user) {
         const currentChoice = vote.userChoice;
-        vote.userChoice = choice;
-        if (currentChoice) {
-          vote.aggregatedResult[currentChoice] -= 1;
+        if (currentChoice?.length) {
+          // Remove previous choices
+          currentChoice.forEach((c) => {
+            vote.aggregatedResult[c] -= 1;
+          });
         } else {
           vote.totalVotes += 1;
         }
-        vote.aggregatedResult[choice] += 1;
-        _votes[voteId] = {
-          ...vote
-        };
+
+        vote.userChoice = choices;
+
+        if (choices.length > 0) {
+          // Add new choices
+          choices.forEach((c) => {
+            vote.aggregatedResult[c] += 1;
+          });
+        } else if (currentChoice && currentChoice.length) {
+          // User deselected all previous choices
+          vote.totalVotes = vote.totalVotes > 0 ? vote.totalVotes - 1 : 0;
+        }
+
+        _votes[voteId] = vote;
       }
+
       return { ..._votes };
     });
-    removeVoteFromTask(voteId);
     return userVote;
   }
 
-  async function createVote(votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId'>): Promise<ExtendedVote> {
+  async function createVote(
+    votePayload: Omit<VoteDTO, 'createdBy' | 'spaceId' | 'description'>
+  ): Promise<ExtendedVote> {
     if (!user || !currentSpace) {
       throw new Error('Missing user or space');
     }
@@ -217,7 +176,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
         delete _votes[voteId];
         return _votes;
       });
-      removeVoteFromTask(voteId);
     }
   }
 
@@ -226,7 +184,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     if (vote.context === 'inline') {
       await charmClient.votes.updateVote(voteId, { status: 'Cancelled' });
       setVotes((prevVotes) => ({ ...prevVotes, [voteId]: { ...prevVotes[voteId], status: 'Cancelled' } }));
-      removeVoteFromTask(voteId);
     }
   }
 

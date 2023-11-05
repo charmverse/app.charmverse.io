@@ -1,5 +1,4 @@
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
 import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import { ClickAwayListener } from '@mui/material';
@@ -11,6 +10,8 @@ import Popper from '@mui/material/Popper';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useMemo, useCallback, useEffect, useState } from 'react';
+
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 
 import type { NestedPagePluginState } from '../../nestedPage';
 import { GroupLabel } from '../../PopoverMenu';
@@ -57,7 +58,7 @@ const InlinePaletteGroup = styled.div`
 
 interface InlineCommentGroupProps {
   menuKey?: PluginKey;
-  nestedPagePluginKey?: PluginKey<NestedPagePluginState>;
+  linkedPagePluginKey?: PluginKey<NestedPagePluginState>;
   disableNestedPage?: boolean;
   filterItem?: (item: PaletteItem) => boolean;
   externalPopupState?: PopupState;
@@ -74,7 +75,7 @@ function defaultFilterItem(item: PaletteItem, { disableNestedPage }: { disableNe
 
 export default function InlineCommandPalette({
   menuKey,
-  nestedPagePluginKey,
+  linkedPagePluginKey,
   disableNestedPage = false,
   pageId,
   filterItem,
@@ -86,7 +87,7 @@ export default function InlineCommandPalette({
 }: InlineCommentGroupProps) {
   const { query, counter, isVisible, tooltipContentDOM } = useInlinePaletteQuery(palettePluginKey);
   const view = useEditorViewContext();
-  const editorItems = useEditorItems({ pageId, disableNestedPage, nestedPagePluginKey, enableVoting });
+  const editorItems = useEditorItems({ pageId, disableNestedPage, linkedPagePluginKey, enableVoting });
   const isItemDisabled = useCallback(
     (item: PaletteItem) => {
       return typeof item.disabled === 'function' ? item.disabled(view.state) : item.disabled;

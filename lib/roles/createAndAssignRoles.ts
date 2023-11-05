@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import type { ExternalRole } from 'lib/roles/interfaces';

@@ -1,7 +1,8 @@
-import { prisma } from '@charmverse/core';
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 
-import { UndesirableOperationError } from 'lib/utilities/errors';
+import { InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
@@ -32,7 +33,61 @@ describe('deleteProposalCategory', () => {
     expect(afterDelete).toBeNull();
   });
 
-  it('should throw an error if the category contains proposals', async () => {
+  it('should delete the category with all attached proposals, only if they are all marked as deleted', async () => {
+    const { user: localUser, space: localSpace } = await testUtilsUser.generateUserAndSpace();
+
+    const deletedProposalCategory = await generateProposalCategory({
+      spaceId: localSpace.id
+    });
+
+    const deletedProposal = await generateProposal({
+      categoryId: deletedProposalCategory.id,
+      spaceId: localSpace.id,
+      userId: localUser.id,
+      deletedAt: new Date()
+    });
+
+    const unaffectedCategory = await generateProposalCategory({
+      spaceId: localSpace.id
+    });
+
+    const proposalInUnaffectedCategory = await generateProposal({
+      categoryId: unaffectedCategory.id,
+      spaceId: localSpace.id,
+      userId: localUser.id,
+      deletedAt: new Date()
+    });
+
+    await deleteProposalCategory(deletedProposalCategory.id);
+
+    const categories = await prisma.proposalCategory.findMany({
+      where: {
+        spaceId: localSpace.id
+      }
+    });
+
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        spaceId: localSpace.id
+      },
+      include: {
+        page: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    expect(categories.length).toBe(1);
+    expect(categories[0].id).toBe(unaffectedCategory.id);
+
+    expect(proposals.length).toBe(1);
+    expect(proposals[0].id).toBe(proposalInUnaffectedCategory.id);
+    expect(proposals[0].page?.id).toBe(proposalInUnaffectedCategory.id);
+  });
+
+  it('should throw an error if the category contains non deleted proposals', async () => {
     const proposalCategory = await generateProposalCategory({
       spaceId: space.id
     });
@@ -44,5 +99,10 @@ describe('deleteProposalCategory', () => {
     });
 
     await expect(deleteProposalCategory(proposalCategory.id)).rejects.toBeInstanceOf(UndesirableOperationError);
+  });
+
+  it('should throw an error if categoryId is invalid', async () => {
+    await expect(deleteProposalCategory(null as any)).rejects.toBeInstanceOf(InvalidInputError);
+    await expect(deleteProposalCategory('not UUID')).rejects.toBeInstanceOf(InvalidInputError);
   });
 });

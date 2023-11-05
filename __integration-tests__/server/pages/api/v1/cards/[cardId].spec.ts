@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import type {
-  InvalidCustomPropertyValueError,
   CardPage as ApiPage,
+  InvalidCustomPropertyValueError,
   PageProperty,
   UnsupportedKeysError
 } from 'lib/public-api';
-import { createDatabase, createDatabaseCardPage } from 'lib/public-api';
+import { createDatabase } from 'lib/public-api/createDatabase';
+import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -112,7 +112,7 @@ describe('GET /api/v1/cards/{cardId}', () => {
       .set('Authorization', secondSpace.apiToken.token)
       .send();
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(404);
   });
 });
 
@@ -300,7 +300,7 @@ describe('PATCH /api/v1/cards/{cardId}', () => {
         }
       });
 
-    exampleBoardSchema[0].options.forEach((option) => {
+    exampleBoardSchema[0].options?.forEach((option) => {
       expect((response.body as InvalidCustomPropertyValueError).error.validOptions).toContain(option.value);
     });
   });

@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
@@ -13,7 +13,7 @@ export async function addUserToSpace({
   userId
 }: {
   spaceId: string;
-  isAdmin: boolean;
+  isAdmin?: boolean;
   userId: string;
 }): Promise<LoggedInUser> {
   return prisma.user.update({
@@ -39,7 +39,17 @@ export async function addUserToSpace({
 /**
  * Utility to create a space by existing user
  */
-export async function generateSpaceForUser(user: LoggedInUser, isAdmin = true, spaceName = 'Example space') {
+export async function generateSpaceForUser({
+  user,
+  isAdmin = true,
+  spaceName = 'Example space',
+  skipOnboarding = true
+}: {
+  user: LoggedInUser;
+  isAdmin?: boolean;
+  spaceName?: string;
+  skipOnboarding?: boolean;
+}) {
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
   let space = null;
@@ -67,7 +77,9 @@ export async function generateSpaceForUser(user: LoggedInUser, isAdmin = true, s
         spaceRoles: {
           create: {
             userId: user.id,
-            isAdmin
+            isAdmin,
+            // skip onboarding for normal test users
+            onboarded: skipOnboarding
           }
         }
       },
@@ -79,4 +91,27 @@ export async function generateSpaceForUser(user: LoggedInUser, isAdmin = true, s
   }
 
   return space;
+}
+
+export async function addSpaceSubscription({
+  spaceId,
+  customerId = v4(),
+  subscriptionId = v4(),
+  deletedAt = null
+}: {
+  spaceId: string;
+  customerId?: string;
+  subscriptionId?: string;
+  deletedAt?: Date | null;
+}) {
+  const spaceSubscription = await prisma.stripeSubscription.create({
+    data: {
+      deletedAt,
+      spaceId,
+      customerId,
+      subscriptionId
+    }
+  });
+
+  return spaceSubscription;
 }

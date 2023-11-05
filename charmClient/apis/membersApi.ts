@@ -91,6 +91,10 @@ export class MembersApi {
   }
 
   removeMember({ spaceId, userId }: RemoveMemberInput) {
-    return http.DELETE<Member[]>(`/api/spaces/${spaceId}/members/${userId}`);
+    return http.DELETE(`/api/spaces/${spaceId}/members/${userId}`);
+  }
+
+  banMember({ spaceId, userId }: RemoveMemberInput) {
+    return http.DELETE(`/api/spaces/${spaceId}/members/${userId}/ban`);
   }
 }

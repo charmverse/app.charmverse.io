@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
@@ -7,7 +7,8 @@ import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
 import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import type { Space } from 'lib/public-api/interfaces';
+import type { SpaceApiResponse } from 'lib/public-api/interfaces';
+import { staticSpaceTemplates } from 'lib/spaces/config';
 import type { SpaceCreateInput } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
@@ -66,17 +67,19 @@ export async function createWorkspaceApi({
     superApiTokenId: superApiToken?.id
   };
 
+  const internalTemplate = staticSpaceTemplates.find((tpl) => tpl.apiName === template)?.id ?? 'templateNftCommunity';
+
   const space = await createWorkspace({
     spaceData,
     userId: adminUserId,
     webhookUrl,
     extraAdmins: [botUser.id],
-    createSpaceTemplate: template ?? 'nft_community'
+    spaceTemplate: internalTemplate
   });
 
   // create roles from discord
   if (discordServerId) {
-    await upsertSpaceRolesFromDiscord({ space, userId: botUser.id });
+    await upsertSpaceRolesFromDiscord({ spaceId: space.id, discordServerId, userId: botUser.id });
   }
 
   // assing roles to discord admin user
@@ -88,7 +91,7 @@ export async function createWorkspaceApi({
   trackUserAction('create_new_workspace', {
     userId: adminUserId,
     spaceId: space.id,
-    template: template ?? 'nft_community',
+    template: internalTemplate,
     source: superApiToken?.name || 'charmverse_api'
   });
   updateTrackGroupProfile(space, superApiToken?.name);
@@ -105,7 +108,7 @@ export async function createWorkspaceApi({
   };
 }
 
-export function mapSpace(space: PrismaSpace): Space {
+export function mapSpace(space: PrismaSpace): SpaceApiResponse {
   return {
     id: space.id,
     createdAt: space.createdAt.toString(),

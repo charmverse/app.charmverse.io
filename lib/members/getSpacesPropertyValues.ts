@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import { getCommonSpaceIds } from 'lib/members/getCommonSpaceIds';
@@ -17,6 +17,7 @@ export async function getSpacesPropertyValues({
     spaceId: spaceIds,
     requestingUserId
   });
+
   const memberPropertyIds = visibleMemberProperties.map((mp) => mp.id);
 
   const memberPropertyValues = await prisma.memberPropertyValue.findMany({
@@ -39,7 +40,7 @@ export async function getSpacesPropertyValues({
     const spaceMetadataMap = await getSpaceMemberMetadata({ spaceIds, memberId });
     propertyValues = propertyValues.map((pv) => {
       if (pv.type === 'role' && isRolePropertyVisible) {
-        return { ...pv, value: spaceMetadataMap[pv.spaceId]?.roles.map((r) => r.name) || [] };
+        return { ...pv, value: spaceMetadataMap[pv.spaceId]?.roles || [] };
       } else if (pv.type === 'join_date' && isJoinDatePropertyVisible) {
         return { ...pv, value: spaceMetadataMap[pv.spaceId]?.joinDate };
       }

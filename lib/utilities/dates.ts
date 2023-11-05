@@ -8,6 +8,7 @@ export type DateTimeFormat = 'relative' | 'absolute';
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 export type DateFormatConfig = {
+  month?: Intl.DateTimeFormatOptions['month'];
   withYear?: boolean;
 };
 
@@ -166,11 +167,24 @@ export function formatDate(dateInput: Date | string, config?: DateFormatConfig, 
 
   return getFormattedDateTime(
     dateInput,
-    { day: 'numeric', month: 'short', year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined },
+    {
+      day: 'numeric',
+      month: config?.month ?? 'short',
+      year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined
+    },
     locale
   );
 }
 
 export function formatTime(dateInput: Date | string, locale?: string | null) {
   return getFormattedDateTime(dateInput, { timeStyle: 'short' }, locale);
+}
+
+export function sortByDate<T extends { createdAt: string | Date }>(a: T, b: T): number {
+  return a.createdAt > b.createdAt ? -1 : 1;
+}
+
+export function getCurrentDate() {
+  // Use static time for Storybook
+  return process.env.IS_STORYBOOK ? new Date('2021-10-01T00:00:00.000Z') : new Date();
 }

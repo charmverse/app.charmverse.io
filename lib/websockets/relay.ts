@@ -1,5 +1,4 @@
 import { WebsocketBroadcaster } from './broadcaster';
-
 // Export the singleton instance
 declare global {
   // eslint-disable-next-line no-var, vars-on-top

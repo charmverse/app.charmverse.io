@@ -1,3 +1,5 @@
+import type { PageMeta } from '@charmverse/core/pages';
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
@@ -10,8 +12,8 @@ import {
   getCurrentBoard,
   setCurrent as setCurrentBoard
 } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { initialReadOnlyLoad } from 'components/common/BoardEditor/focalboard/src/store/initialLoad';
 import {
   getCurrentBoardViews,
   setCurrent as setCurrentView
@@ -20,8 +22,6 @@ import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PageMeta } from 'lib/pages';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 /**
@@ -33,25 +33,23 @@ interface Props {
   page: PageMeta;
   readOnly?: boolean;
   setPage: (p: Partial<Page>) => void;
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: PagePermissionFlags;
 }
 
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
   const board = useAppSelector(getCurrentBoard);
-  const [currentViewId, setCurrentViewId] = useState<string | undefined>(router.query.viewId as string | undefined);
   const boardViews = useAppSelector(getCurrentBoardViews);
   // grab the first board view if current view is not specified
   const { showMessage } = useSnackbar();
-  const activeView =
-    typeof currentViewId === 'string' ? boardViews.find((view) => view.id === currentViewId) : boardViews[0];
+  const currentViewId = router.query.viewId as string | undefined;
+  const activeView = boardViews.find((view) => view.id === currentViewId) ?? boardViews[0];
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  // TODO: remove this feature entirely after some time has passed and we are sure we dont need it. Disabled on April 4, 2023.
-  const readOnlySourceData = false; // activeView?.fields?.sourceType === 'google_form'; // blocks that are synced cannot be edited
+
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -79,7 +77,6 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
     if (boardId) {
       dispatch(setCurrentBoard(boardId));
-      setCurrentViewId(urlViewId);
       // Note: current view in Redux is only used for search, which we currently are not using at the moment
       dispatch(setCurrentView(urlViewId || ''));
       setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
@@ -89,10 +86,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   // load initial data for readonly boards - otherwise its loaded in _app.tsx
   // inline linked board will be loaded manually
   useEffect(() => {
-    if (readOnlyBoard && page.boardId && page.type !== 'inline_linked_board' && page.type !== 'linked_board') {
-      dispatch(initialReadOnlyLoad(page.boardId));
+    if (page.id && (!board || page.id !== board.id)) {
+      dispatch(initialDatabaseLoad({ pageId: page.id }));
     }
-  }, [page.boardId]);
+  }, [page.id]);
 
   useHotkeys('ctrl+z,cmd+z', () => {
     Utils.log('Undo');
@@ -128,22 +125,14 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
 
   const showView = useCallback(
     (viewId: string) => {
-      if (viewId === '') {
-        // when creating an ew view for linked boards, user must select a source before the view exists
-        // but we dont want to change the URL until the view is created
-        setCurrentViewId('');
-      } else {
-        const { cardId, ...rest } = router.query;
-        router.push({
-          pathname: router.pathname,
-          query: {
-            ...rest,
-            viewId: viewId || ''
-          }
-        });
-        // call setCurrentViewId in case user clicked "add view", because we didnt update the URL so it wouldnt affect the activeView
-        setCurrentViewId(viewId);
-      }
+      const { cardId, ...rest } = router.query;
+      router.replace({
+        pathname: router.pathname,
+        query: {
+          ...rest,
+          viewId: viewId || ''
+        }
+      });
     },
     [router.query]
   );
@@ -151,10 +140,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   if (board) {
     return (
       <>
-        <div className='focalboard-body full-page'>
+        <div data-test='database-page' className='focalboard-body full-page'>
           <CenterPanel
+            currentRootPageId={page.id}
             readOnly={Boolean(readOnlyBoard)}
-            readOnlySourceData={readOnlySourceData}
             board={board}
             setPage={setPage}
             pageIcon={page.icon}

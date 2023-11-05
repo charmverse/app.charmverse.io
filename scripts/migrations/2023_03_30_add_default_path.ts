@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { uid } from 'lib/utilities/strings';
 
 async function init() {
@@ -10,7 +10,6 @@ async function init() {
   //     path: null
   //   }
   // })
-
   // for (const user of users) {
   //   await prisma.user.update({
   //     where: {

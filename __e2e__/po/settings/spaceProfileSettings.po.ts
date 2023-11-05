@@ -11,24 +11,59 @@ export class SpaceProfileSettings extends SettingsModal {
 
   readonly submitSpaceUpdateButton: Locator;
 
-  readonly bountyVisibilityToggle: Locator;
+  readonly deleteSpaceButton: Locator;
 
-  readonly forumVisibilityToggle: Locator;
+  readonly confirmDeleteSpaceButton: Locator;
 
-  readonly memberDirectoryVisibilityToggle: Locator;
+  readonly bountyVisibility: Locator;
 
-  readonly proposalsVisibilityToggle: Locator;
+  readonly forumVisibility: Locator;
+
+  readonly memberDirectoryVisibility: Locator;
+
+  readonly proposalsVisibility: Locator;
+
+  readonly proposalsVisibilityMenu: Locator;
+
+  readonly proposalsVisibilityHideAction: Locator;
+
+  readonly proposalsVisibilityShowAction: Locator;
+
+  readonly profileCharmverseItem: Locator;
+
+  readonly profileCharmverseItemMenu: Locator;
+
+  readonly profileHideAction: Locator;
+
+  readonly profileOpenAddProfilesModal: Locator;
+
+  readonly profileAddProfilesModal: Locator;
+
+  readonly profileAddCharmverseProfileButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.spaceNameInput = page.locator('data-test=space-name-input >> input');
     this.spaceDomainInput = page.locator('data-test=space-domain-input >> input');
     this.submitSpaceUpdateButton = page.locator('data-test=submit-space-update');
+    this.deleteSpaceButton = page.locator('data-test=submit-space-delete');
+    this.confirmDeleteSpaceButton = page.locator('data-testid=confirm-delete-button');
 
-    // Space feature visibility toggles
-    this.bountyVisibilityToggle = page.locator(`data-test=space-feature-toggle-bounties`);
-    this.forumVisibilityToggle = page.locator(`data-test=space-feature-toggle-forum`);
-    this.memberDirectoryVisibilityToggle = page.locator(`data-test=space-feature-toggle-member_directory`);
-    this.proposalsVisibilityToggle = page.locator(`data-test=space-feature-toggle-proposals >> input`);
+    // Space features
+    this.bountyVisibility = page.locator(`data-test=settings-feature-item-bounties`);
+    this.forumVisibility = page.locator(`data-test=settings-feature-item-forum`);
+    this.memberDirectoryVisibility = page.locator(`data-test=settings-feature-item-member_directory`);
+    this.proposalsVisibility = page.locator(`data-test=settings-feature-item-proposals`);
+    this.proposalsVisibilityMenu = page.locator(`data-test=settings-feature-item-proposals >> button`);
+    this.proposalsVisibilityHideAction = page.locator(`data-test=settings-feature-option-hide`);
+    this.proposalsVisibilityShowAction = page.locator(`data-test=settings-feature-option-show`);
+
+    // Space member profiles
+    this.profileCharmverseItem = page.locator(`data-test=settings-profiles-item-charmverse`);
+    this.profileCharmverseItemMenu = page.locator(`data-test=settings-profiles-item-charmverse >> button`);
+    this.profileHideAction = page.locator(`data-test=settings-profiles-option-hide`);
+    this.profileOpenAddProfilesModal = page.locator(`data-test=settings-add-profiles-button`);
+    this.profileAddProfilesModal = page.locator(`data-test=add-profiles-modal`);
+    this.profileAddCharmverseProfileButton = page.locator(`data-test=add-profile-button-charmverse`);
   }
 }

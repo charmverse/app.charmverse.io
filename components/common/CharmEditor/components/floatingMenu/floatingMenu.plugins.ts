@@ -1,12 +1,11 @@
-import type { PluginKey } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
-import type { NodeSelection } from 'prosemirror-state';
+import type { NodeSelection, PluginKey } from 'prosemirror-state';
 
 import { floatingMenu } from './floating-menu';
 
 // Components that should not trigger floating menu
 const blacklistedComponents =
-  'video image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark tableOfContents file poll';
+  'nft embed video image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark tableOfContents file poll';
 
 export function plugins({
   key,

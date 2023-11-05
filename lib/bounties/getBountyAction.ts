@@ -1,40 +1,8 @@
-import type { Application, ApplicationStatus, Bounty, BountyStatus } from '@charmverse/core/prisma';
+import type { Application, Bounty } from '@charmverse/core/prisma';
 
-import type { BountyTask } from './getBountyTasks';
+import type { BountyNotificationType } from 'lib/notifications/interfaces';
 
-export function getBountyAction({
-  isSpaceAdmin,
-  bountyStatus,
-  applicationStatus,
-  isApplicant,
-  isReviewer
-}: {
-  isSpaceAdmin: boolean;
-  bountyStatus: BountyStatus;
-  applicationStatus?: ApplicationStatus;
-  isApplicant: boolean;
-  isReviewer: boolean;
-}): BountyTask['action'] | null {
-  if (applicationStatus === 'applied' && isReviewer) {
-    return 'application_pending';
-  } else if (applicationStatus === 'inProgress' && isApplicant) {
-    return 'application_approved';
-  } else if (applicationStatus === 'rejected' && isApplicant) {
-    return 'application_rejected';
-  } else if (applicationStatus === 'review' && isReviewer) {
-    return 'work_submitted';
-  } else if (applicationStatus === 'complete' && isApplicant) {
-    return 'work_approved';
-  } else if (applicationStatus === 'complete' && isReviewer) {
-    return 'payment_needed';
-  } else if (applicationStatus === 'paid' && isApplicant) {
-    return 'payment_complete';
-  } else if (bountyStatus === 'suggestion' && isSpaceAdmin) {
-    return 'suggested_bounty';
-  }
-
-  return null;
-}
+export function convertBountyAction(type: BountyNotificationType) {}
 
 export function getBountyActor({
   bounty,

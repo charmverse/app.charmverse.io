@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { UserDetails } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -8,17 +8,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(createUserDetails).use(requireUser).get(getUserDetails).put(updateUserDetails);
-
-export async function createUserDetails(req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
-  const details: UserDetails = await prisma.userDetails.create({
-    data: {
-      id: req.session.user.id
-    }
-  });
-
-  res.status(200).json(details);
-}
+handler.use(requireUser).get(getUserDetails).put(updateUserDetails);
 
 async function getUserDetails(req: NextApiRequest, res: NextApiResponse<UserDetails | { error: any }>) {
   const details = await prisma.userDetails.findUnique({

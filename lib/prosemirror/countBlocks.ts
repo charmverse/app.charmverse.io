@@ -5,8 +5,11 @@ import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 // dont count these nodes as "BLOCKS" because they are really inline marks
 const INLINE_NODES_TO_IGNORE = [
   'bold',
+  'bullet_list',
+  'bulletList',
   'code',
   'columnBlock',
+  'date',
   'deletion',
   'disclosureSummary',
   'doc',
@@ -23,6 +26,8 @@ const INLINE_NODES_TO_IGNORE = [
   'mention',
   'mentionSuggest',
   'nestedPageSuggest',
+  'ordered_list',
+  'orderedList',
   'strike',
   'tabIndent',
   'table_cell',
@@ -33,20 +38,28 @@ const INLINE_NODES_TO_IGNORE = [
   'underline'
 ];
 
-export function countBlocks(pageContent: any | null, spaceId?: string) {
+export function countBlocks(
+  pageContent: any | null,
+  meta: { spaceId?: string; blockId?: string; postId?: string; pageId?: string } = {}
+) {
   let count = 0;
   if (pageContent) {
     try {
       const doc = getNodeFromJson(pageContent);
       if (doc) {
-        doc.nodesBetween(0, doc.nodeSize, (node) => {
+        doc.nodesBetween(0, doc.content.size, (node) => {
           if (node.type && !INLINE_NODES_TO_IGNORE.includes(node.type.name)) {
             count += 1;
           }
         });
       }
     } catch (error) {
-      log.error('Error counting prosemirror blocks', { error, pageContent, spaceId });
+      // assume that spaceId is passed if we care about logging
+      log.error('Error counting prosemirror blocks', {
+        error,
+        pageContent,
+        ...meta
+      });
     }
   }
   return count;

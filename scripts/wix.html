@@ -1,0 +1,117 @@
+<script async type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=G-NFFT204NB1"></script>
+<script type="text/javascript">
+  function gtag() { dataLayer.push(arguments); }
+  !function (w, a) {
+    function config() {
+      gtag('config', 'G-NFFT204NB1', { anonymize_ip: true, send_page_view: false });
+    }
+    if (!w.dataLayer) {
+      w.dataLayer = w.dataLayer || [];
+      gtag('js', new Date());
+    }
+    gtag('set', 'developer_id.dYzMzMD', true);
+    config()
+    w[a] = (w[a] && w[a].filter(c => c.name !== 'globalGtag')) || [];
+    w[a].push({
+      name: 'globalGtag',
+      report: gtag,
+      config: {
+        trackingId: 'G-NFFT204NB1'
+      }
+    });
+  }(window, "promoteAnalyticsChannels");
+</script>
+<script type="text/javascript"
+  src="https://static.parastorage.com/services/cookie-consent-banner-for-uou/1.709.0//app.bundle.min.js" async></script>
+
+<script type="text/javascript">
+  (function () {
+
+    // overwrite XHR response which clears out session cookies
+    const isEvilRequest = (url) => /_api\/tag-manager\/api\/v1\/tags\/sites\//.test(url);
+    const response = '{"tags":[],"errors":[],"config":{"consentPolicy":{"essential":true,"functional":true,"analytics":true,"advertising":true,"dataToThirdParty":true},"geo":"US","experiments":{"specs.tagManagerPartytown":"true","specs.tagManagerConfigOverrides":"true","specs.tagManagerRenderTagByPageID":"true","specs.ignoreDisabledAppMarketTemplates":"false","specs.tagManagerEmbedScriptsFreeSites":"true","specs.cookieConsent.CcpWixCookieBannerDeclineAll":"true","specs.cookieConsent.OverrideUoUConsentVersion":"false","specs.tagManagerNewSiteEmbedsService":"true","specs.cookieConsent.CcpHostsIntegration":"true","specs.cookieConsent.CcpML_MigrationUoU":"true","specs.cookieConsent.CcpLpIntegration":"true","specs.returnNonEssentialCustomEmbeds":"true"}}}';
+
+    // Override the open method of XMLHttpRequest to intercept all requests
+    var originalOpen = XMLHttpRequest.prototype.open;
+    var originalSend = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.open = function (method, url) {
+      this._url = url;
+      return originalOpen.apply(this, arguments);
+    };
+    XMLHttpRequest.prototype.send = function (body) {
+      if (this._url && isEvilRequest(this._url)) {
+        console.log('ignore evil request');
+      }
+      else {
+        originalSend.apply(this, arguments);
+      }
+    };
+
+  })();
+</script>
+
+
+<script type="text/javascript">
+  (function () {
+
+    // XMLHttpRequest.prototype.open = function (method, url) {
+    //   console.log("Intercepted HTTP request: " + method + " " + url);
+    //   if (isEvilRequest(url)) {
+    //     console.log('ignore evil request');
+    //     return;
+    //   }
+    //   else {
+    //     originalOpen.apply(this, arguments);
+    //   }
+    // };
+
+
+    // XMLHttpRequest = new Proxy(XMLHttpRequest, {
+    //   construct: function (target, args) {
+
+    //     console.log('fetch args', args);
+    //     if (args[0] && isEvilRequest(args[0])) {
+    //       console.log('evil request');
+    //     }
+    //     const xhr = new target(...args);
+    //     // Do whatever you want with XHR request
+    //     xhr.onreadystatechange = function () {
+    //       if (xhr.readyState === 1) {
+    //         // Before sent request to server
+    //         xhr.setRequestHeader("Authorization", "XXXX-XXXX-XXXX-XXXX");
+    //       }
+    //       if (xhr.readyState === 4) {
+    //         // After complition of XHR request
+    //         if (xhr.status === 401) {
+    //           alert("Session expired, please reload the page!");
+    //         }
+    //       }
+    //     };
+    //     return xhr;
+    //   },
+    // });
+
+    // window.fetch = new Proxy(window.fetch, {
+    //   apply: function (target, that, args) {
+    //     // args holds argument of fetch function
+    //     // Do whatever you want with fetch request
+    //     console.log('fetch args', args);
+    //     if (args[0] && isEvilRequest(args[0])) {
+    //       return new Promise((resolve) => {
+    //         resolve(response);
+    //       });
+    //     }
+    //     let temp = target.apply(that, args);
+    //     temp.then((res) => {
+    //       // After completion of request
+    //       if (res.status === 401) {
+    //         alert("Session expired, please reload the page!");
+    //       }
+    //     });
+    //     return temp;
+    //   }
+    // });
+
+  })();
+</script>

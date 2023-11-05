@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { getPage } from 'lib/pages/server';
 
 import { mixpanel } from './mixpanel';
@@ -17,7 +17,7 @@ export async function updateTrackPageProfile(pageId: string) {
   }
 }
 
-export function getTrackPageProfile(page: IPageWithPermissions) {
+export function getTrackPageProfile(page: PageWithPermissions) {
   const isPublic = page.permissions.some((p) => p.public);
 
   return {
@@ -27,6 +27,7 @@ export function getTrackPageProfile(page: IPageWithPermissions) {
     Type: page.type,
     Deleted: !!page.deletedAt,
     Public: isPublic,
+    'Space Id': page.spaceId,
     'Is Database': ['board', 'inline_board', 'inline_linked_board', 'linked_board'].includes(page.type),
     'Page Created By': page.createdBy,
     'Page Updated At': page.updatedAt

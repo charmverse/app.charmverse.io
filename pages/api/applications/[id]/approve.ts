@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Application } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,6 +11,8 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -37,7 +39,6 @@ async function approveUserApplication(req: NextApiRequest, res: NextApiResponse<
   }
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: application.bountyId,
     userId
   });
@@ -51,7 +52,17 @@ async function approveUserApplication(req: NextApiRequest, res: NextApiResponse<
     userId
   });
 
-  await rollupBountyStatus(approvedApplication.bountyId);
+  await publishBountyEvent({
+    applicationId: approvedApplication.id,
+    bountyId: approvedApplication.bountyId,
+    scope: WebhookEventNames.RewardApplicationApproved,
+    spaceId: application.bounty.spaceId
+  });
+
+  await rollupBountyStatus({
+    bountyId: approvedApplication.bountyId,
+    userId
+  });
   const { id: bountyId, rewardAmount, rewardToken, spaceId, page, customReward } = application.bounty;
   trackUserAction('bounty_application_accepted', {
     userId,

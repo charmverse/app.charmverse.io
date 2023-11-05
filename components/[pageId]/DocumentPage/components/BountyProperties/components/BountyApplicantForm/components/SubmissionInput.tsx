@@ -22,7 +22,7 @@ import type { AssignedBountyPermissions } from 'lib/bounties';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
 
-import BountyApplicantStatus from '../../BountyApplicantStatus';
+import { BountyApplicantStatus } from '../../BountyApplicantStatus';
 
 const schema = (customReward?: boolean) => {
   return yup.object({
@@ -83,8 +83,6 @@ export default function SubmissionInput({
   });
 
   const [formError, setFormError] = useState<SystemError | null>(null);
-
-  //  const defaultWalletAddress = submission.walletAddress ?? ;
 
   async function onSubmit(values: FormValues) {
     setFormError(null);
@@ -192,10 +190,7 @@ export default function SubmissionInput({
             )}
 
             {!readOnly && (
-              <Grid item display='flex' gap={1}>
-                <Button disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched} type='submit'>
-                  {submission?.submission ? 'Update' : 'Submit'}
-                </Button>
+              <Grid item display='flex' gap={1} justifyContent='flex-end'>
                 {!submission?.submission && !alwaysExpanded && (
                   <Button
                     onClick={() => {
@@ -207,6 +202,9 @@ export default function SubmissionInput({
                     Cancel
                   </Button>
                 )}
+                <Button disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched} type='submit'>
+                  {submission?.submission ? 'Update' : 'Submit'}
+                </Button>
               </Grid>
             )}
 

@@ -1,18 +1,16 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Bounty } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Typography, Box } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { PageActions } from 'components/common/PageActions';
+import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePage } from 'hooks/usePage';
-import type { PageMeta } from 'lib/pages';
-import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import BountyStatusBadge from './BountyStatusBadge';
+import { BountyStatusBadge } from './BountyStatusBadge';
 
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })};
@@ -39,17 +37,14 @@ interface Props {
   readOnly?: boolean;
   bounty: Bounty;
   page: PageMeta;
-  onDuplicate?: (duplicatePageResponse: DuplicatePageResponse) => void;
 }
 
-export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete, onDuplicate }: Props) {
+export function BountyGalleryCard({ page: bountyPage, bounty, readOnly, onClick, onDelete }: Props) {
   const { page } = usePage({ pageIdOrPath: bountyPage?.id });
 
   return bountyPage ? (
     <StyledBox onClick={onClick} className='GalleryCard' data-test={`bounty-card-${bounty.id}`}>
-      {!readOnly && (
-        <PageActions onDuplicate={onDuplicate} page={bountyPage} onClickDelete={() => onDelete(bounty.id)} />
-      )}
+      {!readOnly && <KanbanPageActionsMenuButton page={bountyPage} onClickDelete={() => onDelete(bountyPage.id)} />}
       <div className='gallery-title'>
         {bountyPage?.icon ? (
           <PageIcon isEditorEmpty={!bountyPage?.hasContent} pageType='card' icon={bountyPage.icon} />

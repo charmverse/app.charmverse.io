@@ -1,9 +1,9 @@
-import { prisma } from '@charmverse/core';
 import type { SpaceRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, InsecureOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
 
 import type { RoleAssignment } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';
@@ -23,6 +23,10 @@ export async function assignRole({ roleId, userId }: RoleAssignment) {
   }
 
   const role = await listRoleMembers({ roleId });
+
+  if (role?.source === 'summon') {
+    throw new UndesirableOperationError('Cannot assign role imported from summon');
+  }
 
   // User is already a member
   if (role.users.some((u) => u.id === userId)) {

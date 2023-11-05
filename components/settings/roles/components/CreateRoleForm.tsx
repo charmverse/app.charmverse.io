@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { useMembers } from 'hooks/useMembers';
 import type { ISystemError } from 'lib/utilities/errors';

@@ -18,7 +18,9 @@ type Context = {
   makeGuest: (userIds: string[]) => Promise<void>;
   makeMember: (userIds: string[]) => Promise<void>;
   removeFromSpace: (userId: string) => Promise<void>;
+  banFromSpace: (userId: string) => Promise<void>;
   isLoading: boolean;
+  isValidating: boolean;
   getMemberById: (id?: string | null) => Member | undefined;
 };
 
@@ -27,22 +29,25 @@ const MembersContext = createContext<Readonly<Context>>({
   membersRecord: {},
   guests: [],
   isLoading: false,
+  isValidating: false,
   mutateMembers: () => Promise.resolve(undefined),
   removeGuest: () => Promise.resolve(),
   makeAdmin: () => Promise.resolve(),
   makeGuest: () => Promise.resolve(),
   makeMember: () => Promise.resolve(),
   removeFromSpace: () => Promise.resolve(),
+  banFromSpace: () => Promise.resolve(),
   getMemberById: () => undefined
 });
 
 export function MembersProvider({ children }: { children: ReactNode }) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const {
     data: members,
     mutate: mutateMembers,
-    isLoading
+    isLoading,
+    isValidating
   } = useSWR(
     () => (space ? `members/${space?.id}` : null),
     () => {
@@ -106,6 +111,7 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       );
     }
   }
+
   async function removeFromSpace(userId: string) {
     if (!space) {
       throw new Error('Space not found');
@@ -114,9 +120,27 @@ export function MembersProvider({ children }: { children: ReactNode }) {
     mutateMembers((_members) => _members?.filter((c) => c.id !== userId), { revalidate: false });
   }
 
+  async function banFromSpace(userId: string) {
+    if (!space) {
+      throw new Error('Space not found');
+    }
+    await charmClient.members.banMember({ spaceId: space.id, userId });
+    mutateMembers((_members) => _members?.filter((c) => c.id !== userId), { revalidate: false });
+  }
+
   const value = useMemo(
     () => ({
-      members: members || [],
+      members:
+        members?.map((member) => ({
+          ...member,
+          roles: [
+            ...member.roles,
+            {
+              id: member.isAdmin ? 'admin' : member.isGuest ? 'guest' : 'member',
+              name: member.isAdmin ? 'Admin' : member.isGuest ? 'Guest' : 'Member'
+            }
+          ]
+        })) || [],
       membersRecord,
       guests: members?.filter((member) => member.isGuest) || [],
       mutateMembers,
@@ -126,7 +150,9 @@ export function MembersProvider({ children }: { children: ReactNode }) {
       removeGuest,
       removeFromSpace,
       isLoading,
-      getMemberById
+      isValidating,
+      getMemberById,
+      banFromSpace
     }),
     [members, membersRecord, getMemberById]
   );

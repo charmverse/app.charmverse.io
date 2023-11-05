@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
@@ -37,7 +37,7 @@ export async function getVotesByPage({
   });
 
   return pageVotes.map((pageVote) => {
-    const userVotes = pageVote.userVotes;
+    const userVotes = pageVote.userVotes?.filter((uv) => uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({
       userId,
       userVotes,

@@ -1,4 +1,4 @@
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/getNFTs';
 
 export interface UserAvatar {
   avatar: string | null;

@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -15,13 +16,17 @@ if (isTestEnv) {
 }
 
 async function register(req: NextApiRequest, res: NextApiResponse) {
-  const { address } = req.body;
-
+  const { address, userId } = req.body;
   let user: LoggedInUser;
 
   try {
-    user = await getUserProfile('addresses', address);
+    user = await (userId ? getUserProfile('id', userId) : getUserProfile('addresses', address));
   } catch {
+    if (!address) {
+      throw new InvalidInputError(
+        userId ? `User with id "${userId}" not found` : `Please provide a user wallet to create this account`
+      );
+    }
     user = await createUserFromWallet({ address });
     user.isNew = true;
   }

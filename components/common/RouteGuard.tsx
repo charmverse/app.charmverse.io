@@ -5,15 +5,17 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
-import { getKey } from 'hooks/useLocalStorage';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { isSpaceDomain } from 'lib/spaces/utils';
-
+import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
+import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/browser';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
 const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test'];
+// pages that should be always available to logged in users
+const publicLoggedInPages = ['createSpace'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -23,26 +25,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
-
-  if (typeof window !== 'undefined') {
-    const pathSegments: string[] = router.asPath
-      .split('?')[0]
-      .split('/')
-      .filter((segment) => !!segment);
-    const firstSegment: string = pathSegments[0];
-    const isDomain: boolean = !!isSpaceDomain(firstSegment);
-    const workspaceDomain = isDomain ? firstSegment : null;
-    const defaultPageKey: string = workspaceDomain ? getKey(`last-page-${workspaceDomain}`) : '';
-    const defaultWorkspaceKey: string = getKey('last-workspace');
-
-    if (workspaceDomain) {
-      localStorage.setItem(defaultWorkspaceKey, router.asPath);
-    }
-
-    if (workspaceDomain && pathSegments.length > 1) {
-      localStorage.setItem(defaultPageKey, router.asPath);
-    }
-  }
+  const spaceDomain = (router.query.domain as string) || '';
 
   useEffect(() => {
     // wait to listen to events until data is loaded
@@ -51,7 +34,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     }
 
     async function authCheckAndRedirect(path: string) {
-      const result = await authCheck(path);
+      const result = await authCheck(path, spaceDomain);
 
       setAuthorized(result.authorized);
 
@@ -67,10 +50,10 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     return () => {
       router.events.off('routeChangeComplete', authCheckAndRedirect);
     };
-  }, [isLoading, user, spaces]);
+  }, [isLoading, user, spaces, spaceDomain, router.query?.returnUrl]);
 
   // authCheck runs before each page load and redirects to login if user is not logged in
-  async function authCheck(url: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
+  async function authCheck(url: string, _spaceDomain: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
     const path = url.split('?')[0];
 
     const firstPathSegment =
@@ -78,28 +61,50 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         // Only get segments that evaluate to some value
         return pathElem;
       })[0] ?? '/';
-
-    const spaceDomain = path.split('/')[1];
+    const isPublicPath = publicPages.some((basePath) => firstPathSegment === basePath);
+    // special case, when visiting main app url on space subdomain
+    const isSpaceSubdomainPath = firstPathSegment === '/' && !!_spaceDomain;
+    // visiting page that shoould be alway available to logged in users
+    const isAvailableToLoggedInUsers = publicLoggedInPages.some((basePath) => firstPathSegment === basePath);
 
     // condition: public page
-    if (publicPages.some((basePath) => firstPathSegment === basePath) || hasSharedPageAccess) {
+    if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
       return { authorized: true };
     }
+
     // condition: no user session and no wallet address
     else if (!user) {
+      if (getCustomDomainFromHost()) {
+        // if app is running on a custom domain, main url will handle login
+        return { authorized: true };
+      }
+
+      // if app is running on a subdomain, redirect to main app login
+      if (shouldRedirectToAppLogin() && redirectToAppLogin()) {
+        return { authorized: false };
+      }
+
       log.info('[RouteGuard]: redirect to login');
-      return {
-        authorized: true,
-        redirect: {
-          pathname: '/',
-          query: { returnUrl: router.asPath }
-        }
-      };
+
+      // Don't return a redirect if we already have a return url
+      if (router.query.returnUrl) {
+        return {
+          authorized: true
+        };
+      } else {
+        return {
+          authorized: true,
+          redirect: {
+            pathname: '/',
+            query: { returnUrl: router.asPath }
+          }
+        };
+      }
     }
     // condition: trying to access a space without access
-    else if (isSpaceDomain(spaceDomain) && !spaces.some((s) => s.domain === spaceDomain)) {
+    else if (!isAvailableToLoggedInUsers && !!_spaceDomain && !filterSpaceByDomain(spaces, _spaceDomain)) {
       log.info('[RouteGuard]: send to join space page');
-      if (authorizedSpaceDomainRef.current === spaceDomain) {
+      if (authorizedSpaceDomainRef.current === _spaceDomain) {
         authorizedSpaceDomainRef.current = '';
         return {
           authorized: false,
@@ -113,11 +118,11 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         authorized: false,
         redirect: {
           pathname: '/join',
-          query: { domain: spaceDomain, returnUrl: router.asPath }
+          query: { domain: _spaceDomain, returnUrl: router.asPath }
         }
       };
     } else {
-      authorizedSpaceDomainRef.current = spaceDomain;
+      authorizedSpaceDomainRef.current = _spaceDomain;
       return { authorized: true };
     }
   }

@@ -1,18 +1,18 @@
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import type {
+  CardPage as ApiPage,
+  CardPageQuery,
   InvalidCustomPropertyKeyError,
   InvalidCustomPropertyValueError,
-  CardPage as ApiPage,
   PageProperty,
-  CardPageQuery,
   PaginatedQuery,
   PaginatedResponse,
   UnsupportedKeysError
 } from 'lib/public-api';
-import { createDatabase, createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
+import { createDatabase } from 'lib/public-api/createDatabase';
+import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { uniqueValues } from 'lib/utilities/array';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -336,7 +336,7 @@ describe('POST /databases/{id}/search', () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const statusSchema = exampleBoardSchema.find((schema) => schema.name === 'Status')!;
 
-    statusSchema.options.forEach((option) => {
+    statusSchema.options?.forEach((option) => {
       expect((response.body as InvalidCustomPropertyValueError).error.validOptions).toContain(option.value);
     });
   });

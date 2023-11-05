@@ -15,7 +15,7 @@ const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !==
   ${({ theme, type }) =>
     type && ['defaultMenu', 'inlineCommentSubMenu'].includes(type) && theme.breakpoints.down('sm')} {
     ${({ inline, theme }) => !inline && `width: calc(100vw - ${theme.spacing(1)})`};
-    margin: 0 ${({ theme }) => theme.spacing(0.5)};
+    margin: ${({ theme }) => theme.spacing(2, 0.5)};
     ${({ noScroll }) => (noScroll ? '' : 'overflow-x: auto')};
   }
 `;

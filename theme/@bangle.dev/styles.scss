@@ -10,10 +10,6 @@
   }
 }
 
-.bangle-editor a:not(.MuiTypography-root) {
-  text-decoration: underline;
-}
-
 .bangle-editor li[data-bangle-is-todo] > span:first-child > input {
   margin-top: 0.45rem;
 }
@@ -21,25 +17,6 @@
 .bangle-editor {
   border: none;
   outline: none;
-}
-
-.ProseMirror .tableWrapper {
-  overflow-x: auto;
-}
-
-.ProseMirror table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  overflow: hidden;
-}
-
-.ProseMirror td,
-.ProseMirror th {
-  vertical-align: top;
-  box-sizing: border-box;
-  position: relative;
-  background-color: var(--background-default);
 }
 
 /* Prevent iframes from stealing drag events - https://github.com/react-grid-layout/react-draggable/issues/613 */
@@ -83,30 +60,6 @@
 
 .ProseMirror {
   padding: 5px 0;
-}
-
-.ProseMirror table {
-  margin: 0 !important;
-}
-
-.ProseMirror th,
-.ProseMirror td {
-  min-width: 1em;
-  border: 1px solid #ddd;
-  padding: 3px 5px;
-}
-
-.ProseMirror th {
-  background-color: var(--bg-gray);
-}
-
-.ProseMirror .tableWrapper {
-  margin: 1em 0;
-}
-
-.ProseMirror th {
-  font-weight: bold;
-  text-align: left;
 }
 
 // @bangle.dev/core/style.css
@@ -177,13 +130,12 @@ img.ProseMirror-separator {
  * Component-Styling
  */
 
-// Making sure inline database header link doesn't have underlines
-.bangle-editor a:not(.MuiTypography-root) {
+.bangle-editor .charm-link {
   color: #4299e1;
   text-decoration: underline;
 }
 
-.bangle-editor a:hover:not(.MuiTypography-root) {
+.bangle-editor .charm-link:hover {
   color: #24659b;
   text-decoration: underline;
 }
@@ -274,13 +226,13 @@ img.ProseMirror-separator {
 
 // nested list styles
 ul li {
-  li {
+  ul li {
     list-style-type: circle;
 
-    li {
+    ul li {
       list-style-type: square;
 
-      li {
+      ul li {
         list-style-type: disc;
       }
     }
@@ -288,13 +240,13 @@ ul li {
 }
 
 ol li {
-  li {
+  ol li {
     list-style-type: lower-alpha;
 
-    li {
+    ol li {
       list-style-type: lower-roman;
 
-      li {
+      ol li {
         list-style-type: circle;
       }
     }
@@ -326,35 +278,18 @@ ol li {
   transition: background-color 150ms ease-in-out;
 }
 
-.bangle-nv-container {
+#Prosemirror-hovered-page-node {
+  background-color: var(--charmeditor-active);
   transition: background-color 150ms ease-in-out;
 }
 
-.bangle-editor li[data-bangle-is-todo] {
-  display: flex;
-  flex-direction: row;
-  position: relative;
-}
-
-.bangle-editor li[data-bangle-is-todo] > span:first-child {
-  margin-left: -1.5rem;
-}
-
-.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
-  margin-top: 0.5rem;
-  margin-right: 6px;
-  outline: none;
+.bangle-nv-container {
+  transition: background-color 150ms ease-in-out;
 }
 
 .bangle-editor > ol {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-}
-
-.bangle-editor ol {
-  list-style-type: decimal;
-  list-style-position: outside;
-  padding-left: 1.5rem;
 }
 
 .bangle-editor > p {
@@ -377,11 +312,11 @@ ol li {
 }
 
 /** Bullet List */
-.bangle-editor ul:not(.MuiList-root) {
-  list-style-type: disc;
-  list-style-position: outside;
-  padding-left: 1.5rem;
-}
+// .bangle-editor ul:not(.MuiList-root) {
+//   list-style-type: disc;
+//   list-style-position: outside;
+//   padding-left: 24px;
+// }
 
 .bangle-editor ul,
 .bangle-editor ol {
@@ -394,7 +329,7 @@ ol li {
   padding-left: 20px;
 
   & > :not(:first-child) {
-    display: none;
+    display: none !important; /** Add !important for lists or other elements that set display **/
   }
 
   &[open] {
@@ -403,7 +338,7 @@ ol li {
     }
 
     & > :not(:first-child) {
-      display: block;
+      display: block !important;
     }
   }
 
@@ -480,6 +415,12 @@ ol li {
   position: relative;
 }
 
+// add some space at bottom of editor so user can click to adding new rows
+.charm-empty-footer {
+  width: 100%;
+  height: 100px;
+}
+
 .empty-editor .row-handle {
   display: none;
 }
@@ -487,23 +428,24 @@ ol li {
 // handles on the side of each row
 .row-handle {
   display: initial;
-  left: 20px;
+  left: 0px;
   top: -1000px;
   position: absolute;
-  width: 30px;
+  width: 56px;
   height: 24px;
-  margin-top: 5px;
-  opacity: 0;
+  margin-top: 3px;
+  // opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.charm-drag-handle {
+  display: flex;
+  cursor: grab;
+  opacity: 0.5;
   transition: opacity 0.2s ease-in-out;
 
-  .charm-drag-handle {
-    cursor: grab;
-    opacity: 0.5;
-    transition: opacity 0.2s ease-in-out;
-
-    &:hover {
-      opacity: 1;
-    }
+  &:hover {
+    opacity: 1;
   }
 }
 
@@ -511,6 +453,19 @@ ol li {
   &:hover {
     .row-handle {
       opacity: 1;
+    }
+  }
+}
+
+.charm-column-row {
+  @media (max-width: 600px) {
+    flex-direction: column !important;
+
+    .charm-column {
+      flex: 1 1 auto !important;
+    }
+    .charm-column-resizer {
+      display: none;
     }
   }
 }
@@ -540,12 +495,133 @@ ol li {
 }
 
 /** placeholder **/
-.ProseMirror[data-placeholder]::before {
+.ProseMirror[data-placeholder]::before,
+.charm-placeholder::before  {
   display: block;
   height: 0;
-  color: var(--bg-gray);
+  color: var(--secondary-text);
   content: attr(data-placeholder);
+  opacity: 0.75;
   pointer-events: none;
   position: relative;
+}
+.ProseMirror[data-placeholder]::before  {
   top: 3px;
+}
+
+.readonly {
+  .charm-placeholder::before {
+    display: none;
+  }
+}
+
+
+/** Begin Resizable columns **/
+
+.charm-column {
+  border-radius: 4px;
+  padding: 8px 0;
+  position: relative;
+  overflow: hidden; // this is also set by the column-resizer library
+
+  &::before {
+    content: '';
+    opacity: 0.4;
+    transition: background-color 250ms ease-in-out;
+    border-radius: 2px;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    z-index: -1; // make the background appear behind children
+  }
+  &:hover::before {
+    background-color: var(--background-light);
+  }
+
+  & .bangle-nv-content p {
+    overflow-wrap: anywhere;
+  }
+}
+
+.charm-column-resizer {
+  cursor: col-resize;
+  position: relative;
+  flex: 0 0 50px; //  this is the bar width, also set by the column-resizer library
+  > div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -10px; // extend outside boundary to give more space to detect the cursor
+    right: -10px;
+    > div {
+      height: 100%;
+      width: 4px;
+      margin: 0 auto;
+      padding: 4px 0;
+    }
+    &:hover > div {
+      background-color: var(--input-border);
+    }
+  }
+}
+
+.read-only {
+  .charm-column > .bangle-nv-container:hover {
+    background-color: transparent;
+  }
+  .charm-column-resizer {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.bangle-editor-core.readonly {
+  p, h1, h2, h3, ul, ol, code, .tableScrollWrapper, .charm-column-row, .bangle-nv-container {
+    &:has(div.charm-row-decoration-suggestions) {
+      // important for column row, as it uses inline-styles
+      display: none !important;
+    }
+  }
+
+  // For NodeView blocks the decoration is adjacent to it
+  .bangle-nv-container:has(+ div.charm-row-decoration-suggestions) {
+    display: none;
+  }
+
+  div.charm-row-decoration-suggestions {
+    display: none;
+  }
+}
+
+/** End columns **/
+
+/** Tab **/
+.charm-tab {
+  tab-size: var(--tab-width);  // should equal list item padding
+
+  &[data-indent='1'] {
+    tab-size: calc(2 * var(--tab-width));
+  }
+  &[data-indent='2'] {
+    tab-size: calc(3 * var(--tab-width));
+  }
+  &[data-indent='3'] {
+    tab-size: calc(4 * var(--tab-width));
+  }
+  &[data-indent='4'] {
+    tab-size: calc(5 * var(--tab-width));
+  }
+  &[data-indent='5'] {
+    tab-size: calc(6 * var(--tab-width));
+  }
+  &[data-indent='6'] {
+    tab-size: calc(7 * var(--tab-width));
+  }
+}
+
+/** hide tab when a user suggested to delete a list item - it should not exist yet **/
+li .insertion > .charm-tab {
+  display: none;
 }

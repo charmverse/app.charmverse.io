@@ -1,17 +1,22 @@
-import type { CommunityDetails } from 'components/profile/components/CommunityRow';
-import type { DeepDaoProposal, DeepDaoVote } from 'lib/deepdao/interfaces';
+import type { ProfileProposalEvent, ProfileVoteEvent, ProfileBountyEvent, UserCommunity } from './interfaces';
 
-import type { ProfileBountyEvent, UserCommunity } from './interfaces';
+export type CommunityDetails = UserCommunity & {
+  votes: ProfileVoteEvent[];
+  bounties: ProfileBountyEvent[];
+  proposals: ProfileProposalEvent[];
+  joinDate: string;
+  latestEventDate?: string;
+};
 
 interface CommunitiesData {
   communities: UserCommunity[];
-  proposals: DeepDaoProposal[];
-  votes: DeepDaoVote[];
+  proposals: ProfileProposalEvent[];
+  votes: ProfileVoteEvent[];
   bounties: ProfileBountyEvent[];
 }
 
 export function combineCommunityData(params: CommunitiesData): CommunityDetails[] {
-  const { communities, proposals, votes, bounties } = params;
+  const { communities, bounties, votes } = params;
 
   const communityMap = communities.reduce<Record<string, CommunityDetails>>((acc, org) => {
     acc[org.id] = {
@@ -26,12 +31,12 @@ export function combineCommunityData(params: CommunitiesData): CommunityDetails[
     return acc;
   }, {});
 
-  proposals
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .forEach((event) => {
-      const organization = communityMap[event.organizationId];
-      organization?.proposals.push(event);
-    });
+  // proposals
+  //   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  //   .forEach((event) => {
+  //     const organization = communityMap[event.organizationId];
+  //     organization?.proposals.push(event);
+  //   });
 
   votes
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

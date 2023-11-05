@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
@@ -47,5 +47,5 @@ export async function castProposalVote({
     throw error;
   }
 
-  return castVoteService(choice, vote, userId);
+  return castVoteService([choice], vote, userId);
 }

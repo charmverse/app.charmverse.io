@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
@@ -8,7 +9,6 @@ import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import type { PageMeta } from 'lib/pages';
 
 const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
   top: ${({ card }) => (card ? '50px' : '55px')};
@@ -27,7 +27,7 @@ type Props = {
 };
 
 export function PageTemplateBanner({ pageType, parentId }: Props) {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;

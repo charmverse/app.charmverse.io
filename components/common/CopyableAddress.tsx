@@ -3,9 +3,8 @@ import Tooltip from '@mui/material/Tooltip';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { shortenHex } from 'lib/utilities/strings';
-
-import Button from './Button';
+import { Button } from 'components/common/Button';
+import { shortenHex } from 'lib/utilities/blockchain';
 
 const StyledButton = styled(Button)`
   color: inherit;

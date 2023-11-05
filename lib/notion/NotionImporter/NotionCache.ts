@@ -5,7 +5,7 @@ import { RateLimit } from 'async-sema';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
-import type { BlocksRecord, CreatePageInput } from '../types';
+import type { BlocksRecord, CreatePageInput, FailedImportsError } from '../types';
 
 export type RegularPageItem = {
   charmversePage?: Page;
@@ -34,15 +34,7 @@ export class NotionCache {
 
   pagesWithoutIntegrationAccess: Set<string> = new Set();
 
-  failedImportsRecord: Record<
-    string,
-    {
-      pageId: string;
-      type: 'page' | 'database';
-      title: string;
-      blocks: [string, string][];
-    }
-  > = {};
+  failedImportsRecord: Record<string, FailedImportsError> = {};
 
   // key: blockId, value: pageId
   blockPageIdRecord: Map<string, string> = new Map();

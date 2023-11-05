@@ -1,13 +1,14 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
-import { Divider, MenuItem, Typography, Box } from '@mui/material';
+import type { PageMeta } from '@charmverse/core/pages';
+import { MoreHoriz } from '@mui/icons-material';
+import { Divider, ListItemIcon, MenuItem, Typography, Box } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta } from 'lib/pages';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 import { sanitizeForRegex } from 'lib/utilities/strings';
 
@@ -27,6 +28,8 @@ export function MentionSuggest({ pluginKey }: { pluginKey: PluginKey<MentionPlug
   return null;
 }
 
+const DEFAULT_ITEM_LIMIT = 5;
+
 function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const { members } = useMembers();
   const view = useEditorViewContext();
@@ -41,46 +44,47 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
     [view, pluginKey]
   );
 
-  const triggerTextRegex = sanitizeForRegex(triggerText).toLowerCase();
-
-  const filterByUserCustomName = (member: Member) =>
-    member.properties
-      .find((prop) => prop.type === 'name')
-      ?.value?.toString()
-      .toLowerCase()
-      .match(triggerTextRegex);
-
-  const filterByDiscordName = (member: Member) =>
-    (member.profile?.social as Record<string, string>)?.discordUsername
-      ?.toString()
-      .toLowerCase()
-      .match(triggerTextRegex);
-
-  const filterByUsername = (member: Member) => member.username.toLowerCase().match(triggerTextRegex);
-
-  const filterByPath = (member: Member) => member.path?.toLowerCase().match(triggerTextRegex);
-
-  const filteredMembers =
-    triggerText.length !== 0
-      ? members.filter(
-          (member) =>
-            filterByUserCustomName(member) ||
-            filterByDiscordName(member) ||
-            filterByUsername(member) ||
-            filterByPath(member)
-        )
-      : members;
-
-  const filteredPages = Object.values(pages).filter(
-    (page) =>
-      page &&
-      page?.deletedAt === null &&
-      (triggerText.length !== 0 ? (page.title || 'Untitled').toLowerCase().startsWith(triggerText.toLowerCase()) : true)
+  const [showAllMembers, setShowAllMembers] = useState(false);
+  const [showAllPages, setShowAllPages] = useState(false);
+  const searchText = sanitizeForRegex(triggerText).toLowerCase();
+  const filteredMembers = useMemo(
+    () =>
+      searchText.length !== 0
+        ? members.filter(
+            (member) =>
+              filterByUserCustomName(member, searchText) ||
+              filterByDiscordName(member, searchText) ||
+              filterByUsername(member, searchText)
+          )
+        : members,
+    [members, searchText, searchText]
   );
+
+  const filteredPages = useMemo<PageMeta[]>(
+    () =>
+      Object.values(pages).filter(
+        (page) => page && !page.deletedAt && (!triggerText || page.title?.toLowerCase().startsWith(searchText))
+      ) as PageMeta[],
+    [pages, searchText]
+  );
+
+  const visibleFilteredMembers = showAllMembers ? filteredMembers : filteredMembers.slice(0, DEFAULT_ITEM_LIMIT);
+  const visibleFilteredPages = showAllPages ? filteredPages : filteredPages.slice(0, DEFAULT_ITEM_LIMIT);
   const totalItems = filteredMembers.length + filteredPages.length;
   const roundedCounter = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
   const selectedGroup = roundedCounter < filteredMembers.length ? 'members' : 'pages';
   const activeItemIndex = selectedGroup === 'members' ? roundedCounter : roundedCounter - filteredMembers.length;
+
+  function showAllMembersToggle() {
+    setShowAllMembers(true);
+  }
+
+  function showAllPagesToggle() {
+    setShowAllPages(true);
+  }
+
+  const hiddenPagesCount = filteredPages.length - DEFAULT_ITEM_LIMIT;
+  const hiddenMembersCount = filteredMembers.length - DEFAULT_ITEM_LIMIT;
 
   useEffect(() => {
     const activeDomElement = document.querySelector('.mention-selected') as HTMLDivElement;
@@ -88,6 +92,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
       safeScrollIntoViewIfNeeded(activeDomElement, true);
     }
   }, [activeItemIndex]);
+
   return (
     <PopoverMenu
       container={tooltipContentDOM}
@@ -110,7 +115,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
           </Typography>
         ) : (
           <div>
-            {filteredMembers.map((member, memberIndex) => {
+            {visibleFilteredMembers.map((member, memberIndex) => {
               const isSelected = selectedGroup === 'members' ? activeItemIndex === memberIndex : false;
               return (
                 <MenuItem
@@ -126,6 +131,9 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
                 </MenuItem>
               );
             })}
+            {!showAllMembers && hiddenMembersCount > 0 && (
+              <ShowMoreMenuItem onClick={showAllMembersToggle}>{hiddenMembersCount} more results</ShowMoreMenuItem>
+            )}
           </div>
         )}
         <Divider
@@ -133,15 +141,49 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
             my: 1
           }}
         />
-        <GroupLabel>Pages</GroupLabel>
+        <GroupLabel>Link to page</GroupLabel>
         <PagesList
           activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1}
-          pages={filteredPages as PageMeta[]}
+          pages={visibleFilteredPages}
           onSelectPage={(pageId) => onSelectMention(pageId, 'page')}
         />
+
+        {!showAllPages && hiddenPagesCount > 0 && (
+          <ShowMoreMenuItem onClick={showAllPagesToggle}>{hiddenPagesCount} more results</ShowMoreMenuItem>
+        )}
       </Box>
     </PopoverMenu>
   );
+}
+
+function ShowMoreMenuItem({ onClick, children }: { onClick: VoidFunction; children: React.ReactNode }) {
+  return (
+    <MenuItem component='div' onClick={onClick}>
+      <ListItemIcon>
+        <MoreHoriz color='secondary' />
+      </ListItemIcon>
+      <Typography color='secondary'>{children}</Typography>
+    </MenuItem>
+  );
+}
+
+function filterByUserCustomName(member: Member, searchText: string) {
+  return member.properties
+    .find((prop) => prop.type === 'name')
+    ?.value?.toString()
+    .toLowerCase()
+    .match(searchText);
+}
+
+function filterByDiscordName(member: Member, searchText: string) {
+  return (member.profile?.social as Record<string, string>)?.discordUsername
+    ?.toString()
+    .toLowerCase()
+    .match(searchText);
+}
+
+function filterByUsername(member: Member, searchText: string) {
+  return member.username.toLowerCase().match(searchText);
 }
 
 export default memo(MentionSuggest);

@@ -3,19 +3,28 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { votePageComment } from 'lib/pages/comments/votePageComment';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(commentVoteHandler);
+handler
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
+  .use(requireUser)
+  .put(commentVoteHandler);
 
 async function commentVoteHandler(req: NextApiRequest, res: NextApiResponse) {
   const { id: pageId, commentId } = req.query as any as { id: string; commentId: string };
   const userId = req.session.user.id;
   const { upvoted } = req.body;
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

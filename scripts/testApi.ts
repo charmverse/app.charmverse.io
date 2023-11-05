@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
 
-import fetch from 'adapters/http/fetch.server'
+import { GET } from '@charmverse/core/http';
 export {};
 
 // use this file and test api keys
 const apiDomain = 'https://app.charmverse.io';
 const apiKey = process.env.API_KEY;
 
-async function getBounties () {
+async function getBounties() {
   try {
-    const response = await fetch(`${apiDomain}/api/v1/bounties`, {
+    const response = await GET(`${apiDomain}/api/v1/bounties`, {
       headers: {
         Authorization: `Bearer ${apiKey}`
       }
@@ -29,16 +29,15 @@ async function testCreateSpace() {
         authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        "name": 'API Test space',
-        "adminWalletAddress": '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-        "avatar": "https://nftstorage.link/ipfs/bafybeidtbz346s5mpdklyyrq6czzpcf3unyytjm5aqqlndxq2welvcsxci",
-        "template": "nft_community"
+        name: 'API Test space',
+        adminWalletAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
+        avatar: 'https://nftstorage.link/ipfs/bafybeidtbz346s5mpdklyyrq6czzpcf3unyytjm5aqqlndxq2welvcsxci',
+        template: 'nft_community'
       })
     });
 
     console.log('🔥', res);
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
   }
 }

@@ -1,12 +1,17 @@
+import { NodeSelection } from '@bangle.dev/pm';
 import type { EditorView } from '@bangle.dev/pm';
-import { safeInsert } from '@bangle.dev/utils';
+import { safeInsert, GapCursorSelection } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
-import { TextSelection } from 'prosemirror-state';
 
 export const undoEventName = 'editor-undo';
 
-export function insertNode(state: EditorState, dispatch: ((tr: Transaction) => void) | undefined, nodeToInsert: Node) {
+export function insertNode(
+  state: EditorState,
+  dispatch: ((tr: Transaction) => void) | undefined,
+  nodeToInsert: Node,
+  inheritMarks = true
+) {
   const insertPos = state.selection.$from.after();
 
   const tr = state.tr;
@@ -24,9 +29,8 @@ export function insertNode(state: EditorState, dispatch: ((tr: Transaction) => v
 }
 
 export function isAtBeginningOfLine(state: EditorState) {
-  // @ts-ignore types package is missing $cursor property as of 1.2.8
-  const parentOffset = state.selection.$cursor?.parentOffset;
-  return parentOffset === 0;
+  const { empty, $from } = state.selection;
+  return empty && ($from.parentOffset === 0 || state.selection instanceof GapCursorSelection);
 }
 
 export const safeRequestAnimationFrame =
@@ -41,3 +45,10 @@ export const safeRequestAnimationFrame =
         (window as any).lastTime = currTime + timeToCall;
         return id;
       };
+export function enableDragAndDrop(view: EditorView, nodePos: number | undefined) {
+  if (typeof nodePos === 'number') {
+    view.dispatch(
+      view.state.tr.setMeta('row-handle-is-dragging', true).setSelection(NodeSelection.create(view.state.doc, nodePos))
+    );
+  }
+}

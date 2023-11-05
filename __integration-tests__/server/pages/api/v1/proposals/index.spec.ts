@@ -1,4 +1,3 @@
-import { prisma } from '@charmverse/core';
 import type {
   GoogleAccount,
   Page,
@@ -9,13 +8,16 @@ import type {
   User,
   UserWallet
 } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
+import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace, generateRole } from 'testing/setupDatabase';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 type ProposalWithDetails = Proposal & {
   page: Page;
@@ -37,6 +39,8 @@ let space: Space;
 let superApiKey: SuperApiToken;
 
 const proposalText = `This is an improvement idea`;
+
+const voteOptions = ['Yes', 'No', 'Abstain'];
 
 beforeAll(async () => {
   const generated = await generateUserAndSpace();
@@ -147,6 +151,24 @@ beforeAll(async () => {
     }
   })) as ProposalWithDetails;
 
+  await prisma.vote.create({
+    data: {
+      deadline: new Date(),
+      status: 'InProgress',
+      threshold: 20,
+      title: 'Test Vote',
+      context: 'proposal',
+      page: { connect: { id: proposal.page.id } },
+      author: { connect: { id: proposalAuthor.id } },
+      space: { connect: { id: space.id } },
+      voteOptions: {
+        createMany: {
+          data: voteOptions.map((opt) => ({ name: opt }))
+        }
+      }
+    }
+  });
+
   draftProposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
@@ -230,7 +252,7 @@ beforeAll(async () => {
 
 describe('GET /api/v1/proposals', () => {
   // This test needs to be fixed.
-  it('should return a list of proposals (except draft and private draft) in the space when called with an API key', async () => {
+  it('should return a list of proposals (except draft and private draft), along with vote options if they exist, in the space when called with an API key', async () => {
     const normalApiToken = await prisma.spaceApiToken.create({
       data: {
         token: v4(),
@@ -275,7 +297,8 @@ describe('GET /api/v1/proposals', () => {
 
         title: proposal.page.title,
         status: proposal.status,
-        url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`
+        url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
+        voteOptions
       })
     );
   });
@@ -385,5 +408,29 @@ describe('GET /api/v1/proposals', () => {
       .set({ authorization: `Bearer ${otherSuperApiKey.token}` })
       .send()
       .expect(401);
+  });
+
+  it('should not fail if an author has no google accounts or verified emails in their account', async () => {
+    const { space: secondSpace, user: secondSpaceUser } = await testUtilsUser.generateUserAndSpace();
+
+    const secondSpaceProposal = await testUtilsProposals.generateProposal({
+      spaceId: secondSpace.id,
+      userId: secondSpaceUser.id,
+      authors: [secondSpaceUser.id],
+      proposalStatus: 'discussion'
+    });
+
+    const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });
+
+    const response = (
+      await request(baseUrl)
+        .get(`/api/v1/proposals?spaceId=${secondSpace.id}`)
+        .set({ authorization: `Bearer ${otherSuperApiKey.token}` })
+        .send()
+        .expect(200)
+    ).body;
+
+    expect(response.length).toEqual(1);
+    expect(response[0].id).toBe(secondSpaceProposal.id);
   });
 });

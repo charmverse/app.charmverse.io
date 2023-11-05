@@ -13,7 +13,8 @@
     "airbnb",
     "plugin:@next/next/recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:storybook/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -44,6 +45,7 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/member-delimiter-style": [
       "error",
       {
@@ -173,7 +175,7 @@
     "react/self-closing-comp": "off",
     "react/state-in-constructor": "off",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "off",
+    "react-hooks/exhaustive-deps": "warn",
     "prefer-spread": "off",
     "no-bitwise": "warn",
     "no-undef": "off",
@@ -194,5 +196,14 @@
         "jsxSingleQuote": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      // ignore default export warning for next.js folder
+      "files": ["!pages"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    }
+  ]
 }

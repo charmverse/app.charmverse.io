@@ -1,17 +1,17 @@
-import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
-import { SpecRegistry } from '@bangle.dev/core';
+import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
 
+import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
 import * as bulletList from './components/bulletList';
-import * as callout from './components/callout';
-import * as columnLayout from './components/columnLayout';
+import * as callout from './components/callout/callout';
+import * as columnLayout from './components/columnLayout/columnLayout.schema';
 import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
-import * as doc from './components/doc';
-import * as emoji from './components/emojiSuggest';
+import * as doc from './components/doc/doc';
+import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import { specs as fileSpecs } from './components/file/file.specs';
 import * as heading from './components/heading';
@@ -22,22 +22,28 @@ import * as inlineDatabase from './components/inlineDatabase';
 import { spec as inlinePaletteSpecs } from './components/inlinePalette';
 import * as inlineVote from './components/inlineVote';
 import { spec as linkSpec } from './components/link/link.specs';
+import { linkedPageSpec } from './components/linkedPage/linkedPage.specs';
 import * as listItem from './components/listItem/listItem';
+import { spec as bulletListItemSpec } from './components/listItemNew/bulletListSpecs';
+import { spec as listItemSpec } from './components/listItemNew/listItemSpecs';
+import { spec as markSpec } from './components/listItemNew/markSpec';
+import { spec as orderedListItemSpec } from './components/listItemNew/orderedListSpecs';
 import { mentionSpecs } from './components/mention';
 import { nestedPageSpec } from './components/nestedPage';
-import * as nft from './components/nft/nftSpec';
+import * as nft from './components/nft/nft.specs';
 import * as orderedList from './components/orderedList';
-import paragraph from './components/paragraph';
+import { spec as paragraphSpec } from './components/paragraph/paragraph';
 import * as poll from './components/poll/pollSpec';
-import * as quote from './components/quote';
+import * as quote from './components/quote/quote';
 import * as image from './components/ResizableImage';
 import { pdfSpec } from './components/ResizablePDF';
 import * as tabIndent from './components/tabIndent';
-import * as table from './components/table';
+import { spec as tableSpec } from './components/table/table.schema';
 import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
+import { hardBreakSpec } from './specs/hardBreakSpec';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -52,17 +58,21 @@ export const specRegistry = new SpecRegistry([
   //
   doc.spec(), // OK
   // MAKE SURE THIS IS ALWAYS AT THE TOP! Or deleting all contents will leave the wrong component in the editor
-  paragraph.spec(), // OK
+  paragraphSpec(), // OK
   mentionSpecs(), // NO
   inlineVote.spec(),
   bold.spec(), // OK
-  bulletList.spec(), // OK
-  hardBreak.spec(), // OK
+  hardBreakSpec(), // OK
   horizontalRule.spec(), // OK
   italic.spec(), // OK
   linkSpec(), // OK
+  bulletList.spec(), // OK
+  bulletListItemSpec(), // Note that bullets should appear first, so drag/drop and copy/paste prefers bullet lists, since the type is not carried over
   listItem.spec(), // OK
   orderedList.spec(), // OK
+  orderedListItemSpec(),
+  listItemSpec(),
+  markSpec(),
   strike.spec(), // OK
   underline.spec(), // OK
   emoji.specs(), // OK
@@ -76,12 +86,12 @@ export const specRegistry = new SpecRegistry([
   cryptoPriceSpec(), // NO
   pdfSpec(), // NO
   image.spec(), // OK
-  columnLayout.rowSpec(), // NO
-  columnLayout.columnSpec(), // NO
+  columnLayout.spec(), // NO
   nestedPageSpec(), // NO
+  linkedPageSpec(),
   quote.spec(), // OK
   tabIndent.spec(),
-  table.spec(), // OK - only for text content
+  tableSpec(), // OK - only for text content
   disclosure.spec(),
   inlineDatabase.spec(),
   deletion,

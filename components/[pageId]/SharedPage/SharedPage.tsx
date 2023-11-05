@@ -1,6 +1,7 @@
+import { Box } from '@mui/material';
 import { useEffect } from 'react';
 
-import charmClient from 'charmClient';
+import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
@@ -9,8 +10,9 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useBounties } from 'hooks/useBounties';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -24,29 +26,27 @@ export function SharedPage({ publicPage }: Props) {
   const { setCurrentPageId } = useCurrentPage();
   const { pages } = usePages();
   const [, setTitleState] = usePageTitle();
+  const { space } = useCurrentSpace();
 
   const basePageId = publicPage?.page?.id || '';
 
-  const { setBounties, loadingBounties } = useBounties();
+  const { isLoading: isLoadingRewards, mutateRewards: refreshRewards } = useRewards();
 
   // Pre-populate bounties state in place of prop drilling
   useEffect(() => {
-    if (publicPage?.bounty && !loadingBounties) {
-      setBounties([publicPage.bounty]);
+    if (publicPage?.bounty && !isLoadingRewards) {
+      refreshRewards([publicPage.bounty]);
     }
-  }, [publicPage, loadingBounties]);
+  }, [publicPage, isLoadingRewards]);
 
-  async function onLoad() {
-    if (!publicPage) {
-      return;
-    }
+  async function onLoad(_publicPage: PublicPageResponse) {
+    const { page: rootPage, cards, boards, views } = _publicPage;
 
-    const { page: rootPage, cards, boards, views } = publicPage;
-
-    charmClient.track.trackAction('page_view', {
+    trackPageView({
       type: rootPage.type,
       pageId: rootPage.id,
-      spaceId: rootPage.spaceId
+      spaceId: rootPage.spaceId,
+      spaceDomain: space?.domain
     });
 
     setTitleState(rootPage.title);
@@ -66,15 +66,15 @@ export function SharedPage({ publicPage }: Props) {
 
   useEffect(() => {
     if (publicPage) {
-      onLoad();
+      onLoad(publicPage);
     }
 
     return () => {
       setCurrentPageId('');
     };
-  }, [publicPage]);
+  }, [publicPage?.page.id]);
 
-  const currentPage = pages?.[basePageId];
+  const currentPage = publicPage?.page ?? pages?.[basePageId];
 
   if (!currentPage && publicPage) {
     return <LoadingComponent isLoading />;
@@ -87,6 +87,13 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
   ) : (
-    <DocumentPage page={publicPage.page} refreshPage={() => Promise.resolve()} savePage={() => null} readOnly={true} />
+    <Box sx={{ overflowY: 'auto' }}>
+      <DocumentPage
+        page={publicPage.page}
+        refreshPage={() => Promise.resolve()}
+        savePage={() => null}
+        readOnly={true}
+      />
+    </Box>
   );
 }

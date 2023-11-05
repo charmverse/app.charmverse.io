@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
@@ -18,7 +19,6 @@ import charmClient from 'charmClient';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import type { PageMeta } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 enum ResultType {
@@ -106,7 +106,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const { close, isOpen } = props;
   const router = useRouter();
   const { pages } = usePages();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const [expandPageList, setExpandPageList] = useState(false);
   const [options, setOptions] = useState<SearchResultItem[]>([]);
 

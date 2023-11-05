@@ -11,6 +11,7 @@ import { v4 } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
+import { relay } from 'lib/websockets/relay';
 
 import { convertPropertyType } from '../convertPropertyType';
 import type { BlocksRecord, ChildBlockListResponse } from '../types';
@@ -91,7 +92,15 @@ export class NotionPage {
           cache: this.cache,
           notionPage: this
         });
-        return charmversePage.create();
+        const page = await charmversePage.create();
+        relay.broadcast(
+          {
+            type: 'pages_created',
+            payload: [page]
+          },
+          this.spaceId
+        );
+        return page;
       } else {
         const pageRecord = this.cache.pagesRecord.get(notionPageId) as DatabasePageItem;
 
@@ -108,7 +117,17 @@ export class NotionPage {
           notionPage: this
         });
 
-        return charmverseDatabasePage.create();
+        const databasePage = await charmverseDatabasePage.create();
+
+        relay.broadcast(
+          {
+            type: 'pages_created',
+            payload: [databasePage]
+          },
+          this.spaceId
+        );
+
+        return databasePage;
       }
     } catch (err: any) {
       if (err.code === 'object_not_found') {

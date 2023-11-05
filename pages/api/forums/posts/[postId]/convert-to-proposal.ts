@@ -1,12 +1,12 @@
-import { prisma } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { PageMeta } from 'lib/pages';
-import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
@@ -15,6 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(providePermissionClients({ key: 'categoryId', location: 'body', resourceIdType: 'proposalCategory' }))
   .use(requireKeys(['categoryId'], 'body'))
   .post(convertToProposal);
 
@@ -51,7 +52,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
 
   const categoryId = req.body.categoryId;
 
-  const permissions = await computeProposalCategoryPermissions({
+  const permissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
     resourceId: categoryId,
     userId
   });

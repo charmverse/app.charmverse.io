@@ -1,5 +1,6 @@
 import { Box, Chip } from '@mui/material';
 
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import { conditionalPlural } from 'lib/utilities/strings';
 
@@ -13,9 +14,7 @@ export default function BountySlots({ maxSubmissions, validSubmissions }: Bounty
 
   return (
     <Box display='flex' alignItems='center' gap={2}>
-      <div className='octo-propertyname octo-propertyname--readonly'>
-        <Button>Submission limit</Button>
-      </div>
+      <PropertyLabel readOnly>Submission limit</PropertyLabel>
 
       <Box display='flex' alignItems='center'>
         {remainingSlots <= 0 ? (

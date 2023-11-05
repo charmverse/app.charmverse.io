@@ -1,28 +1,39 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@charmverse/core';
+import type { Role, Space, User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
+import type { RoleAssignment } from 'lib/roles';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/roles/assignment - Assign a user to a role', () => {
-  it('should succeed if the requesting user is a space admin, and respond 201', async () => {
-    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const extraUser = await generateSpaceUser({
+  let space: Space;
+  let adminUser: User;
+  let nonAdminUser: User;
+  let role: Role;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    space = generated.space;
+    adminUser = generated.user;
+    nonAdminUser = await testUtilsUser.generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
     });
-
-    const role = await generateRole({
+    role = await testUtilsMembers.generateRole({
       createdBy: adminUser.id,
       spaceId: space.id
     });
+  });
 
+  it('should succeed if the requesting user is a space admin, and respond 201', async () => {
     const roleAssignment: RoleAssignment = {
       roleId: role.id,
-      userId: extraUser.id
+      userId: nonAdminUser.id
     };
 
     const adminCookie = await loginUser(adminUser.id);
@@ -33,7 +44,7 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
       where: {
         roleId: role.id,
         spaceRole: {
-          userId: extraUser.id
+          userId: nonAdminUser.id
         }
       }
     });
@@ -41,20 +52,9 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {
-    const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const extraUser = await generateSpaceUser({
-      spaceId: space.id,
-      isAdmin: false
-    });
-
-    const role = await generateRole({
-      createdBy: nonAdminUser.id,
-      spaceId: space.id
-    });
-
     const roleAssignment: RoleAssignment = {
       roleId: role.id,
-      userId: extraUser.id
+      userId: nonAdminUser.id
     };
 
     const nonAdminCookie = await loginUser(nonAdminUser.id);
@@ -64,33 +64,41 @@ describe('POST /api/roles/assignment - Assign a user to a role', () => {
 });
 
 describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
-  it('should succeed if the requesting user is a space admin, and respond 200', async () => {
-    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const extraUser = await generateSpaceUser({
+  let space: Space;
+  let adminUser: User;
+  let nonAdminUser: User;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    space = generated.space;
+    adminUser = generated.user;
+    nonAdminUser = await testUtilsUser.generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
     });
-
-    const role = await generateRole({
+  });
+  it('should succeed if the requesting user is a space admin, and respond 200', async () => {
+    const role = await testUtilsMembers.generateRole({
       createdBy: adminUser.id,
-      spaceId: space.id
+      spaceId: space.id,
+      assigneeUserIds: [nonAdminUser.id]
     });
 
     const roleAssignment: RoleAssignment = {
       roleId: role.id,
-      userId: extraUser.id
+      userId: nonAdminUser.id
     };
-
-    await assignRole(roleAssignment);
 
     const adminCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).send(roleAssignment).expect(200);
+    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', adminCookie).query(roleAssignment).expect(200);
     const userRoleRecord = await prisma.spaceRoleToRole.count({
       where: {
         roleId: role.id,
         spaceRole: {
-          userId: extraUser.id
+          userId: nonAdminUser.id
         }
       }
     });
@@ -98,28 +106,19 @@ describe('DELETE /api/roles/assignment - Unassign a user from a role', () => {
   });
 
   it('should fail if the requesting user is not a space admin, and respond 401', async () => {
-    const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const extraUser = await generateSpaceUser({
+    const role = await testUtilsMembers.generateRole({
+      createdBy: adminUser.id,
       spaceId: space.id,
-      isAdmin: false
-    });
-
-    const role = await generateRole({
-      createdBy: nonAdminUser.id,
-      spaceId: space.id
+      assigneeUserIds: [nonAdminUser.id]
     });
 
     const roleAssignment: RoleAssignment = {
       roleId: role.id,
-      userId: extraUser.id
+      userId: nonAdminUser.id
     };
 
-    const nonAdminCookie = await loginUser(nonAdminUser.id);
+    const userCookie = await loginUser(nonAdminUser.id);
 
-    await request(baseUrl)
-      .delete('/api/roles/assignment')
-      .set('Cookie', nonAdminCookie)
-      .send(roleAssignment)
-      .expect(401);
+    await request(baseUrl).delete('/api/roles/assignment').set('Cookie', userCookie).query(roleAssignment).expect(401);
   });
 });

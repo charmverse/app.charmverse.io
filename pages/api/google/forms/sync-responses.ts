@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { GaxiosError } from 'gaxios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

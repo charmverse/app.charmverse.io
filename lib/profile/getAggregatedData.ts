@@ -1,32 +1,18 @@
-import { prisma } from '@charmverse/core';
-
-import type { CommunityDetails } from 'components/profile/components/CommunityRow';
-import type { DeepDaoProfile, DeepDaoVote } from 'lib/deepdao/interfaces';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { combineCommunityData } from './combineCommunityData';
-import { getOrgs } from './getOrgs';
-import type { ProfileBountyEvent } from './interfaces';
+import { getUserSpaces } from './getUserSpaces';
+import type { CommunityDetails, DeepDaoProfile, ProfileVoteEvent, ProfileBountyEvent } from './interfaces';
 
 export type AggregatedProfileData = Pick<DeepDaoProfile, 'totalProposals' | 'totalVotes'> & {
   bounties: number;
   communities: CommunityDetails[];
 };
 
-export async function getAggregatedData(userId: string, apiToken?: string): Promise<AggregatedProfileData> {
-  const { charmverseCommunities, deepdaoCommunities, profiles } = await getOrgs({
-    userId,
-    apiToken
+export async function getAggregatedData(userId: string): Promise<AggregatedProfileData> {
+  const charmverseCommunities = await getUserSpaces({
+    userId
   });
-
-  const proposals = profiles
-    .map((profile) =>
-      profile.data.proposals.map((proposal) => ({
-        ...proposal,
-        // sometimes the title includes the whole body of the proposal with "&&" as a separator
-        title: proposal.title?.split('&&')[0]
-      }))
-    )
-    .flat();
 
   const [bountiesCreated, bountyApplications, userProposalsCount] = await Promise.all([
     prisma.bounty.findMany({
@@ -58,10 +44,7 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
       where: {
         page: {
           deletedAt: null,
-          type: 'proposal',
-          snapshotProposalId: {
-            notIn: proposals.map((prop) => prop.proposalId)
-          }
+          type: 'proposal'
         },
         authors: {
           some: {
@@ -97,7 +80,8 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
         }
       },
       spaceId: true,
-      description: true,
+      content: true,
+      contentText: true,
       title: true,
       id: true,
       createdAt: true,
@@ -106,7 +90,7 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
           userId
         },
         select: {
-          choice: true
+          choices: true
         }
       },
       deadline: true,
@@ -116,24 +100,17 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
       status: true
     }
   });
-
-  const communities = [...deepdaoCommunities, ...charmverseCommunities];
-
-  const votes = [
-    // Deepdao votes
-    ...profiles.reduce<DeepDaoProfile['votes']>((_votes, profile) => [..._votes, ...profile.data.votes], []),
-    ...userVotes.map(
-      (vote) =>
-        ({
-          createdAt: vote.createdAt.toString(),
-          description: vote.description ?? '',
-          organizationId: vote.spaceId,
-          title: vote.title || vote.page?.title,
-          voteId: vote.id,
-          successful: vote.status === 'Passed'
-        } as DeepDaoVote)
-    )
-  ];
+  const votes = userVotes.map(
+    (vote) =>
+      ({
+        createdAt: vote.createdAt.toString(),
+        description: vote.contentText ?? '',
+        organizationId: vote.spaceId,
+        title: vote.title || vote.page?.title,
+        voteId: vote.id,
+        successful: vote.status === 'Passed'
+      } as ProfileVoteEvent)
+  );
 
   const bounties: ProfileBountyEvent[] = [
     ...bountiesCreated.map(
@@ -159,16 +136,16 @@ export async function getAggregatedData(userId: string, apiToken?: string): Prom
   ];
 
   const sortedCommunities = combineCommunityData({
-    communities,
+    communities: charmverseCommunities,
     bounties,
-    proposals,
+    proposals: [], // TODO: proposals from CharmVerse
     votes
   });
 
   return {
     communities: sortedCommunities,
-    totalProposals: profiles.reduce((acc, profile) => acc + profile.data.totalProposals, 0) + userProposalsCount,
-    totalVotes: profiles.reduce((acc, profile) => acc + profile.data.totalVotes, 0) + userVotes.length,
+    totalProposals: userProposalsCount,
+    totalVotes: userVotes.length,
     bounties: completedApplications.length
   };
 }

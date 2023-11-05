@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 
@@ -10,8 +10,11 @@ export async function removeSpaceMemberDiscord({
   discordServerId: string;
 }) {
   const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
+  if (!spacesData) {
+    return;
+  }
 
-  return Promise.allSettled(
+  await Promise.allSettled(
     spacesData.map(({ space, user }) =>
       prisma.spaceRole.delete({
         where: {
@@ -23,4 +26,6 @@ export async function removeSpaceMemberDiscord({
       })
     )
   );
+
+  return { spaceIds: spacesData.map(({ space }) => space.id), userId: spacesData[0].user.id };
 }

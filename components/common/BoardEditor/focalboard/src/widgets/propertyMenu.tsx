@@ -1,17 +1,14 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { ListItemIcon, Menu, MenuItem, TextField, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { ListItemIcon, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useRef, useState } from 'react';
-import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
-import { Utils } from '../utils';
-
 import { PropertyTypes } from './propertyTypes';
+import { typeDisplayName } from './typeDisplayName';
 
 type Props = {
   onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
@@ -19,62 +16,6 @@ type Props = {
   deleteDisabled?: boolean;
   property: IPropertyTemplate;
 };
-
-export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
-  switch (type) {
-    case 'text':
-      return intl.formatMessage({ id: 'PropertyType.Text', defaultMessage: 'Text' });
-    case 'number':
-      return intl.formatMessage({ id: 'PropertyType.Number', defaultMessage: 'Number' });
-    case 'select':
-      return intl.formatMessage({ id: 'PropertyType.Select', defaultMessage: 'Select' });
-    case 'multiSelect':
-      return intl.formatMessage({ id: 'PropertyType.MultiSelect', defaultMessage: 'Multi Select' });
-    case 'person':
-      return intl.formatMessage({ id: 'PropertyType.Person', defaultMessage: 'Person' });
-    case 'file':
-      return intl.formatMessage({ id: 'PropertyType.File', defaultMessage: 'File or Media' });
-    case 'checkbox':
-      return intl.formatMessage({ id: 'PropertyType.Toggle', defaultMessage: 'Toggle' });
-    case 'url':
-      return intl.formatMessage({ id: 'PropertyType.URL', defaultMessage: 'URL' });
-    case 'email':
-      return intl.formatMessage({ id: 'PropertyType.Email', defaultMessage: 'Email' });
-    case 'phone':
-      return intl.formatMessage({ id: 'PropertyType.Phone', defaultMessage: 'Phone' });
-    case 'createdTime':
-      return intl.formatMessage({ id: 'PropertyType.CreatedTime', defaultMessage: 'Created time' });
-    case 'createdBy':
-      return intl.formatMessage({ id: 'PropertyType.CreatedBy', defaultMessage: 'Created by' });
-    case 'updatedTime':
-      return intl.formatMessage({ id: 'PropertyType.UpdatedTime', defaultMessage: 'Last updated time' });
-    case 'updatedBy':
-      return intl.formatMessage({ id: 'PropertyType.UpdatedBy', defaultMessage: 'Last updated by' });
-    case 'date':
-      return intl.formatMessage({ id: 'PropertyType.Date', defaultMessage: 'Date' });
-    default: {
-      Utils.assertFailure(`typeDisplayName, unhandled type: ${type}`);
-      return type;
-    }
-  }
-}
-
-export const propertyTypesList: PropertyType[] = [
-  'text',
-  'number',
-  'email',
-  'phone',
-  'url',
-  'select',
-  'multiSelect',
-  'date',
-  'person',
-  'checkbox',
-  'createdTime',
-  'createdBy',
-  'updatedTime',
-  'updatedBy'
-];
 
 const PropertyMenu = React.memo((props: Props) => {
   const nameTextbox = useRef<HTMLInputElement>(null);

@@ -1,35 +1,29 @@
-import { prisma } from '@charmverse/core';
-import { customAlphabet } from 'nanoid';
-import fs from 'node:fs/promises';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import * as opts from 'nanoid-dictionary';
-console.log(opts)
-function uid( ) {
-  return Math.round(Date.now() + Math.random() * 1000).toString(36)
-}
-function uid2 () {
-  return customAlphabet(opts.lowercase + opts.numbers, 8)();
-}
+/**
+
+  userId: cb9a5ede-6ff7-4eaa-9c23-91e684e23aed
+  spaceId: 33918abc-f753-4a3d-858d-63c3fa36fa15
+
+  kameil userId: f7d47848-f993-4d16-8008-e1f5b23b8ad3 or 356af4f7-cbd1-4350-b046-9f55da500fec
+*/
+
 /**
  * Use this script to perform database searches.
  */
 
 async function search() {
-  const page = await prisma.page.findFirst({
+
+  const acc = await prisma.user.findMany({
     where: {
-      path: `page-12890905063646585`
-    },
-    include: {
-      author: true,
-      diffs: {
-        orderBy: {
-          version: 'asc'
-        }
-      }
+      username: {
+        contains: '0x036'
+      } 
     }
   })
 
-  await fs.writeFile(`${__dirname}/out.json`, JSON.stringify(page, null, 2))
+
+  console.log(JSON.stringify({acc}, null, 2))
 }
 
 search().then(() => console.log('Done'));

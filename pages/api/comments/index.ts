@@ -1,4 +1,5 @@
-import { prisma } from '@charmverse/core';
+import { PageNotFoundError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,9 +7,12 @@ import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages/page-permission-compute';
+import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,10 +36,26 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     throw new DataNotFoundError(`Thread with id ${threadId} not found`);
   }
 
-  const permissionSet = await computeUserPagePermissions({
-    resourceId: thread.pageId,
-    userId
+  const pageId = thread.pageId;
+
+  const page = await prisma.page.findUnique({
+    where: { id: pageId },
+    select: { spaceId: true, createdBy: true, type: true, bountyId: true, proposalId: true, cardId: true, id: true }
   });
+
+  if (!page) {
+    throw new PageNotFoundError(pageId);
+  }
+
+  const permissionSet = await getPermissionsClient({
+    resourceId: thread.pageId,
+    resourceIdType: 'page'
+  }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: thread.pageId,
+      userId
+    })
+  );
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();
@@ -47,11 +67,29 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     content
   });
 
+  await publishDocumentEvent({
+    documentId: page.id,
+    scope: WebhookEventNames.DocumentInlineCommentCreated,
+    inlineCommentId: createdComment.id,
+    spaceId: page.spaceId
+  });
+
   trackUserAction('page_comment_created', {
     pageId: thread.pageId,
     userId,
     spaceId: thread.spaceId
   });
+
+  relay.broadcast(
+    {
+      type: 'threads_updated',
+      payload: {
+        pageId: thread.pageId,
+        threadId
+      }
+    },
+    thread.spaceId
+  );
 
   return res.status(201).json(createdComment);
 }

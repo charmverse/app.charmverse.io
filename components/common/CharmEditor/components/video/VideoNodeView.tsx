@@ -8,6 +8,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
+import { enableDragAndDrop } from '../../utils';
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -32,10 +33,11 @@ export function VideoNodeView({
   view,
   selected,
   updateAttrs,
-  isPost = false
-}: CharmNodeViewProps & { isPost?: boolean }) {
+  isPost = false,
+  isPollOrVote = false
+}: CharmNodeViewProps & { isPost?: boolean; isPollOrVote?: boolean }) {
   const attrs = node.attrs as VideoNodeAttrs;
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
 
   // poll endpoint until video is ready
@@ -64,7 +66,7 @@ export function VideoNodeView({
 
   // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxAssetId) {
-    if (readOnly || (!pageId && !isPost)) {
+    if (readOnly || (!pageId && !isPost && !isPollOrVote)) {
       // hide the row completely
       return <div />;
     } else {
@@ -87,6 +89,7 @@ export function VideoNodeView({
                     const embedType = extractIframeEmbedType(videoUrl);
                     if (embedType) {
                       const pos = getPos();
+                      if (!pos) return;
                       const newConfig = embeds[embedType] as Embed;
                       const width = attrs.width;
                       let height = width / VIDEO_ASPECT_RATIO;
@@ -123,13 +126,23 @@ export function VideoNodeView({
   if (attrs.muxAssetId) {
     if (playbackIdWithToken) {
       return (
-        <BlockAligner readOnly={readOnly} onDelete={deleteNode}>
+        <BlockAligner
+          readOnly={readOnly}
+          onDelete={deleteNode}
+          onDragStart={() => {
+            const pos = getPos();
+            if (typeof pos === 'number') {
+              enableDragAndDrop(view, pos);
+            }
+          }}
+        >
           <MuxVideo
+            playsInline
             style={{ height: '100%', maxWidth: '100%', width: '100%' }}
             playbackId={playbackIdWithToken} // asset.playbackId includes signed token
             // for analytics
             metadata={{
-              page_id: pageId
+              custom_1: pageId
               // video_id: 'video-id-123456'
               // video_title: 'Super Interesting Video',
               // viewer_user_id: 'user-id-bc-789'
@@ -146,6 +159,12 @@ export function VideoNodeView({
     const embedUrl = (attrs.src && extractYoutubeEmbedLink(attrs.src)) || attrs.src;
     return (
       <Resizable
+        onDragStart={() => {
+          const pos = getPos();
+          if (typeof pos === 'number') {
+            enableDragAndDrop(view, pos);
+          }
+        }}
         readOnly={readOnly}
         aspectRatio={VIDEO_ASPECT_RATIO}
         initialSize={attrs.width}

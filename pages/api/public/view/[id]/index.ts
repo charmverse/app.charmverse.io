@@ -1,20 +1,27 @@
-import { prisma } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
-import { Prisma, Block } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { onError, onNoMatch } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getPageByBlockViewId);
+handler
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
+  .get(getPageByBlockViewId);
 
 async function getPageByBlockViewId(req: NextApiRequest, res: NextApiResponse<Page>) {
-  const { id } = req.query;
+  const { id } = req.query as { id: string };
 
   const view = await prisma.block.findFirst({
     where: {
@@ -27,9 +34,8 @@ async function getPageByBlockViewId(req: NextApiRequest, res: NextApiResponse<Pa
     return res.status(400).json({ error: 'No such view exists' } as any);
   }
 
-  const computed = await computeUserPagePermissions({
-    resourceId: id as string,
-    userId: req.session?.user?.id
+  const computed = await req.basePermissionsClient.pages.computePagePermissions({
+    resourceId: id
   });
 
   if (computed.read !== true) {

@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { FavoritePage } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -14,14 +14,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .put(updateFavoritePagesHandler)
+  .delete(unFavoritePage)
   .use((req, res, next) => {
     if (!req.body.pageId) {
       return res.status(400).json({ error: 'pageId is required' });
     }
     next();
   })
-  .post(addFavoritePage)
-  .delete(unFavoritePage);
+  .post(addFavoritePage);
 
 async function addFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
   const pageId = req.body.pageId as string;
@@ -50,7 +50,8 @@ async function addFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial
 }
 
 async function unFavoritePage(req: NextApiRequest, res: NextApiResponse<Partial<LoggedInUser> | { error: any }>) {
-  const pageId = req.body.pageId as string;
+  // remove use of req.body after browsers update - 06/2023
+  const pageId = (req.query || req.body).pageId as string;
   const user = await prisma.user.update({
     where: {
       id: req.session.user.id

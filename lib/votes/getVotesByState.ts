@@ -13,7 +13,13 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
     if (vote.userVotes.length === 0) {
       rejectedVotes.push(vote);
     } else if (vote.type === VoteType.Approval) {
-      const yesVoteCount = vote.userVotes.filter((uv) => uv.choice === YES_OPTION).length;
+      const yesVoteCount = vote.userVotes.filter((uv) => {
+        if (uv.choices) {
+          return uv.choices.includes(YES_OPTION);
+        }
+
+        return false;
+      }).length;
       const isPassed = (yesVoteCount * 100) / vote.userVotes.length >= vote.threshold;
 
       if (isPassed) {
@@ -21,8 +27,14 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
       } else {
         rejectedVotes.push(vote);
       }
-    } else {
-      const choices: string[] = vote.userVotes.map((uv) => uv.choice).sort();
+    } else if (vote.type === VoteType.SingleChoice) {
+      const choices: string[] = vote.userVotes.reduce((currentChoices, userVote) => {
+        if (userVote.choices) {
+          currentChoices.push(...userVote.choices);
+        }
+
+        return currentChoices;
+      }, [] as string[]);
 
       let index = 0;
       let maxCount = 0;
@@ -52,6 +64,8 @@ export const getVotesByState = (votes: VoteWithUserVotes[]) => {
       } else {
         passedVotes.push(vote);
       }
+    } else if (vote.type === VoteType.MultiChoice) {
+      passedVotes.push(vote);
     }
   }
 

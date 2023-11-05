@@ -1,10 +1,13 @@
 import styled from '@emotion/styled';
 
-const PageWrapper = styled.div`
+export type PageWrapperOptions = { bgcolor?: 'default' | 'light' };
+
+const PageWrapper = styled.div<PageWrapperOptions>`
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  background-color: ${({ theme }) => theme.palette.background.light};
+  background-color: ${({ bgcolor, theme }) =>
+    bgcolor ? theme.palette.background[bgcolor] : theme.palette.background.light};
 `;
 
 export default PageWrapper;

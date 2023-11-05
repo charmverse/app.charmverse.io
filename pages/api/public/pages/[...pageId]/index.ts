@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
-import type { Bounty, Page } from '@charmverse/core/prisma';
+import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,8 +9,9 @@ import type { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
 
@@ -154,8 +155,17 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     throw new NotFoundError('Space domain is required');
   }
 
-  const space = await prisma.space.findUnique({
-    where: page ? { id: page.spaceId } : { domain: spaceDomain }
+  const space = await prisma.space.findFirst({
+    where: page
+      ? { id: page.spaceId }
+      : {
+          OR: [
+            {
+              customDomain: spaceDomain
+            },
+            { domain: spaceDomain }
+          ]
+        }
   });
 
   if (!space) {
@@ -163,13 +173,24 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   }
 
   if (pagePath && !page) {
+    const trimmedPath = pagePath.trim();
+
     page = await prisma.page.findFirst({
       where: {
         deletedAt: null,
         space: {
-          domain: spaceDomain
+          id: space.id
         },
-        path: pagePath.trim()
+        OR: [
+          {
+            path: trimmedPath
+          },
+          {
+            additionalPaths: {
+              has: trimmedPath
+            }
+          }
+        ]
       }
     });
   }
@@ -178,9 +199,11 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     throw new NotFoundError('Page not found');
   }
 
-  const computed = await computeUserPagePermissions({
-    resourceId: page.id
-  });
+  const computed = await getPermissionsClient({ resourceId: page.id, resourceIdType: 'page' }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: page!.id
+    })
+  );
 
   if (computed.read !== true && page.type !== 'bounty') {
     throw new NotFoundError('Page not found');
@@ -192,7 +215,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   let boards: Board[] = [];
   let cards: Card[] = [];
   let views: BoardView[] = [];
-  let bounty: Bounty | null = null;
+  let bounty: (Bounty & { permissions: BountyPermission[] }) | null = null;
 
   if (page.cardId && page.parentId) {
     const boardPage = await prisma.page.findFirst({
@@ -251,19 +274,19 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     bounty = await prisma.bounty.findUnique({
       where: {
         id: page.id
+      },
+      include: {
+        permissions: true
       }
     });
   }
-
   return res.status(200).json({
     bounty: bounty
       ? {
-          ...bounty,
+          ...mapDbRewardToReward({ ...bounty, applications: [] }),
           page: {
-            ...page,
-            permissions: []
-          },
-          applications: []
+            ...page
+          }
         }
       : null,
     page: {

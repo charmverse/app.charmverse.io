@@ -1,7 +1,7 @@
 import type { EditorState, Node, Transaction } from '@bangle.dev/pm';
-import { Slice, ReplaceStep, ReplaceAroundStep, AddMarkStep, RemoveMarkStep, Mapping } from '@bangle.dev/pm';
-import { CellSelection } from '@skiff-org/prosemirror-tables';
+import { AddMarkStep, Mapping, RemoveMarkStep, ReplaceAroundStep, ReplaceStep, Slice } from '@bangle.dev/pm';
 import { Selection, TextSelection } from 'prosemirror-state';
+import { CellSelection } from 'prosemirror-tables';
 
 import type { FidusEditor } from '../fiduseditor';
 
@@ -32,7 +32,7 @@ function markInsertion(
       tr.removeMark(Math.max(from, pos), Math.min(pos + node.nodeSize, to), tr.doc.type.schema.marks.insertion);
       tr.addMark(Math.max(from, pos), Math.min(pos + node.nodeSize, to), insertionMark);
       return false;
-    } else if (pos < from || ['bulletList', 'orderedList'].includes(node.type.name)) {
+    } else if (pos < from || ['bulletList', 'orderedList', 'bullet_list', 'ordered_list'].includes(node.type.name)) {
       return true;
     } else if (['table_row', 'table_cell'].includes(node.type.name)) {
       return false;
@@ -97,7 +97,7 @@ function markDeletion(
       );
     } else if (
       !node.attrs.track?.find((t: TrackAttribute) => t.type === 'deletion') &&
-      !['bulletList', 'orderedList'].includes(node.type.name)
+      !['bulletList', 'orderedList', 'bullet_list', 'ordered_list'].includes(node.type.name)
     ) {
       if (node.attrs.track?.find((t: TrackAttribute) => t.type === 'insertion' && t.user === user.id)) {
         let removeStep;
@@ -124,11 +124,11 @@ function markDeletion(
         if (removeStep && !tr.maybeStep(removeStep).failed) {
           deletionMap.appendMap(removeStep.getMap());
         }
-        if (node.type.name === 'listItem' && listItem) {
+        if ((node.type.name === 'listItem' || node.type.name === 'list_item') && listItem) {
           listItem = false;
         }
       } else if (node.attrs.track) {
-        if (node.type.name === 'listItem') {
+        if (node.type.name === 'listItem' || node.type.name === 'list_item') {
           listItem = true;
         } else if (listItem) {
           // The first child of the first list item (likely a par) will not be merged with the paragraph
@@ -161,7 +161,6 @@ function markWrapping(
   let blockTrack = track.find((t) => t.type === 'block_change');
 
   const trackBefore = blockTrack?.before as undefined | { type: string; attrs: any };
-
   if (blockTrack) {
     track = track.filter((t: TrackAttribute) => t !== blockTrack);
     if (trackBefore?.type !== newNode.type.name || trackBefore?.attrs.level !== newNode.attrs.level) {
@@ -192,12 +191,13 @@ function markWrapping(
 
 export function amendTransaction(tr: Transaction, state: EditorState, editor: FidusEditor, trackingEnabled: boolean) {
   if (
-    !tr.docChanged ||
     !tr.steps.length ||
     ((tr as any).meta &&
-      (!Object.keys((tr as any).meta).every(
+      (!Object.entries((tr as any).meta).every(
         // Only replace TRs that have no metadata or only inputType metadata
-        (metadata) => ['inputType', 'uiEvent', 'paste'].includes(metadata)
+        ([key, value]) =>
+          ['inputType', 'uiEvent', 'paste', 'suggestTooltipFeature'].includes(key) ||
+          ['@', ':'].includes((value as any).text)
       ) ||
         // don't replace history TRs
         ['historyUndo', 'historyRedo'].includes(tr.getMeta('inputType'))))
@@ -206,7 +206,6 @@ export function amendTransaction(tr: Transaction, state: EditorState, editor: Fi
     // are footnote creations, history or fixing IDs. Give up.
     return tr;
   } else {
-    // console.log('track transaction', tr);
     return trackedTransaction(
       tr,
       state,
@@ -233,6 +232,7 @@ export function trackedTransaction(
   const cellDeleteTr =
     ['deleteContentBackward', 'deleteContentForward'].includes(tr.getMeta('inputType')) &&
     state.selection instanceof CellSelection;
+
   tr.steps.forEach((originalStep, originalStepIndex) => {
     const step = originalStep.map(map);
     const doc = newTr.doc;
@@ -433,8 +433,6 @@ export function trackedTransaction(
   if (tr.storedMarks && tr.storedMarksSet) {
     newTr.setStoredMarks(tr.storedMarks);
   }
-
-  newTr.scrollIntoView();
 
   return newTr;
 }

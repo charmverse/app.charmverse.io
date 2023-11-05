@@ -1,14 +1,15 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { isProdEnv, isStagingEnv } from 'config/constants';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
+import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
 import { DisabledAccountError } from 'lib/utilities/errors';
 import { uid } from 'lib/utilities/strings';
@@ -19,6 +20,7 @@ type LoginWithDiscord = {
   discordApiUrl?: string;
   userId?: string;
   signupAnalytics?: Partial<SignupAnalytics>;
+  authFlowType?: OauthFlowType;
 };
 
 export async function loginByDiscord({
@@ -26,13 +28,13 @@ export async function loginByDiscord({
   hostName,
   discordApiUrl,
   userId = v4(),
-  signupAnalytics = {}
+  signupAnalytics = {},
+  authFlowType = 'page'
 }: LoginWithDiscord) {
-  const domain = isProdEnv || isStagingEnv ? `https://${hostName}` : `http://${hostName}`;
   const discordAccount = await getDiscordAccount({
     code,
     discordApiUrl,
-    redirectUrl: `${domain}/api/discord/callback`
+    redirectUrl: getDiscordCallbackUrl(hostName, authFlowType)
   });
   const discordUser = await prisma.discordUser.findUnique({
     where: {

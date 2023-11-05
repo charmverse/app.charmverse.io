@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { Prisma, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import jsZip from 'jszip';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,7 +10,7 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/mid
 import { getRequestLanguage } from 'lib/middleware/getRequestLanguage';
 import { getPagePath } from 'lib/pages';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
-import { pageMetaSelect } from 'lib/pages/server/getPageMeta';
+import { pageMetaSelect } from 'lib/pages/server/pageMetaSelect';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

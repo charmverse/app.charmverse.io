@@ -1,13 +1,3 @@
-import { typedKeys } from 'lib/utilities/objects';
-
-export enum SpaceTemplate {
-  impact_community,
-  hackathon,
-  creator,
-  nft_community,
-  nounish_dao
-}
-
 export const DOMAIN_BLACKLIST = [
   'api',
   'api-docs',
@@ -19,36 +9,59 @@ export const DOMAIN_BLACKLIST = [
   'join',
   'share',
   'signup',
-  'u'
+  'u',
+  'loop'
 ];
 
-export const spaceTemplateLabelMapping = {
-  templateNftCommunity: 'NFT Community',
-  templateCreator: 'Creator',
-  templateHackathon: 'Hackathon',
-  templateNounishDAO: 'Nounish DAO',
-  templateImpactCommunity: 'Impact Community'
-};
-
-const staticTemplateOptions = ['default', 'importNotion', 'importMarkdown'] as const;
-
-export const spaceInternalTemplateMapping: Record<keyof typeof SpaceTemplate, keyof typeof spaceTemplateLabelMapping> =
+export const staticSpaceTemplates = [
   {
-    creator: 'templateCreator',
-    hackathon: 'templateHackathon',
-    impact_community: 'templateImpactCommunity',
-    nft_community: 'templateNftCommunity',
-    nounish_dao: 'templateNounishDAO'
-  };
+    id: 'templateNftCommunity',
+    name: 'NFT Community',
+    apiName: 'nft_community'
+  },
+  {
+    id: 'templateCreator',
+    name: 'Creator',
+    apiName: 'creator'
+  },
+  {
+    id: 'templateGrantor',
+    name: 'Grantor',
+    apiName: 'grantor'
+  },
+  {
+    id: 'templateGrantRecipient',
+    name: 'Grant Recipient',
+    apiName: 'grant_recipient'
+  },
+  {
+    id: 'templateHackathon',
+    name: 'Hackathon',
+    apiName: 'hackathon'
+  },
+  {
+    id: 'templateNounishDAO',
+    name: 'Nounish DAO',
+    apiName: 'nounish_dao'
+  },
+  {
+    id: 'templateImpactCommunity',
+    name: 'Impact Community',
+    apiName: 'impact_community'
+  }
+] as const;
 
-export type SpaceTemplateType = keyof typeof SpaceTemplate;
+export const internalTemplates = ['templateGitcoin', 'templateOPGrant'] as const;
 
-export const spaceCreateTemplates = [...typedKeys(spaceInternalTemplateMapping), ...staticTemplateOptions];
+const dynamicTemplateIds = ['default', 'importNotion', 'importMarkdown'] as const;
 
-export type SpaceCreateTemplate = (typeof spaceCreateTemplates)[number];
+export const spaceTemplateIds = [...staticSpaceTemplates.map((tpl) => tpl.id), ...dynamicTemplateIds];
+export const spaceTemplateApiNames = [...staticSpaceTemplates.map((tpl) => tpl.apiName)];
 
-// templates that will not appear in the template picker
-export type PrivateTemplate = 'gitcoin';
-export const privateTemplateMapping: Record<PrivateTemplate, string> = {
-  gitcoin: 'templateGitcoin'
-};
+export type StaticSpaceTemplateType = (typeof staticSpaceTemplates)[number]['id'];
+export type APISpaceTemplateType = (typeof staticSpaceTemplates)[number]['apiName'];
+
+type InternalTemplateType = (typeof internalTemplates)[number];
+
+// Include internal templates
+export type SpaceTemplateType = (typeof spaceTemplateIds)[number] | InternalTemplateType;

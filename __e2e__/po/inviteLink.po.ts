@@ -15,7 +15,7 @@ export class AcceptInvitePage {
   }
 
   async waitForWorkspaceLoaded({ domain }: { domain: string }) {
-    await this.page.waitForURL(`**/${domain}`);
+    await this.page.waitForURL(`**/${domain}/**`);
   }
 
   async goto() {

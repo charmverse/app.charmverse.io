@@ -7,7 +7,11 @@ type UserData = User & {
   discordUser: DiscordUser | null;
 };
 
-export function getMemberSearchValue(userData: UserData): string {
+export function getMemberSearchValue(
+  userData: UserData,
+  memberProperties: Record<string, string>,
+  username: string
+): string {
   const { profile, memberPropertyValues = [], telegramUser, discordUser } = userData;
 
   const discordAccountString =
@@ -25,16 +29,16 @@ export function getMemberSearchValue(userData: UserData): string {
   const propertyValuesString = memberPropertyValues
     .map((prop) => {
       if (Array.isArray(prop.value)) {
-        return prop.value.join(' ');
+        return prop.value.map((val) => memberProperties[val as string] || val).join(' ');
       }
-      return prop.value;
+      return memberProperties[prop.value as string] || prop.value;
     })
     .join(' ');
 
   // all socials
   const socialsString = profile?.social ? Object.values(profile.social).join(' ') : '';
 
-  return `${userDetailsString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString}`
+  return `${userDetailsString} ${propertyValuesString} ${socialsString} ${telegramAccountString} ${discordAccountString} ${username}`
     .toLowerCase()
     .replace(/\s\s+/g, ' ');
 }

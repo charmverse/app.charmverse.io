@@ -1,21 +1,23 @@
-import { prisma } from '@charmverse/core';
 import type { TokenGateToRole } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
-import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';
+import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
   .use(requireKeys(['roleIds', 'spaceId'], 'body'))
+  .use(requirePaidPermissionsSubscription({ key: 'spaceId', resourceIdType: 'space', location: 'body' }))
   .use(requireSpaceMembership({ adminOnly: true }))
-  .post(updateTokenGateRolesHandler);
+  .put(updateTokenGateRolesHandler);
 
 async function updateTokenGateRolesHandler(req: NextApiRequest, res: NextApiResponse<TokenGateToRole[]>) {
   const { roleIds } = req.body as { roleIds: string[] };

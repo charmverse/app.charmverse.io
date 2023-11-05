@@ -1,8 +1,9 @@
-import type { Node, EditorView, EditorState } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import { collab, sendableSteps } from 'prosemirror-collab';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type {
   ClientSubscribeMessage,
   SocketMessage,
@@ -16,6 +17,7 @@ import {
   acceptAllNoInsertions,
   amendTransaction
 } from './track';
+import type { ConnectionEvent } from './ws';
 import { WebSocketConnector } from './ws';
 
 type EditorModules = {
@@ -38,6 +40,7 @@ type EditorProps = {
   enableSuggestionMode: boolean;
   onDocLoaded?: () => void;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
+  onCommentUpdate?: VoidFunction;
 };
 
 // A smaller version of the original Editor class in fiduswriter, which renders the page layout as well as Prosemirror View
@@ -81,15 +84,21 @@ export class FidusEditor {
 
   onDocLoaded: NonNullable<EditorProps['onDocLoaded']> = () => {};
 
+  onCommentUpdate: VoidFunction = () => {};
+
   onParticipantUpdate: NonNullable<EditorProps['onParticipantUpdate']> = () => {};
 
-  constructor({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate }: EditorProps) {
+  constructor({ user, docId, enableSuggestionMode, onDocLoaded, onParticipantUpdate, onCommentUpdate }: EditorProps) {
     this.user = user;
     if (onDocLoaded) {
       this.onDocLoaded = onDocLoaded;
     }
     if (onParticipantUpdate) {
       this.onParticipantUpdate = onParticipantUpdate;
+    }
+
+    if (onCommentUpdate) {
+      this.onCommentUpdate = onCommentUpdate;
     }
 
     this.enableSuggestionMode = enableSuggestionMode;
@@ -109,7 +118,7 @@ export class FidusEditor {
     ];
   }
 
-  init(view: EditorView, authToken: string, onError: (error: Error) => void) {
+  init(view: EditorView, authToken: string, onConnectionEvent: (event: ConnectionEvent) => void) {
     let resubscribed = false;
 
     this.ws = new WebSocketConnector({
@@ -127,7 +136,7 @@ export class FidusEditor {
         }
         return message;
       },
-      onError,
+      onConnectionEvent,
       resubscribed: () => {
         resubscribed = true;
         if (this.mod.collab) {
@@ -144,6 +153,7 @@ export class FidusEditor {
             // define .sessionIds on each participant
             const participants = this.mod.collab.updateParticipantList(data.participant_list);
             if (resubscribed) {
+              log.debug('Check version after getting connections message', { pageId: this.docInfo.id });
               // check version if only reconnected after being offline
               this.mod.collab.doc.checkVersion(); // check version to sync the doc
               resubscribed = false;
@@ -156,8 +166,8 @@ export class FidusEditor {
             try {
               this.mod.collab.doc.receiveDocument(data);
             } catch (error) {
-              log.error('Error loading document from sockets', { error });
-              onError(error as Error);
+              log.error('Error loading document from sockets', { data, error, pageId: this.docInfo.id });
+              onConnectionEvent({ type: 'error', error: error as Error });
             }
             // console.log('received doc');
             break;
@@ -172,23 +182,32 @@ export class FidusEditor {
           case 'selection_change':
             this.mod.collab.doc.cancelCurrentlyCheckingVersion();
             if (data.v !== this.docInfo.version) {
+              log.debug('Check version after selection change', { pageId: this.docInfo.id });
               this.mod.collab.doc.checkVersion();
               return;
             }
             this.mod.collab.doc.receiveSelectionChange(data);
             break;
-          case 'diff':
+          case 'diff': {
             if (data.cid === this.client_id) {
               // The diff origins from the local user.
               this.mod.collab.doc.confirmDiff(data.rid);
               return;
             }
             if (data.v !== this.docInfo.version) {
+              log.debug('Check version after diff', { pageId: this.docInfo.id });
               this.mod.collab.doc.checkVersion();
               return;
             }
             this.mod.collab.doc.receiveDiff(data);
+            const isCommentUpdate = data.ds.find(
+              (step) => step.stepType === 'addMark' && step.mark?.type === 'inline-comment'
+            );
+            if (isCommentUpdate) {
+              this.onCommentUpdate();
+            }
             break;
+          }
           case 'confirm_diff':
             this.mod.collab.doc.confirmDiff(data.rid);
             break;
@@ -196,43 +215,16 @@ export class FidusEditor {
             this.mod.collab.doc.rejectDiff(data.rid);
             break;
           case 'patch_error':
-            onError(new Error('Your document was out of sync and has been reset.'));
+            onConnectionEvent({ type: 'error', error: new Error('Your document was out of sync and has been reset.') });
             break;
           case 'error':
             log.error('Error talking to socket server', data.message);
-            onError(new Error(data.message));
+            onConnectionEvent({ type: 'error', error: new Error(data.message) });
             break;
           default:
             break;
         }
       }
-      // failedAuth: () => {
-      //   if (this.view.state.plugins.length && sendableSteps(this.view.state) && this.ws.connectionCount > 0) {
-      //     this.ws.online = false; // To avoid Websocket trying to reconnect.
-      //     new ExportFidusFile(
-      //       this.getDoc({ use_current_view: true }),
-      //       this.mod.db.bibDB,
-      //       this.mod.db.imageDB
-      //     );
-      //     const sessionDialog = new Dialog({
-      //       title: gettext('Session Expired'),
-      //       id: 'session_expiration_dialog',
-      //       body: gettext('Your session expired while you were offline, so we cannot save your work to the server any longer, and it is downloaded to your computer instead. Please consider importing it into a new document.'),
-      //       buttons: [{
-      //         text: gettext('Proceed to Login page'),
-      //         classes: 'fw-dark',
-      //         click: () => {
-      //           window.location.href = '/';
-      //         }
-      //       }],
-      //       canClose: false
-      //     });
-      //     sessionDialog.open();
-      //   }
-      //   else {
-      //     window.location.href = '/';
-      //   }
-      // }
     });
 
     this.initEditor(view);
@@ -304,6 +296,63 @@ export class FidusEditor {
     new ModCollab(this);
     // new ModTrack(this);
     // this.ws.init();
+  }
+
+  extractPagePath(step: any) {
+    const sliceLength = step.slice?.content.length ?? 0;
+    let marks: any[] = [];
+
+    const content0 = step.slice?.content?.[0];
+
+    if (!content0) {
+      return null;
+    }
+
+    // Check if the step type is replace
+    const isReplace = step.stepType === 'replace' && step.from === step.to;
+
+    if (!isReplace) {
+      return null;
+    }
+
+    if (sliceLength === 1) {
+      marks =
+        (content0.type === 'text'
+          ? content0.marks
+          : content0.type === 'paragraph'
+          ? content0.content?.[0]?.marks
+          : []) ?? [];
+    } else if (sliceLength === 2) {
+      const content1 = step.slice?.content?.[1];
+
+      if (!content1) {
+        return null;
+      }
+
+      const isImage = content0.type === 'image';
+      const isParagraph = content1.type === 'paragraph';
+
+      if (!isImage || !isParagraph) {
+        return null;
+      }
+
+      marks = content1.content[0]?.marks ?? [];
+    }
+
+    if (marks.length === 0) {
+      return null;
+    }
+
+    let href = null;
+    if (marks[0].type === 'link') {
+      href = marks[0].attrs.href;
+    }
+
+    if (href?.startsWith(window.location.origin)) {
+      href = href.split('/').at(-1);
+    }
+
+    return href;
   }
 
   // Collect all components of the current doc. Needed for saving and export

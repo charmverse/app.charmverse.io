@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { BountyStatus, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { getBountyPagePermissionSet } from 'lib/bounties/shared';
@@ -7,6 +7,8 @@ import { NotFoundError } from 'lib/middleware';
 import { getPagePath } from 'lib/pages/utils';
 import { setBountyPermissions } from 'lib/permissions/bounties';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getBountyOrThrow } from './getBounty';
 import type { BountyCreationData } from './interfaces';
@@ -162,14 +164,6 @@ export async function createBounty({
           bountyId
         }
       })
-      // prisma.pagePermission.createMany({
-      //   data: bountyPagePermissionSet.map(p => {
-      //     return {
-      //       ...p,
-      //       pageId: linkedPageId
-      //     };
-      //   })
-      // })
     ]);
   }
 
@@ -194,6 +188,13 @@ export async function createBounty({
       permissionsToAssign: permissions
     });
   }
+
+  await publishBountyEvent({
+    scope: WebhookEventNames.RewardSuggestionCreated,
+    bountyId,
+    spaceId: space.id,
+    userId: createdBy
+  });
 
   return getBountyOrThrow(bountyId);
 }

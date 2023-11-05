@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getPage } from 'lib/pages/server';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';

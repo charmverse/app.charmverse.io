@@ -1,9 +1,10 @@
-import { truncate } from 'fs/promises';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { prisma } from '@charmverse/core';
-
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import type { PageWithProposal } from 'lib/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';
+
+import type { ProposalWithUsersAndRubric } from './interface';
 
 /**
  *
@@ -14,7 +15,7 @@ export async function getProposal({
   proposalId
 }: {
   proposalId: string;
-}): Promise<IPageWithPermissions & PageWithProposal> {
+}): Promise<PageWithPermissions & PageWithProposal> {
   const proposalPage = await prisma.page.findUnique({
     where: {
       proposalId
@@ -24,7 +25,10 @@ export async function getProposal({
         include: {
           authors: true,
           reviewers: true,
-          category: true
+          category: true,
+          draftRubricAnswers: true,
+          rubricAnswers: true,
+          rubricCriteria: true
         }
       },
       permissions: {
@@ -39,5 +43,7 @@ export async function getProposal({
     throw new DataNotFoundError(`Proposal with id ${proposalId} not found`);
   }
 
-  return proposalPage;
+  (proposalPage as any as PageWithProposal).proposal.page = { sourceTemplateId: proposalPage?.sourceTemplateId };
+
+  return proposalPage as PageWithPermissions & { proposal: ProposalWithUsersAndRubric };
 }

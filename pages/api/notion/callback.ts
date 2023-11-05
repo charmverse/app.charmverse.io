@@ -23,7 +23,6 @@ handler.get(async (req, res) => {
     return;
   }
 
-  // use cookies to pass response to frontend because they're easier to delete than query params
   const cookies = new Cookies(req, res);
 
   if (typeof tempAuthCode === 'string') {

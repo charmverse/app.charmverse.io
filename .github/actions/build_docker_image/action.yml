@@ -1,36 +1,63 @@
 name: 'Build Docker Image'
 
+inputs:
+  codebase_sha:
+    description: "Your code base sha, if it's different from the sha of the github action event"
+    value: ""
+    required: false
+
+outputs:
+  ecr-registry:
+    description: "ECR registry url"
+    value: ${{ steps.login-ecr.outputs.registry }}
+  img_tag:
+    description: "Image tag of the image"
+    value: "${{ steps.get_img_tag.outputs.version }}"
+  img_repo:
+    description: "Image tag of the image"
+    value: "${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace"
+  full_image_name:
+    description: "Full image repo and tag"
+    value: "${{ steps.get_img_tag.outputs.tags }}"
+
 runs:
   using: 'composite'
   steps:
-    - name: Remove dev dependencies
+    - name: Prune dev dependencies and calculate img tag
+      id: prune_dev_dep
       shell: bash
       run: |
-        npm prune --production
+        npm prune --omit=dev
         rm -rf .next/cache
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
     - name: Configure AWS credentials
-      # Locked version as temporary workaround to failing deps
-      # https://github.com/aws-actions/configure-aws-credentials/issues/670#issuecomment-1444620155
-      uses: aws-actions/configure-aws-credentials@v1-node16
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-region: ${{ env.AWS_REGION }}
+        mask-aws-account-id: 'false'
 
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: Docker get image tags
+      id: get_img_tag
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{steps.login-ecr.outputs.registry}}/charmverse-web3-workspace
+        tags: |
+          type=sha,prefix=${{github.run_id}}-,format=short
+        flavor: |
+          latest=${{ github.ref == 'refs/heads/main' }}
+
     - name: Build and push
       uses: docker/build-push-action@v3
-      env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPO: charmverse-web3-workspace
       with:
         context: .
         push: true
-        tags: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}'
+        tags: ${{ steps.get_img_tag.outputs.tags }}
         cache-from: type=gha
         cache-to: type=gha,mode=max

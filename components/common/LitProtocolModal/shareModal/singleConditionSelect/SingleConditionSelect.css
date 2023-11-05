@@ -1,0 +1,56 @@
+.lsm-single-condition-select-container {
+    height: calc(100% - 4.5em);
+    box-sizing: border-box;
+    padding: 0 0.5em;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+
+.lsm-single-condition-footer {
+    /*align-self: flex-end;*/
+}
+
+.lsm-single-condition-select-prompt {
+    color: var(--lsm-primary-color);
+    font-family: var(--lsm-primary-font);
+    font-weight: var(--lsm-primary-font-weight);
+    text-align: center;
+    font-size: 1.05em;
+}
+
+.lsm-single-condition-select-prompt {
+    margin: 1em 0;
+}
+
+.lsm-single-condition-multiple-button {
+    /*width: calc(100% - 2em);*/
+    width: 100%;
+    box-sizing: border-box;
+    margin: 2em auto;
+    height: 4em;
+    padding: 0 1em;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    text-decoration: underline;
+    border: none;
+    background-color: var(--lsm-background-color);
+    color: var(--lsm-primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: var(--lsm-primary-font-weight);
+}
+
+.lsm-single-condition-multiple-button p {
+    margin-left: 0.25em;
+}
+
+@media (min-width: 768px) {
+    .lsm-single-condition-select-container {
+        /*height: 100%;*/
+    }
+}

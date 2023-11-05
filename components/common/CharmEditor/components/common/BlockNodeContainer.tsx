@@ -9,11 +9,19 @@ export type EmptyContentProps = {
   readOnly?: boolean;
   children: React.ReactNode;
   sx?: SxProps<Theme>;
+  onDragStart?: () => void;
 };
 
-export function BlockNodeContainer({ readOnly, onDelete, isSelected, children, sx = {} }: EmptyContentProps) {
+export function BlockNodeContainer({
+  readOnly,
+  onDelete,
+  isSelected,
+  children,
+  sx = {},
+  onDragStart
+}: EmptyContentProps) {
   return (
-    <BlockAligner readOnly={readOnly} onDelete={onDelete}>
+    <BlockAligner readOnly={readOnly} onDelete={onDelete} onDragStart={onDragStart}>
       <ListItem
         button
         sx={{

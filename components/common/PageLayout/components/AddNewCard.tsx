@@ -12,7 +12,7 @@ import { StyledIconButton } from './NewPageMenu';
 
 function AddNewCard({ pageId }: { pageId: string }) {
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { pages } = usePages();
 
   return (

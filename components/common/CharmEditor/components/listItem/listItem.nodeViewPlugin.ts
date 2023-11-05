@@ -1,8 +1,9 @@
-import type { UpdateAttrsFunction } from '@bangle.dev/core';
-import { NodeView } from '@bangle.dev/core';
 import type { EditorState, Node } from '@bangle.dev/pm';
 import { createElement } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import type { UpdateAttrsFunction } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
 export function listItemNodeViewPlugin(name: string, readOnly?: boolean) {
   const checkParentBulletList = (state: EditorState, pos: number) => {
@@ -83,16 +84,26 @@ export function listItemNodeViewPlugin(name: string, readOnly?: boolean) {
     renderHandlers: {
       create: (instance, { attrs, updateAttrs, getPos, view }) => {
         const todoChecked = attrs.todoChecked;
+        const pos = getPos();
         // branch if todo needs to be created
-        if (todoChecked != null) {
+        if (typeof pos === 'number' && todoChecked != null) {
           // todo only makes sense if parent is bullet list
-          if (checkParentBulletList(view.state, getPos())) {
+          if (checkParentBulletList(view.state, pos)) {
             setupCheckbox(attrs, updateAttrs, instance as NodeView);
           }
         }
 
         // Connect the two contentDOM and containerDOM for pm to write to
-        instance.containerDOM!.appendChild(instance.contentDOM!);
+        instance.containerDOM?.appendChild(instance.contentDOM!);
+
+        // Disable mutation observer for all attributes except checked
+        instance.ignoreMutation = (mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName !== 'checked') {
+            return true;
+          }
+
+          return false;
+        };
       },
 
       // We need to achieve a two way binding of the todoChecked state.
@@ -100,13 +111,14 @@ export function listItemNodeViewPlugin(name: string, readOnly?: boolean) {
       // Second binding: editor -> dom: Done by the `update` handler below
       update: (instance, { attrs, view, getPos, updateAttrs }) => {
         const { todoChecked } = attrs;
+        const pos = getPos();
         if (todoChecked == null) {
           removeCheckbox(instance as NodeView);
           return;
         }
 
         // if parent is not bulletList i.e. it is orderedList
-        if (!checkParentBulletList(view.state, getPos())) {
+        if (typeof pos === 'number' && !checkParentBulletList(view.state, pos)) {
           return;
         }
 

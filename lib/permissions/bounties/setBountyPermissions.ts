@@ -1,24 +1,13 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma } from '@charmverse/core/prisma';
-import { BountyPermissionLevel } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getBountyOrThrow } from 'lib/bounties/getBounty';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { typedKeys } from '../../utilities/objects';
-import type { TargetPermissionGroup } from '../interfaces';
 
-import { addBountyPermissionGroup } from './addBountyPermissionGroup';
-import type {
-  BountyPermissionAssignment,
-  BountyPermissionGroup,
-  BountyPermissions,
-  BountyReviewer,
-  BountySubmitter,
-  BulkBountyPermissionAssignment
-} from './interfaces';
+import type { BountyPermissionAssignment, BountyPermissions, BulkBountyPermissionAssignment } from './interfaces';
 import { queryBountyPermissions } from './queryBountyPermissions';
-import { removeBountyPermissionGroup } from './removeBountyPermissionGroup';
 
 /**
  * Will reset all permissions for a bounty to target state. Existing permissions not included here will be deleted

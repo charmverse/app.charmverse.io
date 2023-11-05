@@ -1,13 +1,16 @@
-import { link } from '@bangle.dev/base-components';
+/* eslint-disable max-len */
 import type { Mark, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
 
+import { linkPlugins } from '../@bangle.dev/base-components/link';
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import {
   hideSuggestionsTooltip,
   referenceElement,
   renderSuggestionsTooltip
 } from '../@bangle.dev/tooltip/suggest-tooltip';
+
+import { getLinkElement } from './getLinkElement';
 
 export type LinkPluginState = {
   show: boolean;
@@ -18,10 +21,10 @@ export type LinkPluginState = {
 
 export function plugins({ key }: { key: PluginKey }) {
   const tooltipDOMSpec = createTooltipDOM();
-  let tooltipTimer: null | NodeJS.Timer = null;
+  let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
 
   return [
-    link.plugins(),
+    linkPlugins(),
     new Plugin<LinkPluginState>({
       key,
       state: {
@@ -59,7 +62,7 @@ export function plugins({ key }: { key: PluginKey }) {
         }
       },
       props: {
-        handleClick: (view, _pos, event) => {
+        handleClickOn: (view, _pos, _node, _nodePos, event) => {
           const { schema } = view.state;
           const markType = schema.marks.link;
           let marks: Mark[] = [];
@@ -70,6 +73,7 @@ export function plugins({ key }: { key: PluginKey }) {
           if (attrs.href) {
             event.stopPropagation();
             window.open(attrs.href, '_blank');
+            return true;
           }
           return false;
         },
@@ -82,13 +86,7 @@ export function plugins({ key }: { key: PluginKey }) {
               }, 750);
             }
 
-            const target = event.target as HTMLAnchorElement; // span for link
-            const parentElement = target?.parentElement; // anchor for link
-            const hrefElement = parentElement?.classList.contains('charm-link')
-              ? parentElement
-              : target?.classList.contains('charm-link')
-              ? target
-              : null;
+            const hrefElement = getLinkElement({ htmlElement: event.target as HTMLElement });
 
             if (hrefElement) {
               const href = hrefElement.getAttribute('href');

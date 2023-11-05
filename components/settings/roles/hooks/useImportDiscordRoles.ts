@@ -15,9 +15,9 @@ export function useImportDiscordRoles() {
   const { showMessage } = useSnackbar();
   const isAdmin = useIsAdmin();
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { refreshRoles } = useRoles();
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
 
   const [importDiscordRoles, setImportDiscordRoles] = useState(false);
 
@@ -26,7 +26,7 @@ export function useImportDiscordRoles() {
   const { data, isValidating, error } = useSWRImmutable(
     importDiscordRoles ? 'discord-roles-import' : null,
     async () => {
-      onClick(`roles`);
+      openSettings(`roles`);
       return charmClient.discord
         .importRolesFromDiscordServer({
           guildId,

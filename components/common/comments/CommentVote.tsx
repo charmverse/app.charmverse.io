@@ -40,9 +40,10 @@ export function CommentVote({ votes, onVote, permissions }: Props) {
 
   return (
     <Box display='flex' alignItems='center' gap={0.5}>
-      <Tooltip title={permissions?.upvote === false ? 'You do not have permissions to upvote this post.' : ''}>
+      <Tooltip title={permissions?.upvote === false ? 'You do not have permissions to upvote this post' : ''}>
         <div>
           <IconButton
+            data-test='upvote-post'
             disabled={!permissions?.upvote}
             size='small'
             onClick={(e) => {
@@ -54,13 +55,14 @@ export function CommentVote({ votes, onVote, permissions }: Props) {
         </div>
       </Tooltip>
       <Box minWidth={14}>
-        <Typography align='center' variant='body2'>
+        <Typography data-test='post-score' align='center' variant='body2'>
           {upvotes - downvotes}
         </Typography>
       </Box>
       <Tooltip title={permissions?.downvote === false ? 'You do not have permissions to downvote this post.' : ''}>
         <div>
           <IconButton
+            data-test='downvote-post'
             disabled={!permissions?.downvote}
             size='small'
             onClick={(e) => {

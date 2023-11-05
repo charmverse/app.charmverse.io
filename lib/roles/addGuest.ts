@@ -1,7 +1,8 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { isUUID, isValidEmail, uid } from 'lib/utilities/strings';
 
 type GuestToAdd = {
@@ -21,7 +22,6 @@ type GuestAddedResult = {
   user: UserFromGuest;
   isNewUser: boolean;
   isNewSpaceRole: boolean;
-  spaceDomain: string;
 };
 
 export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
@@ -29,11 +29,21 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
     throw new InvalidInputError(`Invalid spaceId: ${spaceId}`);
   }
 
-  const userIdIsUiid = isUUID(userIdOrEmail);
-  const userIdIsEmail = userIdIsUiid ? false : isValidEmail(userIdOrEmail);
+  const userIdIsUuid = isUUID(userIdOrEmail);
+  const userIdIsEmail = userIdIsUuid ? false : isValidEmail(userIdOrEmail);
 
-  if (!userIdIsUiid && !userIdIsEmail) {
+  if (!userIdIsUuid && !userIdIsEmail) {
     throw new InvalidInputError(`Invalid userIdOrEmail: ${userIdOrEmail}`);
+  }
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: [spaceId],
+    userId: userIdIsUuid ? userIdOrEmail : undefined,
+    emails: userIdIsEmail ? [userIdOrEmail] : []
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(`User with that ${userIdIsUuid ? 'id' : 'email'} has been banned from space`);
   }
 
   const spaceWithDomain = await prisma.space.findUnique({
@@ -46,7 +56,7 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
     throw new DataNotFoundError(`Space not found: ${spaceId}`);
   }
 
-  const query: Prisma.UserWhereInput = userIdIsUiid
+  const query: Prisma.UserWhereInput = userIdIsUuid
     ? {
         id: userIdOrEmail
       }
@@ -73,7 +83,7 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
   // Keep a record of the fact that user did not exist before creation
   const userExists = !!user;
 
-  if (!userExists && userIdIsUiid) {
+  if (!userExists && userIdIsUuid) {
     throw new DataNotFoundError(`User not found: ${userIdOrEmail}`);
   }
 
@@ -117,8 +127,7 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
       spaceRoles: [existingSpaceRole ?? (newSpaceRole as SpaceRole)]
     },
     isNewUser: !userExists,
-    isNewSpaceRole: !existingSpaceRole,
-    spaceDomain: spaceWithDomain.domain
+    isNewSpaceRole: !existingSpaceRole
   };
 
   return result;

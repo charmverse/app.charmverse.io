@@ -1,4 +1,3 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import type { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -9,10 +8,13 @@ import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+
+import { enableDragAndDrop } from '../utils';
 
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import BlockAligner from './BlockAligner';
@@ -59,7 +61,7 @@ function EmptyImageContainer({
 const StyledImageContainer = styled.div<{ size: number }>`
   max-width: 100%;
   width: ${({ size }) => size}px;
-  margin: 0 auto;
+  margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
 const StyledImage = styled.img`
@@ -143,8 +145,10 @@ function ResizableImage({
 
   function onDelete() {
     const start = getPos();
-    const end = start + 1;
-    view.dispatch(view.state.tr.deleteRange(start, end));
+    if (typeof start === 'number') {
+      const end = start + 1;
+      view.dispatch(view.state.tr.deleteRange(start, end));
+    }
   }
 
   useEffect(() => {
@@ -200,7 +204,16 @@ function ResizableImage({
   } else {
     return (
       <Resizable initialSize={node.attrs.size} minWidth={MIN_IMAGE_WIDTH} updateAttrs={updateAttrs} onDelete={onDelete}>
-        <StyledImage draggable={false} src={node.attrs.src} alt={node.attrs.alt} />
+        <StyledImage
+          onDragStart={() => {
+            const nodePos = getPos();
+            if (typeof nodePos === 'number') {
+              enableDragAndDrop(view, nodePos);
+            }
+          }}
+          src={node.attrs.src}
+          alt={node.attrs.alt}
+        />
       </Resizable>
     );
   }
@@ -239,7 +252,7 @@ function getFileBinary(src: string): File | null {
 
 export function spec() {
   // this is a dummy marker to let us know to show the image selector
-  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image' });
+  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image', excludes: '_' });
   tooltipSpec.schema.inclusive = false;
   return [tooltipSpec, imageSpec()];
 }

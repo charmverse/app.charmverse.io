@@ -1,32 +1,33 @@
-import { prisma } from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
+import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 
-export type UpdateableSpaceFields = Partial<Pick<Space, 'domain' | 'name' | 'spaceImage'>>;
+export type UpdateableSpaceFields = Partial<
+  Pick<
+    Space,
+    'hiddenFeatures' | 'domain' | 'name' | 'spaceImage' | 'features' | 'memberProfiles' | 'notificationToggles'
+  >
+>;
 
-export async function updateSpace(
-  spaceId: string,
-  { domain, name, spaceImage }: UpdateableSpaceFields
-): Promise<Space> {
+export async function updateSpace(spaceId: string, updates: UpdateableSpaceFields): Promise<Space> {
   if (!spaceId) {
     throw new InvalidInputError('A space ID is required');
   }
 
+  const domain = updates?.domain ? getSpaceDomainFromName(updates?.domain) : undefined;
+
   if (domain) {
-    const existingSpace = await prisma.space.findUnique({
-      where: {
-        domain
-      },
-      select: {
-        id: true
-      }
-    });
+    const existingSpace = await getSpaceByDomain(domain);
 
     if (existingSpace && existingSpace.id !== spaceId) {
       throw new DuplicateDataError(`A space with the domain ${domain} already exists`);
     }
+  } else if (typeof domain !== 'undefined') {
+    throw new InvalidInputError('Domain cannot be empty');
   }
 
   const updatedSpace = await prisma.space.update({
@@ -35,8 +36,12 @@ export async function updateSpace(
     },
     data: {
       domain,
-      name,
-      spaceImage
+      name: updates.name,
+      spaceImage: updates.spaceImage,
+      hiddenFeatures: updates.hiddenFeatures,
+      notificationToggles: updates.notificationToggles as any,
+      features: updates.features as any,
+      memberProfiles: updates.memberProfiles as any
     }
   });
 

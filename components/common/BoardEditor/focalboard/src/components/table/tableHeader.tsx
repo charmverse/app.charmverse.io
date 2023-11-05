@@ -26,8 +26,18 @@ import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/
 import React, { useMemo, useRef, useState } from 'react';
 
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import {
+  AUTHORS_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_BOARD_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  REVIEWERS_BLOCK_ID,
+  STATUS_BLOCK_ID
+} from 'lib/proposal/blocks/constants';
 
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
@@ -40,7 +50,6 @@ import HorizontalGrip from './horizontalGrip';
 
 type Props = {
   readOnly: boolean;
-  readOnlySourceData: boolean;
   sorted: 'up' | 'down' | 'none';
   name: string;
   board: Board;
@@ -54,13 +63,24 @@ type Props = {
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
 };
 
+const DEFAULT_BLOCK_IDS = [
+  DEFAULT_BOARD_BLOCK_ID,
+  CATEGORY_BLOCK_ID,
+  DEFAULT_VIEW_BLOCK_ID,
+  STATUS_BLOCK_ID,
+  EVALUATION_TYPE_BLOCK_ID,
+  AUTHORS_BLOCK_ID,
+  REVIEWERS_BLOCK_ID
+];
+
 function TableHeader(props: Props): JSX.Element {
-  const { activeView, board, views, cards, sorted, name, type, template, readOnly, readOnlySourceData } = props;
+  const { activeView, board, views, cards, sorted, name, type, template, readOnly } = props;
   const { id: templateId } = template;
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
+  const disableRename = proposalPropertyTypesList.includes(type as any) || DEFAULT_BLOCK_IDS.includes(templateId);
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -137,6 +157,7 @@ function TableHeader(props: Props): JSX.Element {
       <MenuList>
         <Stack p={1}>
           <TextField
+            disabled={disableRename}
             value={tempName}
             onClick={(e) => {
               e.stopPropagation();
@@ -181,15 +202,11 @@ function TableHeader(props: Props): JSX.Element {
         <Divider />
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle name column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId)
-              mutator.insertPropertyTemplate(board, activeView, index);
+            let index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
+            if (templateId === Constants.titleColumnId && index === -1) {
+              index = 0;
             }
+            mutator.insertPropertyTemplate(board, activeView, index);
           }}
         >
           <ListItemIcon>
@@ -199,15 +216,11 @@ function TableHeader(props: Props): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            if (templateId === Constants.titleColumnId) {
-              // eslint-disable-next-line no-warning-comments
-              // TODO: Handle title column
-            } else {
-              const index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId) + 1;
-
-              // const index = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === templateId) + 1
-              mutator.insertPropertyTemplate(board, activeView, index);
+            let index = activeView.fields.visiblePropertyIds.findIndex((i) => i === templateId);
+            if (templateId === Constants.titleColumnId && index === -1) {
+              index = 0;
             }
+            mutator.insertPropertyTemplate(board, activeView, index + 1);
           }}
         >
           <ListItemIcon>
@@ -231,6 +244,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
+            disabled={proposalPropertyTypesList.includes(type as any)}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}
@@ -242,6 +256,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='delete'
+            disabled={proposalPropertyTypesList.includes(type as any)}
             onClick={() => {
               mutator.deleteProperty(board, views, cards, templateId);
             }}
@@ -316,12 +331,12 @@ function TableHeader(props: Props): JSX.Element {
       ref={columnRef}
     >
       <Stack width='100%' justifyContent='center'>
-        {readOnly || readOnlySourceData ? (
+        {readOnly ? (
           label
         ) : (
           <div ref={toggleRef}>
             <div {...popoverToggleProps}>{label}</div>
-            <Popover disableRestoreFocus {...popoverProps}>
+            <Popover {...popoverProps}>
               <Paper>{popupContent}</Paper>
             </Popover>
           </div>

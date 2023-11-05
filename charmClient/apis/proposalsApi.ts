@@ -1,39 +1,33 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
-import type { ProposalFlowFlags } from 'lib/proposal/computeProposalFlowFlags';
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
-import type { CreateProposalFromTemplateInput } from 'lib/proposal/createProposalFromTemplate';
-import type { ProposalReviewerPool } from 'lib/proposal/getProposalReviewerPool';
-import type { ListProposalsRequest } from 'lib/proposal/getProposalsBySpace';
-import type { ProposalCategory, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
+import type { ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 export class ProposalsApi {
-  createProposal(input: CreateProposalInput) {
-    return http.POST<PageWithProposal>('/api/proposals', input);
-  }
-
-  updateProposal({ proposalId, authors, reviewers, categoryId }: UpdateProposalRequest) {
-    return http.PUT(`/api/proposals/${proposalId}`, { authors, reviewers, categoryId });
+  updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
+    return http.PUT(`/api/proposals/${proposalId}`, rest);
   }
 
   getProposal(proposalId: string) {
-    return http.GET<ProposalWithUsers>(`/api/proposals/${proposalId}`);
+    return http.GET<ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}`);
+  }
+
+  updateProposalLensProperties({ proposalId, ...rest }: UpdateProposalLensPropertiesRequest) {
+    return http.PUT(`/api/proposals/${proposalId}/update-lens-properties`, rest);
   }
 
   updateStatus(proposalId: string, newStatus: ProposalStatus) {
     return http.PUT<ProposalWithUsers>(`/api/proposals/${proposalId}/status`, { newStatus });
   }
 
-  getProposalsBySpace({ spaceId, categoryIds }: ListProposalsRequest) {
-    return http.POST<ProposalWithUsers[]>(`/api/spaces/${spaceId}/proposals`, { categoryIds });
-  }
-
-  getProposalCategories(spaceId: string) {
-    return http.GET<ProposalCategoryWithPermissions[]>(`/api/spaces/${spaceId}/proposal-categories`);
+  archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
+    return http.POST<ProposalWithUsers>(`/api/proposals/${proposalId}/archive`, { archived });
   }
 
   createProposalTemplate({
@@ -42,18 +36,11 @@ export class ProposalsApi {
   }: {
     spaceId: string;
     categoryId: string;
-  }): Promise<IPageWithPermissions> {
+  }): Promise<PageWithPermissions> {
     return http.POST('/api/proposals/templates', { spaceId, categoryId });
   }
 
-  createProposalFromTemplate({
-    spaceId,
-    templateId
-  }: Omit<CreateProposalFromTemplateInput, 'createdBy'>): Promise<IPageWithPermissions> {
-    return http.POST('/api/proposals/from-template', { spaceId, templateId });
-  }
-
-  deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<IPageWithPermissions> {
+  deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
 
@@ -69,13 +56,5 @@ export class ProposalsApi {
 
   deleteProposalCategory(spaceId: string, categoryId: string) {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
-  }
-
-  computeProposalFlowFlags(proposalId: string) {
-    return http.GET<ProposalFlowFlags>(`/api/proposals/${proposalId}/compute-flow-flags`);
-  }
-
-  getReviewerPool(spaceId: string) {
-    return http.GET<ProposalReviewerPool>(`/api/proposals/reviewer-pool?spaceId=${spaceId}`);
   }
 }

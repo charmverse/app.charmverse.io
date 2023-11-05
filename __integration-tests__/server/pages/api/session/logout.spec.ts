@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-import { ironOptions } from 'lib/session/config';
+import { getIronOptions } from 'lib/session/getIronOptions';
 import { baseUrl } from 'testing/mockApiCall';
 
 // These API calls should succeed without needed a user account
@@ -10,6 +10,6 @@ describe('POST /api/session/logout - Log out user', () => {
 
     const cookies = r.get('Set-Cookie');
     expect(cookies.length).toBe(1);
-    expect(cookies[0]).toContain(`${ironOptions.cookieName}=;`);
+    expect(cookies[0]).toContain(`${getIronOptions().cookieName}=;`);
   });
 });

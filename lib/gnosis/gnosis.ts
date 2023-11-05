@@ -3,11 +3,13 @@ import type { UserGnosisSafe } from '@charmverse/core/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
-import { getChainById, RPC } from 'connectors';
+import { getChainById, RPCList } from 'connectors/chains';
 import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import uniqBy from 'lodash/uniqBy';
+
+import { getSafesByOwner, getSafeData } from './mantleClient';
 
 export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
 
@@ -16,12 +18,12 @@ function getGnosisRPCUrl(chainId: number) {
 }
 
 interface GetGnosisServiceProps {
-  signer: ethers.Signer;
+  signer: ethers.Signer | ethers.providers.Provider;
   chainId?: number;
   serviceUrl?: string;
 }
 
-function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
+export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
   const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
   if (!txServiceUrl) {
     return null;
@@ -53,23 +55,44 @@ export async function getSafesForAddress({ signer, chainId, address }: GetSafesF
   if (!serviceUrl) {
     return [];
   }
-  const service = getGnosisService({ signer, serviceUrl });
-  if (service) {
-    const checksumAddress = getAddress(address); // convert to checksum address
-    return service.getSafesByOwner(checksumAddress).then((r) =>
+
+  const checksumAddress = getAddress(address); // convert to checksum address
+  if (chainId === 5001 || chainId === 5000) {
+    const { safes } = await getSafesByOwner({ serviceUrl, chainId, address: checksumAddress });
+    return Promise.all(
+      safes.map(async (safeAddr) => {
+        const safeData = await getSafeData({ serviceUrl, chainId, address: getAddress(safeAddr) });
+        return {
+          chainId,
+          address: safeAddr,
+          nonce: safeData.nonce,
+          threshold: safeData.threshold,
+          masterCopy: safeData.implementation.value,
+          owners: safeData.owners.map((owner) => owner.value),
+          modules: safeData.modules ?? [],
+          fallbackHandler: safeData.fallbackHandler.value,
+          version: safeData.version
+        };
+      })
+    );
+  } else {
+    const safeService = getGnosisService({ signer, serviceUrl });
+    if (!safeService) {
+      return [];
+    }
+    return safeService.getSafesByOwner(checksumAddress).then((r) =>
       Promise.all(
         r.safes.map((safeAddr) => {
-          return service.getSafeInfo(safeAddr).then((info) => ({ ...info, chainId }));
+          return safeService.getSafeInfo(safeAddr).then((info) => ({ ...info, chainId }));
         })
       )
     );
   }
-  return [];
 }
 
 export async function getSafesForAddresses(signer: ethers.Signer, addresses: string[]) {
   const safes = await Promise.all(
-    Object.values(RPC).map((network) => {
+    RPCList.map((network) => {
       return Promise.all(addresses.map((address) => getSafesForAddress({ signer, chainId: network.chainId, address })));
     })
   ).then((list) => list.flat().flat());
@@ -79,9 +102,9 @@ export async function getSafesForAddresses(signer: ethers.Signer, addresses: str
 }
 
 async function getTransactionsforSafe(signer: Signer, wallet: UserGnosisSafe): Promise<GnosisTransaction[]> {
-  const service = getGnosisService({ signer, chainId: wallet.chainId });
-  if (service) {
-    const transactions = await service.getPendingTransactions(wallet.address);
+  const safeService = getGnosisService({ signer, chainId: wallet.chainId });
+  if (safeService) {
+    const transactions = await safeService.getPendingTransactions(wallet.address);
     return transactions.results;
   }
   return [];

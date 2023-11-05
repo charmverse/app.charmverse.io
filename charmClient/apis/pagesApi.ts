@@ -1,10 +1,11 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
-import type { PageWithContent, PageMeta } from 'lib/pages/interfaces';
+import type { PageWithContent } from 'lib/pages/interfaces';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
@@ -51,9 +52,10 @@ export class PagesApi {
     pageId,
     id,
     content,
-    contentText
+    contentText,
+    lensCommentLink
   }: UpdateCommentInput & { pageId: string; id: string }): Promise<PageComment> {
-    return http.PUT(`/api/pages/${pageId}/comments/${id}`, { content, contentText });
+    return http.PUT(`/api/pages/${pageId}/comments/${id}`, { content, contentText, lensCommentLink });
   }
 
   deleteComment({ commentId, pageId }: { pageId: string; commentId: string }): Promise<void> {
@@ -62,5 +64,9 @@ export class PagesApi {
 
   voteComment({ pageId, upvoted, commentId }: { commentId: string; upvoted: boolean | null; pageId: string }) {
     return http.PUT(`/api/pages/${pageId}/comments/${commentId}/vote`, { upvoted });
+  }
+
+  syncPageComments({ pageId }: { pageId: string }): Promise<PageCommentWithVote[]> {
+    return http.POST(`/api/pages/${pageId}/sync-page-comments`);
   }
 }

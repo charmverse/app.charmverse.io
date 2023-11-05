@@ -19,8 +19,9 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import { ListItemIcon, ListItemText } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
+import { MEMBER_PROPERTY_CONFIG, PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   text: <TextIcon fontSize='small' />,
@@ -43,7 +44,11 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   join_date: <CalendarMonthIcon fontSize='small' />
 };
 
-export function MemberPropertyItem({ type, name }: { type: MemberPropertyType; name?: string }) {
+type Props = {
+  type: MemberPropertyType;
+  name?: string;
+};
+export function MemberPropertyItem({ type, name }: Props) {
   return (
     <>
       <ListItemIcon>{MemberPropertyIcons[type]}</ListItemIcon>
@@ -52,11 +57,15 @@ export function MemberPropertyItem({ type, name }: { type: MemberPropertyType; n
           '& span': {
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
           }
         }}
       >
         {name ?? MEMBER_PROPERTY_CONFIG[type]?.label}
+        {PREMIUM_MEMBER_PROPERTIES.includes(type) && <UpgradeChip upgradeContext='custom_roles' />}
       </ListItemText>
     </>
   );

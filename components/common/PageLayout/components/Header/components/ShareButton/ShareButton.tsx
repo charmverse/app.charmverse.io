@@ -1,34 +1,22 @@
-import type { PageType } from '@charmverse/core/prisma';
 import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
-import { Box, Divider, IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { memo, useEffect } from 'react';
-import useSWRImmutable from 'swr/immutable';
+import { IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
+import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import { memo } from 'react';
 
-import charmClient from 'charmClient';
-import Button from 'components/common/Button';
-import Loader from 'components/common/Loader';
-import { usePagePermissionsList } from 'hooks/usePagePermissionsList';
-import { usePages } from 'hooks/usePages';
+import { Button } from 'components/common/Button';
 
-import PagePermissions from './components/PagePermissions';
-import { ProposalPagePermissions } from './components/PagePermissions/ProposalPagePermissions';
-import ShareToWeb from './components/ShareToWeb';
+import { PagePermissionsContainer } from './components/PagePermissionsContainer';
 
-function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: string }) {
-  const { refreshPage, pages } = usePages();
+type Props = {
+  headerHeight: number;
+  pageId: string;
+};
+
+export function ShareButton({ headerHeight, pageId }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
-  const { pagePermissions, refreshPermissions } = usePagePermissionsList({
-    pageId
-  });
+
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
-  // watch changes to the page in case permissions get updated
-  useEffect(() => {
-    if (pageId) {
-      refreshPage(pageId);
-    }
-  }, [pageId, pagePermissions]);
 
   return (
     <>
@@ -39,21 +27,12 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
             color='secondary'
             variant='text'
             size='small'
-            onClick={() => {
-              refreshPermissions();
-              popupState.open();
-            }}
+            {...bindTrigger(popupState)}
           >
             Share
           </Button>
         ) : (
-          <IconButton
-            data-test='toggle-page-permissions-dialog'
-            onClick={() => {
-              refreshPermissions();
-              popupState.open();
-            }}
-          >
+          <IconButton data-test='toggle-page-permissions-dialog' {...bindTrigger(popupState)}>
             <IosShare color='secondary' fontSize='small' />
           </IconButton>
         )}
@@ -64,7 +43,7 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
           horizontal: 'right',
           vertical: 'bottom'
         }}
-        anchorReference='none'
+        // anchorReference='none'
         transformOrigin={{
           vertical: 'top',
           horizontal: 'center'
@@ -77,30 +56,8 @@ function ShareButton({ headerHeight, pageId }: { headerHeight: number; pageId: s
           }
         }}
       >
-        {!pagePermissions ? (
-          <Box sx={{ height: 100 }}>
-            <Loader size={20} sx={{ height: 600 }} />
-          </Box>
-        ) : (
-          <>
-            <ShareToWeb pageId={pageId} pagePermissions={pagePermissions} refreshPermissions={refreshPermissions} />
-            <Divider />
-            {pages[pageId]?.type === 'proposal' && (
-              <ProposalPagePermissions proposalId={pages[pageId]?.proposalId as string} />
-            )}
-            {pages[pageId]?.type !== 'proposal' && (
-              <PagePermissions
-                pageId={pageId}
-                refreshPermissions={refreshPermissions}
-                pagePermissions={pagePermissions}
-                pageType={pages[pageId]?.type as PageType}
-              />
-            )}
-          </>
-        )}
+        <PagePermissionsContainer pageId={pageId} />
       </Popover>
     </>
   );
 }
-
-export default memo(ShareButton);

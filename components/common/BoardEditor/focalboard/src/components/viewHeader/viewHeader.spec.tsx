@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { render } from '@testing-library/react';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
@@ -7,34 +5,29 @@ import { Provider as ReduxProvider } from 'react-redux';
 import '@testing-library/jest-dom';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { mockStateStore, wrapIntl } from '../../testUtils';
+import { mockStateStore, wrapDNDIntl } from '../../testUtils';
 
 import ViewHeader from './viewHeader';
 
 const board = TestBlockFactory.createBoard();
 const activeView = TestBlockFactory.createBoardView(board);
 const card = TestBlockFactory.createCard(board);
+card.id = 'card-id-1';
+activeView.id = 'view-id-1';
 
-jest.mock('react-router-dom', () => {
-  const originalModule = jest.requireActual('react-router-dom');
-
-  return {
-    ...originalModule,
-    useRouteMatch: jest.fn(() => {
-      return { url: '/board/view' };
-    })
-  };
-});
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/[domain]/',
+    query: {
+      domain: 'test-space'
+    },
+    asPath: '/test-space',
+    isReady: true
+  })
+}));
 
 describe('components/viewHeader/viewHeader', () => {
   const state = {
-    users: {
-      me: {
-        id: 'user-id-1',
-        username: 'username_1'
-      }
-    },
-    searchText: {},
     boards: {
       current: board
     },
@@ -51,16 +44,17 @@ describe('components/viewHeader/viewHeader', () => {
   const store = mockStateStore([], state);
   test('return viewHeader', () => {
     const { container } = render(
-      wrapIntl(
+      wrapDNDIntl(
         <ReduxProvider store={store}>
           <ViewHeader
-            board={board}
+            showCard={jest.fn()}
+            showView={jest.fn()}
+            toggleViewOptions={jest.fn()}
+            viewsBoard={board}
             activeView={activeView}
             views={[activeView]}
             cards={[card]}
-            groupByProperty={board.fields.cardProperties[0]}
             addCard={jest.fn()}
-            addCardFromTemplate={jest.fn()}
             addCardTemplate={jest.fn()}
             editCardTemplate={jest.fn()}
             readOnly={false}
@@ -72,16 +66,17 @@ describe('components/viewHeader/viewHeader', () => {
   });
   test('return viewHeader readonly', () => {
     const { container } = render(
-      wrapIntl(
+      wrapDNDIntl(
         <ReduxProvider store={store}>
           <ViewHeader
-            board={board}
+            viewsBoard={board}
+            showCard={jest.fn()}
+            showView={jest.fn()}
+            toggleViewOptions={jest.fn()}
             activeView={activeView}
             views={[activeView]}
             cards={[card]}
-            groupByProperty={board.fields.cardProperties[0]}
             addCard={jest.fn()}
-            addCardFromTemplate={jest.fn()}
             addCardTemplate={jest.fn()}
             editCardTemplate={jest.fn()}
             readOnly={true}

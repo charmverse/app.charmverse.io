@@ -1,11 +1,12 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { UpdateCommentInput } from 'lib/comments';
 
 export async function updatePageComment({
   content,
   contentText,
-  commentId
+  commentId,
+  lensCommentLink
 }: UpdateCommentInput & {
   commentId: string;
 }) {
@@ -14,8 +15,9 @@ export async function updatePageComment({
       id: commentId
     },
     data: {
+      lensCommentLink,
       content,
-      contentText: contentText.trim()
+      contentText: contentText ? contentText.trim() : undefined
     }
   });
 }

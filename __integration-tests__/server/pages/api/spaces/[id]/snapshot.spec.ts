@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

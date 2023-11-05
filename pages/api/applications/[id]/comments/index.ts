@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import type { PageComment } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -32,7 +32,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
     throw new DataNotFoundError(`Bounty not found`);
   }
 
-  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId, allowAdminBypass: false });
+  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId });
 
   if (application.createdBy === userId || bountyPermissions.review) {
     const pageComment = await prisma.pageComment.create({
@@ -66,7 +66,7 @@ async function getApplicationCommentsController(req: NextApiRequest, res: NextAp
     throw new DataNotFoundError(`Bounty not found`);
   }
 
-  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId, allowAdminBypass: false });
+  const bountyPermissions = await computeBountyPermissions({ resourceId: bounty.id, userId });
 
   if (application.createdBy === userId || bountyPermissions.review) {
     const pageComments = await prisma.pageComment.findMany({

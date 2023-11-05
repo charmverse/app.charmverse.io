@@ -8,8 +8,8 @@ import { memo } from 'react';
 import PageActionToggle from 'components/[pageId]/DocumentPage/components/PageActionToggle';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { PageAction } from 'hooks/usePageActionDisplay';
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import type { PageAction } from 'hooks/usePageSidebar';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 
 const PageActionListBox = styled.div`
   position: fixed;
@@ -20,7 +20,7 @@ const PageActionListBox = styled.div`
   z-index: var(--z-index-drawer);
   height: calc(100% - 80px);
   overflow: auto;
-  padding: ${({ theme }) => theme.spacing(0, 1, 0, 3)};
+  padding: ${({ theme }) => theme.spacing(0, 1)};
   background: ${({ theme }) => theme.palette.background.default};
 `;
 
@@ -48,7 +48,7 @@ function SidebarDrawerComponent({
   open: boolean;
   title: string;
 }) {
-  const { setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { setActiveView } = usePageSidebar();
   const isMdScreen = useMdScreen();
   const theme = useTheme();
 
@@ -94,7 +94,7 @@ function SidebarDrawerComponent({
     <MobileDialog
       title={title}
       open={open}
-      onClose={() => setCurrentPageActionDisplay(null)}
+      onClose={() => setActiveView(null)}
       rightActions={
         <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
           <PageActionIcon view='comments' size='medium' />
@@ -112,15 +112,15 @@ function SidebarDrawerComponent({
 }
 
 function PageActionIcon({ view, size = 'small' }: { view: PageAction; size?: 'small' | 'medium' }) {
-  const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { activeView, setActiveView } = usePageSidebar();
 
   function setView() {
-    setCurrentPageActionDisplay(view);
+    setActiveView(view);
   }
 
   return (
     <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
-      <IconButton color={currentPageActionDisplay === view ? 'inherit' : 'secondary'} size={size} onClick={setView}>
+      <IconButton color={activeView === view ? 'inherit' : 'secondary'} size={size} onClick={setView}>
         {SIDEBAR_VIEWS[view].icon}
       </IconButton>
     </Tooltip>

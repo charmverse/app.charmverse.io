@@ -1,4 +1,4 @@
-import type { AssignedPostCategoryPermission } from '@charmverse/core';
+import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import type { PostCategoryPermission } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 

@@ -3,27 +3,33 @@ import { Box, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
 
+import { useTrackPageView } from 'charmClient/hooks/track';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePendingLocalAction } from 'hooks/usePendingLocalAction';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 
 import Legend from '../Legend';
 
-import InviteLinkList from './components/InviteLinks';
+import { InviteLinkList } from './components/InviteLinks';
 import InviteActions from './components/InviteLinks/components/InviteActions';
 import InviteIntro from './components/InviteLinks/components/InviteIntro';
-import TokenGates from './components/TokenGates';
+import { PublicInvitesList } from './components/PublicInvitesList';
+import { TokenGates } from './components/TokenGates';
 
-function Invites({ space }: { space: Space }) {
+export function Invites({ space }: { space: Space }) {
   const spaceId = space.id;
   const isAdmin = useIsAdmin();
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
   const { isPendingAction, setPendingAction } = usePendingLocalAction('open-token-gate-modal');
   const isTokenGatePending = useRef(false);
-  const { openWalletSelectorModal } = useContext(Web3Connection);
-  const { account } = useWeb3AuthSig();
+  const { connectWallet } = useContext(Web3Connection);
+  const { account } = useWeb3Account();
+  const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
+  useTrackPageView({ type: 'settings/invites' });
 
   if (account && isTokenGatePending.current) {
     setPendingAction();
@@ -35,7 +41,7 @@ function Invites({ space }: { space: Space }) {
       popupTokenGateState.open();
     } else {
       isTokenGatePending.current = true;
-      openWalletSelectorModal();
+      connectWallet();
     }
   }
 
@@ -69,10 +75,15 @@ function Invites({ space }: { space: Space }) {
           isAdmin={isAdmin}
         />
       </Legend>
-      <InviteLinkList isAdmin={isAdmin} spaceId={spaceId} popupState={popupInvitesState} />
+      {isLoadingInvites ? <Loader size={20} /> : <InviteLinkList popupState={popupInvitesState} />}
+      <Box sx={{ my: 2 }} />
+      {publicInvites && publicInvites.length > 0 && (
+        <>
+          <PublicInvitesList />
+          <Box sx={{ my: 2 }} />
+        </>
+      )}
       <TokenGates isAdmin={isAdmin} spaceId={spaceId} popupState={popupTokenGateState} />
     </>
   );
 }
-
-export default Invites;

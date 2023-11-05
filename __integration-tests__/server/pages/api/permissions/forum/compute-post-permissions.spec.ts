@@ -1,10 +1,10 @@
 import type { PostCategoryPermission, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { computePostPermissions } from 'lib/permissions/forum/computePostPermissions';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
@@ -43,7 +43,7 @@ describe('POST /api/permissions/forum/compute-post-permissions - Compute permiss
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await computePostPermissions({
+    const computed = await premiumPermissionsApiClient.forum.computePostPermissions({
       resourceId: post.id,
       userId: user.id
     });
@@ -84,7 +84,7 @@ describe('POST /api/permissions/forum/compute-post-permissions - Compute permiss
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await computePostPermissions({
+    const computed = await premiumPermissionsApiClient.forum.computePostPermissions({
       resourceId: post.id,
       userId: user.id
     });
@@ -118,7 +118,7 @@ describe('POST /api/permissions/forum/compute-post-permissions - Compute permiss
     });
 
     // Non logged in user test case
-    const publicComputed = await computePostPermissions({
+    const publicComputed = await premiumPermissionsApiClient.forum.computePostPermissions({
       resourceId: post.id,
       userId: undefined
     });

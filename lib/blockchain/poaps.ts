@@ -1,7 +1,6 @@
+import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
-
-import fetch from 'adapters/http/fetch.server';
 
 import type { ExtendedPoap } from './interfaces';
 
@@ -18,7 +17,7 @@ export async function getPOAPs(wallets: UserWallet[]): Promise<ExtendedPoap[]> {
   const addresses = wallets.map((w) => w.address);
 
   const requests = addresses.map((address) => {
-    return fetch<PoapInResponse[]>(getPOAPsURL(address), {
+    return GET<PoapInResponse[]>(getPOAPsURL(address), undefined, {
       headers: { 'X-API-Key': apiKey }
     }).catch((err) => {
       log.warn(`Error retrieving POAPS for address: ${address}`, err);

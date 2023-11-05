@@ -1,6 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { sessionUserRelations } from 'lib/session/config';
 import { MissingDataError } from 'lib/utilities/errors';
@@ -28,6 +28,7 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
       },
       include: sessionUserRelations,
       data: {
+        publishToLensDefault: update.publishToLensDefault,
         avatar: update.avatar,
         avatarChain: update.avatarChain,
         avatarContract: update.avatarContract,
@@ -41,7 +42,7 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
     });
   }
 
-  log.info('Updated user information', { userId, update });
+  log.debug('Updated user information', { userId });
 
   return getUserProfile('id', userId);
 }

@@ -1,6 +1,5 @@
 import { Add } from '@mui/icons-material';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Typography, Box } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useDrop } from 'react-dnd';
 
@@ -30,15 +29,18 @@ type Props = {
   visibleGroups: BoardGroup[];
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
-  readOnlySourceData: boolean;
   cardIdToFocusOnRender: string;
-  showCard: (cardId: string | null) => void;
+  showCard: (cardId: string | null, parentId?: string) => void;
   addCard: (groupByOptionId?: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
+  onDeleteCard?: (cardId: string) => Promise<void>;
+  readOnlyTitle?: boolean;
+  disableAddingCards?: boolean;
+  expandSubRowsOnLoad?: boolean;
 };
 
 function Table(props: Props): JSX.Element {
-  const { board, cardPages, activeView, visibleGroups, groupByProperty, views } = props;
+  const { board, cardPages, activeView, visibleGroups, groupByProperty, views, expandSubRowsOnLoad } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
 
@@ -226,7 +228,6 @@ function Table(props: Props): JSX.Element {
           resizingColumn={resizingColumn}
           columnRefs={columnRefs}
           readOnly={props.readOnly}
-          readOnlySourceData={props.readOnlySourceData}
         />
 
         {/* Table rows */}
@@ -240,7 +241,7 @@ function Table(props: Props): JSX.Element {
                   activeView={activeView}
                   groupByProperty={groupByProperty}
                   group={group}
-                  readOnly={props.readOnly || props.readOnlySourceData}
+                  readOnly={props.readOnly}
                   columnRefs={columnRefs}
                   selectedCardIds={props.selectedCardIds}
                   cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -252,6 +253,8 @@ function Table(props: Props): JSX.Element {
                   onDropToGroupHeader={onDropToGroupHeader}
                   onDropToCard={onDropToCard}
                   onDropToGroup={onDropToGroup}
+                  readOnlyTitle={props.readOnlyTitle}
+                  disableAddingCards={props.disableAddingCards}
                 />
               );
             })}
@@ -264,7 +267,7 @@ function Table(props: Props): JSX.Element {
               columnRefs={columnRefs}
               cardPages={cardPages}
               selectedCardIds={props.selectedCardIds}
-              readOnly={props.readOnly || props.readOnlySourceData}
+              readOnly={props.readOnly}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
               offset={offset}
               resizingColumn={resizingColumn}
@@ -272,14 +275,18 @@ function Table(props: Props): JSX.Element {
               addCard={props.addCard}
               onCardClicked={props.onCardClicked}
               onDrop={onDropToCard}
+              onDeleteCard={props.onDeleteCard}
+              readOnlyTitle={props.readOnlyTitle}
+              expandSubRowsOnLoad={expandSubRowsOnLoad}
             />
           )}
         </div>
 
         {/* Add New row */}
         <div className='octo-table-footer'>
-          {!props.readOnly && !props.readOnlySourceData && !activeView.fields.groupById && (
+          {!props.readOnly && !activeView.fields.groupById && !props.disableAddingCards && (
             <div
+              data-test='table-add-card'
               className='octo-table-cell'
               onClick={() => {
                 props.addCard('');
@@ -301,7 +308,7 @@ function Table(props: Props): JSX.Element {
           activeView={activeView}
           resizingColumn={resizingColumn}
           offset={offset}
-          readOnly={props.readOnly || props.readOnlySourceData}
+          readOnly={props.readOnly}
         />
       </div>
     </div>

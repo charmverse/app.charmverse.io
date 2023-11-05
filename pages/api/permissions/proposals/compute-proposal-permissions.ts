@@ -1,11 +1,11 @@
-import { prisma } from '@charmverse/core';
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
-import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-import type { AvailableProposalPermissionFlags } from 'lib/permissions/proposals/interfaces';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -13,9 +13,9 @@ import { isUUID } from 'lib/utilities/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePermissions);
+handler.post(computePermissions);
 
-async function computePermissions(req: NextApiRequest, res: NextApiResponse<AvailableProposalPermissionFlags>) {
+async function computePermissions(req: NextApiRequest, res: NextApiResponse<ProposalPermissionFlags>) {
   const input = req.body as PermissionCompute;
 
   let resourceId = input.resourceId;
@@ -47,10 +47,12 @@ async function computePermissions(req: NextApiRequest, res: NextApiResponse<Avai
     }
   }
 
-  const permissions = await computeProposalPermissions({
-    resourceId,
-    userId: req.session.user?.id
-  });
+  const permissions = await getPermissionsClient({ resourceId, resourceIdType: 'proposal' }).then(({ client }) =>
+    client.proposals.computeProposalPermissions({
+      resourceId,
+      userId: req.session.user?.id
+    })
+  );
   res.status(200).json(permissions);
 }
 

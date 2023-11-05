@@ -1,27 +1,29 @@
-import { UnsupportedChainIdError } from '@web3-react/core';
 import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected
-} from '@web3-react/injected-connector';
-import { UserRejectedRequestError as UserRejectedRequestErrorWalletConnect } from '@web3-react/walletconnect-connector';
+  ChainDisconnectedError,
+  ClientChainNotConfiguredError,
+  InvalidChainIdError,
+  ProviderDisconnectedError,
+  UserRejectedRequestError
+} from 'viem';
 
 import type { ErrorInfo } from 'components/common/errors/WalletError';
 
 const processConnectionError = (error: Error): ErrorInfo => {
   switch (error.constructor) {
-    case NoEthereumProviderError:
+    case ChainDisconnectedError:
+    case ProviderDisconnectedError:
       return {
         title: 'Wallet not found',
         description:
           'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.'
       };
-    case UnsupportedChainIdError:
+    case InvalidChainIdError:
+    case ClientChainNotConfiguredError:
       return {
         title: 'Wrong network',
         description: 'Please switch to a supported network, or connect to another wallet.'
       };
-    case UserRejectedRequestErrorInjected:
-    case UserRejectedRequestErrorWalletConnect:
+    case UserRejectedRequestError:
       return {
         title: 'Error connecting. Try again!',
         description: 'Please authorize this website to access your Ethereum account.'

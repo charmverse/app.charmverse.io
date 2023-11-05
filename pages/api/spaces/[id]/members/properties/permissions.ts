@@ -26,7 +26,8 @@ async function createMemberPropertyPermissionHandler(
 }
 
 async function deleteMemberPropertyPermissionHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as { permissionId: string };
+  // TODO: Remove check for req.body after user browsers are updated - 06/2023
+  const { permissionId } = (req.query || req.body) as { permissionId: string };
 
   await deleteMemberPropertyPermission(permissionId);
 

@@ -30,7 +30,6 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return <ErrorPage />;
     }
-
     return this.props.children;
   }
 }

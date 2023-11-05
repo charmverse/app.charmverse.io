@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export async function updateProposlsDraftStatus() {
   const updated = await prisma.proposal.updateMany({
@@ -6,8 +6,8 @@ export async function updateProposlsDraftStatus() {
       status: 'private_draft' as any
     },
     data: {
-      status: 'draft',
-    },
+      status: 'draft'
+    }
   });
 
   console.log('🔥 udpated:', updated);

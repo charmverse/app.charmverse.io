@@ -1,41 +1,42 @@
+import env from '@beam-australia/react-env';
 import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
 import { useEffect } from 'react';
 
-import { isProdEnv } from 'config/constants';
-
-import { useUser } from '../../../hooks/useUser';
+import { isProdEnv, isStagingEnv } from 'config/constants';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useUser } from 'hooks/useUser';
 
 const DD_SITE = 'datadoghq.com';
 const DD_SERVICE = 'webapp-browser';
 
-const env = process.env.NODE_ENV === 'production' ? 'prd' : 'dev';
+const appEnv = isStagingEnv ? 'stg' : isProdEnv ? 'prd' : 'dev';
 
 export default function useDatadogLogger() {
   const { user } = useUser();
+  const { space } = useCurrentSpace();
 
   // Load DD_LOGS
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN && isProdEnv) {
+    if (env('DD_CLIENT_TOKEN') && isProdEnv) {
       datadogLogs.init({
-        clientToken: process.env.NEXT_PUBLIC_DD_CLIENT_TOKEN,
+        clientToken: env('DD_CLIENT_TOKEN'),
         site: DD_SITE,
         service: DD_SERVICE,
         forwardErrorsToLogs: true,
-        sampleRate: 100,
-        env,
-        version: process.env.NEXT_PUBLIC_BUILD_ID,
-        forwardConsoleLogs: ['error']
+        sessionSampleRate: 100,
+        env: appEnv,
+        version: env('BUILD_ID')
       });
     }
   }, []);
 
   // Load DD_RUM_LOGS
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN && process.env.NEXT_PUBLIC_DD_RUM_APP_ID && isProdEnv) {
+    if (env('DD_RUM_CLIENT_TOKEN') && env('DD_RUM_APP_ID') && isProdEnv) {
       datadogRum.init({
-        applicationId: process.env.NEXT_PUBLIC_DD_RUM_APP_ID,
-        clientToken: process.env.NEXT_PUBLIC_DD_RUM_CLIENT_TOKEN,
+        applicationId: env('DD_RUM_APP_ID'),
+        clientToken: env('DD_RUM_CLIENT_TOKEN'),
         site: DD_SITE,
         service: DD_SERVICE,
         sampleRate: 100,
@@ -44,8 +45,8 @@ export default function useDatadogLogger() {
         trackResources: true,
         trackLongTasks: true,
         defaultPrivacyLevel: 'mask-user-input',
-        env,
-        version: process.env.NEXT_PUBLIC_BUILD_ID
+        env: appEnv,
+        version: env('BUILD_ID')
       });
 
       datadogRum.startSessionReplayRecording();
@@ -70,4 +71,21 @@ export default function useDatadogLogger() {
       datadogRum.clearUser();
     };
   }, [user?.id]);
+
+  // Add space id to context
+  useEffect(() => {
+    if (space && isProdEnv) {
+      datadogLogs.onReady(() => {
+        datadogLogs.setGlobalContext({ spaceId: space.id });
+      });
+      datadogRum.onReady(() => {
+        datadogRum.setGlobalContext({ spaceId: space.id });
+      });
+    }
+
+    return () => {
+      datadogLogs.setGlobalContext({ spaceId: null });
+      datadogRum.setGlobalContext({ spaceId: null });
+    };
+  }, [space?.id]);
 }

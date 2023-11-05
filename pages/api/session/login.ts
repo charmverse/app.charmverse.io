@@ -1,4 +1,5 @@
-import { prisma } from '@charmverse/core';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -43,6 +44,9 @@ async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { 
     user.wallets.map((w) => w.address),
     user.spaceRoles
   );
+
+  log.info(`User ${user.id} logged in with Wallet`, { userId: user.id, method: 'wallet' });
+
   await req.session.save();
 
   trackUserAction('sign_in', { userId: user.id, identityType: 'Wallet' });

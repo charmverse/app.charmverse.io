@@ -63,7 +63,7 @@ export function randomBannerImage() {
 interface PageBannerProps {
   focalBoard?: boolean;
   headerImage: string;
-  readOnly: boolean;
+  readOnly?: boolean;
   setPage: (page: { headerImage: string | null }) => void;
 }
 
@@ -89,7 +89,11 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
           }}
           className='page-cover-controls'
         >
-          <ImageSelector galleryImages={bannerImageGroups} onImageSelect={setImage}>
+          <ImageSelector
+            galleryImages={bannerImageGroups}
+            onImageSelect={setImage}
+            uploadDisclaimer='We recommend using an image at least 1500px wide, or a ratio of 1500px by 220px.'
+          >
             <ListItem
               button
               disableRipple

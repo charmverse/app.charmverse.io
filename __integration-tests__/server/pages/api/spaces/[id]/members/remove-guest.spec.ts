@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@charmverse/core';
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
-import type { SpaceHiddenFeatures } from 'lib/spaces/setHiddenFeatures';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

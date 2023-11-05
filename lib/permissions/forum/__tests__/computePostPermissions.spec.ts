@@ -1,13 +1,14 @@
-import type { PostPermissionFlags } from '@charmverse/core';
-import { AvailablePostPermissions, generateForumPost, generatePostCategory, objectUtils } from '@charmverse/core';
+import type { PostPermissionFlags } from '@charmverse/core/permissions';
+import { AvailablePostPermissions } from '@charmverse/core/permissions';
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { PostOperation } from '@charmverse/core/prisma';
+import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
+import { objectUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';
@@ -26,13 +27,13 @@ let otherSpaceAdminUser: User;
 let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace({ isAdmin: true });
+  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   adminUser = generated.user;
   space = generated.space;
-  spaceMemberUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
-  authorUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+  spaceMemberUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
+  authorUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
-  const secondGenerated = await generateUserAndSpace({ isAdmin: true });
+  const secondGenerated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   otherSpaceAdminUser = secondGenerated.user;
   otherSpace = secondGenerated.space;
   proposalCategory = await generateProposalCategory({
@@ -47,11 +48,11 @@ describe('computePostPermissions - base', () => {
   // This test exists so we can apply a certain permission level to the space, but make it higher or lower for a user
   it('should provide full permissions to the admin', async () => {
     // Perform the test with a page that has user / role / space / permissions ----------------------------
-    const postCategory = await generatePostCategory({
+    const postCategory = await testUtilsForum.generatePostCategory({
       spaceId: space.id
     });
 
-    const post = await generateForumPost({
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
@@ -69,9 +70,9 @@ describe('computePostPermissions - base', () => {
     );
   });
 
-  it('should allow space members to view, comment and vote on a post', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
+  it('should provide full permissions to space members', async () => {
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
@@ -81,20 +82,25 @@ describe('computePostPermissions - base', () => {
       userId: spaceMemberUser.id
     });
 
-    const operations: PostOperation[] = ['view_post', 'upvote', 'downvote', 'add_comment'];
-
-    postOperations.forEach((op) => {
-      if (operations.includes(op)) {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
+    expect(permissions).toMatchObject<PostPermissionFlags>({
+      // All space members can engage with the post
+      view_post: true,
+      add_comment: true,
+      downvote: true,
+      upvote: true,
+      // Moderator-type permissions are provided to all members
+      delete_comments: true,
+      delete_post: true,
+      lock_post: true,
+      pin_post: true,
+      // Only author gets an edit_post permission
+      edit_post: false
     });
   });
 
   it('should always allow the author to view, edit and delete the post', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
@@ -104,23 +110,26 @@ describe('computePostPermissions - base', () => {
       userId: authorUser.id
     });
 
-    const authorOperations: PostOperation[] = ['edit_post', 'delete_post'];
-
-    const combinedOps = [...authorOperations, ...memberOperations];
-
-    postOperations.forEach((op) => {
-      if (combinedOps.includes(op)) {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
+    expect(permissions).toMatchObject<PostPermissionFlags>({
+      // All space members can engage with the post
+      view_post: true,
+      add_comment: true,
+      downvote: true,
+      upvote: true,
+      // Moderator-type permissions are provided to all members
+      delete_comments: true,
+      delete_post: true,
+      lock_post: true,
+      pin_post: true,
+      // Only author gets an edit_post permission
+      edit_post: true
     });
   });
 
   it('should allow people from outside the space to view the post', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
 
-    const post = await generateForumPost({
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
@@ -178,8 +187,8 @@ describe('computePostPermissions - base', () => {
 
 describe('computePostPermissions - with editable by author policy', () => {
   it('should only allow a author to edit their post', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
@@ -203,18 +212,12 @@ describe('computePostPermissions - with editable by author policy', () => {
 });
 
 describe('computePostPermissions - with proposal permission filtering policy', () => {
-  it('should return delete_post and view_post permissions of a proposal converted post for admins', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
+  it('should return unmodifed permissions of a proposal converted post for admins', async () => {
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
-    });
-
-    await convertPostToProposal({
-      post,
-      userId: authorUser.id,
-      categoryId: proposalCategory.id
     });
 
     const permissions = await computePostPermissions({
@@ -222,18 +225,23 @@ describe('computePostPermissions - with proposal permission filtering policy', (
       userId: adminUser.id
     });
 
-    postOperationsWithoutEdit.forEach((op) => {
-      if (op === 'delete_post' || op === 'view_post') {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
+    await convertPostToProposal({
+      post,
+      userId: authorUser.id,
+      categoryId: proposalCategory.id
     });
+
+    const permissionsAfterConversion = await computePostPermissions({
+      resourceId: post.id,
+      userId: adminUser.id
+    });
+
+    expect(permissionsAfterConversion).toMatchObject(permissions);
   });
 
   it('should return delete_post and view_post permissions of a proposal converted post for author', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
@@ -259,10 +267,10 @@ describe('computePostPermissions - with proposal permission filtering policy', (
     });
   });
 
-  it('should return only view_post permissions of a proposal converted post for a regular user', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
+  it('should return only view_post permissions of a post converted to proposal for a regular user', async () => {
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
 
-    const post = await generateForumPost({
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id
@@ -279,20 +287,20 @@ describe('computePostPermissions - with proposal permission filtering policy', (
       userId: spaceMemberUser.id
     });
 
-    postOperationsWithoutEdit.forEach((op) => {
-      if (op === 'view_post') {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
+    expect(permissions.view_post).toBe(true);
+
+    const testedOperations: PostOperation[] = ['add_comment', 'delete_comments', 'upvote', 'downvote'];
+    // Post should now be readonly
+    testedOperations.forEach((op) => {
+      expect(permissions[op]).toBe(false);
     });
   });
 });
 
 describe('computePostPermissions - with draft post permission filtering policy', () => {
   it('should enable view_post and delete_post only for drafted post author', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id,
@@ -314,8 +322,8 @@ describe('computePostPermissions - with draft post permission filtering policy',
   });
 
   it('should disable all permissions of drafted post for admin', async () => {
-    const postCategory = await generatePostCategory({ spaceId: space.id });
-    const post = await generateForumPost({
+    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       categoryId: postCategory.id,
       userId: authorUser.id,

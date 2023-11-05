@@ -1,16 +1,24 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import type { PageDetails } from 'lib/pages';
 import { getPageDetails } from 'lib/pages/server/getPageDetails';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireKeys(['id'], 'query')).get(getPageDetailsHandler);
+handler
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
+  .get(getPageDetailsHandler);
 
 async function getPageDetailsHandler(req: NextApiRequest, res: NextApiResponse<PageDetails>) {
   const pageIdOrPath = req.query.id as string;
@@ -22,7 +30,7 @@ async function getPageDetailsHandler(req: NextApiRequest, res: NextApiResponse<P
   }
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageDetails.id,
     userId
   });

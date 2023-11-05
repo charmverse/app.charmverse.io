@@ -3,31 +3,34 @@ import styled from '@emotion/styled';
 import ModeStandbyOutlinedIcon from '@mui/icons-material/ModeStandbyOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { Box, Card, Grid, Tab, Tabs, Typography } from '@mui/material';
+import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo } from 'react';
 import { CSVLink } from 'react-csv';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import Link from 'components/common/Link';
-import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { BountyWithDetails } from 'lib/bounties';
 import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
-import BountiesKanbanView from './components/BountiesKanbanView';
-import BountiesGalleryView from './components/BountyGalleryView';
+import { BountiesKanbanView } from './components/BountiesKanbanView';
+import { BountiesGalleryView } from './components/BountyGalleryView';
 import { MultiPaymentModal } from './components/MultiPaymentModal';
 import { NewBountyButton } from './components/NewBountyButton';
+import { useOnBountyCardClose } from './hooks/useOnBountyCardClose';
 
 const bountyStatuses: BountyStatus[] = ['open', 'inProgress', 'complete', 'paid', 'suggestion'];
 
 interface Props {
   publicMode?: boolean;
   bounties: BountyWithDetails[];
+  title: string;
 }
 
 const StyledButton = styled(Button)`
@@ -39,21 +42,18 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const views: { label: string; view: 'gallery' | 'board' }[] = [
-  { label: 'Open', view: 'gallery' },
-  { label: 'All', view: 'board' }
-];
+const views = [
+  { icon: <BountyIcon fontSize='small' />, label: 'Open', type: 'open' },
+  { icon: <ModeStandbyOutlinedIcon fontSize='small' />, label: 'All', type: 'all' }
+] as const;
 
-export default function BountiesPage({ publicMode = false, bounties }: Props) {
-  const space = useCurrentSpace();
+export function BountiesPage({ publicMode = false, bounties, title }: Props) {
+  const { space } = useCurrentSpace();
+  const { showPage } = usePageDialog();
+  const { onClose } = useOnBountyCardClose();
   const router = useRouter();
-
-  const currentView = views.find((view) => view.view === router.query.view) ?? views[0];
-
-  useEffect(() => {
-    charmClient.track.trackAction('page_view', { spaceId: space?.id, type: 'bounties_list' });
-  }, []);
-
+  const viewFromUrl = router.query.view as (typeof views)[number]['type'];
+  const currentView = views.find((v) => v.type === viewFromUrl) ?? views[0];
   const bountiesSorted = bounties ? sortArrayByObjectProperty(bounties, 'status', bountyStatuses) : [];
 
   const csvData = useMemo(() => {
@@ -91,103 +91,103 @@ export default function BountiesPage({ publicMode = false, bounties }: Props) {
     }
   }
 
-  return (
-    <PageDialogProvider>
-      <div className='focalboard-body full-page'>
-        <div className='BoardComponent'>
-          <div className='top-head'>
-            <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
-              <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
-                <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
-                  Bounties
-                </Typography>
+  useEffect(() => {
+    if (typeof router.query.bountyId === 'string') {
+      showPage({
+        bountyId: router.query.bountyId,
+        readOnly: publicMode,
+        onClose
+      });
+    }
+  }, [router.query.bountyId]);
 
-                {!publicMode && (
-                  <Box width='fit-content' display='flex' gap={1}>
-                    {!!csvData.length && (
-                      <CSVLink
-                        data={csvData}
-                        onClick={recordExportEvent}
-                        filename='Gnosis Safe Airdrop.csv'
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <Button color='secondary' variant='outlined'>
-                          Export to CSV
-                        </Button>
-                      </CSVLink>
-                    )}
-                    <MultiPaymentModal bounties={bounties} />
-                    <NewBountyButton />
-                  </Box>
-                )}
-              </Grid>
+  return (
+    <div className='focalboard-body full-page'>
+      <div className='BoardComponent'>
+        <div className='top-head'>
+          <Grid container display='flex' justifyContent='space-between' alignContent='center' mb={3} mt={10}>
+            <Grid display='flex' justifyContent='space-between' item xs={12} mb={2}>
+              <Typography variant='h1' display='flex' alignItems='center' sx={{ height: '100%' }}>
+                {title}
+              </Typography>
+
+              {!publicMode && (
+                <Box width='fit-content' display='flex' gap={1}>
+                  {!!csvData.length && (
+                    <CSVLink
+                      data={csvData}
+                      onClick={recordExportEvent}
+                      filename='Gnosis Safe Airdrop.csv'
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <Button color='secondary' variant='outlined'>
+                        Export to CSV
+                      </Button>
+                    </CSVLink>
+                  )}
+                  <MultiPaymentModal bounties={bounties} />
+                  <NewBountyButton />
+                </Box>
+              )}
             </Grid>
-            {bounties.length !== 0 && (
-              <Box className='ViewHeader' alignItems='flex-start'>
-                <Tabs
-                  textColor='primary'
-                  indicatorColor='secondary'
-                  value={currentView.view}
-                  sx={{ minHeight: 0, mb: '-6px' }}
-                >
-                  {views.map(({ label, view }) => (
-                    <Tab
-                      component='div'
-                      disableRipple
-                      key={label}
-                      label={
-                        <StyledButton
-                          startIcon={
-                            view === 'board' ? (
-                              <BountyIcon fontSize='small' />
-                            ) : (
-                              <ModeStandbyOutlinedIcon fontSize='small' />
-                            )
-                          }
-                          onClick={() => {
-                            router.push(`/${space?.domain}/bounties?view=${view}`);
-                          }}
-                          variant='text'
-                          size='small'
-                          sx={{ p: 0, mb: '5px', width: '100%' }}
-                          color={currentView.label === label ? 'textPrimary' : 'secondary'}
-                        >
-                          {label[0].toUpperCase() + label.slice(1)}
-                        </StyledButton>
-                      }
-                      sx={{ p: 0 }}
-                      value={view}
-                    />
-                  ))}
-                </Tabs>
-              </Box>
-            )}
-          </div>
-          {bounties.length === 0 ? (
-            <EmptyStateVideo
-              description='Getting started with bounties'
-              videoTitle='Bounties | Getting started with Charmverse'
-              videoUrl='https://tiny.charmverse.io/bounties'
-            />
-          ) : currentView.view === 'gallery' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (
-            <Card variant='outlined' sx={{ margin: '0 auto', my: 2, width: 'fit-content' }}>
-              <Box p={3} textAlign='center'>
-                <Typography color='secondary'>
-                  There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=board`}>here</Link> to
-                  see all of your existing bounties
-                </Typography>
-              </Box>
-            </Card>
-          ) : currentView.view === 'gallery' ? (
-            <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
-          ) : (
-            <div className='container-container'>
-              <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
-            </div>
+          </Grid>
+          {bounties.length !== 0 && (
+            <Box className='ViewHeader' alignItems='flex-start'>
+              <Tabs
+                textColor='primary'
+                indicatorColor='secondary'
+                value={currentView.type}
+                sx={{ minHeight: 0, mb: '-6px' }}
+              >
+                {views.map(({ icon, label, type }) => (
+                  <Tab
+                    data-test={`bounties-view-${type}`}
+                    disableRipple
+                    component={NextLink}
+                    href={getAbsolutePath(`/bounties?view=${type}`, space?.domain)}
+                    key={type}
+                    value={type}
+                    label={
+                      <StyledButton
+                        startIcon={icon}
+                        variant='text'
+                        size='small'
+                        sx={{ p: 0, mb: '5px', width: '100%' }}
+                        color={currentView.type === type ? 'textPrimary' : 'secondary'}
+                      >
+                        {label}
+                      </StyledButton>
+                    }
+                    sx={{ p: 0 }}
+                  />
+                ))}
+              </Tabs>
+            </Box>
           )}
         </div>
+        {bounties.length === 0 ? (
+          <EmptyStateVideo
+            description='Getting started with bounties'
+            videoTitle='Bounties | Getting started with CharmVerse'
+            videoUrl='https://tiny.charmverse.io/bounties'
+          />
+        ) : currentView.type === 'open' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (
+          <Card variant='outlined' sx={{ margin: '0 auto', my: 2, width: 'fit-content' }}>
+            <Box p={3} textAlign='center'>
+              <Typography color='secondary'>
+                There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=all`}>here</Link> to see
+                all of your existing bounties
+              </Typography>
+            </Box>
+          </Card>
+        ) : currentView.type === 'open' ? (
+          <BountiesGalleryView bounties={bounties} publicMode={publicMode} />
+        ) : (
+          <div className='container-container'>
+            <BountiesKanbanView publicMode={publicMode} bounties={bounties} />
+          </div>
+        )}
       </div>
-      <PageDialogGlobalModal />
-    </PageDialogProvider>
+    </div>
   );
 }

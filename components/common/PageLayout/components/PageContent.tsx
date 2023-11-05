@@ -27,11 +27,3 @@ export function CenteredPageContent(props: { children: ReactNode; style?: CSSPro
     </ScrollableWindow>
   );
 }
-
-export function FullWidthPageContent(props: { children: ReactNode }) {
-  return (
-    <ScrollableWindow>
-      <StyledBox>{props.children}</StyledBox>
-    </ScrollableWindow>
-  );
-}

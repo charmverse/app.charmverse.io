@@ -1,6 +1,6 @@
 export interface BaseEvent {
   userId: string;
-  // Prop for even groups - set in mixpanel as Wrokspace Id
+  // Prop for event groups - set in mixpanel as Wrokspace Id
   spaceId: string;
 }
 

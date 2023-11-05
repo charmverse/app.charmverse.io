@@ -7,6 +7,8 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -20,7 +22,6 @@ async function closeBountyController(req: NextApiRequest, res: NextApiResponse<B
   const userId = req.session.user.id;
 
   const permissions = await computeBountyPermissions({
-    allowAdminBypass: true,
     resourceId: bounty.id,
     userId
   });
@@ -29,7 +30,17 @@ async function closeBountyController(req: NextApiRequest, res: NextApiResponse<B
     throw new UnauthorisedActionError('You do not have the permission to close this bounty');
   }
 
-  const completeBounty = await closeOutBounty(bountyId);
+  const completeBounty = await closeOutBounty({
+    bountyId: bounty.id,
+    userId
+  });
+
+  await publishBountyEvent({
+    scope: WebhookEventNames.RewardCompleted,
+    bountyId: bounty.id,
+    spaceId: bounty.page.spaceId,
+    userId
+  });
 
   return res.status(200).json(completeBounty);
 }

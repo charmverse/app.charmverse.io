@@ -2,7 +2,7 @@ import type { Typeform } from '@typeform/api-client';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
-export interface TypeformFields {
+export type TypeformFields = {
   id?: string;
   ref?: string;
   type?: string;
@@ -14,7 +14,7 @@ export interface TypeformFields {
     label?: string;
   }[];
   properties?: Record<string, string>;
-}
+};
 
 export interface TypeformResponse extends Typeform.Response {
   definition?: {

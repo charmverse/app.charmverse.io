@@ -2,15 +2,15 @@ import { useTheme } from '@emotion/react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { IconButton } from '@mui/material';
 
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 
 export default function PageActionToggle() {
-  const { currentPageActionDisplay, setCurrentPageActionDisplay } = usePageActionDisplay();
+  const { activeView, setActiveView } = usePageSidebar();
   const theme = useTheme();
   return (
     <IconButton
       onClick={() => {
-        setCurrentPageActionDisplay(currentPageActionDisplay === null ? 'comments' : null);
+        setActiveView(activeView === null ? 'comments' : null);
       }}
       size='small'
       sx={{

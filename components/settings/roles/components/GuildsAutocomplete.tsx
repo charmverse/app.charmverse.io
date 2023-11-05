@@ -1,4 +1,5 @@
-import type { GetGuildsResponse } from '@guildxyz/sdk';
+import { stringUtils } from '@charmverse/core/utilities';
+import type { GetGuildResponse } from '@guildxyz/sdk';
 import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -8,7 +9,7 @@ import { VariableSizeList } from 'react-window';
 
 const LISTBOX_PADDING = 8;
 
-type ItemData = [React.HTMLAttributes<HTMLLIElement>, GetGuildsResponse[0]];
+type ItemData = [React.HTMLAttributes<HTMLLIElement>, GetGuildResponse];
 
 function renderRow(props: { data: ItemData[]; index: number; style: React.CSSProperties }) {
   const { data, index, style } = props;
@@ -63,10 +64,7 @@ function renderRow(props: { data: ItemData[]; index: number; style: React.CSSPro
           </Box>
           <Box display='flex' gap={1}>
             <Typography variant='subtitle2' color='secondary'>
-              {guild.memberCount} Members(s)
-            </Typography>
-            <Typography variant='subtitle2' color='secondary'>
-              {guild.roles.length} Role(s)
+              {guild.roles.length} {stringUtils.conditionalPlural({ count: guild.roles.length, word: 'Role' })}
             </Typography>
           </Box>
         </MenuItem>
@@ -137,10 +135,10 @@ export default function GuildsAutocomplete({
   disabled: boolean;
   onChange: (guildIds: number[]) => void;
   selectedGuildIds: number[];
-  guilds: GetGuildsResponse;
+  guilds: GetGuildResponse[];
 }) {
   const guildRecord = React.useMemo(() => {
-    return guilds.reduce<Record<string, GetGuildsResponse[0]>>(
+    return guilds.reduce<Record<string, GetGuildResponse>>(
       (record, guild) => ({
         ...record,
         [guild.name]: guild,

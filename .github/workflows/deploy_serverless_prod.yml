@@ -7,6 +7,7 @@ on:
       # Trigger the job only when the serverless config or files have been changed
       - serverless/**
       - serverless.yml
+      - lib/**
 
 jobs:
   deploy:
@@ -14,18 +15,54 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        function_name: ["webhook-queueWorker", "webhookChecker"]
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - name: serverless deploy
+      - name: Install dependencies
+        uses: ./.github/actions/install
+      - name: populate env file
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          secrets_pattern='^(.+)=.*pull:secretsmanager:(.*):SecretString:([^:]+):?(.*)}}'
+
+          cat .ebstalk.apps.env/serverless.env | while read line; do
+            if [[ $line =~ $secrets_pattern ]]; then
+                env_var_name=${BASH_REMATCH[1]}
+                secret_name=${BASH_REMATCH[2]}
+                secret_json_key=${BASH_REMATCH[3]}
+                secret_version=${BASH_REMATCH[4]:-AWSCURRENT}
+
+                if [[ $secret_version =~ ^AWS ]]; then 
+                    secret_version_option=(--version-stage "$secret_version")
+                else
+                    secret_version_option=(--version-id "$secret_version")
+                fi
+
+                secret_value=$(aws secretsmanager get-secret-value     \
+                                        --region us-east-1             \
+                                        --secret-id "$secret_name"     \
+                                        --query "SecretString"         \
+                                        "${secret_version_option[@]}"  \
+                           | jq -r --arg keyname $secret_json_key '. | fromjson | .[$keyname]')
+
+                [ -z "$secret_value" ] && {
+                    echo "$secret_name or $secret_json_key not found."
+                    secret_value="SECRET_NOT_FOUND"
+                }
+                echo "$env_var_name=\"$secret_value\"" >> .env
+            fi
+          done
+      - name: Copy Prisma files
+        run:
+          node copyPrismaFiles.js
+          ls -lA ./serverless/
+      - name: serverless deploy ${{ matrix.function_name }}
         uses: serverless/github-action@v3.1
         with:
-          args: deploy --stage prod
+          args: deploy --stage prod --function ${{ matrix.function_name }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

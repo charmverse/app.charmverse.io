@@ -1,21 +1,22 @@
-import * as http from 'adapters/http';
-import type { PermissionCompute, PermissionToDelete } from 'lib/permissions/interfaces';
 import type {
   AssignedProposalCategoryPermission,
-  AvailableProposalCategoryPermissionFlags,
-  AvailableProposalPermissionFlags
-} from 'lib/permissions/proposals/interfaces';
+  ProposalCategoryPermissionFlags,
+  ProposalPermissionFlags
+} from '@charmverse/core/permissions';
+
+import * as http from 'adapters/http';
+import type { PermissionCompute, PermissionResource } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 export class ProposalPermissionsApi {
   computeProposalPermissions({ proposalIdOrPath, spaceDomain }: { proposalIdOrPath: string; spaceDomain?: string }) {
-    return http.POST<AvailableProposalPermissionFlags>(`/api/permissions/proposals/compute-proposal-permissions`, {
+    return http.POST<ProposalPermissionFlags>(`/api/permissions/proposals/compute-proposal-permissions`, {
       resourceId: !spaceDomain ? proposalIdOrPath : `${spaceDomain}/${proposalIdOrPath}`
     } as PermissionCompute);
   }
 
   computeProposalCategoryPermissions(proposalCategoryId: string) {
-    return http.POST<AvailableProposalCategoryPermissionFlags>(
+    return http.POST<ProposalCategoryPermissionFlags>(
       `/api/permissions/proposals/compute-proposal-category-permissions`,
       {
         resourceId: proposalCategoryId
@@ -28,7 +29,7 @@ export class ProposalPermissionsApi {
   }
 
   deleteProposalCategoryPermission(permissionId: string) {
-    return http.DELETE('/api/permissions/proposals', { permissionId } as PermissionToDelete);
+    return http.DELETE('/api/permissions/proposals', { permissionId } as PermissionResource);
   }
 
   listProposalCategoryPermissions(resourceId: string) {

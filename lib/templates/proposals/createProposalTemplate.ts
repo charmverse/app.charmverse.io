@@ -1,6 +1,7 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import { v4 } from 'uuid';
 
-import type { IPageWithPermissions, PageWithProposal } from 'lib/pages';
+import type { PageWithProposal } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -25,7 +26,7 @@ export async function createProposalTemplate({
   pageContent,
   reviewers,
   categoryId
-}: CreateProposalTemplateInput): Promise<IPageWithPermissions & PageWithProposal> {
+}: CreateProposalTemplateInput): Promise<PageWithPermissions & PageWithProposal> {
   const proposalId = v4();
 
   if (!categoryId) {

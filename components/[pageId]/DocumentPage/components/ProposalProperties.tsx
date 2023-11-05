@@ -1,347 +1,204 @@
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
-import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Collapse, Divider, Grid, IconButton, Stack, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { debounce } from 'lodash';
+import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
-import { InputSearchMemberBase } from 'components/common/form/InputSearchMember';
-import { InputSearchReviewers } from 'components/common/form/InputSearchReviewers';
-import UserDisplay from 'components/common/UserDisplay';
-import { useTasks } from 'components/nexus/hooks/useTasks';
-import ProposalCategoryInput from 'components/proposals/components/ProposalCategoryInput';
-import { ProposalStepper } from 'components/proposals/components/ProposalStepper/ProposalStepper';
-import { ProposalStepSummary } from 'components/proposals/components/ProposalStepSummary';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
-import { useProposalDetails } from 'components/proposals/hooks/useProposalDetails';
-import { useProposalFlowFlags } from 'components/proposals/hooks/useProposalFlowFlags';
+import {
+  useUpsertRubricCriteria,
+  useGetAllReviewerUserIds,
+  useGetProposalFlowFlags,
+  useGetProposalDetails
+} from 'charmClient/hooks/proposals';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
+import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
+import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
+import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useLensPublication } from 'components/settings/account/hooks/useLensPublication';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMembers } from 'hooks/useMembers';
-import { useRoles } from 'hooks/useRoles';
 import { useUser } from 'hooks/useUser';
-import type { Member } from 'lib/members/interfaces';
-import type { IPagePermissionFlags } from 'lib/permissions/pages';
-import type { ProposalCategory } from 'lib/proposal/interface';
-import type { ProposalUserGroup } from 'lib/proposal/proposalStatusTransition';
-import type { ListSpaceRolesResponse } from 'pages/api/roles';
+import type { PageWithContent } from 'lib/pages';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
   pageId: string;
   proposalId: string;
+  snapshotProposalId: string | null;
   isTemplate: boolean;
-  pagePermissions?: IPagePermissionFlags;
+  pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
+  title?: string;
+  proposalPage: PageWithContent;
 }
 
-export default function ProposalProperties({
+export function ProposalProperties({
   pagePermissions,
   refreshPagePermissions = () => null,
   pageId,
   proposalId,
+  snapshotProposalId,
   readOnly,
-  isTemplate
+  isTemplate,
+  title,
+  proposalPage
 }: ProposalPropertiesProps) {
-  const { proposal, refreshProposal } = useProposalDetails(proposalId);
-  const { categories } = useProposalCategories();
-  const { mutate: mutateTasks } = useTasks();
-  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
-
+  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
+  const { mutate: mutateNotifications } = useNotifications();
+  const { user } = useUser();
+  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
+  const { createLensPost } = useLensPublication({
+    proposalId,
+    proposalPath: proposalPage.path,
+    proposalTitle: proposalPage.title
+  });
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
+  const { mutateProposals } = useProposals();
 
-  const { permissions: proposalFlowFlags, refresh: refreshProposalFlowFlags } = useProposalFlowFlags({ proposalId });
+  const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
-  const { getMemberById, members } = useMembers();
-  const { roles = [] } = useRoles();
-  const { user } = useUser();
+  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
+    !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
+  );
+  const { data: proposalFlowFlags, mutate: refreshProposalFlowFlags } = useGetProposalFlowFlags(proposalId);
+  const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
-  const prevStatusRef = useRef(proposal?.status || '');
-  const [detailsExpanded, setDetailsExpanded] = useState(() => proposal?.status === 'draft');
+  // further restrict readOnly if user cannot update proposal properties specifically
+  const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
+  const canAnswerRubric = proposalPermissions?.evaluate;
+  const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
+  const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
+  const sourceTemplate = isFromTemplateSource
+    ? proposalTemplates?.find((template) => template.id === proposal?.page?.sourceTemplateId)
+    : undefined;
 
-  const proposalStatus = proposal?.status;
-  const proposalCategory = proposal?.category;
-  const proposalAuthors = proposal?.authors ?? [];
-  const proposalReviewers = proposal?.reviewers ?? [];
-  const proposalReviewerId = proposal?.reviewedBy;
+  // properties with values from templates should be read only
+  const readOnlyCustomProperties =
+    !isAdmin && sourceTemplate?.fields
+      ? Object.entries((sourceTemplate?.fields as ProposalFields).properties)?.reduce((acc, [key, value]) => {
+          if (!value) {
+            return acc;
+          }
 
-  const proposalReviewer = getMemberById(proposalReviewerId);
+          acc.push(key);
+          return acc;
+        }, [] as string[])
+      : [];
 
-  const isProposalAuthor = user && proposalAuthors.some((author) => author.userId === user.id);
-
-  useEffect(() => {
-    if (!prevStatusRef.current && proposal?.status === 'draft') {
-      setDetailsExpanded(true);
-    }
-
-    prevStatusRef.current = proposal?.status || '';
-  }, [detailsExpanded, proposal?.status]);
-
-  const isProposalReviewer =
-    user &&
-    proposalReviewers.some((reviewer) => {
-      if (reviewer.userId) {
-        return reviewer.userId === user.id;
-      }
-      return user.spaceRoles.some((spaceRole) =>
-        spaceRole.spaceRoleToRole.some(({ roleId }) => roleId === reviewer.roleId)
-      );
-    });
-
-  const canUpdateProposalProperties = pagePermissions?.edit_content || isAdmin;
-
-  const reviewerOptionsRecord: Record<
-    string,
-    ({ group: 'role' } & ListSpaceRolesResponse) | ({ group: 'user' } & Member)
-  > = {};
-
-  const currentUserGroups: ProposalUserGroup[] = [];
-  if (isProposalAuthor) {
-    currentUserGroups.push('author');
-  }
-
-  if (isProposalReviewer) {
-    currentUserGroups.push('reviewer');
-  }
-
-  members.forEach((member) => {
-    reviewerOptionsRecord[member.id] = {
-      ...member,
-      group: 'user'
-    };
-  });
-
-  (roles ?? []).forEach((role) => {
-    reviewerOptionsRecord[role.id] = {
-      ...role,
-      group: 'role'
-    };
-  });
-
-  async function onChangeCategory(updatedCategory: ProposalCategory | null) {
-    if (!proposal) {
-      return;
-    }
-
-    await charmClient.proposals.updateProposal({
-      proposalId: proposal.id,
-      authors: proposal.authors.map((author) => author.userId),
-      reviewers: proposalReviewers.map((reviewer) => ({
+  const proposalFormInputs: ProposalPropertiesInput = {
+    categoryId: proposal?.categoryId,
+    evaluationType: proposal?.evaluationType || 'vote',
+    authors: proposal?.authors.map((author) => author.userId) ?? [],
+    rubricCriteria: proposal?.rubricCriteria ?? [],
+    publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
+    reviewers:
+      proposal?.reviewers.map((reviewer) => ({
         group: reviewer.roleId ? 'role' : 'user',
         id: reviewer.roleId ?? (reviewer.userId as string)
-      })),
-      categoryId: updatedCategory?.id || null
-    });
-
-    await refreshProposal();
-  }
+      })) ?? [],
+    fields:
+      typeof proposal?.fields === 'object' && !!proposal?.fields
+        ? (proposal.fields as ProposalFields)
+        : { properties: {} }
+  };
 
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
+      // If proposal is being published for the first time and publish to lens is enabled, create a lens post
+      if (newStatus === 'discussion' && proposalPage && proposal.publishToLens && !proposal.lensPostLink) {
+        setIsPublishingToLens(true);
+        await createLensPost({
+          proposalContent: proposalPage.content as PageContent
+        });
+        setIsPublishingToLens(false);
+      }
       await Promise.all([
         refreshProposal(),
         refreshProposalFlowFlags(),
         refreshPagePermissions(),
         refreshProposalPermissions()
       ]);
-      mutateTasks();
+      mutateNotifications();
+      mutateProposals();
     }
   }
 
-  const openVoteModal = () => {
-    setIsVoteModalOpen(true);
-  };
+  function onSaveRubricCriteriaAnswers() {
+    return refreshProposal();
+  }
+
+  async function onChangeRubricCriteria(rubricCriteria: ProposalPropertiesInput['rubricCriteria']) {
+    // @ts-ignore TODO: unify types for rubricCriteria
+    await upsertRubricCriteria({ rubricCriteria });
+    if (proposal?.status === 'evaluation_active') {
+      refreshProposal();
+    }
+  }
+
+  async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
+    if (proposal) {
+      await charmClient.proposals.updateProposal({
+        proposalId,
+        authors: proposal.authors.map(({ userId }) => userId),
+        reviewers: proposal.reviewers.map((reviewer) => ({
+          id: reviewer.roleId ?? (reviewer.userId as string),
+          group: reviewer.roleId ? 'role' : 'user'
+        })),
+        ...values
+      });
+    }
+    refreshProposal();
+    refreshProposalFlowFlags(); // needs to run when reviewers change?
+    mutateProposals();
+  }
+
+  const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
+  const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
+  const readOnlyReviewers = readOnlyProperties || (!isAdmin && sourceTemplate && sourceTemplate.reviewers.length > 0);
 
   return (
-    <Box
-      className='octo-propertylist'
-      sx={{
-        '& .MuiInputBase-input': {
-          background: 'none'
-        }
-      }}
-      mt={2}
-    >
-      {!isTemplate && (
-        <>
-          <Grid container mb={2}>
-            <ProposalStepSummary
-              proposalFlowFlags={proposalFlowFlags}
-              proposal={proposal}
-              openVoteModal={openVoteModal}
-              updateProposalStatus={updateProposalStatus}
-            />
-          </Grid>
-
-          <Stack
-            direction='row'
-            gap={4}
-            alignItems='center'
-            sx={{ cursor: 'pointer' }}
-            onClick={() => setDetailsExpanded((v) => !v)}
-          >
-            <Typography variant='subtitle1'>Additional information</Typography>
-            <IconButton size='small'>
-              <KeyboardArrowDown
-                fontSize='small'
-                sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
-              />
-            </IconButton>
-          </Stack>
-        </>
-      )}
-      <Collapse in={isTemplate ? true : detailsExpanded} timeout='auto' unmountOnExit>
-        {!isTemplate && (
-          <Grid container mb={2} mt={2}>
-            <ProposalStepper
-              proposalFlowPermissions={proposalFlowFlags}
-              proposal={proposal}
-              openVoteModal={openVoteModal}
-              updateProposalStatus={updateProposalStatus}
-            />
-          </Grid>
-        )}
-
-        <Grid container mb={2}>
-          <Grid item xs={8}>
-            <Box display='flex' gap={1} alignItems='center'>
-              <Typography fontWeight='bold'>Proposal information</Typography>
-            </Box>
-          </Grid>
-        </Grid>
-
-        <Box justifyContent='space-between' gap={2} alignItems='center' my='6px'>
-          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Category</Button>
-            </div>
-            <Box display='flex' flex={1}>
-              <ProposalCategoryInput
-                disabled={!proposalPermissions?.edit}
-                options={categories || []}
-                canEditCategories={!proposalPermissions?.edit}
-                value={proposalCategory ?? null}
-                onChange={onChangeCategory}
-              />
-            </Box>
-          </Box>
-        </Box>
-
-        <Box justifyContent='space-between' gap={2} alignItems='center'>
-          <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
-          >
-            <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Author</Button>
-            </div>
-            <div style={{ width: '100%' }}>
-              <InputSearchMemberBase
-                filterSelectedOptions
-                multiple
-                placeholder='Select authors'
-                value={members.filter((member) => proposalAuthors.find((author) => member.id === author.userId))}
-                disableCloseOnSelect
-                onChange={async (_, _members) => {
-                  // Must have atleast one author of proposal
-                  if ((_members as Member[]).length !== 0) {
-                    await charmClient.proposals.updateProposal({
-                      proposalId,
-                      authors: (_members as Member[]).map((member) => member.id),
-                      reviewers: proposalReviewers.map((reviewer) => ({
-                        group: reviewer.roleId ? 'role' : 'user',
-                        id: reviewer.roleId ?? (reviewer.userId as string)
-                      }))
-                    });
-                    refreshProposal();
-                  }
-                }}
-                disabled={readOnly || !canUpdateProposalProperties || !proposal}
-                readOnly={readOnly}
-                options={members}
-                sx={{
-                  width: '100%'
-                }}
-              />
-            </div>
-          </div>
-        </Box>
-        <Box justifyContent='space-between' gap={2} alignItems='center'>
-          <div
-            className='octo-propertyrow'
-            style={{
-              display: 'flex',
-              height: 'fit-content',
-              flexGrow: 1
-            }}
-          >
-            <div className='octo-propertyname octo-propertyname--readonly'>
-              <Button>Reviewer</Button>
-            </div>
-            <div style={{ width: '100%' }}>
-              {proposalStatus === 'reviewed' && proposalReviewer ? (
-                <UserDisplay showMiniProfile user={proposalReviewer} avatarSize='small' />
-              ) : (
-                <InputSearchReviewers
-                  isProposal
-                  disabled={readOnly || !canUpdateProposalProperties}
-                  readOnly={readOnly}
-                  value={proposalReviewers.map(
-                    (reviewer) => reviewerOptionsRecord[(reviewer.roleId ?? reviewer.userId) as string]
-                  )}
-                  disableCloseOnSelect={true}
-                  excludedIds={proposalReviewers.map((reviewer) => (reviewer.roleId ?? reviewer.userId) as string)}
-                  onChange={async (e, options) => {
-                    await charmClient.proposals.updateProposal({
-                      proposalId,
-                      authors: proposalAuthors.map((author) => author.userId),
-                      reviewers: options.map((option) => ({ group: option.group, id: option.id }))
-                    });
-                    refreshProposal();
-                    refreshProposalFlowFlags();
-                  }}
-                  sx={{
-                    width: '100%'
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        </Box>
-      </Collapse>
-
-      <Divider
-        sx={{
-          my: 2
-        }}
-      />
-
-      <CreateVoteModal
-        proposalFlowFlags={proposalFlowFlags}
-        proposal={proposal}
-        pageId={pageId}
-        open={isVoteModalOpen}
-        onCreateVote={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus('vote_active');
-        }}
-        onPublishToSnapshot={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus('vote_active');
-        }}
-        onClose={() => {
-          setIsVoteModalOpen(false);
-        }}
-      />
-    </Box>
+    <ProposalPropertiesBase
+      proposalLensLink={proposal?.lensPostLink ?? undefined}
+      archived={!!proposal?.archived}
+      isFromTemplate={!!proposal?.page?.sourceTemplateId}
+      proposalFlowFlags={proposalFlowFlags}
+      proposalStatus={proposal?.status}
+      proposalId={proposal?.id}
+      pageId={pageId}
+      readOnlyAuthors={readOnlyProperties}
+      readOnlyCategory={readOnlyCategory}
+      isAdmin={isAdmin}
+      readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
+      readOnlyProposalEvaluationType={
+        readOnlyProperties ||
+        // dont let users change type after status moves to Feedback, and forward
+        (proposal?.status !== 'draft' && !isTemplate) ||
+        isFromTemplateSource
+      }
+      readOnlyReviewers={readOnlyReviewers}
+      rubricAnswers={proposal?.rubricAnswers}
+      draftRubricAnswers={proposal?.draftRubricAnswers}
+      rubricCriteria={proposal?.rubricCriteria}
+      showStatus={!isTemplate}
+      userId={user?.id}
+      snapshotProposalId={snapshotProposalId}
+      updateProposalStatus={updateProposalStatus}
+      onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
+      onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
+      proposalFormInputs={proposalFormInputs}
+      setProposalFormInputs={onChangeProperties}
+      canAnswerRubric={canAnswerRubric}
+      canViewRubricAnswers={canViewRubricAnswers}
+      title={title || ''}
+      isPublishingToLens={isPublishingToLens}
+      readOnlyCustomProperties={readOnlyCustomProperties}
+    />
   );
 }

@@ -1,14 +1,15 @@
+import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
-import log from 'loglevel';
-import { useCallback, useEffect, useState } from 'react';
+import { Box } from '@mui/material';
+import { useCallback, useEffect } from 'react';
 
+import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PageMeta } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
@@ -18,8 +19,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
-  const currentSpace = useCurrentSpace();
-  const [currentPage] = useState<PageMeta | null>(null);
+  const { space: currentSpace } = useCurrentSpace();
 
   const {
     error: pageWithContentError,
@@ -33,8 +33,17 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
 
   useEffect(() => {
     if (page) {
+      trackPageView({
+        type: page.type,
+        pageId: page.id,
+        spaceId: page.spaceId,
+        spaceDomain: currentSpace?.domain
+      });
       setCurrentPageId(page.id);
     }
+    return () => {
+      resetPageProps();
+    };
   }, [page?.id]);
 
   // reset page id on unmount
@@ -60,10 +69,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       // pass editMode thru to fix hot-reloading which resets the prop
       setPageProps({ permissions: page.permissionFlags, editMode });
     }
-    return () => {
-      resetPageProps();
-    };
-  }, [page?.permissionFlags]);
+  }, [page?.permissionFlags.edit_content]);
 
   const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {
@@ -87,10 +93,10 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
 
   useEffect(() => {
     // make sure current page is loaded
-    if (currentPage) {
-      setTitleState(currentPage.title || 'Untitled');
+    if (page?.title) {
+      setTitleState(page.title || 'Untitled');
     }
-  }, [currentPage?.title]);
+  }, [page?.title]);
 
   if (pageWithContentError === 'access_denied') {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
@@ -113,9 +119,11 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     ) {
       return <DatabasePage page={page} setPage={savePage} pagePermissions={page.permissionFlags} />;
     } else {
+      // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
-        // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+        <Box height='100%' sx={{ overflowY: 'auto' }}>
+          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+        </Box>
       );
     }
   }

@@ -3,11 +3,12 @@ import { useRouter } from 'next/router';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import DiscordIcon from 'public/images/discord_logo.svg';
+import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
+import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
-export default function ImportDiscordRolesMenuItem() {
+export function ImportDiscordRolesMenuItem() {
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const isAdmin = useIsAdmin();
 
@@ -19,7 +20,10 @@ export default function ImportDiscordRolesMenuItem() {
       disableRipple
       onClick={() => {
         router.push(
-          `/api/discord/oauth?redirect=${encodeURIComponent(`${window.location.origin}/${space?.domain}`)}&type=server`
+          getDiscordLoginPath({
+            type: 'server',
+            redirectUrl: encodeURIComponent(`${window.location.origin}/${space?.domain}`)
+          })
         );
       }}
     >

@@ -1,10 +1,11 @@
-import { prisma } from '@charmverse/core';
 import type { Prisma, Role, SpacePermission, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ApiError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -19,6 +20,13 @@ export type CreateRoleInput = {
 handler
   .get(listSpaceRoles)
   .use(requireUser)
+  .use(
+    requirePaidPermissionsSubscription({
+      key: 'spaceId',
+      resourceIdType: 'space',
+      location: 'body'
+    })
+  )
   .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
   .post(createRole);
@@ -94,7 +102,7 @@ async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
     name: data.name
   });
 
-  return res.status(200).json(role);
+  return res.status(201).json(role);
 }
 
 export default withSessionRoute(handler);

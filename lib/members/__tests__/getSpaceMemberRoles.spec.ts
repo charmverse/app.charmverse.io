@@ -17,12 +17,12 @@ beforeAll(async () => {
   const { user: u1, space } = await generateUserAndSpaceWithApiToken(undefined, true);
   user1 = u1;
   u1Space1 = space;
-  u1Space2 = await generateSpaceForUser(user1);
+  u1Space2 = await generateSpaceForUser({ user: user1 });
 
   // User with 2 spaces, 1 common with user 1
   const { user: u2 } = await generateUserAndSpaceWithApiToken(undefined, true);
   user2 = await addUserToSpace({ spaceId: u1Space1.id, userId: u2.id, isAdmin: false });
-  await generateSpaceForUser(user2);
+  await generateSpaceForUser({ user: user2 });
 
   const role1 = await generateRole({ spaceId: u1Space1.id, roleName: 'test role 1', createdBy: u1.id });
   const role2 = await generateRole({ spaceId: u1Space1.id, roleName: 'test role 2', createdBy: u1.id });
@@ -39,7 +39,7 @@ describe('getSpaceMemberMetadata', () => {
   it('should retrieve admin user roles for single space', async () => {
     const metadataMap = await getSpaceMemberMetadata({ spaceIds: u1Space1.id, memberId: user1.id });
 
-    expect(metadataMap[u1Space1.id].roles.length).toBe(2);
+    expect(metadataMap[u1Space1.id].roles.length).toBe(3);
     expect(metadataMap[u1Space1.id].joinDate).toBeTruthy();
     expect(metadataMap[u1Space2.id]).toBeUndefined();
   });
@@ -47,9 +47,9 @@ describe('getSpaceMemberMetadata', () => {
   it('should retrieve admin user roles for multiple spaces', async () => {
     const metadataMap = await getSpaceMemberMetadata({ spaceIds: [u1Space1.id, u1Space2.id], memberId: user1.id });
 
-    expect(metadataMap[u1Space1.id]?.roles.length).toBe(2);
+    expect(metadataMap[u1Space1.id]?.roles.length).toBe(3);
     expect(metadataMap[u1Space1.id]?.joinDate).toBeTruthy();
-    expect(metadataMap[u1Space2.id]?.roles.length).toBe(1);
+    expect(metadataMap[u1Space2.id]?.roles.length).toBe(2);
     expect(metadataMap[u1Space2.id]?.joinDate).toBeTruthy();
   });
 
@@ -63,7 +63,7 @@ describe('getSpaceMemberMetadata', () => {
   it('should retrieve non-admin user roles for single space', async () => {
     const metadataMap = await getSpaceMemberMetadata({ spaceIds: [u1Space1.id], memberId: user2.id });
 
-    expect(metadataMap[u1Space1.id]?.roles.length).toBe(1);
+    expect(metadataMap[u1Space1.id]?.roles.length).toBe(2);
     expect(metadataMap[u1Space1.id]?.joinDate).toBeTruthy();
   });
 });

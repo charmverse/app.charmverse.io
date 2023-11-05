@@ -1,7 +1,6 @@
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Typography, Box } from '@mui/material';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { CircularProgressWithLabel } from 'components/common/CircularProgressWithLabel/CircularProgressWithLabel';
 import type { UploadedFileCallback } from 'hooks/useS3UploadInput';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
@@ -11,8 +10,9 @@ type Props = {
 };
 
 export function FileUploadForm({ onComplete }: Props) {
-  const { inputRef, openFilePicker, onFileChange, isUploading, progress, fileName, sizeLimit } =
-    useS3UploadInput(onComplete);
+  const { inputRef, openFilePicker, onFileChange, isUploading, progress, fileName, sizeLimit } = useS3UploadInput({
+    onFileUpload: onComplete
+  });
 
   return (
     <Box

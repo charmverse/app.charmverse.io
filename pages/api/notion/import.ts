@@ -1,8 +1,8 @@
+import * as http from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import * as http from 'adapters/http';
 import { isTestEnv } from 'config/constants';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';

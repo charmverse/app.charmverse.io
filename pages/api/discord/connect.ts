@@ -1,17 +1,19 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
 import type { DiscordUser } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isProdEnv, isStagingEnv } from 'config/constants';
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
 import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
 import type { DiscordServerRole } from 'lib/discord/interface';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
 import { mergeUserDiscordAccounts } from 'lib/users/mergeUserDiscordAccounts';
@@ -33,6 +35,8 @@ export interface ConnectDiscordResponse {
 // TODO: Add nonce for oauth state
 async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | { error: string }>) {
   const { code } = req.body as ConnectDiscordPayload;
+  const authFlowType = req.query.authFlowType as OauthFlowType;
+
   if (!code) {
     res.status(400).json({
       error: 'Missing code to connect'
@@ -43,8 +47,10 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
   let discordAccount: DiscordAccount;
 
   try {
-    const domain = isProdEnv || isStagingEnv ? `https://${req.headers.host}` : `http://${req.headers.host}`;
-    discordAccount = await getDiscordAccount({ code, redirectUrl: `${domain}/api/discord/callback` });
+    discordAccount = await getDiscordAccount({
+      code,
+      redirectUrl: getDiscordCallbackUrl(req.headers.host, authFlowType)
+    });
   } catch (error) {
     log.warn('Error while connecting to Discord', error);
     res.status(400).json({
@@ -66,6 +72,32 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
         discordId: id
       }
     });
+
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        userId
+      },
+      select: {
+        space: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    const userSpaceIds = spaceRoles.map((role) => role.space.id);
+
+    const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+      spaceIds: userSpaceIds,
+      discordId: existingDiscordUser?.discordId ?? id
+    });
+
+    if (isUserBannedFromSpace) {
+      return res.status(401).json({
+        error: 'You need to leave space before you can add this discord identity to your account'
+      });
+    }
 
     // If the entry exists we merge the user accounts
     if (existingDiscordUser) {
@@ -89,7 +121,9 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
       });
     }
   } catch (error) {
-    log.warn('Error while creating Discord record', error);
+    log.warn('Error while creating Discord record', {
+      error
+    });
     // If the discord user is already connected to a charmverse account this code will be run
     res.status(400).json({
       error: 'Connection to Discord failed.'

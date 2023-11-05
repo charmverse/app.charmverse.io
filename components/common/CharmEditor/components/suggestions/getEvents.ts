@@ -62,7 +62,6 @@ export function getEventsFromDoc({ state }: { state: EditorState }) {
 
 function getEventsFromNode({ node, lastNode, lastNodeTracks }: GetTracksProps) {
   const trackAttr: TrackAttribute[] | undefined = node.attrs.track;
-
   const nodeTracks: TrackAttribute2[] = trackAttr
     ? trackAttr.map((track) => {
         const nodeTrack: TrackAttribute2 = {
@@ -83,8 +82,9 @@ function getEventsFromNode({ node, lastNode, lastNodeTracks }: GetTracksProps) {
         .map((mark): TrackAttribute2 => ({ type: mark.type.name as TrackType, data: mark.attrs as any }));
 
   // Filter out trackmarks already present in the last node (if it's an inline node).
+  // Without skipping over the emoji and mention nodes they are inserted in the document rather than as suggestion
   const tracks =
-    node.isInline === lastNode.isInline
+    node.isInline === lastNode.isInline && !['emoji', ' mention'].includes(node.type.name)
       ? nodeTracks.filter(
           (track) =>
             !lastNodeTracks.find(
@@ -94,7 +94,7 @@ function getEventsFromNode({ node, lastNode, lastNodeTracks }: GetTracksProps) {
                 track.data.date === lastTrack.data.date &&
                 (node.isInline || // block level changes almost always need new boxes
                   (node.type.name === 'paragraph' &&
-                    lastNode.type.name === 'listItem' &&
+                    (lastNode.type.name === 'listItem' || lastNode.type.name === 'list_item') &&
                     lastTrack.type === 'insertion')) && // Don't show first paragraphs in list items.
                 (['insertion', 'deletion'].includes(track.type) ||
                   (track.type === 'format_change' &&

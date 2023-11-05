@@ -1,20 +1,25 @@
-import type { ethers } from 'ethers';
-import { useEffect, useState } from 'react';
+import { providers } from 'ethers';
+import { useMemo } from 'react';
+import { useWalletClient } from 'wagmi';
+import type { WalletClient } from 'wagmi';
 
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+// adapter from viem to ethers https://wagmi.sh/react/ethers-adapters
+export function walletClientToSigner(walletClient: WalletClient) {
+  const { account, chain, transport } = walletClient;
+  const network = {
+    chainId: chain.id,
+    name: chain.name,
+    ensAddress: chain.contracts?.ensRegistry?.address
+  };
+  const provider = new providers.Web3Provider(transport, network);
+  const signer = provider.getSigner(account.address);
+  return { provider, signer };
+}
 
-// a wrapper around account and library from web3react
-export default function useWeb3Signer() {
-  const { account, library } = useWeb3AuthSig();
-  const [signer, setSigner] = useState<ethers.Signer | null>(null);
+/** Hook to convert a viem Wallet Client to an ethers.js Signer. */
+export function useWeb3Signer({ chainId }: { chainId?: number } = {}) {
+  const { data: walletClient } = useWalletClient({ chainId });
+  const web3Signer = useMemo(() => (walletClient ? walletClientToSigner(walletClient) : undefined), [walletClient]);
 
-  useEffect(() => {
-    if (account && library) {
-      setSigner(library.getSigner(account));
-    } else {
-      setSigner(null);
-    }
-  }, [account, library]);
-
-  return signer;
+  return web3Signer ?? { signer: undefined, provider: undefined };
 }

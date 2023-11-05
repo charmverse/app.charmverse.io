@@ -1,29 +1,18 @@
-/* eslint-disable no-console */
-import { prisma } from '@charmverse/core';
-import type { PagePermission } from '@charmverse/core/prisma';
+import { log } from '@charmverse/core/log';
+import type {
+  AssignedPagePermission,
+  PagePermissionAssignmentByValues,
+  PermissionResource,
+  TargetPermissionGroup
+} from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { sendMagicLink } from 'lib/google/sendMagicLink';
+import { sendPageInviteEmail } from 'lib/mailer';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type {
-  IPagePermissionRequest,
-  IPagePermissionToCreate,
-  IPagePermissionToDelete,
-  IPagePermissionWithAssignee,
-  IPagePermissionWithSource
-} from 'lib/permissions/pages';
-import {
-  computeUserPagePermissions,
-  deletePagePermission,
-  getPagePermission,
-  listPagePermissions,
-  setupPermissionsAfterPagePermissionAdded,
-  upsertPermission
-} from 'lib/permissions/pages';
-import { PermissionNotFoundError } from 'lib/permissions/pages/errors';
-import { boardPagePermissionUpdated } from 'lib/permissions/pages/triggers';
+import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -33,39 +22,51 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  //  .use(requireSpaceMembership)
-  .get(findPagePermissions)
-  .delete(removePagePermission)
-  .use(requireKeys<PagePermission>(['pageId'], 'body'))
-  .post(addPagePermission);
+  .get(
+    requirePaidPermissionsSubscription({ key: 'pageId', location: 'query', resourceIdType: 'page' }),
+    findPagePermissions
+  )
+  .delete(
+    requirePaidPermissionsSubscription({ key: 'permissionId', resourceIdType: 'pagePermission' }),
+    removePagePermission
+  )
+  .use(requireKeys(['pageId'], 'body'))
+  .post(
+    requirePaidPermissionsSubscription({ key: 'pageId', location: 'body', resourceIdType: 'page' }),
+    addPagePermission
+  );
 
-async function findPagePermissions(req: NextApiRequest, res: NextApiResponse<IPagePermissionWithAssignee[]>) {
-  const { pageId } = req.query as any as IPagePermissionRequest;
+async function findPagePermissions(req: NextApiRequest, res: NextApiResponse<AssignedPagePermission[]>) {
+  const { pageId } = req.query;
 
-  const permissions = await listPagePermissions(pageId);
+  const permissions = await req.premiumPermissionsClient.pages.listPagePermissions({
+    resourceId: pageId as string
+  });
 
   return res.status(200).json(permissions);
 }
 
-async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPagePermissionWithSource>) {
-  const { pageId, permissionLevel } = req.body as Required<IPagePermissionToCreate>;
+async function addPagePermission(req: NextApiRequest, res: NextApiResponse<AssignedPagePermission>) {
+  const { pageId, permission: permissionData } = req.body as {
+    pageId: string;
+    permission: PagePermissionAssignmentByValues;
+  };
 
-  const computedPermissions = await computeUserPagePermissions({
+  const computedPermissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session.user.id
   });
 
-  if (req.body.public === true && computedPermissions.edit_isPublic !== true) {
+  if (permissionData.assignee.group === 'public' && computedPermissions.edit_isPublic !== true) {
     throw new ActionNotPermittedError('You cannot make page public.');
-  } else if (req.body.public !== true && computedPermissions.grant_permissions !== true) {
+  } else if (permissionData.assignee.group !== 'public' && computedPermissions.grant_permissions !== true) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  } else if (permissionLevel === 'proposal_editor') {
+  } else if (permissionData.permissionLevel === 'proposal_editor') {
     throw new ActionNotPermittedError('This permission level can only be created automatically by proposals.');
-  } else if (req.body.public === true && permissionLevel !== 'view') {
+  } else if (permissionData.assignee.group === 'public' && permissionData.permissionLevel !== 'view') {
     throw new ActionNotPermittedError('Only view permissions can be provided to public.');
   }
 
-  const permissionData = { ...req.body } as IPagePermissionToCreate;
   const page = await prisma.page.findUnique({
     where: {
       id: pageId
@@ -73,7 +74,13 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
     select: {
       type: true,
       spaceId: true,
-      path: true
+      path: true,
+      title: true,
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
 
@@ -81,84 +88,86 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<IPage
     throw new DataNotFoundError('Page not found');
   }
 
-  // Usually a userId, but can be an email
-  const userIdAsEmail = req.body.userId;
-
-  // Store these in top level scope, so we can send an email to the user after the page permission is created
-  let isNewSpaceMember = false;
-  let spaceDomain: string = '';
-
-  // Handle case where we are sharing a page
-  if (isValidEmail(userIdAsEmail)) {
-    const addGuestResult = await addGuest({
-      spaceId: page.spaceId,
-      userIdOrEmail: userIdAsEmail
-    });
-
-    isNewSpaceMember = addGuestResult.isNewSpaceRole;
-    spaceDomain = addGuestResult.spaceDomain;
-
-    permissionData.userId = addGuestResult.user.id;
-  }
-
-  if (page.type === 'proposal' && typeof req.body.public !== 'boolean') {
+  if (page.type === 'proposal' && permissionData.assignee.group !== 'public') {
     throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
   }
 
-  // Count before and after permissions so we don't trigger the event unless necessary
-  const permissionsBefore = await prisma.pagePermission.count({
-    where: {
-      pageId
-    }
+  // Usually a userId, but can be an email
+  const userIdAsEmail = permissionData.assignee.group === 'user' ? permissionData.assignee.id : null;
+  const userEmail = userIdAsEmail && isValidEmail(userIdAsEmail) ? userIdAsEmail : null;
+
+  // Handle case where we are sharing a page to a user by email
+  if (userEmail) {
+    const addGuestResult = await addGuest({
+      spaceId: page.spaceId,
+      userIdOrEmail: userEmail
+    });
+    (permissionData.assignee as TargetPermissionGroup<'user'>).id = addGuestResult.user.id;
+
+    log.info('Member shared a page with a guest by email', {
+      pageId,
+      spaceId: page.spaceId,
+      guestUserId: addGuestResult.user.id,
+      userId: req.session.user.id
+    });
+  }
+
+  const createdPermission = await req.premiumPermissionsClient.pages.upsertPagePermission({
+    pageId,
+    permission: permissionData
   });
 
-  const createdPermission = await prisma.$transaction(
-    async (tx) => {
-      const newPermission = await upsertPermission(pageId, permissionData, undefined, tx);
-
-      // Override behaviour, we always cascade board permissions downwards
-      if (page.type.match(/board/)) {
-        await boardPagePermissionUpdated({ boardId: pageId, permissionId: newPermission.id, tx });
-      }
-      // Existing behaviour where we setup permissions after a page permission is added, and account for inheritance conditions
-      else {
-        const permissionsAfter = await tx.pagePermission.count({
+  // notify a user the doc has been shared
+  if (createdPermission.assignee.group === 'user') {
+    const userId = (createdPermission.assignee as TargetPermissionGroup<'user'>).id;
+    // get the email of the user, if available
+    const notificationEmail =
+      userEmail ||
+      (await prisma.user
+        .findUniqueOrThrow({
           where: {
-            pageId
+            id: userId
+          },
+          select: {
+            googleAccounts: true,
+            verifiedEmails: true
           }
-        });
-
-        if (permissionsAfter > permissionsBefore) {
-          await setupPermissionsAfterPagePermissionAdded(newPermission.id, tx);
+        })
+        // TODO: maybe support checking user.email, but we would need to look for it when logging in thru magic link
+        .then((user) => user.googleAccounts[0]?.email || user.verifiedEmails[0]?.email));
+    if (notificationEmail) {
+      const sender = await prisma.user.findUniqueOrThrow({
+        where: {
+          id: req.session.user.id
         }
-      }
-
-      return newPermission;
-    },
-    {
-      timeout: 20000
+      });
+      await sendPageInviteEmail({
+        guestEmail: notificationEmail,
+        to: { email: notificationEmail, userId },
+        pageId,
+        pageTitle: page.title,
+        invitingUserName: sender.username
+      });
     }
-  );
+  }
 
   updateTrackPageProfile(pageId);
 
-  if (isNewSpaceMember) {
-    await sendMagicLink({ email: userIdAsEmail, redirectUrl: `/${spaceDomain}/${page.path}` });
-  }
-
   return res.status(201).json(createdPermission);
 }
-
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
-  const { permissionId } = req.body as IPagePermissionToDelete;
+  const { permissionId } = (req.query || req.body) as PermissionResource;
 
-  const permission = await getPagePermission(permissionId);
+  const permission = await prisma.pagePermission.findUnique({
+    where: { id: permissionId },
+    select: { public: true, pageId: true }
+  });
 
   if (!permission) {
-    throw new PermissionNotFoundError(permissionId);
+    throw new DataNotFoundError(permissionId);
   }
 
-  const computedPermissions = await computeUserPagePermissions({
+  const computedPermissions = await req.premiumPermissionsClient.pages.computePagePermissions({
     resourceId: permission.pageId,
     userId: req.session.user.id
   });
@@ -169,7 +178,7 @@ async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You cannot manage permissions for this page');
   }
 
-  await deletePagePermission(permissionId);
+  await req.premiumPermissionsClient.pages.deletePagePermission({ permissionId });
 
   updateTrackPageProfile(permission.pageId);
 

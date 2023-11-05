@@ -1,4 +1,5 @@
 .EmojiPicker {
+  overflow-x: auto;
   .emoji-mart {
     color: rgb(var(--center-channel-color-rgb));
     background: rgb(var(--center-channel-bg-rgb));
@@ -18,7 +19,34 @@
   }
 }
 
+div[role="tabpanel"] .EmojiPicker .emoji-mart {
+
+  .emoji-mart-category-label span {
+    background: var(--background-paper);
+  }
+
+  background: none;
+  border: none;
+}
+
 // Remove emoji mark footer with watermark
 .emoji-mart-scroll + .emoji-mart-bar {
   display: none;
+}
+
+.emoji-mart-bar {
+  border: none;
+}
+
+.emoji-mart-anchor-icon {
+  cursor: pointer;
+}
+
+.emoji-mart-anchor-selected {
+  // This is an inline style so we need to use !important to override it
+  color: var(--primary-color) !important;
+
+  .emoji-mart-anchor-bar {
+    background: var(--primary-color) !important;
+  }
 }

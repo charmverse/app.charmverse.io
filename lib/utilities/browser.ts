@@ -1,3 +1,12 @@
+import { baseUrl, isDevEnv } from 'config/constants';
+
+import { getAppApexDomain } from './domains/getAppApexDomain';
+import { getCustomDomainFromHost } from './domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from './domains/getSpaceDomainFromHost';
+import { isLocalhostAlias } from './domains/isLocalhostAlias';
+import { getAppOriginURL } from './getAppOriginURL';
+import { addQueryToUrl } from './url';
+
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {
   if (typeof navigator === 'undefined') {
@@ -105,20 +114,12 @@ function scrollIntoViewIfNeededPolyfill(element: HTMLElement, centerIfNeeded?: b
 
 // @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
 export function getNewUrl(params: Record<string, string | null>, currentUrl = window.location.href) {
-  const url = new URL(currentUrl, currentUrl.match('http') ? undefined : window.location.origin);
-  const urlParams: URLSearchParams = new URLSearchParams(url.search);
-  for (const key in params) {
-    if (params.hasOwnProperty(key)) {
-      const value = params[key];
-      if (typeof value === 'string') {
-        urlParams.set(key, value);
-      } else {
-        urlParams.delete(key);
-      }
-    }
-  }
-  url.search = urlParams.toString();
-  return url;
+  return addQueryToUrl({
+    url: currentUrl || window.location.href,
+    urlBase: window.location.origin,
+    query: params,
+    replace: true
+  });
 }
 
 /**
@@ -127,12 +128,18 @@ export function getNewUrl(params: Record<string, string | null>, currentUrl = wi
  *
  * To remove a param from the query, set it as null
  */
-export function setUrlWithoutRerender(pathname: string, params: Record<string, string | null>) {
-  const newUrl = getNewUrl(params);
+export function setUrlWithoutRerender(
+  pathname: string,
+  params: Record<string, string | null>,
+  relativePathToShow?: string
+) {
+  const origin = window.location.origin;
+
+  const newUrl = getNewUrl(params, relativePathToShow ? `${origin}${relativePathToShow}` : undefined);
   // get the path that Next.js uses internally
   const nextjsPath = `${pathname}${newUrl.search}`;
   // get the path that appears in the browsr
-  const displayPath = newUrl.toString().replace(window.location.origin, '');
+  const displayPath = newUrl.toString().replace(origin, '');
 
   const newState = {
     ...window.history.state,
@@ -160,15 +167,21 @@ export function getCookie(name: string): string | undefined {
 export function setCookie({
   name,
   value,
-  expiresInDays = 10 * 365
+  expiresInDays = 10 * 365,
+  expiresAfterSession
 }: {
   name: string;
   value: string;
-  expiresInDays: number;
+  expiresInDays?: number;
+  expiresAfterSession?: boolean;
 }) {
   const expires = new Date();
+  const secure = typeof baseUrl === 'string' && baseUrl.includes('https') ? 'secure;' : '';
+
   expires.setDate(expires.getDate() + expiresInDays);
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; secure`;
+  document.cookie = `${name}=${encodeURIComponent(value)};${
+    expiresAfterSession ? '' : ` expires=${expires.toUTCString()};`
+  } path=/; ${secure}}`;
 }
 
 export function deleteCookie(name: string) {
@@ -209,4 +222,198 @@ export function highlightDomElement(domElement: HTMLElement, postHighlight?: () 
     domElement.style.removeProperty('background-color');
     postHighlight?.();
   }, 1000);
+}
+
+// decode the path to handle special characters
+export function getBrowserPath() {
+  return decodeURIComponent(window.location.pathname + window.location.search);
+}
+
+// determine if a URL has encoded characters (ex: '/civil-lime-planarian/%E5%A0%B1%%85%AC%E3')
+function isEncoded(uri: string) {
+  uri = uri || '';
+  try {
+    const decoded = decodeURIComponent(uri);
+    return decoded !== uri;
+  } catch (error) {
+    return false;
+  }
+}
+
+export function fullyDecodeURI(uri: string) {
+  while (isEncoded(uri)) {
+    uri = decodeURIComponent(uri);
+  }
+
+  return uri;
+}
+// strip out custom or domain depending on the host
+export function getSubdomainPath(
+  path: string,
+  config?: { domain: string; customDomain?: string | null },
+  host?: string
+) {
+  if (path.startsWith('/api')) {
+    return path;
+  }
+
+  const subdomain = getSpaceDomainFromHost(host);
+  const customDomain = getCustomDomainFromHost(host);
+  // strip out domain when using full custom domain
+  if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
+    // remove space domain from path for custom domain
+    if (path.startsWith(`/${config.domain}`)) {
+      return path.replace(`/${config.domain}`, '');
+    }
+
+    if (path.startsWith(`/${config.customDomain}`)) {
+      return path.replace(`/${config.customDomain}`, '');
+    }
+  }
+
+  // strip out subdomain when using subdomain
+  if (subdomain) {
+    return path.replace(new RegExp(`^\\/${subdomain}`), '');
+  }
+  // if we are not using a custom domain or subdomain, make sure that the space domain exists in the URL
+  if (config && !customDomain && !path.startsWith(`/${config?.domain}/`)) {
+    return `/${config.domain}${path}`;
+  }
+  return path;
+}
+
+export function getSpaceUrl(config: { domain: string; customDomain?: string | null }, host?: string) {
+  const { domain } = config;
+  const subdomain = getSpaceDomainFromHost(host);
+  const customDomain = getCustomDomainFromHost(host);
+
+  if (isLocalhostAlias(host)) {
+    return `/${domain}`;
+  }
+
+  // we are on proper space custom domain
+  if (customDomain && config.customDomain && customDomain === config.customDomain) {
+    return '/';
+  }
+
+  // we are on custom domain but we want to redirect to a different space
+  if (customDomain) {
+    // TODO: enable subdomains
+    return getDefaultSpaceUrl({ domain });
+  }
+
+  // TODO - redirect to different custom domain
+
+  if (!subdomain) return `/${domain}`;
+  if (subdomain === domain) return '/';
+
+  // replace old subdomain with desired one
+  if (typeof window !== 'undefined') {
+    return window?.origin.replace(`${subdomain}.`, `${domain}.`);
+  }
+
+  return `/${domain}`;
+}
+
+export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
+  const absolutePath = spaceDomain ? `/${spaceDomain}${path}` : path;
+  const subdomain = getSpaceDomainFromHost();
+
+  if (typeof window !== 'undefined') {
+    const origin =
+      subdomain && subdomain !== spaceDomain
+        ? window?.origin.replace(`${subdomain}.`, `${spaceDomain}.`)
+        : window.location.origin;
+
+    return (
+      origin + getSubdomainPath(absolutePath, { domain: spaceDomain || '', customDomain: getCustomDomainFromHost() })
+    );
+  }
+
+  return absolutePath;
+}
+
+export function getCustomDomainUrl(customDomain: string, path = '/') {
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${customDomain}${path}`;
+  }
+
+  const protocol = isDevEnv ? 'http:' : 'https:';
+
+  return `${protocol}//${customDomain}${path}`;
+}
+
+export function getDefaultSpaceUrl({
+  domain,
+  path = '/',
+  useSubdomain = false
+}: {
+  domain: string;
+  path?: string;
+  useSubdomain?: boolean;
+}) {
+  let protocol = isDevEnv ? 'http:' : 'https:';
+  let port = '';
+  const appDomain = getAppApexDomain();
+
+  if (typeof window !== 'undefined') {
+    protocol = window.location.protocol;
+    port = window.location.port ? `:${window.location.port}` : '';
+  }
+
+  if (appDomain) {
+    return useSubdomain
+      ? `${protocol}//${domain}.${appDomain}${port}${path}`
+      : `${protocol}//app.${appDomain}${port}/${domain}${path}`;
+  }
+
+  return `/${domain}${path}`;
+}
+
+export function shouldRedirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const isSubdomainUrl = !!getSpaceDomainFromHost();
+  const appDomain = getAppApexDomain();
+
+  return isSubdomainUrl && !!appDomain;
+}
+
+export function getAppUrl() {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  if (isLocalhostAlias()) {
+    return new URL(window.location.origin);
+  }
+
+  const port = window.location.port ? `:${window.location.port}` : '';
+
+  return getAppOriginURL({ port, protocol: window.location.protocol, host: window.location.host });
+}
+
+export function redirectToAppLogin() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const appUrl = getAppUrl();
+
+  if (appUrl) {
+    const returnUrl = window.location.href;
+
+    appUrl.searchParams.append('returnUrl', returnUrl);
+    window.location.href = appUrl.toString();
+
+    return true;
+  }
+
+  return false;
+}
+
+export function getUserLocale() {
+  return typeof navigator !== 'undefined' && navigator?.languages?.length ? navigator.languages[0] : navigator.language;
 }

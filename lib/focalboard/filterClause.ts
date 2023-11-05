@@ -68,6 +68,7 @@ export type DataTypeConfigs =
   | SelectDataTypeConfig
   | MiscDataTypeConfig;
 
+// @ts-ignore
 export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   updatedBy: {
     datatype: 'multi_select',
@@ -128,6 +129,42 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   url: {
     datatype: 'text',
     conditions: TextDataTypeConditions
+  },
+  proposalUrl: {
+    datatype: 'text',
+    conditions: TextDataTypeConditions
+  },
+  proposalCategory: {
+    datatype: 'select',
+    conditions: SelectDataTypeConditions
+  },
+  proposalStatus: {
+    datatype: 'select',
+    conditions: SelectDataTypeConditions
+  },
+  proposalEvaluatedBy: {
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
+  },
+  proposalEvaluationAverage: {
+    datatype: 'number',
+    conditions: NumberDataTypeConditions
+  },
+  proposalEvaluationTotal: {
+    datatype: 'number',
+    conditions: NumberDataTypeConditions
+  },
+  proposalAuthor: {
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
+  },
+  proposalReviewer: {
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
+  },
+  proposalEvaluationType: {
+    datatype: 'select',
+    conditions: SelectDataTypeConditions
   }
 };
 

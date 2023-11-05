@@ -1,3 +1,5 @@
+import env from '@beam-australia/react-env';
+
 import * as http from 'adapters/http';
 
 type IframelyResponse = {
@@ -31,7 +33,7 @@ export class IframelyApi {
       `https://cdn.iframe.ly/api/iframely`,
       {
         url,
-        key: process.env.NEXT_PUBLIC_IFRAMELY_API_KEY,
+        key: env('IFRAMELY_API_KEY'),
         iframe: '1',
         omit_script: '1',
         theme: darkMode,

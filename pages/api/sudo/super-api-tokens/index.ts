@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +9,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSudoApiKey)
-  .use(requireKeys(['name'], 'body'))
+  .use(requireKeys(['name']))
   .post(provisionSuperToken)
   .delete(invalidateSuperToken);
 
@@ -22,10 +22,10 @@ async function provisionSuperToken(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function invalidateSuperToken(req: NextApiRequest, res: NextApiResponse) {
-  const { token } = req.body;
+  const { token } = req.query as { token: string };
   await prisma.superApiToken.delete({
     where: {
-      token: token as string
+      token
     }
   });
 

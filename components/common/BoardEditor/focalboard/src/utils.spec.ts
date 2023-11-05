@@ -1,7 +1,7 @@
 import { createIntl } from 'react-intl';
 
 import type { IAppWindow } from './types';
-import { Utils, IDType } from './utils';
+import { Utils } from './utils';
 
 declare let window: IAppWindow;
 
@@ -20,21 +20,6 @@ describe('utils', () => {
 
     test('should add a https for empty protocol', () => {
       expect(Utils.ensureProtocol('focalboard.com')).toBe('https://focalboard.com');
-    });
-  });
-
-  describe('createGuid', () => {
-    test('should create 27 char random id for space', () => {
-      expect(Utils.createGuid(IDType.Space)).toMatch(/^s[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/);
-    });
-    test('should create 27 char random id for board', () => {
-      expect(Utils.createGuid(IDType.Board)).toMatch(/^b[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/);
-    });
-    test('should create 27 char random id for card', () => {
-      expect(Utils.createGuid(IDType.Card)).toMatch(/^c[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/);
-    });
-    test('should create 27 char random id', () => {
-      expect(Utils.createGuid(IDType.None)).toMatch(/^7[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/);
     });
   });
 
@@ -104,7 +89,7 @@ describe('utils', () => {
     it('should show month and day for current year', () => {
       const currentYear = new Date().getFullYear();
       const date = new Date(currentYear, 6, 9);
-      expect(Utils.displayDate(date, intl)).toBe('July 09');
+      expect(Utils.displayDate(date, intl)).toBe('July 09, 2023');
     });
 
     it('should show month, day and year for previous year', () => {
@@ -136,14 +121,14 @@ describe('utils', () => {
     it('should show month, day and time for current year', () => {
       const currentYear = new Date().getFullYear();
       const date = new Date(currentYear, 6, 9, 15, 20);
-      expect(Utils.displayDateTime(date, intl)).toBe('July 09, 3:20 PM');
+      expect(Utils.displayDateTime(date, intl)).toBe('July 09 at 3:20 PM');
     });
 
     it('should show month, day, year and time for previous year', () => {
       const currentYear = new Date().getFullYear();
       const previousYear = currentYear - 1;
       const date = new Date(previousYear, 6, 9, 5, 35);
-      expect(Utils.displayDateTime(date, intl)).toBe(`July 09, ${previousYear}, 5:35 AM`);
+      expect(Utils.displayDateTime(date, intl)).toBe(`July 09, ${previousYear} at 5:35 AM`);
     });
   });
 

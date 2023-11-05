@@ -82,7 +82,6 @@ test.describe.serial('Delete forum posts from the post dialog, and autoclose dia
     await forumHomePage.postDialogDeleteButton.click();
 
     await expect(forumHomePage.postDialog).not.toBeVisible();
-    await page.pause();
     await expect(postCard).not.toBeVisible();
   });
   test('moderator can delete another user post from the post dialog', async ({ forumHomePage, page }) => {

@@ -1,7 +1,6 @@
-import { prisma } from '@charmverse/core';
+import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
-
-import { resolvePageTree } from './server';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export type ChildModificationAction = 'delete' | 'restore' | 'archive';
 
@@ -46,7 +45,9 @@ export async function modifyChildPages(parentId: string, userId: string, action:
             {
               id: {
                 in: modifiedChildPageIds
-              },
+              }
+            },
+            {
               parentId: {
                 in: modifiedChildPageIds
               }

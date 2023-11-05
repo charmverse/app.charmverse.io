@@ -1,31 +1,23 @@
 /* eslint-disable max-len */
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
-import ImageIcon from '@mui/icons-material/Image';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box } from '@mui/material';
-import dynamic from 'next/dynamic';
 import type { KeyboardEvent } from 'react';
 import React, { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
+import { PageControlItem, PageHeaderControls } from 'components/[pageId]/DocumentPage/components/PageHeader';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import type { Board } from 'lib/focalboard/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BlockIcons } from '../blockIcons';
 import mutator from '../mutator';
-import Button from '../widgets/buttons/button';
 import Editable from '../widgets/editable';
-
-import BlockIconSelector from './blockIconSelector';
-
-const CharmEditor = dynamic(() => import('components/common/CharmEditor'), {
-  ssr: false
-});
 
 const BoardTitleEditable = styled(Editable)`
   font-size: 32px;
@@ -91,64 +83,46 @@ function ViewTitle(props: ViewTitleProps) {
 
   return (
     <div className='ViewTitle'>
-      <div className='add-buttons add-visible'>
-        {!props.readOnly && !board.fields.headerImage && (
-          <div className='add-buttons'>
-            <Button
-              onClick={() => setRandomHeaderImage()}
-              icon={<ImageIcon fontSize='small' sx={{ marginRight: 1 }} />}
-            >
-              <FormattedMessage id='CardDetail.add-cover' defaultMessage='Add cover' />
-            </Button>
-          </div>
-        )}
-        {!props.readOnly && !pageIcon && (
-          <Button
-            onClick={onAddRandomIcon}
-            icon={
-              <EmojiEmotionsOutlinedIcon
-                fontSize='small'
-                sx={{
-                  mr: 1
-                }}
-              />
-            }
-          >
-            <FormattedMessage id='TableComponent.add-icon' defaultMessage='Add icon' />
-          </Button>
-        )}
-        {!props.readOnly && board.fields.showDescription && (
-          <Button
-            onClick={onHideDescription}
-            icon={
-              <VisibilityOffOutlinedIcon
-                sx={{
-                  mr: 1
-                }}
-              />
-            }
-          >
-            <FormattedMessage id='ViewTitle.hide-description' defaultMessage='hide description' />
-          </Button>
-        )}
-        {!props.readOnly && !board.fields.showDescription && (
-          <Button
-            onClick={onShowDescription}
-            icon={
-              <VisibilityOutlinedIcon
-                sx={{
-                  mr: 1
-                }}
-              />
-            }
-          >
-            <FormattedMessage id='ViewTitle.show-description' defaultMessage='show description' />
-          </Button>
-        )}
-      </div>
-
       <Box mb={2} data-test='board-title'>
-        <BlockIconSelector readOnly={props.readOnly} pageIcon={pageIcon} setPage={props.setPage} />
+        <PageHeaderControls
+          pageType='board'
+          addPageHeader={() => setRandomHeaderImage()}
+          headerImage={board.fields.headerImage}
+          icon={pageIcon}
+          readOnly={props.readOnly}
+          setPage={props.setPage}
+          controlsPosition='top'
+          endAdornmentComponent={
+            <PageControlItem
+              onClick={() => {
+                if (board.fields.showDescription) {
+                  onHideDescription();
+                } else {
+                  onShowDescription();
+                }
+              }}
+            >
+              {board.fields.showDescription ? (
+                <VisibilityOffOutlinedIcon
+                  sx={{
+                    mr: 1
+                  }}
+                />
+              ) : (
+                <VisibilityOutlinedIcon
+                  sx={{
+                    mr: 1
+                  }}
+                />
+              )}
+              {board.fields.showDescription ? (
+                <FormattedMessage id='ViewTitle.hide-description' defaultMessage='hide description' />
+              ) : (
+                <FormattedMessage id='ViewTitle.show-description' defaultMessage='show description' />
+              )}
+            </PageControlItem>
+          }
+        />
         <BoardTitleEditable
           value={title}
           placeholderText={intl.formatMessage({ id: 'ViewTitle.untitled-board', defaultMessage: 'Untitled board' })}
@@ -170,6 +144,7 @@ function ViewTitle(props: ViewTitleProps) {
             onContentChange={(content: ICharmEditorOutput) => {
               onDescriptionChange(content.doc);
             }}
+            disableNestedPages
             pageId={board.id}
             readOnly={props.readOnly}
           />

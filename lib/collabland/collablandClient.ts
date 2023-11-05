@@ -1,7 +1,7 @@
+import { GET, POST } from '@charmverse/core/http';
 import { getLogger } from '@charmverse/core/log';
 import { RateLimit } from 'async-sema';
 
-import fetch from 'adapters/http/fetch.server';
 import { COLLABLAND_API_URL } from 'lib/collabland/config';
 import type { CollablandUserResult } from 'lib/collabland/interfaces';
 import type { ExternalRole } from 'lib/roles';
@@ -17,7 +17,7 @@ const DEFAULT_HEADERS = {
 
 log.debug('Using collabland API URL:', COLLABLAND_API_URL);
 
-const rateLimiter = RateLimit(1); // requests per second
+const rateLimiter = RateLimit(1, { timeUnit: 5000 }); // 1 request per 5s
 
 export interface BountyEventSubject {
   id: string; // discord user id
@@ -87,8 +87,7 @@ export function getCredentials({ aeToken }: { aeToken: string }) {
     return [];
   }
 
-  return fetch<AnyCredentialType[]>(`${COLLABLAND_API_URL}/veramo/vcs`, {
-    method: 'GET',
+  return GET<AnyCredentialType[]>(`${COLLABLAND_API_URL}/veramo/vcs`, null, {
     headers: getHeaders({
       Authorization: `AE ${aeToken}`
     })
@@ -102,14 +101,16 @@ export function createCredential<T = BountyEventSubject>({ subject }: { subject:
     return null;
   }
 
-  return fetch<CollablandCredential<T>>(`${COLLABLAND_API_URL}/veramo/vcreds`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify({ credentialSubjects: [subject] })
-  });
+  return POST<CollablandCredential<T>>(
+    `${COLLABLAND_API_URL}/veramo/vcreds`,
+    { credentialSubjects: [subject] },
+    {
+      headers: getHeaders()
+    }
+  );
 }
 
-export async function canJoinSpaceViaDiscord({
+export async function getDiscordUserState({
   discordServerId,
   discordUserId
 }: {
@@ -118,8 +119,9 @@ export async function canJoinSpaceViaDiscord({
 }) {
   try {
     await rateLimiter();
-    const res = await fetch<CollablandUserResult>(
+    const res = await GET<CollablandUserResult>(
       `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
+      null,
       {
         headers: getHeaders()
       }
@@ -150,7 +152,7 @@ export async function canJoinSpaceViaDiscord({
 
 export async function getGuildRoles(discordServerId: string) {
   await rateLimiter();
-  const allRoles = await fetch<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, {
+  const allRoles = await GET<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, null, {
     headers: getHeaders()
   });
 

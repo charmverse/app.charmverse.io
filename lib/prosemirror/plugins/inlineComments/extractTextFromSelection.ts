@@ -1,7 +1,7 @@
 import type { EditorView } from '@bangle.dev/pm';
+import type { PageMeta } from '@charmverse/core/pages';
 
 import type { Member } from 'lib/members/interfaces';
-import type { PageMeta } from 'lib/pages';
 
 export function extractTextFromSelection(
   view: EditorView,

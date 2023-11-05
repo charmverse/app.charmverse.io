@@ -1,11 +1,10 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Block } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
-
-import type { PageMeta } from './interfaces';
 
 export type DuplicatePageResponse = {
   pages: PageMeta[];
@@ -32,7 +31,8 @@ export async function duplicatePage({
     exportData: data,
     parentId,
     updateTitle: true,
-    includePermissions: true
+    includePermissions: true,
+    resetPaths: true
   });
 
   if (rootPageIds.length > 1) {

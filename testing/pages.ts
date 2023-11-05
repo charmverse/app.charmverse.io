@@ -1,14 +1,14 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma, Page } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { IPageWithPermissions } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 
 export function createPage(
   options: Partial<Page> &
     Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
-): Promise<IPageWithPermissions> {
+): Promise<PageWithPermissions> {
   return createPageDb({
     data: {
       id: options.id ?? v4(),
@@ -46,5 +46,5 @@ export function createPage(
         }
       }
     }
-  }) as Promise<IPageWithPermissions>;
+  }) as Promise<PageWithPermissions>;
 }

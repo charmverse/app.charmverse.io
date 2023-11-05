@@ -1,5 +1,8 @@
-import { prisma } from '@charmverse/core';
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 
 type Props = {
   spaceId: string;
@@ -16,6 +19,15 @@ export async function addUserToSpace({ spaceId, userId, userXpsEngineId }: Props
       userId
     }
   });
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: [space.id],
+    userId
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(`You have been banned from this space.`);
+  }
 
   if (!spaceMembership) {
     await prisma.spaceRole.create({

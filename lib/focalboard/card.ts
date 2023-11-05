@@ -1,20 +1,25 @@
+import type { PageMeta } from '@charmverse/core/pages';
+
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
-import type { PageMeta } from 'lib/pages';
 
-export type CardFields = {
+export type CardPropertyValue = string | string[] | number;
+
+export type CardFields<V = CardPropertyValue> = {
   icon?: string;
   isTemplate?: boolean;
-  properties: Record<string, string | string[]>;
+  properties: Record<string, V | CardPropertyValue>;
   contentOrder: (string | string[])[];
 };
 
-export type Card = Block & {
-  fields: CardFields;
+export type Card<V = CardPropertyValue> = Block & {
+  fields: CardFields<V>;
+  customIconType?: 'applicationStatus' | 'reward';
 };
 
-export type CardPage = {
-  card: Card;
+export type CardPage<V = CardPropertyValue> = {
+  subPages?: CardPage<V>[];
+  card: Card<V>;
   page: PageMeta;
 };
 

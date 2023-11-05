@@ -5,13 +5,20 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
-import type { TokenGateEvaluationResult, TokenGateJoinType, TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
+import type { TokenGateJoinType, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
-type Props = { autoVerify?: boolean; joinType?: TokenGateJoinType; space: SpaceWithGates; onSuccess?: () => void };
+type Props = {
+  account?: string | null;
+  autoVerify?: boolean;
+  joinType?: TokenGateJoinType;
+  space: SpaceWithGates;
+  onSuccess?: () => void;
+};
 
 export type TokenGateState = {
   isEnabled: boolean;
@@ -20,11 +27,12 @@ export type TokenGateState = {
   isVerified: boolean;
   isVerifying: boolean;
   evaluateEligibility: (sig: AuthSig) => void;
-  joinSpace: () => void;
+  joinSpace: (onError: (error: any) => void) => void;
   joiningSpace: boolean;
 };
 
 export function useTokenGates({
+  account,
   autoVerify = false,
   space,
   joinType = 'token_gate',
@@ -32,7 +40,7 @@ export function useTokenGates({
 }: Props): TokenGateState {
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { getStoredSignature } = useWeb3AuthSig();
+  const { getStoredSignature } = useWeb3Account();
   const { refreshUser, user } = useUser();
 
   const [isVerifying, setIsVerifying] = useState(false);
@@ -42,14 +50,14 @@ export function useTokenGates({
   // Token gates with those that succeedeed first
 
   useEffect(() => {
-    if (autoVerify) {
-      const signature = getStoredSignature();
+    if (autoVerify && account) {
+      const signature = getStoredSignature(account);
 
       if (user && !!signature && user.wallets.some((wallet) => lowerCaseEqual(wallet.address, signature.address))) {
         evaluateEligibility(signature);
       }
     }
-  }, [user]);
+  }, [user, account]);
 
   async function evaluateEligibility(authSig: AuthSig) {
     // Reset the current state
@@ -57,7 +65,7 @@ export function useTokenGates({
     setIsVerifying(true);
 
     charmClient.tokenGates
-      .evalueTokenGateEligibility({
+      .evaluateTokenGateEligibility({
         authSig,
         spaceIdOrDomain: space.id
       })
@@ -70,7 +78,7 @@ export function useTokenGates({
       .finally(() => setIsVerifying(false));
   }
 
-  async function joinSpace() {
+  async function joinSpace(onError: (error: any) => void) {
     setJoiningSpace(true);
 
     try {
@@ -99,9 +107,8 @@ export function useTokenGates({
       }
       onSuccess?.();
     } catch (err: any) {
-      showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
+      onError(err);
     }
-
     setJoiningSpace(false);
   }
 

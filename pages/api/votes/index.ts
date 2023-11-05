@@ -1,5 +1,6 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
+import type { User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,8 +8,6 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
@@ -30,10 +29,15 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
   const userId = req.session?.user?.id;
 
   if (pageId) {
-    const computed = await computeUserPagePermissions({
+    const computed = await getPermissionsClient({
       resourceId: pageId,
-      userId
-    });
+      resourceIdType: 'page'
+    }).then(({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: pageId,
+        userId
+      })
+    );
 
     if (computed.read !== true) {
       throw new UnauthorisedActionError('You do not have access to the page');
@@ -42,7 +46,7 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
     const computed = await getPermissionsClient({
       resourceId: postId,
       resourceIdType: 'post'
-    }).then((client) =>
+    }).then(({ client }) =>
       client.forum.computePostPermissions({
         resourceId: postId,
         userId
@@ -57,7 +61,30 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
   }
 
   const votes = await getVotesByPage({ pageId, postId, userId });
-  return res.status(200).json(votes);
+  return res.status(200).json(
+    votes.map((vote) => ({
+      ...vote,
+      contentText: vote.contentText ?? vote.description ?? '',
+      content: vote.content
+        ? vote.content
+        : vote.description
+        ? {
+            type: 'doc',
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: vote.description
+                  }
+                ]
+              }
+            ]
+          }
+        : null
+    }))
+  );
 }
 
 async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote | null | { error: any }>) {
@@ -97,10 +124,15 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     : null;
   // User must be proposal author or a space admin to create a poll
   if (existingPage?.type === 'proposal' && existingPage.proposalId && newVote.context === 'proposal') {
-    const permissions = await computeProposalPermissions({
+    const permissions = await getPermissionsClient({
       resourceId: existingPage.proposalId,
-      userId
-    });
+      resourceIdType: 'proposal'
+    }).then(({ client }) =>
+      client.proposals.computeProposalPermissions({
+        resourceId: existingPage.proposalId as string,
+        userId
+      })
+    );
 
     if (!permissions.create_vote) {
       throw new UnauthorisedActionError(
@@ -108,10 +140,15 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       );
     }
   } else if (pageId) {
-    const userPagePermissions = await computeUserPagePermissions({
+    const userPagePermissions = await getPermissionsClient({
       resourceId: pageId,
-      userId
-    });
+      resourceIdType: 'page'
+    }).then(({ client }) =>
+      client.pages.computePagePermissions({
+        resourceId: pageId,
+        userId
+      })
+    );
 
     if (!userPagePermissions.create_poll) {
       throw new UnauthorisedActionError('You do not have permissions to create a vote.');
@@ -122,7 +159,7 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     ...newVote,
     createdBy: userId
   } as VoteDTO);
-  const voteAuthor = await prisma.user.findUnique({ where: { id: userId } });
+  const voteAuthor = (await prisma.user.findUnique({ where: { id: userId } })) as User;
 
   if (pageId && vote.context === 'proposal') {
     trackUserAction('new_vote_created', {
@@ -146,8 +183,8 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
   if (existingPage) {
     voteTask = {
       ...vote,
-      createdBy: mapNotificationActor(voteAuthor),
-      taskId: vote.id,
+      createdBy: mapNotificationActor(voteAuthor) as User,
+      id: vote.id,
       spaceName: space.name,
       spaceDomain: space.domain,
       pagePath: existingPage.path,
@@ -156,8 +193,8 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
   } else if (existingPost) {
     voteTask = {
       ...vote,
-      createdBy: mapNotificationActor(voteAuthor),
-      taskId: vote.id,
+      createdBy: mapNotificationActor(voteAuthor) as User,
+      id: vote.id,
       spaceName: space.name,
       spaceDomain: space.domain,
       pagePath: `forum/post/${existingPost.path}`,

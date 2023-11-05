@@ -18,7 +18,10 @@ describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissi
             createBounty: false,
             reviewProposals: false,
             createForumCategory: false,
-            moderateForums: false
+            moderateForums: false,
+            deleteAnyBounty: false,
+            deleteAnyPage: false,
+            deleteAnyProposal: false
           },
           assignee: {
             id: space.id,

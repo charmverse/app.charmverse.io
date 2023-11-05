@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, Thread, User } from '@charmverse/core/prisma';
+import { testUtilsPages } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { upsertPermission } from 'lib/permissions/pages';
 import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -32,15 +32,18 @@ beforeAll(async () => {
 
 describe('POST /api/threads - create a thread', () => {
   it('should succeed if the user has a comment permission, and respond 201', async () => {
-    const page = await createPage({
+    const page = await testUtilsPages.generatePage({
       createdBy: nonAdminUser.id,
-      spaceId: nonAdminUserSpace.id
-    });
-
-    await upsertPermission(page.id, {
-      permissionLevel: 'view_comment',
-      pageId: page.id,
-      userId: nonAdminUser.id
+      spaceId: nonAdminUserSpace.id,
+      pagePermissions: [
+        {
+          permissionLevel: 'view_comment',
+          assignee: {
+            group: 'user',
+            id: nonAdminUser.id
+          }
+        }
+      ]
     });
 
     const creationContent: Omit<ThreadCreate, 'userId'> = {

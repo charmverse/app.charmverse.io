@@ -8,7 +8,7 @@ import { useUser } from 'hooks/useUser';
 
 function useSpaceNotificationsData() {
   const { user } = useUser();
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { data, error, isLoading, mutate } = useSWRImmutable(
     user && currentSpace ? `/api/profile/space-notifications/${user.id}/${currentSpace.id}` : null,
     () => {

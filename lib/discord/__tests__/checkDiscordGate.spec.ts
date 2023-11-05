@@ -1,11 +1,11 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('checkDiscordGate', () => {
   afterEach(() => {
-    jest.unmock('lit-js-sdk');
+    jest.unmock('@lit-protocol/lit-node-client');
     jest.resetModules();
   });
 
@@ -26,7 +26,7 @@ describe('checkDiscordGate', () => {
 
     const canJoinSpaceMock = jest.fn().mockResolvedValue({ isVerified: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
-      canJoinSpaceViaDiscord: canJoinSpaceMock
+      getDiscordUserState: canJoinSpaceMock
     }));
 
     const { checkDiscordGate } = await import('lib/discord/checkDiscordGate');
@@ -43,7 +43,7 @@ describe('checkDiscordGate', () => {
 
     const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isVerified: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
-      canJoinSpaceViaDiscord: canJoinSpaceMock
+      getDiscordUserState: canJoinSpaceMock
     }));
 
     const { checkDiscordGate } = await import('lib/discord/checkDiscordGate');
@@ -67,7 +67,7 @@ describe('checkDiscordGate', () => {
 
     const canJoinSpaceMock = jest.fn().mockResolvedValueOnce({ isVerified: true, roles: [] });
     jest.mock('lib/collabland/collablandClient', () => ({
-      canJoinSpaceViaDiscord: canJoinSpaceMock
+      getDiscordUserState: canJoinSpaceMock
     }));
 
     const { checkDiscordGate } = await import('lib/discord/checkDiscordGate');

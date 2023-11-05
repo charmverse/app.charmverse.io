@@ -1,12 +1,12 @@
-import { prisma } from '@charmverse/core';
 import type { Space, User, Vote } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { PageWithProposal } from 'lib/pages';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace, createProposalWithUsers, createVote } from 'testing/setupDatabase';
+import { createProposalWithUsers, createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;
@@ -67,13 +67,13 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choices: ['1']
       })
     );
 
     const userVotes = await getUserVotes(vote.id);
     expect(userVotes).toHaveLength(1);
-    expect(userVotes[0].choice).toBe('1');
+    expect(userVotes[0].choices[0]).toBe('1');
     expect(userVotes[0].userId).toBe(user.id);
   });
 
@@ -105,13 +105,13 @@ describe('POST /api/v1/proposals/vote', () => {
       expect.objectContaining({
         voteId: vote.id,
         userId: user.id,
-        choice: '1'
+        choices: ['1']
       })
     );
 
     const userVotes = await getUserVotes(vote.id);
     expect(userVotes).toHaveLength(1);
-    expect(userVotes[0].choice).toBe('1');
+    expect(userVotes[0].choices[0]).toBe('1');
     expect(userVotes[0].userId).toBe(user.id);
   });
 

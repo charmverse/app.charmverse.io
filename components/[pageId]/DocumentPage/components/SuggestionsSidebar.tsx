@@ -1,11 +1,11 @@
 import type { EditorState } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
 import { Check, Close, RateReviewOutlined } from '@mui/icons-material';
 import { Box, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { activateTrack } from 'components/common/CharmEditor/components/fiduswriter/state_plugins/track/helpers';
 import { acceptAll } from 'components/common/CharmEditor/components/fiduswriter/track/acceptAll';
 import { rejectAll } from 'components/common/CharmEditor/components/fiduswriter/track/rejectAll';

@@ -7,6 +7,7 @@
       "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
       "updatedAt": "2023-02-11T12:40:54.356Z",
       "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
       "title": "[Your Community] Home",
       "content": {
         "type": "doc",
@@ -988,7 +989,7 @@
             ]
           },
           {
-            "type": "page",
+            "type": "linkedPage",
             "attrs": {
               "id": "2ad188ca-b4b9-421b-8d20-9c3d8eb82c11",
               "track": []
@@ -1034,6 +1035,7 @@
       "headerImage": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/1fd47a60-4a58-4551-af06-24fe5a39c375/jim_banner.jpeg",
       "icon": "👋",
       "path": "page-3108976725883821",
+      "additionalPaths": [],
       "isTemplate": false,
       "parentId": null,
       "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -1045,8 +1047,13 @@
       "proposalId": null,
       "snapshotProposalId": null,
       "fullWidth": false,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
       "version": 747,
       "bountyId": null,
+      "syncWithPageId": null,
+      "convertedProposalId": null,
+      "sourceTemplateId": null,
       "permissions": [
         {
           "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
@@ -1058,6 +1065,7 @@
           "spaceId": null,
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         }
       ],
@@ -1067,8 +1075,9 @@
           "deletedAt": null,
           "createdAt": "2023-02-01T21:46:22.196Z",
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-          "updatedAt": "2023-02-11T16:26:46.016Z",
+          "updatedAt": "2023-09-18T14:47:37.945Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "My Collection",
           "content": {
             "type": "doc",
@@ -1093,7 +1102,7 @@
                     },
                     "content": [
                       {
-                        "text": "Show off your collection. Embed OpenSea NFTs by ",
+                        "text": "Show off your collection. Embed NFTs by ",
                         "type": "text",
                         "marks": [
                           {
@@ -1159,7 +1168,7 @@
                         ]
                       },
                       {
-                        "text": "/opensea",
+                        "text": "/nft",
                         "type": "text",
                         "marks": [
                           {
@@ -1179,6 +1188,9 @@
                 "content": [
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    },
                     "content": [
                       {
                         "type": "paragraph",
@@ -1189,6 +1201,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "265",
                           "track": [],
@@ -1198,6 +1211,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -1208,6 +1222,9 @@
                   },
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    },
                     "content": [
                       {
                         "type": "paragraph",
@@ -1218,6 +1235,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "2034",
                           "track": [],
@@ -1227,6 +1245,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -1251,6 +1270,10 @@
                 "content": [
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "size": 339,
+                      "track": []
+                    },
                     "content": [
                       {
                         "type": "paragraph",
@@ -1261,6 +1284,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "1",
                           "track": [],
@@ -1270,6 +1294,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -1280,6 +1305,10 @@
                   },
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "size": 341,
+                      "track": []
+                    },
                     "content": [
                       {
                         "type": "paragraph",
@@ -1290,6 +1319,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "2",
                           "track": [],
@@ -1299,6 +1329,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -1376,7 +1407,10 @@
                 },
                 "content": [
                   {
-                    "type": "columnBlock"
+                    "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    }
                   }
                 ]
               },
@@ -1586,6 +1620,7 @@
               {
                 "type": "heading",
                 "attrs": {
+                  "id": null,
                   "level": 1,
                   "track": [],
                   "collapseContent": null
@@ -1653,12 +1688,13 @@
               }
             ]
           },
-          "contentText": "Show off your collection. Embed OpenSea NFTs by clicking on the prompts below or typing /openseaAdd a bookmark to your OpenSea collection analytics by typing /bookmarkYou can build an analytics dashboard for your collection using Dune and embed the charts and tables in CharmVerse by typing /dune. Using Dune does require some technical chops. If you don't have the chops, ask a friend   Collection Holders",
+          "contentText": "Show off your collection. Embed NFTs by clicking on the prompts below or typing /nftAdd a bookmark to your OpenSea collection analytics by typing /bookmarkYou can build an analytics dashboard for your collection using Dune and embed the charts and tables in CharmVerse by typing /dune. Using Dune does require some technical chops. If you don't have the chops, ask a friend 😉 👑 Collection Holders",
           "galleryImage": null,
           "hasContent": true,
           "headerImage": "/images/patterns/notion/gradients_10.jpg",
           "icon": "🖼️",
           "path": "page-35815532149056395",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
           "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -1670,8 +1706,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
-          "version": 690,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
+          "version": 708,
           "bountyId": null,
+          "syncWithPageId": null,
+          "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "20ab05a6-9bf3-4db0-b0c5-77422ab762fa",
@@ -1683,6 +1724,7 @@
               "spaceId": null,
               "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                 "userId": null,
@@ -1692,7 +1734,8 @@
                 "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -1705,6 +1748,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-06T00:05:29.967Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Find Me",
           "content": {
             "type": "doc",
@@ -2131,6 +2175,7 @@
           "headerImage": "/images/patterns/notion/solid_yellow.png",
           "icon": "👀",
           "path": "page-03910972091761078",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
           "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -2142,8 +2187,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 536,
           "bountyId": null,
+          "syncWithPageId": null,
+          "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "b0587309-f747-43e4-a441-bfa9fcdcecea",
@@ -2155,6 +2205,7 @@
               "spaceId": null,
               "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                 "userId": null,
@@ -2164,7 +2215,8 @@
                 "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -2177,6 +2229,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-03T18:29:57.963Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Tour",
           "content": null,
           "contentText": "",
@@ -2185,6 +2238,7 @@
           "headerImage": null,
           "icon": "🗓️",
           "path": "page-46116377773789163",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
           "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -2196,8 +2250,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 1,
           "bountyId": null,
+          "syncWithPageId": null,
+          "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "c7efb035-0f6b-44f8-ac46-2a783f746529",
@@ -2209,6 +2268,7 @@
               "spaceId": null,
               "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                 "userId": null,
@@ -2218,7 +2278,8 @@
                 "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -2230,6 +2291,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2023-02-04T15:11:51.998Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "The Jim Dozet Band",
               "content": null,
               "contentText": "",
@@ -2238,6 +2300,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-9741550113245365",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "c7efb035-0f6b-44f8-ac46-2a783f746529",
               "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -2249,8 +2312,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 1,
               "bountyId": null,
+              "syncWithPageId": null,
+              "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "2153d45e-af01-4213-9d4e-efa21a479983",
@@ -2262,6 +2330,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                     "userId": null,
@@ -2271,7 +2340,8 @@
                     "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -2314,6 +2384,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2023-02-04T14:57:15.955Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Jim Dozet Solo",
               "content": null,
               "contentText": "",
@@ -2322,6 +2393,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-6919842056400589",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "c7efb035-0f6b-44f8-ac46-2a783f746529",
               "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -2333,8 +2405,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 1,
               "bountyId": null,
+              "syncWithPageId": null,
+              "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "33eff426-3a8b-4c9a-9c56-e3b3a3f3a0c4",
@@ -2346,6 +2423,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                     "userId": null,
@@ -2355,7 +2433,8 @@
                     "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -2396,6 +2475,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2023-02-04T15:05:12.516Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Jim Dozet Solo",
               "content": null,
               "contentText": "",
@@ -2404,6 +2484,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-14838211877875285",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "c7efb035-0f6b-44f8-ac46-2a783f746529",
               "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -2415,8 +2496,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 1,
               "bountyId": null,
+              "syncWithPageId": null,
+              "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "91519b81-0d8b-43a7-818e-d7aa8ba0882c",
@@ -2428,6 +2514,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                     "userId": null,
@@ -2437,7 +2524,8 @@
                     "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -2478,6 +2566,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2023-02-04T15:08:55.897Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "The Press Project",
               "content": null,
               "contentText": "",
@@ -2486,6 +2575,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-8654960735162995",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "c7efb035-0f6b-44f8-ac46-2a783f746529",
               "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -2497,8 +2587,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 1,
               "bountyId": null,
+              "syncWithPageId": null,
+              "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "8d639093-ffbd-4e14-95c7-260d08e0e7d2",
@@ -2510,6 +2605,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                     "userId": null,
@@ -2519,7 +2615,8 @@
                     "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -2562,6 +2659,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2023-02-04T15:09:05.948Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "The Press Project",
               "content": null,
               "contentText": "",
@@ -2570,6 +2668,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-29851933756213445",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "c7efb035-0f6b-44f8-ac46-2a783f746529",
               "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -2581,8 +2680,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 1,
               "bountyId": null,
+              "syncWithPageId": null,
+              "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "3b2f14b5-705f-46da-ae06-c2b42f4e3ed8",
@@ -2594,6 +2698,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                     "userId": null,
@@ -2603,7 +2708,8 @@
                     "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -2646,7 +2752,7 @@
               "deletedAt": null,
               "createdAt": "2023-02-10T22:27:18.404Z",
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-              "updatedAt": "2023-02-10T22:27:18.404Z",
+              "updatedAt": "2023-03-13T18:36:57.816Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
               "parentId": "",
@@ -2671,7 +2777,7 @@
                 "headerImage": null,
                 "cardProperties": [
                   {
-                    "id": "44fab0f0-9a43-47ae-9ead-d477ba2267fd",
+                    "id": "__title",
                     "name": "Event",
                     "type": "text",
                     "options": []
@@ -2713,7 +2819,7 @@
                     "options": []
                   }
                 ],
-                "showDescription": true,
+                "showDescription": false,
                 "columnCalculations": []
               }
             },
@@ -2747,7 +2853,6 @@
                   "sortOptions": [],
                   "columnWidths": {
                     "__title": 228,
-                    "44fab0f0-9a43-47ae-9ead-d477ba2267fd": 190,
                     "01541c8f-5213-40a5-9cdd-86b27b9d4350": 172,
                     "274b4d5f-b1a1-4049-8209-20294237f19b": 113,
                     "618e7fb8-ccf4-423d-a4f8-dd9293d3ed09": 149,
@@ -2780,6 +2885,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-09T12:40:35.874Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Perks",
           "content": {
             "type": "doc",
@@ -3206,6 +3312,7 @@
           "headerImage": "/images/patterns/notion/solid_red.png",
           "icon": "🔥",
           "path": "page-06015427346011504",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
           "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -3217,8 +3324,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 594,
           "bountyId": null,
+          "syncWithPageId": null,
+          "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "f80abba4-0219-4a86-8b7d-46009a748d77",
@@ -3230,6 +3342,7 @@
               "spaceId": null,
               "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                 "userId": null,
@@ -3239,7 +3352,8 @@
                 "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -3252,6 +3366,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-11T16:44:00.751Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Get Involved",
           "content": {
             "type": "doc",
@@ -3598,6 +3713,7 @@
           "headerImage": "/images/patterns/notion/solid_blue.png",
           "icon": "🤝",
           "path": "page-48424842626641595",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
           "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -3609,8 +3725,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 414,
           "bountyId": null,
+          "syncWithPageId": null,
+          "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "2ad188ca-b4b9-421b-8d20-9c3d8eb82c11",
@@ -3622,6 +3743,7 @@
               "spaceId": null,
               "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                 "userId": null,
@@ -3631,7 +3753,8 @@
                 "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -3644,6 +3767,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-08T21:46:38.829Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Merch",
           "content": {
             "type": "doc",
@@ -3955,6 +4079,7 @@
           "headerImage": "/images/patterns/notion/gradients_8.png",
           "icon": "🛍️",
           "path": "page-12608722822650753",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
           "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -3966,8 +4091,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 485,
           "bountyId": null,
+          "syncWithPageId": null,
+          "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "472dd932-5ab0-4b9f-8f61-b4c767be52f9",
@@ -3979,6 +4109,7 @@
               "spaceId": null,
               "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                 "userId": null,
@@ -3988,7 +4119,8 @@
                 "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -4001,6 +4133,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-04T16:58:44.984Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Exclusive Content",
           "content": {
             "type": "doc",
@@ -5259,6 +5392,7 @@
           "headerImage": "/images/patterns/notion/gradients_10.jpg",
           "icon": "✨",
           "path": "page-8473803416658401",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
           "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
@@ -5270,8 +5404,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 1649,
           "bountyId": null,
+          "syncWithPageId": null,
+          "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "04f695a0-d372-4e90-a8c9-7e2d5a2b5ff4",
@@ -5283,6 +5422,7 @@
               "spaceId": null,
               "inheritedFromPermission": "c5cd3f78-04f9-47c1-832c-c7754bdea87b",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "824e8694-ff17-455d-a9ac-567a6d6f0036",
                 "userId": null,
@@ -5292,7 +5432,8 @@
                 "roleId": "36177f66-04e9-4b7f-8f9b-5ee1d36c922e",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],

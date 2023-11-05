@@ -1,6 +1,5 @@
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
-import { Wallet } from 'ethers';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { getENSName } from 'lib/blockchain/getENSName';
@@ -9,7 +8,8 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
-import { shortWalletAddress, uid } from 'lib/utilities/strings';
+import { shortWalletAddress, randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
@@ -18,7 +18,7 @@ import { prepopulateUserProfile } from './prepopulateUserProfile';
 type UserProps = { address?: string; email?: string; id?: string; avatar?: string; skipTracking?: boolean };
 
 export async function createUserFromWallet(
-  { id = v4(), address = Wallet.createRandom().address, email, avatar, skipTracking }: UserProps = {},
+  { id = v4(), address = randomETHWalletAddress(), email, avatar, skipTracking }: UserProps = {},
   signupAnalytics: Partial<SignupAnalytics> = {}
 ): Promise<LoggedInUser> {
   const lowercaseAddress = address.toLowerCase();

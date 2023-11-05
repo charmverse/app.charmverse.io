@@ -6,7 +6,7 @@ import {
   MAX_EMBED_WIDTH,
   MIN_EMBED_HEIGHT
 } from 'components/common/CharmEditor/components/iframe/config';
-import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/nftUtils';
+import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/utils';
 import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
@@ -135,7 +135,7 @@ export class NotionBlock {
           const listItemBlock = block;
           const convertedBlock = await this.convert(block);
           const listItem = {
-            type: block.type === 'numbered_list_item' ? 'orderedList' : 'bulletList',
+            type: block.type === 'numbered_list_item' ? 'ordered_list' : 'bullet_list',
             content: convertedBlock ? [convertedBlock] : []
           } as any;
 
@@ -285,7 +285,7 @@ export class NotionBlock {
         const { childContent, content } = await this.populatePageContent({ childIds, contents });
 
         const listItemNode: ListItemNode = {
-          type: 'listItem',
+          type: 'list_item',
           content: [
             {
               type: 'paragraph',
@@ -501,7 +501,7 @@ export class NotionBlock {
             : null;
         if (linkedPageId === this.charmversePage.notionPageId) {
           return {
-            type: 'page',
+            type: 'linkedPage',
             attrs: {
               id: this.charmversePage.charmversePageId
             }
@@ -512,12 +512,17 @@ export class NotionBlock {
           const charmversePage = await this.notionPage.fetchAndCreatePage({
             notionPageId: linkedPageId
           });
-          return {
-            type: 'page',
-            attrs: {
-              id: charmversePage?.id
-            }
-          };
+          if (charmversePage) {
+            return {
+              type: 'linkedPage',
+              attrs: {
+                id: charmversePage.id,
+                type: charmversePage.type,
+                path: charmversePage.path
+              }
+            };
+          }
+          return null;
         }
         return null;
       }

@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -9,8 +10,10 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 
 import { Constants } from '../../constants';
 import mutator from '../../mutator';
@@ -36,6 +39,7 @@ type Props = {
   onCalculationMenuOpen: (anchorEl: HTMLElement) => void;
   onCalculationMenuClose: () => void;
   anchorEl: HTMLElement | null;
+  readOnlyTitle?: boolean;
 };
 
 const defaultCalculation = 'count';
@@ -86,6 +90,11 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
       defaultProperty
     : defaultProperty;
 
+  const formattedGroupTitle =
+    groupByProperty?.type === 'proposalStatus'
+      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+      : groupTitle;
+
   return (
     <div
       key={group.option.id || 'empty'}
@@ -116,7 +125,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
       {group.option.id && (
         <Label color={group.option.color}>
           <Editable
-            value={groupTitle}
+            value={formattedGroupTitle}
             placeholderText='New Select'
             onChange={setGroupTitle}
             onSave={() => {
@@ -128,7 +137,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             onCancel={() => {
               setGroupTitle(group.option.value);
             }}
-            readOnly={props.readOnly}
+            readOnly={props.readOnly || props.readOnlyTitle}
             spellCheck={true}
           />
         </Label>
@@ -170,19 +179,22 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             <IconButton icon={<MoreHorizIcon fontSize='small' />} />
             <Menu disablePortal={false}>
               <Menu.Text
-                id='hide'
+                id='hide-column-action'
                 icon={<VisibilityOffOutlinedIcon fontSize='small' />}
                 name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                 onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
               />
               {group.option.id && (
                 <>
-                  <Menu.Text
-                    id='delete'
-                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
-                    name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
-                    onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
-                  />
+                  {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
+                    <Menu.Text
+                      id='delete'
+                      icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
+                      name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
+                      onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
+                    />
+                  )}
+
                   <Menu.Separator />
                   {Object.entries(Constants.menuColors).map(([key, color]) => (
                     <Menu.Color
@@ -196,12 +208,14 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
               )}
             </Menu>
           </MenuWrapper>
-          <IconButton
-            icon={<AddIcon fontSize='small' />}
-            onClick={() => {
-              props.addCard(group.option.id, true);
-            }}
-          />
+          {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
+            <IconButton
+              icon={<AddIcon fontSize='small' />}
+              onClick={() => {
+                props.addCard(group.option.id, true);
+              }}
+            />
+          )}
         </>
       )}
     </div>

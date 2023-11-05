@@ -1,19 +1,20 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, Menu, Popover, Tooltip } from '@mui/material';
-import { bindTrigger, bindPopover, bindMenu } from 'material-ui-popup-state';
+import { Box, Popover, Tooltip } from '@mui/material';
+import { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
-import Button from 'components/common/Button';
+import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { PageMeta } from 'lib/pages';
 
 import { mutator } from '../../mutator';
 import { getCurrentBoardTemplates } from '../../store/cards';
@@ -25,7 +26,6 @@ import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
-import ViewHeaderSortMenu from './viewHeaderSortMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {
@@ -40,7 +40,6 @@ type Props = {
   addCardTemplate: () => void;
   editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
-  readOnlySourceData: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   disableUpdatingUrl?: boolean;
   maxTabsShown?: number;
@@ -49,7 +48,7 @@ type Props = {
   showActionsOnHover?: boolean;
   showView: (viewId: string) => void;
   embeddedBoardPath?: string;
-  toggleViewOptions: (enable?: boolean) => void;
+  toggleViewOptions: (open?: boolean) => void;
 };
 
 function ViewHeader(props: Props) {
@@ -110,6 +109,7 @@ function ViewHeader(props: Props) {
         disableUpdatingUrl={props.disableUpdatingUrl}
         maxTabsShown={maxTabsShown}
         openViewOptions={() => toggleViewOptions(true)}
+        viewIds={viewsBoard?.fields.viewIds ?? []}
       />
 
       {/* add a view */}
@@ -121,7 +121,7 @@ function ViewHeader(props: Props) {
             activeView={activeView}
             views={views}
             showView={showView}
-            onClickIcon={onClickNewView}
+            onClick={onClickNewView}
           />
         </Box>
       )}
@@ -170,40 +170,12 @@ function ViewHeader(props: Props) {
             {/* Sort */}
 
             {withSortBy && (
-              <>
-                <Button
-                  color={activeView.fields.sortOptions?.length > 0 ? 'primary' : 'secondary'}
-                  variant='text'
-                  size='small'
-                  sx={{ minWidth: 0 }}
-                  {...bindTrigger(viewSortPopup)}
-                >
-                  <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
-                </Button>
-                <Menu
-                  {...bindMenu(viewSortPopup)}
-                  PaperProps={{
-                    sx: {
-                      overflow: 'visible'
-                    }
-                  }}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right'
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                  }}
-                  onClick={() => viewSortPopup.close()}
-                >
-                  <ViewHeaderSortMenu
-                    properties={activeBoard?.fields.cardProperties ?? []}
-                    activeView={activeView}
-                    orderedCards={cards}
-                  />
-                </Menu>
-              </>
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                viewSortPopup={viewSortPopup}
+              />
             )}
           </>
         )}
@@ -212,11 +184,16 @@ function ViewHeader(props: Props) {
 
         {/* <ViewHeaderSearch/> */}
 
-        {/* Link to view embedded table in full */}
-        {props.embeddedBoardPath && (
+        {/* Link to view embedded table in full - check that at least one view is created */}
+        {props.embeddedBoardPath && !!views.length && (
           <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
             <Tooltip title='Open as full page' placement='top'>
-              <IconButton icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />} style={{ width: '32px' }} />
+              <span>
+                <IconButton
+                  icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
+                  style={{ width: '32px' }}
+                />
+              </span>
             </Tooltip>
           </Link>
         )}
@@ -229,7 +206,7 @@ function ViewHeader(props: Props) {
 
             {/* New card button */}
 
-            {!props.readOnlySourceData && (
+            {activeBoard?.fields.sourceType !== 'proposals' && (
               <NewCardButton
                 addCard={props.addCard}
                 addCardFromTemplate={addPageFromTemplate}

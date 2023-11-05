@@ -1,33 +1,32 @@
-import { log } from '@charmverse/core/log';
 import { Box, Button, TextField } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
-import { PimpedButton } from '../Button';
 import { selectorPopupSizeConfig } from '../CharmEditor/components/common/selectorPopupSizeConfig';
 
 import ImageSelectorGallery from './ImageSelectorGallery';
+import { ImageUploadButton } from './ImageUploadButton';
 
 interface ImageSelectorProps {
   autoOpen?: boolean;
   onImageSelect: (imageSrc: string) => void;
   children: ReactNode;
   galleryImages?: { [category: string]: string[] };
+  uploadDisclaimer?: string;
 }
 
 export default function ImageSelector({
   autoOpen = false,
   children,
   galleryImages,
-  onImageSelect
+  onImageSelect,
+  uploadDisclaimer
 }: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const tabs: [string, ReactNode][] = [];
-  const [isUploading, setIsUploading] = useState(false);
 
   if (galleryImages) {
     tabs.push(['Gallery', <ImageSelectorGallery key='gallery' onImageClick={onImageSelect} items={galleryImages} />]);
@@ -40,7 +39,6 @@ export default function ImageSelector({
       popupContent={
         <Box>
           <MultiTabs
-            disabled={isUploading}
             tabs={[
               ...tabs,
               [
@@ -48,38 +46,15 @@ export default function ImageSelector({
                 <Box
                   key='upload'
                   sx={{
+                    flexDirection: 'column',
                     display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
                     justifyContent: 'center',
                     width: '100%'
                   }}
                 >
-                  <PimpedButton
-                    loading={isUploading}
-                    loadingMessage='Uploading image'
-                    disabled={isUploading}
-                    component='label'
-                    variant='contained'
-                  >
-                    Choose an image
-                    <input
-                      type='file'
-                      hidden
-                      accept='image/*'
-                      onChange={async (e) => {
-                        setIsUploading(true);
-                        const firstFile = e.target.files?.[0];
-                        if (firstFile) {
-                          try {
-                            const { url } = await uploadToS3(firstFile);
-                            onImageSelect(url);
-                          } catch (error) {
-                            log.error('Error uploading image to s3', { error });
-                          }
-                        }
-                        setIsUploading(false);
-                      }}
-                    />
-                  </PimpedButton>
+                  <ImageUploadButton setImage={onImageSelect} uploadDisclaimer={uploadDisclaimer} />
                 </Box>
               ],
               [

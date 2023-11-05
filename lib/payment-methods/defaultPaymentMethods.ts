@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { PaymentMethod, Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { DataNotFoundError } from 'lib/utilities/errors';
 
@@ -41,8 +41,16 @@ const defaultPaymentMethods: Pick<
     tokenDecimals: 18,
     tokenName: 'Optimism',
     tokenSymbol: 'OP',
-    // tokenLogo: '/images/cryptoLogos/optimism.svg',
     tokenLogo: 'https://optimistic.etherscan.io/token/images/optimism_32.png'
+  },
+  // arbitrum
+  {
+    chainId: 42161,
+    contractAddress: '0x912CE59144191C1204E64559FE8253a0e49E6548',
+    tokenDecimals: 18,
+    tokenName: 'Arbitrum',
+    tokenSymbol: 'ARB',
+    tokenLogo: 'https://static.alchemyapi.io/images/assets/11841.png'
   }
 ];
 

@@ -1,1 +1,1 @@
-export { default } from './InviteLinks';
+export { InviteLinkList } from './InviteLinks';

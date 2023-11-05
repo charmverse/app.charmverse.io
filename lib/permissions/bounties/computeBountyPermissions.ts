@@ -1,19 +1,18 @@
-import { prisma } from '@charmverse/core';
-import type { Prisma } from '@charmverse/core/prisma';
+import type { PermissionCompute } from '@charmverse/core/permissions';
+import type { BountyPermission, BountyPermissionLevel } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-import type { PermissionComputeRequest } from '../interfaces';
-
 import { AvailableBountyPermissions } from './availableBountyPermissions';
+import { computeBountyPermissionsPublic } from './computeBountyPermissions.public';
 import type { BountyPermissionFlags } from './interfaces';
 import { bountyPermissionMapping } from './mapping';
 
 export async function computeBountyPermissions({
-  allowAdminBypass,
   resourceId,
   userId
-}: PermissionComputeRequest): Promise<BountyPermissionFlags> {
+}: PermissionCompute): Promise<BountyPermissionFlags> {
   const allowedOperations = new AvailableBountyPermissions();
 
   const bounty = await prisma.bounty.findUnique({
@@ -23,7 +22,13 @@ export async function computeBountyPermissions({
     select: {
       id: true,
       spaceId: true,
+      space: {
+        select: {
+          paidTier: true
+        }
+      },
       createdBy: true,
+      permissions: true,
       page: {
         select: {
           permissions: {
@@ -42,6 +47,13 @@ export async function computeBountyPermissions({
     return allowedOperations.empty;
   }
 
+  if (bounty.space.paidTier === 'free') {
+    return computeBountyPermissionsPublic({
+      userId,
+      bounty
+    });
+  }
+
   const { error, isAdmin } = await hasAccessToSpace({
     userId,
     spaceId: bounty.spaceId,
@@ -56,51 +68,70 @@ export async function computeBountyPermissions({
   let basePermissions = allowedOperations.empty as BountyPermissionFlags;
 
   // Provision full set of operations
-  if (isAdmin && allowAdminBypass) {
+  if (isAdmin) {
     basePermissions = allowedOperations.full;
   }
   // Calculate actual available permissions
   else {
     // At the point we execute this query, we are certain there is a requesting user who is a member of the target space
-    const query: Prisma.BountyPermissionWhereInput = {
-      AND: [
-        {
-          bountyId: resourceId
-        },
-        {
-          OR: [
-            {
-              public: true
-            },
-            {
-              spaceId: bounty.spaceId
-            },
-            {
+    const rewardPermissions = await prisma.bountyPermission.findMany({
+      where: {
+        bountyId: resourceId
+      },
+      select: {
+        roleId: true,
+        userId: true,
+        spaceId: true,
+        permissionLevel: true
+      }
+    });
+
+    const mappedPermissions: Record<'space' | 'role' | 'user', Partial<BountyPermission>[]> = rewardPermissions.reduce(
+      (acc, val) => {
+        if (val.roleId) {
+          acc.role = [...(acc.role as any), val];
+        } else if (val.userId) {
+          acc.user = [...(acc.user as any), val];
+        } else if (val.spaceId) {
+          acc.space = [...(acc.space as any), val];
+        }
+
+        return acc;
+      },
+      { role: [], space: [], user: [] } as Record<'space' | 'role' | 'user', BountyPermission[]>
+    );
+    const isRoleRestrictedReward = mappedPermissions.role.some((p) => p.permissionLevel === 'submitter');
+
+    // Default to explicit space-wide permission
+    if (!isRoleRestrictedReward) {
+      allowedOperations.addPermissions(bountyPermissionMapping.submitter.slice());
+    }
+
+    const applicableRolePermissions = mappedPermissions.role.length
+      ? await prisma.spaceRoleToRole.findMany({
+          where: {
+            spaceRole: {
               userId
             },
-            {
-              role: {
-                spaceRolesToRole: {
-                  some: {
-                    spaceRole: {
-                      userId
-                    }
-                  }
-                }
-              }
+            roleId: {
+              in: mappedPermissions.role.map((p) => p.roleId as string)
             }
-          ]
-        }
-      ]
-    };
+          }
+        })
+      : [];
 
-    const bountyPermissions = await prisma.bountyPermission.findMany({
-      where: query
+    const permissions = [
+      ...mappedPermissions.role.filter((rolePermission) =>
+        applicableRolePermissions.some((p) => p.roleId === rolePermission.roleId)
+      ),
+      ...mappedPermissions.user.filter((p) => p.userId === userId),
+      ...mappedPermissions.space
+    ];
+
+    permissions.forEach((p) => {
+      allowedOperations.addPermissions(bountyPermissionMapping[p.permissionLevel as BountyPermissionLevel].slice());
     });
 
-    bountyPermissions.forEach((p) => {
-      allowedOperations.addPermissions(bountyPermissionMapping[p.permissionLevel].slice());
-    });
     basePermissions = allowedOperations.operationFlags;
   }
 
@@ -110,12 +141,6 @@ export async function computeBountyPermissions({
     bountyPermissionMapping.creator.forEach((op) => {
       basePermissions[op] = true;
     });
-  }
-
-  // DENY case-specific permissions
-  // 1. Don't allow bounty creator to apply to their own bounty
-  if (bounty.createdBy === userId) {
-    basePermissions.work = false;
   }
 
   return basePermissions;

@@ -18,13 +18,15 @@ function extractThreadIds(inlineCommentNodes: NodeWithPos[]) {
   return threadIds;
 }
 
-export function extractDeletedThreadIds(schema: Schema, curDoc: Node, prevDoc: Node) {
+export function extractThreadIdsFromDoc(doc: Node, schema: Schema) {
   const inlineCommentMarkSchema = schema.marks['inline-comment'] as MarkType;
-  const currentDocInlineCommentNodes = findChildrenByMark(curDoc, inlineCommentMarkSchema);
-  const prevDocInlineCommentNodes = findChildrenByMark(prevDoc, inlineCommentMarkSchema);
+  const inlineCommentNodes = findChildrenByMark(doc, inlineCommentMarkSchema);
+  return extractThreadIds(inlineCommentNodes);
+}
 
-  const prevDocThreadIds = extractThreadIds(prevDocInlineCommentNodes);
-  const curDocThreadIds = extractThreadIds(currentDocInlineCommentNodes);
+export function extractDeletedThreadIds(schema: Schema, curDoc: Node, prevDoc: Node) {
+  const prevDocThreadIds = extractThreadIdsFromDoc(prevDoc, schema);
+  const curDocThreadIds = extractThreadIdsFromDoc(curDoc, schema);
 
   const deletedThreadIds: string[] = [];
   prevDocThreadIds.forEach((prevDocThreadId) => {

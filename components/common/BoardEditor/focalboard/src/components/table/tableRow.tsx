@@ -1,27 +1,40 @@
+import type { PageMeta } from '@charmverse/core/pages';
+import type { ApplicationStatus } from '@charmverse/core/prisma-client';
+import CollapseIcon from '@mui/icons-material/ArrowDropDown';
+import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
-import { PageActionsMenu } from 'components/common/PageActionsMenu';
+import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import {
+  REWARD_APPLICATION_STATUS_COLORS,
+  RewardApplicationStatusIcon
+} from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import type { PageMeta } from 'lib/pages';
+import type { Card, CardPage } from 'lib/focalboard/card';
+import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { TextInput } from '../../../../components/properties/TextInput';
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import { TextInput } from '../../widgets/TextInput';
 import PropertyValueElement from '../propertyValueElement';
+
+export type CardPageWithCustomIcon = CardPage & {
+  customIcon?: ReactElement | null;
+  subPages?: CardPageWithCustomIcon[];
+};
 
 type Props = {
   hasContent?: boolean;
@@ -32,7 +45,7 @@ type Props = {
   pageTitle: string;
   isSelected: boolean;
   focusOnMount: boolean;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string, parentId?: string) => void;
   readOnly: boolean;
   offset: number;
   pageUpdatedAt: string;
@@ -40,9 +53,15 @@ type Props = {
   resizingColumn: string;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
   onClick?: (e: React.MouseEvent<HTMLDivElement>, card: Card) => void;
+  onDeleteCard?: (cardId: string) => Promise<void>;
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   cardPage: PageMeta;
+  readOnlyTitle?: boolean;
+  isExpanded?: boolean | null;
+  setIsExpanded?: (expanded: boolean) => void;
+  indentTitle?: number;
+  expandSubRowsOnLoad?: boolean;
 };
 
 export const columnWidth = (
@@ -69,9 +88,13 @@ function TableRow(props: Props) {
     pageTitle,
     pageUpdatedAt,
     pageUpdatedBy,
-    saveTitle
+    saveTitle,
+    onDeleteCard,
+    setIsExpanded,
+    isExpanded,
+    indentTitle
   } = props;
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -87,12 +110,16 @@ function TableRow(props: Props) {
       Utils.assertFailure();
       return;
     }
-    await mutator.deleteBlock(card, 'delete card');
+    if (onDeleteCard) {
+      await onDeleteCard(card.id);
+    } else {
+      await mutator.deleteBlock(card, 'delete card');
+    }
     mutate(`pages/${space?.id}`);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     event.preventDefault();
     setAnchorEl(event.currentTarget);
@@ -132,17 +159,25 @@ function TableRow(props: Props) {
     onChange: (newTitle: string) => setTitle(newTitle),
     onSave: (saveType: string) => saveTitle(saveType, card.id, title, pageTitle),
     onCancel: () => setTitle(card.title || ''),
-    readOnly: props.readOnly,
+    readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
-
   return (
     <div
+      data-test={`database-row-${card.id}`}
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
       ref={cardRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
+      {!props.readOnly && (
+        <Box className='icons row-actions' onClick={handleClick}>
+          <Box className='charm-drag-handle'>
+            <DragIndicatorIcon color='secondary' />
+          </Box>
+        </Box>
+      )}
+
       {/* Columns, one per property */}
       {visiblePropertyTemplates.map((template, templateIndex) => {
         if (template.id === Constants.titleColumnId) {
@@ -161,42 +196,60 @@ function TableRow(props: Props) {
               key={template.id}
               onPaste={(e) => e.stopPropagation()}
             >
-              {!props.readOnly && templateIndex === 0 && (
-                <IconButton className='icons' onClick={handleClick} size='small'>
-                  <DragIndicatorIcon color='secondary' />
-                </IconButton>
-              )}
-              <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
-                <PageIcon isEditorEmpty={!hasContent} pageType='page' icon={pageIcon} />
-                <TextInput {...commonProps} multiline={wrapColumn} />
-              </div>
+              <div style={{ display: 'flex', width: '100%' }}>
+                <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
+                  {setIsExpanded &&
+                    (isExpanded ? (
+                      <CollapseIcon onClick={() => setIsExpanded(false)} />
+                    ) : isExpanded === false ? (
+                      <ExpandIcon onClick={() => setIsExpanded(true)} />
+                    ) : (
+                      <span style={{ paddingRight: '24px' }}></span>
+                    ))}
 
-              <div className='open-button'>
-                <Button onClick={() => props.showCard(props.card.id || '')}>
-                  <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-                </Button>
+                  {indentTitle && <div style={{ paddingRight: `${indentTitle}px` }}></div>}
+                  {card.customIconType === 'applicationStatus' && card.fields.properties[REWARD_STATUS_BLOCK_ID] && (
+                    <RewardApplicationStatusIcon
+                      status={card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus}
+                    />
+                  )}
+                  {card.customIconType !== 'applicationStatus' && (
+                    <PageIcon
+                      isEditorEmpty={!hasContent}
+                      pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
+                      icon={pageIcon}
+                    />
+                  )}
+                  <TextInput {...commonProps} multiline={wrapColumn} />
+                </div>
+
+                <div className='open-button' data-test={`database-open-button-${card.id}`}>
+                  <Button onClick={() => props.showCard(props.card.id || '', props.card.parentId)}>
+                    <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                  </Button>
+                </div>
               </div>
             </Box>
           );
         }
+
+        const columnRef = columnRefs.get(template.id);
+
         return (
           <div
             className='octo-table-cell'
             key={template.id}
             style={{
               alignItems: 'flex-start',
-              width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id)
+              width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id),
+              overflowX: 'hidden'
             }}
-            ref={columnRefs.get(template.id)}
+            ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
-            {!props.readOnly && templateIndex === 0 && (
-              <IconButton className='icons' onClick={handleClick} size='small'>
-                <DragIndicatorIcon color='secondary' />
-              </IconButton>
-            )}
             <PropertyValueElement
               readOnly={props.readOnly}
+              syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               board={board}
               showEmptyPlaceholder={false}
@@ -204,12 +257,13 @@ function TableRow(props: Props) {
               updatedAt={pageUpdatedAt}
               updatedBy={pageUpdatedBy}
               displayType='table'
+              columnRef={columnRef}
               wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
             />
           </div>
         );
       })}
-      {cardPage && !props.readOnly && (
+      {!props.readOnly && (
         <PageActionsMenu
           onClickDelete={handleDeleteCard}
           anchorEl={anchorEl}
@@ -223,4 +277,38 @@ function TableRow(props: Props) {
   );
 }
 
-export default memo(TableRow);
+export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { subPages?: CardPage[] }) {
+  const isExpandedOnRender = props.subPages?.length ? !!props.expandSubRowsOnLoad : null;
+  const [isExpanded, setIsExpanded] = useState<boolean | null>(isExpandedOnRender);
+
+  useEffect(() => {
+    setIsExpanded((v) => {
+      if (v === null && props.subPages?.length) {
+        return !!props.expandSubRowsOnLoad;
+      }
+
+      return v;
+    });
+  }, [props.subPages?.length]);
+
+  return (
+    <>
+      <TableRow {...props} isExpanded={isExpanded} setIsExpanded={props.subPages ? setIsExpanded : undefined} />
+      {isExpanded &&
+        props.subPages?.map((subPage) => (
+          <ExpandableTableRow
+            key={subPage.card.id}
+            {...props}
+            pageTitle={subPage.page.title}
+            pageUpdatedAt={subPage.page.updatedAt.toISOString()}
+            card={subPage.card}
+            cardPage={subPage.page}
+            subPages={subPage.subPages}
+            indentTitle={48}
+          />
+        ))}
+    </>
+  );
+}
+
+export default memo(ExpandableTableRow);

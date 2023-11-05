@@ -1,33 +1,34 @@
-import { prisma } from '@charmverse/core';
+import { DataNotFoundError } from '@charmverse/core/errors';
+import type { ProposalReviewerPool, Resource } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 
-export type ProposalReviewerPool = {
-  space: boolean;
-  roles: string[];
-};
-export async function getProposalReviewerPool({ spaceId }: { spaceId: string }): Promise<ProposalReviewerPool> {
-  const reviewerPool: ProposalReviewerPool = {
-    space: false,
-    roles: []
-  };
-
-  const spacePermissions = await prisma.spacePermission.findMany({
+export async function getProposalReviewerPool({ resourceId }: Resource): Promise<ProposalReviewerPool> {
+  const category = await prisma.proposalCategory.findUnique({
     where: {
-      forSpaceId: spaceId,
-      operations: {
-        has: 'reviewProposals'
-      }
+      id: resourceId
+    },
+    select: {
+      spaceId: true
     }
   });
 
-  if (spacePermissions.some((permission) => permission.spaceId === spaceId)) {
-    reviewerPool.space = true;
-  } else {
-    spacePermissions.forEach((permission) => {
-      if (permission.roleId) {
-        reviewerPool.roles.push(permission.roleId);
-      }
-    });
+  if (!category) {
+    throw new DataNotFoundError(`Proposal category with id ${resourceId} not found`);
   }
 
-  return reviewerPool;
+  const spaceId = category.spaceId;
+
+  const spaceRoles = await prisma.spaceRole.findMany({
+    where: {
+      spaceId
+    },
+    select: {
+      userId: true
+    }
+  });
+
+  return {
+    userIds: spaceRoles.map((spaceRole) => spaceRole.userId),
+    roleIds: []
+  };
 }

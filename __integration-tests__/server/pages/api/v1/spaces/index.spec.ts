@@ -1,23 +1,22 @@
-import { prisma } from '@charmverse/core';
-import type { SuperApiToken } from '@charmverse/core/prisma';
-import { Wallet } from 'ethers';
+import type { Space, SuperApiToken } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
+import { randomETHWallet } from 'lib/utilities/blockchain';
+import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateSuperApiToken } from 'testing/utils/middleware';
 
-let apiToken: SuperApiToken;
-
+let superApiKey: SuperApiToken;
 const defaultSpaceData = {
   name: `Test Space`,
-  adminDiscordUserId: `1337-${v4()}`
+  adminDiscordUserId: `1337-${uuid()}`
 };
 
 beforeAll(async () => {
-  apiToken = await generateSuperApiToken({ name: `test 1-${v4()}` });
+  superApiKey = await generateSuperApiKey();
 });
 
 describe('GET /api/v1/spaces', () => {
@@ -34,15 +33,15 @@ describe('GET /api/v1/spaces', () => {
   it('should respond 400 with error message when space name is missing or invalid', async () => {
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
-      .send({ ...defaultSpaceData, name: '' });
+      .set('Authorization', superApiKey.token)
+      .send({ name: null });
 
     expect(response.statusCode).toBe(400);
     expect(response.body.message).toBe('Key name is required in request body and must not be an empty value.');
 
     const response2 = await request(baseUrl)
       .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
+      .set('Authorization', superApiKey.token)
       .send({ ...defaultSpaceData, name: 'ab' });
 
     expect(response2.statusCode).toBe(400);
@@ -52,7 +51,7 @@ describe('GET /api/v1/spaces', () => {
   it('should respond 400 when admin identifier is missing', async () => {
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
+      .set('Authorization', superApiKey.token)
       .send({ ...defaultSpaceData, adminDiscordUserId: '', adminWalletAddress: '' });
 
     expect(response.statusCode).toBe(400);
@@ -63,7 +62,7 @@ describe('GET /api/v1/spaces', () => {
     const spaceName = `Test Space - ${Date.now()}`;
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
+      .set('Authorization', superApiKey.token)
       .send({ ...defaultSpaceData, name: spaceName });
 
     const expectedDomain = getSpaceDomainFromName(spaceName);
@@ -78,7 +77,7 @@ describe('GET /api/v1/spaces', () => {
     expect(space).toBeDefined();
     expect(space?.domain).toBe(expectedDomain);
     expect(space?.name).toBe(spaceName);
-    expect(space?.superApiTokenId).toBe(apiToken.id);
+    expect(space?.superApiTokenId).toBe(superApiKey.id);
 
     const spaceRoles = await prisma.spaceRole.findMany({
       where: { spaceId: response.body.id },
@@ -111,7 +110,7 @@ describe('GET /api/v1/spaces', () => {
 
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
+      .set('Authorization', superApiKey.token)
       .send({ ...defaultSpaceData, name: existingDomain });
 
     expect(response.statusCode).toBe(201);
@@ -123,12 +122,12 @@ describe('GET /api/v1/spaces', () => {
   });
 
   it('should create a space for XPS Engine', async () => {
-    const xpsEngineId = 'xps-4eva';
-    const wallet = Wallet.createRandom();
+    const xpsEngineId = `xps-4eva-${uuid()}`;
+    const wallet = randomETHWallet();
 
     const response = await request(baseUrl)
       .post('/api/v1/spaces')
-      .set('Authorization', apiToken.token)
+      .set('Authorization', superApiKey.token)
       .send({ adminWalletAddress: wallet.address, xpsEngineId, name: `${Date.now()}` });
 
     expect(response.statusCode).toBe(201);

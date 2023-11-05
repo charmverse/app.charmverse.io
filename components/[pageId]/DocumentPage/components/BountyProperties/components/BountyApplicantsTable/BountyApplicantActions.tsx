@@ -1,7 +1,7 @@
 import { Box, Tooltip } from '@mui/material';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ApplicationWithTransactions } from 'lib/applications/actions';

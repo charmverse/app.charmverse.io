@@ -1,9 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 
 type Props = {
   spaceId: string;
@@ -26,6 +27,15 @@ export async function applyDiscordGate({ spaceId, userId }: Props): Promise<Spac
 
   if (!isVerified) {
     return null;
+  }
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: [space.id],
+    userId
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(`You have been banned from this space.`);
   }
 
   const spaceMembership = await prisma.spaceRole.findFirst({

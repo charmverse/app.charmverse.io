@@ -2,14 +2,14 @@ import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
 import mutator from '../../mutator';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
-import { typeDisplayName } from '../../widgets/propertyMenu';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 type Props = {
   properties: readonly IPropertyTemplate[];

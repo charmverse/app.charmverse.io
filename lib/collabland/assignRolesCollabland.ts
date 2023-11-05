@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { findOrCreateCollablandRoles } from 'lib/collabland/findOrCreateCollablandRoles';
 import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
@@ -15,14 +15,18 @@ export async function assignRolesCollabland({
   const roleIdsToAdd = Array.isArray(roles) ? roles : [roles];
   const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
 
+  if (!spacesData) {
+    return;
+  }
+
   return Promise.allSettled(
     spacesData.map(({ space, user }) =>
-      createAndAssignCollablanRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })
+      createAndAssignCollablandRoles({ userId: user.id, spaceId: space.id, roles: roleIdsToAdd })
     )
   );
 }
 
-async function createAndAssignCollablanRoles({
+export async function createAndAssignCollablandRoles({
   userId,
   spaceId,
   roles
@@ -87,4 +91,5 @@ async function createAndAssignCollablanRoles({
       });
     })
   );
+  return { userId, spaceId };
 }

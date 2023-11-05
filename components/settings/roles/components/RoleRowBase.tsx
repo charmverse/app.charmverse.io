@@ -3,25 +3,29 @@ import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {
-  Box,
-  Grid,
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Typography,
+  Box,
   Chip,
   Divider,
+  Grid,
   Paper,
+  SvgIcon,
   Tab,
-  Tabs
+  Tabs,
+  Tooltip,
+  Typography
 } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import Modal from 'components/common/Modal';
+import type { Props as UpgradeProps } from 'components/settings/subscription/UpgradeWrapper';
+import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Member } from 'lib/members/interfaces';
 
@@ -37,6 +41,8 @@ type RoleRowProps = {
   permissions?: ReactNode;
   roleActions?: ReactNode;
   memberRoleId?: string;
+  upgradeProps?: UpgradeProps;
+  descriptionIcon?: any;
 };
 
 const ScrollableBox = styled.div<{ rows: number }>`
@@ -54,7 +60,9 @@ export function RoleRowBase({
   title,
   permissions,
   onAddMembers,
-  members
+  members,
+  upgradeProps,
+  descriptionIcon
 }: RoleRowProps) {
   const [openTab, setOpenTab] = useState(0);
 
@@ -71,6 +79,14 @@ export function RoleRowBase({
               <Typography variant='h6' sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {title}
                 <Chip size='small' label={members.length} />
+                {descriptionIcon && (
+                  <Tooltip title={description}>
+                    <SvgIcon sx={{ height: 20 }} component={descriptionIcon} inheritViewBox />
+                  </Tooltip>
+                )}
+                {upgradeProps?.upgradeContext && (
+                  <UpgradeChip upgradeContext={upgradeProps.upgradeContext} onClick={upgradeProps.onClick} />
+                )}
               </Typography>
             </Box>
             <div onClick={(e) => e.stopPropagation()}>{roleActions}</div>

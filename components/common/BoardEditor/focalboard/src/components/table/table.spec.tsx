@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom';
+import type { PageMeta } from '@charmverse/core/pages';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import 'isomorphic-fetch';
-
 import type { BoardView } from 'lib/focalboard/boardView';
+import { pageStubToCreate } from 'testing/generatePageStub';
 
 import { FetchMock } from '../../test/fetchMock';
 import { TestBlockFactory } from '../../test/testBlockFactory';
@@ -16,11 +16,21 @@ import { Utils, IDType } from '../../utils';
 
 import Table from './table';
 
-global.fetch = FetchMock.fn;
+window.fetch = FetchMock.fn;
 
 beforeEach(() => {
   FetchMock.fn.mockReset();
 });
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/[domain]/',
+    query: {
+      domain: 'test-space'
+    },
+    isReady: true
+  })
+}));
 
 describe('components/table/Table', () => {
   const board = TestBlockFactory.createBoard();
@@ -68,10 +78,10 @@ describe('components/table/Table', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
+          cardPages={[]}
           board={board}
           activeView={view}
           visibleGroups={[]}
-          cards={[card]}
           views={[view, view2]}
           selectedCardIds={[]}
           readOnly={false}
@@ -96,10 +106,10 @@ describe('components/table/Table', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
+          cardPages={[]}
           board={board}
           activeView={view}
           visibleGroups={[]}
-          cards={[card]}
           views={[view, view2]}
           selectedCardIds={[]}
           readOnly={true}
@@ -125,16 +135,16 @@ describe('components/table/Table', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
+          cardPages={[]}
           board={board}
           activeView={{ ...view, fields: { ...view.fields, groupById: 'property1' } } as BoardView}
-          visibleGroups={[{ option: { id: '', value: 'test', color: '' }, cards: [] }]}
+          visibleGroups={[{ option: { id: '', value: 'test', color: '' }, cardPages: [], cards: [] }]}
           groupByProperty={{
             id: '',
             name: 'Property 1',
             type: 'text',
             options: [{ id: 'property1', value: 'Property 1', color: '' }]
           }}
-          cards={[card]}
           views={[view, view2]}
           selectedCardIds={[]}
           readOnly={false}
@@ -184,9 +194,11 @@ describe('components/table/Table extended', () => {
 
     const card1 = TestBlockFactory.createCard(board);
     card1.createdAt = Date.parse('15 Jun 2021 16:22:00');
+    card1.id = 'card-id-1';
 
     const card2 = TestBlockFactory.createCard(board);
     card2.createdAt = Date.parse('15 Jun 2021 16:22:00');
+    card2.id = 'card-id-2';
 
     const view = TestBlockFactory.createBoardView(board);
     view.fields.viewType = 'table';
@@ -210,10 +222,29 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
+          cardPages={[
+            {
+              card: card1,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card1.id,
+                path: card1.id
+              }) as PageMeta
+            },
+            {
+              card: card2,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card2.id,
+                path: card2.id
+              }) as PageMeta
+            }
+          ]}
           board={board}
           activeView={view}
           visibleGroups={[]}
-          cards={[card1, card2]}
           views={[view]}
           selectedCardIds={[]}
           readOnly={false}
@@ -241,14 +272,11 @@ describe('components/table/Table extended', () => {
 
     const card1 = TestBlockFactory.createCard(board);
     card1.updatedAt = Date.parse('20 Jun 2021 12:22:00');
+    card1.id = 'card-id-1';
 
     const card2 = TestBlockFactory.createCard(board);
     card2.updatedAt = Date.parse('20 Jun 2021 12:22:00');
-
-    const card2Comment = TestBlockFactory.createCard(board);
-    card2Comment.parentId = card2.id;
-    card2Comment.type = 'comment';
-    card2Comment.updatedAt = Date.parse('21 Jun 2021 15:23:00');
+    card2.id = 'card-id-2';
 
     const card2Text = TestBlockFactory.createCard(board);
     card2Text.parentId = card2.id;
@@ -268,11 +296,6 @@ describe('components/table/Table extended', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       ...state,
-      comments: {
-        comments: {
-          [card2Comment.id]: card2Comment
-        }
-      },
       contents: {
         contents: {
           [card2Text.id]: card2Text
@@ -289,10 +312,29 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
+          cardPages={[
+            {
+              card: card1,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card1.id,
+                path: card1.id
+              }) as PageMeta
+            },
+            {
+              card: card2,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card2.id,
+                path: card2.id
+              }) as PageMeta
+            }
+          ]}
           board={board}
           activeView={view}
           visibleGroups={[]}
-          cards={[card1, card2]}
           views={[view]}
           selectedCardIds={[]}
           readOnly={false}
@@ -320,9 +362,11 @@ describe('components/table/Table extended', () => {
 
     const card1 = TestBlockFactory.createCard(board);
     card1.createdBy = 'user-id-1';
+    card1.id = 'card-id-1';
 
     const card2 = TestBlockFactory.createCard(board);
     card2.createdBy = 'user-id-2';
+    card2.id = 'card-id-2';
 
     const view = TestBlockFactory.createBoardView(board);
     view.fields.viewType = 'table';
@@ -346,10 +390,29 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
+          cardPages={[
+            {
+              card: card1,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card1.id,
+                path: card1.id
+              }) as PageMeta
+            },
+            {
+              card: card2,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card2.id,
+                path: card2.id
+              }) as PageMeta
+            }
+          ]}
           board={board}
           activeView={view}
           visibleGroups={[]}
-          cards={[card1, card2]}
           views={[view]}
           selectedCardIds={[]}
           readOnly={false}
@@ -379,6 +442,7 @@ describe('components/table/Table extended', () => {
     const card1 = TestBlockFactory.createCard(board);
     card1.updatedBy = 'user-id-1';
     card1.updatedAt = Date.parse('15 Jun 2021 16:22:00');
+    card1.id = 'card-id-1';
 
     const card1Text = TestBlockFactory.createCard(board);
     card1Text.parentId = card1.id;
@@ -391,11 +455,8 @@ describe('components/table/Table extended', () => {
     const card2 = TestBlockFactory.createCard(board);
     card2.updatedBy = 'user-id-2';
     card2.updatedAt = Date.parse('15 Jun 2021 16:22:00');
+    card2.id = 'card-id-2';
 
-    const card2Comment = TestBlockFactory.createCard(board);
-    card2Comment.parentId = card2.id;
-    card2Comment.type = 'comment';
-    card2Comment.updatedBy = 'user-id-3';
     card2.updatedAt = Date.parse('16 Jun 2021 16:22:00');
 
     const view = TestBlockFactory.createBoardView(board);
@@ -409,11 +470,6 @@ describe('components/table/Table extended', () => {
     const mockStore = configureStore([]);
     const store = mockStore({
       ...state,
-      comments: {
-        comments: {
-          [card2Comment.id]: card2Comment
-        }
-      },
       contents: {
         contents: {
           [card1Text.id]: card1Text
@@ -430,10 +486,29 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
+          cardPages={[
+            {
+              card: card1,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card1.id,
+                path: card1.id
+              }) as PageMeta
+            },
+            {
+              card: card2,
+              page: pageStubToCreate({
+                createdBy: 'user-id-1',
+                spaceId: 'space-id-1',
+                id: card2.id,
+                path: card2.id
+              }) as PageMeta
+            }
+          ]}
           board={board}
           activeView={view}
           visibleGroups={[]}
-          cards={[card1, card2]}
           views={[view]}
           selectedCardIds={[]}
           readOnly={false}

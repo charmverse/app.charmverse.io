@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space, User } from '@charmverse/core/prisma';
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import type { IPageWithPermissions } from 'lib/pages';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -65,11 +65,11 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
 
     const { permissions } = (
       await request(baseUrl)
-        .post(`/api/pages/${bounty.page.id}/restrict-permissions`)
+        .post(`/api/pages/${bounty.id}/restrict-permissions`)
         .set('Cookie', cookie)
         .send({})
         .expect(200)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     expect(permissions.length > 0).toBe(true);
   });
@@ -117,11 +117,11 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
 
     const { permissions } = (
       await request(baseUrl)
-        .post(`/api/pages/${bounty.page.id}/restrict-permissions`)
+        .post(`/api/pages/${bounty.id}/restrict-permissions`)
         .set('Cookie', adminCookie)
         .send({})
         .expect(200)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
 
     expect(permissions.length).toBe(2);
     expect(permissions.some((p) => p.userId === user.id && p.permissionLevel === 'full_access'));
@@ -170,7 +170,7 @@ describe('POST /api/pages/{pageId}/restrict-permissions - Lock down bounty page 
     });
 
     await request(baseUrl)
-      .post(`/api/pages/${bounty.page.id}/restrict-permissions`)
+      .post(`/api/pages/${bounty.id}/restrict-permissions`)
       .set('Cookie', nonAdminCookie)
       .send({})
       .expect(401);

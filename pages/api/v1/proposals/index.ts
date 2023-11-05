@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
@@ -70,10 +70,12 @@ type ProposalReviewer = {
  *              type: string
  *        authors:
  *          type: array
- *          $ref: '#/components/schemas/ProposalAuthor'
+ *          items:
+ *            $ref: '#/components/schemas/ProposalAuthor'
  *        reviewers:
  *          type: array
- *          $ref: '#/components/schemas/ProposalReviewer'
+ *          items:
+ *            $ref: '#/components/schemas/ProposalReviewer'
  *        status:
  *          type: string
  *          example: vote_active
@@ -89,9 +91,13 @@ type ProposalReviewer = {
  *        url:
  *          type: string
  *          example: https://app.charmverse.io/charmverse/proposals?id=3334afc4-5f0a-4d3c-8889-56fcc2b2ed8d
+ *        voteOptions:
+ *          type: array
+ *          items:
+ *            type: string
  *
  */
-export interface PublicApiProposal {
+export type PublicApiProposal = {
   id: string;
   createdAt: string;
   content: {
@@ -103,7 +109,8 @@ export interface PublicApiProposal {
   status: ProposalStatus;
   title: string;
   url: string;
-}
+  voteOptions?: string[];
+};
 
 handler.get(listProposals);
 
@@ -113,9 +120,11 @@ handler.get(listProposals);
  *   get:
  *     summary: Get active proposals.
  *     description: Get a list of all proposals that are currently active in the space.
+ *     tags:
+ *      - 'Space API'
  *     responses:
  *       200:
- *         description: List of proposals of casted vote
+ *         description: List of proposals
  *         content:
  *            application/json:
  *              schema:
@@ -132,7 +141,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
     throw new InvalidStateError('Space ID is undefined');
   }
 
-  const space = await prisma.space.findUnique({
+  const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
     }
@@ -151,6 +160,14 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
         status: true,
         page: {
           select: {
+            votes: {
+              where: {
+                context: 'proposal'
+              },
+              select: {
+                voteOptions: true
+              }
+            },
             path: true,
             createdAt: true,
             title: true,
@@ -179,7 +196,8 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
               select: {
                 wallets: true,
                 id: true,
-                googleAccounts: true
+                googleAccounts: true,
+                verifiedEmails: true
               }
             }
           }
@@ -216,12 +234,13 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       authors: proposal.authors.map((author) => ({
         userId: author.author?.id,
         address: author.author?.wallets[0]?.address,
-        email: author.author?.googleAccounts[0]?.email
+        email: author.author?.googleAccounts[0]?.email ?? author.author?.verifiedEmails[0]?.email
       })),
       reviewers: proposal.reviewers.map((reviewer) => ({
         id: reviewer.role?.id ?? (reviewer.reviewer?.id as string),
         type: reviewer.role ? 'role' : 'user'
-      }))
+      })),
+      voteOptions: proposal.page?.votes[0]?.voteOptions.map((opt) => opt.name)
     };
     return apiProposal;
   });

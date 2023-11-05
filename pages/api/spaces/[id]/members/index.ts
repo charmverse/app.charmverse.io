@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -39,6 +39,8 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
       id: sr.user.id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      onboarded: true,
+      path: 'not-found',
       joinDate: new Date().toISOString(),
       properties: [],
       roles: [],

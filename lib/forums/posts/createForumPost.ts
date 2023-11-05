@@ -1,11 +1,12 @@
-import { prisma } from '@charmverse/core';
 import type { Post, Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { extractPollIdsFromDoc } from 'lib/prosemirror/extractPollIdsFromDoc';
+import { extractPollIds } from 'lib/prosemirror/extractPollIds';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { InsecureOperationError } from 'lib/utilities/errors';
 
 import { getPostPath } from './getPostPath';
@@ -42,7 +43,7 @@ export async function createForumPost({
   const postId = v4();
 
   // check for polls that were created before publishing the forum post
-  const pollIds = content ? extractPollIdsFromDoc(content) : [];
+  const pollIds = content ? extractPollIds(content as PageContent) : [];
 
   const createdPost = await prisma.post.create({
     data: {

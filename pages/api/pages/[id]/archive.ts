@@ -1,14 +1,12 @@
-import { prisma } from '@charmverse/core';
-import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { archivePages } from 'lib/pages/archivePages';
 import { PageNotFoundError } from 'lib/pages/server';
-import { computeUserPagePermissions, setupPermissionsAfterPageRepositioned } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
@@ -16,6 +14,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .use(requireKeys(['archive'], 'body'))
   .put(togglePageArchiveStatus);
 
@@ -37,7 +42,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await computeUserPagePermissions({
+  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -46,62 +51,14 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
 
-  const modifiedChildPageIds = await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore');
-  // If we are restoring page then severe the link with parent, only if its not of type card
-  // A card type page can't doesn't have any meaning without its parent, and it gets a lot of metadata from its parent
-  if (!archive) {
-    const page = await prisma.page.findUnique({
-      where: {
-        id: pageId
-      },
-      select: {
-        type: true
-      }
-    });
-    if (page?.type !== 'card') {
-      await prisma.page.update({
-        where: {
-          id: pageId
-        },
-        data: {
-          parentId: null
-        }
-      });
-
-      if (page?.type.match(/board/)) {
-        await prisma.block.update({
-          where: {
-            id: pageId
-          },
-          data: {
-            parentId: undefined
-          }
-        });
-      }
-
-      await setupPermissionsAfterPageRepositioned(pageId);
-    }
-  }
-
-  trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId: pageSpaceId.spaceId, pageId });
-
-  log.info(`User ${archive ? 'archived' : 'restored'} a page`, {
-    pageId,
-    pageIds: modifiedChildPageIds,
+  const { modifiedChildPageIds } = await archivePages({
+    archive,
+    pageIds: [pageId],
+    userId,
     spaceId: pageSpaceId.spaceId,
-    userId
+    emitPageStatusEvent: false,
+    relay
   });
-
-  const deletedAt = archive ? new Date() : null;
-  const deletedBy = archive ? userId : null;
-
-  relay.broadcast(
-    {
-      type: 'pages_meta_updated',
-      payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId: pageSpaceId.spaceId, deletedBy }))
-    },
-    pageSpaceId.spaceId
-  );
 
   return res.status(200).json({ pageIds: modifiedChildPageIds });
 }

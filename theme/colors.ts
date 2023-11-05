@@ -34,7 +34,7 @@ export const settingsHeaderBackgroundColorDarkMode = darken(backgroundLightColor
 export const scrollBarTrackBackgroundColorDarkMode = darken(backgroundLightColorDarkMode, 0.2);
 export const scrollBarThumbBackgroundColorDarkMode = lighten(scrollBarTrackBackgroundColorDarkMode, 0.1);
 export const inputBackgroundDarkMode = 'rgba(255, 255, 255, 0.055)';
-export const inputBorderDarkMode = 'rgba(15, 15, 15, 0.2)';
+export const inputBorderDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const linkUnderlineColorDarkMode = 'rgba(55, 55, 55, 1)';
 
 export const colors = {
@@ -49,6 +49,10 @@ export const colors = {
   yellow: {
     dark: '#81730E',
     light: '#EFE9CB'
+  },
+  green: {
+    dark: '#1D7324',
+    light: '#D0EFD6'
   },
   teal: {
     dark: '#007C8F',
@@ -85,6 +89,7 @@ export const focalboardColorsMap: { [key: string]: SupportedColor } = {
   propColorDefault: 'default',
   propColorGray: 'gray',
   propColorTurquoise: 'turquoise',
+  propColorGreen: 'green',
   propColorOrange: 'orange',
   propColorYellow: 'yellow',
   propColorTeal: 'teal',

@@ -1,40 +1,36 @@
-import { useTheme } from '@emotion/react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Box, Collapse, Stack, Typography } from '@mui/material';
-import type { ChangeEvent } from 'react';
-import { useState } from 'react';
+import { Box, Collapse, Stack, Typography, useTheme } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useEffect } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
 
-import { StyledSidebar } from './viewSidebar/viewSidebar';
-import type { DatabaseSourceProps } from './viewSidebar/viewSourceOptions';
-import { ViewSourceOptions } from './viewSidebar/viewSourceOptions';
+import { StyledSidebar } from './viewSidebar/styledSidebar';
+import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOptions';
 
-type CreateLinkedViewProps = DatabaseSourceProps & {
-  readOnly: boolean;
-  onCsvImport?: (event: ChangeEvent<HTMLInputElement>) => void;
-  pageId?: string;
+/**
+ * @rootDatabaseId The top level board within which this sidebar is being displayed
+ */
+type Props = {
+  rootBoard: Board;
+  views: BoardView[];
+  showView: (viewId: string) => void;
 };
 
-type SidebarState = 'select-source' | null;
-
-export function CreateLinkedView(props: CreateLinkedViewProps) {
-  const [sidebarState, setSidebarState] = useState<SidebarState>('select-source');
+export function CreateLinkedView(props: Props) {
+  const sourcePopup = usePopupState({ variant: 'popover', popupId: 'select-source' });
   const isSmallScreen = useSmallScreen();
-  const theme = useTheme();
 
-  function openSidebar() {
-    setSidebarState(!sidebarState ? 'select-source' : null);
-  }
-
-  function closeSidebar() {
-    setSidebarState(null);
-  }
+  useEffect(() => {
+    sourcePopup.open();
+  }, []);
 
   return (
-    <Box display='flex'>
+    <Box display='flex' data-test='create-linked-view'>
       <Box flexGrow={1} display='flex' justifyContent='center' alignItems='center'>
         <Stack alignItems='center' spacing={0} mt={{ xs: 3, md: 0 }}>
           <HelpOutlineIcon color='secondary' fontSize='large' />
@@ -45,10 +41,9 @@ export function CreateLinkedView(props: CreateLinkedViewProps) {
             <Button
               color='secondary'
               component='span'
-              onClick={openSidebar}
+              onClick={sourcePopup.open}
               variant='text'
               sx={{ fontSize: 'inherit', textDecoration: 'underline' }}
-              disabled={props.readOnly}
             >
               Select a data source
             </Button>
@@ -59,21 +54,20 @@ export function CreateLinkedView(props: CreateLinkedViewProps) {
       {isSmallScreen ? (
         <MobileDialog
           title='Select data source'
-          onClose={closeSidebar}
-          open={props.readOnly === true ? false : Boolean(sidebarState)}
-          PaperProps={{ sx: { background: theme.palette.background.light } }}
+          onClose={sourcePopup.close}
+          open={sourcePopup.isOpen}
           contentSx={{ pr: 0, pb: 0, pl: 1 }}
         >
-          <ViewSourceOptions {...props} />
+          <ViewSourceOptions {...props} closeSidebar={sourcePopup.close} />
         </MobileDialog>
       ) : (
-        <Collapse in={props.readOnly === true ? false : Boolean(sidebarState)} orientation='horizontal'>
+        <Collapse in={sourcePopup.isOpen} orientation='horizontal'>
           <StyledSidebar
             style={{
               height: 'fit-content'
             }}
           >
-            <ViewSourceOptions {...props} title='Select data source' closeSidebar={closeSidebar} />
+            <ViewSourceOptions {...props} title='Select data source' closeSidebar={sourcePopup.close} />
           </StyledSidebar>
         </Collapse>
       )}

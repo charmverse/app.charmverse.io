@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { createSwaggerSpec } from 'next-swagger-doc';
 import { useEffect } from 'react';
 
-import { charmverseDiscordInvite } from 'config/constants';
+import { charmverseDiscordInvite, isProdEnv } from 'config/constants';
 import { useColorMode } from 'context/darkMode';
 
 import 'swagger-ui-react/swagger-ui.css';
@@ -13,6 +13,8 @@ const SwaggerUI = dynamic(() => import('swagger-ui-react'), {
   ssr: false
 });
 
+const postmanCollectionUrl = `https://github.com/charmverse/app.charmverse.io/blob/464b385ac468c76552ac993eede40c3b52fcfe96/lib/public-api/CharmVerse%20API%20v1.postman_collection.json`;
+
 export const getStaticProps: GetStaticProps = async () => {
   // See this site for official OAS format https://swagger.io/docs/specification/basic-structure/
   const spec: Record<string, any> = createSwaggerSpec({
@@ -20,15 +22,34 @@ export const getStaticProps: GetStaticProps = async () => {
     schemaFolders: ['lib/public-api'],
     definition: {
       openapi: '3.0.0',
-      servers: [{ url: 'https://app.charmverse.io/api/v1', description: 'Production' }],
+      servers: [
+        { url: `${isProdEnv ? 'https://app.charmverse.io' : process.env.DOMAIN}/api/v1`, description: 'Production' }
+      ],
       info: {
-        title: 'Charmverse API',
-        description: `The Charmverse public API requires an API key linked to your space, or a partner API key allowing access to multiple spaces. You can request this on our [Discord server](${charmverseDiscordInvite}).\r\n\r\nYour API key should be passed in the request headers as **Authorization: "Bearer <your-api-key>"**\r\n\r\n⚠️ If you are using a multi-space partner API key, any requests to API endpoints in the default group should also contain the spaceId you wish to make the request for as part of the query.\r\nExample:**"/api/v1/endpoint?spaceId=fc59c720-40de-bc1a-8b2b-00538f02953c"**`,
-        version: '1.0.0',
+        title: 'CharmVerse API',
+        description: `The CharmVerse public API requires an API key linked to your space, or a partner API key allowing access to multiple spaces. You can request this on our [Discord server](${charmverseDiscordInvite})\r\n\r\nYour API key should be passed in the request headers as **Authorization: "Bearer <your-api-key>"**.\r\nYou can make requests related to cards or databases using the UUID id or the page path ie. "page-022345334" which is visible in the URL when the card or database is open as a full page.\r\n\r\nWe provide a [Postman collection](${postmanCollectionUrl}) for you test out requests while build your integration. Make sure the target database you make requests against contains the properties you wish to use as custom properties in your request. You will need to setup Postman with an API_KEY and API_URL environment variable.\r\nThe API_URL can be taken from the servers list in this documentation. The API_KEY will be the one you receive after requesting it from us.\r\n\r\n⚠️ If you are using a multi-space partner API key, any requests to API endpoints in the Space API category should also contain the spaceId you wish to make the request for as part of the query.\r\nExample:**"/api/v1/endpoint?spaceId=fc59c720-40de-bc1a-8b2b-00538f02953c"**
+        `,
+        version: '1.1.0',
         contact: 'hello@charmverse.io',
         host: 'app.charmverse.io',
         baseUrl: 'v1'
-      }
+      },
+      components: {
+        securitySchemes: {
+          BearerAuth: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+            scheme: 'bearer',
+            bearerFormat: 'JWT'
+          }
+        }
+      },
+      security: [
+        {
+          BearerAuth: []
+        }
+      ]
     }
   });
 

@@ -1,20 +1,22 @@
+import type { ProposalCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
-import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
-import type { AvailableProposalCategoryPermissionFlags } from 'lib/permissions/proposals/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePermissions);
+handler
+  .use(providePermissionClients({ key: 'resourceId', location: 'body', resourceIdType: 'proposalCategory' }))
+  .post(computePermissions);
 
-async function computePermissions(req: NextApiRequest, res: NextApiResponse<AvailableProposalCategoryPermissionFlags>) {
+async function computePermissions(req: NextApiRequest, res: NextApiResponse<ProposalCategoryPermissionFlags>) {
   const input = req.body as PermissionCompute;
 
-  const permissions = await computeProposalCategoryPermissions({
+  const permissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
     resourceId: input.resourceId,
     userId: req.session.user?.id
   });

@@ -4,9 +4,11 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
+import { useGetApplication, useGetReward } from 'charmClient/hooks/rewards';
 import Link from 'components/common/Link';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 
@@ -118,46 +120,76 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
   );
 }
 
-function ProposalPageTitle({ basePath }: { basePath: string }) {
+function ProposalPageTitle({ basePath, baseTitle }: { basePath: string; baseTitle: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/proposals`}>Proposals</Link>
+        <Link href={`${basePath}/proposals`}>{baseTitle}</Link>
       </BreadCrumb>
       {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
 
-function ForumPostTitle({ basePath, pathName }: { basePath: string; pathName: string }) {
+function ForumPostTitle({ basePath, pathName, baseTitle }: { basePath: string; pathName: string; baseTitle: string }) {
   const [pageTitle] = usePageTitle();
   const title = pathName === '/[domain]/forum' ? 'All Categories' : pageTitle;
 
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/forum`}>Forum</Link>
+        <Link href={`${basePath}/forum`}>{baseTitle}</Link>
       </BreadCrumb>
       {title ?? 'Untitled'}
     </PageTitle>
   );
 }
 
-function BountyPageTitle({ basePath }: { basePath: string }) {
+function BountyPageTitle({ basePath, baseTitle }: { basePath: string; baseTitle: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <PageTitle>
       <BreadCrumb>
-        <Link href={`${basePath}/bounties`}>Bounties</Link>
+        <Link href={`${basePath}/bounties`}>{baseTitle}</Link>
       </BreadCrumb>
       {pageTitle || 'Untitled'}
     </PageTitle>
   );
 }
 
+function RewardsPageTitle({
+  basePath,
+  baseTitle,
+  applicationId
+}: {
+  basePath: string;
+  baseTitle: string;
+  applicationId?: string;
+}) {
+  const [pageTitle] = usePageTitle();
+  const { data: application } = useGetApplication({ applicationId });
+  const { data: rewardWithPageMeta } = useGetReward({ rewardId: application?.bountyId });
+
+  return (
+    <PageTitle>
+      <BreadCrumb>
+        <Link href={`${basePath}/rewards`}>{baseTitle}</Link>
+      </BreadCrumb>
+      {pageTitle && !applicationId ? pageTitle : null}
+      {rewardWithPageMeta && (
+        <>
+          <BreadCrumb>
+            <Link href={`${basePath}/${rewardWithPageMeta.page.path}`}>{rewardWithPageMeta.page.title}</Link>
+          </BreadCrumb>
+          {applicationId && 'Application'}
+        </>
+      )}
+    </PageTitle>
+  );
+}
 function PublicBountyPageTitle() {
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   return (
     <PageTitle>
       {space && (
@@ -175,28 +207,35 @@ function DefaultPageTitle() {
   return <PageTitle>{pageTitle}</PageTitle>;
 }
 
-function EmptyPageTitle() {
-  return <div></div>;
-}
-
 export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?: string; pageType?: PageType }) {
   const router = useRouter();
-  const space = useCurrentSpace();
+  const { mappedFeatures } = useFeaturesAndMembers();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  } else if (pageType === 'bounty') {
-    return <BountyPageTitle basePath={`/${router.query.domain}`} />;
+  } else if (pageType === 'bounty' && router.route.startsWith('/[domain]/rewards/')) {
+    const baseTitle = mappedFeatures.rewards.title;
+    return (
+      <RewardsPageTitle
+        basePath={`/${router.query.domain}`}
+        baseTitle={baseTitle}
+        applicationId={router.query.applicationId as string}
+      />
+    );
+  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/bounties/')) {
+    const baseTitle = mappedFeatures.bounties.title;
+    return <BountyPageTitle baseTitle={baseTitle} basePath={`/${router.query.domain}`} />;
+    // Switch over when we use rewards
   } else if (pageType === 'proposal') {
-    return <ProposalPageTitle basePath={`/${router.query.domain}`} />;
+    const baseTitle = mappedFeatures.proposals.title;
+    return <ProposalPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;
   } else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${space?.domain}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} />;
   } else if (router.route.includes('/[domain]/forum')) {
-    return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} />;
+    const baseTitle = mappedFeatures.forum.title;
+    return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} baseTitle={baseTitle} />;
   } else if (router.route === '/share/[...pageId]') {
-    return <DocumentPageTitle basePath={`/share/${space?.domain}`} pageId={pageId} />;
-  } else if (router.route.startsWith('/u/')) {
-    return <EmptyPageTitle />;
+    return <DocumentPageTitle basePath={`/share/${router.query.domain}`} pageId={pageId} />;
   } else {
     return <DefaultPageTitle />;
   }

@@ -1,110 +1,145 @@
 import PublishIcon from '@mui/icons-material/ElectricBolt';
-import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
+import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import useSWR from 'swr';
 
-import Button from 'components/common/Button';
+import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
+import { Button } from 'components/common/Button';
 import Loader from 'components/common/LoadingComponent';
-import VoteStatusChip from 'components/votes/components/VoteStatusChip';
+import { useSnapshotVoting } from 'components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting';
+import { SnapshotVotingForm } from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { SnapshotProposal } from 'lib/snapshot';
-import { getSnapshotProposal, getUserProposalVotes } from 'lib/snapshot';
-import { coerceToMilliseconds, relativeTime } from 'lib/utilities/dates';
 import { percent } from 'lib/utilities/numbers';
 
-import { StyledFormControl, VotesWrapper } from './VotesWrapper';
+import { VotesWrapper } from './VotesWrapper';
 
 type Props = {
   snapshotProposalId: string;
 };
 
 export function SnapshotVoteDetails({ snapshotProposalId }: Props) {
-  const { account } = useWeb3AuthSig();
-  const { data: snapshotProposal } = useSWR<SnapshotProposal | null>(`/snapshotProposal/${snapshotProposalId}`, () =>
-    getSnapshotProposal(snapshotProposalId)
-  );
-  const { data: userVotes } = useSWR(account ? `snapshotUserVotes-${account}` : null, () =>
-    getUserProposalVotes({ walletAddress: account as string, snapshotProposalId })
-  );
+  const {
+    snapshotProposal,
+    userVotes,
+    votingPower,
+    isVotingActive,
+    remainingTime,
+    hasPassedDeadline,
+    proposalEndDate,
+    votingDisabledStatus,
+    castSnapshotVote
+  } = useSnapshotVoting({
+    snapshotProposalId
+  });
   const { formatDate } = useDateFormatter();
-
-  const loading = snapshotProposal === undefined;
-
-  const proposalEndDate = coerceToMilliseconds(snapshotProposal?.end ?? 0);
-
   // Either the number of votes or tokens
 
   const voteChoices = snapshotProposal?.choices ?? [];
   const voteScores = snapshotProposal?.scores ?? [];
 
-  const hasPassedDeadline = proposalEndDate < Date.now();
+  const flatUserChoices = (userVotes ?? []).reduce((acc, v) => {
+    if (typeof v.choice === 'number') {
+      acc.push(v.choice);
+    }
 
-  const remainingTime = relativeTime(proposalEndDate);
+    if (Array.isArray(v.choice)) {
+      v.choice.forEach((c) => acc.push(c));
+    }
 
-  const currentUserChoices = (userVotes ?? []).map((v) => voteChoices[v.choice - 1]).join(',');
+    return acc;
+  }, [] as number[]);
+
+  const currentUserChoices = flatUserChoices.map((v) => voteChoices[v - 1]).join(',');
+
+  const isLoading = snapshotProposal === undefined;
+  let statusText = 'Loading...';
+
+  if (snapshotProposal) {
+    if (snapshotProposal.state === 'pending') {
+      statusText = 'Pending';
+    } else if (hasPassedDeadline) {
+      statusText = `Voting ended on ${formatDate(new Date(proposalEndDate))}`;
+    } else {
+      statusText = `Voting ends ${remainingTime}`;
+    }
+  } else if (!isLoading) {
+    statusText = 'Not found';
+  }
 
   return (
     <VotesWrapper id={`vote.${snapshotProposalId}`}>
-      <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
-        <Typography variant='h6' fontWeight='bold'>
-          Snapshot votes on this proposal
+      <Box
+        display='flex'
+        flexDirection={{ xs: 'column', md: 'row' }}
+        justifyContent='space-between'
+        gap={1}
+        alignItems='center'
+      >
+        <Typography color='secondary' variant='subtitle1'>
+          Status: {statusText}
         </Typography>
-
         <Button
           startIcon={<PublishIcon />}
           href={`https://snapshot.org/#/${snapshotProposal?.space.id}/proposal/${snapshotProposal?.id}`}
-          size='small'
           color='secondary'
-          variant='outlined'
+          variant='text'
           external
           target='_blank'
           disabled={!snapshotProposal}
         >
-          View on snapshot
+          View on Snapshot
         </Button>
       </Box>
-      <Box display='flex' justifyContent='space-between'>
-        <Typography color='secondary' variant='subtitle1'>
-          {!snapshotProposal && loading && 'Loading...'}
-          {snapshotProposal &&
-            (hasPassedDeadline ? `Finished on ${formatDate(new Date(proposalEndDate))}` : `Finishes ${remainingTime}`)}
-        </Typography>
-        {snapshotProposal && <VoteStatusChip size='small' status={hasPassedDeadline ? 'Complete' : 'InProgress'} />}
-      </Box>
 
-      {!snapshotProposal && loading && <Loader isLoading={true} />}
+      <Divider sx={{ mb: 1, mt: 1 }} />
 
-      {!snapshotProposal && !loading && <Alert severity='warning'>Proposal not found on Snapshot</Alert>}
+      {!snapshotProposal && isLoading && <Loader isLoading={true} />}
+
+      {!snapshotProposal && !isLoading && <Alert severity='warning'>Proposal not found on Snapshot</Alert>}
 
       {snapshotProposal && (
-        <StyledFormControl>
-          <RadioGroup name={snapshotProposal.id} value={currentUserChoices as any}>
-            {voteChoices.map((voteOption, index) => (
-              <FormControlLabel
-                key={voteOption}
-                control={<Radio size='small' />}
-                disabled
-                value={voteOption}
-                label={
-                  <Box display='flex' justifyContent='space-between' flexGrow={1}>
-                    <span>{voteOption}</span>
-                    <Typography variant='subtitle1' color='secondary'>
-                      {!voteScores[index]
-                        ? 'No votes yet'
-                        : percent({
-                            value: voteScores[index],
-                            total: snapshotProposal.scores_total,
-                            significantDigits: 2
-                          })}
-                    </Typography>
-                  </Box>
-                }
-                disableTypography
+        <Box display='flex' flexDirection='column' gap={1}>
+          {isVotingActive ? (
+            <Box>
+              <Stack mb={1}>
+                {votingDisabledStatus && (
+                  <Alert
+                    sx={{ alignItems: 'center' }}
+                    severity='warning'
+                    action={
+                      votingDisabledStatus.reason === 'account' ? <OpenWalletSelectorButton color='inherit' /> : null
+                    }
+                  >
+                    {votingDisabledStatus.message}
+                  </Alert>
+                )}
+              </Stack>
+              <SnapshotVotingForm
+                snapshotProposal={snapshotProposal}
+                votingPower={votingPower}
+                userVotes={userVotes}
+                castVote={castSnapshotVote}
               />
-            ))}
-          </RadioGroup>
-        </StyledFormControl>
+            </Box>
+          ) : (
+            voteChoices.map((voteOption, index) => (
+              <Box key={voteOption} display='flex' justifyContent='space-between'>
+                <Box gap={1} display='flex'>
+                  {voteOption}
+                  {currentUserChoices.includes(voteOption) && <Chip color='teal' size='small' label='Voted' />}
+                </Box>
+                <Typography variant='subtitle1' color='secondary'>
+                  {!voteScores[index]
+                    ? 'No votes yet'
+                    : percent({
+                        value: voteScores[index],
+                        total: snapshotProposal.scores_total,
+                        significantDigits: 2
+                      })}
+                </Typography>
+              </Box>
+            ))
+          )}
+        </Box>
       )}
     </VotesWrapper>
   );

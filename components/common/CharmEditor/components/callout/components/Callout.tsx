@@ -1,11 +1,9 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { IconButton, Menu } from '@mui/material';
-import type { BaseEmoji } from 'emoji-mart';
-import { Picker } from 'emoji-mart';
+import { Box, IconButton, Menu } from '@mui/material';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import { getTwitterEmoji } from 'components/common/Emoji';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
@@ -13,13 +11,20 @@ import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 const StyledCallout = styled.div`
   background-color: ${({ theme }) => theme.palette.background.light};
   padding: ${({ theme }) => theme.spacing(1)};
-  margin-top: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.down('sm')} {
     flex-wrap: wrap;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    margin: 0 !important; // override global editor styles
   }
 `;
 
@@ -55,66 +60,73 @@ export default function Callout({
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     event.preventDefault();
+    event.stopPropagation();
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const theme = useTheme();
-  const twemojiImage = getTwitterEmoji(node.attrs.emoji);
+
+  const emoji = node.attrs.emoji;
+  const twemojiImage = emoji?.startsWith('http') ? emoji : getTwitterEmoji(emoji);
 
   return (
-    <StyledCallout>
-      <CalloutEmoji>
-        <IconButton
-          sx={{
-            width: 35,
-            height: 35,
-            fontSize: 20,
-            padding: 0.75,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // This is necessary to fix a bug on Macbook, where readonly emojis showed as greyed out
-            '&.Mui-disabled': {
-              color: '#FFFFFFFF'
-            }
-          }}
-          onClick={handleClick}
-          disabled={readOnly}
-        >
-          {twemojiImage ? (
-            <img
-              style={{
-                cursor: 'pointer',
-                transition: 'background 100ms ease-in-out'
-              }}
-              src={twemojiImage}
-            />
-          ) : (
-            <div
-              style={{
-                cursor: 'pointer',
-                transition: 'background 100ms ease-in-out'
-              }}
-            >
-              {node.attrs.emoji}
-            </div>
-          )}
-        </IconButton>
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <Picker
-            theme={theme.palette.mode}
-            onSelect={(emoji: BaseEmoji) => {
-              updateAttrs({
-                emoji: emoji.native
-              });
-              handleClose();
+    <Box py={0.5}>
+      <StyledCallout>
+        <CalloutEmoji>
+          <IconButton
+            sx={{
+              width: 35,
+              height: 35,
+              fontSize: 20,
+              padding: 0.75,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              // This is necessary to fix a bug on Macbook, where readonly emojis showed as greyed out
+              '&.Mui-disabled': {
+                color: '#FFFFFFFF'
+              }
             }}
-          />
-        </Menu>
-      </CalloutEmoji>
-      {children}
-    </StyledCallout>
+            // use onMouseDown - for some reason, onClick gets intercepted by the editor
+            onMouseDown={handleClick}
+            disabled={readOnly}
+          >
+            {twemojiImage ? (
+              <img
+                style={{
+                  cursor: 'pointer',
+                  transition: 'background 100ms ease-in-out',
+                  objectFit: 'cover',
+                  width: 22,
+                  height: 22
+                }}
+                src={twemojiImage}
+              />
+            ) : (
+              <div
+                style={{
+                  cursor: 'pointer',
+                  transition: 'background 100ms ease-in-out'
+                }}
+              >
+                {node.attrs.emoji}
+              </div>
+            )}
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <CustomEmojiPicker
+              onUpdate={(_emoji) => {
+                updateAttrs({
+                  emoji: _emoji
+                });
+                handleClose();
+              }}
+            />
+          </Menu>
+        </CalloutEmoji>
+        {children}
+      </StyledCallout>
+    </Box>
   );
 }

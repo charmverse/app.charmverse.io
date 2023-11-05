@@ -1,23 +1,32 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getThreads);
+handler
+  .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
+  .get(getThreads);
 
 async function getThreads(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
-  const computed = await computeUserPagePermissions({
+  const computed = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session?.user?.id
   });
 
-  if (computed.read !== true) {
+  if (computed.comment !== true) {
     throw new NotFoundError('Page not found');
   }
 
@@ -27,9 +36,6 @@ async function getThreads(req: NextApiRequest, res: NextApiResponse) {
     },
     include: {
       comments: {
-        include: {
-          user: true
-        },
         orderBy: {
           createdAt: 'asc'
         }

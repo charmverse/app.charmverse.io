@@ -1,6 +1,8 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { keymap } from '@bangle.dev/pm';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 const name = 'tabIndent';
 
@@ -12,8 +14,14 @@ export function spec(): RawSpecs {
       inline: true,
       group: 'inline',
       parseDOM: [{ tag: 'span.charm-tab' }],
-      toDOM: (): DOMOutputSpec => ['span', { class: 'charm-tab', style: 'white-space:pre' }, '\t'],
-      attrs: {}
+      toDOM: (node): DOMOutputSpec => [
+        'span',
+        { class: 'charm-tab', 'data-indent': node.attrs.indent || 0, style: 'white-space:pre' },
+        '\t'
+      ],
+      attrs: {
+        indent: { default: 0 }
+      }
     },
     markdown: {
       toMarkdown: () => null

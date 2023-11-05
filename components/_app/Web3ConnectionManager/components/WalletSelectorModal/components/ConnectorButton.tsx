@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import type { ReactNode } from 'react';
 
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { greyColor2 } from 'theme/colors';
 
 const ImageIcon = styled.img`

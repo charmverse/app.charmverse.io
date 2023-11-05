@@ -16,7 +16,7 @@ export function FieldWrapper({ children, label, inline, iconLabel }: Props) {
   }
 
   return (
-    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' gap={1} my={1}>
+    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' my={1}>
       {(label || !!iconLabel) && (
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}

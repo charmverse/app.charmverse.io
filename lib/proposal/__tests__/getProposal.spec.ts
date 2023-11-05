@@ -1,8 +1,7 @@
-import { prisma } from '@charmverse/core';
 import type { Page } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { PageWithProposal } from 'lib/pages';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
@@ -31,24 +30,22 @@ describe('getProposal', () => {
 
     const proposalFromDb = await getProposal({ proposalId: proposal.id });
 
-    expect(proposalFromDb).toMatchObject(
-      expect.objectContaining<PageWithProposal>({
-        ...page,
-        proposal: {
-          authors: [],
-          category: proposalCategory,
-          categoryId: proposalCategory.id,
-          createdBy: user.id,
-          id: proposal.id,
-          reviewedAt: null,
-          reviewedBy: null,
-          reviewers: [],
-          snapshotProposalExpiry: null,
-          spaceId: space.id,
-          status: expect.any(String)
+    expect(proposalFromDb).toMatchObject({
+      ...page,
+      proposal: {
+        category: proposalCategory,
+        categoryId: proposalCategory.id,
+        createdBy: user.id,
+        id: proposal.id,
+        reviewers: [],
+        spaceId: space.id,
+        status: proposal.status,
+        evaluationType: 'vote',
+        page: {
+          sourceTemplateId: null
         }
-      })
-    );
+      }
+    });
   });
 
   it('should throw an error if the proposal does not exist', async () => {

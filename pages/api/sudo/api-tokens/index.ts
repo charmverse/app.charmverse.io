@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +9,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSudoApiKey)
-  .use(requireKeys(['spaceId'], 'body'))
+  .use(requireKeys(['spaceId']))
   .post(provisionToken)
   .delete(invalidateToken);
 
@@ -22,10 +22,10 @@ async function provisionToken(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function invalidateToken(req: NextApiRequest, res: NextApiResponse) {
-  const { spaceId } = req.body;
+  const { spaceId } = req.query as { spaceId: string };
   await prisma.spaceApiToken.delete({
     where: {
-      spaceId: spaceId as string
+      spaceId
     }
   });
 

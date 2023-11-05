@@ -2,31 +2,35 @@ import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
+import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import type { BoxProps } from '@mui/material';
+import { Popover } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useMemo, useState } from 'react';
 
-import { SpaceSettingsDialog } from 'components/common/Modal/SettingsDialog';
+import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
+import { BlockCounts } from 'components/settings/subscription/BlockCounts';
 import { charmverseDiscordInvite } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useFavoritePages } from 'hooks/useFavoritePages';
+import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 
@@ -36,9 +40,10 @@ import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
-import { sidebarItemStyles, SidebarLink } from './SidebarButton';
-import SidebarSubmenu from './SidebarSubmenu';
-import { STATIC_PAGES } from './utils/staticPages';
+import { NotificationUpdates } from './components/NotificationsPopover';
+import { SectionName } from './components/SectionName';
+import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
+import SidebarSubmenu from './components/SidebarSubmenu';
 
 const WorkspaceLabel = styled.div`
   display: flex;
@@ -92,16 +97,6 @@ const SidebarContainer = styled.div`
   }
 `;
 
-export const SectionName = styled(Typography)`
-  padding-left: ${({ theme }) => theme.spacing(2)};
-  padding-right: ${({ theme }) => theme.spacing(2)};
-  color: ${({ theme }) => theme.palette.secondary.main};
-  font-size: 11.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-`;
-
 const StyledSidebarBox = styled(Box)`
   cursor: pointer;
   ${sidebarItemStyles}
@@ -129,22 +124,23 @@ interface SidebarProps {
   navAction?: () => void;
 }
 
-export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
+export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
   const router = useRouter();
   const { user, logoutUser } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { categories } = useForumCategories();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const { logoutWallet } = useWeb3AuthSig();
+  const { logoutWallet } = useWeb3Account();
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
 
-  const { onClick } = useSettingsDialog();
+  const { openSettings } = useSettingsDialog();
+
   const handleModalClick = (path?: SettingsPath) => {
-    onClick(path);
+    openSettings(path);
     navAction?.();
   };
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
@@ -181,15 +177,15 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
         {favoritePageIds.length > 0 && (
           <Box mb={2}>
             <SectionName mb={1}>FAVORITES</SectionName>
-            <PageNavigation isFavorites rootPageIds={favoritePageIds} />
+            <PageNavigation isFavorites rootPageIds={favoritePageIds} onClick={navAction} />
           </Box>
         )}
-        <WorkspaceLabel>
+        <WorkspaceLabel data-test='page-sidebar-header'>
           <SectionName>SPACE</SectionName>
           {/** Test component */}
           {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
-              <NewPageMenu tooltip='Add a page' addPage={addPage} />
+              <NewPageMenu data-test='sidebar-add-page' tooltip='Add a page' addPage={addPage} />
             </div>
           )}
         </WorkspaceLabel>
@@ -205,6 +201,7 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
           />
           <SidebarLink
             active={false}
+            external
             href={charmverseDiscordInvite}
             icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
             label='Support & Feedback'
@@ -219,14 +216,23 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
             icon={<DeleteOutlinedIcon fontSize='small' />}
             label='Trash'
           />
+          <Box my={2} />
+
+          {
+            // Don't show block counts for free or entreprise spaces
+            space?.paidTier === 'community' && (
+              <Box ml={2}>
+                <BlockCounts />
+              </Box>
+            )
+          }
         </Box>
       </>
     );
-  }, [favoritePageIds, userSpacePermissions, navAction, addPage, isLoadingAccess]);
+  }, [favoritePageIds, userSpacePermissions, isMobile, navAction, addPage, showMemberFeatures]);
 
-  if (isLoadingAccess) {
-    return null;
-  }
+  const { features } = useFeaturesAndMembers();
+  const isCharmverse = useIsCharmverseSpace();
 
   return (
     <SidebarContainer>
@@ -263,36 +269,44 @@ export default function Sidebar({ closeSidebar, navAction }: SidebarProps) {
                 isOpen={searchInWorkspaceModalState.isOpen}
                 close={searchInWorkspaceModalState.close}
               />
-              {showMemberFeatures && (
-                <SidebarBox
-                  onClick={() => handleModalClick('invites')}
-                  icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
-                  label='Invites'
-                />
-              )}
-              <Divider sx={{ mx: 2, my: 1 }} />
-              {STATIC_PAGES.map((page) => {
-                if (
-                  !space.hiddenFeatures.includes(page.feature) &&
-                  (showMemberFeatures ||
-                    // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                    (page.path === 'forum' && categories.length > 0))
-                ) {
-                  return (
-                    <SidebarLink
-                      key={page.path}
-                      href={`/${space.domain}/${page.path}`}
-                      active={router.pathname.startsWith(`/[domain]/${page.path}`)}
-                      icon={<PageIcon icon={null} pageType={page.path} />}
-                      label={page.title}
-                      onClick={navAction}
-                      data-test={`sidebar-link-${page.path}`}
-                    />
-                  );
-                }
 
-                return null;
-              })}
+              {!isLoadingAccess && (
+                <>
+                  {showMemberFeatures && (
+                    <SidebarBox
+                      onClick={() => handleModalClick('invites')}
+                      icon={<GroupAddOutlinedIcon color='secondary' fontSize='small' />}
+                      label='Invites'
+                    />
+                  )}
+                  <NotificationUpdates closeSidebar={navAction} />
+                  <Divider sx={{ mx: 2, my: 1 }} />
+                  {features
+                    .filter((feat) => feat.path !== 'rewards' || isCharmverse) // hide Rewards behind feature flag
+                    .filter((feat) => !feat.isHidden)
+                    .map((feat) => {
+                      if (
+                        showMemberFeatures ||
+                        // Always show forum to space members. Show it to guests if they have access to at least 1 category
+                        (feat.path === 'forum' && categories.length > 0)
+                      ) {
+                        return (
+                          <SidebarLink
+                            key={feat.path}
+                            href={`/${space.domain}/${feat.path}`}
+                            active={router.pathname.startsWith(`/[domain]/${feat.path}`)}
+                            icon={<PageIcon icon={null} pageType={feat.path} />}
+                            label={feat.title}
+                            onClick={navAction}
+                            data-test={`sidebar-link-${feat.path}`}
+                          />
+                        );
+                      }
+
+                      return null;
+                    })}
+                </>
+              )}
             </Box>
             {isMobile ? (
               <div>{pagesNavigation}</div>

@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Tooltip, Box } from '@mui/material';
-import MuiAppBar from '@mui/material/AppBar';
 import MuiDrawer from '@mui/material/Drawer';
 import Head from 'next/head';
 import * as React from 'react';
@@ -10,7 +9,8 @@ import { useMemo, useState } from 'react';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import PageDialogGlobalModal from 'components/common/PageDialog/PageDialogGlobal';
+import { AnnouncementBanner } from 'components/common/PageLayout/components/AnnouncementBanner';
+import { BlocksExceededBanner } from 'components/common/PageLayout/components/BlocksExceededBanner';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
@@ -21,10 +21,11 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
 
+import { AppBar } from './components/AppBar';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
-import { Header, headerHeight } from './components/Header/Header';
+import { Header, HeaderSpacer } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
-import Sidebar from './components/Sidebar';
+import { Sidebar } from './components/Sidebar/Sidebar';
 
 const MAX_SIDEBAR_WIDTH = 500;
 const MIN_SIDEBAR_WIDTH = 200;
@@ -51,31 +52,6 @@ const closedMixin = (theme: Theme) =>
     border: 'none'
   } as const);
 
-export const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop: string) => prop !== 'sidebarWidth' && prop !== 'open'
-})<{ open: boolean; sidebarWidth: number }>`
-  background: transparent;
-  box-shadow: none;
-  color: inherit;
-  z-index: var(--z-index-appBar);
-  transition: ${({ theme }) =>
-    theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })};
-  ${({ open, sidebarWidth, theme }) =>
-    open
-      ? `
-    margin-left: ${sidebarWidth}px;
-    width: calc(100% - ${sidebarWidth}px);
-    transition: ${theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })};
-  `
-      : ''}
-`;
-
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open' && prop !== 'sidebarWidth'
 })<{ open: boolean; sidebarWidth: number }>(
@@ -97,10 +73,6 @@ const Drawer = styled(MuiDrawer, {
     paddingRight: 3
   })
 );
-
-export const HeaderSpacer = styled.div`
-  min-height: ${headerHeight}px;
-`;
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -151,7 +123,7 @@ function PageLayout({ children }: PageLayoutProps) {
     onResize: setSidebarStorageWidth
   });
   const { user } = useUser();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 
@@ -198,7 +170,11 @@ function PageLayout({ children }: PageLayoutProps) {
   }
 
   if (!showSpaceMemberView) {
-    return <SharedPageLayout basePageId={publicPage?.page?.id}>{children || null}</SharedPageLayout>;
+    return (
+      <SharedPageLayout basePageId={publicPage?.page?.id} basePageType={publicPage?.page?.type}>
+        {children || null}
+      </SharedPageLayout>
+    );
   }
 
   return (
@@ -214,6 +190,14 @@ function PageLayout({ children }: PageLayoutProps) {
                 <>
                   <AppBar open={open} sidebarWidth={displaySidebarWidth} position='fixed'>
                     <Header open={open} openSidebar={handleDrawerOpen} />
+                    <BlocksExceededBanner />
+                    <AnnouncementBanner
+                      actionLabel='Learn more'
+                      actionHref='https://x.com/CharmVerse/status/1705253749826929118?s=20'
+                      expiryDate='2023-09-29'
+                    >
+                      No more free trials! Everyone gets 30k blocks on us.
+                    </AnnouncementBanner>
                   </AppBar>
                   {isMobile ? (
                     <MuiDrawer

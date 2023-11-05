@@ -1,17 +1,18 @@
-import type { SuperApiToken } from '@charmverse/core/prisma';
-import { Wallet } from 'ethers';
+import type { Space, SuperApiToken } from '@charmverse/core/prisma';
+import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateSuperApiToken } from 'testing/utils/middleware';
 
-let apiToken: SuperApiToken;
+let superApiToken: SuperApiToken;
+let space: Space;
 
 beforeAll(async () => {
-  const superToken = await generateSuperApiToken({ name: `test 1-${v4()}` });
-  apiToken = superToken;
+  space = (await testUtilsUser.generateUserAndSpace()).space;
+  superApiToken = await generateSuperApiKey({ spaceId: space.id });
 });
 
 describe('GET /api/v1/spaces', () => {
@@ -29,17 +30,20 @@ describe('GET /api/v1/spaces', () => {
   });
 
   it('should respond 400 with error message when space name is missing or invalid', async () => {
-    const response = await request(baseUrl).get('/api/v1/spaces/search').set('Authorization', apiToken.token).send();
+    const response = await request(baseUrl)
+      .get('/api/v1/spaces/search')
+      .set('Authorization', superApiToken.token)
+      .send();
 
     expect(response.statusCode).toBe(400);
   });
 
   it('should respond 200 with spaces', async () => {
-    const walletAddress = Wallet.createRandom().address;
-    const data = await generateUserAndSpace({ walletAddress, superApiTokenId: apiToken.id });
+    const walletAddress = randomETHWalletAddress();
+    const data = await generateUserAndSpace({ walletAddress, superApiTokenId: superApiToken.id });
     const response = await request(baseUrl)
       .get('/api/v1/spaces/search')
-      .set('Authorization', apiToken.token)
+      .set('Authorization', superApiToken.token)
       .query({ userWallet: walletAddress });
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(1);

@@ -1,4 +1,3 @@
-import type { User } from '@charmverse/core/prisma';
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
@@ -6,9 +5,8 @@ import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
-import Link from 'components/common/Link';
-import { useMemberProfile } from 'components/profile/hooks/useMemberProfile';
-import useENSName from 'hooks/useENSName';
+import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useENSName } from 'hooks/useENSName';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 /**
@@ -20,6 +18,7 @@ interface StyleProps extends BoxProps {
   avatarSize?: InitialAvatarProps['size'];
   hideName?: boolean;
   avatarIcon?: ReactNode;
+  wrapName?: boolean;
 }
 
 interface BaseComponentProps extends StyleProps {
@@ -36,6 +35,7 @@ function BaseComponent({
   fontWeight,
   isNft,
   hideName,
+  wrapName,
   ...props
 }: BaseComponentProps) {
   return (
@@ -45,8 +45,8 @@ function BaseComponent({
       gap={1}
       {...props}
       sx={{
-        ...(props.sx ?? {}),
-        cursor: props.onClick ? 'pointer' : 'initial'
+        cursor: props.onClick ? 'pointer' : 'initial',
+        ...(props.sx ?? {})
       }}
     >
       {props.avatarIcon ? (
@@ -55,7 +55,7 @@ function BaseComponent({
         <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
       )}
       {!hideName && (
-        <Typography whiteSpace='nowrap' fontSize={fontSize} fontWeight={fontWeight}>
+        <Typography whiteSpace={wrapName ? 'break-spaces' : 'nowrap'} fontSize={fontSize} fontWeight={fontWeight}>
           {username}
         </Typography>
       )}
@@ -85,12 +85,11 @@ interface UserDisplayProps extends StyleProps {
     path?: string | null;
     id: string;
   } | null;
-  linkToProfile?: boolean;
   showMiniProfile?: boolean;
 }
 
-function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...props }: UserDisplayProps) {
-  const { showMemberProfile } = useMemberProfile();
+function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayProps) {
+  const { showUserId } = useMemberDialog();
 
   if (!user) {
     // strip out invalid names
@@ -103,19 +102,7 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
     );
   }
 
-  // Copied from User Details component
-  const hostname = typeof window !== 'undefined' ? window.location.origin : '';
-  const userPath = user.path;
-  const userLink = `${hostname}/u/${userPath}`;
   const isNft = hasNftAvatar(user);
-
-  if (linkToProfile) {
-    return (
-      <Link color='inherit' href={userLink} key={user?.id} external={false}>
-        <BaseComponent username={user.username} avatar={user.avatar} isNft={isNft} {...props} />
-      </Link>
-    );
-  }
 
   return (
     <BaseComponent
@@ -123,7 +110,7 @@ function UserDisplay({ showMiniProfile = false, user, linkToProfile = false, ...
         showMiniProfile
           ? () => {
               if (showMiniProfile) {
-                showMemberProfile(user.id);
+                showUserId(user.id);
               }
             }
           : undefined

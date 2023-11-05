@@ -15,25 +15,10 @@ class BountyPermissionLevelOperationMapping implements OperationGroupMapping<Bou
   readonly submitter: Readonly<BountyOperation[]>;
 
   constructor() {
-    this.creator = ['lock', 'approve_applications', 'grant_permissions', 'review', 'mark_paid'];
+    this.creator = ['lock', 'approve_applications', 'grant_permissions', 'review', 'mark_paid', 'work'];
     this.reviewer = ['review', 'approve_applications'];
     this.submitter = ['work'];
   }
 }
 
 export const bountyPermissionMapping = new BountyPermissionLevelOperationMapping();
-
-/**
- * Returns only the permission levels as strings which have access to the full set of operations
- */
-export function getGroupsWithOperations(operations: BountyOperation[]): BountyPermissionLevel[] {
-  return bountyPermissionLevels().filter((level) => {
-    for (const op of operations) {
-      if (!bountyPermissionMapping[level].includes(op)) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-}

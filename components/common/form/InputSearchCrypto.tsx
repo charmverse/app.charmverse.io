@@ -2,8 +2,8 @@ import type { PaymentMethod } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import type { AutocompleteProps, SxProps, Theme } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
-import type { CryptoCurrency } from 'connectors';
-import { CryptoCurrencies } from 'connectors';
+import type { CryptoCurrency } from 'connectors/chains';
+import { CryptoCurrencies } from 'connectors/chains';
 import uniq from 'lodash/uniq';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -12,7 +12,7 @@ import CustomERCTokenForm from 'components/common/form/CustomERCTokenForm';
 import Modal from 'components/common/Modal';
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenInfo, getTokenAndChainInfoFromPayments } from 'lib/tokens/tokenData';
+import { getTokenInfo } from 'lib/tokens/tokenData';
 
 export interface IInputSearchCryptoProps
   extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
@@ -24,6 +24,8 @@ export interface IInputSearchCryptoProps
   cryptoList?: (string | CryptoCurrency)[];
   chainId?: number; // allow passing this down to the 'new custom token' form
   sx?: SxProps<Theme>;
+  variant?: 'standard' | 'outlined';
+  placeholder?: string;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
@@ -38,7 +40,9 @@ export function InputSearchCrypto({
   chainId,
   sx = {},
   disabled,
-  readOnly
+  readOnly,
+  variant,
+  placeholder
 }: IInputSearchCryptoProps) {
   const [inputValue, setInputValue] = useState('');
 
@@ -78,6 +82,7 @@ export function InputSearchCrypto({
     <>
       <Autocomplete
         sx={{ minWidth: 150, ...sx }}
+        forcePopupIcon={variant !== 'standard'}
         onChange={(_, _value, reason) => {
           if (_value === ADD_NEW_CUSTOM) {
             if (reason === 'selectOption') {
@@ -99,7 +104,14 @@ export function InputSearchCrypto({
         autoHighlight
         size='small'
         getOptionLabel={(option) => {
-          return getTokenInfo(paymentMethods, option).tokenSymbol;
+          if (!option) {
+            return '';
+          }
+          const tokenInfo = getTokenInfo({
+            methods: paymentMethods,
+            symbolOrAddress: option
+          });
+          return tokenInfo.tokenSymbol;
         }}
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
@@ -110,9 +122,8 @@ export function InputSearchCrypto({
               </Box>
             );
           }
-          const tokenInfo = getTokenAndChainInfoFromPayments({
+          const tokenInfo = getTokenInfo({
             methods: paymentMethods,
-            chainId: 1,
             symbolOrAddress: option
           });
 
@@ -130,7 +141,17 @@ export function InputSearchCrypto({
             </Box>
           );
         }}
-        renderInput={(params) => <TextField {...params} />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant={variant}
+            InputProps={{
+              ...params.InputProps,
+              ...(variant === 'standard' && { disableUnderline: true }),
+              placeholder
+            }}
+          />
+        )}
         disabled={disabled}
         readOnly={readOnly}
       />

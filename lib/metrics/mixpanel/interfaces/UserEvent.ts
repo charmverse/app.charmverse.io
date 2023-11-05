@@ -1,7 +1,7 @@
 import type { IdentityType } from '@charmverse/core/prisma';
 
-import type { PrivateTemplate, SpaceCreateTemplate } from 'lib/spaces/config';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { SpaceTemplateType } from 'lib/spaces/config';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
 
@@ -42,9 +42,11 @@ export type SpaceJoined = BaseEvent & {
 };
 
 export type CreateNewSpace = BaseEvent & {
-  template: SpaceCreateTemplate | PrivateTemplate;
+  template: SpaceTemplateType;
   source?: string;
 };
+
+export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
 
 export interface UserEventMap {
   sign_up: UserSignupEvent;
@@ -53,4 +55,5 @@ export interface UserEventMap {
   create_new_workspace: CreateNewSpace;
   join_a_workspace: SpaceJoined;
   token_gate_verification: TokenGateVerificationEvent;
+  app_loaded: AppLoaded;
 }

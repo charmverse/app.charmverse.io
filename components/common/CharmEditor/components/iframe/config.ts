@@ -46,7 +46,7 @@ export const embeds = {
     }
   },
   dune: {
-    iconUrl: '/images/dune_logo_bw.png',
+    iconUrl: '/images/logos/dune_logo_bw.png',
     name: 'Dune',
     placeholder: 'https://dune.com/embeds/...',
     text: 'Insert analytics from Dune',
@@ -122,7 +122,7 @@ export const embeds = {
     heightRatio: 560 / 315
   },
   typeform: {
-    iconUrl: '/images/typeform_logo.png',
+    iconUrl: '/images/logos/typeform_logo.png',
     name: 'Typeform',
     placeholder: 'https://typeform.com/to/...',
     text: 'Insert a typeform embed',

@@ -1,8 +1,6 @@
+import { log } from '@charmverse/core/log';
 import type { TokenGate } from '@charmverse/core/prisma';
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
-import type { ResourceId, SigningConditions } from 'lit-js-sdk';
-import LitShareModal from 'lit-share-modal-v3';
+import type { JsonSigningResourceId } from '@lit-protocol/types';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -12,62 +10,27 @@ import { v4 as uuid } from 'uuid';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
+import { LitShareModal } from 'components/common/LitProtocolModal';
+import type { ConditionsModalResult } from 'components/common/LitProtocolModal/shareModal/ShareModal';
 import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import getLitChainFromChainId from 'lib/token-gates/getLitChainFromChainId';
 
 import TokenGatesTable from './components/TokenGatesTable';
 
-const ShareModalContainer = styled.div`
-  width: 100%;
-  min-height: 600px;
-
-  .lsm-single-select-condition-display {
-    overflow-y: scroll;
-  }
-
-  .lsm-single-condition-select-container,
-  .lsm-condition-display,
-  .lsm-condition-container,
-  .lsm-review-conditions-group-container {
-    overflow-y: auto !important;
-  }
-  /* Remove position: absolute so we have a dynamic height */
-  .lsm-condition-display,
-  .lsm-review-conditions-container,
-  .lsm-single-condition-multiple-button,
-  .lsm-lit-footer,
-  // container when selecting multiple conditions
-  .lsm-multiple-conditions-container {
-    position: relative;
-    top: 0;
-  }
-`;
-
-// Example: https://github.com/LIT-Protocol/lit-js-sdk/blob/9b956c0f399493ae2d98b20503c5a0825e0b923c/build/manual_tests.html
-// Docs: https://www.npmjs.com/package/lit-share-modal-v3
-
-type ConditionsModalResult = Pick<SigningConditions, 'unifiedAccessControlConditions' | 'permanant'> & {
-  authSigTypes: string[];
-  chains: string[];
-};
-
 interface TokenGatesProps {
+  popupState: PopupState;
   isAdmin: boolean;
   spaceId: string;
-  popupState: PopupState;
 }
 
-export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
+export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
 
-  const theme = useTheme();
   const litClient = useLitProtocol();
-  const { chainId } = useWeb3AuthSig();
-  const { walletAuthSignature, sign } = useWeb3AuthSig();
+  const { walletAuthSignature, requestSignature, chainId } = useWeb3Account();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
   const [apiError, setApiError] = useState<string>('');
   const { data = [], mutate } = useSWR(`tokenGates/${spaceId}`, () =>
@@ -83,12 +46,13 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
         closeTokenGateModal();
       })
       .catch((error) => {
+        log.warn('Error saving token gate', { error });
         setApiError(error.message || error);
         errorPopupState.open();
       });
   }
 
-  const throttledOnSubmit = useMemo(() => debounce(onSubmit, 200), [litClient]);
+  const throttledOnSubmit = useMemo(() => debounce(onSubmit, 200), [litClient, walletAuthSignature]);
 
   function closeTokenGateDeleteModal() {
     setRemovedTokenGate(null);
@@ -97,7 +61,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
 
   async function saveTokenGate(conditions: ConditionsModalResult) {
     const tokenGateId = uuid();
-    const resourceId: ResourceId = {
+    const resourceId: JsonSigningResourceId = {
       baseUrl: 'https://app.charmverse.io',
       path: `${Math.random()}`,
       orgId: spaceId,
@@ -107,13 +71,12 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
       })
     };
 
-    const chain = getLitChainFromChainId(chainId);
+    const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
 
-    const authSig: AuthSig = walletAuthSignature ?? (await sign());
-
-    await litClient!.saveSigningCondition({
-      ...conditions,
-      chain,
+    await litClient?.saveSigningCondition({
+      unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
+      // not that we can use 'ethereum' for all EVM chains. this would need to be updated to support Solana
+      chain: 'ethereum',
       authSig,
       resourceId
     });
@@ -135,15 +98,7 @@ export default function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesP
     <>
       <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />
       <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size='large'>
-        <ShareModalContainer>
-          <LitShareModal
-            darkMode={theme.palette.mode === 'dark'}
-            injectCSS={false}
-            permanentDefault={true}
-            isModal={false}
-            onUnifiedAccessControlConditionsSelected={throttledOnSubmit}
-          />
-        </ShareModalContainer>
+        <LitShareModal onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any} />
       </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGate && (

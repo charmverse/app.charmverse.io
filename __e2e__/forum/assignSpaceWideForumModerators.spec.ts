@@ -1,10 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsForum } from '@charmverse/core/test';
 import { expect, test as base } from '@playwright/test';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { ForumPostPage } from '../po/forumPost.po';
@@ -109,14 +109,14 @@ test.describe.serial('Comment on forum posts', () => {
     const categoryName = 'Example category';
 
     // A category without any permissions. Nobody can see it apart from moderators
-    const category = await generatePostCategory({
+    const category = await testUtilsForum.generatePostCategory({
       spaceId: space.id,
       name: categoryName
     });
 
     const postName = 'Example post';
 
-    const post = await generateForumPost({
+    const post = await testUtilsForum.generateForumPost({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: category.id,

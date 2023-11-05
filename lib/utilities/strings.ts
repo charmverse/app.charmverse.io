@@ -1,5 +1,3 @@
-import type { UserWallet } from '@charmverse/core/prisma';
-import { utils } from 'ethers';
 import { customAlphabet } from 'nanoid';
 import * as dictionaries from 'nanoid-dictionary';
 import { validate } from 'uuid';
@@ -74,7 +72,17 @@ export function stringToHue(name: string) {
 
 // A future update can use https://www.npmjs.com/package/friendly-url
 // Info for japanese title characters: https://gist.github.com/ryanmcgrath/982242
-export function stringToValidPath(input: string, maxLength?: number): string {
+export function stringToValidPath({
+  input,
+  maxLength,
+  wordSeparator = '_',
+  autoReplaceEmpty = true
+}: {
+  input: string;
+  maxLength?: number;
+  wordSeparator?: string;
+  autoReplaceEmpty?: boolean;
+}): string {
   const sanitizedInput = input
     .slice(0, maxLength)
     .toLowerCase()
@@ -84,19 +92,14 @@ export function stringToValidPath(input: string, maxLength?: number): string {
       ' '
     )
     .trim()
-    .replace(/\s{1,}/g, '_');
+    .replace(/\s{1,}/g, wordSeparator);
 
-  if (sanitizedInput.length < 3) {
-    return `${sanitizedInput}_${uid()}`;
+  if (sanitizedInput.length < 3 && autoReplaceEmpty) {
+    return `${sanitizedInput}${wordSeparator}${uid()}`;
   } else {
     return sanitizedInput;
   }
 }
-
-export const shortenHex = (hex: string = '', length = 4): string => {
-  return `${hex.substring(0, length + 2)}…${hex.substring(hex.length - length)}`;
-};
-
 /**
  * Change the first character of a string to uppercase
  * Leaves other characters unchanged
@@ -184,45 +187,43 @@ export function sanitizeForRegex(string: string) {
   return string.replace(/[#-.]|[[-^]|[?|{}]/g, '\\$&');
 }
 
-/**
- * Shortens valid wallet addresses, leaves other strings unchanged
- */
-export function shortWalletAddress(string?: string): string {
-  if (!string) {
-    return '';
-  }
-
-  if (utils.isAddress(string)) {
-    return shortenHex(string).toLowerCase();
-  }
-
-  return string;
-}
-
-/**
- * Tie a wallet address to a short address, or its mixed case format
- */
-export function matchWalletAddress(
-  address1: string,
-  address2: string | Pick<UserWallet, 'address' | 'ensname'>
-): boolean {
-  if (!address1 || !address2) {
-    return false;
-  }
-  const ensname = typeof address2 === 'string' ? null : address2.ensname;
-
-  if (ensname === address1) {
-    return true;
-  }
-
-  const baseAddress = typeof address2 === 'string' ? address2 : address2.address;
-
-  return shortWalletAddress(address1) === shortWalletAddress(baseAddress);
-}
 const emailRegexp =
   // eslint-disable-next-line max-len
   /[a-z0-9!#$%&'*+/=?^_‘{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_‘{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i;
 
 export function isValidEmail(email: string) {
   return !!email && !!email.match(emailRegexp);
+}
+
+// from https://stackoverflow.com/questions/23305000/javascript-fuzzy-search-that-makes-sense
+// https://gist.github.com/mavaddat/a522c2ed59162d6330569999cab03d76
+export function stringSimilarity(str1?: string, str2?: string, gramSize: number = 2) {
+  function getNGrams(s: string, len: number) {
+    s = ' '.repeat(len - 1) + s.toLowerCase() + ' '.repeat(len - 1);
+    const v = new Array(s.length - len + 1);
+    for (let i = 0; i < v.length; i++) {
+      v[i] = s.slice(i, i + len);
+    }
+    return v;
+  }
+
+  if (!str1?.length || !str2?.length) {
+    return 0.0;
+  }
+
+  const s1 = str1.length < str2.length ? str1 : str2;
+  const s2 = str1.length < str2.length ? str2 : str1;
+
+  const pairs1 = getNGrams(s1, gramSize);
+  const pairs2 = getNGrams(s2, gramSize);
+  const set = new Set<string>(pairs1);
+
+  const total = pairs2.length;
+  let hits = 0;
+  for (const item of pairs2) {
+    if (set.delete(item)) {
+      hits += 1;
+    }
+  }
+  return hits / total;
 }

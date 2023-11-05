@@ -2,7 +2,7 @@ import { AlchemyProvider } from '@ethersproject/providers';
 import { Space } from '@charmverse/core/prisma';
 import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
 import { getProjectDetails, GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import { uid } from 'lib/utilities/strings';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
@@ -18,7 +18,7 @@ import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension
  * It also updates mixpanel profiles so make sure to have prod mixpanel api key set in .env
  */
 
-const START_ID = 500;
+const START_ID = 100;
 const CHAIN_ID = 1;
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
@@ -88,8 +88,7 @@ async function importGitCoinProjects() {
           spaceData,
           userId: adminUserId,
           extraAdmins: [...extraAdmins, botUser.id],
-          createSpaceTemplate: 'gitcoin',
-          skipTracking: true
+          spaceTemplate: 'templateGitcoin'
         });
         console.log('🟢 Created space for project', i, space.id);
 

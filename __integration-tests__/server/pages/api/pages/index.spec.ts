@@ -1,20 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import type { PageWithPermissions } from '@charmverse/core/pages';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { IPageWithPermissions } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import {
-  createPage,
-  generateSpaceUser,
-  generateUserAndSpace,
-  generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
 
 describe('POST /api/pages - create page', () => {
   it('should create a root-level page if the non-admin user has the permission and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: false
+    });
 
     await addSpaceOperations({
       forSpaceId: space.id,
@@ -33,7 +30,7 @@ describe('POST /api/pages - create page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201)) as { body: IPageWithPermissions };
+      .expect(201)) as { body: PageWithPermissions };
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -41,7 +38,9 @@ describe('POST /api/pages - create page', () => {
   });
 
   it('should allow admins to create a page even if no permission exists, and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { user, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
 
     const userCookie = await loginUser(user.id);
 
@@ -54,7 +53,7 @@ describe('POST /api/pages - create page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201)) as { body: IPageWithPermissions };
+      .expect(201)) as { body: PageWithPermissions };
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -62,7 +61,9 @@ describe('POST /api/pages - create page', () => {
   });
 
   it('should fail to create a root-level page if the non-admin user does not have the permission and return it, responding with 401', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { user, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: false
+    });
 
     const userCookie = await loginUser(user.id);
 
@@ -76,21 +77,21 @@ describe('POST /api/pages - create page', () => {
 
   // Handle the creation of nested pages. In this case, we shouldn't depend on space permissions, but on whether you can edit the parent page
   it('should create a nested page if the non-admin user can edit the parent and return it, responding with 201', async () => {
-    const { user, space } = await generateUserAndSpace({
+    const { user, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: false
     });
 
-    const otherUser = await generateSpaceUser({
+    const otherUser = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
 
-    const parentPage = await createPage({
+    const parentPage = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
       pagePermissions: [
         {
           permissionLevel: 'full_access',
-          spaceId: space.id
+          assignee: { group: 'space', id: space.id }
         }
       ]
     });
@@ -106,7 +107,7 @@ describe('POST /api/pages - create page', () => {
       .post('/api/pages')
       .set('Cookie', userCookie)
       .send(pageToCreate)
-      .expect(201)) as { body: IPageWithPermissions };
+      .expect(201)) as { body: PageWithPermissions };
 
     expect(createdPage.spaceId).toBe(pageToCreate.spaceId as string);
     expect(createdPage.path).toBe(pageToCreate.path);
@@ -114,15 +115,15 @@ describe('POST /api/pages - create page', () => {
   });
 
   it('should not create a nested page if the non-admin user cannot edit the parent the permission and return it, responding with 401', async () => {
-    const { user, space } = await generateUserAndSpace({
+    const { user, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: false
     });
 
-    const otherUser = await generateSpaceUser({
+    const otherUser = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
 
-    const parentPage = await createPage({
+    const parentPage = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
       pagePermissions: [
@@ -143,7 +144,9 @@ describe('POST /api/pages - create page', () => {
   // --------------
 
   it('should prevent creation of proposal templates and proposals', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { user, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
 
     const userCookie = await loginUser(user.id);
 

@@ -17,13 +17,13 @@ describe('calculateVoteStatus', () => {
       deadline: new Date(),
       userVotes: [
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '2'
+          choices: ['2']
         }
       ]
     });
@@ -38,13 +38,13 @@ describe('calculateVoteStatus', () => {
       deadline: nonExpiredDeadline,
       userVotes: [
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '2'
+          choices: ['2']
         }
       ]
     });
@@ -59,13 +59,13 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: 'Yes'
+          choices: ['Yes']
         },
         {
-          choice: 'Yes'
+          choices: ['Yes']
         },
         {
-          choice: 'No'
+          choices: ['No']
         }
       ]
     });
@@ -80,13 +80,13 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: 'Yes'
+          choices: ['Yes']
         },
         {
-          choice: 'No'
+          choices: ['No']
         },
         {
-          choice: 'No'
+          choices: ['No']
         }
       ]
     });
@@ -101,13 +101,13 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '2'
+          choices: ['2']
         }
       ]
     });
@@ -122,13 +122,13 @@ describe('calculateVoteStatus', () => {
       deadline: expiredDeadline,
       userVotes: [
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '1'
+          choices: ['1']
         },
         {
-          choice: '2'
+          choices: ['2']
         }
       ]
     });

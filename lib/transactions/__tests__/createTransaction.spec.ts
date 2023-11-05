@@ -1,11 +1,17 @@
 import type { Application, Bounty, Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import { createSubmission } from 'lib/applications/actions';
+import { refreshPaymentStatus } from 'lib/rewards/refreshPaymentStatus';
+import { work } from 'lib/rewards/work';
 import { createTransaction } from 'lib/transactions/createTransaction';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+
+jest.mock('lib/rewards/refreshPaymentStatus', () => ({
+  refreshPaymentStatus: jest.fn()
+}));
+const mockedRefreshPaymentStatus: jest.Mocked<typeof refreshPaymentStatus> = refreshPaymentStatus;
 
 let user: User;
 let space: Space;
@@ -22,16 +28,13 @@ beforeAll(async () => {
     status: 'open',
     approveSubmitters: false
   });
-  application = await createSubmission({
-    bountyId: bounty.id,
+  application = await work({
+    rewardId: bounty.id,
     userId: user.id,
-    submissionContent: {
-      submission: 'Hello World',
-      submissionNodes:
-        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
-      walletAddress: '0x123456789'
-    },
-    customReward: false
+    submission: 'Hello World',
+    submissionNodes:
+      '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My submission"}]}]}',
+    walletAddress: '0x123456789'
   });
 });
 
@@ -44,6 +47,9 @@ describe('createTransaction', () => {
     });
 
     expect(transaction).not.toBeNull();
+    expect(transaction.transactionId).toBe('123');
+    expect(transaction.safeTxHash).toBeNull();
+    expect(mockedRefreshPaymentStatus).not.toHaveBeenCalled();
   });
 
   it("Should throw error if application doesn't exist", async () => {
@@ -57,6 +63,21 @@ describe('createTransaction', () => {
       throw new ExpectedAnError();
     } catch (err: any) {
       expect(err).toBeInstanceOf(DataNotFoundError);
+      expect(mockedRefreshPaymentStatus).not.toHaveBeenCalled();
     }
+  });
+
+  it('Should create transaction for a submission and refresh status if it is a multisig transaction (safeHashTx is present)', async () => {
+    const transaction = await createTransaction({
+      applicationId: application.id,
+      chainId: '4',
+      transactionId: '123',
+      safeTxHash: '0x1234'
+    });
+
+    expect(transaction).not.toBeNull();
+    expect(transaction.transactionId).toBe('123');
+    expect(transaction.safeTxHash).toBe('0x1234');
+    expect(mockedRefreshPaymentStatus).toHaveBeenCalled();
   });
 });

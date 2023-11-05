@@ -170,11 +170,4 @@
       }
     }
   }
-
-  @media not screen and (max-width: 430px) {
-    .hideOnWidescreen {
-      /* Hide controls (e.g. close button) on larger screens */
-      display: none !important;
-    }
-  }
 }

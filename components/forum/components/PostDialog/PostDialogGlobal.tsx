@@ -33,12 +33,11 @@ export default function PostDialogGlobal() {
   if (newPost || post || postId) {
     return (
       <PostDialog
-        key={post?.id}
         isLoading={!post && !newPost}
         post={post}
         newPostCategory={newPost?.category}
         onClose={hidePost}
-        spaceId={post?.spaceId || (newPost?.spaceId as string)}
+        spaceId={post?.spaceId || newPost?.spaceId}
       />
     );
   }

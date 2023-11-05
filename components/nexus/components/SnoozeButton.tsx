@@ -9,17 +9,17 @@ import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-p
 import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useUser } from 'hooks/useUser';
 import type { LoggedInUser } from 'models';
 
-import useTasksState from '../hooks/useTasksState';
+import useNotificationsState from '../hooks/useNotificationsState';
 
 export default function SnoozeButton() {
   const { setUser } = useUser();
-  const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateTasks } = useTasksState();
+  const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateNotifications } = useNotificationsState();
   const { formatDate, formatDateTime } = useDateFormatter();
 
   const isSnoozed = snoozedForDate !== null;
@@ -62,7 +62,7 @@ export default function SnoozeButton() {
   async function removeSnoozedForDate() {
     resetState();
     setShowLoading(true);
-    await charmClient.tasks.updateTasksState({
+    await charmClient.notifications.updateNotificationsState({
       snoozeFor: null,
       snoozeMessage: null
     });
@@ -73,7 +73,7 @@ export default function SnoozeButton() {
         snoozeMessage: null
       }
     }));
-    await mutateTasks();
+    await mutateNotifications();
     setShowLoading(false);
   }
 
@@ -102,7 +102,7 @@ export default function SnoozeButton() {
     resetState();
     setShowLoading(true);
     const newSnoozedForDate = getSnoozedDate();
-    await charmClient.tasks.updateTasksState({
+    await charmClient.notifications.updateNotificationsState({
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage: _snoozeMessage
     });
@@ -113,7 +113,7 @@ export default function SnoozeButton() {
         snoozeMessage: _snoozeMessage
       }
     }));
-    await mutateTasks();
+    await mutateNotifications();
     setShowLoading(false);
   }
 

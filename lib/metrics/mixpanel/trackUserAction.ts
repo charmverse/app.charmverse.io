@@ -1,4 +1,4 @@
-import log from 'loglevel';
+import { log } from '@charmverse/core/log';
 
 import type { MixpanelEventMap, MixpanelEventName, MixpanelTrackBase } from './interfaces';
 import { mixpanel } from './mixpanel';

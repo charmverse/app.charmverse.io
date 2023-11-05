@@ -1,3 +1,4 @@
+import type { PublicBountyToggle } from '@charmverse/core/permissions';
 import type { Application, PageComment, Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
@@ -10,13 +11,12 @@ import type {
 } from 'lib/applications/interfaces';
 import type {
   AssignedBountyPermissions,
-  BountyCreationData,
   BountyUpdate,
   SuggestionAction,
-  BountyWithDetails
+  BountyWithDetails,
+  BountyCreationData
 } from 'lib/bounties';
 import type { Resource } from 'lib/permissions/interfaces';
-import type { PublicBountyToggle } from 'lib/spaces/interfaces';
 import type { TransactionCreationData } from 'lib/transactions/interface';
 
 export class BountiesApi {
@@ -123,5 +123,13 @@ export class BountiesApi {
 
   getApplicationComments(applicationId: string) {
     return http.GET<PageComment[]>(`/api/applications/${applicationId}/comments`);
+  }
+
+  refreshApplicationStatus(applicationId: string) {
+    return http.GET<Application>(`/api/applications/${applicationId}/refresh-status`);
+  }
+
+  isBountyEditable(bountyId: string) {
+    return http.GET<{ editable: boolean }>(`/api/bounties/${bountyId}/is-editable`);
   }
 }

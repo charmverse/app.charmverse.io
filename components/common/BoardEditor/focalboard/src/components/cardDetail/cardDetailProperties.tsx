@@ -1,12 +1,10 @@
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box, Menu, Stack } from '@mui/material';
+import { Box, Menu } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import charmClient from 'charmClient';
+import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -16,134 +14,40 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTruthy } from 'lib/utilities/types';
 
-import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
+import type { Mutator } from '../../mutator';
+import defaultMutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
-import PropertyMenu, { typeDisplayName } from '../../widgets/propertyMenu';
 import { PropertyTypes } from '../../widgets/propertyTypes';
+import { typeDisplayName } from '../../widgets/typeDisplayName';
 import Calculations from '../calculations/calculations';
-import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
   board: Board;
-  card: Card;
-  cards: Card[];
+  syncWithPageId?: string | null;
+  card: Card<any>;
+  cards: Card<any>[];
   activeView?: BoardView;
   views: BoardView[];
   readOnly: boolean;
   pageUpdatedBy: string;
   pageUpdatedAt: string;
+  mutator?: Mutator;
+  readOnlyProperties?: string[];
 };
 
-export const PropertyNameContainer = styled(Stack)`
-  position: relative;
-  flex-direction: row;
-  align-items: center;
-
-  &:hover .icons {
-    opacity: 1;
-    transition: opacity 150ms ease-in-out;
-  }
-
-  & .icons {
-    position: absolute;
-    opacity: 0;
-    z-index: 1;
-    left: -25px;
-    cursor: pointer;
-    transition: opacity 150ms ease-in-out;
-  }
-`;
-
-function CardDetailProperty({
-  readOnly,
-  property,
-  onTypeAndNameChanged,
-  board,
-  card,
-  onDelete,
-  pageUpdatedBy,
-  pageUpdatedAt,
-  deleteDisabledMessage,
-  onDrop
-}: {
-  readOnly: boolean;
-  property: IPropertyTemplate;
-  card: Card;
-  board: Board;
-  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
-  onDelete: VoidFunction;
-  pageUpdatedAt: string;
-  pageUpdatedBy: string;
-  deleteDisabledMessage?: string;
-  onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
-}) {
-  const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
-  const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
-
-  return (
-    <Stack
-      ref={columnRef}
-      sx={{
-        minWidth: 250,
-        overflow: 'unset',
-        flexDirection: 'row',
-        // Allow dragging past left border
-        paddingLeft: '150px',
-        marginLeft: '-150px !important'
-        // position: 'relative',
-        // right: '150px'
-      }}
-      className='octo-propertyrow'
-    >
-      {readOnly && (
-        <div className='octo-propertyname octo-propertyname--readonly'>
-          <Button>{property.name}</Button>
-        </div>
-      )}
-      {!readOnly && (
-        <Box>
-          <PropertyNameContainer
-            className='octo-propertyname'
-            sx={{
-              opacity: isDragging ? 0.5 : 1,
-              transition: `background-color 150ms ease-in-out`,
-              backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial'
-            }}
-          >
-            <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
-            <Button {...bindTrigger(changePropertyPopupState)}>{property.name}</Button>
-          </PropertyNameContainer>
-          <Menu {...bindMenu(changePropertyPopupState)}>
-            <PropertyMenu
-              onDelete={onDelete}
-              deleteDisabled={deleteDisabledMessage?.length !== 0}
-              property={property}
-              onTypeAndNameChanged={(newType, newName) => {
-                onTypeAndNameChanged(newType, newName);
-                changePropertyPopupState.close();
-              }}
-            />
-          </Menu>
-        </Box>
-      )}
-      <PropertyValueElement
-        readOnly={readOnly}
-        card={card}
-        board={board}
-        updatedAt={pageUpdatedAt}
-        updatedBy={pageUpdatedBy}
-        propertyTemplate={property}
-        showEmptyPlaceholder={true}
-        displayType='details'
-      />
-    </Stack>
-  );
-}
-
 function CardDetailProperties(props: Props) {
-  const { board, card, cards, views, activeView, pageUpdatedAt, pageUpdatedBy } = props;
+  const {
+    board,
+    card,
+    cards,
+    views,
+    activeView,
+    pageUpdatedAt,
+    pageUpdatedBy,
+    syncWithPageId,
+    mutator = defaultMutator
+  } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -153,11 +57,11 @@ function CardDetailProperties(props: Props) {
   const isSmallScreen = useSmallScreen();
 
   useEffect(() => {
-    const newProperty = board.fields.cardProperties.find((property) => property.id === newTemplateId);
+    const newProperty = board.fields?.cardProperties.find((property) => property.id === newTemplateId);
     if (newProperty) {
       setNewTemplateId('');
     }
-  }, [newTemplateId, board.fields.cardProperties]);
+  }, [newTemplateId, board.fields?.cardProperties]);
 
   const [confirmationDialogBox, setConfirmationDialogBox] = useState<{
     heading: string;
@@ -179,19 +83,12 @@ function CardDetailProperties(props: Props) {
     const srcIndex = cardPropertyIds.indexOf(sourceProperty.id);
     cardPropertyIds.splice(srcIndex, 1);
     cardPropertyIds.splice(destIndex, 0, sourceProperty.id);
-    await charmClient.patchBlock(
-      board.id,
-      {
-        updatedFields: {
-          cardProperties: cardPropertyIds
-            .map((cardPropertyId) =>
-              board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId)
-            )
-            .filter(isTruthy)
-        }
-      },
-      () => {}
-    );
+
+    const updatedProperties = cardPropertyIds
+      .map((cardPropertyId) => board.fields.cardProperties.find((cardProperty) => cardProperty.id === cardPropertyId))
+      .filter(isTruthy);
+
+    await mutator.reorderProperties(board.id, updatedProperties);
   };
 
   function onPropertyChangeSetAndOpenConfirmationDialog(
@@ -351,10 +248,13 @@ function CardDetailProperties(props: Props) {
   );
 
   return (
-    <div className='octo-propertylist'>
-      {board.fields.cardProperties.map((propertyTemplate) => {
+    <div className='octo-propertylist' data-test='card-detail-properties'>
+      {board.fields?.cardProperties.map((propertyTemplate) => {
+        const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
+
         return (
           <CardDetailProperty
+            syncWithPageId={syncWithPageId}
             onDrop={onDrop}
             key={propertyTemplate.id}
             board={board}
@@ -367,7 +267,8 @@ function CardDetailProperties(props: Props) {
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}
             property={propertyTemplate}
-            readOnly={props.readOnly}
+            readOnly={readOnly}
+            mutator={mutator}
           />
         );
       })}

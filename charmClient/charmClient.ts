@@ -1,48 +1,38 @@
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
+  ApiPageKey,
   Block,
   FavoritePage,
   InviteLink,
   Page,
   PaymentMethod,
-  Prisma,
   Space,
   TelegramUser,
   TokenGateToRole,
   User,
   UserDetails,
-  UserGnosisSafe,
-  UserWallet,
-  ApiPageKey
+  UserWallet
 } from '@charmverse/core/prisma';
-import type { FiatCurrency, IPairQuote } from 'connectors';
+import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
+import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
 import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { Block as FBBlock, BlockPatch } from 'lib/focalboard/block';
+import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
+import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
+import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
+import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
-import type { IPageWithPermissions, ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type {
-  IPagePermissionFlags,
-  IPagePermissionToCreate,
-  IPagePermissionUserRequest,
-  IPagePermissionWithAssignee,
-  IPagePermissionWithSource,
-  SpaceDefaultPublicPageToggle
-} from 'lib/permissions/pages/page-permission-interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utilities/encodeFilename';
-import type { SocketAuthReponse } from 'lib/websockets/interfaces';
+import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
-import type { ServerBlockFields } from 'pages/api/blocks';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { InviteLinkPopulated } from 'pages/api/invites/index';
-import type { PublicUser } from 'pages/api/public/profile/[userId]';
-import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
-import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
@@ -51,18 +41,22 @@ import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
+import { GnosisSafeApi } from './apis/gnosisSafeApi';
 import { GoogleApi } from './apis/googleApi';
 import { IframelyApi } from './apis/iframelyApi';
 import { MembersApi } from './apis/membersApi';
 import { MuxApi } from './apis/muxApi';
+import { NotificationsApi } from './apis/notificationsApi';
 import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
 import { ProposalsApi } from './apis/proposalsApi';
+import { PublicProfileApi } from './apis/publicProfileApi';
+import { RewardsApi } from './apis/rewardsApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
+import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
-import { TasksApi } from './apis/tasksApi';
 import { TokenGatesApi } from './apis/tokenGates';
 import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
@@ -98,6 +92,8 @@ class CharmClient {
 
   profile = new ProfileApi();
 
+  publicProfile = new PublicProfileApi();
+
   proposals = new ProposalsApi();
 
   roles = new RolesApi();
@@ -106,7 +102,7 @@ class CharmClient {
 
   summon = new SummonApi();
 
-  tasks = new TasksApi();
+  notifications = new NotificationsApi();
 
   track = new TrackApi();
 
@@ -118,8 +114,14 @@ class CharmClient {
 
   tokenGates = new TokenGatesApi();
 
+  subscription = new SubscriptionApi();
+
+  gnosisSafe = new GnosisSafeApi();
+
+  rewards = new RewardsApi();
+
   async socket() {
-    return http.GET<SocketAuthReponse>('/api/socket');
+    return http.GET<SocketAuthResponse>('/api/socket');
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
@@ -138,10 +140,6 @@ class CharmClient {
     return http.GET<LoggedInUser>('/api/profile');
   }
 
-  getUserByPath(path: string) {
-    return http.GET<PublicUser>(`/api/public/profile/${path}`);
-  }
-
   createUser({ address, walletSignature }: Web3LoginRequest) {
     return http.POST<LoggedInUser>('/api/profile', {
       address,
@@ -151,10 +149,6 @@ class CharmClient {
 
   updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
     return http.PUT<LoggedInUser>('/api/profile', data);
-  }
-
-  checkPublicProfilePath(path: string) {
-    return http.GET<{ available: boolean }>('/api/profile/check-path-availability', { path });
   }
 
   getUserDetails() {
@@ -177,45 +171,8 @@ class CharmClient {
     return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
-  async createSpace(spaceOptions: Pick<CreateSpaceProps, 'createSpaceTemplate' | 'spaceData'>) {
-    const space = await http.POST<Space>('/api/spaces', spaceOptions);
-    return space;
-  }
-
-  deleteSpace(spaceId: string) {
-    return http.DELETE(`/api/spaces/${spaceId}`);
-  }
-
-  updateSpace(spaceOpts: Prisma.SpaceUpdateInput) {
-    return http.PUT<Space>(`/api/spaces/${spaceOpts.id}`, spaceOpts);
-  }
-
-  updateSpaceWebhook(spaceId: string, webhookOpts: SetSpaceWebhookBody) {
-    return http.PUT<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/set-webhook`, webhookOpts);
-  }
-
-  leaveSpace(spaceId: string) {
-    return http.POST(`/api/spaces/${spaceId}/leave`);
-  }
-
-  getSpaces() {
-    return http.GET<Space[]>('/api/spaces');
-  }
-
-  getSpaceWebhook(spaceId: string) {
-    return http.GET<SetSpaceWebhookResponse>(`/api/spaces/${spaceId}/webhook`);
-  }
-
-  checkDomain(params: { spaceId?: string; domain: string }) {
-    return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
-  }
-
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
-  }
-
-  getBlockViewsByPageId(pageId: string) {
-    return http.GET<Block[]>(`/api/blocks/views/${pageId}`);
   }
 
   getPageLink(pageId: string) {
@@ -223,7 +180,7 @@ class CharmClient {
   }
 
   createPage(pageOpts: Partial<Page>) {
-    return http.POST<IPageWithPermissions>('/api/pages', pageOpts);
+    return http.POST<PageWithPermissions>('/api/pages', pageOpts);
   }
 
   archivePage(pageId: string) {
@@ -239,7 +196,7 @@ class CharmClient {
   }
 
   deletePages(pageIds: string[]) {
-    return http.DELETE<undefined>(`/api/pages`, pageIds);
+    return http.DELETE<undefined>(`/api/pages`, { pageIds });
   }
 
   favoritePage(pageId: string) {
@@ -254,44 +211,32 @@ class CharmClient {
     return http.PUT<FavoritePage[]>('/api/profile/favorites', favorites);
   }
 
-  setMyGnosisSafes(wallets: Partial<UserGnosisSafe>[]): Promise<UserGnosisSafe[]> {
-    return http.POST('/api/profile/gnosis-safes', wallets);
-  }
-
-  getMyGnosisSafes(): Promise<UserGnosisSafe[]> {
-    return http.GET('/api/profile/gnosis-safes');
-  }
-
-  updateMyGnosisSafe(wallet: { id: string; name: string }): Promise<UserGnosisSafe[]> {
-    return http.PUT(`/api/profile/gnosis-safes/${wallet.id}`, wallet);
-  }
-
-  deleteMyGnosisSafe(walletId: string) {
-    return http.DELETE(`/api/profile/gnosis-safes/${walletId}`);
-  }
-
   getPublicPage(pageIdOrPath: string) {
     return http.GET<PublicPageResponse>(`/api/public/pages/${pageIdOrPath}`);
   }
 
   updateInviteLinkRoles(inviteLinkId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
+    return http.PUT<InviteLinkWithRoles[]>(`/api/invites/${inviteLinkId}/roles`, { spaceId, roleIds });
   }
 
   createInviteLink(link: Partial<InviteLink>) {
-    return http.POST<InviteLinkPopulated[]>('/api/invites', link);
+    return http.POST<InviteLink>('/api/invites', link);
   }
 
   deleteInviteLink(linkId: string) {
-    return http.DELETE<InviteLinkPopulated[]>(`/api/invites/${linkId}`);
+    return http.DELETE<InviteLinkWithRoles[]>(`/api/invites/${linkId}`);
   }
 
   getInviteLinks(spaceId: string) {
-    return http.GET<InviteLinkPopulated[]>('/api/invites', { spaceId });
+    return http.GET<InviteLinkWithRoles[]>('/api/invites', { spaceId });
+  }
+
+  getPublicInviteLink({ visibleOn, spaceId }: PublicInviteLinkRequest) {
+    return http.GET<InviteLinkPopulated>('/api/invites/public', { spaceId, visibleOn });
   }
 
   acceptInvite({ id }: { id: string }) {
-    return http.POST<InviteLinkPopulated[]>(`/api/invites/${id}`);
+    return http.POST<InviteLinkWithRoles[]>(`/api/invites/${id}/accept`);
   }
 
   importFromNotion(payload: { code: string; spaceId: string }) {
@@ -310,51 +255,29 @@ class CharmClient {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
-  async getAllBlocks(spaceId: string): Promise<FBBlock[]> {
+  getBlock({ blockId }: { blockId: string }): Promise<FBBlock> {
+    return http.GET<Block>(`/api/blocks/${blockId}`).then(blockToFBBlock);
+  }
+
+  getSubtree({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>('/api/blocks', { spaceId })
-      .then((blocks) => blocks.map(this.blockToFBBlock))
-      .then((blocks) => this.fixBlocks(blocks));
+      .GET<Block[]>(`/api/blocks/${pageId}/subtree`)
+      .then((blocks) => blocks.map(blockToFBBlock))
+      .then((blocks) => fixBlocks(blocks));
   }
 
-  getSubtree(rootId?: string, levels = 2): Promise<FBBlock[]> {
+  getViews({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${rootId}/subtree`, { levels })
-      .then((blocks) => blocks.map(this.blockToFBBlock))
-      .then((blocks) => this.fixBlocks(blocks));
+      .GET<Block[]>(`/api/blocks/${pageId}/views`)
+      .then((blocks) => blocks.map(blockToFBBlock))
+      .then((blocks) => fixBlocks(blocks));
   }
 
-  async fixBlocks(blocks: FBBlock[]): Promise<FBBlock[]> {
-    const OctoUtils = (await import('components/common/BoardEditor/focalboard/src/octoUtils')).OctoUtils;
-    // Hydrate is important, as it ensures that each block is complete to the current model
-    const fixedBlocks = OctoUtils.hydrateBlocks(blocks);
-    return fixedBlocks;
-  }
-
-  private blockToFBBlock(block: Block): FBBlock {
-    return {
-      ...block,
-      deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
-      createdAt: new Date(block.createdAt).getTime(),
-      updatedAt: new Date(block.updatedAt).getTime(),
-      type: block.type as FBBlock['type'],
-      fields: block.fields as FBBlock['fields']
-    };
-  }
-
-  private fbBlockToBlock(fbBlock: FBBlock): Omit<Block, ServerBlockFields> {
-    return {
-      id: fbBlock.id,
-      parentId: fbBlock.parentId,
-      rootId: fbBlock.rootId,
-      schema: fbBlock.schema,
-      type: fbBlock.type,
-      title: fbBlock.title,
-      fields: fbBlock.fields,
-      deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
-      createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
-      updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
-    };
+  getComments({ pageId }: { pageId: string }): Promise<FBBlock[]> {
+    return http
+      .GET<Block[]>(`/api/blocks/${pageId}/comments`)
+      .then((blocks) => blocks.map(blockToFBBlock))
+      .then((blocks) => fixBlocks(blocks));
   }
 
   async insertBlock(block: FBBlock, updater: BlockUpdater): Promise<FBBlock[]> {
@@ -363,7 +286,7 @@ class CharmClient {
 
   async deleteBlock(blockId: string, updater: BlockUpdater): Promise<void> {
     const { rootBlock } = await http.DELETE<{ deletedCount: number; rootBlock: Block }>(`/api/blocks/${blockId}`);
-    const fbBlock = this.blockToFBBlock(rootBlock);
+    const fbBlock = blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
@@ -371,36 +294,35 @@ class CharmClient {
   async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
     const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
     const fbBlocks = rootBlocks.map((rootBlock) => ({
-      ...this.blockToFBBlock(rootBlock),
+      ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
     }));
     updater(fbBlocks);
   }
 
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {
-    const blocksInput = fbBlocks.map(this.fbBlockToBlock);
+    const blocksInput = fbBlocks.map(fbBlockToBlock);
     const newBlocks = await http.POST<Block[]>('/api/blocks', blocksInput);
-    const newFBBlocks = newBlocks.map(this.blockToFBBlock);
+    const newFBBlocks = newBlocks.map(blockToFBBlock);
     updater(newFBBlocks);
     return newFBBlocks;
   }
 
   async patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> {
-    const currentBlocks = await http.GET<Block[]>('/api/blocks', { id: blockId });
-    const currentFBBlock = this.blockToFBBlock(currentBlocks[0]);
+    const currentFBBlock: FBBlock = blockToFBBlock(await http.GET<Block>(`/api/blocks/${blockId}`));
     const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
-    const blockInput = this.fbBlockToBlock(fbBlockInput);
+    const blockInput = fbBlockToBlock(fbBlockInput);
     const updatedBlocks = await http.PUT<Block[]>('/api/blocks', [blockInput]);
-    const fbBlock = this.blockToFBBlock(updatedBlocks[0]);
+    const fbBlock = blockToFBBlock(updatedBlocks[0]);
     updater([fbBlock]);
   }
 
   async updateBlock(blockInput: FBBlock) {
-    const newBlock = this.fbBlockToBlock(blockInput);
+    const newBlock = fbBlockToBlock(blockInput);
     return http.PUT<Block[]>('/api/blocks', [newBlock]);
   }
 
@@ -411,10 +333,10 @@ class CharmClient {
         fields: { ...(currentFBBlock.fields as object), ...updatedFields }
       });
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
-      return this.fbBlockToBlock(fbBlockInput);
+      return fbBlockToBlock(fbBlockInput);
     });
     const updatedBlocks = await http.PUT<Block[]>('/api/blocks', updatedBlockInput);
-    const fbBlocks = updatedBlocks.map(this.blockToFBBlock);
+    const fbBlocks = updatedBlocks.map(blockToFBBlock);
     updater(fbBlocks);
   }
 
@@ -449,7 +371,7 @@ class CharmClient {
   }
 
   updateTokenGateRoles(tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.POST<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
+    return http.PUT<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
   }
 
   getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
@@ -468,48 +390,20 @@ class CharmClient {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }
 
-  /**
-   * Get full set of permissions for a specific user on a certain page
-   */
-  computeUserPagePermissions(request: IPagePermissionUserRequest): Promise<IPagePermissionFlags> {
-    return http.GET('/api/permissions/query', request);
-  }
-
-  listPagePermissions(pageId: string): Promise<IPagePermissionWithAssignee[]> {
-    return http.GET('/api/permissions', { pageId });
-  }
-
-  createPermission(permission: IPagePermissionToCreate): Promise<IPagePermissionWithSource> {
-    return http.POST('/api/permissions', permission);
-  }
-
-  deletePermission(permissionId: string): Promise<boolean> {
-    return http.DELETE('/api/permissions', { permissionId });
-  }
-
-  restrictPagePermissions({ pageId }: { pageId: string }): Promise<IPageWithPermissions> {
+  restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  updateSnapshotConnection(
-    spaceId: string,
-    data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
-  ): Promise<Space> {
-    return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
-  }
-
-  setDefaultPublicPages({ spaceId, defaultPublicPages }: SpaceDefaultPublicPageToggle) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/set-default-public-pages`, {
-      defaultPublicPages
-    });
-  }
-
-  completeOnboarding({ spaceId }: { spaceId: string }) {
-    return http.PUT(`/api/spaces/${spaceId}/onboarding`);
-  }
-
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<IPageWithPermissions> {
+  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
     return http.PUT(`/api/pages/${pageId}/snapshot`, data);
+  }
+
+  createProposalSource({ pageId }: { pageId: string }) {
+    return http.POST<void>(`/api/pages/${pageId}/proposal-source`);
+  }
+
+  updateProposalSource({ pageId }: { pageId: string }) {
+    return http.PUT<void>(`/api/pages/${pageId}/proposal-source`);
   }
 
   getBuildId() {
@@ -526,6 +420,21 @@ class CharmClient {
 
   createApiPageKey({ pageId, type }: { pageId: string; type: ApiPageKey['type'] }) {
     return http.POST<ApiPageKey>(`/api/api-page-key`, { type, pageId });
+  }
+
+  testSpaceWebhook({ spaceId, webhookUrl }: { spaceId: string; webhookUrl: string }) {
+    return http.POST<{ status: number }>(`/api/spaces/${spaceId}/test-webhook`, { webhookUrl });
+  }
+
+  resizeImage(formData: FormData) {
+    return http.POST<{ url: string }>('/api/image/resize', formData, {
+      noHeaders: true,
+      skipStringifying: true
+    });
+  }
+
+  createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
+    return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
   }
 }
 

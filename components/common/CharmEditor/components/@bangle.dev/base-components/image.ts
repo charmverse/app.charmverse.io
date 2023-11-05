@@ -1,11 +1,10 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import type { Command, EditorView, Node, NodeType, Schema } from '@bangle.dev/pm';
 import { InputRule, NodeSelection, Plugin, PluginKey } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
 
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {};
 
@@ -17,45 +16,6 @@ export interface ImageNodeSchemaAttrs {
   caption: null | string;
   src: null | string;
   alt: null | string;
-}
-
-function specFactory(): RawSpecs {
-  return {
-    type: 'node',
-    name,
-    schema: {
-      atom: true,
-      inline: true,
-      attrs: {
-        caption: {
-          default: null
-        },
-        src: {
-          default: null
-        },
-        alt: {
-          default: null
-        },
-        track: {
-          default: []
-        }
-      },
-      group: 'inline',
-      draggable: false,
-      parseDOM: [
-        {
-          tag: 'img[src]',
-          getAttrs: (dom: any) => ({
-            src: dom.getAttribute('src'),
-            alt: dom.getAttribute('alt')
-          })
-        }
-      ],
-      toDOM: (node: Node) => {
-        return ['img', node.attrs];
-      }
-    }
-  };
 }
 
 function pluginsFactory({

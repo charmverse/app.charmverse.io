@@ -1,18 +1,46 @@
-import { Tooltip } from '@mui/material';
+import type { ProposalStatus, ApplicationStatus } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
+import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import { SelectProperty } from 'components/common/BoardEditor/components/properties/SelectProperty/SelectProperty';
+import charmClient from 'charmClient';
+import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
+import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
+import {
+  REWARD_APPLICATION_STATUS_LABELS,
+  RewardApplicationStatusChip
+} from 'components/rewards/components/RewardApplicationStatusChip';
+import { RewardStatusChip } from 'components/rewards/components/RewardChip';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import {
+  ASSIGNEES_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_REVIEWERS_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID
+} from 'lib/rewards/blocks/constants';
+import type { RewardStatus } from 'lib/rewards/interfaces';
+import { getAbsolutePath } from 'lib/utilities/browser';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
-import mutator from '../mutator';
+import { TextInput } from '../../../components/properties/TextInput';
+import type { Mutator } from '../mutator';
+import defaultMutator from '../mutator';
 import { OctoUtils } from '../octoUtils';
-import Switch from '../widgets/switch';
-import { TextInput } from '../widgets/TextInput';
+import Checkbox from '../widgets/checkbox';
 
 import CreatedAt from './properties/createdAt/createdAt';
 import CreatedBy from './properties/createdBy/createdBy';
@@ -20,12 +48,12 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
-import UserProperty from './properties/user/user';
 
 type Props = {
   board: Board;
   readOnly: boolean;
   card: Card;
+  syncWithPageId?: string | null;
   updatedBy: string;
   updatedAt: string;
   propertyTemplate: IPropertyTemplate;
@@ -33,24 +61,63 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   showTooltip?: boolean;
   wrapColumn?: boolean;
+  columnRef?: React.RefObject<HTMLDivElement>;
+  mutator?: Mutator;
 };
+
+/**
+ * Hide these values if user is not an evalutor for the proposal
+ */
+const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
+  'proposalEvaluationAverage',
+  'proposalEvaluatedBy',
+  'proposalEvaluationTotal'
+];
 
 function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
-  const { card, propertyTemplate, readOnly, showEmptyPlaceholder, board, updatedBy, updatedAt, displayType } = props;
+  const {
+    card,
+    syncWithPageId,
+    propertyTemplate,
+    readOnly,
+    showEmptyPlaceholder,
+    board,
+    updatedBy,
+    updatedAt,
+    displayType,
+    mutator = defaultMutator
+  } = props;
+
+  const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
+    useProposalsWhereUserIsEvaluator({
+      spaceId:
+        !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
+          ? board.spaceId
+          : undefined
+    });
+
+  const isAdmin = useIsAdmin();
+
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
-  const displayValue = OctoUtils.propertyDisplayValue(card, propertyValue, propertyTemplate, {
-    date: formatDate,
-    dateTime: formatDateTime
+  const displayValue = OctoUtils.propertyDisplayValue({
+    block: card,
+    propertyValue,
+    propertyTemplate,
+    formatters: {
+      date: formatDate,
+      dateTime: formatDateTime
+    }
   });
+
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
-
-  const finalDisplayValue = displayValue || emptyDisplayValue;
+  const router = useRouter();
+  const domain = router.query.domain as string;
 
   const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
@@ -91,12 +158,39 @@ function PropertyValueElement(props: Props) {
   };
 
   let propertyValueElement: ReactNode = null;
-  if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
+
+  if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
+    if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
+      return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
+    }
+    return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+  } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === STATUS_BLOCK_ID) {
+    // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
+    // We should migrate over the proposals as datasource blocks to the same format as proposals table
+    return (
+      <ProposalStatusChipTextOnly
+        status={
+          (stringUtils.isUUID(propertyValue as string)
+            ? propertyTemplate.options.find((opt) => opt.id === propertyValue)?.value
+            : propertyValue) as ProposalStatus
+        }
+      />
+    );
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+    return <UserAndRoleSelect readOnly={readOnly} onChange={() => null} value={propertyValue as any} />;
+  } else if (
+    propertyTemplate.type === 'select' ||
+    propertyTemplate.type === 'multiSelect' ||
+    propertyTemplate.type === 'proposalCategory' ||
+    propertyTemplate.type === 'proposalEvaluationType'
+  ) {
     propertyValueElement = (
-      <SelectProperty
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
+      <TagSelect
+        data-test='closed-select-input'
+        canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
-        readOnly={readOnly || !board}
+        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
         options={propertyTemplate.options}
         onChange={(newValue) => {
@@ -114,17 +208,49 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-  } else if (propertyTemplate.type === 'person') {
+  } else if (
+    propertyTemplate.type === 'person' ||
+    propertyTemplate.type === 'proposalEvaluatedBy' ||
+    propertyTemplate.type === 'proposalAuthor' ||
+    propertyTemplate.type === 'proposalReviewer' ||
+    propertyTemplate.id === ASSIGNEES_BLOCK_ID
+  ) {
     propertyValueElement = (
-      <UserProperty
+      <UserSelect
         displayType={displayType}
-        memberIds={typeof propertyValue === 'string' ? [propertyValue] : propertyValue ?? []}
-        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
+        readOnly={
+          readOnly ||
+          (displayType !== 'details' && displayType !== 'table') ||
+          proposalPropertyTypesList.includes(propertyTemplate.type as any)
+        }
         onChange={(newValue) => {
           mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          const previousValue = propertyValue
+            ? typeof propertyValue === 'string'
+              ? [propertyValue]
+              : (propertyValue as string[])
+            : [];
+          const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+          Promise.all(
+            newUserIds.map((userId) =>
+              charmClient.createEvent({
+                spaceId: board.spaceId,
+                payload: {
+                  cardId: card.id,
+                  cardProperty: {
+                    id: propertyTemplate.id,
+                    name: propertyTemplate.name,
+                    value: userId
+                  },
+                  scope: WebhookEventNames.CardPersonPropertyAssigned
+                }
+              })
+            )
+          );
         }}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn ?? false}
-        showEmptyPlaceholder={displayType === 'details'}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        showEmptyPlaceholder={showEmptyPlaceholder}
       />
     );
   } else if (propertyTemplate.type === 'date') {
@@ -133,6 +259,7 @@ function PropertyValueElement(props: Props) {
     } else {
       propertyValueElement = (
         <DateRange
+          wrapColumn={props.wrapColumn}
           className='octo-propertyvalue'
           value={value.toString()}
           showEmptyPlaceholder={showEmptyPlaceholder}
@@ -144,7 +271,9 @@ function PropertyValueElement(props: Props) {
     }
   } else if (propertyTemplate.type === 'checkbox') {
     propertyValueElement = (
-      <Switch
+      <Checkbox
+        displayType={displayType}
+        label={propertyTemplate.name}
         isOn={propertyValue === 'true'}
         onChanged={(newBool) => {
           const newValue = newBool ? 'true' : '';
@@ -165,38 +294,66 @@ function PropertyValueElement(props: Props) {
     );
   }
 
-  if (editableFields.includes(propertyTemplate.type)) {
-    const commonProps = {
-      className: 'octo-propertyvalue',
-      placeholderText: emptyDisplayValue,
-      readOnly,
-      value: value.toString(),
-      autoExpand: true,
-      onChange: setValue,
-      multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
-      onSave: () => {
-        mutator.changePropertyValue(card, propertyTemplate.id, value);
-      },
-      onCancel: () => setValue(propertyValue || ''),
-      validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
-      spellCheck: propertyTemplate.type === 'text'
-    };
+  const commonProps = {
+    className: 'octo-propertyvalue',
+    placeholderText: emptyDisplayValue,
+    readOnly: props.readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any),
+    value: value.toString(),
+    autoExpand: true,
+    onChange: setValue,
+    displayType,
+    multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
+    onSave: () => {
+      mutator.changePropertyValue(card, propertyTemplate.id, value);
+    },
+    onCancel: () => setValue(propertyValue || ''),
+    validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+    spellCheck: propertyTemplate.type === 'text',
+    wrapColumn: props.wrapColumn ?? false,
+    columnRef: props.columnRef
+  };
 
+  if (editableFields.includes(propertyTemplate.type)) {
     if (propertyTemplate.type === 'url') {
       propertyValueElement = <URLProperty {...commonProps} />;
     } else {
-      propertyValueElement = <TextInput {...commonProps} />;
+      propertyValueElement = (
+        <TextInput {...commonProps} readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID} />
+      );
     }
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
+    const proposalUrl = getAbsolutePath(`/${propertyValue as string}`, domain);
+    propertyValueElement = (
+      <div data-test='property-proposal-url'>
+        <URLProperty {...commonProps} value={proposalUrl} validator={() => true} />
+      </div>
+    );
   } else if (propertyValueElement === null) {
-    propertyValueElement = <div className='octo-propertyvalue'>{finalDisplayValue}</div>;
+    propertyValueElement = (
+      <div className='octo-propertyvalue'>
+        {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
+      </div>
+    );
   }
 
-  const hasValue = !!value && (typeof value === 'string' || Array.isArray(value) ? value.length !== 0 : value);
-
+  const hasCardValue = ['createdBy', 'updatedBy', 'createdTime', 'updatedTime'].includes(propertyTemplate.type);
+  const hasArrayValue = Array.isArray(value) && value.length > 0;
+  const hasStringValue = !Array.isArray(value) && !!value;
+  const hasValue = hasCardValue || hasArrayValue || hasStringValue;
   if (!hasValue && props.readOnly && displayType !== 'details') {
     return null;
   }
 
+  // Explicitly hide the value for this proposal
+  if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
+    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId] && !isAdmin) {
+      return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
+    } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
+      return propertyValueElement;
+    } else {
+      return null;
+    }
+  }
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>
@@ -204,8 +361,7 @@ function PropertyValueElement(props: Props) {
       </Tooltip>
     );
   }
-
   return propertyValueElement;
 }
 
-export default PropertyValueElement;
+export default memo(PropertyValueElement);

@@ -1,3 +1,5 @@
-import CharmEditor from './CharmEditor';
+import dynamic from 'next/dynamic';
 
-export default CharmEditor;
+export const CharmEditor = dynamic(() => import('./CharmEditor'), {
+  ssr: false
+});

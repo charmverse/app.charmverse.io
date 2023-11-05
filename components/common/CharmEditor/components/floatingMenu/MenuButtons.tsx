@@ -1,6 +1,5 @@
 import { blockquote, bold, code, history, italic, link, strike, underline } from '@bangle.dev/base-components';
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
-import { useEditorViewContext } from '@bangle.dev/react';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubbleOutline';
@@ -8,9 +7,11 @@ import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import { Box } from '@mui/material';
 import React, { useCallback } from 'react';
 
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+
 import * as heading from '../heading';
 import { createInlineComment } from '../inlineComment';
-import paragraph from '../paragraph';
+import { defaultKeys as paragraphKeys, queryIsTopLevelParagraph, convertToParagraph } from '../paragraph/paragraph';
 import { getCSSColor, queryActiveColor } from '../textColor/textColorUtils';
 
 import type { SubMenu } from './floating-menu';
@@ -37,7 +38,6 @@ const { defaultKeys: boldKeys, queryIsBoldActive, toggleBold } = bold;
 const { defaultKeys: codeKeys, queryIsCodeActive, toggleCode } = code;
 const { defaultKeys: underlineKeys, queryIsUnderlineActive, toggleUnderline } = underline;
 const { defaultKeys: strikeKeys, queryIsStrikeActive, toggleStrike } = strike;
-const { defaultKeys: paragraphKeys, queryIsTopLevelParagraph, convertToParagraph } = paragraph;
 const { defaultKeys: headingKeys, queryIsHeadingActive, toggleHeading } = heading;
 
 const { createLink, queryIsLinkActive } = link;
@@ -265,7 +265,7 @@ export function UndoButton({ hints = ['Undo', historyKeys.undo], children = <Und
 
 export function CodeButton({
   hints = ['Code', codeKeys.toggleCode],
-  children = <CodeIcon fontSize={16} />
+  children = <CodeIcon fontSize={{ xs: 20, md: 16 }} />
 }: ButtonProps) {
   const view = useEditorViewContext();
   const onSelect = useCallback(

@@ -1,20 +1,19 @@
 // playwright-dev-page.ts
-import type { Locator, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 
+import { GlobalPage } from './global.po';
 // capture actions on the pages in signup flow
-export class BountyBoardPage {
-  readonly page: Page;
-
-  readonly createBountyButton: Locator;
-
-  readonly pageDialog: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.createBountyButton = page.locator('data-test=create-suggest-bounty');
-    this.pageDialog = page.locator('data-test=dialog');
+export class BountyBoardPage extends GlobalPage {
+  constructor(
+    public page: Page,
+    public createBountyButton = page.locator('data-test=create-suggest-bounty'),
+    public publicLayout = page.locator('data-test=public-page-layout'),
+    public loggedInLayout = page.locator('data-test=space-page-layout'),
+    public allBountiesLayout = page.locator('data-test=all-bounties-layout')
+  ) {
+    super(page);
   }
 
   async goToBountyBoard(domain: string) {
@@ -23,6 +22,10 @@ export class BountyBoardPage {
 
   async goToBountyBoardWithCard(domain: string, cardId: string) {
     await this.page.goto(`${baseUrl}/${domain}/bounties?bountyId=${cardId}`);
+  }
+
+  async goToView(type: 'all' | 'open') {
+    await this.page.locator(`data-test=bounties-view-${type}`).click();
   }
 
   getBountyCardLocator(bountyId: string) {

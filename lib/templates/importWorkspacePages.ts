@@ -1,17 +1,18 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { prisma } from '@charmverse/core';
 import { log } from '@charmverse/core/log';
-import type { Prisma, Page } from '@charmverse/core/prisma';
-import { v4, validate } from 'uuid';
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Page } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid, validate } from 'uuid';
 
-import type { BountyWithDetails } from 'lib/bounties';
-import type { PageMeta } from 'lib/pages';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPagePath } from 'lib/pages/utils';
+import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
+import type { Reward } from 'lib/rewards/interfaces';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 
@@ -25,6 +26,7 @@ type WorkspaceImportOptions = {
   parentId?: string | null;
   updateTitle?: boolean;
   includePermissions?: boolean;
+  resetPaths?: boolean;
 };
 
 type UpdateRefs = {
@@ -54,23 +56,35 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
       if (node.type === 'poll') {
         const attrs = node.attrs as { pollId: string };
         if (attrs.pollId) {
-          const newPollId = v4();
+          const newPollId = uuid();
           extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id, originalId: attrs.pollId });
           attrs.pollId = newPollId;
         }
-      } else if (node.type === 'page') {
+      } else if (node.type === 'page' || node.type === 'linkedPage') {
         const attrs = node.attrs as { id: string };
         const oldPageId = attrs.id;
         let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
 
         if (oldPageId && !newPageId) {
-          newPageId = v4();
+          newPageId = uuid();
           oldNewPageIdHashMap[oldPageId] = newPageId;
           oldNewPageIdHashMap[newPageId] = oldPageId;
         }
-
         if (oldPageId && newPageId) {
           attrs.id = newPageId;
+        }
+      } else if (node.type === 'mention' && node.attrs?.type === 'page') {
+        const attrs = node.attrs as { value: string };
+        const oldPageId = attrs.value;
+        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+
+        if (oldPageId && !newPageId) {
+          newPageId = uuid();
+          oldNewPageIdHashMap[oldPageId] = newPageId;
+          oldNewPageIdHashMap[newPageId] = oldPageId;
+        }
+        if (oldPageId && newPageId) {
+          attrs.value = newPageId;
         }
       } else if (node.type === 'inlineDatabase') {
         const attrs = node.attrs as { pageId: string };
@@ -78,7 +92,7 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
         let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
 
         if (oldPageId && !newPageId) {
-          newPageId = v4();
+          newPageId = uuid();
           oldNewPageIdHashMap[oldPageId] = newPageId;
           oldNewPageIdHashMap[newPageId] = oldPageId;
         }
@@ -106,7 +120,7 @@ type WorkspaceImportResult = {
   totalBlocks: number;
   totalPages: number;
   rootPageIds: string[];
-  bounties: BountyWithDetails[];
+  bounties: Reward[];
   blockIds: string[];
 };
 
@@ -116,7 +130,8 @@ export async function generateImportWorkspacePages({
   exportName,
   parentId: rootParentId,
   updateTitle,
-  includePermissions
+  includePermissions,
+  resetPaths
 }: WorkspaceImportOptions): Promise<{
   pageArgs: Prisma.PageCreateArgs[];
   blockArgs: Prisma.BlockCreateManyArgs;
@@ -176,7 +191,7 @@ export async function generateImportWorkspacePages({
     const existingNewPageId =
       node.type === 'page' || isBoardPageType(node.type) ? oldNewPageIdHashMap[node.id] : undefined;
 
-    const newId = rootPageId ?? existingNewPageId ?? v4();
+    const newId = rootPageId ?? existingNewPageId ?? uuid();
 
     oldNewPageIdHashMap[newId] = node.id;
     oldNewPageIdHashMap[node.id] = newId;
@@ -205,14 +220,14 @@ export async function generateImportWorkspacePages({
 
     const currentParentId = newParentId ?? rootParentId ?? undefined;
 
-    const newPermissionId = v4();
+    const newPermissionId = uuid();
 
     // Reassigned when creating the root permission
     rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
 
     const pagePermissions = includePermissions
       ? node.permissions.map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
-          const newPagePermissionId = v4();
+          const newPagePermissionId = uuid();
 
           oldNewPermissionMap[permission.id] = newPagePermissionId;
 
@@ -292,6 +307,18 @@ export async function generateImportWorkspacePages({
       }
     };
 
+    if (resetPaths) {
+      const newPath = generatePagePathFromPathAndTitle({
+        existingPagePath: newPageContent.data.path,
+        title: newPageContent.data.title as string
+      });
+
+      newPageContent.data.path = newPath;
+    }
+
+    // Always reset additional paths
+    newPageContent.data.additionalPaths = [];
+
     if (node.type.match('card')) {
       const cardBlock = node.blocks?.card;
 
@@ -314,15 +341,16 @@ export async function generateImportWorkspacePages({
       }
     } else if (isBoardPageType(node.type)) {
       const boardBlock = node.blocks?.board;
-      const viewBlocks = node.blocks?.views ?? [];
+      const viewBlocks = (node.blocks?.views ?? []).map((view) => ({ ...view, id: uuid() }));
+      if (boardBlock && boardBlock.fields) {
+        (boardBlock.fields as any).viewIds = viewBlocks.map((viewBlock) => viewBlock.id);
+      }
 
       // We don't want to create empty databases, but we do want to allow inline databases to be empty so they can be initialised
       if (boardBlock && ((!node.type.match('inline') && viewBlocks.length > 0) || node.type.match('inline'))) {
         [boardBlock, ...viewBlocks].forEach((block) => {
           if (block.type === 'board') {
             block.id = newId;
-          } else {
-            block.id = v4();
           }
 
           block.rootId = newId;
@@ -351,6 +379,7 @@ export async function generateImportWorkspacePages({
       const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
       bountyArgs.push({
         ...bounty,
+        fields: (bounty.fields as any) || undefined,
         spaceId: space.id,
         createdBy: space.createdBy,
         id: oldNewPageIdHashMap[node.id]
@@ -358,7 +387,7 @@ export async function generateImportWorkspacePages({
       permissions.forEach(({ id, ...bountyPermission }) => {
         bountyPermissionArgs.push({
           ...bountyPermission,
-          spaceId: space.id,
+          spaceId: bountyPermission.spaceId ? space.id : null,
           bountyId: oldNewPageIdHashMap[node.id]
         });
       });
@@ -371,7 +400,7 @@ export async function generateImportWorkspacePages({
           space.proposalCategories.find((cat) => cat.title === category.title)?.id ||
           proposalCategoryArgs.find((proposalCategoryArg) => proposalCategoryArg.title === category.title)?.id;
         if (!categoryId) {
-          categoryId = v4();
+          categoryId = uuid();
           proposalCategoryArgs.push({
             id: categoryId,
             title: category.title,
@@ -392,7 +421,8 @@ export async function generateImportWorkspacePages({
         spaceId: space.id,
         createdBy: space.createdBy,
         status: 'draft',
-        id: oldNewPageIdHashMap[node.id]
+        id: oldNewPageIdHashMap[node.id],
+        fields: proposal.fields || {}
       });
       pageArgs.push(newPageContent);
     }
@@ -412,7 +442,9 @@ export async function generateImportWorkspacePages({
             ...vote,
             createdBy: space.createdBy,
             pageId: oldNewPageIdHashMap[pageVote.pageId],
-            id: extractedPoll.newPollId as string
+            id: extractedPoll.newPollId as string,
+            content: vote.content ?? Prisma.DbNull,
+            contentText: vote.contentText
           });
 
           voteOptions.forEach((voteOption) => {
@@ -465,7 +497,8 @@ export async function importWorkspacePages({
   exportName,
   parentId,
   updateTitle,
-  includePermissions
+  includePermissions,
+  resetPaths
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const {
     pageArgs,
@@ -483,7 +516,8 @@ export async function importWorkspacePages({
     exportName,
     parentId,
     updateTitle,
-    includePermissions
+    includePermissions,
+    resetPaths
   });
 
   const pagesToCreate = pageArgs.length;

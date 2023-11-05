@@ -1,24 +1,27 @@
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
+import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
+import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
-import { ListItemButton } from '@mui/material';
+import type { ListItemButtonProps } from '@mui/material';
+import { ClickAwayListener, ListItemButton, Menu, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
-import { memo } from 'react';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import { memo, useCallback, useState } from 'react';
 
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
-import Menu from 'components/common/BoardEditor/focalboard/src/widgets/menu';
-import MenuWrapper from 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper';
+import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import { randomBannerImage } from './PageBanner';
 import { PageTitleInput } from './PageTitleInput';
 
-const PageControlItem = styled(ListItemButton)`
+export const PageControlItem = styled(ListItemButton)`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   opacity: 0.5;
   display: flex;
@@ -32,10 +35,15 @@ const Controls = styled(Box)`
   gap: ${({ theme }) => theme.spacing(0.5)};
 `;
 
-const EditorHeader = styled.div`
-  position: absolute;
-  top: 0;
-  height: 0;
+const EditorHeader = styled.div<{ pageType: 'page' | 'board' }>`
+  ${({ pageType }) =>
+    pageType === 'page'
+      ? `
+    position: absolute;
+    top: 0;
+    height: 0;
+  `
+      : ''}
   display: flex;
   align-items: flex-start;
   flex-direction: column;
@@ -54,25 +62,29 @@ const EditorHeader = styled.div`
   }
 `;
 
-interface PageHeaderProps {
+export type PageHeaderValues = Partial<Pick<Page, 'title' | 'icon' | 'headerImage' | 'updatedAt'>>;
+
+type PageHeaderProps = {
   headerImage: string | null;
   icon: string | null;
   readOnly: boolean;
   title: string;
-  setPage: (p: Partial<Page>) => void;
+  setPage: (p: PageHeaderValues) => void;
   updatedAt: string;
-}
+  readOnlyTitle?: boolean;
+  placeholder?: string;
+};
 
-function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: PageHeaderProps) {
-  function addPageIcon() {
-    const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
-    setPage({ icon: _icon });
-  }
-
-  function updatePageIcon(_icon: string | null) {
-    setPage({ icon: _icon });
-  }
-
+function PageHeader({
+  headerImage,
+  icon,
+  readOnly,
+  setPage,
+  title,
+  updatedAt,
+  readOnlyTitle,
+  placeholder
+}: PageHeaderProps) {
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
@@ -83,62 +95,209 @@ function PageHeader({ headerImage, icon, readOnly, setPage, title, updatedAt }: 
 
   return (
     <>
-      <EditorHeader className='font-family-default'>
-        {icon && (
-          <MenuWrapper>
-            <EmojiIcon size='large' icon={icon} />
-            {
-              // Menu wrapper requires 2 children to show, so we provide an empty div in readonly case
-              readOnly ? (
-                <div></div>
-              ) : (
-                <Menu>
-                  <Menu.Text
-                    id='random'
-                    icon={<EmojiEmotionsOutlinedIcon />}
-                    name='Random'
-                    onClick={() => {
-                      updatePageIcon(BlockIcons.shared.randomIcon());
-                    }}
-                  />
-                  <Menu.SubMenu id='pick' icon={<EmojiEmotionsOutlinedIcon />} name='Pick icon'>
-                    <EmojiPicker
-                      onSelect={(emoji) => {
-                        updatePageIcon(emoji);
-                      }}
-                    />
-                  </Menu.SubMenu>
-                  <Menu.Text
-                    id='remove'
-                    icon={<DeleteOutlineOutlinedIcon />}
-                    name='Remove icon'
-                    onClick={() => {
-                      updatePageIcon(null);
-                    }}
-                  />
-                </Menu>
-              )
-            }
-          </MenuWrapper>
-        )}
-        <Controls className='page-controls'>
-          {!readOnly && !icon && (
-            <PageControlItem onClick={addPageIcon}>
-              <EmojiEmotionsOutlinedIcon fontSize='small' sx={{ marginRight: 1 }} />
-              Add icon
-            </PageControlItem>
-          )}
-          {!readOnly && !headerImage && (
-            <PageControlItem onClick={addPageHeader}>
-              <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
-              Add cover
-            </PageControlItem>
-          )}
-        </Controls>
-      </EditorHeader>
-      <PageTitleInput readOnly={readOnly} value={title} onChange={updateTitle} updatedAt={updatedAt} />
+      <PageHeaderControls
+        addPageHeader={addPageHeader}
+        headerImage={headerImage}
+        icon={icon}
+        readOnly={readOnly}
+        setPage={setPage}
+      />
+      <PageTitleInput
+        readOnly={readOnly || readOnlyTitle}
+        value={title}
+        onChange={updateTitle}
+        updatedAt={updatedAt}
+        placeholder={placeholder}
+      />
     </>
   );
+}
+
+function PageControls({
+  headerImage,
+  setPage,
+  icon,
+  readOnly,
+  addPageHeader,
+  endAdornmentComponent
+}: {
+  endAdornmentComponent?: React.ReactNode;
+  headerImage: string | null;
+  setPage: (p: PageHeaderValues) => void;
+  icon?: string | null;
+  readOnly: boolean;
+  addPageHeader: ListItemButtonProps['onClick'];
+}) {
+  function addPageIcon() {
+    const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
+    setPage({ icon: _icon });
+  }
+  return (
+    <Controls className='page-controls'>
+      {!readOnly && !icon && (
+        <PageControlItem onClick={addPageIcon}>
+          <EmojiEmotionsOutlinedIcon fontSize='small' sx={{ marginRight: 1 }} />
+          Add icon
+        </PageControlItem>
+      )}
+      {!readOnly && !headerImage && (
+        <PageControlItem onClick={addPageHeader}>
+          <ImageIcon fontSize='small' sx={{ marginRight: 1 }} />
+          Add cover
+        </PageControlItem>
+      )}
+      {endAdornmentComponent}
+    </Controls>
+  );
+}
+
+export function PageHeaderControls({
+  headerImage,
+  setPage,
+  icon,
+  readOnly,
+  addPageHeader,
+  endAdornmentComponent,
+  controlsPosition = 'bottom',
+  pageType = 'page'
+}: {
+  controlsPosition?: 'top' | 'bottom';
+  endAdornmentComponent?: React.ReactNode;
+  headerImage: string | null;
+  setPage: (p: PageHeaderValues) => void;
+  icon?: string | null;
+  readOnly: boolean;
+  addPageHeader: ListItemButtonProps['onClick'];
+  pageType?: 'page' | 'board';
+}) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [subMenuAnchorEl, setSubMenuAnchorEl] = useState<null | HTMLElement>(null);
+
+  const showMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
+
+  function closeMenu() {
+    setAnchorEl(null);
+  }
+
+  return (
+    <EditorHeader className='font-family-default' pageType={pageType}>
+      {controlsPosition === 'top' ? (
+        <PageControls
+          addPageHeader={addPageHeader}
+          headerImage={headerImage}
+          readOnly={readOnly}
+          setPage={setPage}
+          endAdornmentComponent={endAdornmentComponent}
+          icon={icon}
+        />
+      ) : null}
+      {icon && (
+        <div>
+          <EmojiIcon size='large' icon={icon} onClick={showMenu} />
+
+          {readOnly ? (
+            <div />
+          ) : (
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={closeMenu}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              <ListItemButton
+                dense
+                disabled={readOnly}
+                onClick={() => {
+                  setPage({ icon: BlockIcons.shared.randomIcon() });
+                  closeMenu();
+                }}
+              >
+                <ListItemIcon>
+                  <CasinoOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText>Random</ListItemText>
+              </ListItemButton>
+
+              <ListItemButton
+                dense
+                disabled={readOnly}
+                onClick={(e) => {
+                  setSubMenuAnchorEl(e.currentTarget);
+                }}
+              >
+                <ListItemIcon>
+                  <EmojiEmotionsOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText>Pick icon</ListItemText>
+                <ArrowDropDownOutlinedIcon sx={{ ml: 3 }} />
+              </ListItemButton>
+
+              <ListItemButton
+                dense
+                disabled={readOnly}
+                onClick={() => {
+                  setPage({ icon: null });
+                  closeMenu();
+                }}
+              >
+                <ListItemIcon>
+                  <DeleteOutlineOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText>Remove icon</ListItemText>
+              </ListItemButton>
+            </Menu>
+          )}
+        </div>
+      )}
+      {controlsPosition === 'bottom' ? (
+        <PageControls
+          addPageHeader={addPageHeader}
+          headerImage={headerImage}
+          readOnly={readOnly}
+          setPage={setPage}
+          endAdornmentComponent={endAdornmentComponent}
+          icon={icon}
+        />
+      ) : null}
+      {subMenuAnchorEl && (
+        <Menu
+          anchorEl={subMenuAnchorEl}
+          open={Boolean(subMenuAnchorEl)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          onClick={() => {
+            setSubMenuAnchorEl(null);
+          }}
+        >
+          <CustomEmojiPicker
+            onUpdate={(emoji) => {
+              setSubMenuAnchorEl(null);
+              closeMenu();
+              setPage({ icon: emoji });
+            }}
+          />
+        </Menu>
+      )}
+    </EditorHeader>
+  );
+}
+
+export function getPageTop({ headerImage, icon }: Partial<Pick<Page, 'headerImage' | 'icon'>>) {
+  let pageTop = 100;
+  if (headerImage) {
+    pageTop = 50;
+    if (icon) {
+      pageTop = 80;
+    }
+  } else if (icon) {
+    pageTop = 200;
+  }
+  return pageTop;
 }
 
 export default memo(PageHeader);

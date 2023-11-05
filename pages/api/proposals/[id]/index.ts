@@ -1,23 +1,26 @@
-import { prisma } from '@charmverse/core';
+import { InsecureOperationError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
-import { computeProposalPermissions } from 'lib/permissions/proposals/computeProposalPermissions';
-import { getProposal } from 'lib/proposal/getProposal';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { updateProposal } from 'lib/proposal/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.put(updateProposalController).get(getProposalController);
+handler
+  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
+  .put(updateProposalController)
+  .get(getProposalController);
 
-async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
+async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user?.id;
 
@@ -26,34 +29,55 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
+      draftRubricAnswers: true,
+      rubricAnswers: true,
+      rubricCriteria: true,
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      page: { select: { sourceTemplateId: true } }
     }
   });
 
   if (!proposal) {
     throw new NotFoundError();
   }
-
-  const computed = await computeUserPagePermissions({
+  const computed = await req.basePermissionsClient.pages.computePagePermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
   });
-
   if (computed.read !== true) {
     throw new NotFoundError();
   }
 
-  return res.status(200).json(proposal);
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId: proposal.spaceId,
+    userId
+  });
+
+  const reviewerIds =
+    !spaceRole || spaceRole.isAdmin
+      ? []
+      : await getAllReviewerUserIds({
+          proposalId: proposal.id
+        });
+
+  const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
+
+  if (!canSeeAnswers) {
+    proposal.draftRubricAnswers = [];
+    proposal.rubricAnswers = [];
+  }
+
+  return res.status(200).json(proposal as ProposalWithUsersAndRubric);
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { authors, reviewers, categoryId } = req.body;
+  const { publishToLens, authors, reviewers, categoryId, evaluationType, fields } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -62,6 +86,8 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     include: {
       authors: true,
       reviewers: true,
+      rubricAnswers: true,
+      rubricCriteria: true,
       page: {
         select: {
           type: true
@@ -89,7 +115,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new AdministratorOnlyError();
   }
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
-  const proposalPermissions = await computeProposalPermissions({
+  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });
@@ -98,11 +124,57 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  await updateProposal({ proposalId: proposal.id, authors, reviewers, categoryId });
+  // We want to filter out only new reviewers so that we don't affect existing proposals
+  if (proposal.page?.type === 'proposal' && (reviewers?.length || 0) > 0) {
+    const newReviewers = (reviewers ?? []).filter(
+      (updatedReviewer) =>
+        !proposal.reviewers.some((proposalReviewer) => {
+          return updatedReviewer.group === 'role'
+            ? proposalReviewer.roleId === updatedReviewer.id
+            : proposalReviewer.userId === updatedReviewer.id;
+        })
+    );
+    if (newReviewers.length > 0) {
+      const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
+        resourceId: proposal.categoryId as string
+      });
+      for (const reviewer of newReviewers) {
+        if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
+          const role = await prisma.role.findUnique({
+            where: {
+              id: reviewer.id
+            },
+            select: {
+              name: true
+            }
+          });
+          throw new InsecureOperationError(`${role?.name} role cannot be added as a reviewer to this proposal`);
+        } else if (reviewer.group === 'user' && !reviewerPool.userIds.includes(reviewer.id)) {
+          const user = await prisma.user.findUnique({
+            where: {
+              id: reviewer.id
+            },
+            select: {
+              username: true
+            }
+          });
+          throw new InsecureOperationError(`User ${user?.username} cannot be added as a reviewer to this proposal`);
+        }
+      }
+    }
+  }
 
-  const updatedProposal = await getProposal({ proposalId: proposal.id });
+  await updateProposal({
+    proposalId: proposal.id,
+    authors,
+    reviewers,
+    categoryId,
+    evaluationType,
+    publishToLens,
+    fields
+  });
 
-  return res.status(200).send(updatedProposal);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

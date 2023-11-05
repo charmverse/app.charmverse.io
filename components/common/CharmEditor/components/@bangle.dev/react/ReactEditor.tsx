@@ -1,26 +1,30 @@
 import { history } from '@bangle.dev/base-components';
-import type { BangleEditorProps as CoreBangleEditorProps } from '@bangle.dev/core';
-import { BangleEditor as CoreBangleEditor } from '@bangle.dev/core';
 import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
-import { EditorViewContext } from '@bangle.dev/react';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
-import type { RefObject } from 'react';
+import type { EditorView } from 'prosemirror-view';
+import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import reactDOM from 'react-dom';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import type { BangleEditorProps as CoreBangleEditorProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
+import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
@@ -33,6 +37,11 @@ const StyledLoadingComponent = styled(LoadingComponent)`
   width: 100%;
   align-items: flex-end;
 `;
+
+export const EditorViewContext = React.createContext<EditorView>(
+  /* we have to provide a default value to createContext */
+  null as unknown as EditorView
+);
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;
@@ -48,6 +57,8 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   isContentControlled?: boolean;
   initialContent?: any;
   enableComments?: boolean;
+  onConnectionEvent?: (event: ConnectionEvent) => void;
+  allowClickingFooter?: boolean;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -69,7 +80,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     trackChanges = false,
     onParticipantUpdate = () => {},
     readOnly = false,
-    enableComments = true
+    enableComments = true,
+    onConnectionEvent,
+    allowClickingFooter
   },
   ref
 ) {
@@ -78,7 +91,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
-  const [isLoading, setIsLoading] = useState(enableFidusEditor);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
 
@@ -99,7 +111,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const [showLoader, setShowLoader] = useState(false);
   const nodeViews = useNodeViews(renderRef);
   const { showMessage } = useSnackbar();
-
   if (enableSuggestions && !trackChanges) {
     log.error('CharmEditor: Suggestions require trackChanges to be enabled');
   }
@@ -115,13 +126,30 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
-  function onError(_editor: CoreBangleEditor, error: Error) {
-    showMessage(error.message, 'warning');
-    log.error('[ws/ceditor]: Error message displayed to user', { error });
-    if (isLoading) {
-      setIsLoading(false);
-      isLoadingRef.current = false;
-      setEditorContent(_editor, initialContent);
+  function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
+    if (onConnectionEvent) {
+      onConnectionEvent(event);
+    } else if (event.type === 'error') {
+      // for now, just use a standard error message to be over-cautious
+      showMessage(event.error.message, 'warning');
+    }
+    if (event.type === 'error') {
+      log.error('[ws/ceditor]: Error message displayed to user', {
+        pageId,
+        error: event.error
+      });
+      if (isLoadingRef.current) {
+        isLoadingRef.current = false;
+        setEditorContent(_editor, initialContent);
+      }
+    }
+  }
+
+  function onClickEditorBottom(event: MouseEvent) {
+    if (editor && !readOnly) {
+      event.preventDefault();
+      // insert new line
+      insertAndFocusLineAtEndofDoc(editor.view);
     }
   }
 
@@ -166,7 +194,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
 
     if (isContentControlled) {
-      setIsLoading(false);
+      isLoadingRef.current = false;
     } else if (useSockets) {
       if (authResponse) {
         log.info('Init FidusEditor');
@@ -175,20 +203,20 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           docId: pageId,
           enableSuggestionMode: enableSuggestions,
           onDocLoaded: () => {
-            setIsLoading(false);
             isLoadingRef.current = false;
+          },
+          onCommentUpdate: () => {
+            mutate(getThreadsKey(pageId));
           },
           onParticipantUpdate
         });
-        fEditor.init(_editor.view, authResponse.authToken, (error) => onError(_editor, error));
+        fEditor.init(_editor.view, authResponse.authToken, (event) => _onConnectionEvent(_editor, event));
       } else if (authError) {
         log.warn('Loading readonly mode of editor due to web socket failure', { error: authError });
-        setIsLoading(false);
         isLoadingRef.current = false;
         setEditorContent(_editor, initialContent);
       }
     } else if (pageId && readOnly) {
-      setIsLoading(false);
       isLoadingRef.current = false;
       setEditorContent(_editor, initialContent);
     }
@@ -208,18 +236,23 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
   }
+
   return (
     <EditorViewContext.Provider value={editor?.view as any}>
       {editor ? children : null}
       <div
         ref={editorRef}
-        className='bangle-editor-core'
+        className={`bangle-editor-core ${readOnly ? 'readonly' : ''}`}
         data-page-id={pageId}
-        style={{ minHeight: showLoader && isLoading ? '200px' : undefined, cursor: readOnly ? 'default' : 'text' }}
-        onClick={() => !readOnly && editor?.view.focus()}
+        style={{
+          minHeight: showLoader && isLoadingRef.current ? '200px' : undefined
+        }}
       >
-        <StyledLoadingComponent isLoading={showLoader && isLoading} />
+        <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
         <div ref={renderRef} id={pageId} className={className} style={style} />
+        {allowClickingFooter && (
+          <div contentEditable='false' className='charm-empty-footer' onMouseDown={onClickEditorBottom} />
+        )}
       </div>
       {nodeViews.map((nodeView) => {
         return nodeView.containerDOM

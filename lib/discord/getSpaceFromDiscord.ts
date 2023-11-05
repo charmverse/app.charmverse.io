@@ -1,13 +1,5 @@
-import { prisma } from '@charmverse/core';
-
-import { InvalidInputError } from 'lib/utilities/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getSpacesFromDiscord(discordServerId: string) {
-  const spaces = await prisma.space.findMany({ where: { discordServerId } });
-
-  if (!spaces.length) {
-    throw new InvalidInputError('Space not found');
-  }
-
-  return spaces;
+  return prisma.space.findMany({ where: { discordServerId } });
 }

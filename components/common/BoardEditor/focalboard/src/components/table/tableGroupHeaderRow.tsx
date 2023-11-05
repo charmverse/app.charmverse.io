@@ -1,15 +1,18 @@
 /* eslint-disable max-lines */
 
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { IPropertyOption, Board, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 
 import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
@@ -31,6 +34,8 @@ type Props = {
   addCard: (groupByOptionId?: string) => Promise<void>;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
+  disableAddingCards?: boolean;
+  readOnlyTitle?: boolean;
 };
 
 const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
@@ -39,6 +44,14 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
 
   const [isDragging, isOver, groupHeaderRef] = useSortable('groupHeader', group.option, !props.readOnly, props.onDrop);
   const intl = useIntl();
+
+  const formattedGroupTitle =
+    groupByProperty?.type === 'proposalStatus'
+      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+      : groupTitle;
+
+  const preventPropertyDeletion =
+    props.groupByProperty && proposalPropertyTypesList.includes(props.groupByProperty.type as any);
 
   useEffect(() => {
     setGroupTitle(group.option.value);
@@ -68,22 +81,21 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
           onClick={() => (props.readOnly ? {} : props.hideGroup(group.option.id || 'undefined'))}
           className='hello-world'
         />
-
         {!group.option.id && (
           <Label
-            title={intl.formatMessage(
+            title={`${intl.formatMessage(
               {
                 id: 'BoardComponent.no-property-title',
                 defaultMessage: 'Items with an empty {property} property will go here. This column cannot be removed.'
               },
               { property: groupByProperty?.name }
-            )}
+            )}`}
           >
             <FormattedMessage
               id='BoardComponent.no-property'
               defaultMessage='No {property}'
               values={{
-                property: groupByProperty?.name
+                property: `${groupByProperty?.name}`
               }}
             />
           </Label>
@@ -91,7 +103,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
         {group.option.id && (
           <Label color={group.option.color}>
             <Editable
-              value={groupTitle}
+              value={formattedGroupTitle}
               placeholderText='New Select'
               onChange={setGroupTitle}
               onSave={() => {
@@ -103,7 +115,7 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               onCancel={() => {
                 setGroupTitle(group.option.value);
               }}
-              readOnly={props.readOnly || !group.option.id}
+              readOnly={props.readOnly || !group.option.id || props.readOnlyTitle}
               spellCheck={true}
             />
           </Label>
@@ -123,12 +135,15 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               />
               {group.option.id && (
                 <>
-                  <Menu.Text
-                    id='delete'
-                    icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
-                    name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
-                    onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
-                  />
+                  {!preventPropertyDeletion && (
+                    <Menu.Text
+                      id='delete'
+                      icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
+                      disabled={preventPropertyDeletion}
+                      name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
+                      onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
+                    />
+                  )}
                   <Menu.Separator />
                   {Object.entries(Constants.menuColors).map(([key, color]) => (
                     <Menu.Color
@@ -142,7 +157,9 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
               )}
             </Menu>
           </MenuWrapper>
-          <IconButton icon={<AddIcon fontSize='small' />} onClick={() => props.addCard(group.option.id)} />
+          {!props.disableAddingCards && (
+            <IconButton icon={<AddIcon fontSize='small' />} onClick={() => props.addCard(group.option.id)} />
+          )}
         </>
       )}
     </div>

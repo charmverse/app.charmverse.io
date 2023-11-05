@@ -1,27 +1,36 @@
 import '@testing-library/jest-dom';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { mockStateStore, wrapDNDIntl } from '../../testUtils';
-import { Utils } from '../../utils';
+import { mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../../testUtils';
 
 import KanbanCard from './kanbanCard';
 
 jest.mock('../../mutator');
 jest.mock('../../utils');
-// jest.mock('../../telemetry/telemetryClient')
-const mockedUtils = jest.mocked(Utils, true);
-const mockedMutator = jest.mocked(Mutator, true);
+const mockedMutator = jest.mocked(Mutator, { shallow: true });
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    pathname: '/[domain]/',
+    query: {
+      domain: 'test-space'
+    },
+    isReady: true
+  })
+}));
+
+const cardId = '86382f29-b73b-42c2-b3bd-b69d2143e7f3';
 
 describe('src/components/kanban/kanbanCard', () => {
   const board = TestBlockFactory.createBoard();
   const card = TestBlockFactory.createCard(board);
+  card.id = cardId;
   const propertyTemplate: IPropertyTemplate = {
     id: 'id',
     name: 'name',
@@ -53,19 +62,21 @@ describe('src/components/kanban/kanbanCard', () => {
   test('should match snapshot', () => {
     const { container } = render(
       wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <KanbanCard
-            card={card}
-            board={board}
-            visiblePropertyTemplates={[propertyTemplate]}
-            visibleBadges={false}
-            isSelected={false}
-            readOnly={false}
-            onDrop={jest.fn()}
-            showCard={jest.fn()}
-            isManualSort={false}
-          />
-        </ReduxProvider>
+        wrapPagesProvider(
+          card.id,
+          <ReduxProvider store={store}>
+            <KanbanCard
+              card={card}
+              board={board}
+              visiblePropertyTemplates={[propertyTemplate]}
+              isSelected={false}
+              readOnly={false}
+              onDrop={jest.fn()}
+              showCard={jest.fn()}
+              isManualSort={false}
+            />
+          </ReduxProvider>
+        )
       )
     );
     expect(container).toMatchSnapshot();
@@ -73,114 +84,55 @@ describe('src/components/kanban/kanbanCard', () => {
   test('should match snapshot with readonly', () => {
     const { container } = render(
       wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <KanbanCard
-            card={card}
-            board={board}
-            visiblePropertyTemplates={[propertyTemplate]}
-            visibleBadges={false}
-            isSelected={false}
-            readOnly={true}
-            onDrop={jest.fn()}
-            showCard={jest.fn()}
-            isManualSort={false}
-          />
-        </ReduxProvider>
+        wrapPagesProvider(
+          card.id,
+          <ReduxProvider store={store}>
+            <KanbanCard
+              card={card}
+              board={board}
+              visiblePropertyTemplates={[propertyTemplate]}
+              isSelected={false}
+              readOnly={true}
+              onDrop={jest.fn()}
+              showCard={jest.fn()}
+              isManualSort={false}
+            />
+          </ReduxProvider>
+        )
       )
     );
     expect(container).toMatchSnapshot();
   });
-  test('return kanbanCard and click on delete menu ', () => {
-    const result = render(
-      wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <KanbanCard
-            card={card}
-            board={board}
-            visiblePropertyTemplates={[propertyTemplate]}
-            visibleBadges={false}
-            isSelected={false}
-            readOnly={false}
-            onDrop={jest.fn()}
-            showCard={jest.fn()}
-            isManualSort={false}
-          />
-        </ReduxProvider>
-      )
-    );
-
-    const { container } = result;
-
-    const elementMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
-    expect(elementMenuWrapper).not.toBeNull();
-    userEvent.click(elementMenuWrapper);
-    expect(container).toMatchSnapshot();
-    const elementButtonDelete = within(elementMenuWrapper).getByRole('button', { name: 'Delete' });
-    expect(elementButtonDelete).not.toBeNull();
-    userEvent.click(elementButtonDelete);
-
-    const confirmDialog = screen.getByTitle('Confirmation Dialog Box');
-    expect(confirmDialog).toBeDefined();
-    const confirmButton = within(confirmDialog).getByRole('button', { name: 'Delete' });
-    expect(confirmButton).toBeDefined();
-    userEvent.click(confirmButton);
-
-    expect(mockedMutator.deleteBlock).toBeCalledWith(card, 'delete card');
-  });
-
-  test('return kanbanCard and click on duplicate menu ', () => {
+  test('return kanbanCard and click on delete menu ', async () => {
     const { container } = render(
       wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <KanbanCard
-            card={card}
-            board={board}
-            visiblePropertyTemplates={[propertyTemplate]}
-            visibleBadges={false}
-            isSelected={false}
-            readOnly={false}
-            onDrop={jest.fn()}
-            showCard={jest.fn()}
-            isManualSort={false}
-          />
-        </ReduxProvider>
+        wrapPagesProvider(
+          card.id,
+          <ReduxProvider store={store}>
+            <KanbanCard
+              card={card}
+              board={board}
+              visiblePropertyTemplates={[propertyTemplate]}
+              isSelected={false}
+              readOnly={false}
+              onDrop={jest.fn()}
+              showCard={jest.fn()}
+              isManualSort={false}
+            />
+          </ReduxProvider>
+        )
       )
     );
-    const elementMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
-    expect(elementMenuWrapper).not.toBeNull();
-    userEvent.click(elementMenuWrapper);
-    expect(container).toMatchSnapshot();
-    const elementButtonDuplicate = within(elementMenuWrapper).getByRole('button', { name: 'Duplicate' });
-    expect(elementButtonDuplicate).not.toBeNull();
-    userEvent.click(elementButtonDuplicate);
-    expect(mockedMutator.duplicateCard).toBeCalledTimes(1);
-  });
 
-  test('return kanbanCard and click on copy link menu ', () => {
-    const { container } = render(
-      wrapDNDIntl(
-        <ReduxProvider store={store}>
-          <KanbanCard
-            card={card}
-            board={board}
-            visiblePropertyTemplates={[propertyTemplate]}
-            visibleBadges={false}
-            isSelected={false}
-            readOnly={false}
-            onDrop={jest.fn()}
-            showCard={jest.fn()}
-            isManualSort={false}
-          />
-        </ReduxProvider>
-      )
-    );
-    const elementMenuWrapper = screen.getByRole('button', { name: 'menuwrapper' });
-    expect(elementMenuWrapper).not.toBeNull();
-    userEvent.click(elementMenuWrapper);
+    const buttonElement = container.querySelector('[data-testid="page-actions-context-menu"] button') as Element;
+    userEvent.click(buttonElement);
     expect(container).toMatchSnapshot();
-    const elementButtonCopyLink = within(elementMenuWrapper).getByRole('button', { name: 'Copy link' });
-    expect(elementButtonCopyLink).not.toBeNull();
-    userEvent.click(elementButtonCopyLink);
-    expect(mockedUtils.copyTextToClipboard).toBeCalledTimes(1);
+
+    const deleteButton = screen.getByText('Delete') as Element;
+    userEvent.click(deleteButton, undefined, { skipPointerEventsCheck: true });
+    const deleteButtonModal = screen.getByRole('button', { name: 'Delete' }) as Element;
+    userEvent.click(deleteButtonModal, undefined, { skipPointerEventsCheck: true });
+    expect(mockedMutator.deleteBlock).toBeCalledTimes(1);
+    expect(mockedMutator.deleteBlock).toBeCalledWith({ id: card.id, type: card.type }, 'delete card');
   });
 });

@@ -33,7 +33,21 @@ export class CdkDeployStack extends Stack {
     });
 
     // Make sure that Elastic Beanstalk app exists before creating an app version
-    appVersionProps.addDependsOn(ebApp);
+    appVersionProps.addDependency(ebApp);
+
+    const healthReportingSystemConfig = {
+      Rules: {
+        Environment: {
+          Application: {
+            ApplicationRequests4xx: { Enabled: false }
+          },
+          ELB: {
+            ELBRequests4xx: { Enabled: false }
+          }
+        }
+      },
+      Version: 1
+    }
 
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
@@ -53,6 +67,16 @@ export class CdkDeployStack extends Stack {
         value: 'application'
       },
       {
+        namespace: 'aws:elasticbeanstalk:healthreporting:system',
+        optionName: 'SystemType',
+        value: 'enhanced'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:healthreporting:system',
+        optionName: 'ConfigDocument',
+        value: JSON.stringify(healthReportingSystemConfig)
+      },
+      {
         namespace: 'aws:elbv2:listener:443',
         optionName: 'Protocol',
         value: 'HTTPS'
@@ -66,6 +90,41 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:elbv2:listener:443',
         optionName: 'SSLCertificateArns',
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'HealthCheckPath',
+        value: '/health_check'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'Port',
+        value: '3002'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        optionName: 'Protocol',
+        value: 'HTTP'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'ListenerEnabled',
+        value: 'true'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'Protocol',
+        value: 'HTTPS'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'SSLCertificateArns',
+        value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
+      },
+      {
+        namespace: 'aws:elbv2:listener:3002',
+        optionName: 'DefaultProcess',
+        value: 'websocket'
       },
       {
         // add security group to access
@@ -86,12 +145,12 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:autoscaling:asg',
         optionName: 'Custom Availability Zones',
-        value: 'us-east-1a,us-east-1b,us-east-1c'
+        value: 'us-east-1a,us-east-1d,us-east-1c,us-east-1f'
       },
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't3.micro'
+        value: 't3a.small,t3.small'
       },
       {
         // ALB health check

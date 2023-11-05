@@ -10,7 +10,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { humanizeAccessControlConditions } from 'lit-js-sdk';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { mutate } from 'swr';
@@ -23,12 +22,14 @@ import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useWeb3AuthSig } from 'hooks/useWeb3AuthSig';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { shortenHex } from 'lib/utilities/strings';
+import { useWeb3Account } from 'hooks/useWeb3Account';
+import { humanizeConditions } from 'lib/tokenGates/humanizeConditions';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import { shortenHex } from 'lib/utilities/blockchain';
+import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
-import TestConnectionModal from './TestConnectionModal';
+import { TestConnectionModal } from './TestConnectionModal';
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
 interface Props {
@@ -62,15 +63,15 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
 }
 
 export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
-  const { account, walletAuthSignature, sign } = useWeb3AuthSig();
+  const { account, walletAuthSignature, requestSignature } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
   const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const shareLink = `${window.location.origin}/join?domain=${space?.domain}`;
-  const { openWalletSelectorModal } = useContext(Web3Connection);
+  const { connectWallet } = useContext(Web3Connection);
 
   function onCopy() {
     showMessage('Link copied to clipboard');
@@ -98,7 +99,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
     async function main() {
       const results = await Promise.all(
         tokenGates.map((tokenGate) =>
-          humanizeAccessControlConditions({
+          humanizeConditions({
             myWalletAddress: account || '',
             ...(tokenGate.conditions as any)
           }).catch((err) => {
@@ -107,7 +108,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
           })
         )
       );
-      setDescriptions(results);
+      setDescriptions(results.filter(isTruthy));
     }
     main();
   }, [tokenGates]);
@@ -118,11 +119,12 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       if (!litClient) {
         throw new Error('Lit Protocol client not initialized');
       }
-      const authSig = walletAuthSignature ?? (await sign());
+      const authSig = walletAuthSignature ?? (await requestSignature());
       const jwt = await litClient.getSignedToken({
         resourceId: tokenGate.resourceId as any,
         authSig,
-        chain: (tokenGate.conditions as any).chain || 'ethereum',
+        chain: (tokenGate.conditions as any).chains?.[0],
+        // chain: (tokenGate.conditions as any).chain || 'ethereum',
         ...(tokenGate.conditions as any)
       });
 
@@ -137,11 +139,14 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       log.warn('Error when verifying wallet', error);
       let message = '';
       switch ((error as any).errorCode) {
-        case 'not_authorized':
-          message = `Address does not meet requirements: ${shortenHex(account || '')}`;
+        case 'NodeNotAuthorized':
+          message = `Your address does not meet requirements: ${shortenHex(account || '')}`;
+          break;
+        case 'rpc_error':
+          message = 'Network error. Please check that the access control conditions are valid.';
           break;
         default:
-          message = (error as Error).message || 'Access denied. Please check your access control conditions.';
+          message = (error as Error).message || 'Unknown error. Please try again.';
       }
       setTestResult({ message, status: 'error' });
     }
@@ -203,11 +208,6 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                   >
                     {descriptions[tokenGateIndex]}
                   </Typography>
-                  {tokenGateArray.length === tokenGateIndex + 1 ? null : (
-                    <Typography variant='caption' sx={{ mt: 1 }}>
-                      -- OR --
-                    </Typography>
-                  )}
                 </TableCell>
                 <TableCell>
                   <TokenGateRolesSelect
@@ -240,7 +240,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                             if (account) {
                               testConnect(tokenGate);
                             } else {
-                              openWalletSelectorModal();
+                              connectWallet();
                             }
                           }
                         }}

@@ -1,14 +1,14 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import { Box, ClickAwayListener, Grow } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import React from 'react';
 import { createPortal } from 'react-dom';
 
-import { usePageActionDisplay } from 'hooks/usePageActionDisplay';
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useUser } from 'hooks/useUser';
 
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { ThreadContainer } from '../inlineComment/inlineComment.components';
+import { ThreadContainer } from '../inlineComment/components/InlineCommentThread';
 
 import { getEventsFromDoc } from './getEvents';
 import { SuggestionCard } from './SuggestionCard';
@@ -18,10 +18,8 @@ export function SuggestionsPopup({
   pluginKey,
   readOnly,
   pageId,
-  spaceId,
-  insideModal
+  spaceId
 }: {
-  insideModal?: boolean;
   pluginKey: PluginKey<SuggestionPluginState>;
   readOnly: boolean;
   pageId: string;
@@ -29,10 +27,10 @@ export function SuggestionsPopup({
 }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, rowPos } = usePluginState(pluginKey) as SuggestionPluginState;
-  const { currentPageActionDisplay } = usePageActionDisplay();
+  const { activeView } = usePageSidebar();
   const { user } = useUser();
 
-  const popupIsVisible = (currentPageActionDisplay !== 'suggestions' || insideModal) && isVisible;
+  const popupIsVisible = activeView !== 'suggestions' && isVisible;
 
   if (popupIsVisible) {
     const rows = getEventsFromDoc({ state: view.state });
@@ -40,7 +38,12 @@ export function SuggestionsPopup({
       .map((row) => row.marks)
       .flat()
       .find((mark) => mark.active);
-    const suggestions = activeSuggestion ? [activeSuggestion] : rows.find((row) => row.pos === rowPos)?.marks ?? [];
+    const suggestions =
+      rowPos !== undefined
+        ? rows.find((row) => row.pos === rowPos)?.marks ?? []
+        : activeSuggestion
+        ? [activeSuggestion]
+        : [];
 
     return createPortal(
       <ClickAwayListener

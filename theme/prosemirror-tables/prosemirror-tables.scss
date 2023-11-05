@@ -1,3 +1,35 @@
+
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  overflow: hidden;
+  margin: 0 !important;
+}
+
+
+.ProseMirror .tableWrapper {
+  margin: 1em 0;
+  td,
+  th {
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+    min-width: 1em;
+    border: 1px solid var(--input-border);
+    padding: 3px 5px;
+  }
+  th {
+    font-weight: bold;
+    text-align: left;
+  }
+}
+
+
+
+
+// Note: The following rules may not be needed. Originally copied from @skiff-org
+
 .active-filters-button {
   display: none;
 }
@@ -187,9 +219,6 @@
     }
   }
 
-  table {
-    margin: 28px 0 0 0 !important;
-  }
 
   .tableColHandleButton,
   .tableRowHandleButton,
@@ -197,6 +226,7 @@
   .tableAddRightColumn {
     background-color: rgb(var(--sidebar-bg-rgb));
     border-color: grey;
+    color: #c1c7cd;
 
     &:hover,
     &:active {
@@ -206,7 +236,21 @@
   }
 
   .tableAddRightColumn {
-    margin-top: 13px !important;
+    font-size: 20px;
+    z-index: 1;
+    background-color: #f7f9fa;
+    width: 15px;
+    pointer-events: auto;
+    margin-bottom: 2px;
+    margin-right: -14px;
+    margin-left: -1px;
+    margin-bottom: 16px;
+    padding: 0;
+    padding-right: 3px;
+    padding-left: 1px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-left: 1px solid #c1c7cd;
   }
 
   .inRowSelection .tableRowHandle::before,
@@ -344,4 +388,480 @@
     top: -45px;
     border: 0 none;
   }
+}
+
+
+// @source: https://github.com/skiff-org/prosemirror-tables/blob/master/style/tables.css
+
+// .tableScrollWrapper {
+//   margin-top: -25px;
+//   margin-left: -40px;
+//   margin-right: -30px;
+//   margin-bottom: -5px;
+
+//   padding-top: 40px;
+//   padding-left: 40px;
+//   padding-right: 30px;
+//   padding-bottom: 15px;
+
+//   overflow: auto;
+// }
+.tableScrollWrapper {
+  .tableButton,
+  .tableColHandle,
+  .addAfterMarker,
+  .addRowAfterContainer,
+  .addColAfterContainer,
+  .tableRowHandle,
+  .tableHandle {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:hover {
+    .tableButton,
+    .tableColHandle,
+    .addAfterMarker,
+    .addRowAfterContainer,
+    .addColAfterContainer,
+    .tableRowHandle,
+    .tableHandle {
+      display: block;
+      opacity: 1;
+    }
+  }
+}
+
+.tableHorizontalWrapper {
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tableVerticalWrapper {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  padding-bottom: 16px;
+  position: relative;
+}
+
+.ProseMirror .tableButton {
+  display: inline-block;
+  zoom: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  text-align: center;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  border: none;
+  text-decoration: none;
+}
+
+.ProseMirror .tableAddBottomRow {
+  background-color: #f7f9fa;
+  height: 15px;
+  padding: 0;
+  pointer-events: auto;
+  margin-top: -1px;
+  margin-bottom: 1px;
+  width: 100%;
+  // width: calc(100% + 30px);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-top: 1px solid #c1c7cd;
+  z-index: 1;
+  position: absolute;
+  bottom: 1px;
+}
+
+.ProseMirror .selectedCell::before {
+  content: '';
+  display: block;
+  top: -2px;
+  bottom: -2px;
+  left: -2px;
+  right: -2px;
+  border: 0 solid;
+  border-color: #0070e0;
+  position: absolute;
+  pointer-events: none;
+  z-index: 12;
+  background-color: rgba(114, 182, 236, 0.1);
+}
+
+.ProseMirror .selectedCell.selectionRightBorder::before {
+  border-right-width: 3px;
+}
+
+.ProseMirror .selectedCell.selectionLeftBorder::before {
+  border-left-width: 3px;
+}
+
+.ProseMirror .selectedCell.selectionBottomBorder::before {
+  border-bottom-width: 3px;
+}
+
+.ProseMirror .selectedCell.selectionTopBorder::before {
+  border-top-width: 3px;
+}
+
+.tableColHandle,
+.tableRowHandle {
+  position: absolute;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+}
+
+.tableRowHandle {
+  left: -17px;
+  height: calc(100% + 1px);
+  top: -1px;
+}
+
+.tableColHandle {
+  width: 100%;
+  top: -15px;
+  left: 0;
+  height: 15px;
+}
+
+.tableRowHandleButton,
+.tableColHandleButton {
+  box-sizing: border-box;
+  background-color: #f7f9fa;
+  border: 0;
+  border-radius: 0;
+}
+
+.tableRowHandleButton {
+  width: 16px;
+  height: 100%;
+  border-top: 1px solid #c1c7cd;
+  padding: 0;
+}
+
+.tableColHandleButton {
+  height: calc(100% + 1px);
+  width: calc(100% + 1px);
+  border-left: 1px solid #c1c7cd;
+  border-bottom: 1px solid #c1c7cd;
+  padding: 0;
+  margin-left: -1px;
+  margin-top: -1px;
+}
+
+.tableRowHandleButton .buttonContent {
+  //content: url(./svgs/drag-handle-vertical.svg);
+  background-color: #e6e8eb;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  display: none;
+}
+
+.tableRowHandleButton:hover .buttonContent {
+  display: block;
+}
+
+.tableColHandleButton:hover .buttonContent {
+  display: block;
+  background-color: #e6e8eb;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.tableColHandleButton .buttonContent::after {
+ // content: url(./svgs/drag-handle-vertical.svg);
+  display: none;
+  transform: rotate(90deg);
+  margin-top: -2px;
+  margin-left: -1px;
+}
+
+.tableColHandleButton:hover .buttonContent::after {
+  display: inline-block;
+}
+
+.tableColHandleButton:hover .buttonContent * {
+  transform: rotate(90deg);
+}
+
+.addRowAfterContainer,
+.addColAfterContainer {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -ms-flex-align: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.addRowAfterContainer {
+  margin-left: -20px;
+  left: -17px;
+  top: -11px;
+  z-index: 1;
+  position: absolute;
+}
+
+.addColAfterContainer {
+  position: absolute;
+  top: -39px;
+  left: -8px;
+  z-index: 1;
+}
+
+/* rules for the addButton - both for col and row */
+.addAfterButton {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  padding: 0;
+  font-size: 20px;
+  color: white;
+  margin-right: 2px;
+  margin-left: -2px;
+  pointer-events: auto;
+  display: inline-block;
+  zoom: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  text-align: center;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-drag: none;
+  -moz-user-drag: none;
+  -ms-user-drag: none;
+  -o-user-drag: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.addAfterButton:hover {
+  background-color: #0070e0;
+}
+
+/* rules for small dot in the addButton place */
+.addAfterButton .addRowButtonContent,
+.addAfterButton .addColButtonContent {
+  height: 3px;
+  width: 3px;
+  background-color: #c1c7cd;
+  border-radius: 50%;
+  margin: auto;
+}
+
+.addAfterButton:hover .addRowButtonContent,
+.addAfterButton:hover .addColButtonContent {
+  display: none;
+}
+
+/* rules for the + inside the addButton */
+.addAfterButton .addButtonText {
+  display: none;
+  margin-top: -1px;
+}
+
+.addAfterButton:hover .addButtonText {
+  display: block;
+}
+
+/* rules for the markers */
+.rowRearrangement tr:hover .addRowAfterMarker,
+.addAfterButton:hover ~ .addRowAfterMarker,
+.addAfterButton:hover ~ .addColAfterMarker {
+  background-color: #0070e0;
+  opacity: 1;
+}
+
+.addRowAfterContainer .addRowAfterMarker {
+  height: 3px;
+  margin-left: 0;
+}
+
+.addColAfterContainer .addColAfterMarker {
+  width: 3px;
+  margin-top: 0;
+  position: absolute;
+  top: 22px;
+  left: 6px;
+}
+
+.addRowAfterMarker,
+.addColAfterMarker {
+  background-color: #c1c7cd;
+  opacity: 0;
+}
+
+@media only print {
+  .ProseMirror table {
+    width: 100% !important;
+  }
+}
+
+/* rules for table main handle */
+.tableHandle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: -22px;
+  border-radius: 50%;
+  border: 1px solid #c1c7cd;
+  background-color: transparent;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.tableHandle:hover {
+  background-color: #e6e8eb;
+}
+
+/* rules for col handle in col selection */
+.inColSelection .tableColHandleButton .buttonContent {
+  background-color: transparent;
+}
+
+.inColSelection .tableColHandleButton {
+  background-color: #0070e0;
+}
+
+.inColSelection .tableColHandleButton .buttonContent::after {
+  display: inline-block;
+}
+
+.inColSelection .tableColHandle .buttonContent::after {
+  // content: url(./svgs/active-drag-handle-vertical.svg);
+}
+
+/* rules for row handle in row selection */
+.inRowSelection .tableRowHandleButton {
+  background-color: #0070e0;
+}
+
+.inRowSelection .tableRowHandleButton .buttonContent {
+  display: block;
+  background-color: #0070e0;
+}
+
+.inRowSelection .tableRowHandle::before,
+.inColSelection .tableColHandle::before {
+  content: '';
+  display: block;
+  top: -1px;
+  bottom: -2px;
+  left: -2px;
+  right: -2px;
+  border: 3px solid #0070e0;
+  border-radius: 2px;
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  background-color: transparent;
+}
+
+.inColSelection .tableColHandle::before {
+  bottom: -1px;
+}
+
+.inRowSelection .tableRowHandle .buttonContent {
+  // content: url(./svgs/active-drag-handle-vertical.svg);
+}
+
+.colHeader {
+  background-color: #f0f1f3;
+  cursor: pointer;
+  padding: 4px !important;
+}
+
+.colHeader:hover {
+  background-color: rgba(55, 53, 47, 0.12);
+}
+
+.colHeader:active {
+  background-color: rgba(55, 53, 47, 0.16);
+}
+
+.markDeleteCells .inRowSelection .tableRowHandle::before,
+.markDeleteCells .inColSelection .tableColHandle::before,
+.markDeleteCells .selectedCell::before {
+  border-color: tomato;
+}
+
+.markDeleteCells .inColSelection .tableColHandleButton,
+.markDeleteCells .inRowSelection .tableRowHandleButton .buttonContent {
+  background-color: tomato;
+}
+
+.sortColButton {
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: -1px;
+  right: 0px;
+  border-radius: 50%;
+  padding: 0px;
+  display: none;
+  opacity: 0.8;
+}
+
+.sortColButton:hover {
+  opacity: 1;
+}
+
+td:hover .sortColButton {
+  display: block;
+}
+
+.sortColButton::after {
+  // content: url(./svgs/sort_down_empty.svg);
+}
+
+.tableFocus .sortColButton.sortedUp,
+.tableFocus .sortColButton.sortedDown {
+  display: block;
+}
+
+.sortColButton.sortedUp {
+  transform: rotate(180deg);
+}
+
+.sortColButton.sortedUp::after {
+  // content: url(./svgs/sorted_up.svg);
+}
+
+.sortColButton.sortedDown::after {
+  // content: url(./svgs/sorted_down.svg);
+}
+
+.selection-shadow-row .tableRowHandleButton,
+.selection-shadow-col .tableColHandleButton {
+  background-color: rgba(0, 112, 224, 0.2);
+}
+
+.focusTableSelected table::before {
+  position: absolute;
+  content: '';
+  width: calc(100% - 5px);
+  height: calc(100% - 21px);
+  border: 3px solid #0070e0;
+  z-index: 10;
 }

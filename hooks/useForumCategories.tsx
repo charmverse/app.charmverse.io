@@ -1,4 +1,4 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core';
+import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { PostCategory } from '@charmverse/core/prisma';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
@@ -12,12 +12,12 @@ import { useUser } from './useUser';
 
 type IContext = {
   createForumCategory: (categoryName: string) => Promise<void>;
-  deleteForumCategory: (option: PostCategory) => Promise<void>;
+  deleteForumCategory: (option: { id: string }) => Promise<void>;
   updateForumCategory: (option: PostCategory) => Promise<PostCategoryWithPermissions | undefined>;
   setDefaultPostCategory: (option: PostCategory) => Promise<void>;
   getForumCategoryById: (id?: string | null) => PostCategoryWithPermissions | undefined;
   getPostableCategories: () => PostCategoryWithPermissions[];
-  isCategoriesLoaded: boolean;
+  isLoading: boolean;
   categories: PostCategoryWithPermissions[];
   error: any;
   disabled: boolean;
@@ -30,14 +30,14 @@ export const PostCategoriesContext = createContext<Readonly<IContext>>({
   setDefaultPostCategory: () => Promise.resolve(undefined),
   getForumCategoryById: () => undefined,
   getPostableCategories: () => [],
-  isCategoriesLoaded: false,
+  isLoading: false,
   categories: [],
   error: undefined,
   disabled: false
 });
 
 export function PostCategoriesProvider({ children }: { children: ReactNode }) {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   const { setSpace } = useSpaces();
 
   const { user } = useUser();
@@ -99,7 +99,7 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function deleteForumCategory(option: PostCategory) {
+  async function deleteForumCategory(option: { id: string }) {
     if (currentSpace) {
       await charmClient.forum.deletePostCategory({ id: option.id, spaceId: currentSpace.id });
       mutateForumCategories(
@@ -132,8 +132,6 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
     return (categories ?? []).filter((c) => c.permissions.create_post);
   }
 
-  const isCategoriesLoaded = !!categories;
-
   const value = useMemo<IContext>(
     () => ({
       createForumCategory,
@@ -142,12 +140,12 @@ export function PostCategoriesProvider({ children }: { children: ReactNode }) {
       setDefaultPostCategory,
       getForumCategoryById,
       getPostableCategories,
-      isCategoriesLoaded,
+      isLoading: !categories,
       categories: categories || [],
       error,
       disabled: isValidating
     }),
-    [isCategoriesLoaded, error, categories, isValidating, currentSpace]
+    [error, categories, isValidating, currentSpace]
   );
 
   return <PostCategoriesContext.Provider value={value}>{children}</PostCategoriesContext.Provider>;

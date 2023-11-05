@@ -1,7 +1,7 @@
-import { prisma } from '@charmverse/core';
 import type { Role } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
-import { syncDiscordRoles } from 'lib/discord/syncDiscorRoles';
+import { syncDiscordRoles } from 'lib/discord/syncDiscordRoles';
 
 type RolesRecord = Record<string, Role | null>;
 

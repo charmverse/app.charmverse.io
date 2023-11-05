@@ -1,48 +1,43 @@
 import { log } from '@charmverse/core/log';
+import { AvailablePagePermissions } from '@charmverse/core/permissions/flags';
 import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 
-import charmClient from 'charmClient';
+import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
-import Button from 'components/common/Button';
-import { useBounties } from 'hooks/useBounties';
+import { Button } from 'components/common/Button';
+import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import type { BountyWithDetails } from 'lib/bounties';
-import { AllowedPagePermissions } from 'lib/permissions/pages/available-page-permissions.class';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import { PageActions } from '../PageActions';
-import { BountyActions } from '../PageLayout/components/Header/components/BountyActions';
-import { ExportToPDFMarkdown } from '../PageLayout/components/Header/components/ExportToPDFMenuItem';
+import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
+import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
 
 interface Props {
   pageId?: string;
   onClose: () => void;
   readOnly?: boolean;
-  bounty?: BountyWithDetails | null;
-  toolbar?: ReactNode;
   hideToolsMenu?: boolean;
 }
 
-export default function PageDialog(props: Props) {
-  const { hideToolsMenu = false, pageId, bounty, toolbar, readOnly } = props;
+export function PageDialog(props: Props) {
+  const { hideToolsMenu = false, pageId, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
-  const { setBounties, refreshBounty } = useBounties();
   const { setCurrentPageId } = useCurrentPage();
+  const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
-  const { updatePage, deletePage } = usePages();
+  const { updatePage } = usePages();
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
-  const pagePermissions = page?.permissionFlags || new AllowedPagePermissions().full;
+  const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
   const fullPageUrl = `/${domain}/${page?.path}`;
 
@@ -65,23 +60,11 @@ export default function PageDialog(props: Props) {
 
   useEffect(() => {
     if (page?.id) {
-      charmClient.track.trackAction('page_view', { spaceId: page.spaceId, pageId: page.id, type: page.type });
+      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: domain });
     }
   }, [page?.id]);
 
-  async function onClickDelete() {
-    if (page) {
-      if (page.type === 'card' || page.type === 'card_synced') {
-        await charmClient.deleteBlock(page.id, () => null);
-      } else if (page.type === 'bounty') {
-        setBounties((bounties) => bounties.filter((_bounty) => _bounty.id !== page.id));
-      }
-      await deletePage({ pageId: page.id });
-      onClose();
-    }
-  }
-
-  function onClose() {
+  function close() {
     popupState.close();
     props.onClose();
   }
@@ -92,8 +75,27 @@ export default function PageDialog(props: Props) {
     }
     return () => {
       setCurrentPageId('');
+      resetPageProps();
     };
   }, [page?.id]);
+
+  // set page attributes of the primary charm editor
+  useEffect(() => {
+    if (!page) {
+      // wait for pages loaded for permissions to be correct
+      return;
+    }
+    if (!editMode) {
+      if (page.permissionFlags.edit_content) {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'editing' });
+      } else {
+        setPageProps({ permissions: page.permissionFlags, editMode: 'viewing' });
+      }
+    } else {
+      // pass editMode thru to fix hot-reloading which resets the prop
+      setPageProps({ permissions: page.permissionFlags, editMode });
+    }
+  }, [page?.permissionFlags.edit_content]);
 
   const savePage = useCallback(
     debouncePromise(async (updates: Partial<Page>) => {
@@ -113,27 +115,7 @@ export default function PageDialog(props: Props) {
 
   return (
     <Dialog
-      toolsMenu={
-        !hideToolsMenu &&
-        !readOnly &&
-        page && (
-          <PageActions
-            page={page}
-            onClickDelete={() => {
-              onClickDelete();
-              onClose();
-            }}
-            onDuplicate={(pageDuplicateResponse) => {
-              if (bounty) {
-                refreshBounty(pageDuplicateResponse.rootPageId);
-              }
-            }}
-          >
-            <ExportToPDFMarkdown pdfTitle={page.title} />
-            {bounty && <BountyActions bountyId={bounty.id} />}
-          </PageActions>
-        )
-      }
+      toolsMenu={!hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton page={page} onDelete={close} />}
       toolbar={
         <Box display='flex' justifyContent='space-between'>
           <Button
@@ -141,20 +123,23 @@ export default function PageDialog(props: Props) {
             size='small'
             color='secondary'
             href={fullPageUrl}
-            onClick={onClose}
+            onClick={close}
             variant='text'
             startIcon={<OpenInFullIcon fontSize='small' />}
+            sx={{ px: 1.5 }}
           >
             Open as Page
           </Button>
-          {toolbar}
+          {page && (
+            <Box display='flex' alignItems='center' gap={0.5}>
+              <DocumentHeaderElements headerHeight={0} page={page} />
+            </Box>
+          )}
         </Box>
       }
-      onClose={onClose}
+      onClose={close}
     >
-      {page && (
-        <DocumentPage insideModal page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />
-      )}
+      {page && <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />}
     </Dialog>
   );
 }

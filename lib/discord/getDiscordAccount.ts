@@ -1,4 +1,4 @@
-import * as http from 'adapters/http';
+import * as http from '@charmverse/core/http';
 
 import { getDiscordToken, DISCORD_API_URL } from './getDiscordToken';
 

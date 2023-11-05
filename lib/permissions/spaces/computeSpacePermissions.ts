@@ -1,54 +1,47 @@
-import { prisma } from '@charmverse/core';
+import type { PreComputedSpaceRole } from '@charmverse/core/permissions';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
 
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-
-import { filterApplicablePermissions } from '../filterApplicablePermissions';
 import type { PermissionCompute } from '../interfaces';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
 
+type ComputeParams = PermissionCompute & PreComputedSpaceRole;
+
 export async function computeSpacePermissions({
   resourceId,
-  userId
-}: PermissionCompute): Promise<SpacePermissionFlags> {
+  userId,
+  preComputedSpaceRole
+}: ComputeParams): Promise<SpacePermissionFlags> {
   const allowedOperations = new AvailableSpacePermissions();
 
   if (!userId) {
     return allowedOperations.empty;
   }
 
-  const { error, isAdmin } = await hasAccessToSpace({
+  const { spaceRole } = await hasAccessToSpace({
     userId,
     spaceId: resourceId,
-    adminOnly: false,
-    disallowGuest: true
+    preComputedSpaceRole
   });
 
-  if (error) {
+  if (!spaceRole) {
     // Returns all permissions as false since user is not space member
     return allowedOperations.empty;
-  }
 
-  if (isAdmin) {
+    // Provide full permissions to all space members independent of admin status
+  } else if (spaceRole.isAdmin) {
     return allowedOperations.full;
+  } else {
+    return {
+      createBounty: true,
+      createForumCategory: true,
+      createPage: true,
+      moderateForums: true,
+      reviewProposals: true,
+      deleteAnyBounty: false,
+      deleteAnyPage: false,
+      deleteAnyProposal: false
+    };
   }
-
-  // Rollup space permissions
-  const spacePermissions = await prisma.spacePermission.findMany({
-    where: {
-      forSpaceId: resourceId
-    }
-  });
-
-  const applicablePermissions = await filterApplicablePermissions({
-    permissions: spacePermissions,
-    resourceSpaceId: resourceId,
-    userId
-  });
-
-  applicablePermissions.forEach((permission) => {
-    allowedOperations.addPermissions(permission.operations);
-  });
-  return allowedOperations.operationFlags;
 }

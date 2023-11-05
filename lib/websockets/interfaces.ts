@@ -1,7 +1,12 @@
 // import type { Block } from '@charmverse/core/prisma';
 
+import type { PageMeta } from '@charmverse/core/pages';
+import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Node } from 'prosemirror-model';
+import type { Server, Socket } from 'socket.io';
+
 import type { Block } from 'lib/focalboard/block';
-import type { PageMeta } from 'lib/pages';
+import type { FailedImportsError } from 'lib/notion/types';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource = { id: string };
@@ -11,7 +16,7 @@ export type SealedUserId = {
   userId: string;
 };
 
-export type SocketAuthReponse = {
+export type SocketAuthResponse = {
   authToken: string;
 };
 
@@ -32,7 +37,8 @@ type BlocksDeleted = {
 
 type PagesMetaUpdated = {
   type: 'pages_meta_updated';
-  payload: (Partial<PageMeta> & ResourceWithSpaceId)[];
+  // we use the full Page interface so that we can pass other fields for individual page views
+  payload: (Partial<Page> & ResourceWithSpaceId)[];
 };
 
 type PagesCreated = {
@@ -95,10 +101,97 @@ type SubscribeToWorkspace = {
   type: 'subscribe';
   payload: {
     spaceId: string;
-  } & SocketAuthReponse;
+  } & SocketAuthResponse;
 };
 
-export type ClientMessage = SubscribeToWorkspace;
+type PageDeleted = {
+  type: 'page_deleted';
+  payload: Resource;
+};
+
+type PageRestored = {
+  type: 'page_restored';
+  payload: Resource;
+};
+
+export type PageCreated = {
+  type: 'page_created';
+  payload: Partial<Prisma.PageUncheckedCreateInput> &
+    Pick<
+      Prisma.PageUncheckedCreateInput,
+      'boardId' | 'content' | 'contentText' | 'path' | 'title' | 'type' | 'spaceId'
+    >;
+};
+
+type PageReorderedSidebarToSidebar = {
+  type: 'page_reordered_sidebar_to_sidebar';
+  payload: {
+    pageId: string;
+    newParentId: string | null;
+  };
+};
+
+type PageReorderedSidebarToEditor = {
+  type: 'page_reordered_sidebar_to_editor';
+  payload: {
+    pageId: string;
+    newParentId: string;
+    dropPos: number | null;
+  };
+};
+
+type PageReorderedEditorToEditor = {
+  type: 'page_reordered_editor_to_editor';
+  payload: {
+    pageId: string;
+    newParentId: string;
+    draggedNode: {
+      type: string;
+      attrs?: Record<string, any>;
+    };
+    dragNodePos: number;
+    currentParentId: string;
+  };
+};
+
+type SpaceSubscriptionUpdated = {
+  type: 'space_subscription';
+  payload: {
+    type: 'activated' | 'cancelled' | 'updated';
+    paidTier: SubscriptionTier | null;
+  };
+};
+
+export type NotionImportCompleted = {
+  type: 'notion_import_completed';
+  payload: {
+    totalImportedPages: number;
+    totalPages: number;
+    failedImports: FailedImportsError[];
+  };
+};
+
+type ThreadsUpdated = {
+  type: 'threads_updated';
+  payload: {
+    threadId: string;
+    pageId: string;
+  };
+};
+
+type PagesRestored = {
+  type: 'pages_restored';
+  payload: Resource[];
+};
+
+export type ClientMessage =
+  | SubscribeToWorkspace
+  | PageDeleted
+  | PageRestored
+  | PageCreated
+  | PageReorderedSidebarToSidebar
+  | PageReorderedSidebarToEditor
+  | PageReorderedEditorToEditor;
 
 export type ServerMessage =
   | BlocksUpdated
@@ -113,8 +206,28 @@ export type ServerMessage =
   | VotesUpdated
   | PostPublished
   | PostUpdated
-  | PostDeleted;
+  | PostDeleted
+  | ThreadsUpdated
+  | SpaceSubscriptionUpdated
+  | NotionImportCompleted
+  | PagesRestored;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
 export type WebSocketPayload<T extends WebSocketMessage['type']> = Extract<WebSocketMessage, { type: T }>['payload'];
+
+export type AbstractWebsocketBroadcaster = {
+  sockets: Record<string, Socket>;
+
+  bindServer(io: Server): Promise<void>;
+
+  broadcastToAll(message: ServerMessage): void;
+
+  broadcast(message: ServerMessage, roomId: string): void;
+
+  leaveRoom(socket: Socket, roomId: string): void;
+
+  registerWorkspaceSubscriber(args: { userId: string; socket: Socket; roomId: string }): Promise<void>;
+
+  close(): void;
+};

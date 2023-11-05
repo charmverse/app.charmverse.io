@@ -1,9 +1,11 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
+import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { getUserProfile } from 'lib/users/getUser';
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
+import { InvalidInputError, MissingDataError, UnauthorisedActionError } from 'lib/utilities/errors';
 import type { LoggedInUser } from 'models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
@@ -14,19 +16,49 @@ export async function connectGoogleAccount({
   accessToken,
   avatarUrl,
   displayName,
-  userId
+  userId,
+  oauthParams
 }: ConnectGoogleAccountRequest): Promise<LoggedInUser> {
-  const verified = await verifyGoogleToken(accessToken);
+  const verified = await verifyGoogleToken(accessToken, oauthParams);
 
   const email = verified.email;
+  const userDisplayName = displayName || verified.name || '';
+  const userAvatarUrl = avatarUrl || verified.picture || '';
 
   if (!email) {
     throw new InvalidInputError(`Email required to complete signup`);
   }
 
-  const [user, googleAccount] = await Promise.all([
+  const spaceRoles = await prisma.spaceRole.findMany({
+    where: {
+      userId
+    },
+    select: {
+      space: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+
+  const userSpaceIds = spaceRoles.map((role) => role.space.id);
+
+  const isUserBannedFromSpace = await checkUserSpaceBanStatus({
+    spaceIds: userSpaceIds,
+    emails: [email]
+  });
+
+  if (isUserBannedFromSpace) {
+    throw new UnauthorisedActionError(
+      'You need to leave space before you can add this google identity to your account'
+    );
+  }
+
+  const [user, googleAccount, verifiedEmail] = await Promise.all([
     getUserProfile('id', userId),
-    prisma.googleAccount.findUnique({ where: { email } })
+    prisma.googleAccount.findUnique({ where: { email } }),
+    prisma.verifiedEmail.findUnique({ where: { email } })
   ]);
 
   if (!user) {
@@ -38,32 +70,51 @@ export async function connectGoogleAccount({
     return user;
   }
 
-  await prisma.googleAccount.upsert({
-    where: {
-      email
-    },
-    create: {
-      name: displayName,
-      avatarUrl,
-      email,
-      user: {
-        connect: {
-          id: userId
+  await prisma.$transaction(async (tx) => {
+    await tx.googleAccount.upsert({
+      where: {
+        email
+      },
+      create: {
+        name: userDisplayName,
+        avatarUrl: userAvatarUrl,
+        email,
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      },
+      update: {
+        avatarUrl,
+        name: displayName,
+        user: {
+          connect: {
+            id: userId
+          }
         }
       }
-    },
-    update: {
-      avatarUrl,
-      name: displayName,
-      user: {
-        connect: {
-          id: userId
+    });
+
+    if (googleAccount && googleAccount.userId !== userId) {
+      await updateUsedIdentity(googleAccount.userId, undefined, tx);
+      await softDeleteUserWithoutConnectableIdentities({ userId: googleAccount.userId, newUserId: userId, tx });
+    }
+
+    if (verifiedEmail && verifiedEmail.userId !== userId) {
+      await tx.verifiedEmail.update({
+        where: {
+          email: verified.email
+        },
+        data: {
+          user: { connect: { id: userId } }
         }
-      }
+      });
+
+      await updateUsedIdentity(verifiedEmail.userId, undefined, tx);
+      await softDeleteUserWithoutConnectableIdentities({ userId: verifiedEmail.userId, newUserId: userId, tx });
     }
   });
-  if (googleAccount && googleAccount.userId !== userId) {
-    await softDeleteUserWithoutConnectableIdentities({ userId: googleAccount.userId, newUserId: userId });
-  }
+
   return getUserProfile('id', userId);
 }

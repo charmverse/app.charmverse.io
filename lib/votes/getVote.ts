@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core';
 import { VoteStatus } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
@@ -25,7 +25,8 @@ export async function getVote(id: string, userId?: string): Promise<ExtendedVote
     }
   });
 
-  const userVotes = vote?.userVotes ?? [];
+  // filter empty votes
+  const userVotes = vote?.userVotes.filter((uv) => uv.choices.length) ?? [];
   const { aggregatedResult, userChoice } = aggregateVoteResult({
     userId,
     userVotes,

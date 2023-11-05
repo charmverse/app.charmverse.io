@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
 import { superApiHandler } from 'lib/public-api/handler';
-import type { Space } from 'lib/public-api/interfaces';
+import type { SpaceApiResponse } from 'lib/public-api/interfaces';
 import type { SearchSpacesInput } from 'lib/public-api/searchSpaces';
 import { searchSpaces } from 'lib/public-api/searchSpaces';
 
@@ -32,7 +32,7 @@ export const handler = superApiHandler().get(search);
  *                items:
  *                  $ref: '#/components/schemas/Space'
  */
-async function search(req: NextApiRequest, res: NextApiResponse<Space[]>) {
+async function search(req: NextApiRequest, res: NextApiResponse<SpaceApiResponse[]>) {
   const request = req.query as Omit<SearchSpacesInput, 'apiKey'>;
 
   if (!request.userWallet) {

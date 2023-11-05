@@ -1,7 +1,7 @@
 import type { Typeform } from '@typeform/api-client';
 import { v4 } from 'uuid';
 
-import { createBoardPropertyOptions } from 'components/common/PageLayout/components/Header/components/utils/databasePageOptions';
+import { createBoardPropertyOptions } from 'components/common/PageActions/utils/databasePageOptions';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -110,10 +110,9 @@ function simplifyTypeformAnswers(payload: Typeform.Response['answers']) {
 export function simplifyTypeformResponse(payload: TypeformResponse) {
   const questions = simplifyTypeformQuestions(payload.definition?.fields);
   const answers = simplifyTypeformAnswers(payload.answers);
-
-  const qa = questions
+  const questionAnswerPairs = questions
     .map((q) => {
-      const existingCardProperty = answers?.find((p) => p.id === q.id);
+      const existingCardProperty = answers?.find((a) => a.id === q.id);
       if (existingCardProperty) {
         const id = v4();
         return { question: { ...q, id }, answer: existingCardProperty.answer };
@@ -123,10 +122,10 @@ export function simplifyTypeformResponse(payload: TypeformResponse) {
     .filter(isTruthy);
 
   // Push the submitted date
-  qa.push({
+  questionAnswerPairs.push({
     question: { id: v4(), name: 'Submit Date (UTC)', type: 'date', options: [], description: 'Submit Date (UTC)' },
     answer: payload.submitted_at ? new Date(payload.submitted_at).toString() : new Date().toString()
   });
 
-  return qa;
+  return questionAnswerPairs;
 }

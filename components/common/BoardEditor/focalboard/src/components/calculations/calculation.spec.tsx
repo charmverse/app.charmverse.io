@@ -1,6 +1,4 @@
 import { render } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapIntl } from '../../testUtils';
@@ -32,6 +30,7 @@ describe('components/calculations/Calculation', () => {
         onMenuOpen={() => {}}
         onChange={() => {}}
         cards={[card, card2]}
+        anchorEl={null}
         hovered={true}
         property={{
           id: 'property_2',
@@ -51,6 +50,7 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
+        anchorEl={null}
         class='fooClass'
         value='count'
         menuOpen={false}
@@ -77,6 +77,7 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
+        anchorEl={null}
         class='fooClass'
         value='countValue'
         menuOpen={false}
@@ -103,6 +104,7 @@ describe('components/calculations/Calculation', () => {
     const component = wrapIntl(
       <Calculation
         style={{}}
+        anchorEl={null}
         class='fooClass'
         value='countUniqueValue'
         menuOpen={false}
@@ -123,40 +125,5 @@ describe('components/calculations/Calculation', () => {
 
     const { container } = render(component);
     expect(container).toMatchSnapshot();
-  });
-
-  test('should match snapshot - option change', () => {
-    const onMenuOpen = jest.fn();
-    const onMenuClose = jest.fn();
-    const onChange = jest.fn();
-
-    const component = wrapIntl(
-      <Calculation
-        style={{}}
-        class='fooClass'
-        value='none'
-        menuOpen={true}
-        onMenuClose={onMenuClose}
-        onMenuOpen={onMenuOpen}
-        onChange={onChange}
-        cards={[card, card2]}
-        hovered={true}
-        property={{
-          id: 'property_2',
-          name: '',
-          type: 'text',
-          options: []
-        }}
-        optionsComponent={TableCalculationOptions}
-      />
-    );
-
-    const { container } = render(component);
-    const countMenuOption = container.querySelector('#react-select-2-option-1');
-    userEvent.click(countMenuOption as Element);
-    expect(container).toMatchSnapshot();
-    expect(onMenuOpen).not.toBeCalled();
-    expect(onMenuClose).toBeCalled();
-    expect(onChange).toBeCalled();
   });
 });

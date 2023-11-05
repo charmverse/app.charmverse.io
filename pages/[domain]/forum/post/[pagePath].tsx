@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useTrackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import type { FormInputs } from 'components/forum/components/interfaces';
@@ -22,6 +23,8 @@ function WrapperPostPage({ post }: { post: PostWithVotes }) {
   const [formInputs, setFormInputs] = useState<FormInputs>(post);
   const [contentUpdated, setContentUpdated] = useState(false);
   const [, setTitleState] = usePageTitle();
+
+  useTrackPageView({ postId: post.id, type: 'post' });
 
   return (
     <PostPage

@@ -1,5 +1,5 @@
-import { getChainById } from 'connectors';
-import { ethers } from 'ethers';
+import { getChainById } from 'connectors/chains';
+import { toHex } from 'viem';
 
 /**
  * See
@@ -11,22 +11,26 @@ export async function switchActiveNetwork(chainId: number) {
   try {
     await (window as any).ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: ethers.utils.hexValue(chainId) }]
+      params: [{ chainId: toHex(chainId) }]
     });
   } catch (error: any) {
-    if (error.code === 4902) {
+    // -32603 is from Coinbase wallet
+    if (error.code === 4902 || error.code === -32603) {
       const chainInfo = getChainById(chainId);
 
       if (!chainInfo) {
         throw new Error('Unsupported chain');
       }
-
+      const { chainName, nativeCurrency, rpcUrls, blockExplorerUrls } = chainInfo;
       return (window as any).ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [
           {
-            ...chainInfo,
-            chainId: ethers.utils.hexValue(chainInfo?.chainId)
+            chainName,
+            nativeCurrency,
+            rpcUrls,
+            blockExplorerUrls,
+            chainId: toHex(chainId)
           }
         ]
       });

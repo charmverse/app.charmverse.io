@@ -1,6 +1,5 @@
 import type { Thread, Comment } from '@charmverse/core/prisma';
 
-import type { CommentWithUser } from 'lib/comments/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export enum ThreadStatus {
@@ -30,7 +29,7 @@ export interface ThreadWithComments extends Thread {
 }
 
 export interface ThreadWithCommentsAndAuthors extends Thread {
-  comments: CommentWithUser[];
+  comments: Comment[];
 }
 
 export interface MultipleThreadsInput {

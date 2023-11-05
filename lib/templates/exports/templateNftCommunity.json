@@ -7,6 +7,7 @@
       "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
       "updatedAt": "2022-12-21T14:53:40.425Z",
       "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
       "title": "LNFT#011: Next Lil Collection Artwork",
       "content": null,
       "contentText": "",
@@ -15,6 +16,7 @@
       "headerImage": null,
       "icon": null,
       "path": "page-12095802968568892",
+      "additionalPaths": [],
       "isTemplate": false,
       "parentId": null,
       "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -26,9 +28,13 @@
       "proposalId": "90a6fb8e-de12-4767-9f2b-32b108c91d34",
       "snapshotProposalId": null,
       "fullWidth": false,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
       "version": 0,
       "bountyId": null,
+      "syncWithPageId": null,
       "convertedProposalId": null,
+      "sourceTemplateId": null,
       "permissions": [
         {
           "pageId": "90a6fb8e-de12-4767-9f2b-32b108c91d34",
@@ -40,6 +46,7 @@
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         }
       ],
@@ -49,10 +56,15 @@
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
         "status": "vote_closed",
+        "archived": false,
         "reviewedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "reviewedAt": "2022-11-15T20:59:19.643Z",
         "categoryId": "d58fbcc1-3ae6-4944-bba6-ae7a8c29e548",
         "snapshotProposalExpiry": null,
+        "publishToLens": null,
+        "lensPostLink": null,
+        "evaluationType": "vote",
+        "fields": null,
         "category": {
           "id": "d58fbcc1-3ae6-4944-bba6-ae7a8c29e548",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -68,6 +80,7 @@
       "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
       "updatedAt": "2022-12-21T14:53:40.824Z",
       "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
       "title": "LNFT#012: Build New Minting Experience",
       "content": null,
       "contentText": "",
@@ -76,6 +89,7 @@
       "headerImage": null,
       "icon": null,
       "path": "page-10719017674074038",
+      "additionalPaths": [],
       "isTemplate": false,
       "parentId": null,
       "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -87,9 +101,13 @@
       "proposalId": "ddb11df1-76c1-4aa1-bbbe-7630b6c296b5",
       "snapshotProposalId": null,
       "fullWidth": false,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
       "version": 0,
       "bountyId": null,
+      "syncWithPageId": null,
       "convertedProposalId": null,
+      "sourceTemplateId": null,
       "permissions": [
         {
           "pageId": "ddb11df1-76c1-4aa1-bbbe-7630b6c296b5",
@@ -101,6 +119,7 @@
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         }
       ],
@@ -110,10 +129,15 @@
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
         "status": "reviewed",
+        "archived": false,
         "reviewedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "reviewedAt": "2022-11-15T20:59:48.726Z",
         "categoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
         "snapshotProposalExpiry": null,
+        "publishToLens": null,
+        "lensPostLink": null,
+        "evaluationType": "vote",
+        "fields": null,
         "category": {
           "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -129,6 +153,7 @@
       "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
       "updatedAt": "2022-12-21T14:53:40.839Z",
       "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
       "title": "LNFT#13: Partner with Big NFT",
       "content": null,
       "contentText": "",
@@ -137,6 +162,7 @@
       "headerImage": null,
       "icon": null,
       "path": "page-4412138107665571",
+      "additionalPaths": [],
       "isTemplate": false,
       "parentId": null,
       "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -148,9 +174,13 @@
       "proposalId": "eefd7719-c802-4990-b8a0-8b962a7e9240",
       "snapshotProposalId": null,
       "fullWidth": false,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
       "version": 0,
       "bountyId": null,
+      "syncWithPageId": null,
       "convertedProposalId": null,
+      "sourceTemplateId": null,
       "permissions": [
         {
           "pageId": "eefd7719-c802-4990-b8a0-8b962a7e9240",
@@ -162,6 +192,7 @@
           "spaceId": null,
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         },
         {
@@ -174,6 +205,7 @@
           "spaceId": null,
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         },
         {
@@ -186,6 +218,7 @@
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         }
       ],
@@ -195,10 +228,15 @@
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
         "status": "discussion",
+        "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "categoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
         "snapshotProposalExpiry": null,
+        "publishToLens": null,
+        "lensPostLink": null,
+        "evaluationType": "vote",
+        "fields": null,
         "category": {
           "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -208,60 +246,13 @@
       }
     },
     {
-      "id": "5fd04504-510e-4616-905f-f9f853be056f",
-      "deletedAt": null,
-      "createdAt": "2023-03-08T12:57:43.542Z",
-      "createdBy": "c4421d10-3765-4c58-9f46-b8648ffea350",
-      "updatedAt": "2023-03-08T12:57:43.542Z",
-      "updatedBy": "c4421d10-3765-4c58-9f46-b8648ffea350",
-      "title": "",
-      "content": null,
-      "contentText": "",
-      "galleryImage": "",
-      "hasContent": false,
-      "headerImage": null,
-      "icon": null,
-      "path": "page-7686948914617233",
-      "isTemplate": false,
-      "parentId": null,
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "type": "proposal",
-      "boardId": null,
-      "autoGenerated": false,
-      "index": -1,
-      "cardId": null,
-      "proposalId": "5fd04504-510e-4616-905f-f9f853be056f",
-      "snapshotProposalId": null,
-      "fullWidth": false,
-      "version": 1,
-      "bountyId": null,
-      "convertedProposalId": null,
-      "permissions": [],
-      "children": [],
-      "proposal": {
-        "id": "5fd04504-510e-4616-905f-f9f853be056f",
-        "createdBy": "c4421d10-3765-4c58-9f46-b8648ffea350",
-        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-        "status": "draft",
-        "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "56af92d2-b109-44d2-8f67-977e1bc55667",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "56af92d2-b109-44d2-8f67-977e1bc55667",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "General",
-          "color": "gray"
-        }
-      }
-    },
-    {
       "id": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
       "deletedAt": null,
       "createdAt": "2022-05-23T16:37:26.193Z",
       "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "updatedAt": "2023-02-08T20:34:07.858Z",
+      "updatedAt": "2023-04-19T11:28:00.509Z",
       "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
       "title": "[Your Community Home]",
       "content": {
         "type": "doc",
@@ -406,6 +397,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 2,
               "track": [],
               "collapseContent": null
@@ -507,24 +499,7 @@
                 "type": "paragraph",
                 "attrs": {
                   "track": []
-                },
-                "content": [
-                  {
-                    "text": "Quick Navigation",
-                    "type": "text",
-                    "marks": [
-                      {
-                        "type": "insertion",
-                        "attrs": {
-                          "date": "2022-12-15T22:30:00.000Z",
-                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                          "approved": true,
-                          "username": "Drea | CharmVerse"
-                        }
-                      }
-                    ]
-                  }
-                ]
+                }
               },
               {
                 "type": "columnLayout",
@@ -539,6 +514,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "5dfeceb8-6efb-42df-b3ac-c02c12a59420",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       },
@@ -546,6 +523,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "f80af944-7320-482c-94f4-e7b08a1ac54f",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       },
@@ -553,6 +532,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       }
@@ -565,6 +546,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "b4296303-a8eb-4da2-9eae-549f0f1f93ca",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       },
@@ -572,6 +555,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "71960167-dc07-4ecc-bd12-964a1b5d8168",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       },
@@ -579,6 +564,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "3a0b75a8-a74c-46b4-b6dd-c0f0bd819fba",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       }
@@ -591,6 +578,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "0267fb8e-b25c-4784-8fe5-0c9f1c5eb174",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       },
@@ -598,6 +587,8 @@
                         "type": "page",
                         "attrs": {
                           "id": "22f791c5-ce26-47e8-88cf-562fd690c744",
+                          "path": null,
+                          "type": null,
                           "track": []
                         }
                       }
@@ -616,6 +607,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 2,
               "track": [],
               "collapseContent": null
@@ -694,6 +686,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 2,
               "track": [],
               "collapseContent": null
@@ -772,6 +765,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 2,
               "track": [],
               "collapseContent": null
@@ -850,6 +844,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 2,
               "track": [],
               "collapseContent": null
@@ -1048,12 +1043,13 @@
           }
         ]
       },
-      "contentText": "Welcome your members! Add your own images by clicking on the prompts below or typing /image. Delete example images by hovering over the image and clicking the trash can that appears in the upper right-hand corner. You may delete any block by clicking the  ⋮⋮ to the left on hover.Welcome to [Your Community]!Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas arcu sapien, tempor eu nunc quis, ultrices tristique justo. Vestibulum a commodo massa. Sed malesuada pellentesque tincidunt. Morbi posuere tristique egestas.Quick NavigationOur StoryMorbi sit amet elit lacus. Duis nibh libero, imperdiet vel tellus ultrices, mattis finibus odio. Morbi eget felis et urna vestibulum rutrum sit amet vel sapien. In eleifend imperdiet magna, in fermentum neque dictum in. Quisque suscipit venenatis bibendum. Proin vel lorem at eros fermentum finibus sed eu elit. Suspendisse potenti.Mission & VisionEtiam sit amet sem vel tortor lacinia condimentum. Fusce felis quam, tincidunt id quam ac, fermentum vulputate enim. In hac habitasse platea dictumst. Donec mattis nibh odio, sed ornare ligula sagittis vitae. Nam tincidunt semper sem in scelerisque. Vestibulum ac dolor in ex imperdiet suscipit eget quis libero. Suspendisse justo nunc, ornare id est quis, dapibus mollis sem. Aliquam eu lectus arcu. Fusce ut finibus arcu.Positive ImpactCras varius lacus vel ante pellentesque, vitae lobortis est efficitur. Quisque lobortis, arcu ut aliquet bibendum, eros diam egestas metus, vel lobortis quam ligula quis ligula. Suspendisse iaculis purus ac venenatis bibendum. Ut feugiat urna est, in cursus odio faucibus nec. Praesent ultrices eros et eleifend consectetur. Nullam ut vulputate nisl, nec viverra dui.How to get involvedPhasellus non condimentum arcu, at sagittis neque. Quisque viverra arcu quam, interdum rhoncus augue fermentum ac. Praesent ac nisl malesuada massa imperdiet feugiat. Fusce est leo, dictum in enim a, faucibus venenatis dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Thank you, Anomura! This page was built using project info from our friends at Anomura! Anomura is a web3 gaming project with a greater purpose.  They will support wildlife conservation with their innovative play-to-donate model. Check it out!",
+      "contentText": "Welcome your members! Add your own images by clicking on the prompts below or typing /image. Delete example images by hovering over the image and clicking the trash can that appears in the upper right-hand corner. You may delete any block by clicking the  ⋮⋮ to the left on hover.Welcome to [Your Community]!Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas arcu sapien, tempor eu nunc quis, ultrices tristique justo. Vestibulum a commodo massa. Sed malesuada pellentesque tincidunt. Morbi posuere tristique egestas.Our StoryMorbi sit amet elit lacus. Duis nibh libero, imperdiet vel tellus ultrices, mattis finibus odio. Morbi eget felis et urna vestibulum rutrum sit amet vel sapien. In eleifend imperdiet magna, in fermentum neque dictum in. Quisque suscipit venenatis bibendum. Proin vel lorem at eros fermentum finibus sed eu elit. Suspendisse potenti.Mission & VisionEtiam sit amet sem vel tortor lacinia condimentum. Fusce felis quam, tincidunt id quam ac, fermentum vulputate enim. In hac habitasse platea dictumst. Donec mattis nibh odio, sed ornare ligula sagittis vitae. Nam tincidunt semper sem in scelerisque. Vestibulum ac dolor in ex imperdiet suscipit eget quis libero. Suspendisse justo nunc, ornare id est quis, dapibus mollis sem. Aliquam eu lectus arcu. Fusce ut finibus arcu.Positive ImpactCras varius lacus vel ante pellentesque, vitae lobortis est efficitur. Quisque lobortis, arcu ut aliquet bibendum, eros diam egestas metus, vel lobortis quam ligula quis ligula. Suspendisse iaculis purus ac venenatis bibendum. Ut feugiat urna est, in cursus odio faucibus nec. Praesent ultrices eros et eleifend consectetur. Nullam ut vulputate nisl, nec viverra dui.How to get involvedPhasellus non condimentum arcu, at sagittis neque. Quisque viverra arcu quam, interdum rhoncus augue fermentum ac. Praesent ac nisl malesuada massa imperdiet feugiat. Fusce est leo, dictum in enim a, faucibus venenatis dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Thank you, Anomura! This page was built using project info from our friends at Anomura! Anomura is a web3 gaming project with a greater purpose.  They will support wildlife conservation with their innovative play-to-donate model. Check it out!",
       "galleryImage": null,
       "hasContent": true,
       "headerImage": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/c7ee9ccf-8272-4ef8-b058-5bda17c886a1/anomura_banner.jpeg",
       "icon": "👋",
       "path": "page-5940897998829309",
+      "additionalPaths": [],
       "isTemplate": false,
       "parentId": null,
       "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -1065,9 +1061,13 @@
       "proposalId": null,
       "snapshotProposalId": null,
       "fullWidth": false,
-      "version": 451,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
+      "version": 452,
       "bountyId": null,
+      "syncWithPageId": null,
       "convertedProposalId": null,
+      "sourceTemplateId": null,
       "permissions": [
         {
           "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
@@ -1079,6 +1079,7 @@
           "spaceId": null,
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         },
         {
@@ -1091,6 +1092,7 @@
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
           "inheritedFromPermission": null,
           "public": null,
+          "allowDiscovery": false,
           "sourcePermission": null
         }
       ],
@@ -1102,6 +1104,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-11T16:18:22.454Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Onboarding",
           "content": {
             "type": "doc",
@@ -1412,6 +1415,7 @@
           "headerImage": "/images/patterns/notion/gradients_11.jpg",
           "icon": "🚀",
           "path": "page-35241928967622305",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -1423,9 +1427,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 89,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "5dfeceb8-6efb-42df-b3ac-c02c12a59420",
@@ -1437,6 +1445,7 @@
               "spaceId": null,
               "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -1446,7 +1455,8 @@
                 "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             },
             {
@@ -1459,6 +1469,7 @@
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
               "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -1468,7 +1479,8 @@
                 "roleId": null,
                 "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -1481,6 +1493,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-11T16:20:22.334Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Official Links",
           "content": {
             "type": "doc",
@@ -2066,6 +2079,7 @@
           "headerImage": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/18b276ed-7b2e-4e2b-ba86-efd17045cd33/anomura_banner.jpeg",
           "icon": "🔗",
           "path": "page-9401402369062757",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -2077,9 +2091,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 459,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "f80af944-7320-482c-94f4-e7b08a1ac54f",
@@ -2091,6 +2109,7 @@
               "spaceId": null,
               "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -2100,7 +2119,8 @@
                 "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             },
             {
@@ -2113,6 +2133,7 @@
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
               "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -2122,163 +2143,12 @@
                 "roleId": null,
                 "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
-          "children": [
-            {
-              "id": "ea259ea1-f90c-4d05-acd0-8725e092f520",
-              "deletedAt": null,
-              "createdAt": "2022-11-05T15:10:38.515Z",
-              "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-              "updatedAt": "2022-11-05T16:35:09.147Z",
-              "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-              "title": "On Youtube!",
-              "content": {
-                "type": "doc",
-                "content": [
-                  {
-                    "type": "paragraph",
-                    "attrs": {
-                      "track": []
-                    }
-                  },
-                  {
-                    "type": "iframe",
-                    "attrs": {
-                      "src": "https://www.youtube.com/embed/_qSHFhjfB5k",
-                      "type": "video",
-                      "track": [],
-                      "width": 700,
-                      "height": 395.48022598870057
-                    }
-                  },
-                  {
-                    "type": "paragraph",
-                    "attrs": {
-                      "track": []
-                    }
-                  },
-                  {
-                    "type": "iframe",
-                    "attrs": {
-                      "src": "https://www.youtube.com/embed/6oBVm39Fv2s",
-                      "type": "video",
-                      "track": [],
-                      "width": 700,
-                      "height": 395.48022598870057
-                    }
-                  },
-                  {
-                    "type": "paragraph",
-                    "attrs": {
-                      "track": []
-                    }
-                  },
-                  {
-                    "type": "iframe",
-                    "attrs": {
-                      "src": "https://www.youtube.com/embed/s8weIFN3HFQ",
-                      "type": "video",
-                      "track": [],
-                      "width": 700,
-                      "height": 395.48022598870057
-                    }
-                  },
-                  {
-                    "type": "paragraph",
-                    "attrs": {
-                      "track": []
-                    }
-                  },
-                  {
-                    "type": "iframe",
-                    "attrs": {
-                      "src": "https://www.youtube.com/embed/A4AwV1vcZbw",
-                      "type": "video",
-                      "track": [],
-                      "width": 700,
-                      "height": 395.48022598870057
-                    }
-                  },
-                  {
-                    "type": "paragraph",
-                    "attrs": {
-                      "track": []
-                    }
-                  }
-                ]
-              },
-              "contentText": "",
-              "galleryImage": "",
-              "hasContent": true,
-              "headerImage": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/ca61a8ca-5955-40e4-822b-4b91e4049c9e/anomura_banner.jpeg",
-              "icon": "📺",
-              "path": "page-9528992899181672",
-              "isTemplate": false,
-              "parentId": "f80af944-7320-482c-94f4-e7b08a1ac54f",
-              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-              "type": "page",
-              "boardId": null,
-              "autoGenerated": false,
-              "index": 1000,
-              "cardId": null,
-              "proposalId": null,
-              "snapshotProposalId": null,
-              "fullWidth": false,
-              "version": 0,
-              "bountyId": null,
-              "convertedProposalId": null,
-              "permissions": [
-                {
-                  "pageId": "ea259ea1-f90c-4d05-acd0-8725e092f520",
-                  "userId": null,
-                  "id": "8d6eec94-ba90-4457-8ec7-db0c1c502e0a",
-                  "permissionLevel": "view_comment",
-                  "permissions": [],
-                  "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
-                  "spaceId": null,
-                  "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
-                  "public": null,
-                  "sourcePermission": {
-                    "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
-                    "userId": null,
-                    "id": "82d0584b-f917-4565-9895-e050a3e483c8",
-                    "permissionLevel": "view_comment",
-                    "permissions": [],
-                    "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
-                    "spaceId": null,
-                    "inheritedFromPermission": null,
-                    "public": null
-                  }
-                },
-                {
-                  "pageId": "ea259ea1-f90c-4d05-acd0-8725e092f520",
-                  "userId": null,
-                  "id": "244974a4-2c76-49b5-913e-7c9a9fbad5dd",
-                  "permissionLevel": "view",
-                  "permissions": [],
-                  "roleId": null,
-                  "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                  "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
-                  "public": null,
-                  "sourcePermission": {
-                    "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
-                    "userId": null,
-                    "id": "91b90268-1173-430e-99f0-cb5272103f81",
-                    "permissionLevel": "view",
-                    "permissions": [],
-                    "roleId": null,
-                    "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                    "inheritedFromPermission": null,
-                    "public": null
-                  }
-                }
-              ],
-              "children": []
-            }
-          ]
+          "children": []
         },
         {
           "id": "b4296303-a8eb-4da2-9eae-549f0f1f93ca",
@@ -2287,6 +2157,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-11T16:45:12.796Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Newsletter",
           "content": {
             "type": "doc",
@@ -2380,6 +2251,7 @@
           "headerImage": "/images/patterns/notion/gradients_5.png",
           "icon": "🧵",
           "path": "page-9051101123848941",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -2391,9 +2263,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 118,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "b4296303-a8eb-4da2-9eae-549f0f1f93ca",
@@ -2405,6 +2281,7 @@
               "spaceId": null,
               "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -2414,7 +2291,8 @@
                 "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             },
             {
@@ -2427,6 +2305,7 @@
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
               "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -2436,7 +2315,8 @@
                 "roleId": null,
                 "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -2448,6 +2328,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-15T22:40:03.281Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "July 2022 News",
               "content": {
                 "type": "doc",
@@ -2575,6 +2456,7 @@
               "headerImage": null,
               "icon": null,
               "path": "page-2789637270464731",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "b4296303-a8eb-4da2-9eae-549f0f1f93ca",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -2586,9 +2468,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 2,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "6311d8c9-381f-4009-a51b-71334be975aa",
@@ -2600,6 +2486,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -2609,7 +2496,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -2622,6 +2510,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -2631,7 +2520,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -2644,6 +2534,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-15T22:40:12.189Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "June 2022 News",
               "content": {
                 "type": "doc",
@@ -2771,6 +2662,7 @@
               "headerImage": null,
               "icon": null,
               "path": "page-9606391558360003",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "b4296303-a8eb-4da2-9eae-549f0f1f93ca",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -2782,9 +2674,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 2,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "7e84de00-abf9-448c-ab26-d649f1398ea9",
@@ -2796,6 +2692,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -2805,7 +2702,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -2818,6 +2716,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -2827,7 +2726,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -2840,6 +2740,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-15T22:40:16.840Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "May 2022 News",
               "content": {
                 "type": "doc",
@@ -2967,6 +2868,7 @@
               "headerImage": null,
               "icon": null,
               "path": "page-8202547986124131",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "b4296303-a8eb-4da2-9eae-549f0f1f93ca",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -2978,9 +2880,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 2,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "8352c8f4-16de-415e-878a-23479f67b45c",
@@ -2992,6 +2898,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -3001,7 +2908,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -3014,6 +2922,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -3023,7 +2932,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -3036,8 +2946,9 @@
           "deletedAt": null,
           "createdAt": "2022-12-15T16:35:38.010Z",
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-          "updatedAt": "2023-02-12T14:27:29.032Z",
+          "updatedAt": "2023-09-12T15:35:30.259Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Collection Highlights",
           "content": {
             "type": "doc",
@@ -3045,6 +2956,7 @@
               {
                 "type": "heading",
                 "attrs": {
+                  "id": null,
                   "level": 1,
                   "track": [],
                   "collapseContent": null
@@ -3116,7 +3028,7 @@
                     },
                     "content": [
                       {
-                        "text": "Show off your collection. Embed OpenSea NFTs by clicking on the prompts below or typing ",
+                        "text": "Show off your collection. Embed NFTs by clicking on the prompts below or typing ",
                         "type": "text",
                         "marks": [
                           {
@@ -3138,7 +3050,7 @@
                         ]
                       },
                       {
-                        "text": "/opensea",
+                        "text": "/nft",
                         "type": "text",
                         "marks": [
                           {
@@ -3157,7 +3069,10 @@
                 },
                 "content": [
                   {
-                    "type": "columnBlock"
+                    "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    }
                   }
                 ]
               },
@@ -3169,16 +3084,14 @@
                 "content": [
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    },
                     "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "1171",
                           "track": [],
@@ -3188,6 +3101,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -3198,16 +3112,14 @@
                   },
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    },
                     "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "1273",
                           "track": [],
@@ -3217,6 +3129,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -3234,7 +3147,10 @@
                 },
                 "content": [
                   {
-                    "type": "columnBlock"
+                    "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    }
                   }
                 ]
               },
@@ -3246,16 +3162,14 @@
                 "content": [
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    },
                     "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "774",
                           "track": [],
@@ -3265,6 +3179,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -3275,16 +3190,14 @@
                   },
                   {
                     "type": "columnBlock",
+                    "attrs": {
+                      "track": []
+                    },
                     "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "123",
                           "track": [],
@@ -3294,6 +3207,7 @@
                       {
                         "type": "nft",
                         "attrs": {
+                          "size": null,
                           "chain": 1,
                           "token": "",
                           "track": [],
@@ -3507,6 +3421,7 @@
               {
                 "type": "heading",
                 "attrs": {
+                  "id": null,
                   "level": 1,
                   "track": [],
                   "collapseContent": null
@@ -3596,12 +3511,13 @@
               }
             ]
           },
-          "contentText": "Good Deals on OpenSea...Show off your collection. Embed OpenSea NFTs by clicking on the prompts below or typing /openseaYou can build an analytics dashboard for your collection using Dune and embed the charts and tables in CharmVerse by typing /dune. Using Dune does require some technical chops. If you don't have the chops, ask a friend   Collection Holders",
+          "contentText": "Good Deals on OpenSea...Show off your collection. Embed NFTs by clicking on the prompts below or typing /nftYou can build an analytics dashboard for your collection using Dune and embed the charts and tables in CharmVerse by typing /dune. Using Dune does require some technical chops. If you don't have the chops, ask a friend 😉 👑 Collection Holders",
           "galleryImage": null,
           "hasContent": true,
           "headerImage": "/images/patterns/notion/solid_red.png",
           "icon": "📊",
           "path": "page-5046088564919973",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -3613,9 +3529,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
-          "version": 689,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
+          "version": 719,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "71960167-dc07-4ecc-bd12-964a1b5d8168",
@@ -3627,6 +3547,7 @@
               "spaceId": null,
               "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -3636,7 +3557,8 @@
                 "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             },
             {
@@ -3649,6 +3571,7 @@
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
               "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -3658,7 +3581,8 @@
                 "roleId": null,
                 "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -3669,8 +3593,9 @@
           "deletedAt": null,
           "createdAt": "2022-12-15T22:12:16.728Z",
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-          "updatedAt": "2023-02-11T16:45:21.426Z",
+          "updatedAt": "2023-09-12T15:36:29.726Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Get Involved",
           "content": {
             "type": "doc",
@@ -3797,6 +3722,7 @@
                   {
                     "type": "heading",
                     "attrs": {
+                      "id": null,
                       "level": 3,
                       "track": [],
                       "collapseContent": null
@@ -3953,6 +3879,7 @@
                   {
                     "type": "heading",
                     "attrs": {
+                      "id": null,
                       "level": 3,
                       "track": [],
                       "collapseContent": null
@@ -4025,6 +3952,7 @@
                   {
                     "type": "heading",
                     "attrs": {
+                      "id": null,
                       "level": 3,
                       "track": [],
                       "collapseContent": null
@@ -4097,614 +4025,16 @@
                 "attrs": {
                   "track": []
                 }
-              },
-              {
-                "type": "image",
-                "attrs": {
-                  "alt": null,
-                  "src": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/08d588fc-46eb-437e-8512-ec6664124847/Screen-Shot-2022-12-19-at-2.03.29-PM.png",
-                  "size": 700,
-                  "track": [],
-                  "caption": null
-                }
-              },
-              {
-                "type": "paragraph",
-                "attrs": {
-                  "track": []
-                }
-              },
-              {
-                "type": "orderedList",
-                "attrs": {
-                  "order": 1,
-                  "tight": false,
-                  "track": []
-                },
-                "content": [
-                  {
-                    "type": "listItem",
-                    "attrs": {
-                      "track": [],
-                      "todoChecked": null
-                    },
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Private Draft:",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              },
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": " ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "A new proposal starts off in the \"Private Draft\" stage. Only authors and workspace admins can view/edit the proposal. Choose to move the proposal to \"Public Draft\" or directly to \"Discussion\"",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "listItem",
-                    "attrs": {
-                      "track": [],
-                      "todoChecked": null
-                    },
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Public Draft:",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              },
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": " ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "All members have view only access to the proposal. Author(s) may continue to edit the proposal in the open and choose to move the proposal back to \"Private Draft\" or ahead to \"Discussion\"",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "listItem",
-                    "attrs": {
-                      "track": [],
-                      "todoChecked": null
-                    },
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Discussion:",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              },
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": " ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "Community members are invited to comment, suggest edits, and add polls to the proposal draft. If discussion leads to substantial editing, an author may decide to send the proposal back to either \"Public Draft\" or \"Private Draft\". When everything looks good,  an author may move the proposal forward to \"In Review\"",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "listItem",
-                    "attrs": {
-                      "track": [],
-                      "todoChecked": null
-                    },
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "In Review:",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              },
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": " ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "Designated reviewer(s) are invited to assess the proposal and move the proposal ahead to \"Reviewed\" if they believe the proposal is ready for a vote or back to any previous stage for more discussion and/or editing. ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "listItem",
-                    "attrs": {
-                      "track": [],
-                      "todoChecked": null
-                    },
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Reviewed:",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              },
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": " ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "Authors are notified that the proposal has been approved by a reviewer. An author or admin may initiate a community vote by moving the proposal to \"Vote Active\" or if they aren't ready, they can send the proposal back to any previous stage.",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "listItem",
-                    "attrs": {
-                      "track": [],
-                      "todoChecked": null
-                    },
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Vote Active:",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              },
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": " ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "The author may create a vote in CharmVerse or publish the proposal to Snapshot. Community members will be notified that it is time to vote. Once the vote has been initiated, the proposal may not be modified in any way.",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "type": "listItem",
-                    "attrs": {
-                      "track": [],
-                      "todoChecked": null
-                    },
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Vote Closed:",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "bold"
-                              },
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": "purple",
-                                  "bgColor": ""
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": " ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:00:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "When the deadline for the vote has passed, results will be saved on the Proposals page for all eternity. ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2022-12-19T19:10:00.000Z",
-                                  "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                                  "approved": true,
-                                  "username": "Drea | CharmVerse"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "attrs": {
-                  "track": []
-                }
               }
             ]
           },
-          "contentText": "Engage your members! Embed forms to collect information using the / command. You can select from a Google Form, Airtable, or Typeform.Apply to be a contributor.Get input from your members! Insert a poll by typing /poll Let us know what you thinkLearn how to create a proposal Private Draft: A new proposal starts off in the \"Private Draft\" stage. Only authors and workspace admins can view/edit the proposal. Choose to move the proposal to \"Public Draft\" or directly to \"Discussion\"Public Draft: All members have view only access to the proposal. Author(s) may continue to edit the proposal in the open and choose to move the proposal back to \"Private Draft\" or ahead to \"Discussion\"Discussion: Community members are invited to comment, suggest edits, and add polls to the proposal draft. If discussion leads to substantial editing, an author may decide to send the proposal back to either \"Public Draft\" or \"Private Draft\". When everything looks good,  an author may move the proposal forward to \"In Review\"In Review: Designated reviewer(s) are invited to assess the proposal and move the proposal ahead to \"Reviewed\" if they believe the proposal is ready for a vote or back to any previous stage for more discussion and/or editing. Reviewed: Authors are notified that the proposal has been approved by a reviewer. An author or admin may initiate a community vote by moving the proposal to \"Vote Active\" or if they aren't ready, they can send the proposal back to any previous stage.Vote Active: The author may create a vote in CharmVerse or publish the proposal to Snapshot. Community members will be notified that it is time to vote. Once the vote has been initiated, the proposal may not be modified in any way.Vote Closed: When the deadline for the vote has passed, results will be saved on the Proposals page for all eternity. ",
+          "contentText": "Engage your members! Embed forms to collect information using the / command. You can select from a Google Form, Airtable, or Typeform.Apply to be a contributor.Get input from your members! Insert a poll by typing /poll Let us know what you thinkLearn how to create a proposal ",
           "galleryImage": null,
           "hasContent": true,
           "headerImage": "/images/patterns/notion/gradients_4.png",
           "icon": "🤝",
           "path": "page-5579340286417676",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -4716,9 +4046,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
-          "version": 850,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
+          "version": 851,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "3a0b75a8-a74c-46b4-b6dd-c0f0bd819fba",
@@ -4730,6 +4064,7 @@
               "spaceId": null,
               "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -4739,7 +4074,8 @@
                 "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             },
             {
@@ -4752,6 +4088,7 @@
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
               "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -4761,7 +4098,8 @@
                 "roleId": null,
                 "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -4774,6 +4112,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2022-12-15T22:12:42.411Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Artwork",
           "content": null,
           "contentText": "",
@@ -4782,6 +4121,7 @@
           "headerImage": null,
           "icon": "🎨",
           "path": "page-34448366853596357",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -4793,9 +4133,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 1,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
@@ -4807,6 +4151,7 @@
               "spaceId": null,
               "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -4816,7 +4161,8 @@
                 "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             },
             {
@@ -4829,6 +4175,7 @@
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
               "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -4838,136 +4185,12 @@
                 "roleId": null,
                 "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
           "children": [
-            {
-              "id": "f6308ac2-9780-4d41-b19f-c9550646bd59",
-              "deletedAt": null,
-              "createdAt": "2022-12-15T21:43:11.202Z",
-              "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-              "updatedAt": "2022-12-19T19:29:32.280Z",
-              "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-              "title": "Crab playing Anomura",
-              "content": {
-                "type": "doc",
-                "content": [
-                  {
-                    "type": "image",
-                    "attrs": {
-                      "alt": null,
-                      "src": "https://www.anomuragame.com/img/home/about/Anomura%20playing%20video%20game_600x400.gif",
-                      "size": 425,
-                      "track": [],
-                      "caption": null
-                    }
-                  },
-                  {
-                    "type": "paragraph",
-                    "attrs": {
-                      "track": []
-                    }
-                  }
-                ]
-              },
-              "contentText": "",
-              "galleryImage": "https://www.anomuragame.com/img/home/about/Anomura%20playing%20video%20game_600x400.gif",
-              "hasContent": false,
-              "headerImage": null,
-              "icon": "",
-              "path": "page-2556646678300505",
-              "isTemplate": false,
-              "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
-              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-              "type": "card",
-              "boardId": null,
-              "autoGenerated": false,
-              "index": -1,
-              "cardId": "f6308ac2-9780-4d41-b19f-c9550646bd59",
-              "proposalId": null,
-              "snapshotProposalId": null,
-              "fullWidth": false,
-              "version": 2,
-              "bountyId": null,
-              "convertedProposalId": null,
-              "permissions": [
-                {
-                  "pageId": "f6308ac2-9780-4d41-b19f-c9550646bd59",
-                  "userId": null,
-                  "id": "26419314-be4f-4f2d-9f88-d6ff4245a3d0",
-                  "permissionLevel": "view_comment",
-                  "permissions": [],
-                  "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
-                  "spaceId": null,
-                  "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
-                  "public": null,
-                  "sourcePermission": {
-                    "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
-                    "userId": null,
-                    "id": "82d0584b-f917-4565-9895-e050a3e483c8",
-                    "permissionLevel": "view_comment",
-                    "permissions": [],
-                    "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
-                    "spaceId": null,
-                    "inheritedFromPermission": null,
-                    "public": null
-                  }
-                },
-                {
-                  "pageId": "f6308ac2-9780-4d41-b19f-c9550646bd59",
-                  "userId": null,
-                  "id": "a050ae39-4e25-4181-96eb-a7947767c562",
-                  "permissionLevel": "view",
-                  "permissions": [],
-                  "roleId": null,
-                  "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                  "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
-                  "public": null,
-                  "sourcePermission": {
-                    "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
-                    "userId": null,
-                    "id": "91b90268-1173-430e-99f0-cb5272103f81",
-                    "permissionLevel": "view",
-                    "permissions": [],
-                    "roleId": null,
-                    "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                    "inheritedFromPermission": null,
-                    "public": null
-                  }
-                }
-              ],
-              "children": [],
-              "blocks": {
-                "card": {
-                  "id": "f6308ac2-9780-4d41-b19f-c9550646bd59",
-                  "deletedAt": null,
-                  "createdAt": "2022-12-15T21:43:11.202Z",
-                  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                  "updatedAt": "2022-12-19T19:33:40.115Z",
-                  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                  "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                  "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
-                  "rootId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
-                  "schema": 1,
-                  "type": "card",
-                  "title": "Card 1",
-                  "fields": {
-                    "icon": "",
-                    "isTemplate": false,
-                    "properties": {
-                      "11eefd10-f082-40d6-abc0-0a8cec44fb90": [
-                        "c2d87833-95b6-433d-9519-5d60977ce721",
-                        "b960c9a1-c16e-4d04-aba4-d2c01f7071e0"
-                      ]
-                    },
-                    "headerImage": null,
-                    "contentOrder": []
-                  }
-                }
-              }
-            },
             {
               "id": "3832cd1f-b95a-4325-b406-600836701460",
               "deletedAt": null,
@@ -4975,6 +4198,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-19T19:30:40.407Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Anomura Shop",
               "content": {
                 "type": "doc",
@@ -5003,6 +4227,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-43228977161856985",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -5014,9 +4239,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 2,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "3832cd1f-b95a-4325-b406-600836701460",
@@ -5028,6 +4257,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5037,7 +4267,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -5050,6 +4281,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5059,7 +4291,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -5100,6 +4333,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-19T19:31:42.981Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Anomura loves wildlife",
               "content": {
                 "type": "doc",
@@ -5128,6 +4362,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-42915168498668477",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -5139,9 +4374,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 2,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "60ff9ddf-0bc8-42ca-94b6-2405e34bf569",
@@ -5153,6 +4392,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5162,7 +4402,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -5175,6 +4416,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5184,7 +4426,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -5219,12 +4462,148 @@
               }
             },
             {
+              "id": "f6308ac2-9780-4d41-b19f-c9550646bd59",
+              "deletedAt": null,
+              "createdAt": "2022-12-15T21:43:11.202Z",
+              "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "updatedAt": "2022-12-19T19:29:32.280Z",
+              "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
+              "title": "Crab playing Anomura",
+              "content": {
+                "type": "doc",
+                "content": [
+                  {
+                    "type": "image",
+                    "attrs": {
+                      "alt": null,
+                      "src": "https://www.anomuragame.com/img/home/about/Anomura%20playing%20video%20game_600x400.gif",
+                      "size": 425,
+                      "track": [],
+                      "caption": null
+                    }
+                  },
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    }
+                  }
+                ]
+              },
+              "contentText": "",
+              "galleryImage": "https://www.anomuragame.com/img/home/about/Anomura%20playing%20video%20game_600x400.gif",
+              "hasContent": false,
+              "headerImage": null,
+              "icon": "",
+              "path": "page-2556646678300505",
+              "additionalPaths": [],
+              "isTemplate": false,
+              "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
+              "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+              "type": "card",
+              "boardId": null,
+              "autoGenerated": false,
+              "index": -1,
+              "cardId": "f6308ac2-9780-4d41-b19f-c9550646bd59",
+              "proposalId": null,
+              "snapshotProposalId": null,
+              "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
+              "version": 2,
+              "bountyId": null,
+              "syncWithPageId": null,
+              "convertedProposalId": null,
+              "sourceTemplateId": null,
+              "permissions": [
+                {
+                  "pageId": "f6308ac2-9780-4d41-b19f-c9550646bd59",
+                  "userId": null,
+                  "id": "26419314-be4f-4f2d-9f88-d6ff4245a3d0",
+                  "permissionLevel": "view_comment",
+                  "permissions": [],
+                  "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
+                  "spaceId": null,
+                  "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
+                  "public": null,
+                  "allowDiscovery": false,
+                  "sourcePermission": {
+                    "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
+                    "userId": null,
+                    "id": "82d0584b-f917-4565-9895-e050a3e483c8",
+                    "permissionLevel": "view_comment",
+                    "permissions": [],
+                    "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
+                    "spaceId": null,
+                    "inheritedFromPermission": null,
+                    "public": null,
+                    "allowDiscovery": false
+                  }
+                },
+                {
+                  "pageId": "f6308ac2-9780-4d41-b19f-c9550646bd59",
+                  "userId": null,
+                  "id": "a050ae39-4e25-4181-96eb-a7947767c562",
+                  "permissionLevel": "view",
+                  "permissions": [],
+                  "roleId": null,
+                  "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+                  "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
+                  "public": null,
+                  "allowDiscovery": false,
+                  "sourcePermission": {
+                    "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
+                    "userId": null,
+                    "id": "91b90268-1173-430e-99f0-cb5272103f81",
+                    "permissionLevel": "view",
+                    "permissions": [],
+                    "roleId": null,
+                    "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+                    "inheritedFromPermission": null,
+                    "public": null,
+                    "allowDiscovery": false
+                  }
+                }
+              ],
+              "children": [],
+              "blocks": {
+                "card": {
+                  "id": "f6308ac2-9780-4d41-b19f-c9550646bd59",
+                  "deletedAt": null,
+                  "createdAt": "2022-12-15T21:43:11.202Z",
+                  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                  "updatedAt": "2022-12-19T19:33:40.115Z",
+                  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                  "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+                  "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
+                  "rootId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
+                  "schema": 1,
+                  "type": "card",
+                  "title": "Card 1",
+                  "fields": {
+                    "icon": "",
+                    "isTemplate": false,
+                    "properties": {
+                      "11eefd10-f082-40d6-abc0-0a8cec44fb90": [
+                        "c2d87833-95b6-433d-9519-5d60977ce721",
+                        "b960c9a1-c16e-4d04-aba4-d2c01f7071e0"
+                      ]
+                    },
+                    "headerImage": null,
+                    "contentOrder": []
+                  }
+                }
+              }
+            },
+            {
               "id": "9105fd0a-9cd5-4943-a9ff-1158078196f6",
               "deletedAt": null,
               "createdAt": "2022-12-19T19:22:53.422Z",
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-19T19:32:27.728Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Pedestal",
               "content": {
                 "type": "doc",
@@ -5253,6 +4632,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-7951427341427733",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -5264,9 +4644,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 2,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "9105fd0a-9cd5-4943-a9ff-1158078196f6",
@@ -5278,6 +4662,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5287,7 +4672,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -5300,6 +4686,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5309,7 +4696,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -5350,6 +4738,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-19T19:37:49.061Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Anomura Name Logo",
               "content": {
                 "type": "doc",
@@ -5378,6 +4767,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-5128160381049898",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -5389,9 +4779,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 2,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "fd826534-ba64-4f4a-af82-30cad103c655",
@@ -5403,6 +4797,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5412,7 +4807,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -5425,6 +4821,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5434,7 +4831,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -5475,6 +4873,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-19T19:37:59.256Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Anomura Crab Logo",
               "content": {
                 "type": "doc",
@@ -5503,6 +4902,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-9085281344345733",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -5514,9 +4914,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 3,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "666279fa-3d21-4d0a-aa44-f25456667d9a",
@@ -5528,6 +4932,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5537,7 +4942,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -5550,6 +4956,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5559,7 +4966,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -5600,6 +5008,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-19T19:35:16.032Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Anomura Banner",
               "content": {
                 "type": "doc",
@@ -5628,6 +5037,7 @@
               "headerImage": null,
               "icon": "",
               "path": "page-7805469453578793",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "af9cca4e-ca1c-4054-a20f-3d7745d7a1e7",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -5639,9 +5049,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 10,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "4e8454ec-65bf-4275-b31f-a926fbc62d6c",
@@ -5653,6 +5067,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5662,7 +5077,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -5675,6 +5091,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -5684,7 +5101,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -5865,6 +5283,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-11T16:45:30.562Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Member Benefits",
           "content": {
             "type": "doc",
@@ -6979,6 +6398,7 @@
           "headerImage": "/images/patterns/notion/solid_red.png",
           "icon": "🔒",
           "path": "page-9701600777607564",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -6990,9 +6410,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 658,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [],
           "children": [
             {
@@ -7002,6 +6426,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-15T21:46:10.400Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Airdrops",
               "content": null,
               "contentText": "",
@@ -7010,6 +6435,7 @@
               "headerImage": null,
               "icon": "🪂",
               "path": "page-7711867590927035",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "0267fb8e-b25c-4784-8fe5-0c9f1c5eb174",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -7021,9 +6447,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 1,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "3ceb7315-bda6-48a1-b93b-cbab2567feac",
@@ -7035,6 +6465,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": null,
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": null
                 }
               ],
@@ -7049,6 +6480,7 @@
           "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
           "updatedAt": "2023-02-11T16:45:35.493Z",
           "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "deletedBy": null,
           "title": "Core Team",
           "content": {
             "type": "doc",
@@ -8089,6 +7521,7 @@
           "headerImage": "/images/patterns/notion/gradients_8.png",
           "icon": "👑",
           "path": "page-8325927945470504",
+          "additionalPaths": [],
           "isTemplate": false,
           "parentId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
           "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -8100,9 +7533,13 @@
           "proposalId": null,
           "snapshotProposalId": null,
           "fullWidth": false,
+          "fontFamily": "default",
+          "fontSizeSmall": false,
           "version": 75,
           "bountyId": null,
+          "syncWithPageId": null,
           "convertedProposalId": null,
+          "sourceTemplateId": null,
           "permissions": [
             {
               "pageId": "22f791c5-ce26-47e8-88cf-562fd690c744",
@@ -8114,6 +7551,7 @@
               "spaceId": null,
               "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -8123,7 +7561,8 @@
                 "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                 "spaceId": null,
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             },
             {
@@ -8136,6 +7575,7 @@
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
               "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
               "public": null,
+              "allowDiscovery": false,
               "sourcePermission": {
                 "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                 "userId": null,
@@ -8145,7 +7585,8 @@
                 "roleId": null,
                 "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                 "inheritedFromPermission": null,
-                "public": null
+                "public": null,
+                "allowDiscovery": false
               }
             }
           ],
@@ -8157,6 +7598,7 @@
               "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
               "updatedAt": "2022-12-15T21:46:39.282Z",
               "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+              "deletedBy": null,
               "title": "Core Team Task list",
               "content": null,
               "contentText": "",
@@ -8165,6 +7607,7 @@
               "headerImage": null,
               "icon": "📝",
               "path": "page-8693293242105495",
+              "additionalPaths": [],
               "isTemplate": false,
               "parentId": "22f791c5-ce26-47e8-88cf-562fd690c744",
               "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -8176,9 +7619,13 @@
               "proposalId": null,
               "snapshotProposalId": null,
               "fullWidth": false,
+              "fontFamily": "default",
+              "fontSizeSmall": false,
               "version": 0,
               "bountyId": null,
+              "syncWithPageId": null,
               "convertedProposalId": null,
+              "sourceTemplateId": null,
               "permissions": [
                 {
                   "pageId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
@@ -8190,6 +7637,7 @@
                   "spaceId": null,
                   "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -8199,7 +7647,8 @@
                     "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                     "spaceId": null,
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 },
                 {
@@ -8212,6 +7661,7 @@
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                   "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                   "public": null,
+                  "allowDiscovery": false,
                   "sourcePermission": {
                     "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                     "userId": null,
@@ -8221,7 +7671,8 @@
                     "roleId": null,
                     "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                     "inheritedFromPermission": null,
-                    "public": null
+                    "public": null,
+                    "allowDiscovery": false
                   }
                 }
               ],
@@ -8233,6 +7684,7 @@
                   "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
                   "updatedAt": "2022-12-20T12:33:01.210Z",
                   "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                  "deletedBy": null,
                   "title": "Organize a Twitter Space about web3 gaming w/ CharmVerse",
                   "content": null,
                   "contentText": "",
@@ -8241,6 +7693,7 @@
                   "headerImage": null,
                   "icon": "",
                   "path": "page-4200597684450389",
+                  "additionalPaths": [],
                   "isTemplate": false,
                   "parentId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -8252,9 +7705,13 @@
                   "proposalId": null,
                   "snapshotProposalId": null,
                   "fullWidth": false,
+                  "fontFamily": "default",
+                  "fontSizeSmall": false,
                   "version": 0,
                   "bountyId": null,
+                  "syncWithPageId": null,
                   "convertedProposalId": null,
+                  "sourceTemplateId": null,
                   "permissions": [
                     {
                       "pageId": "01fdd8ff-61b4-4368-8f98-3713d79c1733",
@@ -8266,6 +7723,7 @@
                       "spaceId": null,
                       "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                       "public": null,
+                      "allowDiscovery": false,
                       "sourcePermission": {
                         "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                         "userId": null,
@@ -8275,7 +7733,8 @@
                         "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                         "spaceId": null,
                         "inheritedFromPermission": null,
-                        "public": null
+                        "public": null,
+                        "allowDiscovery": false
                       }
                     },
                     {
@@ -8288,6 +7747,7 @@
                       "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                       "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                       "public": null,
+                      "allowDiscovery": false,
                       "sourcePermission": {
                         "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                         "userId": null,
@@ -8297,7 +7757,8 @@
                         "roleId": null,
                         "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                         "inheritedFromPermission": null,
-                        "public": null
+                        "public": null,
+                        "allowDiscovery": false
                       }
                     }
                   ],
@@ -8332,117 +7793,13 @@
                   }
                 },
                 {
-                  "id": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
-                  "deletedAt": null,
-                  "createdAt": "2022-11-23T15:30:10.941Z",
-                  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                  "updatedAt": "2022-12-20T12:33:10.144Z",
-                  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                  "title": "Finish the CharmVerse workspace",
-                  "content": null,
-                  "contentText": "",
-                  "galleryImage": "",
-                  "hasContent": false,
-                  "headerImage": null,
-                  "icon": "",
-                  "path": "page-03645194272056074",
-                  "isTemplate": false,
-                  "parentId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
-                  "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                  "type": "card",
-                  "boardId": null,
-                  "autoGenerated": false,
-                  "index": -1,
-                  "cardId": null,
-                  "proposalId": null,
-                  "snapshotProposalId": null,
-                  "fullWidth": false,
-                  "version": 0,
-                  "bountyId": null,
-                  "convertedProposalId": null,
-                  "permissions": [
-                    {
-                      "pageId": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
-                      "userId": null,
-                      "id": "15a6e7d2-4744-434c-ba75-b89daa536879",
-                      "permissionLevel": "view_comment",
-                      "permissions": [],
-                      "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
-                      "spaceId": null,
-                      "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
-                      "public": null,
-                      "sourcePermission": {
-                        "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
-                        "userId": null,
-                        "id": "82d0584b-f917-4565-9895-e050a3e483c8",
-                        "permissionLevel": "view_comment",
-                        "permissions": [],
-                        "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
-                        "spaceId": null,
-                        "inheritedFromPermission": null,
-                        "public": null
-                      }
-                    },
-                    {
-                      "pageId": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
-                      "userId": null,
-                      "id": "7e5eab9e-7cc7-4da4-81a3-02e9b17659a9",
-                      "permissionLevel": "view",
-                      "permissions": [],
-                      "roleId": null,
-                      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                      "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
-                      "public": null,
-                      "sourcePermission": {
-                        "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
-                        "userId": null,
-                        "id": "91b90268-1173-430e-99f0-cb5272103f81",
-                        "permissionLevel": "view",
-                        "permissions": [],
-                        "roleId": null,
-                        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                        "inheritedFromPermission": null,
-                        "public": null
-                      }
-                    }
-                  ],
-                  "children": [],
-                  "blocks": {
-                    "card": {
-                      "id": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
-                      "deletedAt": null,
-                      "createdAt": "2022-12-15T19:50:11.392Z",
-                      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                      "updatedAt": "2022-12-15T19:50:11.392Z",
-                      "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-                      "parentId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
-                      "rootId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
-                      "schema": 1,
-                      "type": "card",
-                      "title": "Card 2",
-                      "fields": {
-                        "icon": "",
-                        "isTemplate": false,
-                        "properties": {
-                          "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "181ec031-6afc-4414-b1b8-87d2ecc74b82",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "e5dba747-be62-49be-a7ba-71cf27b17174"
-                          ]
-                        },
-                        "headerImage": null,
-                        "contentOrder": []
-                      }
-                    }
-                  }
-                },
-                {
                   "id": "13dd811c-af38-4739-9ad6-01d6e32572eb",
                   "deletedAt": null,
                   "createdAt": "2022-11-23T15:30:10.941Z",
                   "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
                   "updatedAt": "2022-12-20T12:33:22.093Z",
                   "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                  "deletedBy": null,
                   "title": "Work on the website",
                   "content": {
                     "type": "doc",
@@ -8461,6 +7818,7 @@
                   "headerImage": null,
                   "icon": "",
                   "path": "page-8484888185250994",
+                  "additionalPaths": [],
                   "isTemplate": false,
                   "parentId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
                   "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
@@ -8472,9 +7830,13 @@
                   "proposalId": null,
                   "snapshotProposalId": null,
                   "fullWidth": false,
+                  "fontFamily": "default",
+                  "fontSizeSmall": false,
                   "version": 0,
                   "bountyId": null,
+                  "syncWithPageId": null,
                   "convertedProposalId": null,
+                  "sourceTemplateId": null,
                   "permissions": [
                     {
                       "pageId": "13dd811c-af38-4739-9ad6-01d6e32572eb",
@@ -8486,6 +7848,7 @@
                       "spaceId": null,
                       "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
                       "public": null,
+                      "allowDiscovery": false,
                       "sourcePermission": {
                         "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                         "userId": null,
@@ -8495,7 +7858,8 @@
                         "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
                         "spaceId": null,
                         "inheritedFromPermission": null,
-                        "public": null
+                        "public": null,
+                        "allowDiscovery": false
                       }
                     },
                     {
@@ -8508,6 +7872,7 @@
                       "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                       "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
                       "public": null,
+                      "allowDiscovery": false,
                       "sourcePermission": {
                         "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
                         "userId": null,
@@ -8517,7 +7882,8 @@
                         "roleId": null,
                         "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
                         "inheritedFromPermission": null,
-                        "public": null
+                        "public": null,
+                        "allowDiscovery": false
                       }
                     }
                   ],
@@ -8543,6 +7909,121 @@
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
                           "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
                             "f7d47848-f993-4d16-8008-e1f5b23b8ad3"
+                          ]
+                        },
+                        "headerImage": null,
+                        "contentOrder": []
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
+                  "deletedAt": null,
+                  "createdAt": "2022-11-23T15:30:10.941Z",
+                  "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                  "updatedAt": "2022-12-20T12:33:10.144Z",
+                  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                  "deletedBy": null,
+                  "title": "Finish the CharmVerse workspace",
+                  "content": null,
+                  "contentText": "",
+                  "galleryImage": "",
+                  "hasContent": false,
+                  "headerImage": null,
+                  "icon": "",
+                  "path": "page-03645194272056074",
+                  "additionalPaths": [],
+                  "isTemplate": false,
+                  "parentId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
+                  "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+                  "type": "card",
+                  "boardId": null,
+                  "autoGenerated": false,
+                  "index": -1,
+                  "cardId": null,
+                  "proposalId": null,
+                  "snapshotProposalId": null,
+                  "fullWidth": false,
+                  "fontFamily": "default",
+                  "fontSizeSmall": false,
+                  "version": 0,
+                  "bountyId": null,
+                  "syncWithPageId": null,
+                  "convertedProposalId": null,
+                  "sourceTemplateId": null,
+                  "permissions": [
+                    {
+                      "pageId": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
+                      "userId": null,
+                      "id": "15a6e7d2-4744-434c-ba75-b89daa536879",
+                      "permissionLevel": "view_comment",
+                      "permissions": [],
+                      "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
+                      "spaceId": null,
+                      "inheritedFromPermission": "82d0584b-f917-4565-9895-e050a3e483c8",
+                      "public": null,
+                      "allowDiscovery": false,
+                      "sourcePermission": {
+                        "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
+                        "userId": null,
+                        "id": "82d0584b-f917-4565-9895-e050a3e483c8",
+                        "permissionLevel": "view_comment",
+                        "permissions": [],
+                        "roleId": "98c504cd-ee3c-48ee-8867-3d2de1512f17",
+                        "spaceId": null,
+                        "inheritedFromPermission": null,
+                        "public": null,
+                        "allowDiscovery": false
+                      }
+                    },
+                    {
+                      "pageId": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
+                      "userId": null,
+                      "id": "7e5eab9e-7cc7-4da4-81a3-02e9b17659a9",
+                      "permissionLevel": "view",
+                      "permissions": [],
+                      "roleId": null,
+                      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+                      "inheritedFromPermission": "91b90268-1173-430e-99f0-cb5272103f81",
+                      "public": null,
+                      "allowDiscovery": false,
+                      "sourcePermission": {
+                        "pageId": "0e2c3ecc-61aa-40b8-bed6-699f0f14fc04",
+                        "userId": null,
+                        "id": "91b90268-1173-430e-99f0-cb5272103f81",
+                        "permissionLevel": "view",
+                        "permissions": [],
+                        "roleId": null,
+                        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+                        "inheritedFromPermission": null,
+                        "public": null,
+                        "allowDiscovery": false
+                      }
+                    }
+                  ],
+                  "children": [],
+                  "blocks": {
+                    "card": {
+                      "id": "a5552b55-1f1f-48bd-bf70-ac6e8fd0d935",
+                      "deletedAt": null,
+                      "createdAt": "2022-12-15T19:50:11.392Z",
+                      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "updatedAt": "2022-12-15T19:50:11.392Z",
+                      "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+                      "parentId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
+                      "rootId": "3d5b76c8-3ab8-4568-a212-6871b287a0f7",
+                      "schema": 1,
+                      "type": "card",
+                      "title": "Card 2",
+                      "fields": {
+                        "icon": "",
+                        "isTemplate": false,
+                        "properties": {
+                          "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "181ec031-6afc-4414-b1b8-87d2ecc74b82",
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
+                            "e5dba747-be62-49be-a7ba-71cf27b17174"
                           ]
                         },
                         "headerImage": null,

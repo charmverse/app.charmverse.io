@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTruthy } from 'lib/utilities/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
@@ -20,7 +20,7 @@ const updateVoteStatus = async () => {
     }
   });
 
-  const { passedVotes, rejectedVotes } = await getVotesByState(votesPassedDeadline);
+  const { passedVotes, rejectedVotes } = getVotesByState(votesPassedDeadline);
 
   const proposalPageIds = votesPassedDeadline
     .filter((v) => v.context === 'proposal')

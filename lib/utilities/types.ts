@@ -11,3 +11,22 @@ export type RequiredNotNull<T> = {
 export type JSONValues<T> = {
   [P in keyof T]: P extends string ? (T[P] extends Date ? string : T[P]) : never;
 };
+
+type PickNullable<T> = {
+  [P in keyof T as null extends T[P] ? P : never]: T[P];
+};
+
+type PickNotNullable<T> = {
+  [P in keyof T as null extends T[P] ? never : P]: T[P];
+};
+
+// make all nullable values optional. source: https://stackoverflow.com/questions/72165227/how-to-make-nullable-properties-optional-in-typescript
+export type OptionalNullable<T> = T extends any[]
+  ? OptionalNullable<T[number]>[]
+  : T extends object
+  ? {
+      [K in keyof PickNullable<T>]?: OptionalNullable<T[K]>;
+    } & {
+      [K in keyof PickNotNullable<T>]: OptionalNullable<T[K]>;
+    }
+  : T;

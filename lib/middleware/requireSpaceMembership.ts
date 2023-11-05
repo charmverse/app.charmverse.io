@@ -1,14 +1,24 @@
-import { prisma } from '@charmverse/core';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { ApiError } from 'lib/middleware';
 import type { ISystemError } from 'lib/utilities/errors';
 
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
+import { ApiError } from './errors';
+
+declare module 'http' {
+  interface IncomingMessage {
+    isAdmin: boolean;
+    isGuest: boolean;
+  }
+}
+
 /**
- * Allow an endpoint to be consumed if it originates from a share page
+ * Allow an endpoint to be consumed if a user is a space member
+ *
+ * Also sets isAdmin status on the request
  */
 export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey?: string } = { adminOnly: false }) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
@@ -56,6 +66,8 @@ export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey
     if (options.adminOnly && spaceRole.isAdmin !== true) {
       throw new AdministratorOnlyError();
     } else {
+      req.isAdmin = spaceRole.isAdmin;
+      req.isGuest = !spaceRole.isAdmin && spaceRole.isGuest;
       next();
     }
   };

@@ -1,9 +1,69 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
+import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { TypedDataField } from 'ethers/lib/ethers';
 
-import type { SpaceTemplateType } from 'lib/spaces/config';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { APISpaceTemplateType } from 'lib/spaces/config';
+
+export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ * @swagger
+ * components:
+ *  schemas:
+ *    UserProfile:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        avatar:
+ *          type: string
+ *          example: https://google.com/image.png
+ *        wallet:
+ *          type: string
+ *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *        username:
+ *          type: string
+ *          example: testuser
+ *        email:
+ *          type: string
+ *          example: johndoe@gmail.com
+ */
+
+export type UserProfile = {
+  id: string;
+  avatar: string | null;
+  wallet: string;
+  username: string;
+  email: string;
+};
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    PagePropertyOption:
+ *     type: object
+ *     properties:
+ *      id:
+ *        type: string
+ *        example: a6f7c9ac-d660-44ba-a64a-3198e012277f
+ *      color:
+ *        type: string
+ *        example: propColorTeal
+ *      value:
+ *        type: string
+ *        example: Complete
+ */
+export interface PagePropertyOption {
+  id: string;
+  color: string;
+  value: string;
+}
+
+/**
  *
  * @swagger
  * components:
@@ -22,36 +82,19 @@ import type { SpaceTemplateType } from 'lib/spaces/config';
  *          type: string
  *          example: select
  *        options:
- *          required: false
  *          type: array
  *          items:
  *            type: object
- *            properties:
- *               id:
- *                 type: string
- *                 example: a6f7c9ac-d660-44ba-a64a-3198e012277f
- *               color:
- *                 type: string
- *                 example: propColorTeal
- *               value:
- *                 type: string
- *                 example: Complete
+ *            $ref: '#/components/schemas/PagePropertyOption'
  */
-
-export interface PageProperty {
-  id: string;
-  name: string;
-  type: string;
-  options: {
-    id: string;
-    color: string;
-    value: string;
-  }[];
-}
+export type PageProperty<T extends PropertyType = PropertyType> = Pick<IPropertyTemplate, 'id' | 'name'> &
+  Partial<Pick<IPropertyTemplate, 'description'>> & {
+    type: T;
+    options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+  } & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -113,8 +156,6 @@ export interface PageContentFormats {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -157,7 +198,7 @@ export interface PageContentFormats {
  *                example: Medium
  *
  */
-export interface CardPage {
+export type CardPage = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -166,12 +207,10 @@ export interface CardPage {
   content: PageContentFormats;
   title: string;
   isTemplate: boolean;
-  properties: Record<string, string | number>;
-}
+  properties: Record<string, BoardPropertyValue>;
+};
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -199,6 +238,71 @@ export interface CardPage {
 export type CardPageQuery = Partial<Pick<CardPage, 'title' | 'properties'>>;
 
 /**
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardPageCreationData:
+ *      type: object
+ *      properties:
+ *        title:
+ *          type: string
+ *          example: grants
+ *          required: true
+ *        contentMarkdown:
+ *          type: string
+ *          example: Markdown title content
+ *          required: false
+ *        properties:
+ *          type: object
+ *          required: false
+ *          properties:
+ *            Status:
+ *              type: string
+ *              example: Complete
+ *              required: false
+ *            Priority:
+ *              type: string
+ *              example: High
+ *              required: false
+ *
+ */
+export type CardPageCreationData = {
+  title: string;
+  properties?: Record<string, BoardPropertyValue>;
+  contentMarkdown?: string;
+};
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    CardPageUpdateData:
+ *      type: object
+ *      properties:
+ *        title:
+ *          type: string
+ *          example: Grants - Summer
+ *          required: false
+ *        properties:
+ *          type: object
+ *          required: false
+ *          properties:
+ *            Status:
+ *              type: string
+ *              example: Complete
+ *              required: false
+ *            Priority:
+ *              type: string
+ *              example: High
+ *              required: false
+ *
+ */
+export type CardPageUpdateData = {
+  title?: string;
+  properties?: Record<string, BoardPropertyValue>;
+};
+
+/**
  *
  * @property cursor undefined if hasNext is false
  */
@@ -212,12 +316,31 @@ export interface PaginatedResponse<T> {
 export type PaginatedQuery<T> = {
   cursor?: string;
   limit?: number;
-  query: T;
+  query?: T;
 };
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
+ * @swagger
+ * components:
+ *  schemas:
+ *    PaginatedCardPageQuery:
+ *      type: object
+ *      properties:
+ *         limit:
+ *           type: integer
+ *           required: false
+ *           example: 10
+ *         cursor:
+ *           type: string
+ *           required: false
+ *           example: e63758e2-de17-48b2-9c74-5a40ea5be761
+ *         query:
+ *           type: object
+ *           $ref: '#/components/schemas/CardPageQuery'
+ */
+export type PaginatedCardPageQuery = PaginatedQuery<CardPageQuery>;
+
+/**
  * @swagger
  * components:
  *  schemas:
@@ -279,8 +402,6 @@ export interface Workspace {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -327,12 +448,10 @@ export interface CreateWorkspaceRequestBody {
   adminUsername?: string;
   webhookUrl?: string;
   avatar?: string;
-  template?: SpaceTemplateType;
+  template?: APISpaceTemplateType;
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -359,7 +478,7 @@ export interface CreateWorkspaceRequestBody {
  *          type: url
  *          example: https://app.charmverse.io/join?domain=test-dao-space
  */
-export interface Space {
+export interface SpaceApiResponse {
   id: string;
   createdAt: string;
   createdBy: string;
@@ -370,8 +489,6 @@ export interface Space {
 }
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
- *
  * @swagger
  * components:
  *  schemas:
@@ -389,14 +506,78 @@ export interface Space {
  *          type: url
  *          example: https://app.charmverse.io/join?domain=test-dao-space
  */
-export interface CreateWorkspaceResponseBody extends Space {
+export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
   webhookSigningSecret?: string;
 }
 
-export type UserProfile = {
-  id: string;
-  avatar: string | null;
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    CreateSpaceMemberRequestBody:
+ *      required:
+ *        - wallet
+ *      type: object
+ *      properties:
+ *        email:
+ *          type: string
+ *          example: john.doe@gmail.com
+ *        wallet:
+ *          type: string
+ *          example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
+ */
+export interface CreateSpaceMemberRequestBody {
+  email?: string;
   wallet: string;
-  username: string;
-  email: string;
-};
+}
+
+/**
+ * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
+ *
+ * @swagger
+ * components:
+ *  schemas:
+ *    SnapshotProposalVoteMessage:
+ *      required:
+ *        - space
+ *        - proposal
+ *        - type
+ *        - choice
+ *      type: object
+ *      properties:
+ *        space:
+ *          type: string
+ *        proposal:
+ *          type: string
+ *        type:
+ *          type: string
+ *          enum: [single-choice, approval, quadratic, ranked-choice, weighted, basic]
+ *        choice:
+ *          type: string
+ *          example: Abstain
+ */
+export interface SnapshotProposalVoteMessage {
+  space: string;
+  proposal: string;
+  type: ProposalType;
+  choice: string | number;
+}
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    SnapshotProposalVoteType:
+ *      type: object
+ *      properties:
+ *        Vote:
+ *          type: array
+ *          items:
+ *            type: object
+ *            properties:
+ *              name:
+ *                type: string
+ *              type:
+ *                type: string
+ */
+export type SnapshotProposalVoteType = Record<string, TypedDataField[]>;

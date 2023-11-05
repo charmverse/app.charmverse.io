@@ -1,10 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { ApiPageKey, ApiPageKeyType } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computeUserPagePermissions } from 'lib/permissions/pages';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { uid } from 'lib/utilities/strings';
@@ -21,10 +21,12 @@ async function getApiKeys(req: NextApiRequest, res: NextApiResponse<ApiPageKey[]
   const pageId = req.query.pageId as string;
   const userId = req.session?.user?.id;
 
-  const computed = await computeUserPagePermissions({
-    resourceId: pageId,
-    userId
-  });
+  const computed = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: pageId,
+      userId
+    })
+  );
 
   if (computed.edit_content !== true) {
     throw new UnauthorisedActionError('You do not have permission to update this page');
@@ -44,10 +46,12 @@ async function createApiKey(req: NextApiRequest, res: NextApiResponse<ApiPageKey
   const type = req.body.type as ApiPageKeyType;
   const userId = req.session?.user?.id;
 
-  const permissions = await computeUserPagePermissions({
-    resourceId: pageId,
-    userId
-  });
+  const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
+    client.pages.computePagePermissions({
+      resourceId: pageId,
+      userId
+    })
+  );
 
   if (permissions.edit_content !== true) {
     throw new UnauthorisedActionError('You do not have permission to update this page');

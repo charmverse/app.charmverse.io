@@ -1,20 +1,19 @@
 import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { computeProposalCategoryPermissions } from 'lib/permissions/proposals/computeProposalCategoryPermissions';
+import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 describe('POST /api/permissions/proposals/compute-proposal-category-permissions - Compute permissions for a proposal category', () => {
   it('should return computed permissions for a user and non user, and respond 200', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const proposalCategory = await generateProposalCategory({
+    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
-    const role = await generateRole({
+    const role = await testUtilsMembers.generateRole({
       createdBy: user.id,
       spaceId: space.id,
       assigneeUserIds: [user.id]
@@ -28,7 +27,7 @@ describe('POST /api/permissions/proposals/compute-proposal-category-permissions 
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await computeProposalCategoryPermissions({
+    const computed = await premiumPermissionsApiClient.proposals.computeProposalCategoryPermissions({
       resourceId: proposalCategory.id,
       userId: user.id
     });
@@ -44,7 +43,7 @@ describe('POST /api/permissions/proposals/compute-proposal-category-permissions 
     expect(result).toMatchObject(expect.objectContaining(computed));
 
     // Non logged in user test case
-    const publicComputed = await computeProposalCategoryPermissions({
+    const publicComputed = await premiumPermissionsApiClient.proposals.computeProposalCategoryPermissions({
       resourceId: proposalCategory.id,
       userId: undefined
     });

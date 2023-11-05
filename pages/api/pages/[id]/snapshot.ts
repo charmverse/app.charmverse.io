@@ -1,23 +1,32 @@
-import { prisma } from '@charmverse/core';
+import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { IPageWithPermissions } from 'lib/pages/server';
 import { getPage } from 'lib/pages/server';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
+  .use(
+    providePermissionClients({
+      key: 'id',
+      location: 'query',
+      resourceIdType: 'page'
+    })
+  )
   .use(requireKeys<Page>(['snapshotProposalId'], 'body'))
   .put(recordSnapshotInfo);
 
-async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<IPageWithPermissions>) {
+async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const { snapshotProposalId } = req.body;
 
   const pageId = req.query.id as string;
@@ -37,7 +46,7 @@ async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<IPag
     throw error;
   }
 
-  const updatedPage = await prisma.page.update({
+  await prisma.page.update({
     where: {
       id: pageId
     },
@@ -53,7 +62,16 @@ async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<IPag
     }
   });
 
-  res.status(200).json(updatedPage);
+  // update the UI
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: [{ snapshotProposalId, spaceId: page.spaceId, id: pageId }]
+    },
+    page.spaceId
+  );
+
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);

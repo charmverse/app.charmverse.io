@@ -186,6 +186,10 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         main: colors.gray[mode || 'light'],
         contrastText
       },
+      green: {
+        main: colors.green[mode || 'light'],
+        contrastText
+      },
       turquoise: {
         main: colors.turquoise[mode || 'light'],
         contrastText
@@ -238,6 +242,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       }
     },
     components: {
+      MuiPopover: {
+        defaultProps: {
+          disableRestoreFocus: true
+        }
+      },
       MuiAvatar: {
         styleOverrides: {
           root: ({ ownerState }) => ({
@@ -273,7 +282,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       MuiButtonGroup: {
         defaultProps: {
-          disableRipple: true
+          disableRipple: true,
+          disableElevation: true
         },
         styleOverrides: {
           groupedContained: {
@@ -285,7 +295,8 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       MuiButton: {
         defaultProps: {
-          variant: 'contained'
+          variant: 'contained',
+          disableElevation: true
         },
         styleOverrides: {
           root: {
@@ -319,6 +330,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       MuiTooltip: {
         defaultProps: {
           arrow: true,
+          enterDelay: 1000,
           placement: 'top'
         }
       },

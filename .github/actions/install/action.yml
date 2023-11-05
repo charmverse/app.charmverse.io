@@ -1,28 +1,88 @@
 name: 'Install dependencies'
 
+inputs:
+  core_pkg_version:
+    description: "Optional. Defaults to what's in package.json. Valid options are latest and custom version"
+    required: false
+  commit_core_pkg_upgrade:
+    description: 'Whether commit the update to core package back to branch'
+    required: false
+  save_cache:
+    description: "Whether to save the cache"
+    required: false
+  use_github_core_branch:
+    description: |
+      Optional, core branch name to install from github.
+      If set core_pkg_version and commit_core_pkg_upgrade will be ignored.
+      Add your branch to this variable below to install your custom branch.
+    required: false
+    default:
+outputs:
+  core_bump_commit_hash:
+    description: |
+      Returns new commit hash after committing core version bump.
+      If no new commits because core has already been bumped, return the existing github sha'Returns new commit hash after committing core version bump'
+    value: "${{ steps.commit_core_bump.outputs.commit_hash || github.sha }}"
+
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v3
-
     - uses: actions/setup-node@v3
       with:
         node-version: 18
 
-    
     - name: Create .env.test.local file
       shell: bash
       run: cp .env.test.local.example .env.test.local
 
-    - name: Cache dependencies
-      id: cache_node_modules
-      uses: actions/cache@v3
+    - name: Restore dependencies
+      id: restore_node_modules
+      uses: actions/cache/restore@v3
       with:
         path: ./node_modules
         key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
 
     - name: Install npm dependencies
       shell: bash
-      if: steps.cache_node_modules.outputs.cache-hit != 'true'
+      if: steps.restore_node_modules.outputs.cache-hit != 'true'
       run: npm ci --no-audit --no-fund
 
+    # If installing specific version of core via npmjs
+    - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
+      shell: bash
+      if: inputs.core_pkg_version
+      run: |
+        npm install @charmverse/core@${{ inputs.core_pkg_version }}
+
+    # Commits pkg upgrade back to the code if commit_core_pkg_upgrade is true
+    - name: Commit package and lock file back into repo
+      if: inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      id: commit_core_bump
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_options: '--no-verify'
+        file_pattern: 'package*.json'
+        commit_message: 'Github action: automated Core pk upgrade to ${{ inputs.core_pkg_version }}'
+
+    - name: Print the last commit
+      if: inputs.core_pkg_version && inputs.commit_core_pkg_upgrade
+      shell: bash
+      run: |
+        echo "Newest commit hash - ${{ steps.commit_core_bump.outputs.commit_hash }}"
+
+    # If installing core via github branch
+    - name: Install custom core branch
+      shell: bash
+      if: inputs.use_github_core_branch && github.head_ref == inputs.use_github_core_branch
+      run: |
+        rm -fr node_modules/@charmverse/core
+        npm install github:charmverse/core#${{inputs.use_github_core_branch}}
+        cd node_modules/@charmverse/core
+        npm run build
+
+    - name: Cache dependencies
+      if: inputs.save_cache
+      uses: actions/cache/save@v3
+      with:
+        path: ./node_modules
+        key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}

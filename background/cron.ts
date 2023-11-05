@@ -1,10 +1,12 @@
 import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
 
-import app from './server/app';
+import app from './healthCheck/app';
+import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as processWebhookMessages } from './tasks/processWebhookMessages';
-import { task as notificationTask } from './tasks/sendNotifications';
+import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
+import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
 import { task as verifyTokenGateMembershipsTask } from './tasks/verifyTokenGateMemberships';
@@ -17,9 +19,6 @@ processWebhookMessages();
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);
 
-// Send user task notifications by email
-cron.schedule('*/30 * * * *', notificationTask);
-
 // Update votes status
 cron.schedule('*/30 * * * *', voteTask);
 
@@ -28,6 +27,15 @@ cron.schedule('*/15 * * * *', proposalTask);
 
 // Verify token gates and remove users who no longer meet the conditions
 cron.schedule('*/30 * * * *', verifyTokenGateMembershipsTask);
+
+// Refresh applications with pending payments
+cron.schedule('*/30 * * * *', refreshBountyApplications);
+
+// Count blocks in all spaces
+cron.schedule('*/30 * * * *', countAllSpacesBlocksTask);
+
+// Sync summon space roles every day at midnight
+cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 
 const port = process.env.PORT || 4000;
 

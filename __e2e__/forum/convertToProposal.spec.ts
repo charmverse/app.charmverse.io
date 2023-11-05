@@ -1,11 +1,13 @@
+import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
+import { v4 } from 'uuid';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
-import { createUserAndSpace } from '../utils/mocks';
+import { createUserAndSpace, generateSpaceRole, createUser } from '../utils/mocks';
 import { login } from '../utils/session';
 
 type Fixtures = {
@@ -23,13 +25,22 @@ test('convert post to proposal - create a post, convert that post to proposal an
   forumPostPage,
   page
 }) => {
-  const { space, user } = await createUserAndSpace({
+  const { space } = await createUserAndSpace({
     browserPage: page,
     permissionConfigurationMode: 'collaborative'
   });
+
+  const spaceMember = await createUser({ browserPage: page, address: v4() });
+
+  await generateSpaceRole({
+    spaceId: space.id,
+    userId: spaceMember.id,
+    isOnboarded: true
+  });
+
   await login({
     page,
-    userId: user.id
+    userId: spaceMember.id
   });
 
   const postName = 'Example post';
@@ -48,7 +59,7 @@ test('convert post to proposal - create a post, convert that post to proposal an
 
   const post = await generateForumPost({
     spaceId: space.id,
-    userId: user.id,
+    userId: spaceMember.id,
     categoryId: category.id,
     title: postName
   });

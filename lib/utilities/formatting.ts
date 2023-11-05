@@ -1,4 +1,4 @@
-import type { FiatCurrency } from 'connectors';
+import type { FiatCurrency } from 'connectors/chains';
 
 export function formatMoney(amount: number, currency: FiatCurrency, userLocale: string): string {
   const minimumFractionDigits = amount < 1 && amount > -1 ? 4 : 2;

@@ -1,17 +1,14 @@
-import useSWR from 'swr/immutable';
+import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 
 import charmClient from 'charmClient';
+import { useGetProposalCategories } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { ProposalCategoryWithPermissions } from 'lib/permissions/proposals/interfaces';
 import type { NewProposalCategory } from 'lib/proposal/interface';
 
 export function useProposalCategories() {
-  const currentSpace = useCurrentSpace();
+  const { space: currentSpace } = useCurrentSpace();
   // Might need better ACL in the future
-  const { data: categories, mutate } = useSWR(
-    () => (currentSpace ? `proposals/${currentSpace.id}/categories` : null),
-    () => charmClient.proposals.getProposalCategories(currentSpace!.id)
-  );
+  const { data: categories, mutate } = useGetProposalCategories(currentSpace?.id);
 
   async function addCategory(category: NewProposalCategory) {
     const newCategory = await charmClient.proposals.createProposalCategory(currentSpace!.id, category);
@@ -43,17 +40,14 @@ export function useProposalCategories() {
     });
   }
 
-  function getCategoriesWithCreatePermission() {
-    return (categories ?? [])?.filter((c) => c.permissions.create_proposal);
-  }
+  const proposalCategoriesWithCreatePermission = (categories ?? [])?.filter((c) => c.permissions.create_proposal);
 
   function getDefaultCreateCategory() {
-    const creatableCategories = getCategoriesWithCreatePermission();
-    const firstDefault = creatableCategories.find((c) => c.title === 'General');
+    const firstDefault = proposalCategoriesWithCreatePermission.find((c) => c.title === 'General');
     if (firstDefault) {
       return firstDefault;
     }
-    return creatableCategories[0];
+    return proposalCategoriesWithCreatePermission[0];
   }
 
   return {
@@ -62,7 +56,7 @@ export function useProposalCategories() {
     addCategory,
     deleteCategory,
     mutateCategory,
-    getCategoriesWithCreatePermission,
+    proposalCategoriesWithCreatePermission,
     getDefaultCreateCategory
   };
 }

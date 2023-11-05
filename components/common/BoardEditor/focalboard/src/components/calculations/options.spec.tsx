@@ -15,6 +15,7 @@ describe('components/calculations/Options', () => {
 
     const component = wrapIntl(
       <CalculationOptions
+        anchorEl={null}
         value='none'
         onChange={() => {}}
         property={property}
@@ -41,6 +42,7 @@ describe('components/calculations/Options', () => {
     const component = wrapIntl(
       <CalculationOptions
         value='none'
+        anchorEl={null}
         menuOpen={true}
         onChange={() => {}}
         property={property}

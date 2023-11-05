@@ -3,12 +3,11 @@ import React from 'react';
 
 import { createCard } from 'lib/focalboard/card';
 
-import { createCommentBlock } from '../../../blocks/commentBlock';
 import { wrapIntl } from '../../../testUtils';
 
 import LastModifiedAt from './lastModifiedAt';
 
-describe('componnets/properties/lastModifiedAt', () => {
+describe('components/properties/lastModifiedAt', () => {
   test('should match snapshot', () => {
     const card = createCard();
     card.id = 'card-id-1';

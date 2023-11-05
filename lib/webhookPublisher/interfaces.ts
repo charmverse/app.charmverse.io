@@ -1,3 +1,7 @@
+import type { PageType, ProposalStatus } from '@charmverse/core/prisma';
+
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+
 export type UserEntity = {
   id: string;
   avatar?: string;
@@ -5,6 +9,14 @@ export type UserEntity = {
   walletAddress?: string;
   googleEmail?: string;
   username: string;
+};
+
+export type DocumentEntity = {
+  id: string;
+  title: string;
+  url: string;
+  type: PageType;
+  authors: UserEntity[];
 };
 
 export type SpaceEntity = {
@@ -38,7 +50,14 @@ export type ProposalEntity = {
   authors: UserEntity[];
 };
 
-export type BountyEntity = {
+export type VoteEntity = {
+  id: string;
+  page: DocumentEntity | null;
+  post: PostEntity | null;
+  title: string;
+};
+
+export type RewardEntity = {
   createdAt: string;
   id: string;
   title: string;
@@ -47,28 +66,81 @@ export type BountyEntity = {
   rewardChain: number | null;
   rewardAmount: number | null;
   customReward: string | null;
+  author: UserEntity;
+};
+
+export type ApplicationEntity = {
+  id: string;
+  createdAt: string;
+  user: UserEntity;
+  bounty: RewardEntity;
+};
+
+export type InlineCommentEntity = {
+  createdAt: string;
+  id: string;
+  threadId: string;
+  author: UserEntity;
+};
+
+export type BlockCommentEntity = {
+  createdAt: string;
+  id: string;
+  author: UserEntity;
+};
+
+export type CardPropertyEntity = {
+  id: string;
+  name: string;
+  value: string;
 };
 
 export enum WebhookNameSpaces {
-  Bounty = 'bounty',
+  Reward = 'bounty',
   Forum = 'forum',
   user = 'user',
   Proposal = 'proposal'
 }
 
 export enum WebhookEventNames {
-  BountyCompleted = 'bounty.completed',
-  CommentCreated = 'forum.comment.created',
-  CommentUpvoted = 'forum.comment.upvoted',
-  CommentDownvoted = 'forum.comment.downvoted',
-  PostCreated = 'forum.post.created',
+  RewardCompleted = 'reward.completed',
+  RewardApplicationCreated = 'reward.application.created',
+  RewardApplicationRejected = 'reward.application.rejected',
+  RewardApplicationApproved = 'reward.application.approved',
+  RewardSubmissionCreated = 'reward.submission.created',
+  RewardSubmissionApproved = 'reward.submission.approved',
+  RewardApplicationPaymentCompleted = 'reward.payment.completed',
+  RewardSuggestionCreated = 'reward.suggestion.created',
+  ForumCommentUpvoted = 'forum.comment.upvoted',
+  ForumCommentDownvoted = 'forum.comment.downvoted',
+  ForumPostCreated = 'forum.post.created',
   ProposalPassed = 'proposal.passed',
   ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
+  ProposalStatusChanged = 'proposal.status_changed',
   UserJoined = 'user.joined',
-  HelloWorld = 'hello.world'
+  HelloWorld = 'hello.world',
+  DocumentCommentCreated = 'document.comment.created',
+  DocumentInlineCommentCreated = 'document.inline_comment.created',
+  DocumentMentionCreated = 'document.mention.created',
+  CardPersonPropertyAssigned = 'card.person_property.assigned',
+  VoteCreated = 'vote.created'
 }
+
+export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
+  'reward.completed',
+  'forum.comment.created',
+  'forum.comment.upvoted',
+  'forum.comment.downvoted',
+  'forum.post.created',
+  'proposal.passed',
+  'proposal.failed',
+  'proposal.suggestion_approved',
+  'proposal.user_voted',
+  'user.joined',
+  'hello.world'
+];
 
 // Utils to share common props among events
 type WebhookEventSharedProps<T = WebhookEventNames> = {
@@ -77,74 +149,138 @@ type WebhookEventSharedProps<T = WebhookEventNames> = {
 };
 
 // Strongly typed events, shared between API, serverless functions and possibly our end users
-export type WebhookEvent<T = WebhookEventNames> =
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.PostCreated;
-      post: PostEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.CommentCreated;
-      comment: CommentEntity;
-      post: PostEntity | null;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.CommentUpvoted;
-      comment: CommentEntity;
-      post: PostEntity;
-      voter: UserEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.CommentDownvoted;
-      comment: CommentEntity;
-      post: PostEntity;
-      voter: UserEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ProposalPassed;
-      proposal: ProposalEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ProposalFailed;
-      proposal: ProposalEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ProposalSuggestionApproved;
-      proposal: ProposalEntity;
-      user: UserEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.ProposalUserVoted;
-      proposal: ProposalEntity;
-      user: UserEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.BountyCompleted;
-      bounty: BountyEntity;
-      user: UserEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.UserJoined;
-      user: UserEntity;
-    })
-  | (WebhookEventSharedProps<T> & {
-      scope: WebhookEventNames.HelloWorld;
-    });
+export type WebhookEvent = WebhookEventSharedProps &
+  (
+    | {
+        scope: WebhookEventNames.ForumPostCreated;
+        post: PostEntity;
+      }
+    | {
+        scope: WebhookEventNames.ForumCommentUpvoted;
+        comment: CommentEntity;
+        post: PostEntity;
+        voter: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.ForumCommentDownvoted;
+        comment: CommentEntity;
+        post: PostEntity;
+        voter: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalPassed;
+        proposal: ProposalEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalFailed;
+        proposal: ProposalEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalSuggestionApproved;
+        proposal: ProposalEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalUserVoted;
+        proposal: ProposalEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalStatusChanged;
+        proposal: ProposalEntity;
+        newStatus: ProposalStatus;
+        oldStatus: ProposalStatus | null;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardCompleted;
+        bounty: RewardEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardApplicationCreated;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardApplicationApproved;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardApplicationRejected;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardSubmissionCreated;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardSubmissionApproved;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardApplicationPaymentCompleted;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardSuggestionCreated;
+        bounty: RewardEntity;
+        user: UserEntity;
+      }
+    | {
+        user: UserEntity;
+        scope: WebhookEventNames.DocumentMentionCreated;
+        document: DocumentEntity | null;
+        post: PostEntity | null;
+        mention: UserMentionMetadata;
+      }
+    | {
+        scope: WebhookEventNames.DocumentCommentCreated;
+        document: DocumentEntity | null;
+        post: PostEntity | null;
+        comment: CommentEntity;
+      }
+    | {
+        scope: WebhookEventNames.DocumentInlineCommentCreated;
+        document: DocumentEntity;
+        inlineComment: InlineCommentEntity;
+      }
+    | {
+        scope: WebhookEventNames.UserJoined;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.HelloWorld;
+      }
+    | {
+        scope: WebhookEventNames.VoteCreated;
+        vote: VoteEntity;
+      }
+    | {
+        scope: WebhookEventNames.CardPersonPropertyAssigned;
+        space: SpaceEntity;
+        card: DocumentEntity;
+        assignedUser: UserEntity;
+        personProperty: CardPropertyEntity;
+        user: UserEntity;
+      }
+  );
 
 // Webhook payload being sent by out API toward theirs
-export type WebhookPayload<T = WebhookEventNames> = {
+export type WebhookPayload = {
   createdAt: string;
-  event: WebhookEvent<T>;
+  event: WebhookEvent;
   spaceId: string;
-  webhookURL: string;
-  signingSecret: string;
+  webhookURL: string | null;
+  signingSecret: string | null;
 };
 
-// Payload example
-// const payload: WebhookPayload = {
-//   createdAt: new Date().toISOString(),
-//   event: {
-//     scope: WebhookEventNames.BountyCompleted,
-//     bounty,
-//     user
-//   }
-// }
+export type WebhookEventBody<T extends WebhookEventNames> = Extract<WebhookEvent, { scope: T }>;

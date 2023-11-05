@@ -8,6 +8,8 @@ jspm_packages
 # Serverless directories
 .serverless
 .build
+serverless/schema.prisma
+serverless/*.node
 
 # next.js
 /.next/
@@ -26,15 +28,15 @@ playwright-report
 
 # misc
 .DS_Store
-.env
-.env.test.local
-.env.production
-**.local
+*.env*
+!.env.*.example
 *.tsbuildinfo
 
 ./pages/api/script/*
 
 scripts/exportData/exports
+
+jsonoutputs
 
 # cdk
 cdk.out
@@ -47,6 +49,7 @@ public/__ENV.js
 *.csv
 .vscode/vscode-chrome-debug-userdatadir/
 /depgraphs
+/scripts/*.json
 
 # debug
 npm-debug.log*
@@ -56,3 +59,7 @@ todo.md
 /test-results/
 /playwright-report/
 /playwright/.cache/
+storybook-static
+build-storybook.log
+# Storybook dev server cache folder
+.cache

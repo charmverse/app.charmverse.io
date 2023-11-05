@@ -1,14 +1,15 @@
-import type { RawPlugins } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/core';
 import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
+import { Plugin } from 'prosemirror-state';
 import { createRoot } from 'react-dom/client';
 
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { getLinkElement } from '../link/getLinkElement';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
 import { markName } from './inlineComment.constants';
@@ -63,6 +64,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
           const className =
             (event.target as HTMLElement).className +
             ((event.target as HTMLElement).parentNode as HTMLElement).className;
+
           if (/charm-inline-comment/.test(className)) {
             return highlightMarkedElement({
               view,

@@ -1,10 +1,10 @@
-import { prisma } from '@charmverse/core';
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import { InvalidStateError } from 'lib/middleware';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-import type { ProposalWithUsers } from '../interface';
 import { updateProposal } from '../updateProposal';
 
 let author1: User;

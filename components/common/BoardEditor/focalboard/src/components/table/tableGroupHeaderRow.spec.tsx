@@ -1,9 +1,6 @@
 import '@testing-library/jest-dom';
-
-import 'isomorphic-fetch';
 import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { act } from 'react-dom/test-utils';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
@@ -23,7 +20,8 @@ const boardTreeNoGroup = {
     value: '',
     color: 'propColorTurquoise'
   },
-  cards: []
+  cards: [],
+  cardPages: []
 };
 
 const boardTreeGroup = {
@@ -32,7 +30,8 @@ const boardTreeGroup = {
     value: 'value 1',
     color: 'propColorTurquoise'
   },
-  cards: []
+  cards: [],
+  cardPages: []
 };
 
 test('should match snapshot, no groups', async () => {
@@ -112,7 +111,7 @@ test('should match snapshot, hide group', async () => {
   );
 
   const { container } = render(component);
-  const triangle = container.querySelector('svg.DisclosureTriangleIcon');
+  const triangle = container.querySelector('[data-testid="ArrowDropDownOutlinedIcon"]');
   expect(triangle).not.toBeNull();
 
   act(() => {
@@ -140,12 +139,10 @@ test('should match snapshot, add new', async () => {
 
   const { container } = render(component);
 
-  const triangle = container.querySelector('i.AddIcon');
+  const triangle = container.querySelector('[data-testid="AddIcon"]');
   expect(triangle).not.toBeNull();
+  userEvent.click(triangle as Element);
 
-  act(() => {
-    fireEvent.click(triangle as Element);
-  });
   expect(addNew).toBeCalled();
   expect(container).toMatchSnapshot();
 });

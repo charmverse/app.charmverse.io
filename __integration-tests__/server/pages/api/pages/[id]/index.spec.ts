@@ -1,46 +1,49 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@charmverse/core';
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma-client';
+import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { IPageWithPermissions } from 'lib/pages';
-import { getPagePath } from 'lib/pages';
 import { getPage } from 'lib/pages/server';
 import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
-import { generatePageNode } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 const updateContent = {
   content: {
     paragraph: 'This is a paragraph'
   }
 };
+let adminUser: User;
+let normalMember: User;
+let space: Space;
+
+beforeAll(async () => {
+  const generated = await testUtilsUser.generateUserAndSpace({
+    isAdmin: true
+  });
+  adminUser = generated.user;
+  space = generated.space;
+  normalMember = await testUtilsUser.generateSpaceUser({
+    spaceId: space.id,
+    isAdmin: false
+  });
+});
 
 describe('PUT /api/pages/{id} - update page', () => {
   it('should allow user with permissions to update the page content, title, header image, and icon', async () => {
-    const { user, space } = await generateUserAndSpace({ isAdmin: false });
-
-    const page = await prisma.page.create({
-      data: {
-        title: 'Page 1',
-        type: 'page',
-        updatedBy: user.id,
-        author: { connect: { id: user.id } },
-        space: { connect: { id: space.id } },
-        path: getPagePath(),
-        contentText: '',
-        content: {},
-        permissions: {
-          create: {
-            permissionLevel: 'full_access',
-            space: { connect: { id: space.id } }
-          }
+    const page = await testUtilsPages.generatePage({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          permissionLevel: 'editor',
+          assignee: { group: 'space', id: space.id }
         }
-      }
+      ]
     });
-    const userCookie = await loginUser(user.id);
+
+    const userCookie = await loginUser(normalMember.id);
 
     const pageUpdate: Pick<Page, 'title' | 'headerImage' | 'icon' | 'content' | 'contentText'> = {
       content: { paragraph: 'This is a paragraph' },
@@ -59,27 +62,17 @@ describe('PUT /api/pages/{id} - update page', () => {
 
   // This is a temporary test, until we get a more fine grained way to evaluate diffs received in content field
   it('should not allow user with view_comment permission or less to update any other field than the page content', async () => {
-    const { user, space } = await generateUserAndSpace({ isAdmin: false });
-
-    const page = await prisma.page.create({
-      data: {
-        title: 'Page 1',
-        type: 'page',
-        updatedBy: user.id,
-        author: { connect: { id: user.id } },
-        space: { connect: { id: space.id } },
-        path: getPagePath(),
-        contentText: '',
-        content: {},
-        permissions: {
-          create: {
-            permissionLevel: 'view_comment',
-            space: { connect: { id: space.id } }
-          }
+    const page = await testUtilsPages.generatePage({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          permissionLevel: 'view_comment',
+          assignee: { group: 'space', id: space.id }
         }
-      }
+      ]
     });
-    const userCookie = await loginUser(user.id);
+    const userCookie = await loginUser(normalMember.id);
     // This isn't the exact shape of a comment mark, but it's enough to test the functionality
     const commentUpdate: Pick<Page, 'content' | 'contentText'> = {
       content: { paragraph: 'This is a paragraph', marks: ['commentMark'] },
@@ -107,8 +100,7 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should update proposal template page content if the user is an admin and respond 200', async () => {
-    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const proposalCategory = await generateProposalCategory({
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
@@ -122,24 +114,81 @@ describe('PUT /api/pages/{id} - update page', () => {
 
     const body = (
       await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', adminCookie).send(updateContent).expect(200)
-    ).body as IPageWithPermissions;
+    ).body as PageWithPermissions;
   });
 
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {
-    const { user: nonAdminUser, space } = await generateUserAndSpaceWithApiToken(undefined, false);
-
-    const proposalCategory = await generateProposalCategory({
+    const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
     });
 
     const template = await createProposalTemplate({
       spaceId: space.id,
-      userId: nonAdminUser.id,
+      userId: adminUser.id,
       categoryId: proposalCategory.id
     });
 
-    const adminCookie = await loginUser(nonAdminUser.id);
+    const memberCookie = await loginUser(normalMember.id);
 
-    await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', adminCookie).send(updateContent).expect(401);
+    await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', memberCookie).send(updateContent).expect(401);
+  });
+});
+
+describe('GET /api/pages/{id} - get page', () => {
+  it('should return a page to a user with permission to access it and respond 200', async () => {
+    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'editor'
+        }
+      ]
+    });
+    const userCookie = await loginUser(normalMember.id);
+    const receivedPage = (await request(baseUrl).get(`/api/pages/${page.id}`).set('Cookie', userCookie).expect(200))
+      .body;
+
+    expect(receivedPage).toMatchObject(expect.objectContaining(page));
+  });
+
+  it('should support queries by page path and space domain for a user with permission to access the page and respond 200', async () => {
+    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      pagePermissions: [
+        {
+          assignee: { group: 'space', id: space.id },
+          permissionLevel: 'editor'
+        }
+      ]
+    });
+    const userCookie = await loginUser(normalMember.id);
+
+    const receivedPage = (
+      await request(baseUrl).get(`/api/pages/${page.path}?spaceId=${space.id}`).set('Cookie', userCookie).expect(200)
+    ).body;
+
+    const receivedPage2 = (
+      await request(baseUrl)
+        .get(`/api/pages/${page.path}?spaceId=${space.domain}`)
+        .set('Cookie', userCookie)
+        .expect(200)
+    ).body;
+
+    expect(receivedPage).toMatchObject(expect.objectContaining(page));
+    expect(receivedPage2).toMatchObject(expect.objectContaining(page));
+  });
+
+  // This is a temporary test, until we get a more fine grained way to evaluate diffs received in content field
+  it('should not allow user without permissions to view the page', async () => {
+    // Created by admin, only visible by them as no permissions exist
+    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+      createdBy: adminUser.id,
+      spaceId: space.id
+    });
+    const userCookie = await loginUser(normalMember.id);
+    await request(baseUrl).get(`/api/pages/${page.id}`).set('Cookie', userCookie).expect(401);
   });
 });

@@ -2,11 +2,16 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
+import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 
-import { createBounty } from 'lib/bounties';
-import type { IPageWithPermissions } from 'lib/pages';
-import { createPage, generateBoard, generateProposal, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import {
+  createPage,
+  generateBounty,
+  generateBoard,
+  generateProposal,
+  generateUserAndSpace
+} from 'testing/setupDatabase';
 
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 
@@ -14,13 +19,13 @@ jest.mock('node:fs/promises');
 
 let space: Space;
 let user: User;
-let root_1: IPageWithPermissions;
-let page_1_1: IPageWithPermissions;
-let page_1_1_1: IPageWithPermissions;
+let root_1: PageWithPermissions;
+let page_1_1: PageWithPermissions;
+let page_1_1_1: PageWithPermissions;
 let boardPage: Page;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   space = generated.space;
   user = generated.user;
 
@@ -120,7 +125,7 @@ describe('exportWorkspacePages', () => {
   });
 
   it('should ignore deleted pages', async () => {
-    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
+    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpace();
 
     await createPage({
       parentId: null,
@@ -148,34 +153,29 @@ describe('exportWorkspacePages', () => {
   });
 
   it('should not ignore bounties', async () => {
-    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
+    const { space: _space, user: _user } = await generateUserAndSpace();
 
-    const bounty = await createBounty({
+    const bounty = await generateBounty({
       createdBy: _user.id,
-      spaceId: spaceWithDeletedPage.id
-    });
-
-    const returnedPage = await createPage({
-      parentId: null,
-      title: 'Root 1',
-      index: 1,
-      createdBy: _user.id,
-      spaceId: spaceWithDeletedPage.id
+      spaceId: _space.id
     });
 
     const data = await exportWorkspacePages({
-      sourceSpaceIdOrDomain: spaceWithDeletedPage.id
+      sourceSpaceIdOrDomain: _space.id
     });
 
-    const pageIds = [bounty.id, returnedPage.id];
+    expect(data.pages.length).toBe(1);
+    const page = data.pages[0];
 
-    expect(data.pages.length).toBe(2);
-    expect(pageIds.includes(data.pages[0].id)).toBeTruthy();
-    expect(pageIds.includes(data.pages[1].id)).toBeTruthy();
+    expect(page).toMatchObject(
+      expect.objectContaining({
+        id: bounty.id
+      })
+    );
   });
 
   it('should not ignore proposals', async () => {
-    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpaceWithApiToken();
+    const { space: spaceWithDeletedPage, user: _user } = await generateUserAndSpace();
 
     const generatedProposal = await generateProposal({
       authors: [_user.id],

@@ -14,6 +14,10 @@ export async function createAndAssignRolesDiscord({
   const rolesToAdd = Array.isArray(roles) ? roles : [roles];
   const spacesData = await getSpacesAndUserFromDiscord({ discordUserId, discordServerId });
 
+  if (!spacesData) {
+    return;
+  }
+
   return Promise.all(
     spacesData.map(({ space, user }) => createAndAssignRoles({ userId: user.id, spaceId: space.id, roles: rolesToAdd }))
   );

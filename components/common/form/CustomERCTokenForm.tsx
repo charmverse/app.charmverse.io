@@ -10,12 +10,12 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import Button from 'components/common/Button';
+import { Button } from 'components/common/Button';
 import { FormError } from 'components/common/form/FormError.class';
-import InputSearchBlockchain from 'components/common/form/InputSearchBlockchain';
+import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import type { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { ISystemError } from 'lib/utilities/errors';
@@ -63,7 +63,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
   });
 
   const [, , refreshPaymentMethods] = usePaymentMethods();
-  const space = useCurrentSpace();
+  const { space } = useCurrentSpace();
 
   const [allowManualInput, setAllowManualInput] = useState(false);
   const [formError, setFormError] = useState<ISystemError | null>(null);

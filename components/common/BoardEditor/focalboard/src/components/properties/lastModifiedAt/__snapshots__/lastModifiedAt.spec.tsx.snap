@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/properties/lastModifiedAt should match snapshot 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <div
+      class="LastModifiedAt octo-propertyvalue readonly"
+    >
+      Invalid Date
+    </div>
+  </span>
+</div>
+`;

@@ -6,6 +6,19 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { Card, CardPage } from './card';
 
+export const proposalPropertyTypesList = [
+  'proposalUrl',
+  'proposalStatus',
+  'proposalCategory',
+  'proposalEvaluatedBy',
+  'proposalEvaluationTotal',
+  'proposalEvaluationAverage',
+  'proposalAuthor',
+  'proposalReviewer',
+  'proposalEvaluationType'
+] as const;
+export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
+
 export type PropertyType =
   | 'text'
   | 'number'
@@ -21,22 +34,51 @@ export type PropertyType =
   | 'createdTime'
   | 'createdBy'
   | 'updatedTime'
-  | 'updatedBy';
+  | 'updatedBy'
+  | DatabaseProposalPropertyType;
 
-interface IPropertyOption {
-  id: string;
+export const propertyTypesList: PropertyType[] = [
+  'text',
+  'number',
+  'email',
+  'phone',
+  'url',
+  'select',
+  'multiSelect',
+  'date',
+  'person',
+  'checkbox',
+  'createdTime',
+  'createdBy',
+  'updatedTime',
+  'updatedBy',
+  ...proposalPropertyTypesList
+];
+
+interface IPropertyOption<T = string> {
+  id: T;
   value: string;
   color: string;
 }
 
 // A template for card properties attached to a board
-interface IPropertyTemplate {
+export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   id: string;
   name: string;
-  type: PropertyType;
+  type: T;
   options: IPropertyOption[];
   description?: string;
-}
+};
+
+export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
+
+export type GoogleFormSourceData = {
+  credentialId: string;
+  boardId?: string; // the board which contains the blocks that are synced from this form
+  formId: string;
+  formName: string;
+  formUrl: string;
+};
 
 export type BoardFields = {
   icon: string;
@@ -45,6 +87,11 @@ export type BoardFields = {
   isTemplate?: boolean;
   cardProperties: IPropertyTemplate[];
   columnCalculations: Record<string, string>;
+  viewIds: string[];
+  // Currently only for boards of type proposal - TODO: use DataSourceType
+  sourceType?: 'proposals';
+  // Currently unused. We will migrate Google Data here in a subsequent PR
+  sourceData?: GoogleFormSourceData;
 };
 
 type Board = Block & {
@@ -101,6 +148,7 @@ function createBoard({
       isTemplate: block?.fields?.isTemplate ?? false,
       columnCalculations: block?.fields?.columnCalculations ?? [],
       headerImage: block?.fields?.headerImage ?? null,
+      viewIds: block?.fields?.viewIds ?? [],
       ...block?.fields,
       cardProperties
     }
@@ -114,4 +162,4 @@ type BoardGroup = {
 };
 
 export { createBoard };
-export type { Board, IPropertyOption, IPropertyTemplate, BoardGroup };
+export type { Board, IPropertyOption, BoardGroup };
