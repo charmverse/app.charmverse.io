@@ -39,7 +39,7 @@ const esmModules = [
 if (process.env.NODE_ENV === 'test') {
   esmModules.push('@babel/runtime');
   esmModules.push('isows');
-  esmModules.push('wagmi');
+  // esmModules.push('wagmi');
   esmModules.push('@wagmi/core');
   esmModules.push('@wagmi/connectors');
 }

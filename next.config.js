@@ -174,21 +174,7 @@ const config = {
         }
       ]
     });
-    // check for nodejs runtime. see https://github.com/vercel/next.js/issues/36237#issuecomment-1117694528
-    if (nextRuntime === 'nodejs') {
-      const entry = _config.entry;
-      _config.entry = () => {
-        return entry().then((_entry) => {
-          return {
-            ..._entry,
-            cron: './background/cron.ts'
-            // websockets: './background/initWebsockets.ts'
-            // countSpaceData: './scripts/countSpaceData.ts',
-            // importFromDiscourse: './scripts/importFromDiscourse.ts',
-          };
-        });
-      };
-    } else {
+    if (nextRuntime !== 'nodejs') {
       /**
        * Add support for the `node:` scheme available since Node.js 16.
        *
