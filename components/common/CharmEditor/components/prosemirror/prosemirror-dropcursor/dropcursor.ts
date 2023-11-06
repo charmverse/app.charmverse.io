@@ -144,10 +144,10 @@ class DropCursorView {
     // Dragged node might not exist if we are dragging from the sidebar
     // Sometimes the hovered dom node is the text node inside the page node, so we need to check the parent element as well
     const hoveredPageDomNode = (
-      domElementAtCoords?.dataset?.pageType === 'page' &&
+      domElementAtCoords?.dataset?.pageType?.match(/(page|card)/) &&
       (draggedNode ? draggedNode?.type.name === 'page' || draggedNode?.type.name === 'linkedPage' : true)
         ? domElementAtCoords
-        : domElementAtCoords?.parentElement?.dataset?.pageType === 'page'
+        : domElementAtCoords?.parentElement?.dataset?.pageType?.match(/(page|card)/)
         ? domElementAtCoords.parentElement
         : null
     ) as HTMLElement | null;

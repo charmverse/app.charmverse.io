@@ -1,3 +1,35 @@
+diff --git a/node_modules/@bangle.dev/tooltip/dist/index.cjs b/node_modules/@bangle.dev/tooltip/dist/index.cjs
+index ddf68cf..b955298 100644
+--- a/node_modules/@bangle.dev/tooltip/dist/index.cjs
++++ b/node_modules/@bangle.dev/tooltip/dist/index.cjs
+@@ -5,12 +5,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
+ var pm = require('@bangle.dev/pm');
+ var core = require('@bangle.dev/core');
+ var utils = require('@bangle.dev/utils');
+-var arrow = require('@popperjs/core/lib/modifiers/arrow');
+-var flip = require('@popperjs/core/lib/modifiers/flip');
+-var offset = require('@popperjs/core/lib/modifiers/offset');
+-var popperOffsets = require('@popperjs/core/lib/modifiers/popperOffsets');
+-var preventOverflow = require('@popperjs/core/lib/modifiers/preventOverflow');
+-var popperLite = require('@popperjs/core/lib/popper-lite');
++var arrow = core.arrow;
++var flip = core.flip;
++var offset = core.offset;
++var popperOffsets = core.popperOffsets;
++var preventOverflow = core.reventOverflow;
++var createPopperLite = core.createPopperLite;
+ 
+ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+ 
+@@ -140,7 +140,7 @@ function tooltipPlacement({ stateKey, renderOpts: { tooltipDOMSpec, placement =
+                     }
+                     : undefined,
+             ].filter(Boolean);
+-            this.popperInstance = popperLite.createPopper(getReferenceElement(view, this._tooltip, this._scrollContainerDOM), this._tooltip, {
++            this.popperInstance = createPopperLite(getReferenceElement(view, this._tooltip, this._scrollContainerDOM), this._tooltip, {
+                 placement,
+                 modifiers: customPopperModifiers
+                     ? customPopperModifiers(view, this._tooltip, this._scrollContainerDOM, defaultModifiers)
 diff --git a/node_modules/@bangle.dev/tooltip/dist/index.js b/node_modules/@bangle.dev/tooltip/dist/index.js
 index 6a5dbce..000741d 100644
 --- a/node_modules/@bangle.dev/tooltip/dist/index.js
