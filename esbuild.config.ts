@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable import/no-extraneous-dependencies */
-
-const esbuild = require('esbuild');
+import * as esbuild from 'esbuild';
 
 esbuild
   .build({
