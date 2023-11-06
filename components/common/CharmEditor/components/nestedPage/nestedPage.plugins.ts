@@ -93,7 +93,7 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
               } else if (hoveredPageDomNode) {
                 const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
 
-                if (!draggedNode || hoveredPageDomNode.getAttribute('data-page-type') !== 'page') {
+                if (!draggedNode || !hoveredPageDomNode.getAttribute('data-page-type')?.match(/(page|card)/)) {
                   return false;
                 }
 
