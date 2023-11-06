@@ -44,7 +44,7 @@ type SocketSessionData = AuthenticatedSocketData & {
 };
 
 function isValidPageNode(node: PageContent): node is PageContent & { attrs: Record<string, string> } {
-  const { id: pageId, type: pageType = '', path: pagePath } = node.attrs ?? {};
+  const { id: pageId, type: pageType = '', path: pagePath } = node?.attrs ?? {};
   return Boolean(
     isUUID(pageId) &&
       node.attrs &&
