@@ -2,17 +2,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 const esbuild = require('esbuild');
-const { nodeExternalsPlugin } = require('esbuild-node-externals');
 
 esbuild
   .build({
+    bundle: true,
     entryPoints: ['./background/initWebsockets.ts', './background/cron.ts'],
     outdir: './dist',
-    bundle: true,
-    format: 'cjs',
+    packages: 'external',
     platform: 'node',
     sourcemap: true,
-    target: 'node18',
-    plugins: [nodeExternalsPlugin()]
+    target: 'node18'
   })
   .catch(() => process.exit(1));
