@@ -39,6 +39,7 @@ async function updatePostCategoryController(req: NextApiRequest, res: NextApiRes
 
   return res.status(200).json({ ...updatedPostCategory, permissions });
 }
+
 async function deletePostCategoryController(req: NextApiRequest, res: NextApiResponse) {
   const { postCategoryId } = req.query;
 

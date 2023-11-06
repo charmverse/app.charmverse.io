@@ -78,7 +78,8 @@ export function CommentForm({
       placeholderText: placeholder ?? 'What are your thoughts?',
       onContentChange: updatePostContent,
       content: postContent.doc,
-      isContentControlled: true
+      isContentControlled: true,
+      disableNestedPages: true
     };
 
     if (!inlineCharmEditor) {

@@ -10,7 +10,9 @@ import type { CommentContent, UpdateCommentInput } from 'lib/comments';
 export function usePageComments(pageId: string) {
   const [commentSort, setCommentSort] = useState<CommentSortType>('latest');
   const { mutateMembers } = useMembers();
-  const { data, mutate, isValidating } = useSWR(`${pageId}/comments`, () => charmClient.pages.listComments(pageId));
+  const { data, mutate, isValidating } = useSWR(pageId && `${pageId}/comments`, () =>
+    charmClient.pages.listComments(pageId)
+  );
   const isLoadingComments = !data && isValidating;
 
   const comments = useMemo(() => {
