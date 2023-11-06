@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { InvalidInputError } from '@charmverse/core/errors';
-import { prisma, type Space } from '@charmverse/core/prisma-client';
+import { type Space } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import type { SpaceDataExport } from '../exportSpaceData';
@@ -22,16 +22,11 @@ describe('getImportData', () => {
 
     validExportData = {
       pages: [],
+      roles: [],
+      proposalCategories: [],
       permissions: {
-        roles: [],
-        space: {
-          id: space.id,
-          permissions: {
-            proposalCategoryPermissions: [],
-            proposalsWithReviewerPermission: [],
-            rewardsWithReviewerPermission: []
-          }
-        }
+        proposalCategoryPermissions: [],
+        spacePermissions: []
       }
     };
 

@@ -5,14 +5,23 @@ import {
   type TargetPermissionGroup
 } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Prisma, Role } from '@charmverse/core/prisma-client';
+import type { Prisma, Role, SpaceOperation } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import { v4 as uuid } from 'uuid';
+
+import {
+  mapSpacePermissionToAssignee,
+  type AssignedSpacePermission
+} from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
+import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
+import { importProposalCategories } from './importProposalCategories';
 import { importRoles } from './importRoles';
 import type { ImportParams } from './interfaces';
 
 export type ImportedPermissions = {
+  spacePermissions: AssignedSpacePermission[];
   proposalCategoryPermissions: AssignedProposalCategoryPermission[];
   roles: Role[];
 };
@@ -21,65 +30,36 @@ export async function importSpacePermissions({
   targetSpaceIdOrDomain,
   ...params
 }: ImportParams): Promise<ImportedPermissions> {
-  if (!targetSpaceIdOrDomain) {
-    throw new InvalidInputError(`targetSpaceIdOrDomain is required`);
-  }
+  const targetSpace = await getSpace(targetSpaceIdOrDomain);
 
-  const isUuidValue = stringUtils.isUUID(targetSpaceIdOrDomain);
+  const { permissions, roles, proposalCategories } = await getImportData(params);
 
-  const targetSpace = await prisma.space.findFirstOrThrow({
-    where: {
-      id: isUuidValue ? targetSpaceIdOrDomain : undefined,
-      domain: !isUuidValue ? targetSpaceIdOrDomain : undefined
-    }
-  });
-
-  const { permissions, roles } = await getImportData(params);
-
-  const sourceProposalCategoryPermissions = [
-    ...(permissions?.roles ?? []).map((role) => role.permissions.proposalCategoryPermissions).flat(),
-    ...(permissions?.space.permissions.proposalCategoryPermissions ?? [])
-  ];
+  const sourceProposalCategoryPermissions = permissions?.proposalCategoryPermissions ?? [];
+  const sourceSpacePermissions = permissions?.spacePermissions ?? [];
 
   // Port over roles
   const { oldNewRecordIdHashMap: roleIdsHashMap, roles: importedRolesFromTemplate } = await importRoles({
     targetSpaceIdOrDomain,
     ...params
   });
-  const sourceProposalCategories = await prisma.proposalCategory.findMany({
-    where: {
-      id: {
-        in: sourceProposalCategoryPermissions.map((p) => p.proposalCategoryId)
+
+  const { oldNewIdMap: sourceTargetProposalCategoryHashmap, proposalCategories: importedProposalCategories } =
+    await importProposalCategories({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: {
+        proposalCategories:
+          proposalCategories ||
+          (await prisma.proposalCategory.findMany({
+            where: {
+              id: {
+                in: sourceProposalCategoryPermissions.map((p) => p.proposalCategoryId)
+              }
+            }
+          }))
       }
-    },
-    select: {
-      id: true,
-      title: true
-    }
-  });
+    });
 
   // Match categories by title
-  const targetSpaceProposalCategories = await prisma.proposalCategory.findMany({
-    where: {
-      spaceId: targetSpace.id,
-      title: {
-        in: sourceProposalCategories.map((c) => c.title)
-      }
-    },
-    select: {
-      id: true,
-      title: true
-    }
-  });
-
-  const sourceTargetProposalCategoryHashmap = sourceProposalCategories.reduce((acc, sourceCategory) => {
-    const matchingCategory = targetSpaceProposalCategories.find((c) => c.title === sourceCategory.id);
-
-    acc[sourceCategory.id] = matchingCategory?.id;
-
-    return acc;
-  }, {} as Record<string, string | undefined>);
-
   const proposalCategoryPermissionsToCreate: Prisma.ProposalCategoryPermissionCreateManyInput[] =
     sourceProposalCategoryPermissions
       .map(({ assignee, proposalCategoryId, permissionLevel }) => {
@@ -93,7 +73,8 @@ export async function importSpacePermissions({
         }
 
         return {
-          spaceId: isSpacePermission ? roleIdsHashMap[assigneeId] : undefined,
+          id: uuid(),
+          spaceId: isSpacePermission ? targetSpace.id : undefined,
           roleId: isRolePermission ? roleIdsHashMap[assigneeId] : undefined,
           proposalCategoryId: matchingCategoryId,
           permissionLevel
@@ -114,8 +95,46 @@ export async function importSpacePermissions({
     })
     .then((_permissions) => _permissions.map(mapProposalCategoryPermissionToAssignee));
 
+  ///
+
+  const spacePermissionsToCreate: Prisma.SpacePermissionCreateManyInput[] = sourceSpacePermissions
+    .map(({ assignee, operations }) => {
+      const assigneeId = (assignee as TargetPermissionGroup<'role' | 'space'>).id;
+      const isRolePermission = assignee.group === 'role';
+      const isSpacePermission = assignee.group === 'space';
+
+      if (!isRolePermission && !isSpacePermission) {
+        return null;
+      }
+
+      return {
+        id: uuid(),
+        forSpaceId: targetSpace.id,
+        spaceId: isSpacePermission ? targetSpace.id : undefined,
+        roleId: isRolePermission ? roleIdsHashMap[assigneeId] : undefined,
+        operations: Object.entries(operations)
+          .filter(([key, value]) => !!value)
+          .map(([key]) => key as SpaceOperation)
+      } as Prisma.SpacePermissionCreateManyInput;
+    })
+    .filter((val) => !!val) as Prisma.SpacePermissionCreateManyInput[];
+
+  // Lock in changes inside the db for space permissions
+  await prisma.spacePermission.createMany({ data: spacePermissionsToCreate });
+
+  const createdSpacePermissions = await prisma.spacePermission
+    .findMany({
+      where: {
+        id: {
+          in: spacePermissionsToCreate.map((p) => p.id as string)
+        }
+      }
+    })
+    .then((_permissions) => _permissions.map(mapSpacePermissionToAssignee));
+
   return {
     proposalCategoryPermissions: createdProposalCategoryPermissions,
-    roles: importedRolesFromTemplate
+    roles: importedRolesFromTemplate,
+    spacePermissions: createdSpacePermissions
   };
 }

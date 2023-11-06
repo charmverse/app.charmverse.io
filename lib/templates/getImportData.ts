@@ -9,7 +9,7 @@ import type { ImportParams } from './interfaces';
 export async function getImportData({
   exportData,
   exportName
-}: Pick<ImportParams, 'exportData' | 'exportName'>): Promise<SpaceDataExport> {
+}: Pick<ImportParams, 'exportData' | 'exportName'>): Promise<Partial<SpaceDataExport>> {
   if (!exportData && !exportName) {
     throw new InvalidInputError(`Export data or name of file in lib/templates/exports/ folder is required`);
   }

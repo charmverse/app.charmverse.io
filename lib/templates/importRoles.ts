@@ -31,11 +31,11 @@ export async function importRoles({ targetSpaceIdOrDomain, ...importParams }: Im
     oldNewRecordIdHashMap: {}
   };
 
-  const { rolesToCreate, existing } = roles.reduce(
+  const { rolesToCreate, existingInTargetSpace } = roles.reduce(
     (acc, roleToCopy) => {
-      const existingMatchingRole = targetSpaceRoles.find((r) => r.name === roleToCopy.name);
+      const existingMatchingRoleInTargetSpace = targetSpaceRoles.find((r) => r.name === roleToCopy.name);
 
-      if (!existingMatchingRole) {
+      if (!existingMatchingRoleInTargetSpace) {
         const createInput: Prisma.RoleCreateInput = {
           id: uuid(),
           createdBy: targetSpace.createdBy,
@@ -50,14 +50,17 @@ export async function importRoles({ targetSpaceIdOrDomain, ...importParams }: Im
           targetSpaceRoleCreateData: createInput
         });
       } else {
-        acc.existing.push({ sourceRoleId: roleToCopy.id, targetSpaceRole: existingMatchingRole });
+        acc.existingInTargetSpace.push({
+          sourceRoleId: roleToCopy.id,
+          targetSpaceRole: existingMatchingRoleInTargetSpace
+        });
 
-        hashmap.oldNewRecordIdHashMap[roleToCopy.id] = existingMatchingRole.id;
+        hashmap.oldNewRecordIdHashMap[roleToCopy.id] = existingMatchingRoleInTargetSpace.id;
       }
       return acc;
     },
-    { existing: [], rolesToCreate: [] } as {
-      existing: { sourceRoleId: string; targetSpaceRole: Role }[];
+    { existingInTargetSpace: [], rolesToCreate: [] } as {
+      existingInTargetSpace: { sourceRoleId: string; targetSpaceRole: Role }[];
       rolesToCreate: { sourceRoleId: string; targetSpaceRoleCreateData: Prisma.RoleCreateInput }[];
     }
   );
@@ -65,10 +68,10 @@ export async function importRoles({ targetSpaceIdOrDomain, ...importParams }: Im
     rolesToCreate.map((r) => prisma.role.create({ data: r.targetSpaceRoleCreateData }))
   );
 
-  const allRoles = [...newlyAddedRoles, ...existing.map((r) => r.targetSpaceRole)];
+  const allRoles = [...newlyAddedRoles, ...existingInTargetSpace.map((r) => r.targetSpaceRole)];
 
   return {
-    ...hashmap,
-    roles
+    oldNewRecordIdHashMap: hashmap.oldNewRecordIdHashMap,
+    roles: allRoles
   };
 }

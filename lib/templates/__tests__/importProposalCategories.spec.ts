@@ -19,9 +19,11 @@ describe('importProposalCategories', () => {
   it('should import new categories', async () => {
     const { space: targetSpace } = await testUtilsUser.generateUserAndSpace({});
 
-    const { categories: importedCategories, oldNewIdMap } = await importProposalCategories({
-      spaceIdOrDomain: targetSpace.id,
-      categories: [existingCategory]
+    const { proposalCategories: importedCategories, oldNewIdMap } = await importProposalCategories({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: {
+        proposalCategories: [existingCategory]
+      }
     });
 
     expect(importedCategories).toMatchObject([
@@ -40,12 +42,17 @@ describe('importProposalCategories', () => {
   it('should not reimport categories that already have the same title', async () => {
     const { space: targetSpace } = await testUtilsUser.generateUserAndSpace({});
 
-    const { categories: importedCategories, oldNewIdMap } = await importProposalCategories({
-      spaceIdOrDomain: targetSpace.id,
-      categories: [existingCategory]
+    const { proposalCategories: importedCategories, oldNewIdMap } = await importProposalCategories({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: {
+        proposalCategories: [existingCategory]
+      }
     });
 
-    await importProposalCategories({ categories: [existingCategory], spaceIdOrDomain: targetSpace.id });
+    await importProposalCategories({
+      exportData: { proposalCategories: [existingCategory] },
+      targetSpaceIdOrDomain: targetSpace.id
+    });
 
     expect(importedCategories).toMatchObject([
       {
@@ -75,12 +82,14 @@ describe('importProposalCategories', () => {
       { id: uuid(), title: existingCategoryName, spaceId: space.id, color: '#654321' }
     ];
 
-    const { categories, oldNewIdMap } = await importProposalCategories({
-      spaceIdOrDomain: targetSpace.id,
-      categories: mixedCategories
+    const { proposalCategories, oldNewIdMap } = await importProposalCategories({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: {
+        proposalCategories: mixedCategories
+      }
     });
 
-    expect(categories).toMatchObject(
+    expect(proposalCategories).toMatchObject(
       expect.arrayContaining<ProposalCategory>([
         {
           ...mixedCategories[0],
@@ -101,21 +110,27 @@ describe('importProposalCategories', () => {
     const categories = [
       { id: 'existing-cat-3', title: existingCategory.title.toUpperCase(), spaceId: space.id, color: '#FF00FF' }
     ];
-    const result = await importProposalCategories({ spaceIdOrDomain: space.id, categories });
+    const result = await importProposalCategories({
+      targetSpaceIdOrDomain: space.id,
+      exportData: { proposalCategories: categories }
+    });
 
-    expect(result.categories.some((c) => c.title === existingCategory.title)).toBeTruthy();
-    expect(result.oldNewIdMap['existing-cat-3']).toBe(existingCategory.id);
+    expect(result.proposalCategories?.some((c) => c.title === existingCategory.title)).toBeTruthy();
+    expect(result.oldNewIdMap?.['existing-cat-3']).toBe(existingCategory.id);
   });
 
   // Error Cases
   it('should throw error for invalid space Id or domain', async () => {
-    await expect(importProposalCategories({ spaceIdOrDomain: 'invalid-space', categories: [] })).rejects.toThrow(); // Specify the exact error type if known
+    await expect(
+      importProposalCategories({ targetSpaceIdOrDomain: 'invalid-space', exportData: { proposalCategories: [] } })
+    ).rejects.toThrow(); // Specify the exact error type if known
   });
 
   it('should handle empty categories array gracefully', async () => {
-    const result = await importProposalCategories({ spaceIdOrDomain: space.id, categories: [] });
-    expect(result.categories.length).toBeGreaterThanOrEqual(0); // or specific checks
+    const result = await importProposalCategories({
+      targetSpaceIdOrDomain: space.id,
+      exportData: { proposalCategories: [] }
+    });
+    expect(result.proposalCategories?.length).toBeGreaterThanOrEqual(0); // or specific checks
   });
-
-  // Additional error cases like "Invalid Category Data" can be added depending on the function's validation logic
 });

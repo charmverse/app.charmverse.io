@@ -1,15 +1,19 @@
+import type { AssignableSpacePermissionGroups } from '@charmverse/core/dist/cjs/permissions';
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalCategory, Role, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import type { AssignedSpacePermission } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
+import { mapSpacePermissionToAssignee } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
+
 import { exportSpaceData, type SpaceDataExport } from '../exportSpaceData';
+import type { ImportedPermissions } from '../importSpacePermissions';
 import { importSpacePermissions } from '../importSpacePermissions';
 
 describe('importSpacePermissions', () => {
   let sourceSpace: Space;
-  let targetSpace: Space;
 
   let firstSourceProposalCategory: ProposalCategory;
   let secondSourceProposalCategory: ProposalCategory;
@@ -17,9 +21,10 @@ describe('importSpacePermissions', () => {
   let secondSourceRole: Role;
   let exportedData: SpaceDataExport;
 
+  let spacePermissions: AssignedSpacePermission[];
+
   beforeAll(async () => {
     ({ space: sourceSpace } = await testUtilsUser.generateUserAndSpace());
-    ({ space: targetSpace } = await testUtilsUser.generateUserAndSpace());
 
     firstSourceRole = await testUtilsMembers.generateRole({
       createdBy: sourceSpace.createdBy,
@@ -68,21 +73,57 @@ describe('importSpacePermissions', () => {
       ]
     });
 
-    exportedData = await exportSpaceData({ spaceId: sourceSpace.id });
+    spacePermissions = await prisma
+      .$transaction([
+        // Space
+        prisma.spacePermission.create({
+          data: {
+            forSpace: { connect: { id: sourceSpace.id } },
+            space: { connect: { id: sourceSpace.id } },
+            operations: ['createBounty', 'createPage', 'createForumCategory']
+          }
+        }),
+        // Roles
+        prisma.spacePermission.create({
+          data: {
+            forSpace: { connect: { id: sourceSpace.id } },
+            role: { connect: { id: firstSourceRole.id } },
+            operations: ['createBounty', 'createPage', 'createForumCategory', 'deleteAnyPage', 'deleteAnyProposal']
+          }
+        }),
+        prisma.spacePermission.create({
+          data: {
+            forSpace: { connect: { id: sourceSpace.id } },
+            role: { connect: { id: secondSourceRole.id } },
+            operations: ['createBounty', 'createPage', 'createForumCategory', 'deleteAnyPage', 'deleteAnyProposal']
+          }
+        })
+      ])
+      .then((data) => data.map(mapSpacePermissionToAssignee));
+
+    exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id });
   });
 
   it('should correctly import permissions using export data', async () => {
-    const { roles: importedRoles, proposalCategoryPermissions: importedProposalCategoryPermissions } =
-      await importSpacePermissions({
-        targetSpaceIdOrDomain: targetSpace.id,
-        exportData: exportedData
-      });
+    const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
 
-    // Assuming importedPermissions structure reflects the permissions imported into targetSpace
-    expect(importedProposalCategoryPermissions).toHaveLength(exportedData.roles?.length as number);
-    expect(importedRoles).toHaveLength(2);
-    expect(importedRoles).toEqual(
-      expect.arrayContaining([
+    const importResult = await importSpacePermissions({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: exportedData
+    });
+
+    expect(importResult).toMatchObject<ImportedPermissions>({
+      proposalCategoryPermissions: [],
+      spacePermissions: expect.arrayContaining<AssignedSpacePermission>(
+        spacePermissions.map((p) => ({
+          operations: p.operations,
+          assignee: {
+            group: p.assignee.group,
+            id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+          }
+        }))
+      ),
+      roles: expect.arrayContaining([
         {
           ...firstSourceRole,
           id: expect.not.stringContaining(firstSourceRole.id),
@@ -94,10 +135,11 @@ describe('importSpacePermissions', () => {
           spaceId: targetSpace.id
         }
       ])
-    );
+    });
   });
 
   it('should ensure idempotency when importing permissions', async () => {
+    const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
     // First import
     const importedPermissions = await importSpacePermissions({
       targetSpaceIdOrDomain: targetSpace.id,
@@ -128,12 +170,17 @@ describe('importSpacePermissions', () => {
     ).rejects.toThrowError();
   });
 
-  it('should fail for invalid permissions data', async () => {
+  it('should perform a no-op if no import data is provided', async () => {
+    const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
     await expect(
       importSpacePermissions({
         targetSpaceIdOrDomain: targetSpace.id,
-        exportData: { invalid: 'data' } as any // Invalid data for testing
+        exportData: {} as any // Invalid data for testing
       })
-    ).rejects.toThrow(InvalidInputError);
+    ).resolves.toMatchObject<ImportedPermissions>({
+      proposalCategoryPermissions: [],
+      roles: [],
+      spacePermissions: []
+    });
   });
 });
