@@ -111,8 +111,10 @@ export function ProposalProperties({
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
       if (account && newStatus === 'discussion' && proposalPage && !proposal.lensPostLink) {
-        await setupLensProfile();
-        setIsPublishingToLens(true);
+        const lensProfileSetup = await setupLensProfile();
+        if (lensProfileSetup) {
+          setIsPublishingToLens(true);
+        }
       }
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
       await Promise.all([

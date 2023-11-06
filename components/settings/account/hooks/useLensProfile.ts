@@ -1,22 +1,91 @@
-import type { ProfileId } from '@lens-protocol/react-web';
+import { log } from '@charmverse/core/log';
+import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
+import type {
+  BroadcastingError,
+  PendingSigningRequestError,
+  ProfileId,
+  TransactionError,
+  UserRejectedError,
+  WalletConnectionError
+} from '@lens-protocol/react-web';
 import { SessionType, useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import { LensChain } from 'lib/lens/lensClient';
 
-async function switchNetwork() {
-  return switchActiveNetwork(LensChain);
+export function useHandleLensError() {
+  const { showMessage } = useSnackbar();
+  const handlerLensError = (
+    error:
+      | BroadcastingError
+      | PendingSigningRequestError
+      | UserRejectedError
+      | WalletConnectionError
+      | TransactionError
+      | CredentialsExpiredError
+      | NotAuthenticatedError
+  ) => {
+    let errorMessage = '';
+    switch (error.name) {
+      case 'BroadcastingError': {
+        errorMessage = 'There was an error broadcasting the transaction';
+        break;
+      }
+
+      case 'PendingSigningRequestError': {
+        errorMessage = 'There is a pending signing request in your wallet. Approve it or discard it and try again.';
+        break;
+      }
+
+      case 'WalletConnectionError': {
+        errorMessage = 'There was an error connecting to your wallet';
+        break;
+      }
+
+      case 'UserRejectedError': {
+        errorMessage = 'You rejected the transaction';
+        break;
+      }
+
+      case 'CredentialsExpiredError': {
+        errorMessage = 'Your credentials have expired. Please log in again.';
+        break;
+      }
+
+      case 'NotAuthenticatedError': {
+        errorMessage = 'You are not authenticated. Please log in.';
+        break;
+      }
+
+      case 'TransactionError': {
+        errorMessage = 'There was an error with the transaction';
+        break;
+      }
+
+      default: {
+        errorMessage = 'There was an error publishing to Lens';
+      }
+    }
+
+    log.warn(errorMessage, {
+      error
+    });
+    showMessage(errorMessage, 'error');
+  };
+
+  return {
+    handlerLensError
+  };
 }
 
 export function useLensProfile() {
-  const { account, chainId } = useWeb3Account();
+  const { account } = useWeb3Account();
   const { data: sessionData } = useSession();
   const authenticated = sessionData?.authenticated ?? false;
   const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
+  const { handlerLensError } = useHandleLensError();
 
   const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
     where: {
@@ -33,16 +102,12 @@ export function useLensProfile() {
   const { space } = useCurrentSpace();
 
   const setupLensProfile = async () => {
-    if (!user || !account) {
+    if (!user || !account || !lensProfile) {
       return false;
     }
 
-    if (chainId !== LensChain) {
-      await switchNetwork();
-    }
-
-    if (authenticated || !lensProfile) {
-      return false;
+    if (authenticated) {
+      return true;
     }
 
     const result = await execute({
@@ -51,7 +116,7 @@ export function useLensProfile() {
     });
 
     if (result.isFailure()) {
-      showMessage(result.error.name, 'error');
+      handlerLensError(result.error);
       return false;
     }
 

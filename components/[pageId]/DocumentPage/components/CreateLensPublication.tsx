@@ -1,23 +1,16 @@
 import { log } from '@charmverse/core/log';
-import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
 import { textOnly } from '@lens-protocol/metadata';
-import type {
-  BroadcastingError,
-  PendingSigningRequestError,
-  TransactionError,
-  UserRejectedError,
-  WalletConnectionError
-} from '@lens-protocol/react-web';
 import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
 import { useEffect } from 'react';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
+import { useHandleLensError } from 'components/settings/account/hooks/useLensProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import { LensChain, lensClient } from 'lib/lens/lensClient';
+import { LensChain } from 'lib/lens/lensClient';
 import { uploadToArweave } from 'lib/lens/uploadToArweave';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
@@ -27,71 +20,6 @@ async function switchNetwork() {
 }
 
 const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
-
-function useHandleLensError() {
-  const { showMessage } = useSnackbar();
-  const handlerLensError = (
-    error:
-      | BroadcastingError
-      | PendingSigningRequestError
-      | UserRejectedError
-      | WalletConnectionError
-      | TransactionError
-      | CredentialsExpiredError
-      | NotAuthenticatedError
-  ) => {
-    let errorMessage = '';
-    switch (error.name) {
-      case 'BroadcastingError': {
-        errorMessage = 'There was an error broadcasting the transaction';
-        break;
-      }
-
-      case 'PendingSigningRequestError': {
-        errorMessage = 'There is a pending signing request in your wallet. Approve it or discard it and try again.';
-        break;
-      }
-
-      case 'WalletConnectionError': {
-        errorMessage = 'There was an error connecting to your wallet';
-        break;
-      }
-
-      case 'UserRejectedError': {
-        errorMessage = 'You rejected the transaction';
-        break;
-      }
-
-      case 'CredentialsExpiredError': {
-        errorMessage = 'Your credentials have expired. Please log in again.';
-        break;
-      }
-
-      case 'NotAuthenticatedError': {
-        errorMessage = 'You are not authenticated. Please log in.';
-        break;
-      }
-
-      case 'TransactionError': {
-        errorMessage = 'There was an error with the transaction';
-        break;
-      }
-
-      default: {
-        errorMessage = 'There was an error publishing to Lens';
-      }
-    }
-
-    log.warn(errorMessage, {
-      error
-    });
-    showMessage(errorMessage, 'error');
-  };
-
-  return {
-    handlerLensError
-  };
-}
 
 export function CreateLensPublication(
   params: {
