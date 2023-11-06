@@ -5,7 +5,7 @@
     "defaults"
   ],
   "scripts": {
-    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build",
+    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run esbuild",
     "build:analyze": "cross-env ANALYZE=true next build",
     "esbuild": "node esbuild.js",
     "verifydeps": "npx depcruise --ts-config ./tsconfig.json --config .dependency-cruiser.js -- ./",
