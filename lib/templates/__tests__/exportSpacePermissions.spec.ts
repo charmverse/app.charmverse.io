@@ -1,7 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+
+import { mapSpacePermissionToAssignee } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
 
 import type { SpacePermissionsExport } from '../exportSpacePermissions';
 import { exportSpacePermissions } from '../exportSpacePermissions';
@@ -22,8 +23,23 @@ describe('exportSpacePermissions', () => {
     const spacePermissions = await prisma.$transaction([
       prisma.spacePermission.create({
         data: {
+          operations: ['reviewProposals', 'deleteAnyProposal', 'createPage'],
           forSpace: { connect: { id: space.id } },
           role: { connect: { id: proposalReviewerRole.id } }
+        }
+      }),
+      prisma.spacePermission.create({
+        data: {
+          operations: ['reviewProposals', 'deleteAnyProposal', 'createPage'],
+          forSpace: { connect: { id: space.id } },
+          role: { connect: { id: secondProposalReviewerRole.id } }
+        }
+      }),
+      prisma.spacePermission.create({
+        data: {
+          operations: ['createPage'],
+          forSpace: { connect: { id: space.id } },
+          space: { connect: { id: space.id } }
         }
       })
     ]);
@@ -75,14 +91,14 @@ describe('exportSpacePermissions', () => {
       userId: space.createdBy,
       reviewers: [{ group: 'role', id: secondProposalReviewerRole.id }]
     });
-    const exportedPermissions = await exportSpacePermissions({ spaceId: space.id });
+    const exportedPermissions = await exportSpacePermissions({ spaceIdOrDomain: space.id });
 
     expect(exportedPermissions.roles).toHaveLength(2);
 
     expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
       roles: [proposalReviewerRole, secondProposalReviewerRole],
       permissions: {
-        spacePermissions: [],
+        spacePermissions: expect.arrayContaining(spacePermissions.map(mapSpacePermissionToAssignee)),
         proposalCategoryPermissions: expect.arrayContaining<AssignedProposalCategoryPermission>([
           {
             assignee: { group: 'role', id: proposalReviewerRole.id },
@@ -116,7 +132,7 @@ describe('exportSpacePermissions', () => {
   it('returns an object with empty arrays for a valid space ID without data', async () => {
     const { space: newSpace } = await testUtilsUser.generateUserAndSpace();
 
-    const { permissions } = await exportSpacePermissions({ spaceId: newSpace.id });
+    const { permissions } = await exportSpacePermissions({ spaceIdOrDomain: newSpace.id });
 
     expect(permissions).toBeDefined();
     expect(permissions.proposalCategoryPermissions).toEqual([]);
@@ -127,7 +143,7 @@ describe('exportSpacePermissions', () => {
   it.each([undefined, 'invalid-space-id'])(
     'throws InvalidInputError for invalid space IDs (testing with %s)',
     async (invalidSpaceId) => {
-      await expect(exportSpacePermissions({ spaceId: invalidSpaceId as any })).rejects.toThrow(InvalidInputError);
+      await expect(exportSpacePermissions({ spaceIdOrDomain: invalidSpaceId as any })).rejects.toThrowError();
     }
   );
 });

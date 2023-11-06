@@ -1,16 +1,15 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import {
   mapProposalCategoryPermissionToAssignee,
   type AssignedProposalCategoryPermission
 } from '@charmverse/core/permissions';
 import type { Role } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 
 import {
   mapSpacePermissionToAssignee,
   type AssignedSpacePermission
 } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
+import { getSpace } from 'lib/spaces/getSpace';
 
 import { exportRoles } from './exportRoles';
 
@@ -23,18 +22,20 @@ export type SpacePermissionsExport = {
   roles: Role[];
   permissions: ExportedPermissions;
 };
-export async function exportSpacePermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissionsExport> {
-  if (!stringUtils.isUUID(spaceId)) {
-    throw new InvalidInputError(`Invalid space id: ${spaceId}`);
-  }
+export async function exportSpacePermissions({
+  spaceIdOrDomain
+}: {
+  spaceIdOrDomain: string;
+}): Promise<SpacePermissionsExport> {
+  const space = await getSpace(spaceIdOrDomain);
 
-  const { roles } = await exportRoles({ spaceIdOrDomain: spaceId });
+  const { roles } = await exportRoles({ spaceIdOrDomain });
 
   const [proposalCategoryPermissions, spacePermissions] = await Promise.all([
     prisma.proposalCategoryPermission.findMany({
       where: {
         proposalCategory: {
-          spaceId
+          spaceId: space.id
         },
         OR: [
           {
@@ -52,7 +53,7 @@ export async function exportSpacePermissions({ spaceId }: { spaceId: string }): 
     }),
     prisma.spacePermission.findMany({
       where: {
-        forSpaceId: spaceId,
+        forSpaceId: space.id,
         OR: [
           {
             spaceId: {
