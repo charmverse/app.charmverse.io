@@ -7,7 +7,7 @@ export type RoleExport = {
   proposalCategories: ProposalCategory[];
 };
 
-export async function exportProposalCategories({ spaceIdOrDomain }: { spaceIdOrDomain: string }) {
+export async function exportSpaceProposalCategories({ spaceIdOrDomain }: { spaceIdOrDomain: string }) {
   const space = await getSpace(spaceIdOrDomain);
 
   const proposalCategories = await prisma.proposalCategory.findMany({

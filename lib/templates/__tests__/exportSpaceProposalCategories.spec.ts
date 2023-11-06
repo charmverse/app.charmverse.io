@@ -1,9 +1,9 @@
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
-import { exportProposalCategories } from '../exportProposalCategories';
+import { exportSpaceProposalCategories } from '../exportSpaceProposalCategories';
 
-describe('exportProposalCategories', () => {
+describe('exportSpaceProposalCategories', () => {
   let space: Space;
   let user: User;
 
@@ -18,7 +18,7 @@ describe('exportProposalCategories', () => {
 
   it('should successfully retrieve proposal categories for a given space', async () => {
     // Assuming there are already some proposal categories in the test database for this space
-    const { proposalCategories } = await exportProposalCategories({ spaceIdOrDomain: space.id });
+    const { proposalCategories } = await exportSpaceProposalCategories({ spaceIdOrDomain: space.id });
 
     expect(proposalCategories).toEqual(
       expect.arrayContaining<ProposalCategory>([proposalCategory1, proposalCategory2])
@@ -29,7 +29,7 @@ describe('exportProposalCategories', () => {
     // Creating a new space to ensure it has no proposal categories
     const { space: newSpace } = await testUtilsUser.generateUserAndSpace();
 
-    const { proposalCategories } = await exportProposalCategories({ spaceIdOrDomain: newSpace.id });
+    const { proposalCategories } = await exportSpaceProposalCategories({ spaceIdOrDomain: newSpace.id });
 
     expect(proposalCategories).toBeDefined();
     expect(Array.isArray(proposalCategories)).toBe(true);
@@ -37,12 +37,12 @@ describe('exportProposalCategories', () => {
   });
 
   it('should throw an error for invalid space identifier', async () => {
-    await expect(exportProposalCategories({ spaceIdOrDomain: 'non_existing_space_id' })).rejects.toThrowError();
+    await expect(exportSpaceProposalCategories({ spaceIdOrDomain: 'non_existing_space_id' })).rejects.toThrowError();
   });
 
   it('should throw an error for missing or null space identifier', async () => {
-    await expect(exportProposalCategories({ spaceIdOrDomain: '' })).rejects.toThrowError();
+    await expect(exportSpaceProposalCategories({ spaceIdOrDomain: '' })).rejects.toThrowError();
 
-    await expect(exportProposalCategories({ spaceIdOrDomain: null as unknown as string })).rejects.toThrowError();
+    await expect(exportSpaceProposalCategories({ spaceIdOrDomain: null as unknown as string })).rejects.toThrowError();
   });
 });
