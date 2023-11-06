@@ -82,7 +82,13 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
     }
   });
 
-  await documentPage.page.waitForTimeout(150);
+  await documentPage.page.waitForFunction(
+    () => document.querySelector('.bangle-editor')?.textContent === 'Item 2Item 1',
+    {},
+    {
+      timeout: 2500
+    }
+  );
 
   const page = await prisma.page.findUniqueOrThrow({
     where: {
