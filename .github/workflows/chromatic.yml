@@ -26,6 +26,7 @@ jobs:
         if: github.ref != 'refs/heads/main'
         uses: chromaui/action@v1
         with:
+          buildScriptName: 'build:storybook'
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           onlyChanged: true
           traceChanged: true
@@ -36,5 +37,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: chromaui/action@v1
         with:
+          buildScriptName: 'build:storybook'
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           autoAcceptChanges: true
