@@ -82,7 +82,7 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
     }
   });
 
-  await documentPage.page.waitForTimeout(150);
+  await documentPage.page.waitForTimeout(500);
 
   const page = await prisma.page.findUniqueOrThrow({
     where: {
