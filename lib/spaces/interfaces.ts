@@ -1,7 +1,7 @@
 import type { Space } from '@charmverse/core/prisma';
 
 import type { DomainCertificateDetails } from 'lib/aws/interfaces';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 // This type is unused for now. We are returning the full space document to the user.
 // This should either be deleted, or picked up again in the future.

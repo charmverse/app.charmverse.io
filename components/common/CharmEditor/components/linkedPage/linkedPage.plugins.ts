@@ -1,6 +1,6 @@
-import { NodeView } from '@bangle.dev/core';
 import { Plugin, PluginKey } from '@bangle.dev/pm';
 
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip';

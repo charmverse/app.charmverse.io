@@ -1,9 +1,11 @@
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
 import type { Command, EditorState, Schema } from '@bangle.dev/pm';
 import { keymap, wrappingInputRule } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { toggleList } from './listItem/commands';
 import { listIsTight } from './listItem/listIsTight';

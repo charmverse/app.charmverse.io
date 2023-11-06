@@ -1,6 +1,6 @@
 import * as http from 'adapters/http';
 import type { VerificationResponse } from 'lib/summon/verifyMembership';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 
 export class SummonApi {
   async joinVerifiedSpace(input: { spaceId: string; joinType: TokenGateJoinType }) {

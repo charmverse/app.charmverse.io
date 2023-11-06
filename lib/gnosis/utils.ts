@@ -1,4 +1,4 @@
-import { getChainShortname } from 'connectors';
+import { getChainShortname } from 'connectors/chains';
 
 export function getGnosisTransactionQueueUrl(address: string, chainId: number) {
   return `https://app.safe.global/${getChainShortname(chainId)}:${address}/transactions/queue`;

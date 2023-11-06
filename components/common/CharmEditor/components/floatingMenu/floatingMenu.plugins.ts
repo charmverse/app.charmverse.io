@@ -1,6 +1,5 @@
-import type { PluginKey } from '@bangle.dev/core';
 import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
-import type { NodeSelection } from 'prosemirror-state';
+import type { NodeSelection, PluginKey } from 'prosemirror-state';
 
 import { floatingMenu } from './floating-menu';
 

@@ -1,6 +1,7 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import { log } from '@charmverse/core/log';
 import type { DOMOutputSpec } from 'prosemirror-model';
+
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export function spec() {
   return [rowSpec(), columnSpec()];

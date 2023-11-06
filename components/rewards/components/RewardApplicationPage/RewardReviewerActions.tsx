@@ -1,7 +1,7 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { getChainExplorerLink } from 'connectors/index';
+import { getChainExplorerLink } from 'connectors/chains';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 

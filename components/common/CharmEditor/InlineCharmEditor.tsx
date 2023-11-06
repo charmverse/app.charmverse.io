@@ -1,17 +1,18 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
-import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
+import { Plugin } from 'prosemirror-state';
 import type { CSSProperties, ReactNode } from 'react';
 
+import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
+import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';

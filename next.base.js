@@ -1,6 +1,7 @@
 const esmModules = [
-  '@bangle.dev/react',
+  '@bangle.dev/base-components',
   '@bangle.dev/tooltip',
+  '@bangle.dev/utils',
   '@popperjs/core',
   '@fullcalendar/common',
   '@fullcalendar/core',
@@ -37,6 +38,7 @@ const esmModules = [
 // this breaks the dev environment with an error when importing MUI icons: Cannot use 'import.meta' outside a module
 if (process.env.NODE_ENV === 'test') {
   esmModules.push('@babel/runtime');
+  esmModules.push('isows');
   esmModules.push('wagmi');
   esmModules.push('@wagmi/core');
   esmModules.push('@wagmi/connectors');

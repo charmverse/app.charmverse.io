@@ -53,25 +53,25 @@ function IframeComponent({ readOnly, node, getPos, view, deleteNode, selected, u
         if (isYoutube) {
           const pos = getPos();
           const _node = view.state.schema.nodes.video.createAndFill({ src: parsedUrl });
-          if (_node) {
+          if (typeof pos === 'number' && _node) {
             view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
           }
         } else if (isPdf) {
           const pos = getPos();
           const _node = view.state.schema.nodes.pdf.createAndFill({ src: parsedUrl });
-          if (_node) {
+          if (typeof pos === 'number' && _node) {
             view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
           }
         } else if (nftAttrs) {
           const pos = getPos();
           const _node = view.state.schema.nodes.nft.createAndFill(nftAttrs);
-          if (_node) {
+          if (typeof pos === 'number' && _node) {
             view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
           }
         } else if (tweetAttrs) {
           const pos = getPos();
           const _node = view.state.schema.nodes.tweet.createAndFill(tweetAttrs);
-          if (_node) {
+          if (typeof pos === 'number' && _node) {
             view.dispatch(view.state.tr.replaceWith(pos, pos + node.nodeSize, _node));
           }
         } else {

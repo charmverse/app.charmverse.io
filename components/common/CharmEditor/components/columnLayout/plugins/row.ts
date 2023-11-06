@@ -1,8 +1,9 @@
-import { createElement } from '@bangle.dev/core';
 import { ColumnResizer } from '@column-resizer/core';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { NodeView } from 'prosemirror-view';
+
+import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 
 export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: string; readOnly: boolean }) {
   return new Plugin({
@@ -26,7 +27,7 @@ export function RowNodeView({ key, name, readOnly }: { key: PluginKey; name: str
 
             let index = 0;
 
-            if (startPos) {
+            if (typeof startPos === 'number') {
               // iterate the children of this node, which are 'columnBlock' type
               view.state.doc.nodesBetween(startPos, startPos + node.nodeSize, (child, pos) => {
                 if (child.type.name === 'columnBlock' && columnUpdates[index]) {

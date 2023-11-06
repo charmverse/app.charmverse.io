@@ -196,5 +196,14 @@
         "jsxSingleQuote": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      // ignore default export warning for next.js folder
+      "files": ["!pages"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    }
+  ]
 }

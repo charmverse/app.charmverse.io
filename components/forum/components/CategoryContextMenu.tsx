@@ -8,7 +8,7 @@ import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';
 
 import PopperPopup from 'components/common/PopperPopup';
@@ -29,7 +29,6 @@ type Props = {
 };
 
 export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props) {
-  const [tempName, setTempName] = useState('');
   const { updateForumCategory, setDefaultPostCategory, categories } = useForumCategories();
   const category = categories.find((c) => c.id === categoryId);
   const { showMessage } = useSnackbar();
@@ -50,12 +49,6 @@ export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props
 
   const editDescriptionDialog = usePopupState({ variant: 'popover', popupId: 'add-roles-dialog' });
 
-  function onSave() {
-    if (category && tempName !== category.name) {
-      onChange({ ...category, name: tempName });
-    }
-  }
-
   const [permissionsDialogIsOpen, setPermissionsDialogIsOpen] = useState(false);
 
   function closeDialog() {
@@ -63,12 +56,6 @@ export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props
   }
 
   const isDefaultSpacePostCategory = space?.defaultPostCategoryId === categoryId;
-
-  useEffect(() => {
-    if (category) {
-      setTempName(category.name || '');
-    }
-  }, [!!category, setTempName]);
 
   const popupContent = useMemo(
     () => (
@@ -171,12 +158,12 @@ export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props
         )}
       </MenuList>
     ),
-    [category, tempName, space?.defaultPostCategoryId, notifications]
+    [category, space?.defaultPostCategoryId, notifications]
   );
 
   return (
     <>
-      <PopperPopup popupContent={popupContent} onClose={onSave}>
+      <PopperPopup popupContent={popupContent} onClose={editDescriptionDialog.close}>
         <IconButton
           data-test={`open-category-context-menu-${categoryId}`}
           size='small'
@@ -193,12 +180,11 @@ export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props
         <PostCategoryPermissionsDialog category={category} onClose={closeDialog} open={permissionsDialogIsOpen} />
       )}
 
-      {category && (
+      {category && editDescriptionDialog.isOpen && (
         <EditCategoryDialog
           onSave={(newValues) => onChange({ ...category, description: newValues.description, name: newValues.name })}
           category={category}
           onClose={editDescriptionDialog.close}
-          open={editDescriptionDialog.isOpen}
         />
       )}
     </>

@@ -11,7 +11,7 @@ import { NftAvatarGalleryPopup } from 'components/members/components/MemberProfi
 import { AvatarEditMenu } from 'components/settings/space/components/AvatarEditMenu';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { NFTData } from 'lib/blockchain/getNFTs';
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import type { UserAvatar } from 'lib/users/interfaces';
 
 import { ProgressOverlay } from './ProgressOverlay';

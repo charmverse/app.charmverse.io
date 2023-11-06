@@ -7,7 +7,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { VerificationResponse } from 'lib/summon/verifyMembership';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 
 type Props = {
   joinType?: TokenGateJoinType;

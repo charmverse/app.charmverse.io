@@ -48,7 +48,7 @@ import { TelegramLoginIframe } from './TelegramLoginIframe';
 
 export function IdentityProviders() {
   const { isConnectingIdentity } = useWeb3ConnectionManager();
-  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
+  const { account, requestSignature, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();
@@ -90,7 +90,7 @@ export function IdentityProviders() {
 
   const generateWalletAuth = async () => {
     try {
-      const authSig = await sign();
+      const authSig = await requestSignature();
       await signSuccess(authSig);
     } catch (error) {
       log.error('Error requesting wallet signature in login page', error);

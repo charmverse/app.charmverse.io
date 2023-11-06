@@ -39,7 +39,7 @@ const StyledStack = styled(Stack)`
   }
 `;
 
-type Props = {
+export type CommentProps = {
   replyingDisabled?: boolean;
   comment: CommentWithChildren;
   permissions?: CommentPermissions;
@@ -65,7 +65,7 @@ export function Comment({
   handleVoteComment,
   lensPostLink,
   isPublishingComments
-}: Props) {
+}: CommentProps) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
@@ -152,7 +152,8 @@ export function Comment({
       placeholderText: 'What are your thoughts?',
       onContentChange: updateCommentContent,
       content: commentEditContent.doc,
-      isContentControlled: true
+      isContentControlled: true,
+      disableNestedPages: true
     };
 
     if (!inlineCharmEditor) {
@@ -165,7 +166,7 @@ export function Comment({
   return (
     <Stack my={1} position='relative' ref={commentContainerRef}>
       {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
-      <StyledStack id={`post-comment-${comment.id}`} data-test={`post-comment-${comment.id}`}>
+      <StyledStack id={`comment-${comment.id}`} data-test={`comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
@@ -192,7 +193,7 @@ export function Comment({
             <IconButton
               className='comment-actions'
               size='small'
-              data-test={`post-comment-menu-${comment.id}`}
+              data-test={`comment-menu-${comment.id}`}
               onClick={(event) => {
                 menuState.open(event.currentTarget);
               }}
@@ -211,7 +212,7 @@ export function Comment({
             left: 10
           }}
         />
-        <Box data-test={`post-comment-charmeditor-${comment.id}`} ml={3}>
+        <Box data-test={`comment-charmeditor-${comment.id}`} ml={3}>
           {isEditingComment ? (
             <Stack>
               {editor}
@@ -247,6 +248,7 @@ export function Comment({
               key={isEditingComment.toString()}
               content={commentContent.doc}
               isContentControlled
+              disableNestedPages
             />
           )}
           {!comment.deletedAt && !replyingDisabled && (

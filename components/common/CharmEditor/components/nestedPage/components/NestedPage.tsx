@@ -1,9 +1,10 @@
-import type { NodeViewProps } from '@bangle.dev/core';
-import { useEditorViewContext } from '@bangle.dev/react';
 import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
+import type { EditorView } from 'prosemirror-view';
 
+import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import type { StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
@@ -13,6 +14,7 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 
 import { enableDragAndDrop } from '../../../utils';
+import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 const NestedPageContainer = styled(Link)`
   align-items: center;
@@ -21,6 +23,7 @@ const NestedPageContainer = styled(Link)`
   padding: 3px 3px 3px 2px;
   position: relative;
   transition: background 20ms ease-in 0s;
+  margin: ${({ theme }) => `${theme.spacing(0.5)} 0px`};
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
@@ -43,6 +46,16 @@ const StyledTypography = styled(Typography)`
   border-bottom: 0.05em solid var(--link-underline);
 `;
 
+function resetPageNodeDropPluginState(view: EditorView) {
+  const pluginState = pageNodeDropPluginKey.getState(view.state) as {
+    hoveredPageDomNode: HTMLElement | null;
+  };
+  if (pluginState.hoveredPageDomNode) {
+    view.dispatch(view.state.tr.setMeta(pageNodeDropPluginKey, { hoveredPageDomNode: null }));
+    pluginState.hoveredPageDomNode.removeAttribute('id');
+  }
+}
+
 export default function NestedPage({
   isLinkedPage,
   node,
@@ -57,7 +70,6 @@ export default function NestedPage({
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
   const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
-
   let pageTitle = '';
   if (documentPage || staticPage) {
     pageTitle = (documentPage || staticPage)?.title || 'Untitled';
@@ -80,16 +92,30 @@ export default function NestedPage({
   return (
     <NestedPageContainer
       data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
+      data-page-type={node.attrs.type ?? documentPage?.type}
       href={appPath ? `/${appPath}` : undefined}
       color='inherit'
-      data-id={`page-${pageId}`}
+      data-id={pageId}
       data-title={pageTitle}
       data-path={fullPath}
       onDragStart={() => {
-        const nodePos = getPos();
-        enableDragAndDrop(view, nodePos);
+        const pos = getPos();
+        if (typeof pos === 'number') {
+          enableDragAndDrop(view, pos);
+        }
       }}
       data-type={node.attrs.type}
+      // Only works for firefox
+      onDragExitCapture={() => {
+        resetPageNodeDropPluginState(view);
+      }}
+      // Should only works for chrome, opera and IE, firefox also handles it but for ff we have onDragExitCapture
+      onDragLeaveCapture={() => {
+        const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        if (!isFirefox) {
+          resetPageNodeDropPluginState(view);
+        }
+      }}
     >
       <div>
         <LinkIcon

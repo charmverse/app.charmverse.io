@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const BundleAnalyzer = require('@next/bundle-analyzer');
-const next = require('next/dist/lib/is-serializable-props');
 
 const esmModules = require('./next.base').esmModules;
 
@@ -20,12 +19,12 @@ const config = {
     styledComponents: true
   },
   experimental: {
-    esmExternals: false
-    //    externalDir: true
+    esmExternals: false,
+    webpackBuildWorker: true
   },
-
   images: {
-    domains: ['cdn.charmverse.io']
+    // next image is broken in staging/production as of 14.0.1
+    unoptimized: true
   },
   transpilePackages: esmModules,
   modularizeImports: {
@@ -106,7 +105,7 @@ const config = {
       }
     ];
   },
-  webpack(_config, { buildId, nextRuntime }) {
+  webpack(_config, { buildId, nextRuntime, webpack }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
 
@@ -186,6 +185,20 @@ const config = {
           };
         });
       };
+    } else {
+      /**
+       * Add support for the `node:` scheme available since Node.js 16.
+       *
+       * `@lit-protocol/lit-node-client` imports from `node:buffer`
+       *
+       * @see https://github.com/webpack/webpack/issues/13290
+       */
+      _config.plugins = _config.plugins ?? [];
+      _config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+          resource.request = resource.request.replace(/^node:/, '');
+        })
+      );
     }
 
     return _config;
@@ -202,12 +215,6 @@ const removeUndefined = (obj) => {
     else if (obj[key] !== undefined) newObj[key] = obj[key];
   });
   return newObj;
-};
-
-// eslint-disable-next-line prefer-destructuring
-const isSerializableProps = next.isSerializableProps;
-next.isSerializableProps = function _isSerializableProps(page, method, input) {
-  return isSerializableProps(page, method, removeUndefined(input));
 };
 
 const withBundleAnalyzer = BundleAnalyzer({
