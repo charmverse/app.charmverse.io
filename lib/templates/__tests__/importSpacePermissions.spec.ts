@@ -126,6 +126,7 @@ describe('importSpacePermissions', () => {
       roles: expect.arrayContaining([
         {
           ...firstSourceRole,
+          createdBy: 
           id: expect.not.stringContaining(firstSourceRole.id),
           spaceId: targetSpace.id
         },

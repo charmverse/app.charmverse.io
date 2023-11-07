@@ -1,3 +1,4 @@
+import type { Role } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
@@ -41,6 +42,32 @@ describe('importRoles', () => {
 
     // After import, roles should be created in the new space
     expect(result.roles.length).toBe(rolesToImport.length);
+
+    expect(result.roles).toEqual(
+      expect.arrayContaining<Role>([
+        {
+          createdAt: expect.any(Date),
+          createdBy: newSpace.createdBy,
+          id: expect.any(String),
+          name: 'Tester',
+          spaceId: newSpace.id,
+          externalId: null,
+          source: null,
+          sourceId: null
+        },
+        {
+          createdAt: expect.any(Date),
+          createdBy: newSpace.createdBy,
+          id: expect.any(String),
+          name: 'Developer',
+          spaceId: newSpace.id,
+          externalId: null,
+          source: null,
+          sourceId: null
+        }
+      ])
+    );
+
     expect(result.oldNewRecordIdHashMap).toMatchObject({
       [rolesToImport[0].id]: result.roles[0].id
     });
