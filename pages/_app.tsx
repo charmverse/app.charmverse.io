@@ -29,7 +29,7 @@ import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
-import { isDevEnv } from 'config/constants';
+import { isDevEnv, isProdEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
@@ -223,7 +223,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
 
 const lensConfig: LensConfig = {
   bindings: wagmiBindings(),
-  environment: isDevEnv ? development : production
+  environment: isProdEnv ? production : development
 };
 
 function DataProviders({ children }: { children: ReactNode }) {
