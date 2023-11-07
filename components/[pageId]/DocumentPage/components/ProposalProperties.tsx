@@ -28,7 +28,6 @@ interface ProposalPropertiesProps {
   pageId: string;
   proposalId: string;
   snapshotProposalId: string | null;
-  isTemplate: boolean;
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
   title?: string;
@@ -42,7 +41,6 @@ export function ProposalProperties({
   proposalId,
   snapshotProposalId,
   readOnly,
-  isTemplate,
   title,
   proposalPage
 }: ProposalPropertiesProps) {
@@ -74,6 +72,7 @@ export function ProposalProperties({
   const canAnswerRubric = proposalPermissions?.evaluate;
   const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
+  const isTemplate = proposalPage.type === 'proposal_template';
   const sourceTemplate = isFromTemplateSource
     ? proposalTemplates?.find((template) => template.id === proposal?.page?.sourceTemplateId)
     : undefined;
@@ -102,6 +101,7 @@ export function ProposalProperties({
         group: reviewer.roleId ? 'role' : 'user',
         id: reviewer.roleId ?? (reviewer.userId as string)
       })) ?? [],
+    type: proposalPage.type,
     fields:
       typeof proposal?.fields === 'object' && !!proposal?.fields
         ? (proposal.fields as ProposalFields)
@@ -184,9 +184,9 @@ export function ProposalProperties({
       }
       readOnlyReviewers={readOnlyReviewers}
       rubricAnswers={proposal?.rubricAnswers}
+      isTemplate={isTemplate}
       draftRubricAnswers={proposal?.draftRubricAnswers}
       rubricCriteria={proposal?.rubricCriteria}
-      showStatus={!isTemplate}
       userId={user?.id}
       snapshotProposalId={snapshotProposalId}
       updateProposalStatus={updateProposalStatus}

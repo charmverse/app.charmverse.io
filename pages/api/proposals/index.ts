@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,6 +8,7 @@ import { providePermissionClients } from 'lib/permissions/api/permissionsClientM
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
+import { AdministratorOnlyError } from 'lib/users/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -24,13 +26,27 @@ handler
 async function createProposalController(req: NextApiRequest, res: NextApiResponse<PageWithProposal>) {
   const proposaCreateProps = req.body as CreateProposalInput;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
-    resourceId: proposaCreateProps.categoryId,
-    userId: req.session.user.id
-  });
+  if (proposaCreateProps.pageProps?.type === 'proposal_template') {
+    const adminRole = await prisma.spaceRole.findFirst({
+      where: {
+        isAdmin: true,
+        userId: req.session.user.id,
+        spaceId: proposaCreateProps.spaceId
+      }
+    });
 
-  if (!permissions.create_proposal) {
-    throw new ActionNotPermittedError('You cannot create new proposals');
+    if (!adminRole) {
+      throw new AdministratorOnlyError();
+    }
+  } else {
+    const permissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
+      resourceId: proposaCreateProps.categoryId,
+      userId: req.session.user.id
+    });
+
+    if (!permissions.create_proposal) {
+      throw new ActionNotPermittedError('You cannot create new proposals');
+    }
   }
   const proposalPage = await createProposal({
     ...req.body,
