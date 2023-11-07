@@ -1,3 +1,4 @@
+import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
@@ -16,11 +17,11 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-export type GroupedRole = { id: string; group: 'role' };
-type GroupedMember = { id: string; group: 'user' };
+export type GroupedRole = TargetPermissionGroup<'role'>;
+type GroupedMember = TargetPermissionGroup<'user'>;
 type GroupedOption = GroupedRole | GroupedMember;
-type GroupedRolePopulated = ListSpaceRolesResponse & { group: 'role' };
-type GroupedMemberPopulated = Member & { group: 'user' };
+type GroupedRolePopulated = ListSpaceRolesResponse & GroupedRole;
+type GroupedMemberPopulated = Member & GroupedMember;
 type GroupedOptionPopulated = GroupedRolePopulated | GroupedMemberPopulated;
 
 type ContainerProps = {
@@ -85,6 +86,7 @@ function SelectedOptions({
               flexDirection='row'
               key={option.id}
               gap={0.5}
+              data-test='selected-user-or-role-option'
               sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
             >
               {option.group === 'user' && (
