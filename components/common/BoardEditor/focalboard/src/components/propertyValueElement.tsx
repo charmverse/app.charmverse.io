@@ -1,6 +1,5 @@
-import type { ProposalStatus, ApplicationStatus } from '@charmverse/core/prisma-client';
+import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -25,7 +24,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { PROPOSAL_REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import {
   ASSIGNEES_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -176,8 +175,15 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
-  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
-    return <UserAndRoleSelect readOnly={readOnly} onChange={() => null} value={propertyValue as any} />;
+  } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
+    return (
+      <UserAndRoleSelect
+        data-test='selected-reviewers'
+        readOnly={readOnly}
+        onChange={() => null}
+        value={propertyValue as any}
+      />
+    );
   } else if (
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
@@ -318,7 +324,11 @@ function PropertyValueElement(props: Props) {
       propertyValueElement = <URLProperty {...commonProps} />;
     } else {
       propertyValueElement = (
-        <TextInput {...commonProps} readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID} />
+        <TextInput
+          {...commonProps}
+          readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID}
+          displayType={propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ? 'details' : commonProps.displayType}
+        />
       );
     }
   } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {

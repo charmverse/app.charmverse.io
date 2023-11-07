@@ -4,4 +4,4 @@ export const DEFAULT_VIEW_BLOCK_ID = '__defaultView';
 export const STATUS_BLOCK_ID = '__status';
 export const EVALUATION_TYPE_BLOCK_ID = '__evaluationType';
 export const AUTHORS_BLOCK_ID = '__authors';
-export const REVIEWERS_BLOCK_ID = '__reviewers';
+export const PROPOSAL_REVIEWERS_BLOCK_ID = '__reviewers';

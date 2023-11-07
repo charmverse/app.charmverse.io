@@ -7,11 +7,12 @@ import { useProposalsBoardAdapter } from 'components/proposals/components/Propos
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 
 type ProposalsBoardContextType = {
   board: Board;
   boardCustomProperties: Board;
-  card: Card;
+  card: Card<ProposalPropertyValue>;
   cards: Card[];
   cardPages: CardPage[];
   activeView: BoardView;
