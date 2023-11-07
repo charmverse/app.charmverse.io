@@ -28,7 +28,7 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   contentText?: string;
   headerImage: string | null;
   icon: string | null;
-  type: Extract<PageType, 'proposal' | 'proposal_template'>;
+  type: PageType;
 };
 
 type Props = {
