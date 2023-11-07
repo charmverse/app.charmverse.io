@@ -226,7 +226,7 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
     const baseTitle = mappedFeatures.bounties.title;
     return <BountyPageTitle baseTitle={baseTitle} basePath={`/${router.query.domain}`} />;
     // Switch over when we use rewards
-  } else if (pageType === 'proposal') {
+  } else if (pageType === 'proposal' || pageType === 'proposal_template') {
     const baseTitle = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;
   } else if (router.route === '/[domain]/[pageId]') {

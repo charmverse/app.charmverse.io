@@ -307,7 +307,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       snapshotProposalId={page.snapshotProposalId}
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
-                      isTemplate={page.type === 'proposal_template'}
                       title={page.title}
                       proposalPage={page}
                     />
@@ -333,7 +332,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {/** REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE 
+              {/** REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE
                * {page.bountyId && (
                 <Box mt='-100px'>
                   <RewardSubmissionsTable openApplication={showApplication} rewardId={page.bountyId} />

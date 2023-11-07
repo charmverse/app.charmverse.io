@@ -139,7 +139,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                     readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
-                    showStatus={true}
+                    isTemplate={formInputs.type === 'proposal_template'}
                     title=''
                     setProposalFormInputs={setFormInputs}
                     onChangeRubricCriteria={(rubricCriteria) => {
