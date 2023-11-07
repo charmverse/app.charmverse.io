@@ -30,7 +30,7 @@ export function RewardApplicantTableRow({ submission, onClickView }: Props) {
 
       <TableCell align='right'>
         <Tooltip title='View application details'>
-          <Button variant='outlined' onClick={onClickView}>
+          <Button variant='text' onClick={onClickView}>
             View
           </Button>
         </Tooltip>
