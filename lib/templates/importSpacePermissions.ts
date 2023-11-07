@@ -1,12 +1,10 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import {
   mapProposalCategoryPermissionToAssignee,
   type AssignedProposalCategoryPermission,
   type TargetPermissionGroup
 } from '@charmverse/core/permissions';
-import { prisma } from '@charmverse/core/prisma-client';
 import type { Prisma, Role, SpaceOperation } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import {
@@ -22,7 +20,7 @@ import type { ImportParams } from './interfaces';
 
 export type ImportedPermissions = {
   spacePermissions: AssignedSpacePermission[];
-  proposalCategoryPermissions: AssignedProposalCategoryPermission[];
+  proposalCategoryPermissions: AssignedProposalCategoryPermission<'role' | 'space'>[];
   roles: Role[];
 };
 
@@ -32,10 +30,25 @@ export async function importSpacePermissions({
 }: ImportParams): Promise<ImportedPermissions> {
   const targetSpace = await getSpace(targetSpaceIdOrDomain);
 
-  const { permissions, roles, proposalCategories } = await getImportData(params);
+  const { permissions, proposalCategories } = await getImportData(params);
 
   const sourceProposalCategoryPermissions = permissions?.proposalCategoryPermissions ?? [];
   const sourceSpacePermissions = permissions?.spacePermissions ?? [];
+
+  const [existingTargetSpacePermissions, existingTargetSpaceProposalCategoryPermissions] = await Promise.all([
+    prisma.spacePermission.findMany({
+      where: {
+        forSpaceId: targetSpace.id
+      }
+    }),
+    prisma.proposalCategoryPermission.findMany({
+      where: {
+        proposalCategory: {
+          spaceId: targetSpace.id
+        }
+      }
+    })
+  ]);
 
   // Port over roles
   const { oldNewRecordIdHashMap: roleIdsHashMap, roles: importedRolesFromTemplate } = await importRoles({
@@ -43,21 +56,20 @@ export async function importSpacePermissions({
     ...params
   });
 
-  const { oldNewIdMap: sourceTargetProposalCategoryHashmap, proposalCategories: importedProposalCategories } =
-    await importProposalCategories({
-      targetSpaceIdOrDomain: targetSpace.id,
-      exportData: {
-        proposalCategories:
-          proposalCategories ||
-          (await prisma.proposalCategory.findMany({
-            where: {
-              id: {
-                in: sourceProposalCategoryPermissions.map((p) => p.proposalCategoryId)
-              }
+  const { oldNewIdMap: sourceTargetProposalCategoryHashmap } = await importProposalCategories({
+    targetSpaceIdOrDomain: targetSpace.id,
+    exportData: {
+      proposalCategories:
+        proposalCategories ||
+        (await prisma.proposalCategory.findMany({
+          where: {
+            id: {
+              in: sourceProposalCategoryPermissions.map((p) => p.proposalCategoryId)
             }
-          }))
-      }
-    });
+          }
+        }))
+    }
+  });
 
   // Match categories by title
   const proposalCategoryPermissionsToCreate: Prisma.ProposalCategoryPermissionCreateManyInput[] =
@@ -68,7 +80,27 @@ export async function importSpacePermissions({
         const isSpacePermission = assignee.group === 'space';
         const matchingCategoryId = sourceTargetProposalCategoryHashmap[proposalCategoryId];
 
-        if ((!isRolePermission && !isSpacePermission) || !matchingCategoryId) {
+        const isDuplicate = existingTargetSpaceProposalCategoryPermissions.some((existingPermission) => {
+          if (!matchingCategoryId) {
+            return false;
+          }
+
+          if (isRolePermission) {
+            return (
+              existingPermission.roleId === roleIdsHashMap[assigneeId] &&
+              existingPermission.proposalCategoryId === sourceTargetProposalCategoryHashmap[proposalCategoryId]
+            );
+          } else if (isSpacePermission) {
+            return (
+              existingPermission.spaceId === targetSpace.id &&
+              existingPermission.proposalCategoryId === matchingCategoryId
+            );
+          }
+
+          return false;
+        });
+
+        if ((!isRolePermission && !isSpacePermission) || !matchingCategoryId || isDuplicate) {
           return null;
         }
 
@@ -82,28 +114,24 @@ export async function importSpacePermissions({
       })
       .filter((val) => !!val) as Prisma.ProposalCategoryPermissionCreateManyInput[];
 
-  // Lock in changes inside the db
-  await prisma.proposalCategoryPermission.createMany({ data: proposalCategoryPermissionsToCreate });
-
-  const createdProposalCategoryPermissions = await prisma.proposalCategoryPermission
-    .findMany({
-      where: {
-        id: {
-          in: proposalCategoryPermissionsToCreate.map((p) => p.id as string)
-        }
-      }
-    })
-    .then((_permissions) => _permissions.map(mapProposalCategoryPermissionToAssignee));
-
-  ///
-
+  // Map out space permissions
   const spacePermissionsToCreate: Prisma.SpacePermissionCreateManyInput[] = sourceSpacePermissions
     .map(({ assignee, operations }) => {
       const assigneeId = (assignee as TargetPermissionGroup<'role' | 'space'>).id;
       const isRolePermission = assignee.group === 'role';
       const isSpacePermission = assignee.group === 'space';
 
-      if (!isRolePermission && !isSpacePermission) {
+      const isDuplicate = existingTargetSpacePermissions.some((existingPermission) => {
+        if (isRolePermission) {
+          return existingPermission.roleId === roleIdsHashMap[assigneeId];
+        } else if (isSpacePermission) {
+          return existingPermission.spaceId === targetSpace.id;
+        }
+
+        return false;
+      });
+
+      if ((!isRolePermission && !isSpacePermission) || isDuplicate) {
         return null;
       }
 
@@ -119,22 +147,35 @@ export async function importSpacePermissions({
     })
     .filter((val) => !!val) as Prisma.SpacePermissionCreateManyInput[];
 
-  // Lock in changes inside the db for space permissions
-  await prisma.spacePermission.createMany({ data: spacePermissionsToCreate });
+  // Lock in changes inside the db for all permissions
 
-  const createdSpacePermissions = await prisma.spacePermission
+  await prisma.proposalCategoryPermission.createMany({ data: proposalCategoryPermissionsToCreate });
+
+  const updatedTargetProposalCategoryPermissions = await prisma.proposalCategoryPermission
     .findMany({
       where: {
-        id: {
-          in: spacePermissionsToCreate.map((p) => p.id as string)
+        proposalCategory: {
+          spaceId: targetSpace.id
         }
+      }
+    })
+    .then((_permissions) => _permissions.map(mapProposalCategoryPermissionToAssignee));
+
+  await prisma.spacePermission.createMany({ data: spacePermissionsToCreate });
+
+  const updatedTargetSpacePermissions = await prisma.spacePermission
+    .findMany({
+      where: {
+        forSpaceId: targetSpace.id
       }
     })
     .then((_permissions) => _permissions.map(mapSpacePermissionToAssignee));
 
   return {
-    proposalCategoryPermissions: createdProposalCategoryPermissions,
+    proposalCategoryPermissions: updatedTargetProposalCategoryPermissions as AssignedProposalCategoryPermission<
+      'role' | 'space'
+    >[],
     roles: importedRolesFromTemplate,
-    spacePermissions: createdSpacePermissions
+    spacePermissions: updatedTargetSpacePermissions
   };
 }

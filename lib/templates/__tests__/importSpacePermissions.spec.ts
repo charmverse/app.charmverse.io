@@ -1,14 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { AssignedProposalCategoryPermission, TargetPermissionGroup } from '@charmverse/core/permissions';
 import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permissions';
-import type {
-  TargetPermissionGroup,
-  AssignableSpacePermissionGroups,
-  AssignedProposalCategoryPermission
-} from '@charmverse/core/permissions';
 import type { ProposalCategory, Role, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { stringUtils } from '@charmverse/core/utilities';
 
 import type { AssignedSpacePermission } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
 import { mapSpacePermissionToAssignee } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
