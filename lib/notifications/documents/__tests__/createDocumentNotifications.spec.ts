@@ -8,6 +8,8 @@ import { createNotificationsFromEvent } from 'lib/notifications/createNotificati
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { createProposal } from 'lib/proposal/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
 import { createUserFromWallet } from 'lib/users/createUser';
 import {
@@ -23,6 +25,7 @@ import { builders } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { generateProposalCategory } from 'testing/utils/proposals';
+import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
@@ -66,7 +69,8 @@ describe(`Test document events and notifications`, () => {
           createdBy: user.id,
           id: mentionId,
           value: user2.id,
-          parentNode: null
+          parentNode: null,
+          type: 'user'
         }
       },
       spaceId: space.id,
@@ -131,7 +135,8 @@ describe(`Test document events and notifications`, () => {
           createdBy: user.id,
           id: mentionId,
           value: user2.id,
-          parentNode: null
+          parentNode: null,
+          type: 'user'
         }
       },
       spaceId: space.id,
@@ -151,6 +156,91 @@ describe(`Test document events and notifications`, () => {
     });
 
     expect(documentNotification).toBeTruthy();
+  });
+
+  it(`Should create document notifications for mention.created event in a post (mention a specific role)`, async () => {
+    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const user2 = await generateUser();
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: user2.id
+    });
+    const mentionId = v4();
+
+    const role = await createRole({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user2.id
+    });
+
+    const postCategory = await generatePostCategory({ spaceId: space.id });
+
+    const mention: UserMentionMetadata = {
+      type: 'role',
+      value: role.id,
+      id: mentionId,
+      createdAt: new Date().toISOString(),
+      createdBy: user.id
+    };
+
+    const post = await createForumPost({
+      categoryId: postCategory.id,
+      content: builders.doc(builders.mention(mention)).toJSON(),
+      contentText: 'Hello World',
+      createdBy: user.id,
+      isDraft: false,
+      spaceId: space.id,
+      title: 'Hello World'
+    });
+
+    await createDocumentNotifications({
+      event: {
+        scope: WebhookEventNames.DocumentMentionCreated,
+        post: await getPostEntity(post.id),
+        document: null,
+        space: await getSpaceEntity(space.id),
+        user: await getUserEntity(user.id),
+        mention
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
+    const documentUserNotification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'mention.created',
+        mentionId,
+        postId: post.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: user.id
+        }
+      }
+    });
+
+    const documentUser2Notification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'mention.created',
+        mentionId,
+        postId: post.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: user2.id
+        }
+      }
+    });
+
+    expect(documentUserNotification).toBeFalsy();
+    expect(documentUser2Notification).toBeTruthy();
   });
 
   it(`Should create document notifications for inline_comment.created event`, async () => {

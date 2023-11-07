@@ -5,14 +5,15 @@ export interface UserMentionMetadata {
   createdAt: string;
   createdBy: string;
   value: string;
-  parentNode: PageContent | null;
+  parentNode?: PageContent | null;
+  type: 'user' | 'role';
 }
 
 function checkMentionNode(node: PageContent) {
   if (
     node.type === 'mention' &&
     node.attrs &&
-    node.attrs.type === 'user' &&
+    (node.attrs.type === 'user' || node.attrs.type === 'role') &&
     node.attrs.id &&
     node.attrs.createdAt &&
     node.attrs.createdBy &&
@@ -20,6 +21,7 @@ function checkMentionNode(node: PageContent) {
   ) {
     return {
       id: node.attrs.id,
+      type: node.attrs.type,
       createdAt: node.attrs.createdAt,
       createdBy: node.attrs.createdBy,
       value: node.attrs.value
@@ -61,33 +63,4 @@ export function extractMentions(content: PageContent | null) {
   recurse(content, null);
 
   return Array.from(mentions.values());
-}
-
-export function extractMentionFromId(content: PageContent | null, mentionId: string): UserMentionMetadata | null {
-  if (!content) {
-    return null;
-  }
-
-  function recurse(node: PageContent, parentNode: PageContent | null): null | UserMentionMetadata {
-    if (node.content) {
-      for (const childNode of node.content) {
-        const mention = recurse(childNode, node);
-        if (mention) {
-          return mention;
-        }
-      }
-    }
-
-    const mention = parentNode ? checkMentionNode(node) : null;
-    if (mention) {
-      return {
-        ...mention,
-        parentNode
-      };
-    }
-
-    return null;
-  }
-
-  return recurse(content, null);
 }
