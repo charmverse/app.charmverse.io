@@ -309,7 +309,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       snapshotProposalId={page.snapshotProposalId}
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
-                      isTemplate={page.type === 'proposal_template'}
                       title={page.title}
                       proposalPage={page}
                     />

@@ -24,11 +24,12 @@ const StyledPageTemplateBanner = styled(Box, {
 `;
 
 type Props = {
+  isNewPage?: boolean;
   parentId?: string | null;
   pageType: PageMeta['type'];
 };
 
-export function PageTemplateBanner({ pageType, parentId }: Props) {
+export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const { space } = useCurrentSpace();
   const theme = useTheme();
   const { pages } = usePages();
@@ -55,7 +56,9 @@ export function PageTemplateBanner({ pageType, parentId }: Props) {
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
-            <span>You're editing a {pageType.split('_template')[0]} template</span>
+            <span>
+              You're {isNewPage ? 'creating' : 'editing'} a {pageType.split('_template')[0]} template
+            </span>
           ) : (
             <>
               <span>You're editing a template in</span>
