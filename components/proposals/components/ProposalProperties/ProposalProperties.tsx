@@ -4,7 +4,7 @@ import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } f
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { Alert, Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -274,9 +274,9 @@ export function ProposalProperties({
   }
 
   const evaluationTabs = useMemo<TabConfig[]>(() => {
-    if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
-      return [];
-    }
+    // if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
+    //   return [];
+    // }
     const tabs = [
       canAnswerRubric &&
         ([
@@ -591,6 +591,7 @@ export function ProposalProperties({
 
         {evaluationTabs.length > 0 && (
           <Card variant='outlined' sx={{ my: 2 }}>
+            <Alert severity='info'>Your evaluation is only viewable by the Reviewers assigned to this Proposal</Alert>
             <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
           </Card>
         )}

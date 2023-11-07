@@ -77,7 +77,8 @@ export function useNewProposal({ newProposal }: Props) {
           title: formInputs.title,
           sourceTemplateId: formInputs.proposalTemplateId,
           headerImage: formInputs.headerImage,
-          icon: formInputs.icon
+          icon: formInputs.icon,
+          type: formInputs.type
         },
         evaluationType: formInputs.evaluationType,
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -153,6 +154,7 @@ export function emptyState({
     reviewers: [],
     rubricCriteria: [],
     title: '',
+    type: 'proposal',
     publishToLens: false,
     fields: { properties: {} },
     ...inputs,

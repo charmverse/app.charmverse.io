@@ -1,6 +1,6 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Page, ProposalStatus } from '@charmverse/core/prisma';
+import type { Page, ProposalStatus, PageType } from '@charmverse/core/prisma';
 import type { ProposalEvaluationType, WorkspaceEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
@@ -20,7 +20,9 @@ import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
-type PageProps = Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon'>>;
+type PageProps = Partial<
+  Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon' | 'type'>
+>;
 
 export type CreateProposalInput = {
   pageId?: string;
@@ -71,6 +73,7 @@ export async function createProposal({
   if (!validation.valid) {
     throw new InsecureOperationError(`You cannot create a proposal with authors or reviewers outside the space`);
   }
+
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, page] = await prisma.$transaction([
     prisma.proposal.create({
@@ -118,7 +121,7 @@ export async function createProposal({
         proposalId,
         sourceTemplateId: pageProps?.sourceTemplateId,
         title: pageProps?.title ?? '',
-        type: 'proposal',
+        type: pageProps?.type ?? 'proposal',
         updatedBy: userId,
         spaceId
       }

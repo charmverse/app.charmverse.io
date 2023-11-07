@@ -57,29 +57,17 @@ export function NewProposalButton({
           id: (reviewer.roleId ?? reviewer.userId) as string
         })),
         rubricCriteria: proposalTemplate.rubricCriteria,
-        fields: (proposalTemplate.fields as ProposalFields) || {}
+        fields: (proposalTemplate.fields as ProposalFields) || {},
+        type: 'proposal'
       });
     }
   }
 
   async function createProposalTemplate() {
-    if (currentSpace) {
-      const newTemplate = await charmClient.proposals.createProposalTemplate({
-        spaceId: currentSpace.id,
-        categoryId: getDefaultCreateCategory()?.id as string
-      });
-
-      mutatePage(newTemplate);
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { domain: router.query.domain, id: newTemplate.id }
-        },
-        undefined,
-        { shallow: true }
-      );
-      popupState.close();
-    }
+    showNewProposal({
+      type: 'proposal_template'
+    });
+    popupState.close();
   }
 
   async function onClickCreate() {
