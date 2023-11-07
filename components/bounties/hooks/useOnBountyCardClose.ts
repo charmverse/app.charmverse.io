@@ -1,17 +1,13 @@
-import { useRouter } from 'next/router';
-
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useRouterTransition } from 'hooks/useRouterTransition';
 
 export function useOnBountyCardClose() {
   const { transitionsRef } = useRouterTransition();
-  const router = useRouter();
+  const { clearURLQuery, router } = useCharmRouter();
 
   function onClose() {
     if (!transitionsRef.current.length && router.query.bountyId) {
-      const { bountyId: _, ...query } = router.query;
-      router.push({ pathname: router.pathname, query }, undefined, {
-        shallow: true
-      });
+      clearURLQuery();
     }
   }
 

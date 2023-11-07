@@ -1,6 +1,5 @@
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Alert, Box, Card, Divider } from '@mui/material';
-import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
@@ -12,6 +11,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 import { getAppUrl, getSpaceUrl } from 'lib/utilities/browser';
@@ -34,7 +34,7 @@ export function AlternateRouteButton({ href, children }: { href: string; childre
 }
 
 export default function JoinWorkspace() {
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const [isRouterReady, setRouterReady] = useState(false);
@@ -49,7 +49,7 @@ export default function JoinWorkspace() {
   useEffect(() => {
     const connectedSpace = filterSpaceByDomain(spaces, domain);
     if (connectedSpace) {
-      router.push(`/${connectedSpace.domain}`);
+      navigateToSpacePath(`/`);
     }
   }, [spaces]);
 
