@@ -209,7 +209,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
                   selected={isSelected}
                   data-value={role.id}
                   data-type='role'
-                  onClick={() => onSelectMention(role.id, 'user')}
+                  onClick={() => onSelectMention(role.id, 'role')}
                   className={isSelected ? 'mention-selected' : ''}
                 >
                   <Typography fontSize={14}>{role.name}</Typography>
