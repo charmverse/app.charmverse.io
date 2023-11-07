@@ -95,4 +95,26 @@ describe('POST /api/proposals - Create a proposal', () => {
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
   });
+
+  it('should fail to create a proposal template if the user is not an admin', async () => {
+    const userCookie = await loginUser(user.id);
+    const otherUser = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const input: CreateProposalInput = {
+      categoryId: proposalCategory.id,
+      spaceId: space.id,
+      userId: user.id,
+      authors: [user.id, otherUser.id],
+      reviewers: [{ group: 'user', id: user.id }],
+      pageProps: {
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal',
+        type: 'proposal_template'
+      }
+    };
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
+  });
 });
