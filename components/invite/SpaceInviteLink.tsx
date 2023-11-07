@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { InviteLink, Space } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -12,12 +13,16 @@ import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { CenteredBox } from './components/CenteredBox';
 
-export default function InvitationPage({ invite }: { invite: InviteLinkPopulated }) {
+export type Props = {
+  invite: Pick<InviteLink, 'id' | 'visibleOn'>;
+  space: Pick<Space, 'id' | 'customDomain' | 'domain' | 'spaceImage' | 'name'>;
+};
+
+export default function InvitationPage({ invite, space }: Props) {
   const { user } = useUser();
   const { walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
@@ -33,7 +38,7 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
       }
       await charmClient.acceptInvite({ id: invite.id });
 
-      let redirectUrl = getSpaceUrl(invite.space);
+      let redirectUrl = getSpaceUrl(space);
 
       if (invite.visibleOn) {
         redirectUrl += '/proposals';
@@ -48,7 +53,7 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
       }
       log.error('Error accepting invite', {
         inviteId: invite.id,
-        spaceId: invite.space.id,
+        spaceId: space.id,
         userId: loggedInUser?.id,
         error
       });
@@ -64,11 +69,11 @@ export default function InvitationPage({ invite }: { invite: InviteLinkPopulated
       />
       <Card sx={{ p: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
-          <WorkspaceAvatar image={invite.space.spaceImage} name={invite.space.name} variant='rounded' />
+          <WorkspaceAvatar image={space.spaceImage} name={space.name} variant='rounded' />
         </Box>
         <Box display='flex' flexDirection='column' alignItems='center' mb={3}>
           <Typography gutterBottom>You've been invited to join</Typography>
-          <Typography variant='h5'>{invite.space.name}</Typography>
+          <Typography variant='h5'>{space.name}</Typography>
         </Box>
         {user ? (
           <PrimaryButton

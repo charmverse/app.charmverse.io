@@ -16,6 +16,7 @@ import { RiNftLine } from 'react-icons/ri';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { useGetNFT } from 'charmClient/hooks/blockchain';
 import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -46,13 +47,10 @@ export function NFTNodeView({ deleteNode, readOnly, node, selected, updateAttrs,
   const attrs = node.attrs as Partial<NodeAttrs>;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
   const [showEditPopup, setShowEditPopup] = useState(false);
-  const { data: nftData, isLoading } = useSWRImmutable(`nft/${attrs.chain}/${attrs.contract}/${attrs.token}`, () => {
-    if (!attrs.chain || !attrs.contract || !attrs.token) return null;
-    return charmClient.blockchain.getNFT({
-      chainId: attrs.chain as any,
-      address: attrs.contract,
-      tokenId: attrs.token
-    });
+  const { data: nftData, isLoading } = useGetNFT({
+    chainId: attrs.chain as any,
+    address: attrs.contract,
+    tokenId: attrs.token
   });
 
   function submitForm(values: NodeAttrs) {
