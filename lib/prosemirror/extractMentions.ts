@@ -1,5 +1,4 @@
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { shortenHex } from 'lib/utilities/blockchain';
 
 export interface UserMentionMetadata {
   id: string;
