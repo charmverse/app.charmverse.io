@@ -56,7 +56,10 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
     const proposalTemplate = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id
+      categoryId: proposalCategory.id,
+      pageProps: {
+        type: 'proposal_template'
+      }
     });
 
     await request(baseUrl)
