@@ -7,7 +7,6 @@ import { useLgScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 
 import { useThreads } from './useThreads';
-import { useVotes } from './useVotes';
 
 export type PageAction = 'comments' | 'suggestions';
 
@@ -27,7 +26,6 @@ export function PageSidebarProvider({ children, isInsideDialog }: { children: Re
   const isLargeScreen = useLgScreen();
   const { currentPageId } = useCurrentPage();
   const { isValidating: isValidatingInlineComments } = useThreads();
-  const { isValidating: isValidatingInlineVotes } = useVotes({ pageId: currentPageId });
   const { cache } = useSWRConfig();
   const [activeView, setActiveView] = useState<IPageSidebarContext['activeView']>(null);
   const commentPageActionToggledOnce = useRef<boolean>(false);
@@ -45,7 +43,7 @@ export function PageSidebarProvider({ children, isInsideDialog }: { children: Re
         return;
       }
 
-      if (currentPageId && !isValidatingInlineComments && !isValidatingInlineVotes) {
+      if (currentPageId && !isValidatingInlineComments) {
         const cachedInlineCommentData: ThreadWithCommentsAndAuthors[] | undefined = cache.get(
           `pages/${currentPageId}/threads`
         )?.data as ThreadWithCommentsAndAuthors[] | undefined;
@@ -63,7 +61,7 @@ export function PageSidebarProvider({ children, isInsideDialog }: { children: Re
       }
     }
     setDefaultPageSidebar();
-  }, [isInsideDialog, isValidatingInlineComments, isValidatingInlineVotes, currentPageId]);
+  }, [isInsideDialog, isValidatingInlineComments, currentPageId]);
 
   const value = useMemo<IPageSidebarContext>(
     () => ({
