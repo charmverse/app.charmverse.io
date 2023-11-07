@@ -17,7 +17,6 @@ type ParentData = {
 };
 
 type IContext = {
-  isValidating: boolean;
   isLoading: boolean;
   setParent: (parent: ParentData | null) => void;
   votes: Record<string, ExtendedVote>;
@@ -29,7 +28,6 @@ type IContext = {
 };
 
 const VotesContext = createContext<Readonly<IContext>>({
-  isValidating: true,
   isLoading: true,
   votes: {},
   setParent: () => undefined,
@@ -103,7 +101,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const { data, isValidating } = useSWR(
+  const { data } = useSWR(
     () => (parent ? `pages/${parent.pageId || parent.postId}/votes` : null),
     async () => charmClient.votes.getVotesByPage(parent!),
     {
@@ -202,7 +200,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const value: IContext = useMemo(
     () => ({
       votes,
-      isValidating,
       isLoading,
       castVote,
       createVote,
@@ -211,7 +208,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       updateDeadline,
       setParent
     }),
-    [votes, isValidating]
+    [votes]
   );
 
   return <VotesContext.Provider value={value}>{children}</VotesContext.Provider>;
