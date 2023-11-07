@@ -133,7 +133,7 @@ export async function addPageAndRedirect(page: NewPageInput, callback: (path: st
   if (page) {
     await addPage(page, {
       trigger: 'sidebar',
-      cb: (newPage) => callback(newPage.path)
+      cb: (newPage) => callback(`/${newPage.path}`)
     });
   }
 }
