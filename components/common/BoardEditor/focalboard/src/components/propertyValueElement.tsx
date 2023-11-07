@@ -176,7 +176,14 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if ([REWARD_REVIEWERS_BLOCK_ID, REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
-    return <UserAndRoleSelect readOnly={readOnly} onChange={() => null} value={propertyValue as any} />;
+    return (
+      <UserAndRoleSelect
+        data-test='selected-reviewers'
+        readOnly={readOnly}
+        onChange={() => null}
+        value={propertyValue as any}
+      />
+    );
   } else if (
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||

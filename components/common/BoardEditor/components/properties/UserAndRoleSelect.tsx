@@ -86,6 +86,7 @@ function SelectedOptions({
               flexDirection='row'
               key={option.id}
               gap={0.5}
+              data-test='selected-user-or-role-option'
               sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
             >
               {option.group === 'user' && (
