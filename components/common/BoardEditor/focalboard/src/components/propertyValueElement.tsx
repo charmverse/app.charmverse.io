@@ -24,7 +24,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { PROPOSAL_REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import {
   ASSIGNEES_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -175,7 +175,7 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
-  } else if ([REWARD_REVIEWERS_BLOCK_ID, REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
+  } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
     return (
       <UserAndRoleSelect
         data-test='selected-reviewers'

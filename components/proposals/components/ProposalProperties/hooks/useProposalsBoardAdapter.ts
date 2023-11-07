@@ -21,7 +21,7 @@ import {
   CATEGORY_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
-  REVIEWERS_BLOCK_ID,
+  PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalFields, ProposalFieldsProp, ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
@@ -120,7 +120,7 @@ function mapProposalToCardPage({
     [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
     [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
-    [REVIEWERS_BLOCK_ID]:
+    [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(
             (r) =>
