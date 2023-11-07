@@ -10,23 +10,16 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { saveDocumentNotification } from '../saveNotification';
 
-async function createDocumentNotificationsFromMention({
+async function getUserIdsFromMentionNode({
   targetMention,
   mentionAuthorId,
-  createdAt,
-  spaceId,
-  pageId,
-  postId
+  spaceId
 }: {
-  createdAt: string;
   spaceId: string;
   targetMention: UserMentionMetadata;
   mentionAuthorId: string;
-  pageId?: string;
-  postId?: string;
 }) {
   const targetUserIds: string[] = [];
-  const notificationIds: string[] = [];
 
   if (targetMention.type === 'role') {
     const roleId = targetMention.value;
@@ -83,22 +76,7 @@ async function createDocumentNotificationsFromMention({
     targetUserIds.push(targetMention.value);
   }
 
-  for (const targetUserId of targetUserIds) {
-    const { id } = await saveDocumentNotification({
-      type: 'mention.created',
-      createdAt,
-      createdBy: mentionAuthorId,
-      mentionId: targetMention.id,
-      pageId,
-      postId,
-      spaceId,
-      userId: targetUserId,
-      content: targetMention.parentNode ?? null
-    });
-    notificationIds.push(id);
-  }
-
-  return notificationIds;
+  return targetUserIds;
 }
 
 export async function createDocumentNotifications(webhookData: {
@@ -150,16 +128,26 @@ export async function createDocumentNotifications(webhookData: {
         break;
       }
 
-      const notificationIds = await createDocumentNotificationsFromMention({
+      const targetUserIds = await getUserIdsFromMentionNode({
         targetMention,
         mentionAuthorId,
-        createdAt: webhookData.createdAt,
-        spaceId: webhookData.spaceId,
-        pageId,
-        postId
+        spaceId: webhookData.spaceId
       });
 
-      notificationIds.forEach((id) => ids.push(id));
+      for (const targetUserId of targetUserIds) {
+        const { id } = await saveDocumentNotification({
+          type: 'mention.created',
+          createdAt: webhookData.createdAt,
+          createdBy: mentionAuthorId,
+          mentionId,
+          pageId,
+          postId,
+          spaceId: webhookData.spaceId,
+          userId: targetUserId,
+          content: targetMention.parentNode ?? null
+        });
+        ids.push(id);
+      }
       break;
     }
 
@@ -231,15 +219,26 @@ export async function createDocumentNotifications(webhookData: {
 
       const extractedMentions = extractMentions(inlineCommentContent);
       for (const extractedMention of extractedMentions) {
-        const notifications = await createDocumentNotificationsFromMention({
+        const targetUserIds = await getUserIdsFromMentionNode({
           targetMention: extractedMention,
           mentionAuthorId: inlineCommentAuthorId,
-          createdAt: webhookData.createdAt,
-          spaceId: webhookData.spaceId,
-          pageId
+          spaceId: webhookData.spaceId
         });
 
-        notifications.forEach((id) => ids.push(id));
+        for (const targetUserId of targetUserIds) {
+          const { id } = await saveDocumentNotification({
+            type: 'inline_comment.mention.created',
+            createdAt: webhookData.createdAt,
+            createdBy: inlineCommentAuthorId,
+            mentionId: extractedMention.id,
+            pageId,
+            spaceId,
+            userId: targetUserId,
+            content: extractedMention.parentNode ?? null,
+            inlineCommentId
+          });
+          ids.push(id);
+        }
       }
       break;
     }
@@ -336,16 +335,29 @@ export async function createDocumentNotifications(webhookData: {
 
       const extractedMentions = extractMentions(commentContent);
       for (const extractedMention of extractedMentions) {
-        const notificationIds = await createDocumentNotificationsFromMention({
+        const targetUserIds = await getUserIdsFromMentionNode({
           targetMention: extractedMention,
           mentionAuthorId: commentAuthorId,
-          createdAt: webhookData.createdAt,
-          spaceId: webhookData.spaceId,
-          pageId: documentId,
-          postId
+          spaceId: webhookData.spaceId
         });
 
-        notificationIds.forEach((id) => ids.push(id));
+        for (const targetUserId of targetUserIds) {
+          const { id } = await saveDocumentNotification({
+            type: 'comment.mention.created',
+            createdAt: webhookData.createdAt,
+            createdBy: commentAuthorId,
+            mentionId: extractedMention.id,
+            pageId: documentId,
+            postId,
+            spaceId,
+            userId: targetUserId,
+            content: extractedMention.parentNode ?? null,
+            pageCommentId: documentId ? commentId : undefined,
+            postCommentId: postId ? commentId : undefined,
+            commentId
+          });
+          ids.push(id);
+        }
       }
 
       break;
