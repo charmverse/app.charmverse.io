@@ -27,7 +27,10 @@ function AddNewCard({ pageId }: { pageId: string }) {
             card.fields.properties = { ...card.fields.properties };
             card.fields.contentOrder = [];
             await charmClient.insertBlocks([card], () => null);
-            router.push(`/${space.domain}/${page.path}?cardId=${card.id}`);
+            router.push({
+              pathname: `/${page.path}`,
+              query: { cardId: card.id, domain: router.query.domain }
+            });
           }
           e.stopPropagation();
         }}

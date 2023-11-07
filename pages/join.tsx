@@ -49,7 +49,7 @@ export default function JoinWorkspace() {
   useEffect(() => {
     const connectedSpace = filterSpaceByDomain(spaces, domain);
     if (connectedSpace) {
-      router.push(`/${connectedSpace.domain}`);
+      router.push({ pathname: `/`, query: { domain: router.query.domain } });
     }
   }, [spaces]);
 

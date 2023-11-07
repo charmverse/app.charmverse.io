@@ -154,7 +154,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
     // If the current page has been deleted permanently route to the first alive page
     if (currentPage && deletePageIds.includes(currentPage.id)) {
       const firstPage = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-      router.push(`/${router.query.domain}/${firstPage}`);
+      router.push({ pathname: `/${firstPage}`, query: { domain: router.query.domain } });
     }
   }
 

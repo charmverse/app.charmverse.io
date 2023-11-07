@@ -47,7 +47,7 @@ export function ForumPostActionList({
   function deletePost() {
     if (post && postPermissions?.delete_post) {
       charmClient.forum.deleteForumPost(post.id).then(() => {
-        router.push(`/${router.query.domain}/forum`);
+        router.push({ pathname: `/forum`, query: { domain: router.query.domain } });
       });
       onComplete();
       onDelete?.();
@@ -75,7 +75,7 @@ export function ForumPostActionList({
       postId: pageId,
       categoryId: getDefaultCreateCategory()?.id
     });
-    router.push(`/${router.query.domain}/${path}`);
+    router.push({ pathname: `/${path}`, query: { domain: router.query.domain } });
   }
 
   return (

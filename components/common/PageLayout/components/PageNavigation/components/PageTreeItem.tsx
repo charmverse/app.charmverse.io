@@ -422,7 +422,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
 
     if (!currentPage && newPage) {
       // If we are in a page that doesn't exist, redirect user to the created page
-      router.push(`/${router.query.domain}/${newPage.id}`);
+      router.push({ pathname: `/${newPage.path}`, query: { domain: router.query.domain } });
     }
   }
 

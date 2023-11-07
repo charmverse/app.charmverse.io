@@ -134,7 +134,7 @@ export async function addPageAndRedirect(page: NewPageInput, router: NextRouter)
     await addPage(page, {
       trigger: 'sidebar',
       cb: (newPage) => {
-        router.push(`/${router.query.domain}/${newPage.path}`);
+        router.push({ pathname: `/${newPage.path}`, query: { domain: router.query.domain } });
       }
     });
   }

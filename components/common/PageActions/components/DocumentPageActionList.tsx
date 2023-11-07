@@ -170,7 +170,7 @@ export function DocumentPageActionList({ page, onComplete, onDelete, pagePermiss
       pageId
     });
     onComplete();
-    router.push(`/${router.query.domain}/${convertedProposal.path}`);
+    router.push({ pathname: `/${convertedProposal.path}`, query: { domain: router.query.domain } });
   }
 
   return (

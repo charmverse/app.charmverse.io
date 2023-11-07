@@ -161,7 +161,7 @@ export function PostPage({
           throw err;
         });
       if (!isDraft) {
-        router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
+        router.push({ pathname: `/forum/post/${newPost.path}`, query: { domain: router.query.domain } });
       } else {
         showPost({
           postId: newPost.id,
@@ -186,7 +186,7 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      router.push(`/${router.query.domain}/forum/post/${draftPost.path}`);
+      router.push({ pathname: `/forum/post/${draftPost.path}`, query: { domain: router.query.domain } });
     }
   }
 

@@ -59,7 +59,7 @@ export function ForumPage() {
 
     // User tried to navigate to a category they cannot access or does not exist, redirect them to forum home
     if (category === undefined && !isCategoriesLoading && currentSpace) {
-      router.push(`/${currentSpace.domain}/forum`);
+      router.push({ pathname: `/forum`, query: { domain: router.query.domain } });
     } else if (category && currentSpace) {
       charmClient.track.trackAction('main_feed_filtered', {
         categoryName: category.name,

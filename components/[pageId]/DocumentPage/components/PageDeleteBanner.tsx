@@ -38,12 +38,12 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   }
 
   async function deletePage() {
-    if (space) {
-      await router.push(
-        `/${router.query.domain}/${
-          Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path
-        }`
-      );
+    const path = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
+    if (path) {
+      await router.push({
+        pathname: `/${path}`,
+        query: { domain: router.query.domain }
+      });
       await charmClient.deletePage(pageId);
     }
   }

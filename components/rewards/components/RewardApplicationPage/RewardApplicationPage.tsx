@@ -62,7 +62,7 @@ export function RewardApplicationPageComponent({ applicationId }: Props) {
   function goToReward() {
     if (space && rewardPageContent) {
       hideApplication();
-      router.push(`/${space.domain}/${rewardPageContent.path}`);
+      router.push({ pathname: `/${rewardPageContent.path}`, query: { domain: router.query.domain } });
     }
   }
 

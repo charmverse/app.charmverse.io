@@ -35,7 +35,7 @@ export default function Authenticate() {
     if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
       router.push(redirectPath);
     } else if (userSpaces?.length) {
-      router.push(`/${userSpaces[0].domain}`);
+      router.push({ pathname: `/`, query: { domain: userSpaces[0].domain } });
     } else {
       router.push('/createSpace');
     }

@@ -35,7 +35,7 @@ export default function useNestedPage(currentPageId?: string) {
                   dispatch(state.tr.replaceSelectionWith(nestedPageNode));
                   // A small delay to let the inserted page be saved in the editor
                   setTimeout(() => {
-                    router.push(`/${router.query.domain}/${page.path}`);
+                    router.push({ pathname: `/${page.path}`, query: { domain: router.query.domain } });
                   }, 500);
                 }
                 return true;

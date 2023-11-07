@@ -41,7 +41,7 @@ export function DuplicatePageAction({
       const { pages, rootPageId } = duplicatePageResponse;
       const duplicatedRootPage = pages.find((_page) => _page.id === rootPageId);
       if (duplicatedRootPage && redirect) {
-        router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
+        router.push({ pathname: `/${duplicatedRootPage.path}`, query: { domain: router.query.domain } });
       }
       if (pageType === 'bounty' || pageType === 'bounty_template') {
         refreshReward(duplicatePageResponse.rootPageId);
