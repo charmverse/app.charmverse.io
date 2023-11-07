@@ -47,7 +47,7 @@ export function getDefaultBoard({
         }
       };
 
-  const cardProperties = [...(block.fields?.cardProperties || []), ...getDefaultProperties({ categories })];
+  const cardProperties = [...getDefaultProperties({ categories }), ...(block.fields?.cardProperties || [])];
 
   block.fields = {
     ...(block.fields || {}),

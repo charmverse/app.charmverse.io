@@ -318,7 +318,11 @@ function PropertyValueElement(props: Props) {
       propertyValueElement = <URLProperty {...commonProps} />;
     } else {
       propertyValueElement = (
-        <TextInput {...commonProps} readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID} />
+        <TextInput
+          {...commonProps}
+          readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID}
+          displayType={propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ? 'details' : commonProps.displayType}
+        />
       );
     }
   } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {

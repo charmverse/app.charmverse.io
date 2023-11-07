@@ -106,7 +106,6 @@ function mapRewardToCardPage({
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
   rewardFields.properties = {
-    ...rewardFields.properties,
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]:
       reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
@@ -121,7 +120,8 @@ function mapRewardToCardPage({
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     // focalboard component expects a timestamp
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
-    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || []
+    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
+    ...rewardFields.properties
   };
 
   const card: Card<RewardPropertyValue> = {

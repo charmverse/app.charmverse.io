@@ -206,7 +206,7 @@ export function RewardsPage({ title }: { title: string }) {
                       views={views}
                       visibleGroups={[]}
                       selectedCardIds={[]}
-                      readOnly
+                      readOnly={!isAdmin}
                       disableAddingCards={true}
                       showCard={showRewardOrApplication}
                       readOnlyTitle={true}

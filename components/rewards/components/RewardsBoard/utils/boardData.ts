@@ -31,7 +31,7 @@ export function getDefaultBoard({
         }
       };
 
-  const cardProperties = [...(block.fields?.cardProperties || []), ...getDefaultProperties()];
+  const cardProperties = [...getDefaultProperties(), ...(block.fields?.cardProperties || [])];
 
   block.fields = {
     ...(block.fields || {}),
@@ -69,6 +69,9 @@ export function getDefaultTableView({ storedBoard }: { storedBoard: RewardProper
     [REWARDS_AVAILABLE_BLOCK_ID]: 150,
     [REWARD_STATUS_BLOCK_ID]: 150
   };
+
+  // Wrap title comumn by default
+  view.fields.columnWrappedIds = [Constants.titleColumnId];
 
   return view;
 }
