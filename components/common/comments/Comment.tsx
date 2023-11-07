@@ -18,7 +18,7 @@ import type { CreateCommentPayload, UpdateCommentPayload } from 'components/comm
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isDevEnv } from 'config/constants';
+import { isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
@@ -275,7 +275,7 @@ export function Comment({
               </Tooltip>
               {comment.lensCommentLink && (
                 <Link
-                  href={`https://${isDevEnv ? 'testnet.' : ''}hey.xyz/posts/${comment.lensCommentLink}`}
+                  href={`https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${comment.lensCommentLink}`}
                   target='_blank'
                   rel='noopener noreferrer'
                 >

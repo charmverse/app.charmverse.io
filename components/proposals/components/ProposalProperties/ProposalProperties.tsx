@@ -24,7 +24,7 @@ import { CustomPropertiesAdapter } from 'components/proposals/components/Proposa
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
-import { isDevEnv } from 'config/constants';
+import { isProdEnv } from 'config/constants';
 import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
@@ -481,7 +481,7 @@ export function ProposalProperties({
                       Lens Post
                     </PropertyLabel>
                     <Link
-                      href={`https://${isDevEnv ? 'testnet.' : ''}hey.xyz/posts/${proposalLensLink}`}
+                      href={`https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${proposalLensLink}`}
                       target='_blank'
                       rel='noopener noreferrer'
                     >
