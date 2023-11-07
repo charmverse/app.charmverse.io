@@ -4,7 +4,6 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import { Collapse, Divider, FormLabel, IconButton, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
@@ -18,6 +17,7 @@ import type { WorkInput } from 'components/rewards/hooks/useApplication';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useNewWork } from 'components/rewards/hooks/useNewApplication';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
@@ -45,7 +45,7 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
       applicationId: applicationId || ''
     });
 
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
   const currentRewardId = rewardId || reward?.id;
 
@@ -59,7 +59,6 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
 
   const { members } = useMembers();
   const { user } = useUser();
-  const { showMessage } = useSnackbar();
 
   const [showProperties, setShowProperties] = useState(false);
   const { showPage: showReward, hidePage: hideReward } = usePageDialog();
@@ -91,13 +90,13 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
       hideApplication();
 
       if (openedFromModal && currentRewardId) {
-        router.push({ pathname: `/rewards`, query: { domain: space.domain, id: currentRewardId } });
+        navigateToSpacePath(`/rewards`, { id: currentRewardId });
         showReward({
           pageId: currentRewardId,
           onClose
         });
       } else {
-        router.push(`/${rewardPageContent.path}`, { query: { domain: space.domain } });
+        navigateToSpacePath(`/${rewardPageContent.path}`);
       }
     }
   }

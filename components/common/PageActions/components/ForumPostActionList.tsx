@@ -3,11 +3,11 @@ import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { List, ListItemText, ListItemButton } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
@@ -36,7 +36,7 @@ export function ForumPostActionList({
   const { showMessage } = useSnackbar();
   const { getMemberById, members } = useMembers();
 
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
 
   const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
 
@@ -47,7 +47,7 @@ export function ForumPostActionList({
   function deletePost() {
     if (post && postPermissions?.delete_post) {
       charmClient.forum.deleteForumPost(post.id).then(() => {
-        router.push({ pathname: `/forum`, query: { domain: router.query.domain } });
+        navigateToSpacePath(`/forum`);
       });
       onComplete();
       onDelete?.();
@@ -75,7 +75,7 @@ export function ForumPostActionList({
       postId: pageId,
       categoryId: getDefaultCreateCategory()?.id
     });
-    router.push({ pathname: `/${path}`, query: { domain: router.query.domain } });
+    navigateToSpacePath(`/${path}`);
   }
 
   return (

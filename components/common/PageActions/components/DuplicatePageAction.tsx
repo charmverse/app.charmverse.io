@@ -2,11 +2,11 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import { ListItemIcon, ListItemText, MenuItem, Tooltip } from '@mui/material';
-import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
@@ -27,7 +27,7 @@ export function DuplicatePageAction({
 }) {
   const { space: currentSpace } = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const { refreshReward } = useRewards();
   const { refreshProposal } = useProposals();
 
@@ -41,7 +41,7 @@ export function DuplicatePageAction({
       const { pages, rootPageId } = duplicatePageResponse;
       const duplicatedRootPage = pages.find((_page) => _page.id === rootPageId);
       if (duplicatedRootPage && redirect) {
-        router.push({ pathname: `/${duplicatedRootPage.path}`, query: { domain: router.query.domain } });
+        navigateToSpacePath(`/${duplicatedRootPage.path}`);
       }
       if (pageType === 'bounty' || pageType === 'bounty_template') {
         refreshReward(duplicatePageResponse.rootPageId);

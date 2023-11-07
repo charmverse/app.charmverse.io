@@ -1,7 +1,6 @@
 import type { Post, PostCategory } from '@charmverse/core/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
@@ -23,6 +22,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
 import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -94,7 +94,7 @@ export function PostPage({
   const { permissions: categoryPermissions } = usePostCategoryPermissions(categoryId as string);
 
   const { getMemberById } = useMembers();
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const {
     data: postComments = [],
     mutate: setPostComments,
@@ -161,7 +161,7 @@ export function PostPage({
           throw err;
         });
       if (!isDraft) {
-        router.push({ pathname: `/forum/post/${newPost.path}`, query: { domain: router.query.domain } });
+        navigateToSpacePath(`/forum/post/${newPost.path}`);
       } else {
         showPost({
           postId: newPost.id,
@@ -186,7 +186,7 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      router.push({ pathname: `/forum/post/${draftPost.path}`, query: { domain: router.query.domain } });
+      navigateToSpacePath(`/[domain]/forum/post/${draftPost.path}`);
     }
   }
 

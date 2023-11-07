@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { useBounties } from 'hooks/useBounties';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
@@ -11,7 +12,7 @@ import type { BountyWithDetails } from 'lib/bounties';
 
 export function NewBountyButton() {
   const { user } = useUser();
-  const router = useRouter();
+  const { updateURLQuery } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const [currentUserPermissions] = useCurrentSpacePermissions();
   const suggestBounties = currentUserPermissions?.createBounty === false;
@@ -58,7 +59,7 @@ export function NewBountyButton() {
         });
       }
       mutatePage(createdBounty.page);
-      router.push({ pathname: router.pathname, query: { ...router.query, bountyId: createdBounty.page.id } });
+      updateURLQuery({ bountyId: createdBounty.page.id });
       setBounties((bounties) => [...bounties, createdBounty]);
     }
   }

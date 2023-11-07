@@ -1,6 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma-client';
 import { Box, Button } from '@mui/material';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
@@ -8,6 +7,7 @@ import charmClient from 'charmClient';
 import { StyledBanner } from 'components/common/Banners/Banner';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
@@ -15,7 +15,7 @@ import { useWebSocketClient } from 'hooks/useWebSocketClient';
 export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageType; pageId: string }) {
   const [isMutating, setIsMutating] = useState(false);
   const { space } = useCurrentSpace();
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const { pages } = usePages();
   const { sendMessage } = useWebSocketClient();
   const dispatch = useAppDispatch();
@@ -40,10 +40,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   async function deletePage() {
     const path = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
     if (path) {
-      await router.push({
-        pathname: `/${path}`,
-        query: { domain: router.query.domain }
-      });
+      await navigateToSpacePath(`/${path}`);
       await charmClient.deletePage(pageId);
     }
   }

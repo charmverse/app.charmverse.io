@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { memo } from 'react';
 
 import charmClient from 'charmClient';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { createCard } from 'lib/focalboard/card';
@@ -11,7 +12,7 @@ import { createCard } from 'lib/focalboard/card';
 import { StyledIconButton } from './NewPageMenu';
 
 function AddNewCard({ pageId }: { pageId: string }) {
-  const router = useRouter();
+  const { updateURLQuery } = useCharmRouter();
   const { space } = useCurrentSpace();
   const { pages } = usePages();
 
@@ -27,10 +28,7 @@ function AddNewCard({ pageId }: { pageId: string }) {
             card.fields.properties = { ...card.fields.properties };
             card.fields.contentOrder = [];
             await charmClient.insertBlocks([card], () => null);
-            router.push({
-              pathname: `/${page.path}`,
-              query: { cardId: card.id, domain: router.query.domain }
-            });
+            updateURLQuery({ cardId: card.id });
           }
           e.stopPropagation();
         }}

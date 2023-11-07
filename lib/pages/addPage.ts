@@ -129,13 +129,11 @@ function createDefaultBoardData({ boardId }: DefaultBoardProps) {
   };
 }
 
-export async function addPageAndRedirect(page: NewPageInput, router: NextRouter) {
+export async function addPageAndRedirect(page: NewPageInput, callback: (path: string) => void) {
   if (page) {
     await addPage(page, {
       trigger: 'sidebar',
-      cb: (newPage) => {
-        router.push({ pathname: `/${newPage.path}`, query: { domain: router.query.domain } });
-      }
+      cb: (newPage) => callback(newPage.path)
     });
   }
 }

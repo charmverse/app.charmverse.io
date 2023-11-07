@@ -1,13 +1,10 @@
-import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { expect, test as base } from '@playwright/test';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
-import { createUserAndSpace, createUser, generateSpaceRole } from '__e2e__/utils/mocks';
+import { generateUserAndSpace, generateUser, grantForumModeratorAccess } from '__e2e__/utils/mocks';
 
-import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
 
 import { login } from '../utils/session';
@@ -24,97 +21,32 @@ const test = base.extend<Fixtures>({
   pageHeader: ({ page }, use) => use(new PageHeader(page))
 });
 
-let moderatorUser: User;
-let memberUser: User;
-let authorUser: User;
-let space: Space;
-let post: Post;
-let postCategory: PostCategory;
-
-test.describe.serial('Moderate forum posts', () => {
+test.describe('Moderate forum posts', () => {
   test('moderator can delete an unwanted comment', async ({ forumPostPage, page }) => {
     // Setup test environment
-    const generated = await createUserAndSpace({
-      browserPage: page,
-      permissionConfigurationMode: 'collaborative'
+    const { space, user: memberUser } = await generateUserAndSpace();
+
+    const authorUser = await generateUser({
+      space: { id: space.id }
     });
 
-    space = generated.space;
-
-    memberUser = await createUser({
-      browserPage: page,
-      address: randomETHWalletAddress()
-    });
-
-    authorUser = await createUser({
-      browserPage: page,
-      address: randomETHWalletAddress()
-    });
-
-    moderatorUser = await createUser({
-      browserPage: page,
-      address: randomETHWalletAddress()
-    });
-
-    await generateSpaceRole({
-      spaceId: space.id,
-      userId: memberUser.id,
-      isAdmin: false
-    });
-
-    await generateSpaceRole({
-      spaceId: space.id,
-      userId: authorUser.id,
-      isAdmin: false
-    });
-
-    const moderatorSpaceRole = await generateSpaceRole({
-      spaceId: space.id,
-      userId: moderatorUser.id,
-      isAdmin: false
+    const moderatorUser = await generateUser({
+      space: { id: space.id }
     });
 
     const categoryName = 'Example category';
 
-    postCategory = await generatePostCategory({
+    const postCategory = await generatePostCategory({
       spaceId: space.id,
-      name: categoryName
+      name: categoryName,
+      fullAccess: true
     });
 
-    // Allow the entire space to create posts and participate in this category
-    await upsertPostCategoryPermission({
-      assignee: { group: 'space', id: space.id },
-      permissionLevel: 'full_access',
-      postCategoryId: postCategory.id
-    });
-
-    // Create a moderation role and assign it to the moderator
-    const moderationRole = await prisma.role.create({
-      data: {
-        space: { connect: { id: space.id } },
-        name: 'Forum Moderator',
-        // Usually this would be created by an admin, but we're not using one in this test
-        createdBy: moderatorUser.id,
-        spaceRolesToRole: {
-          create: {
-            spaceRoleId: moderatorSpaceRole.id
-          }
-        }
-      }
-    });
-
-    // Allow the moderation role to moderate posts in this category
-    await prisma.postCategoryPermission.create({
-      data: {
-        permissionLevel: 'moderator',
-        postCategory: { connect: { id: postCategory.id } },
-        role: { connect: { id: moderationRole.id } }
-      }
-    });
+    await grantForumModeratorAccess({ categoryId: postCategory.id, spaceId: space.id, userId: moderatorUser.id });
 
     const postName = 'Example post';
 
-    post = await generateForumPost({
+    const post = await generateForumPost({
       spaceId: space.id,
       userId: authorUser.id,
       categoryId: postCategory.id,
@@ -176,6 +108,21 @@ test.describe.serial('Moderate forum posts', () => {
     page,
     pageHeader
   }) => {
+    const { space } = await generateUserAndSpace();
+
+    const authorUser = await generateUser({
+      space: { id: space.id }
+    });
+
+    const moderatorUser = await generateUser({
+      space: { id: space.id }
+    });
+    const postCategory = await generatePostCategory({
+      spaceId: space.id,
+      fullAccess: true
+    });
+    await grantForumModeratorAccess({ categoryId: postCategory.id, spaceId: space.id, userId: moderatorUser.id });
+
     const postToDelete = await generateForumPost({
       spaceId: space.id,
       userId: authorUser.id,
@@ -204,6 +151,12 @@ test.describe.serial('Moderate forum posts', () => {
     page,
     pageHeader
   }) => {
+    const { space, user: authorUser } = await generateUserAndSpace();
+
+    const postCategory = await generatePostCategory({
+      spaceId: space.id,
+      fullAccess: true
+    });
     const postToDelete = await generateForumPost({
       spaceId: space.id,
       userId: authorUser.id,
@@ -227,6 +180,14 @@ test.describe.serial('Moderate forum posts', () => {
   });
 
   test('normal member sees a disabled delete post button', async ({ forumPostPage, page, pageHeader }) => {
+    const { space, user: memberUser } = await generateUserAndSpace();
+    const authorUser = await generateUser({
+      space: { id: space.id }
+    });
+    const postCategory = await generatePostCategory({
+      spaceId: space.id,
+      fullAccess: true
+    });
     const postToDelete = await generateForumPost({
       spaceId: space.id,
       userId: authorUser.id,
