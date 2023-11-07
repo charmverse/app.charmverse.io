@@ -8,7 +8,7 @@ import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 import { members, proposalCategories, userProfile } from '../lib/mockData';
 
 export function ProposalsPageStory() {
-  return <ProposalsPageWithProviders />;
+  return <ProposalsPageWithProviders title='Proposals' />;
 }
 
 // Data and api mocks

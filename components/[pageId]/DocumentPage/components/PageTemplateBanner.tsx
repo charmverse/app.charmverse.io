@@ -10,7 +10,9 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
-const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
+const StyledPageTemplateBanner = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'card'
+})<{ card?: boolean }>`
   top: ${({ card }) => (card ? '50px' : '55px')};
   width: '100%';
   z-index: var(--z-index-appBar);
