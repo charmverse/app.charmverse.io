@@ -1,5 +1,10 @@
-import type { AssignableSpacePermissionGroups } from '@charmverse/core/dist/cjs/permissions';
 import { InvalidInputError } from '@charmverse/core/errors';
+import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permissions';
+import type {
+  TargetPermissionGroup,
+  AssignableSpacePermissionGroups,
+  AssignedProposalCategoryPermission
+} from '@charmverse/core/permissions';
 import type { ProposalCategory, Role, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -22,6 +27,7 @@ describe('importSpacePermissions', () => {
   let exportedData: SpaceDataExport;
 
   let spacePermissions: AssignedSpacePermission[];
+  let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
 
   beforeAll(async () => {
     ({ space: sourceSpace } = await testUtilsUser.generateUserAndSpace());
@@ -101,6 +107,12 @@ describe('importSpacePermissions', () => {
       ])
       .then((data) => data.map(mapSpacePermissionToAssignee));
 
+    proposalCategoryPermissions = await prisma.proposalCategoryPermission
+      .findMany({
+        where: { proposalCategory: { spaceId: sourceSpace.id } }
+      })
+      .then((data) => data.map(mapProposalCategoryPermissionToAssignee));
+
     exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id });
   });
 
@@ -113,7 +125,15 @@ describe('importSpacePermissions', () => {
     });
 
     expect(importResult).toMatchObject<ImportedPermissions>({
-      proposalCategoryPermissions: [],
+      proposalCategoryPermissions: proposalCategoryPermissions.map((p) => ({
+        permissionLevel: p.permissionLevel,
+        id: expect.any(String),
+        proposalCategoryId: expect.any(String),
+        assignee: {
+          group: p.assignee.group,
+          id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+        } as TargetPermissionGroup<'role' | 'space'>
+      })),
       spacePermissions: expect.arrayContaining<AssignedSpacePermission>(
         spacePermissions.map((p) => ({
           operations: p.operations,
@@ -126,16 +146,40 @@ describe('importSpacePermissions', () => {
       roles: expect.arrayContaining([
         {
           ...firstSourceRole,
-          createdBy: 
+          createdAt: expect.any(Date),
+          createdBy: targetSpace.createdBy,
           id: expect.not.stringContaining(firstSourceRole.id),
           spaceId: targetSpace.id
         },
         {
           ...secondSourceRole,
+          createdAt: expect.any(Date),
+          createdBy: targetSpace.createdBy,
           id: expect.not.stringContaining(secondSourceRole.id),
           spaceId: targetSpace.id
         }
       ])
+    });
+
+    // Reload roles for checking as a safeguard
+    const targetSpaceRoleIds = await prisma.role
+      .findMany({
+        where: { spaceId: targetSpace.id }
+      })
+      .then((_roles) => _roles.map((r) => r.id));
+
+    const allPermissions = [...importResult.spacePermissions, ...importResult.proposalCategoryPermissions];
+
+    allPermissions.forEach((permission) => {
+      if (permission.assignee.group === 'space') {
+        expect(permission.assignee.id).toBe(targetSpace.id);
+      } else if (permission.assignee.group === 'role') {
+        expect(targetSpaceRoleIds).toContain(permission.assignee.id);
+      }
+    });
+
+    importResult.roles.forEach((role) => {
+      expect(targetSpaceRoleIds).toContain(role.id);
     });
   });
 
