@@ -1,3 +1,4 @@
+import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import type { ProposalBlock } from '@charmverse/core/prisma-client';
 
 export type ProposalPropertyOption = { id: string; color: string; value: string };
@@ -31,7 +32,7 @@ export type ProposalBlockUpdateInput = ProposalBlockInput & {
   id: string;
 };
 
-export type ProposalPropertyValue = string | string[] | number;
+export type ProposalPropertyValue = string | string[] | number | TargetPermissionGroup<'user' | 'role'>[];
 
 export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
 

@@ -30,6 +30,14 @@ export class ProposalsListPage extends GlobalPage {
     return this.page.locator(`data-test=database-open-button-${proposalId}`);
   }
 
+  getProposalRowReviewersLocators(proposalId: string): Promise<Locator[]> {
+    return this.page
+      .locator(`data-test=database-row-${proposalId}`)
+      .locator(`data-test=selected-reviewers`)
+      .locator('data-test=selected-user-or-role-option')
+      .all();
+  }
+
   getProposalCategoryLocator(categoryId: string) {
     return this.page.locator(`data-test=proposal-category-${categoryId}`);
   }
