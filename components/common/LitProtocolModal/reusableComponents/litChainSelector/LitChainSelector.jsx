@@ -4,7 +4,7 @@ import { ShareModalContext } from '../../shareModal/createShareContext';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 function LitChainSelector() {
   const { chain, setChain, chainList } = useContext(ShareModalContext);
-
+  console.log(chainList)
   return (
     <div>
       {!!chain && !!chainList && (

@@ -1,5 +1,6 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
+
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export function spec() {
   return [databaseSpec()];
@@ -16,7 +17,7 @@ function databaseSpec(): BaseRawNodeSpec {
         }
       },
       atom: true,
-      selectable: true,
+      selectable: false,
       isolating: true,
       group: 'block',
       draggable: false,

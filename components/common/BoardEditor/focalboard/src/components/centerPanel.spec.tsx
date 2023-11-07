@@ -44,10 +44,6 @@ describe('components/centerPanel', () => {
   card2.id = '2';
   card2.title = 'card2';
   card2.fields.properties = { id: 'property_value_id_1' };
-  const comment1 = TestBlockFactory.createComment(card1);
-  comment1.id = '1';
-  const comment2 = TestBlockFactory.createComment(card2);
-  comment2.id = '2';
   const state = {
     clientConfig: {
       value: {
@@ -74,9 +70,6 @@ describe('components/centerPanel', () => {
         [activeView.id]: activeView
       },
       current: activeView.id
-    },
-    comments: {
-      comments: [comment1, comment2]
     }
   };
   const store = mockStateStore([], state);

@@ -3,7 +3,7 @@ import type { PaymentMethod } from '@charmverse/core/prisma';
 import type { IChainDetails } from 'connectors/chains';
 import { getChainById, getChainBySymbol } from 'connectors/chains';
 
-import type { SupportedChainId } from '../blockchain/provider/alchemy';
+import type { SupportedChainId } from '../blockchain/provider/alchemy/config';
 
 export interface ITokenMetadataRequest {
   chainId: SupportedChainId;

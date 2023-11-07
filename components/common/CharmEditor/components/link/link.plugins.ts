@@ -1,7 +1,8 @@
-import { link } from '@bangle.dev/base-components';
+/* eslint-disable max-len */
 import type { Mark, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
 
+import { linkPlugins } from '../@bangle.dev/base-components/link';
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import {
   hideSuggestionsTooltip,
@@ -23,7 +24,7 @@ export function plugins({ key }: { key: PluginKey }) {
   let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
 
   return [
-    link.plugins(),
+    linkPlugins(),
     new Plugin<LinkPluginState>({
       key,
       state: {

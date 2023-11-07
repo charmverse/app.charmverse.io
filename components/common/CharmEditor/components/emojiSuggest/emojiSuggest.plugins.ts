@@ -1,6 +1,7 @@
-import type { SpecRegistry } from '@bangle.dev/core';
 import type { Command, EditorState, EditorView, Schema } from '@bangle.dev/pm';
 import { Plugin, PluginKey } from '@bangle.dev/pm';
+
+import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';

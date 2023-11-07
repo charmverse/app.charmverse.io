@@ -44,14 +44,14 @@ import { InlineDatabase } from './components/inlineDatabase/components/InlineDat
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { LinksPopup } from './components/link/LinksPopup';
 import LinkedPagesList from './components/linkedPage/components/LinkedPagesList';
-import Mention, { MentionSuggest } from './components/mention';
+import { Mention, MentionSuggest } from './components/mention/components';
 import NestedPage from './components/nestedPage/components/NestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
+import ResizablePDF from './components/pdf/ResizablePDF';
 import { PollNodeView } from './components/poll/PollComponent';
 import Quote from './components/quote/components/Quote';
 import ResizableImage from './components/ResizableImage';
-import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu from './components/rowActions/RowActionsMenu';
 import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
 import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
@@ -405,10 +405,12 @@ function CharmEditor({
             const view = props.view;
             const tr = view.state.tr;
             const start = props.getPos();
-            const end = start + props.node.nodeSize;
-            tr.deleteRange(start, end);
-            tr.deleteSelection();
-            view.dispatch(tr);
+            if (typeof start === 'number') {
+              const end = start + props.node.nodeSize;
+              tr.deleteRange(start, end);
+              tr.deleteSelection();
+              view.dispatch(tr);
+            }
           }
         };
 

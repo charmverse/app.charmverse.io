@@ -1,10 +1,14 @@
-import type { BaseRawMarkSpec, SpecRegistry } from '@bangle.dev/core';
-import { PluginKey } from '@bangle.dev/core';
 import { keymap } from '@bangle.dev/pm';
 import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
 import type { Node, Schema } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
+import { PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
+
+import type {
+  BaseRawMarkSpec,
+  SpecRegistry
+} from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
@@ -27,6 +31,12 @@ function specFactory(): BaseRawMarkSpec {
     options: {
       ..._spec.options,
       trigger
+    },
+    markdown: {
+      toMarkdown: {
+        open: '',
+        close: ''
+      }
     }
   };
 }

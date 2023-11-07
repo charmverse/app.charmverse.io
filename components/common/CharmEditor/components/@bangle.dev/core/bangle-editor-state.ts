@@ -1,10 +1,12 @@
 // Reference: https://github.com/bangle-io/bangle-editor/blob/13127cf2e4187ebaa6d5e01d80f4e9018fae02a5/lib/core/src/bangle-editor-state.ts
 
-import type { RawPlugins, RawSpecs } from '@bangle.dev/core';
-import { SpecRegistry } from '@bangle.dev/core';
 import type { dropCursor as pmDropCursor, EditorProps, Mark, ParseOptions, Schema, Selection } from '@bangle.dev/pm';
 import { DOMParser, EditorState, Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { pluginLoader } from './plugin-loader';
 

@@ -1,21 +1,14 @@
 import { GET } from '@charmverse/core/http';
-import { RPCList, getChainById } from 'connectors/chains';
+import { getChainById } from 'connectors/chains';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { paginatedCall } from 'lib/utilities/async';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { NFTData } from '../getNFTs';
+import type { NFTData } from '../../getNFTs';
+import { toInt } from '../ankr/client';
 
-import { toInt } from './ankr';
-
-export const supportedChains = RPCList.filter((chain) => chain.alchemyUrl);
-export const supportedChainIds = RPCList.map((chain) => chain.chainId);
-export type SupportedChainId = (typeof supportedChainIds)[number];
-
-export const supportedMainnets: SupportedChainId[] = supportedChains
-  .filter((chain) => !chain.testnet)
-  .map((chain) => chain.chainId);
+import type { SupportedChainId } from './config';
 
 interface NftMedia {
   bytes: number;

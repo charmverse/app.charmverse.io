@@ -655,7 +655,7 @@ export class SpaceEventHandler {
     }
 
     // Find the position of the referenced page node in the parent page content
-    documentNode.forEach((node, nodePos) => {
+    documentNode.descendants((node, nodePos) => {
       if (node.type.name === 'page' && node.attrs.id === childPageId) {
         position = nodePos;
         return false;

@@ -1,7 +1,8 @@
-import { Plugin, NodeView } from '@bangle.dev/core';
 import { TextSelection } from '@bangle.dev/pm';
 import type { PageType } from '@charmverse/core/prisma-client';
+import { Plugin } from 'prosemirror-state';
 
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 
 import { pageNodeDropPluginKey } from '../prosemirror/prosemirror-dropcursor/dropcursor';
@@ -92,7 +93,7 @@ export function pageNodeDropPlugin({ pageId }: { pageId?: string | null }) {
               } else if (hoveredPageDomNode) {
                 const draggedNode = view.state.doc.nodeAt(view.state.selection.$anchor.pos);
 
-                if (!draggedNode || hoveredPageDomNode.getAttribute('data-page-type') !== 'page') {
+                if (!draggedNode || !hoveredPageDomNode.getAttribute('data-page-type')?.match(/(page|card)/)) {
                   return false;
                 }
 

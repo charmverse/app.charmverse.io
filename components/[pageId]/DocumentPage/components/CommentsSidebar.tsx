@@ -1,4 +1,3 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import { isEmptyDocument } from '@bangle.dev/utils';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
@@ -9,6 +8,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { usePageSidebar } from 'hooks/usePageSidebar';

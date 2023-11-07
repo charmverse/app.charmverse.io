@@ -1,5 +1,6 @@
 import { hardBreak } from '@bangle.dev/base-components';
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
+
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export function hardBreakSpec() {
   const nativeSpec = hardBreak.spec() as BaseRawNodeSpec;

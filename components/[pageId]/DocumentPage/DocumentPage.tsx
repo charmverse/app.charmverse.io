@@ -11,13 +11,7 @@ import { useElementSize } from 'usehooks-ts';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import CommentsList from 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList';
-import { getCardComments, hasLoadedCardComments } from 'components/common/BoardEditor/focalboard/src/store/comments';
-import {
-  blockLoad,
-  commentsLoad,
-  databaseViewsLoad
-} from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -116,10 +110,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
     }
   }, [printRef, _printRef]);
 
-  const comments = useAppSelector(getCardComments(page.cardId ?? page.id));
-
-  const hasLoadedCardCommentsForCurrentCard = useAppSelector(hasLoadedCardComments(page.cardId ?? page.id));
-
   const cannotComment = readOnly || !pagePermissions.comment;
 
   const card = useAppSelector((state) => {
@@ -158,9 +148,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
         blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
         blocksDispatch(blockLoad({ blockId: page.id }));
         blocksDispatch(blockLoad({ blockId: page.parentId as string }));
-      }
-      if (!hasLoadedCardCommentsForCurrentCard) {
-        blocksDispatch(commentsLoad({ pageId: page.id }));
       }
     }
   }, [page.id]);
@@ -347,23 +334,16 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       showApplications
                     />
                   )}
-                  {(page.type === 'card' || page.type === 'card_synced') && (
-                    <CommentsList
-                      comments={comments}
-                      rootId={card?.rootId ?? page.id}
-                      cardId={card?.id ?? page.id}
-                      readOnly={cannotComment}
-                    />
-                  )}
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {page.type === 'proposal' && pagePermissions.comment && (
-                <Box mt='-100px'>
-                  {/* add negative margin to offset height of .charm-empty-footer */}
-                  <PageComments page={page} permissions={pagePermissions} />
-                </Box>
-              )}
+              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') &&
+                pagePermissions.comment && (
+                  <Box mt='-100px'>
+                    {/* add negative margin to offset height of .charm-empty-footer */}
+                    <PageComments page={page} permissions={pagePermissions} />
+                  </Box>
+                )}
             </Container>
           </Box>
         </ScrollContainer>

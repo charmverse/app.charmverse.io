@@ -12,9 +12,11 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { Comment } from 'components/common/comments/Comment';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { CommentSort } from 'components/common/comments/CommentSort';
-import { processComments, sortComments } from 'components/common/comments/utils';
+import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
+import { getUpdatedCommentVote, processComments, sortComments } from 'components/common/comments/utils';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
@@ -39,7 +41,6 @@ import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
 
 import { CategoryPosts } from './components/CategoryPosts';
 import { PostCategoryInput } from './components/PostCategoryInput';
-import { PostComment } from './components/PostComment';
 import { DraftPostBanner } from './DraftPostBanner';
 
 type Props = {
@@ -226,11 +227,75 @@ export function PostPage({
 
   const canEdit = !!permissions?.edit_post;
 
+  async function updateComment({ id, content, contentText }: UpdateCommentPayload) {
+    const comment = postComments.find((_comment) => _comment.id === id);
+    if (comment) {
+      const updatedComment = await charmClient.forum.updatePostComment({
+        commentId: id,
+        content,
+        contentText,
+        postId: comment.postId
+      });
+
+      setPostComments((comments) =>
+        comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, ...updatedComment } : _comment))
+      );
+    }
+  }
+
+  async function voteComment({ upvoted, commentId }: { upvoted: boolean | null; commentId: string }) {
+    const comment = postComments.find((_comment) => _comment.id === commentId);
+    if (comment) {
+      await charmClient.forum.upOrDownVoteComment({
+        postId: comment.postId,
+        commentId,
+        upvoted
+      });
+
+      const postCommentVote = getUpdatedCommentVote(comment, upvoted);
+
+      setPostComments((comments) =>
+        comments?.map((_comment) =>
+          _comment.id === comment.id
+            ? {
+                ...comment,
+                ...postCommentVote
+              }
+            : _comment
+        )
+      );
+    }
+  }
+
+  async function addComment({ content, contentText, parentId }: CreateCommentPayload) {
+    const parentComment = postComments.find((_comment) => _comment.id === parentId);
+    if (parentComment) {
+      const postComment = await charmClient.forum.createPostComment(parentComment.postId, {
+        content,
+        contentText,
+        parentId
+      });
+      setPostComments((comments) => (comments ? [postComment, ...comments] : []));
+    }
+  }
+
+  async function deleteComment(commentId: string) {
+    const parentComment = postComments.find((_comment) => _comment.id === commentId);
+    if (parentComment) {
+      await charmClient.forum.deletePostComment({ commentId, postId: parentComment.postId });
+      setPostComments((comments) =>
+        comments?.map((_comment) =>
+          _comment.id === parentComment.id ? { ..._comment, deletedAt: new Date() } : _comment
+        )
+      );
+    }
+  }
+
   useEffect(() => {
     const commentId = router.query.commentId;
     if (commentId && typeof window !== 'undefined' && !isValidating && postComments.length) {
       setTimeout(() => {
-        const commentDomElement = window.document.getElementById(`post-comment-${commentId}`);
+        const commentDomElement = window.document.getElementById(`comment-${commentId}`);
         if (commentDomElement) {
           requestAnimationFrame(() => {
             commentDomElement.scrollIntoView({
@@ -357,12 +422,15 @@ export function PostPage({
                         <Stack gap={1}>
                           <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
                           {topLevelComments.map((comment) => (
-                            <PostComment
-                              post={post}
+                            <Comment
                               permissions={permissions}
-                              setPostComments={setPostComments}
                               comment={comment}
                               key={comment.id}
+                              handleCreateComment={addComment}
+                              handleUpdateComment={updateComment}
+                              handleDeleteComment={deleteComment}
+                              handleVoteComment={voteComment}
+                              deletingDisabled={!!post?.proposalId}
                             />
                           ))}
                         </Stack>

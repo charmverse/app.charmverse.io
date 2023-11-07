@@ -1,7 +1,8 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { DOMOutputSpec, Node, NodeSpec } from 'prosemirror-model';
+
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { LIST_ITEM } from './nodeNames';
 

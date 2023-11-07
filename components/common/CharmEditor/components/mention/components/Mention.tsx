@@ -1,8 +1,8 @@
-import type { NodeViewProps } from '@bangle.dev/core';
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
+import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';

@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { arbitrum, avalanche, base, bsc, mainnet, fantom, mantle, optimism, polygon, zora } from 'viem/chains';
 
 import type { SupportedChainId } from 'lib/blockchain/getNFTs';
 
@@ -7,6 +8,7 @@ import type { NodeAttrs } from './nft.specs';
 const openseaChainsByPath: Record<string, SupportedChainId | undefined> = {
   ethereum: 1,
   bsc: 56,
+  base: base.id,
   arbitrum: 42161,
   avalanche: 43114,
   matic: 137,
@@ -52,19 +54,23 @@ export function getNFTUrl({
 }): string | null {
   let link: null | string = null;
   switch (chain) {
-    case 1:
-    case 10:
-    case 56:
-    case 137:
-    case 42161:
-    case 43114:
+    case mainnet.id:
+    case optimism.id:
+    case base.id:
+    case bsc.id:
+    case polygon.id:
+    case arbitrum.id:
+    case avalanche.id:
       link = `https://opensea.io/assets/${openseaPathsByChain[chain]}/${contract}/${token}`;
       break;
     // fantom chain
-    case 250:
+    case fantom.id:
       link = `https://artion.io/explore/${contract}/${token}`;
       break;
-    case 5000:
+    case zora.id:
+      link = `https://zora.co/collect/zora:${contract}/${token}`;
+      break;
+    case mantle.id:
     default:
       log.warn('NFT Url is not configured for chain', { chain });
       break;

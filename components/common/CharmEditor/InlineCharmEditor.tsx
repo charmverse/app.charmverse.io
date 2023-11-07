@@ -1,11 +1,12 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
-import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
+import { Plugin } from 'prosemirror-state';
 import type { CSSProperties, ReactNode } from 'react';
 
+import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -22,7 +23,8 @@ import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
-import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
+import { mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import { Mention, MentionSuggest } from './components/mention/components';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as tabIndent from './components/tabIndent';
 

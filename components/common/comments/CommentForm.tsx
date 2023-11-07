@@ -83,7 +83,8 @@ export function CommentForm({
       placeholderText: placeholder ?? 'What are your thoughts?',
       onContentChange: updatePostContent,
       content: postContent.doc,
-      isContentControlled: true
+      isContentControlled: true,
+      disableNestedPages: true
     };
 
     if (!inlineCharmEditor) {
@@ -120,11 +121,7 @@ export function CommentForm({
               )}
             </>
           )}
-          <Button
-            data-test='post-comment-button'
-            disabled={!postContent.rawText || disabled}
-            onClick={createPostComment}
-          >
+          <Button data-test='comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
             Comment
           </Button>
         </Stack>

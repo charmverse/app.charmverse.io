@@ -1,4 +1,4 @@
-import type { RawSpecs, BaseRawNodeSpec } from '@bangle.dev/core';
+import type { RawSpecs, BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 type EmbeddedSpecProps = {
   name: string;
