@@ -77,7 +77,11 @@ export default function Mention({ node }: NodeViewProps) {
       <MentionContainer color='secondary'>
         <Typography component='span' color='secondary' sx={{ cursor: 'pointer' }} fontWeight={600}>
           <span style={{ opacity: 0.5 }}>@</span>
-          {roles?.find((role) => role.id === attrs.value)?.name}
+          {attrs.value === 'everyone'
+            ? 'Everyone'
+            : attrs.value === 'admin'
+            ? 'Admin'
+            : roles?.find((role) => role.id === attrs.value)?.name}
         </Typography>
       </MentionContainer>
     );

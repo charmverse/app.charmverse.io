@@ -72,8 +72,19 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
     [pages, searchText]
   );
 
-  const filteredRoles = useMemo<ListSpaceRolesResponse[]>(
-    () => roles?.filter((role) => role.name.toLowerCase().startsWith(searchText)) ?? [],
+  const filteredRoles = useMemo<{ name: string; id: string }[]>(
+    () =>
+      [
+        {
+          name: 'Admin',
+          id: 'admin'
+        },
+        {
+          name: 'Everyone',
+          id: 'everyone'
+        },
+        ...(roles ?? [])
+      ].filter((role) => role.name.toLowerCase().startsWith(searchText)) ?? [],
     [roles, searchText]
   );
 
@@ -194,11 +205,11 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
               return (
                 <MenuItem
                   component='div'
-                  onClick={() => onSelectMention(role.id, 'role')}
                   key={role.id}
                   selected={isSelected}
                   data-value={role.id}
                   data-type='role'
+                  onClick={() => onSelectMention(role.id, 'user')}
                   className={isSelected ? 'mention-selected' : ''}
                 >
                   <Typography fontSize={14}>{role.name}</Typography>

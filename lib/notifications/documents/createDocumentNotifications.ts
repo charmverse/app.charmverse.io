@@ -29,31 +29,54 @@ async function createDocumentNotificationsFromMention({
   const notificationIds: string[] = [];
 
   if (targetMention.type === 'role') {
-    const role = await prisma.role.findFirstOrThrow({
-      where: {
-        id: targetMention.value
-      },
-      select: {
-        spaceRolesToRole: {
-          select: {
-            spaceRole: {
-              select: {
-                user: {
-                  select: {
-                    id: true
+    const roleId = targetMention.value;
+    if (roleId === 'everyone' || roleId === 'admin') {
+      const spaceRoles = await prisma.spaceRole.findMany({
+        where: {
+          spaceId,
+          isAdmin: roleId === 'admin'
+        },
+        select: {
+          user: {
+            select: {
+              id: true
+            }
+          }
+        }
+      });
+
+      spaceRoles.forEach((spaceRole) => {
+        if (spaceRole.user.id !== mentionAuthorId) {
+          targetUserIds.push(spaceRole.user.id);
+        }
+      });
+    } else {
+      const role = await prisma.role.findFirstOrThrow({
+        where: {
+          id: targetMention.value
+        },
+        select: {
+          spaceRolesToRole: {
+            select: {
+              spaceRole: {
+                select: {
+                  user: {
+                    select: {
+                      id: true
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    });
-    role.spaceRolesToRole.forEach((spaceRole) => {
-      if (spaceRole.spaceRole.user.id !== mentionAuthorId) {
-        targetUserIds.push(spaceRole.spaceRole.user.id);
-      }
-    });
+      });
+      role.spaceRolesToRole.forEach(({ spaceRole }) => {
+        if (spaceRole.user.id !== mentionAuthorId) {
+          targetUserIds.push(spaceRole.user.id);
+        }
+      });
+    }
   }
 
   if (targetMention.type === 'user' && targetMention.value !== mentionAuthorId) {
