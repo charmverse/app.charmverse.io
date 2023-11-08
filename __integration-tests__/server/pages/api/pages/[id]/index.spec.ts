@@ -150,7 +150,7 @@ describe('PUT /api/pages/{id} - update page', () => {
 
 describe('GET /api/pages/{id} - get page', () => {
   it('should return a page to a user with permission to access it and respond 200', async () => {
-    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+    const { createdAt, updatedAt, content, ...page } = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
       spaceId: space.id,
       pagePermissions: [
@@ -168,7 +168,7 @@ describe('GET /api/pages/{id} - get page', () => {
   });
 
   it('should support queries by page path and space domain for a user with permission to access the page and respond 200', async () => {
-    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+    const { createdAt, updatedAt, content, ...page } = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
       spaceId: space.id,
       pagePermissions: [
