@@ -15,6 +15,7 @@ import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
@@ -68,6 +69,8 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
     ...page,
     permissionFlags: permissions
   };
+
+  result.content = convertDoc(result.content) as any;
 
   return res.status(200).json(result);
 }

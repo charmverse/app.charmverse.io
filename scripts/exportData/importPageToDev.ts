@@ -16,10 +16,10 @@ import { v4 as uuid } from 'uuid';
  */
 
 // Details for production environment
-const originalPagePath = 'page-16724275028991964';
+const originalPagePath = 'page-7220252559428284';
 
 // Detais for developer environment
-const destinationSpaceDomain = 'rich-magenta-peacock';
+const destinationSpaceDomain = 'cute-azure-mastodon';
 const destinationUserName = 'mattcasey.eth';
 
 const fileName = `./page-backup-05-22.json`;
@@ -79,7 +79,8 @@ async function importData(data: RestoreData) {
     prisma.pagePermission.create({
       data: {
         pageId: newPageId,
-        permissionLevel: 'full_access'
+        permissionLevel: 'view',
+        spaceId: space.id
       }
     }),
     prisma.pageDiff.createMany({
