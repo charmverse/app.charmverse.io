@@ -1,14 +1,14 @@
 import { LensClient, production, development } from '@lens-protocol/client';
 import { polygon, polygonMumbai } from '@wagmi/core/chains';
 
-import { isDevEnv } from 'config/constants';
+import { isProdEnv } from 'config/constants';
 
 const isServer = typeof window === 'undefined';
 
-export const LensChain = isDevEnv ? polygonMumbai.id : polygon.id;
+export const LensChain = isProdEnv ? polygon.id : polygonMumbai.id;
 
 const lensClient = new LensClient({
-  environment: isDevEnv ? development : production,
+  environment: isProdEnv ? production : development,
   storage: {
     // Need to bind the functions to the window.localStorage object otherwise it throws illegal invocation error
     getItem: isServer

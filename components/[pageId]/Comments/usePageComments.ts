@@ -90,6 +90,7 @@ export function usePageComments(pageId: string) {
     addComment,
     deleteComment,
     updateComment,
-    voteComment
+    voteComment,
+    nonNestedComments: data ?? []
   };
 }

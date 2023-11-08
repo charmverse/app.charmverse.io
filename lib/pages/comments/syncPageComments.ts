@@ -26,7 +26,11 @@ async function fetchLensComments({
 
   const comments: CommentFragmentWithMeta[] = [];
   let publicationFetchAllResponse = await lensClient.publication.fetchAll({
-    commentsOf: parentId
+    where: {
+      commentOn: {
+        id: parentId
+      }
+    }
   });
 
   if (publicationFetchAllResponse.items.length === 0) {
@@ -44,7 +48,11 @@ async function fetchLensComments({
   while (publicationFetchAllResponse.pageInfo.next) {
     publicationFetchAllResponse = await lensClient.publication.fetchAll({
       cursor: publicationFetchAllResponse.pageInfo.next,
-      commentsOf: parentId
+      where: {
+        commentOn: {
+          id: parentId
+        }
+      }
     });
 
     comments.push(
@@ -99,7 +107,7 @@ export async function syncPageComments({
 
   for (const lensComment of lensComments) {
     if (!commentIdsPublishedToLens.has(lensComment.id)) {
-      const lensUserHandle = lensComment.profile.handle.toLowerCase();
+      const lensUserHandle = lensComment.by.handle?.fullHandle.toLowerCase();
       let charmverseUserId: null | string = null;
       const charmVerseUser = await prisma.user.findFirst({
         where: {
@@ -123,12 +131,12 @@ export async function syncPageComments({
             username: `${lensUserHandle}-${usernameSuffix}`,
             path: `${lensUserHandle}-${pathSuffix}`,
             isBot: true,
-            avatar:
-              lensComment.profile.coverPicture?.__typename === 'MediaSet'
+            // TODO: Uncomment when we have cover pictures
+            avatar: /* lensComment.by?..coverPicture?.__typename === 'MediaSet'
                 ? lensComment.profile.coverPicture.original.url
                 : lensComment.profile.coverPicture?.__typename === 'NftImage'
                 ? lensComment.profile.coverPicture.uri
-                : null,
+                :  */ null,
             spaceRoles: {
               create: {
                 spaceId
@@ -153,12 +161,13 @@ export async function syncPageComments({
         }
       }
 
+      const contentText = lensComment.metadata?.__typename === 'TextOnlyMetadataV3' ? lensComment.metadata.content : '';
       const charmverseComment = await prisma.pageComment.create({
         data: {
           pageId,
           createdBy: charmverseUserId!,
-          contentText: lensComment.metadata.content ? lensComment.metadata.content : '',
-          content: lensComment.metadata.content ? parseMarkdown(lensComment.metadata.content) : Prisma.JsonNull,
+          contentText,
+          content: contentText ? parseMarkdown(contentText) : Prisma.JsonNull,
           lensCommentLink: lensComment.id,
           // Since we are sorting by depth, parent will always be created before child and thus will be in the record
           parentId:

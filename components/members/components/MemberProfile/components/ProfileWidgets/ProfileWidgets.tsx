@@ -3,6 +3,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 
@@ -23,13 +24,9 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
     canEditSpaceProfile
   } = useMemberPropertyValues(userId);
   const { memberProfiles } = useFeaturesAndMembers();
-
+  const { lensProfile, isLoadingProfiles } = useLensProfile();
   const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
     charmClient.publicProfile.getEnsProfile(userId)
-  );
-
-  const { data: lensProfile, isLoading: isLoadingLensProfile } = useSWR(`public/profile/${userId}/lens`, () =>
-    charmClient.publicProfile.getLensProfile(userId)
   );
 
   const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(`public/profile/${userId}/summon`, () =>
@@ -48,7 +45,7 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
     isFetchingPoaps &&
     isFetchingNfts &&
     isLoadingMemberPropertiesValues &&
-    isLoadingLensProfile;
+    isLoadingProfiles;
 
   const readOnlyMemberProperties = !space || !canEditSpaceProfile(space.id);
 
