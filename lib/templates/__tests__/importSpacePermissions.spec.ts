@@ -1,10 +1,15 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { AssignedProposalCategoryPermission, TargetPermissionGroup } from '@charmverse/core/permissions';
+import type {
+  AssignedPostCategoryPermission,
+  AssignedProposalCategoryPermission,
+  TargetPermissionGroup
+} from '@charmverse/core/permissions';
 import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permissions';
-import type { ProposalCategory, Role, Space } from '@charmverse/core/prisma-client';
+import type { PostCategory, ProposalCategory, Role, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
+import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import type { AssignedSpacePermission } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
 import { mapSpacePermissionToAssignee } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
 
@@ -17,12 +22,17 @@ describe('importSpacePermissions', () => {
 
   let firstSourceProposalCategory: ProposalCategory;
   let secondSourceProposalCategory: ProposalCategory;
+
+  let firstSourcePostCategory: PostCategory;
+  let secondSourcePostCategory: PostCategory;
+
   let firstSourceRole: Role;
   let secondSourceRole: Role;
   let exportedData: SpaceDataExport;
 
   let spacePermissions: AssignedSpacePermission[];
   let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
+  let postCategoryPermissions: AssignedPostCategoryPermission[];
 
   beforeAll(async () => {
     ({ space: sourceSpace } = await testUtilsUser.generateUserAndSpace());
@@ -74,6 +84,43 @@ describe('importSpacePermissions', () => {
       ]
     });
 
+    firstSourcePostCategory = await testUtilsForum.generatePostCategory({
+      spaceId: sourceSpace.id,
+      name: 'Example created 1',
+      permissions: [
+        {
+          assignee: { group: 'role', id: firstSourceRole.id },
+          permissionLevel: 'full_access'
+        },
+        {
+          assignee: { group: 'role', id: secondSourceRole.id },
+          permissionLevel: 'comment_vote'
+        },
+        {
+          assignee: { group: 'space', id: sourceSpace.id },
+          permissionLevel: 'view'
+        }
+      ]
+    });
+    secondSourcePostCategory = await testUtilsForum.generatePostCategory({
+      spaceId: sourceSpace.id,
+      name: 'Example created 2',
+      permissions: [
+        {
+          assignee: { group: 'role', id: firstSourceRole.id },
+          permissionLevel: 'full_access'
+        },
+        {
+          assignee: { group: 'role', id: secondSourceRole.id },
+          permissionLevel: 'comment_vote'
+        },
+        {
+          assignee: { group: 'space', id: sourceSpace.id },
+          permissionLevel: 'view'
+        }
+      ]
+    });
+
     spacePermissions = await prisma
       .$transaction([
         // Space
@@ -108,6 +155,12 @@ describe('importSpacePermissions', () => {
       })
       .then((data) => data.map(mapProposalCategoryPermissionToAssignee));
 
+    postCategoryPermissions = await prisma.postCategoryPermission
+      .findMany({
+        where: { postCategory: { spaceId: sourceSpace.id } }
+      })
+      .then((data) => data.map(mapPostCategoryPermissionToAssignee));
+
     exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id });
   });
 
@@ -124,6 +177,15 @@ describe('importSpacePermissions', () => {
         permissionLevel: p.permissionLevel,
         id: expect.any(String),
         proposalCategoryId: expect.any(String),
+        assignee: {
+          group: p.assignee.group,
+          id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+        } as TargetPermissionGroup<'role' | 'space'>
+      })),
+      postCategoryPermissions: postCategoryPermissions.map((p) => ({
+        permissionLevel: p.permissionLevel,
+        id: expect.any(String),
+        postCategoryId: expect.any(String),
         assignee: {
           group: p.assignee.group,
           id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
@@ -218,6 +280,7 @@ describe('importSpacePermissions', () => {
         exportData: {} as any // Invalid data for testing
       })
     ).resolves.toMatchObject<ImportedPermissions>({
+      postCategoryPermissions: [],
       proposalCategoryPermissions: [],
       roles: [],
       spacePermissions: []

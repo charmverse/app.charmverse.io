@@ -1,10 +1,9 @@
-import {
-  mapProposalCategoryPermissionToAssignee,
-  type AssignedProposalCategoryPermission
-} from '@charmverse/core/permissions';
+import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permissions';
 import type { Role } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import {
   mapSpacePermissionToAssignee,
   type AssignedSpacePermission
@@ -15,6 +14,7 @@ import { exportRoles } from './exportRoles';
 
 export type ExportedPermissions = {
   proposalCategoryPermissions: AssignedProposalCategoryPermission<'role' | 'space'>[];
+  postCategoryPermissions: AssignedPostCategoryPermission<'role' | 'space'>[];
   spacePermissions: AssignedSpacePermission[];
 };
 
@@ -31,10 +31,29 @@ export async function exportSpacePermissions({
 
   const { roles } = await exportRoles({ spaceIdOrDomain });
 
-  const [proposalCategoryPermissions, spacePermissions] = await Promise.all([
+  const [proposalCategoryPermissions, postCategoryPermissions, spacePermissions] = await Promise.all([
     prisma.proposalCategoryPermission.findMany({
       where: {
         proposalCategory: {
+          spaceId: space.id
+        },
+        OR: [
+          {
+            spaceId: {
+              not: null
+            }
+          },
+          {
+            roleId: {
+              not: null
+            }
+          }
+        ]
+      }
+    }),
+    prisma.postCategoryPermission.findMany({
+      where: {
+        postCategory: {
           spaceId: space.id
         },
         OR: [
@@ -74,6 +93,9 @@ export async function exportSpacePermissions({
     proposalCategoryPermissions: proposalCategoryPermissions.map(
       mapProposalCategoryPermissionToAssignee
     ) as AssignedProposalCategoryPermission<'role' | 'space'>[],
+    postCategoryPermissions: postCategoryPermissions.map(
+      mapPostCategoryPermissionToAssignee
+    ) as AssignedPostCategoryPermission<'role' | 'space'>[],
     spacePermissions: spacePermissions.map(mapSpacePermissionToAssignee)
   };
 

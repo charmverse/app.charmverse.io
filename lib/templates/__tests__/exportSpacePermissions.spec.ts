@@ -1,6 +1,6 @@
-import type { AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { mapSpacePermissionToAssignee } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
 
@@ -8,7 +8,7 @@ import type { SpacePermissionsExport } from '../exportSpacePermissions';
 import { exportSpacePermissions } from '../exportSpacePermissions';
 
 describe('exportSpacePermissions', () => {
-  it('return roles, proposal category permissions and space permissions', async () => {
+  it('return roles, proposal category permissions, post category permissions and space permissions', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     const proposalReviewerRole = await testUtilsMembers.generateRole({
@@ -67,30 +67,25 @@ describe('exportSpacePermissions', () => {
       ]
     });
 
-    const proposalInCategory1 = await testUtilsProposals.generateProposal({
+    const postCategory1 = await testUtilsForum.generatePostCategory({
       spaceId: space.id,
-      userId: space.createdBy,
-      reviewers: [
-        { group: 'role', id: proposalReviewerRole.id },
-        // This permission should be ignored because it's not a role-reviewer
-        { group: 'user', id: user.id }
+      name: 'First',
+      permissions: [
+        { assignee: { group: 'space', id: space.id }, permissionLevel: 'view' },
+        { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'full_access' },
+        { assignee: { group: 'role', id: secondProposalReviewerRole.id }, permissionLevel: 'moderator' }
       ]
     });
 
-    const proposalInCategory2 = await testUtilsProposals.generateProposal({
+    const postCategory2 = await testUtilsForum.generatePostCategory({
       spaceId: space.id,
-      userId: space.createdBy,
-      reviewers: [
-        { group: 'role', id: proposalReviewerRole.id },
-        { group: 'role', id: secondProposalReviewerRole.id }
+      name: 'Second',
+      permissions: [
+        { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'comment_vote' },
+        { assignee: { group: 'role', id: secondProposalReviewerRole.id }, permissionLevel: 'view' }
       ]
     });
 
-    const proposalInCategory3 = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: space.createdBy,
-      reviewers: [{ group: 'role', id: secondProposalReviewerRole.id }]
-    });
     const exportedPermissions = await exportSpacePermissions({ spaceIdOrDomain: space.id });
 
     expect(exportedPermissions.roles).toHaveLength(2);
@@ -98,6 +93,38 @@ describe('exportSpacePermissions', () => {
     expect(exportedPermissions).toMatchObject<SpacePermissionsExport>({
       roles: [proposalReviewerRole, secondProposalReviewerRole],
       permissions: {
+        postCategoryPermissions: expect.arrayContaining<AssignedPostCategoryPermission>([
+          {
+            assignee: { group: 'space', id: space.id },
+            permissionLevel: 'view',
+            id: expect.any(String),
+            postCategoryId: postCategory1.id
+          },
+          {
+            assignee: { group: 'role', id: proposalReviewerRole.id },
+            permissionLevel: 'full_access',
+            id: expect.any(String),
+            postCategoryId: postCategory1.id
+          },
+          {
+            assignee: { group: 'role', id: secondProposalReviewerRole.id },
+            permissionLevel: 'moderator',
+            id: expect.any(String),
+            postCategoryId: postCategory1.id
+          },
+          {
+            assignee: { group: 'role', id: proposalReviewerRole.id },
+            permissionLevel: 'comment_vote',
+            id: expect.any(String),
+            postCategoryId: postCategory2.id
+          },
+          {
+            assignee: { group: 'role', id: secondProposalReviewerRole.id },
+            permissionLevel: 'view',
+            id: expect.any(String),
+            postCategoryId: postCategory2.id
+          }
+        ]),
         spacePermissions: expect.arrayContaining(spacePermissions.map(mapSpacePermissionToAssignee)),
         proposalCategoryPermissions: expect.arrayContaining<AssignedProposalCategoryPermission>([
           {

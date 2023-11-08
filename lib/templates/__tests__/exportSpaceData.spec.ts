@@ -2,11 +2,15 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import type { AssignedProposalCategoryPermission } from '@charmverse/core/dist/cjs/permissions';
-import type { Proposal, ProposalCategory, Role, Space, User } from '@charmverse/core/prisma-client';
+import type {
+  AssignedPostCategoryPermission,
+  AssignedProposalCategoryPermission
+} from '@charmverse/core/dist/cjs/permissions';
+import type { PostCategory, Proposal, ProposalCategory, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
+import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import { mapProposalCategoryPermissionToAssignee } from 'lib/permissions/proposals/mapProposalCategoryPermissionToAssignee';
 import {
   mapSpacePermissionToAssignee,
@@ -26,10 +30,12 @@ describe('exportSpaceData', () => {
 
   let spacePermissions: AssignedSpacePermission[];
   let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
+  let postCategoryPermissions: AssignedPostCategoryPermission[];
 
   let proposalCategory1WithoutPermissions: ProposalCategory;
   let proposalCategory2WithSpacePermissions: ProposalCategory;
   let proposalCategory3WithRolePermissions: ProposalCategory;
+  let postCategoryWithPermissions: PostCategory;
 
   let proposalInCategory1: ExportedPage;
 
@@ -73,29 +79,48 @@ describe('exportSpaceData', () => {
       ])
       .then((data) => data.map(mapSpacePermissionToAssignee));
 
-    [proposalCategory1WithoutPermissions, proposalCategory2WithSpacePermissions, proposalCategory3WithRolePermissions] =
-      await Promise.all([
-        testUtilsProposals.generateProposalCategory({
-          spaceId: space.id,
-          proposalCategoryPermissions: [
-            { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'view_comment_vote' }
-          ]
-        }),
-        testUtilsProposals.generateProposalCategory({
-          spaceId: space.id,
-          proposalCategoryPermissions: [
-            { assignee: { group: 'space', id: space.id }, permissionLevel: 'view_comment' },
-            { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'full_access' }
-          ]
-        }),
-        testUtilsProposals.generateProposalCategory({
-          spaceId: space.id,
-          proposalCategoryPermissions: [
-            { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'full_access' },
-            { assignee: { group: 'role', id: secondProposalReviewerRole.id }, permissionLevel: 'view_comment_vote' }
-          ]
-        })
-      ]);
+    [
+      proposalCategory1WithoutPermissions,
+      proposalCategory2WithSpacePermissions,
+      proposalCategory3WithRolePermissions,
+      postCategoryWithPermissions
+    ] = await Promise.all([
+      testUtilsProposals.generateProposalCategory({
+        spaceId: space.id,
+        proposalCategoryPermissions: [
+          { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'view_comment_vote' }
+        ]
+      }),
+      testUtilsProposals.generateProposalCategory({
+        spaceId: space.id,
+        proposalCategoryPermissions: [
+          { assignee: { group: 'space', id: space.id }, permissionLevel: 'view_comment' },
+          { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'full_access' }
+        ]
+      }),
+      testUtilsProposals.generateProposalCategory({
+        spaceId: space.id,
+        proposalCategoryPermissions: [
+          { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'full_access' },
+          { assignee: { group: 'role', id: secondProposalReviewerRole.id }, permissionLevel: 'view_comment_vote' }
+        ]
+      }),
+      testUtilsForum.generatePostCategory({
+        spaceId: space.id,
+        name: 'Example category xx',
+        permissions: [
+          { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'comment_vote' },
+          {
+            assignee: { group: 'role', id: secondProposalReviewerRole.id },
+            permissionLevel: 'full_access'
+          },
+          {
+            assignee: { group: 'space', id: space.id },
+            permissionLevel: 'view'
+          }
+        ]
+      })
+    ]);
 
     proposalCategoryPermissions = await prisma.proposalCategoryPermission
       .findMany({
@@ -106,6 +131,16 @@ describe('exportSpaceData', () => {
         }
       })
       .then((data) => data.map(mapProposalCategoryPermissionToAssignee));
+
+    postCategoryPermissions = await prisma.postCategoryPermission
+      .findMany({
+        where: {
+          postCategory: {
+            spaceId: space.id
+          }
+        }
+      })
+      .then((data) => data.map(mapPostCategoryPermissionToAssignee));
 
     proposalInCategory1 = await testUtilsProposals
       .generateProposal({
@@ -187,6 +222,7 @@ describe('exportSpaceData', () => {
     expect(exportedData).toMatchObject<SpaceDataExport>({
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
+        postCategoryPermissions: expect.arrayContaining(postCategoryPermissions),
         proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions)
       },
@@ -195,12 +231,13 @@ describe('exportSpaceData', () => {
         proposalCategory1WithoutPermissions,
         proposalCategory2WithSpacePermissions,
         proposalCategory3WithRolePermissions
-      ])
+      ]),
+      postCategories: expect.arrayContaining([postCategoryWithPermissions])
     });
   });
 
   it('should export space data successfully by space domain', async () => {
-    const exportedData = await exportSpaceData({ spaceIdOrDomain: space.id });
+    const exportedData = await exportSpaceData({ spaceIdOrDomain: space.domain });
 
     // High level assertions for documentation purposes
 
@@ -208,14 +245,16 @@ describe('exportSpaceData', () => {
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
         proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
-        spacePermissions: expect.arrayContaining(spacePermissions)
+        spacePermissions: expect.arrayContaining(spacePermissions),
+        postCategoryPermissions: expect.arrayContaining(postCategoryPermissions)
       },
       pages: expect.arrayContaining([proposalInCategory1, proposalInCategory2, proposalInCategory3]),
       proposalCategories: expect.arrayContaining([
         proposalCategory1WithoutPermissions,
         proposalCategory2WithSpacePermissions,
         proposalCategory3WithRolePermissions
-      ])
+      ]),
+      postCategories: expect.arrayContaining([postCategoryWithPermissions])
     });
   });
 
@@ -235,6 +274,7 @@ describe('exportSpaceData', () => {
         { ...secondProposalReviewerRole, createdAt: secondProposalReviewerRole.createdAt.toISOString() }
       ]),
       permissions: {
+        postCategoryPermissions: expect.arrayContaining(postCategoryPermissions),
         proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions)
       },
@@ -249,7 +289,8 @@ describe('exportSpaceData', () => {
         proposalCategory1WithoutPermissions,
         proposalCategory2WithSpacePermissions,
         proposalCategory3WithRolePermissions
-      ])
+      ]),
+      postCategories: expect.arrayContaining([postCategoryWithPermissions])
     });
   });
 });
