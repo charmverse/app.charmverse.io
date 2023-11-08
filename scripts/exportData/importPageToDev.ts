@@ -15,9 +15,12 @@ import { v4 as uuid } from 'uuid';
  *  ➜ Uploaded records
  */
 
-const originalPagePath = 'page-34568528710225044';
-const destinationSpaceDomain = 'criminal-brown-canid';
-const destinationUserName = '0x6652…97e2';
+// Details for production environment
+const originalPagePath = 'page-16724275028991964';
+
+// Detais for developer environment
+const destinationSpaceDomain = 'rich-magenta-peacock';
+const destinationUserName = 'mattcasey.eth';
 
 const fileName = `./page-backup-05-22.json`;
 const pathName = path.join(process.cwd(), fileName);
@@ -58,6 +61,8 @@ async function importData(data: RestoreData) {
 
   const pageToRestore = {
     ...data.page,
+    proposalId: null,
+    parentId: null,
     diffs: undefined,
     id: newPageId,
     path: data.page.path + '-restored-' + Date.now(),
