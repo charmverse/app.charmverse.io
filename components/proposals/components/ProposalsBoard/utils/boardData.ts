@@ -64,7 +64,7 @@ export function getDefaultBoard({
 
 function getDefaultProperties({ categories }: { categories: ProposalCategory[] | undefined }) {
   return [
-    proposalDbProperties.proposalCreatedAt(CREATED_AT_ID, 'Created At'),
+    proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
     getDefaultCategoryProperty(categories),
     getDefaultStatusProperty(),
     getDefaultEvaluationTypeProperty(),

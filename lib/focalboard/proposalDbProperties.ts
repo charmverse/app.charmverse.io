@@ -63,9 +63,9 @@ export const proposalDbProperties: {
   }),
   proposalCreatedAt: (id?: string, name?: string) => ({
     id: id || uuid(),
-    name: name || 'Created At',
+    name: name || 'Created Time',
     options: [],
-    type: 'date'
+    type: 'createdTime'
   })
 };
 

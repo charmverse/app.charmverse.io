@@ -48,7 +48,7 @@ export function getDefaultBoard({
 
 function getDefaultProperties() {
   return [
-    rewardDbProperties.rewardCreatedAt(CREATED_AT_ID, 'Created At'),
+    rewardDbProperties.rewardCreatedAt(CREATED_AT_ID),
     rewardDbProperties.rewardDueDate(DUE_DATE_ID, 'Due Date'),
     rewardDbProperties.rewardAssignees(ASSIGNEES_BLOCK_ID, 'Assigned'),
     rewardDbProperties.rewardReviewers(REWARD_REVIEWERS_BLOCK_ID, 'Reviewer'),
