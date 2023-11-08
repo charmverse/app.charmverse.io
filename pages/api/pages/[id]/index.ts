@@ -71,7 +71,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   };
 
   try {
-    result.content = null;
+    result.content = convertDoc(result.content)?.toJSON();
   } catch (error) {
     log.error('Could not convert page with old lists', { pageId: result.id, error });
   }
