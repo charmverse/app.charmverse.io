@@ -54,6 +54,8 @@ describe('importSpaceData', () => {
   let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
   let postCategoryPermissions: AssignedPostCategoryPermission[];
 
+  const fileExportName = 'jest-test-space-data-import.json';
+
   beforeAll(async () => {
     ({ space: sourceSpace, user: sourceSpaceUser } = await testUtilsUser.generateUserAndSpace());
 
@@ -208,7 +210,7 @@ describe('importSpaceData', () => {
       })
       .then((p) => prisma.page.findUniqueOrThrow({ where: { id: p.id }, select: pageMetaSelect() }));
 
-    exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id });
+    exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id, filename: fileExportName });
   });
 
   it('should correctly import space data', async () => {
@@ -314,32 +316,117 @@ describe('importSpaceData', () => {
     });
   });
 
-  it('should ensure idempotency when importing permissions', async () => {
+  it('should correctly import space data from a static file', async () => {
     const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
-    // First import
-    const importedPermissions = await importSpacePermissions({
+
+    const importResult = await importSpaceData({
       targetSpaceIdOrDomain: targetSpace.id,
-      exportData: exportedData
+      exportName: fileExportName
     });
 
-    // Repeat import
-    const reimportedPermissions = await importSpacePermissions({
-      targetSpaceIdOrDomain: targetSpace.id,
-      exportData: exportedData
+    expect(importResult).toMatchObject<SpaceDataImportResult>({
+      postCategories: expect.arrayContaining([
+        { ...firstSourcePostCategory, spaceId: targetSpace.id, id: expect.any(String) }
+      ]),
+      proposalCategories: expect.arrayContaining(
+        [firstSourceProposalCategory, secondSourceProposalCategory].map((c) => ({
+          ...c,
+          spaceId: targetSpace.id,
+          id: expect.any(String)
+        }))
+      ),
+      roles: expect.arrayContaining([
+        {
+          ...firstSourceRole,
+          createdAt: expect.any(Date),
+          createdBy: targetSpace.createdBy,
+          id: expect.not.stringContaining(firstSourceRole.id),
+          spaceId: targetSpace.id
+        },
+        {
+          ...secondSourceRole,
+          createdAt: expect.any(Date),
+          createdBy: targetSpace.createdBy,
+          id: expect.not.stringContaining(secondSourceRole.id),
+          spaceId: targetSpace.id
+        }
+      ]),
+      permissions: {
+        proposalCategoryPermissions: expect.arrayContaining(
+          proposalCategoryPermissions.map((p) => ({
+            permissionLevel: p.permissionLevel,
+            id: expect.any(String),
+            proposalCategoryId: expect.any(String),
+            assignee: {
+              group: p.assignee.group,
+              id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+            } as TargetPermissionGroup<'role' | 'space'>
+          }))
+        ),
+        postCategoryPermissions: expect.arrayContaining(
+          postCategoryPermissions.map((p) => ({
+            permissionLevel: p.permissionLevel,
+            id: expect.any(String),
+            postCategoryId: expect.any(String),
+            assignee: {
+              group: p.assignee.group,
+              id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+            } as TargetPermissionGroup<'role' | 'space'>
+          }))
+        ),
+        spacePermissions: expect.arrayContaining<AssignedSpacePermission>(
+          spacePermissions.map((p) => ({
+            operations: p.operations,
+            assignee: {
+              group: p.assignee.group,
+              id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+            }
+          }))
+        )
+      },
+      pages: expect.arrayContaining(
+        [firstSourceProposalPage, secondSourceProposalPage, firstSourcePage].map((p) =>
+          expect.objectContaining<Partial<PageMeta>>({
+            title: p.title,
+            type: p.type,
+            id: expect.any(String),
+            path: expect.any(String),
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          })
+        )
+      ),
+      oldNewHashMaps: {
+        pages: {
+          [firstSourceProposalPage.id]: expect.any(String),
+          [secondSourceProposalPage.id]: expect.any(String),
+          [firstSourcePage.id]: expect.any(String)
+        },
+        postCategories: {
+          [firstSourcePostCategory.id]: expect.any(String)
+        },
+        proposalCategories: {
+          [firstSourceProposalCategory.id]: expect.any(String),
+          [secondSourceProposalCategory.id]: expect.any(String)
+        },
+        roles: {
+          [firstSourceRole.id]: expect.any(String),
+          [secondSourceRole.id]: expect.any(String)
+        }
+      }
     });
-
-    // Idempotency check - assuming no duplicate entries are created
-    expect(reimportedPermissions).toMatchObject(importedPermissions);
   });
 
   it('should throw InvalidInputError if targetSpaceIdOrDomain is missing', async () => {
-    await expect(importSpacePermissions({ exportData: exportedData } as any)).rejects.toThrow(InvalidInputError);
+    await expect(importSpaceData({ exportData: exportedData } as any)).rejects.toThrow(InvalidInputError);
   });
 
   it('should throw NotFoundError for a non-existent target space', async () => {
     const nonExistentDomain = 'nonexistentdomain.com';
     await expect(
-      importSpacePermissions({
+      importSpaceData({
         targetSpaceIdOrDomain: nonExistentDomain,
         exportData: exportedData
       })

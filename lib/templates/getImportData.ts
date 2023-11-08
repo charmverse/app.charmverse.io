@@ -17,7 +17,7 @@ export async function getImportData({
     return exportData;
   }
 
-  const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${exportName}.json`));
+  const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', exportName as string));
 
   const parsedData = JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
