@@ -39,7 +39,7 @@ exports[`src/components/gallery/GalleryCard without block content should match s
         class="gallery-title"
       >
         <div
-          class="css-emwlh8"
+          class="css-jm1ma0"
         >
           <img
             src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
