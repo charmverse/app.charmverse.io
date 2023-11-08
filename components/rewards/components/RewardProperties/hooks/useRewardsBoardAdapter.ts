@@ -121,7 +121,8 @@ function mapRewardToCardPage({
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     // focalboard component expects a timestamp
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
-    [CREATED_AT_ID]: reward && 'createdAt' in reward && reward.createdAt ? new Date(reward.createdAt).getTime() : '',
+    [CREATED_AT_ID]:
+      rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
     ...rewardFields.properties
   };

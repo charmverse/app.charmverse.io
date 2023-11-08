@@ -28,7 +28,7 @@ type Props = {
 
 export function RewardApplications({ rewardId, onShowApplication }: Props) {
   const theme = useTheme();
-  const { showApplication, createApplication } = useApplicationDialog();
+  const { showApplication } = useApplicationDialog();
 
   const { user } = useUser();
 

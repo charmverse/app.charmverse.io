@@ -22,7 +22,8 @@ import {
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
+  STATUS_BLOCK_ID,
+  CREATED_AT_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalFields, ProposalFieldsProp, ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 
@@ -116,6 +117,10 @@ function mapProposalToCardPage({
   proposalFields.properties = {
     ...proposalFields.properties,
     // add default field values on the fly
+    [CREATED_AT_ID]:
+      proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
+        ? new Date(proposalPage?.createdAt).getTime()
+        : '',
     [CATEGORY_BLOCK_ID]: (proposal && 'categoryId' in proposal && proposal.categoryId) || '',
     [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
     [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
