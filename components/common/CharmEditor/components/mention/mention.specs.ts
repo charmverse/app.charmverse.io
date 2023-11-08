@@ -9,7 +9,7 @@ import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './menti
 
 export interface MentionSpecSchemaAttrs {
   value: string;
-  type: 'user' | 'page';
+  type: 'user' | 'page' | 'role';
   id: string;
   createdAt: Date;
   createdBy: string;

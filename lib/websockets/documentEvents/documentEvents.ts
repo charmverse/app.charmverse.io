@@ -550,9 +550,11 @@ export class DocumentEventHandler {
         if (filteredMentions.length) {
           Promise.all(
             filteredMentions.map((mention) => {
-              log.info('Publishing a user mention', {
+              log.info('Publishing a mention', {
                 ...logMeta,
-                mentionedUserId: mention.value
+                mentionId: mention.id,
+                mentionType: mention.type,
+                mentionValue: mention.value
               });
               return publishDocumentEvent({
                 documentId: room.doc.id,

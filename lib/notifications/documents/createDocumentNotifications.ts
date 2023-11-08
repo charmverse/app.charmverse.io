@@ -2,12 +2,82 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { extractMentionFromId, extractMentions } from 'lib/prosemirror/extractMentions';
+import { getPermissionsClient } from 'lib/permissions/api';
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { saveDocumentNotification } from '../saveNotification';
+
+async function getUserIdsFromMentionNode({
+  targetMention,
+  mentionAuthorId,
+  spaceId
+}: {
+  spaceId: string;
+  targetMention: UserMentionMetadata;
+  mentionAuthorId: string;
+}) {
+  const targetUserIds: string[] = [];
+
+  if (targetMention.type === 'role') {
+    if (targetMention.value === 'everyone' || targetMention.value === 'admin') {
+      const spaceRoles = await prisma.spaceRole.findMany({
+        where: {
+          spaceId,
+          isAdmin: targetMention.value === 'admin' ? true : undefined
+        },
+        select: {
+          user: {
+            select: {
+              id: true
+            }
+          }
+        }
+      });
+
+      spaceRoles.forEach((spaceRole) => {
+        if (spaceRole.user.id !== mentionAuthorId) {
+          targetUserIds.push(spaceRole.user.id);
+        }
+      });
+    } else {
+      const role = await prisma.role.findFirstOrThrow({
+        where: {
+          id: targetMention.value
+        },
+        select: {
+          spaceRolesToRole: {
+            select: {
+              spaceRole: {
+                select: {
+                  user: {
+                    select: {
+                      id: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+      role.spaceRolesToRole.forEach(({ spaceRole }) => {
+        if (spaceRole.user.id !== mentionAuthorId) {
+          targetUserIds.push(spaceRole.user.id);
+        }
+      });
+    }
+  }
+
+  if (targetMention.type === 'user' && targetMention.value !== mentionAuthorId) {
+    targetUserIds.push(targetMention.value);
+  }
+
+  return targetUserIds;
+}
 
 export async function createDocumentNotifications(webhookData: {
   createdAt: string;
@@ -17,74 +87,91 @@ export async function createDocumentNotifications(webhookData: {
   const ids: string[] = [];
   switch (webhookData.event.scope) {
     case WebhookEventNames.DocumentMentionCreated: {
-      const mentionedUserId = webhookData.event.mention.value;
       const mentionId = webhookData.event.mention.id;
       const mentionAuthorId = webhookData.event.user.id;
+      const pageId = webhookData.event.document?.id;
+      const postId = webhookData.event.post?.id;
+      let targetMention: UserMentionMetadata | undefined;
       if (webhookData.event.document) {
-        const documentId = webhookData.event.document.id;
         const document = await prisma.page.findUniqueOrThrow({
           where: {
-            id: documentId
+            id: pageId
           },
           select: {
             content: true
           }
         });
         const documentContent = document.content as PageContent;
-        const targetMention = extractMentionFromId(documentContent, mentionId);
-        if (mentionedUserId !== mentionAuthorId && targetMention) {
-          const { id } = await saveDocumentNotification({
-            type: 'mention.created',
-            createdAt: webhookData.createdAt,
-            createdBy: mentionAuthorId,
-            mentionId: webhookData.event.mention.id,
-            pageId: webhookData.event.document.id,
-            spaceId: webhookData.spaceId,
-            userId: mentionedUserId,
-            content: targetMention.parentNode
-          });
-          ids.push(id);
-        } else {
-          log.warn('Ignore user mention - could not find it in the doc', {
-            pageId: documentId,
-            mentionedUserId,
-            mentionAuthorId,
-            targetMention
-          });
-        }
+        targetMention = extractMentions(documentContent).find((mention) => mention.id === mentionId);
       } else if (webhookData.event.post) {
-        const postId = webhookData.event.post.id;
         const post = await prisma.post.findUniqueOrThrow({
           where: {
             id: postId
           },
           select: {
-            content: true
+            content: true,
+            categoryId: true
           }
         });
         const postContent = post.content as PageContent;
-        const targetMention = extractMentionFromId(postContent, mentionId);
+        targetMention = extractMentions(postContent).find((mention) => mention.id === mentionId);
+      }
 
-        if (mentionedUserId !== mentionAuthorId && targetMention) {
-          const { id } = await saveDocumentNotification({
-            type: 'mention.created',
-            createdAt: webhookData.createdAt,
-            createdBy: mentionAuthorId,
-            mentionId: webhookData.event.mention.id,
-            postId: webhookData.event.post.id,
-            spaceId: webhookData.spaceId,
-            userId: mentionedUserId,
-            content: targetMention.parentNode
+      if (!targetMention) {
+        log.warn('Ignore user mention - could not find it in the doc', {
+          pageId,
+          postId,
+          mentionAuthorId,
+          targetMention
+        });
+        break;
+      }
+
+      const targetUserIds = await getUserIdsFromMentionNode({
+        targetMention,
+        mentionAuthorId,
+        spaceId: webhookData.spaceId
+      });
+
+      const permissionsClient = await getPermissionsClient({
+        resourceId: webhookData.spaceId,
+        resourceIdType: 'space'
+      });
+
+      for (const targetUserId of targetUserIds) {
+        let hasReadPermission = false;
+        if (pageId) {
+          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+            resourceId: pageId,
+            userId: targetUserId
           });
-          ids.push(id);
-        } else {
-          log.warn('Ignore user mention - could not find it in the doc', {
-            postId,
-            mentionedUserId,
-            mentionAuthorId,
-            targetMention
+
+          hasReadPermission = pagePermission.read;
+        } else if (postId) {
+          const postPermission = await permissionsClient.client.forum.computePostPermissions({
+            resourceId: postId,
+            userId: targetUserId
           });
+
+          hasReadPermission = postPermission.view_post;
         }
+
+        if (!hasReadPermission) {
+          continue;
+        }
+
+        const { id } = await saveDocumentNotification({
+          type: 'mention.created',
+          createdAt: webhookData.createdAt,
+          createdBy: mentionAuthorId,
+          mentionId,
+          pageId,
+          postId,
+          spaceId: webhookData.spaceId,
+          userId: targetUserId,
+          content: targetMention.parentNode ?? null
+        });
+        ids.push(id);
       }
       break;
     }
@@ -155,20 +242,39 @@ export async function createDocumentNotifications(webhookData: {
         }
       }
 
+      const permissionsClient = await getPermissionsClient({
+        resourceId: webhookData.spaceId,
+        resourceIdType: 'space'
+      });
+
       const extractedMentions = extractMentions(inlineCommentContent);
       for (const extractedMention of extractedMentions) {
-        const mentionedUserId = extractedMention.value;
-        if (mentionedUserId !== inlineCommentAuthorId) {
+        const targetUserIds = await getUserIdsFromMentionNode({
+          targetMention: extractedMention,
+          mentionAuthorId: inlineCommentAuthorId,
+          spaceId: webhookData.spaceId
+        });
+
+        for (const targetUserId of targetUserIds) {
+          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+            resourceId: pageId,
+            userId: targetUserId
+          });
+
+          if (!pagePermission.read) {
+            continue;
+          }
+
           const { id } = await saveDocumentNotification({
             type: 'inline_comment.mention.created',
             createdAt: webhookData.createdAt,
             createdBy: inlineCommentAuthorId,
-            inlineCommentId,
             mentionId: extractedMention.id,
             pageId,
             spaceId,
-            userId: mentionedUserId,
-            content: extractedMention.parentNode
+            userId: targetUserId,
+            content: extractedMention.parentNode ?? null,
+            inlineCommentId
           });
           ids.push(id);
         }
@@ -267,23 +373,57 @@ export async function createDocumentNotifications(webhookData: {
       const commentContent = comment.content as PageContent;
 
       const extractedMentions = extractMentions(commentContent);
+
+      const permissionsClient = await getPermissionsClient({
+        resourceId: webhookData.spaceId,
+        resourceIdType: 'space'
+      });
+
       for (const extractedMention of extractedMentions) {
-        const mentionedUserId = extractedMention.value;
-        const { id } = await saveDocumentNotification({
-          type: 'comment.mention.created',
-          createdAt: webhookData.createdAt,
-          createdBy: commentAuthorId,
-          commentId,
-          mentionId: extractedMention.id,
-          pageId: documentId,
-          postId,
-          pageCommentId: documentId ? commentId : undefined,
-          postCommentId: postId ? commentId : undefined,
-          spaceId,
-          userId: mentionedUserId,
-          content: extractedMention.parentNode
+        const targetUserIds = await getUserIdsFromMentionNode({
+          targetMention: extractedMention,
+          mentionAuthorId: commentAuthorId,
+          spaceId: webhookData.spaceId
         });
-        ids.push(id);
+
+        for (const targetUserId of targetUserIds) {
+          let hasReadPermission = false;
+          if (documentId) {
+            const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+              resourceId: documentId,
+              userId: targetUserId
+            });
+
+            hasReadPermission = pagePermission.read;
+          } else if (postId) {
+            const postPermission = await permissionsClient.client.forum.computePostPermissions({
+              resourceId: postId,
+              userId: targetUserId
+            });
+
+            hasReadPermission = postPermission.view_post;
+          }
+
+          if (!hasReadPermission) {
+            continue;
+          }
+
+          const { id } = await saveDocumentNotification({
+            type: 'comment.mention.created',
+            createdAt: webhookData.createdAt,
+            createdBy: commentAuthorId,
+            mentionId: extractedMention.id,
+            pageId: documentId,
+            postId,
+            spaceId,
+            userId: targetUserId,
+            content: extractedMention.parentNode ?? null,
+            pageCommentId: documentId ? commentId : undefined,
+            postCommentId: postId ? commentId : undefined,
+            commentId
+          });
+          ids.push(id);
+        }
       }
 
       break;

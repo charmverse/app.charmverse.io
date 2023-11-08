@@ -6,8 +6,11 @@ import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
+import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { createProposal } from 'lib/proposal/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
 import { createUserFromWallet } from 'lib/users/createUser';
 import {
@@ -23,6 +26,7 @@ import { builders } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { generateProposalCategory } from 'testing/utils/proposals';
+import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
@@ -32,70 +36,249 @@ describe(`Test document events and notifications`, () => {
   it(`Should create document notifications for mention.created event in a page`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
     const user2 = await generateUser();
+    const user3 = await generateUser();
+
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
     });
-    const mentionId = v4();
+
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: user3.id
+    });
+
+    const role = await createRole({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user2.id
+    });
+
+    const user2Mention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: user2.id,
+      type: 'user'
+    };
+    const user3Mention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: user3.id,
+      type: 'user'
+    };
+    const everyoneMention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: 'everyone',
+      type: 'role'
+    };
+    const roleMention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: role.id,
+      type: 'role'
+    };
+    const adminMention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user2.id,
+      id: v4(),
+      value: 'admin',
+      type: 'role'
+    };
 
     const createdPage = await createPage({
       createdBy: user.id,
       spaceId: space.id,
       content: builders
         .doc(
-          builders.mention({
-            type: 'user',
-            value: user2.id,
-            id: mentionId,
-            createdAt: new Date().toISOString(),
-            createdBy: user.id
-          })
+          builders.mention(user2Mention),
+          builders.mention(user3Mention),
+          builders.mention(everyoneMention),
+          builders.mention(roleMention),
+          builders.mention(adminMention)
         )
-        .toJSON()
-    });
-
-    await createDocumentNotifications({
-      event: {
-        scope: WebhookEventNames.DocumentMentionCreated,
-        document: await getDocumentEntity(createdPage.id),
-        post: null,
-        space: await getSpaceEntity(space.id),
-        user: await getUserEntity(user.id),
-        mention: {
-          createdAt: new Date().toISOString(),
-          createdBy: user.id,
-          id: mentionId,
-          value: user2.id,
-          parentNode: null
+        .toJSON(),
+      pagePermissions: [
+        {
+          permissionLevel: 'view',
+          roleId: role.id
         }
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
+      ]
     });
 
-    const documentNotification = await prisma.documentNotification.findFirst({
+    const document = await getDocumentEntity(createdPage.id);
+    const spaceEntity = await getSpaceEntity(space.id);
+
+    await Promise.all(
+      [user2Mention, user3Mention, everyoneMention, roleMention, adminMention].map(async (mention) =>
+        createDocumentNotifications({
+          event: {
+            scope: WebhookEventNames.DocumentMentionCreated,
+            document,
+            post: null,
+            space: spaceEntity,
+            user: await getUserEntity(mention.createdBy),
+            mention
+          },
+          spaceId: space.id,
+          createdAt: new Date().toISOString()
+        })
+      )
+    );
+
+    const [user2MentionNotification, user3MentionNotification] = await Promise.all(
+      [user2Mention, user3Mention].map((mention) =>
+        prisma.documentNotification.findFirst({
+          where: {
+            type: 'mention.created',
+            mentionId: mention.id,
+            pageId: createdPage.id,
+            notificationMetadata: {
+              spaceId: space.id,
+              userId: mention.value
+            }
+          }
+        })
+      )
+    );
+
+    const adminMentionNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'mention.created',
-        mentionId,
+        mentionId: adminMention.id,
         pageId: createdPage.id,
         notificationMetadata: {
           spaceId: space.id,
-          userId: user2.id
+          userId: user.id
         }
       }
     });
 
-    expect(documentNotification).toBeTruthy();
+    const [everyoneMentionUserNotification, everyoneMentionUser2Notification, everyoneMentionUser3Notification] =
+      await Promise.all(
+        [user, user2, user3].map((_user) =>
+          prisma.documentNotification.findFirst({
+            where: {
+              type: 'mention.created',
+              mentionId: everyoneMention.id,
+              pageId: createdPage.id,
+              notificationMetadata: {
+                spaceId: space.id,
+                userId: _user.id
+              }
+            }
+          })
+        )
+      );
+
+    const [roleMentionUserNotification, roleMentionUser2Notification, roleMentionUser3Notification] = await Promise.all(
+      [user, user2, user3].map((_user) =>
+        prisma.documentNotification.findFirst({
+          where: {
+            type: 'mention.created',
+            mentionId: roleMention.id,
+            pageId: createdPage.id,
+            notificationMetadata: {
+              spaceId: space.id,
+              userId: _user.id
+            }
+          }
+        })
+      )
+    );
+
+    expect(user2MentionNotification).toBeTruthy();
+    expect(user3MentionNotification).toBeFalsy();
+    expect(adminMentionNotification).toBeTruthy();
+    expect(everyoneMentionUserNotification).toBeFalsy();
+    expect(everyoneMentionUser2Notification).toBeTruthy();
+    expect(everyoneMentionUser3Notification).toBeFalsy();
+    expect(roleMentionUserNotification).toBeFalsy();
+    expect(roleMentionUser2Notification).toBeTruthy();
+    expect(roleMentionUser3Notification).toBeFalsy();
   });
 
   it(`Should create document notifications for mention.created event in a post`, async () => {
     const { space, user } = await generateUserAndSpaceWithApiToken();
     const user2 = await generateUser();
+    const user3 = await generateUser();
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
     });
-    const mentionId = v4();
+
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: user3.id
+    });
+
+    const role = await createRole({
+      spaceId: space.id,
+      createdBy: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: user2.id
+    });
+
+    const user2Mention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: user2.id,
+      type: 'user'
+    };
+
+    const user3Mention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: user3.id,
+      type: 'user'
+    };
+
+    const everyoneMention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: 'everyone',
+      type: 'role'
+    };
+
+    const roleMention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user.id,
+      id: v4(),
+      value: role.id,
+      type: 'role'
+    };
+
+    const adminMention: UserMentionMetadata = {
+      createdAt: new Date().toISOString(),
+      createdBy: user2.id,
+      id: v4(),
+      value: 'admin',
+      type: 'role'
+    };
 
     const postCategory = await generatePostCategory({ spaceId: space.id });
 
@@ -103,13 +286,11 @@ describe(`Test document events and notifications`, () => {
       categoryId: postCategory.id,
       content: builders
         .doc(
-          builders.mention({
-            type: 'user',
-            value: user2.id,
-            id: mentionId,
-            createdAt: new Date().toISOString(),
-            createdBy: user.id
-          })
+          builders.mention(user2Mention),
+          builders.mention(user3Mention),
+          builders.mention(everyoneMention),
+          builders.mention(roleMention),
+          builders.mention(adminMention)
         )
         .toJSON(),
       contentText: 'Hello World',
@@ -119,38 +300,102 @@ describe(`Test document events and notifications`, () => {
       title: 'Hello World'
     });
 
-    await createDocumentNotifications({
-      event: {
-        scope: WebhookEventNames.DocumentMentionCreated,
-        post: await getPostEntity(post.id),
-        document: null,
-        space: await getSpaceEntity(space.id),
-        user: await getUserEntity(user.id),
-        mention: {
-          createdAt: new Date().toISOString(),
-          createdBy: user.id,
-          id: mentionId,
-          value: user2.id,
-          parentNode: null
-        }
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
+    await upsertPostCategoryPermission({
+      assignee: { group: 'role', id: role.id },
+      permissionLevel: 'full_access',
+      postCategoryId: postCategory.id
     });
 
-    const documentNotification = await prisma.documentNotification.findFirst({
+    const postEntity = await getPostEntity(post.id);
+    const spaceEntity = await getSpaceEntity(space.id);
+
+    await Promise.all(
+      [user2Mention, user3Mention, everyoneMention, roleMention, adminMention].map(async (mention) =>
+        createDocumentNotifications({
+          event: {
+            scope: WebhookEventNames.DocumentMentionCreated,
+            document: null,
+            post: postEntity,
+            space: spaceEntity,
+            user: await getUserEntity(mention.createdBy),
+            mention
+          },
+          spaceId: space.id,
+          createdAt: new Date().toISOString()
+        })
+      )
+    );
+
+    const [user2MentionNotification, user3MentionNotification] = await Promise.all(
+      [user2Mention, user3Mention].map((mention) =>
+        prisma.documentNotification.findFirst({
+          where: {
+            type: 'mention.created',
+            mentionId: mention.id,
+            postId: post.id,
+            notificationMetadata: {
+              spaceId: space.id,
+              userId: mention.value
+            }
+          }
+        })
+      )
+    );
+
+    const adminMentionNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'mention.created',
-        mentionId,
+        mentionId: adminMention.id,
         postId: post.id,
         notificationMetadata: {
           spaceId: space.id,
-          userId: user2.id
+          userId: user.id
         }
       }
     });
 
-    expect(documentNotification).toBeTruthy();
+    const [everyoneMentionUserNotification, everyoneMentionUser2Notification, everyoneMentionUser3Notification] =
+      await Promise.all(
+        [user, user2, user3].map((_user) =>
+          prisma.documentNotification.findFirst({
+            where: {
+              type: 'mention.created',
+              mentionId: everyoneMention.id,
+              postId: post.id,
+              notificationMetadata: {
+                spaceId: space.id,
+                userId: _user.id
+              }
+            }
+          })
+        )
+      );
+
+    const [roleMentionUserNotification, roleMentionUser2Notification, roleMentionUser3Notification] = await Promise.all(
+      [user, user2, user3].map((_user) =>
+        prisma.documentNotification.findFirst({
+          where: {
+            type: 'mention.created',
+            mentionId: roleMention.id,
+            postId: post.id,
+            notificationMetadata: {
+              spaceId: space.id,
+              userId: _user.id
+            }
+          }
+        })
+      )
+    );
+
+    expect(user2MentionNotification).toBeTruthy();
+    expect(user3MentionNotification).toBeFalsy();
+    expect(adminMentionNotification).toBeTruthy();
+    expect(everyoneMentionUserNotification).toBeFalsy();
+    expect(everyoneMentionUser2Notification).toBeTruthy();
+    expect(everyoneMentionUser3Notification).toBeFalsy();
+    expect(roleMentionUserNotification).toBeFalsy();
+    expect(roleMentionUser2Notification).toBeTruthy();
+    expect(roleMentionUser3Notification).toBeFalsy();
   });
 
   it(`Should create document notifications for inline_comment.created event`, async () => {
