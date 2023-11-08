@@ -70,7 +70,11 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
     permissionFlags: permissions
   };
 
-  result.content = convertDoc(result.content) as any;
+  try {
+    result.content = convertDoc(result.content) as any;
+  } catch (error) {
+    log.error('Could not convert page with old lists', { pageId: result.id, error });
+  }
 
   return res.status(200).json(result);
 }
