@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 
 import { getBoardColorFromColor } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
+import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposals/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
 
 type ProposalCategoryFields = Pick<ProposalCategory, 'title' | 'id' | 'color'>;

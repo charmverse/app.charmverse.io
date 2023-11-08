@@ -3,8 +3,9 @@ import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import type { AnswerData } from 'lib/proposal/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 
-import type { Block } from './block';
-import type { Card } from './card';
+import type { Block } from '../block';
+import type { Card } from '../card';
+
 import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 
 export function generateResyncedProposalEvaluationForCard({

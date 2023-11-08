@@ -12,10 +12,10 @@ import type {
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from '../pages/createCardPage';
+import { createCardPage } from '../../pages/createCardPage';
+import type { BoardFields } from '../board';
+import type { BoardViewFields } from '../boardView';
 
-import type { BoardFields } from './board';
-import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';

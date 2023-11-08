@@ -2,8 +2,8 @@ import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer 
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
-import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
+import { extractCardProposalProperties } from 'lib/focalboard/proposals/extractCardProposalProperties';
+import { extractDatabaseProposalProperties } from 'lib/focalboard/proposals/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
@@ -12,9 +12,9 @@ import type {
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from '../pages/createCardPage';
+import { createCardPage } from '../../pages/createCardPage';
+import type { BoardFields } from '../board';
 
-import type { BoardFields } from './board';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 
