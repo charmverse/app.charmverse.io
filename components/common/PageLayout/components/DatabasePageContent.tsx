@@ -15,7 +15,7 @@ export function DatabaseStickyHeader({ children }: { children: ReactNode }) {
 
 export function DatabaseTitle({ children }: { children: ReactNode }) {
   return (
-    <Box pt={6} className='ViewTitle'>
+    <Box pt={8} className='ViewTitle'>
       <Box mb={2} data-test='board-title'>
         {children}
       </Box>
