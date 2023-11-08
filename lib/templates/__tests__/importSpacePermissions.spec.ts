@@ -225,7 +225,11 @@ describe('importSpacePermissions', () => {
       })
       .then((_roles) => _roles.map((r) => r.id));
 
-    const allPermissions = [...importResult.spacePermissions, ...importResult.proposalCategoryPermissions];
+    const allPermissions = [
+      ...importResult.spacePermissions,
+      ...importResult.proposalCategoryPermissions,
+      ...importResult.postCategoryPermissions
+    ];
 
     allPermissions.forEach((permission) => {
       if (permission.assignee.group === 'space') {
