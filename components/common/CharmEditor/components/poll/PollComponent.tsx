@@ -62,9 +62,7 @@ export function PollNodeView({
           snapshotProposalId={snapshotProposalId || null}
         />
         <div
-          onClick={(e) => {
-            // e.stopPropagation();
-            // e.preventDefault();
+          onClick={() => {
             setShowModal(true);
           }}
         >
@@ -102,5 +100,6 @@ export function PollNodeView({
     );
   }
 
-  return null;
+  // If the poll id in the node attribute doesn't point to any vote, return an empty div
+  return <div />;
 }
