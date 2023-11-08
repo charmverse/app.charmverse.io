@@ -2,6 +2,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getPermissionsClient } from 'lib/permissions/api';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -91,9 +92,7 @@ export async function createDocumentNotifications(webhookData: {
       const mentionAuthorId = webhookData.event.user.id;
       const pageId = webhookData.event.document?.id;
       const postId = webhookData.event.post?.id;
-
       let targetMention: UserMentionMetadata | undefined;
-
       if (webhookData.event.document) {
         const document = await prisma.page.findUniqueOrThrow({
           where: {
@@ -111,7 +110,8 @@ export async function createDocumentNotifications(webhookData: {
             id: postId
           },
           select: {
-            content: true
+            content: true,
+            categoryId: true
           }
         });
         const postContent = post.content as PageContent;
@@ -134,7 +134,33 @@ export async function createDocumentNotifications(webhookData: {
         spaceId: webhookData.spaceId
       });
 
+      const permissionsClient = await getPermissionsClient({
+        resourceId: webhookData.spaceId,
+        resourceIdType: 'space'
+      });
+
       for (const targetUserId of targetUserIds) {
+        let hasReadPermission = false;
+        if (pageId) {
+          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+            resourceId: pageId,
+            userId: targetUserId
+          });
+
+          hasReadPermission = pagePermission.read;
+        } else if (postId) {
+          const postPermission = await permissionsClient.client.forum.computePostPermissions({
+            resourceId: postId,
+            userId: targetUserId
+          });
+
+          hasReadPermission = postPermission.view_post;
+        }
+
+        if (!hasReadPermission) {
+          continue;
+        }
+
         const { id } = await saveDocumentNotification({
           type: 'mention.created',
           createdAt: webhookData.createdAt,
@@ -217,6 +243,11 @@ export async function createDocumentNotifications(webhookData: {
         }
       }
 
+      const permissionsClient = await getPermissionsClient({
+        resourceId: webhookData.spaceId,
+        resourceIdType: 'space'
+      });
+
       const extractedMentions = extractMentions(inlineCommentContent);
       for (const extractedMention of extractedMentions) {
         const targetUserIds = await getUserIdsFromMentionNode({
@@ -226,6 +257,15 @@ export async function createDocumentNotifications(webhookData: {
         });
 
         for (const targetUserId of targetUserIds) {
+          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+            resourceId: pageId,
+            userId: targetUserId
+          });
+
+          if (!pagePermission.read) {
+            continue;
+          }
+
           const { id } = await saveDocumentNotification({
             type: 'inline_comment.mention.created',
             createdAt: webhookData.createdAt,
@@ -334,6 +374,12 @@ export async function createDocumentNotifications(webhookData: {
       const commentContent = comment.content as PageContent;
 
       const extractedMentions = extractMentions(commentContent);
+
+      const permissionsClient = await getPermissionsClient({
+        resourceId: webhookData.spaceId,
+        resourceIdType: 'space'
+      });
+
       for (const extractedMention of extractedMentions) {
         const targetUserIds = await getUserIdsFromMentionNode({
           targetMention: extractedMention,
@@ -342,6 +388,27 @@ export async function createDocumentNotifications(webhookData: {
         });
 
         for (const targetUserId of targetUserIds) {
+          let hasReadPermission = false;
+          if (documentId) {
+            const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+              resourceId: documentId,
+              userId: targetUserId
+            });
+
+            hasReadPermission = pagePermission.read;
+          } else if (postId) {
+            const postPermission = await permissionsClient.client.forum.computePostPermissions({
+              resourceId: postId,
+              userId: targetUserId
+            });
+
+            hasReadPermission = postPermission.view_post;
+          }
+
+          if (!hasReadPermission) {
+            continue;
+          }
+
           const { id } = await saveDocumentNotification({
             type: 'comment.mention.created',
             createdAt: webhookData.createdAt,
