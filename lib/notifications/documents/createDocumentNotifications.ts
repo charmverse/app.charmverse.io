@@ -23,12 +23,11 @@ async function getUserIdsFromMentionNode({
   const targetUserIds: string[] = [];
 
   if (targetMention.type === 'role') {
-    const roleId = targetMention.value;
-    if (roleId === 'everyone' || roleId === 'admin') {
+    if (targetMention.value === 'everyone' || targetMention.value === 'admin') {
       const spaceRoles = await prisma.spaceRole.findMany({
         where: {
           spaceId,
-          isAdmin: roleId === 'admin'
+          isAdmin: targetMention.value === 'admin' ? true : undefined
         },
         select: {
           user: {
