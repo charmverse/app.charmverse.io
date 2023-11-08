@@ -58,7 +58,7 @@ export function PageComments({ page, permissions }: Props) {
   async function createComment(comment: CommentContent) {
     const _createdComment = await addComment(comment);
     setCreatedComment(_createdComment);
-    if (isProposal && proposal?.lensPostLink && !isPublishingToLens) {
+    if (isProposal && proposal?.lensPostLink && !isPublishingToLens && publishCommentsToLens) {
       const lensProfileSetup = await setupLensProfile();
       if (lensProfileSetup) {
         setIsPublishingToLens(true);

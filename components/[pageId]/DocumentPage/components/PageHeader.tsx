@@ -6,7 +6,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import type { ListItemButtonProps } from '@mui/material';
-import { ClickAwayListener, ListItemButton, Menu, Stack } from '@mui/material';
+import { ListItemButton, Menu } from '@mui/material';
 import Box from '@mui/material/Box';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';

@@ -2,11 +2,12 @@ import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { CreateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import { LoadingIcon } from '../LoadingComponent';
 
@@ -66,15 +67,18 @@ export function CommentReply({
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
         <UserDisplay user={user} hideName={true} />
         <Stack gap={1} width='100%'>
-          <InlineCharmEditor
+          <CharmEditor
             colorMode='dark'
             style={{
-              minHeight: 100
+              minHeight: 100,
+              left: 0
             }}
             key={editorKey}
             content={postContent.doc}
             onContentChange={updateCommentContent}
             placeholderText='What are your thoughts?'
+            disableNestedPages
+            disableRowHandles
           />
 
           <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
@@ -99,7 +103,7 @@ export function CommentReply({
               <Button variant='outlined' color='secondary' onClick={onCancelComment}>
                 Cancel
               </Button>
-              <Button disabled={!postContent.rawText} onClick={createCommentReply}>
+              <Button disabled={checkIsContentEmpty(postContent.doc)} onClick={createCommentReply}>
                 Reply
               </Button>
             </Stack>

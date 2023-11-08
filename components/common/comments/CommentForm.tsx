@@ -8,6 +8,7 @@ import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent } from 'lib/comments';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import { LoadingIcon } from '../LoadingComponent';
 
@@ -116,7 +117,11 @@ export function CommentForm({
               )}
             </>
           )}
-          <Button data-test='comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
+          <Button
+            data-test='comment-button'
+            disabled={checkIsContentEmpty(postContent.doc) || disabled}
+            onClick={createPostComment}
+          >
             Comment
           </Button>
         </Stack>
