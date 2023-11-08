@@ -1,9 +1,13 @@
+import type { LensConfig } from '@lens-protocol/react-web';
+import { LensProvider, development, production } from '@lens-protocol/react-web';
+import { bindings } from '@lens-protocol/wagmi';
 import { Paper } from '@mui/material';
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
 import { SettingsContent } from 'components/settings/SettingsContent';
+import { isProdEnv } from 'config/constants';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
@@ -21,6 +25,11 @@ const space = spaces[0];
 
 space.notificationToggles = {
   rewards: false
+};
+
+const lensConfig: LensConfig = {
+  bindings: bindings(),
+  environment: isProdEnv ? production : development
 };
 
 function Context({ children }: { children: ReactNode }) {
@@ -45,7 +54,9 @@ function Context({ children }: { children: ReactNode }) {
         <CurrentSpaceContext.Provider value={spaceContext.current}>
           <MembersProvider>
             <MemberPropertiesProvider>
-              <Paper>{children}</Paper>
+              <LensProvider config={lensConfig}>
+                <Paper>{children}</Paper>
+              </LensProvider>
             </MemberPropertiesProvider>
           </MembersProvider>
         </CurrentSpaceContext.Provider>

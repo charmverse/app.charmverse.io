@@ -1,3 +1,7 @@
+import { isProdEnv } from '@bangle.dev/utils';
+import { production, development, LensProvider } from '@lens-protocol/react-web';
+import type { LensConfig } from '@lens-protocol/react-web';
+import { bindings } from '@lens-protocol/wagmi';
 import { Box, Paper } from '@mui/material';
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
@@ -39,6 +43,11 @@ const reduxStore = mockStateStore([], {
   }
 });
 
+const lensConfig: LensConfig = {
+  bindings: bindings(),
+  environment: isProdEnv ? production : development
+};
+
 function Context({ children }: { children: ReactNode }) {
   // mock the current space since it usually relies on the URL
   const spaceContext = useRef<ICurrentSpaceContext>({
@@ -50,7 +59,9 @@ function Context({ children }: { children: ReactNode }) {
     <UserProvider>
       <CurrentSpaceContext.Provider value={spaceContext.current}>
         <MembersProvider>
-          <Provider store={reduxStore}>{children}</Provider>
+          <Provider store={reduxStore}>
+            <LensProvider config={lensConfig}>{children}</LensProvider>
+          </Provider>
         </MembersProvider>
       </CurrentSpaceContext.Provider>
     </UserProvider>

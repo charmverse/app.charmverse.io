@@ -110,7 +110,7 @@ export function ProposalProperties({
 
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
-      if (account && newStatus === 'discussion' && proposalPage && !proposal.lensPostLink) {
+      if (account && newStatus === 'discussion' && proposalPage && !proposal.lensPostLink && proposal.publishToLens) {
         const lensProfileSetup = await setupLensProfile();
         if (lensProfileSetup) {
           setIsPublishingToLens(true);
