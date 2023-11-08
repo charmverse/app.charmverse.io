@@ -13,7 +13,7 @@ import {
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
-  REVIEWERS_BLOCK_ID,
+  PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertiesBlock } from 'lib/proposal/blocks/interfaces';
@@ -47,7 +47,7 @@ export function getDefaultBoard({
         }
       };
 
-  const cardProperties = [...(block.fields?.cardProperties || []), ...getDefaultProperties({ categories })];
+  const cardProperties = [...getDefaultProperties({ categories }), ...(block.fields?.cardProperties || [])];
 
   block.fields = {
     ...(block.fields || {}),
@@ -67,7 +67,7 @@ function getDefaultProperties({ categories }: { categories: ProposalCategory[] |
     getDefaultStatusProperty(),
     getDefaultEvaluationTypeProperty(),
     proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
-    proposalDbProperties.proposalReviewer(REVIEWERS_BLOCK_ID, 'Reviewer')
+    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewer')
   ];
 }
 
@@ -113,7 +113,7 @@ export function getDefaultTableView({
     [CATEGORY_BLOCK_ID]: 200,
     [STATUS_BLOCK_ID]: 150,
     [AUTHORS_BLOCK_ID]: 150,
-    [REVIEWERS_BLOCK_ID]: 150
+    [PROPOSAL_REVIEWERS_BLOCK_ID]: 150
   };
 
   return view;

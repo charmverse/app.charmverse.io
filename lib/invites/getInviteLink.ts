@@ -1,10 +1,12 @@
 import type { InviteLink, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ValidatedLink } from './validateInviteLink';
+import type { ValidatedLinkResults } from './validateInviteLink';
 import { validateInviteLink } from './validateInviteLink';
 
 export type InviteLinkPopulated = InviteLink & { space: Space };
+
+type ValidatedLink = ValidatedLinkResults & { invite: InviteLinkPopulated };
 
 export async function getInviteLink(code: string): Promise<ValidatedLink | null> {
   const invite = await prisma.inviteLink.findUnique({
@@ -18,7 +20,8 @@ export async function getInviteLink(code: string): Promise<ValidatedLink | null>
   if (!invite) {
     return null;
   }
-  return validateInviteLink({ invite });
+  const { valid, reason } = validateInviteLink({ invite });
+  return { valid, reason, invite };
 }
 
 export async function deleteInviteLink(id: string) {

@@ -17,6 +17,7 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { usePageSidebar } from 'hooks/usePageSidebar';
@@ -106,7 +107,7 @@ type Props = {
 
 export function DocumentPageActionList({ page, onComplete, onDelete, pagePermissions, undoEditorChanges }: Props) {
   const pageId = page.id;
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const { updatePage, deletePage } = usePages();
   const { rewards, mutateRewards: refreshRewards } = useRewards();
   const { showMessage } = useSnackbar();
@@ -170,7 +171,7 @@ export function DocumentPageActionList({ page, onComplete, onDelete, pagePermiss
       pageId
     });
     onComplete();
-    router.push(`/${router.query.domain}/${convertedProposal.path}`);
+    navigateToSpacePath(`/${convertedProposal.path}`);
   }
 
   return (

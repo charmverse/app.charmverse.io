@@ -1,12 +1,13 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
+import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
@@ -18,9 +19,17 @@ import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
+import type { ProposalPropertiesInput } from '../ProposalProperties/ProposalProperties';
 import { ProposalProperties } from '../ProposalProperties/ProposalProperties';
 
-import type { ProposalPageAndPropertiesInput } from './hooks/useProposalDialog';
+export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
+  title?: string; // title is saved to the same state that's used in ProposalPage
+  content?: PageContent | null;
+  contentText?: string;
+  headerImage: string | null;
+  icon: string | null;
+  type: PageType;
+};
 
 type Props = {
   setFormInputs: (params: Partial<ProposalPageAndPropertiesInput>) => void;
@@ -44,7 +53,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
 
   const { proposalTemplates } = useProposalTemplates();
 
-  const router = useRouter();
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
 
   useEffect(() => {
@@ -84,6 +92,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
   return (
     <div className={`document-print-container ${fontClassName}`}>
       <Box display='flex' flexDirection='column'>
+        <PageTemplateBanner pageType={formInputs.type} isNewPage />
         {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
@@ -130,7 +139,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                     readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'
                     proposalFormInputs={formInputs}
-                    showStatus={true}
+                    isTemplate={formInputs.type === 'proposal_template'}
                     title=''
                     setProposalFormInputs={setFormInputs}
                     onChangeRubricCriteria={(rubricCriteria) => {

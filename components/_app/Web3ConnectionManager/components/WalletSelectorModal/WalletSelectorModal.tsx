@@ -13,7 +13,6 @@ import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import type { AnyIdLogin } from 'components/login/components/LoginButton';
 import { useUnstoppableDomains } from 'hooks/useUnstoppableDomains';
-import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { DisabledAccountError } from 'lib/utilities/errors';
 
 import { useWeb3ConnectionManager } from '../../Web3ConnectionManager';
@@ -49,7 +48,7 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
     try {
       await connectAsync({ connector: _connector });
     } catch (err) {
-      log.warn('CONNECTION ERROR', { err });
+      log.warn('Wallet connection error', { error: err });
     }
   };
 
@@ -62,8 +61,9 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
     }
   }, [closeWalletSelectorModal, isConnected, isWalletSelectorModalOpen]);
 
-  const redirectUri = getCallbackDomain(typeof window === 'undefined' ? '' : window.location.hostname).toString();
-  log.info('Connect redirectUri', redirectUri);
+  function isWalletConnected(connectorId?: string) {
+    return !!(connectorId && activeConnector?.id === connectorId);
+  }
 
   async function handleUnstoppableDomainsLogin() {
     unstoppableDomainsLogin({ loginSuccess, onError });
@@ -78,8 +78,8 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
             name={label}
             onClick={connectMetamask}
             iconUrl='metamask.png'
-            disabled={activeConnector?.id === injectedConnector?.id || isLoading}
-            isActive={activeConnector?.id === injectedConnector?.id}
+            disabled={isWalletConnected(injectedConnector?.id) || isLoading}
+            isActive={isWalletConnected(injectedConnector?.id)}
             isLoading={isLoading && pendingConnector?.id === injectedConnector?.id}
           />
         </Grid>
@@ -89,8 +89,8 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
             name='WalletConnect'
             onClick={() => walletConnectConnector && handleConnect(walletConnectConnector)}
             iconUrl='walletconnect.svg'
-            disabled={activeConnector?.id === walletConnectConnector?.id || isLoading}
-            isActive={activeConnector?.id === walletConnectConnector?.id}
+            disabled={isWalletConnected(walletConnectConnector?.id) || isLoading}
+            isActive={isWalletConnected(walletConnectConnector?.id)}
             isLoading={isLoading && pendingConnector?.id === walletConnectConnector?.id}
           />
         </Grid>
@@ -99,8 +99,8 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
             name='Coinbase Wallet'
             onClick={() => coinbaseWalletConnector && handleConnect(coinbaseWalletConnector)}
             iconUrl='coinbasewallet.png'
-            disabled={activeConnector?.id === coinbaseWalletConnector?.id || isLoading}
-            isActive={activeConnector?.id === coinbaseWalletConnector?.id}
+            disabled={isWalletConnected(coinbaseWalletConnector?.id) || isLoading}
+            isActive={isWalletConnected(coinbaseWalletConnector?.id)}
             isLoading={isLoading && pendingConnector?.id === coinbaseWalletConnector?.id}
           />
         </Grid>

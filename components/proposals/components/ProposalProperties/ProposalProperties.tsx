@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type { ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
+import type { PageType, ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
@@ -60,6 +60,7 @@ export type ProposalPropertiesInput = {
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
   fields: ProposalFields;
+  type: PageType;
 };
 
 type ProposalPropertiesProps = {
@@ -86,7 +87,7 @@ type ProposalPropertiesProps = {
   draftRubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
-  showStatus?: boolean;
+  isTemplate: boolean;
   snapshotProposalId?: string | null;
   userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
@@ -117,7 +118,7 @@ export function ProposalProperties({
   draftRubricAnswers = [],
   rubricCriteria,
   setProposalFormInputs,
-  showStatus,
+  isTemplate,
   snapshotProposalId,
   userId,
   updateProposalStatus,
@@ -181,6 +182,7 @@ export function ProposalProperties({
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
+  const showStatusStepper = !isTemplate;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const myRubricAnswers = useMemo(
     () => rubricAnswers.filter((answer) => answer.userId === userId),
@@ -324,7 +326,7 @@ export function ProposalProperties({
       mt={2}
     >
       <div className='octo-propertylist'>
-        {showStatus && (
+        {showStatusStepper && (
           <>
             <Grid container mb={2}>
               {!isNewProposal && (
@@ -356,7 +358,7 @@ export function ProposalProperties({
           </>
         )}
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-          {showStatus && (
+          {showStatusStepper && (
             <Box mt={2} mb={2}>
               <ProposalStepper
                 proposalFlowPermissions={proposalFlowFlags}
@@ -386,7 +388,7 @@ export function ProposalProperties({
           </Box>
 
           {/* Select a template */}
-          {isNewProposal && (
+          {isNewProposal && proposalFormInputs.type !== 'proposal_template' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly highlighted>

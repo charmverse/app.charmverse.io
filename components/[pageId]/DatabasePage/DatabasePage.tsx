@@ -64,14 +64,18 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     const firstBoardView = boardViews.find((view) => view.parentId === boardId);
 
     if (!urlViewId && firstBoardView) {
-      router.replace({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          viewId: firstBoardView.id,
-          cardId: router.query.cardId ?? ''
-        }
-      });
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            viewId: firstBoardView.id,
+            cardId: router.query.cardId ?? ''
+          }
+        },
+        undefined,
+        { shallow: true }
+      );
       return;
     }
 

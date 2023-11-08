@@ -4,27 +4,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import {
-  useProposalDialog,
-  type ProposalPageAndPropertiesInput
-} from 'components/proposals/components/ProposalDialog/hooks/useProposalDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+
+import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
 type Props = {
-  newProposal?: Partial<ProposalPageAndPropertiesInput>;
+  newProposal: Partial<ProposalPageAndPropertiesInput> | null;
 };
 
 export function useNewProposal({ newProposal }: Props) {
   const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
-  const { showProposal } = useProposalDialog();
   const { mutatePage } = usePages();
   const router = useRouter();
   const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
@@ -82,7 +77,8 @@ export function useNewProposal({ newProposal }: Props) {
           title: formInputs.title,
           sourceTemplateId: formInputs.proposalTemplateId,
           headerImage: formInputs.headerImage,
-          icon: formInputs.icon
+          icon: formInputs.icon,
+          type: formInputs.type
         },
         evaluationType: formInputs.evaluationType,
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -100,13 +96,9 @@ export function useNewProposal({ newProposal }: Props) {
         const { proposal, ...page } = createdProposal;
         mutatePage(page);
         mutate(`/api/spaces/${currentSpace.id}/proposals`);
-        showProposal({
-          pageId: page.id,
-          onClose() {
-            setUrlWithoutRerender(router.pathname, { id: null });
-          }
+        router.push({ pathname: router.pathname, query: { domain: router.query.domain, id: page.id } }, undefined, {
+          shallow: true
         });
-        setUrlWithoutRerender(router.pathname, { id: page.id });
         setContentUpdated(false);
       }
     }
@@ -162,6 +154,7 @@ export function emptyState({
     reviewers: [],
     rubricCriteria: [],
     title: '',
+    type: 'proposal',
     publishToLens: false,
     fields: { properties: {} },
     ...inputs,

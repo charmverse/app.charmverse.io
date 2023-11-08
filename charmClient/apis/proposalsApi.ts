@@ -30,16 +30,6 @@ export class ProposalsApi {
     return http.POST<ProposalWithUsers>(`/api/proposals/${proposalId}/archive`, { archived });
   }
 
-  createProposalTemplate({
-    spaceId,
-    categoryId
-  }: {
-    spaceId: string;
-    categoryId: string;
-  }): Promise<PageWithPermissions> {
-    return http.POST('/api/proposals/templates', { spaceId, categoryId });
-  }
-
   deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
