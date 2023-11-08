@@ -17,20 +17,18 @@ export function RewardsPageWithProviders() {
   setTitle(rewardsTitle);
 
   return (
-    <NewPageProvider>
-      <PageDialogProvider>
-        <RewardsProvider>
-          <RewardBlocksProvider>
-            <RewardsBoardProvider>
-              <ApplicationDialogProvider>
-                <RewardsPage title={rewardsTitle} />
-                <ApplicationDialog />
-                <PageDialogGlobal />
-              </ApplicationDialogProvider>
-            </RewardsBoardProvider>
-          </RewardBlocksProvider>
-        </RewardsProvider>
-      </PageDialogProvider>
-    </NewPageProvider>
+    <PageDialogProvider>
+      <RewardsProvider>
+        <RewardBlocksProvider>
+          <RewardsBoardProvider>
+            <ApplicationDialogProvider>
+              <RewardsPage title={rewardsTitle} />
+              <ApplicationDialog />
+              <PageDialogGlobal />
+            </ApplicationDialogProvider>
+          </RewardsBoardProvider>
+        </RewardBlocksProvider>
+      </RewardsProvider>
+    </PageDialogProvider>
   );
 }
