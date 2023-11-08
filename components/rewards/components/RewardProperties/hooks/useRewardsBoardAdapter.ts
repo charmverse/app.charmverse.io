@@ -15,6 +15,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
   ASSIGNEES_BLOCK_ID,
+  CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
   REWARDER_BLOCK_ID,
@@ -120,6 +121,7 @@ function mapRewardToCardPage({
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     // focalboard component expects a timestamp
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
+    [CREATED_AT_ID]: reward && 'createdAt' in reward && reward.createdAt ? new Date(reward.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
     ...rewardFields.properties
   };

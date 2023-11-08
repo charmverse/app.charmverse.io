@@ -11,7 +11,8 @@ import {
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  CREATED_AT_ID
 } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesBlock } from 'lib/rewards/blocks/interfaces';
 
@@ -47,6 +48,7 @@ export function getDefaultBoard({
 
 function getDefaultProperties() {
   return [
+    rewardDbProperties.rewardCreatedAt(CREATED_AT_ID, 'Created At'),
     rewardDbProperties.rewardDueDate(DUE_DATE_ID, 'Due Date'),
     rewardDbProperties.rewardAssignees(ASSIGNEES_BLOCK_ID, 'Assigned'),
     rewardDbProperties.rewardReviewers(REWARD_REVIEWERS_BLOCK_ID, 'Reviewer'),
@@ -72,6 +74,14 @@ export function getDefaultTableView({ storedBoard }: { storedBoard: RewardProper
 
   // Wrap title comumn by default
   view.fields.columnWrappedIds = [Constants.titleColumnId];
+
+  // Default sorty by latest entries
+  view.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+
+  // Hide createdAt by default
+  view.fields.visiblePropertyIds = view.fields.visiblePropertyIds
+    ? view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID)
+    : [];
 
   return view;
 }

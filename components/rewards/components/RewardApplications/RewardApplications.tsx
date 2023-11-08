@@ -28,7 +28,7 @@ type Props = {
 
 export function RewardApplications({ rewardId, onShowApplication }: Props) {
   const theme = useTheme();
-  const { showApplication } = useApplicationDialog();
+  const { showApplication, createApplication } = useApplicationDialog();
 
   const { user } = useUser();
 
@@ -41,10 +41,6 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
   }
 
   const openApplication = (applicationId: string) => {
-    showApplication(applicationId);
-    setTimeout(() => onShowApplication?.(), 50);
-  };
-  const openNewApplication = (applicationId: string) => {
     showApplication(applicationId);
     setTimeout(() => onShowApplication?.(), 50);
   };
@@ -82,7 +78,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
           >
             There are no submissions yet.
           </Typography>
-          <NewWorkButton rewardId={rewardId} />
+          <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
         </Box>
       </Stack>
     );
