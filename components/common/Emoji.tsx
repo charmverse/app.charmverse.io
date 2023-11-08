@@ -9,9 +9,6 @@ import { isMac } from 'lib/utilities/browser';
 type ImgSize = 'large' | 'small';
 
 export const Emoji = styled.div<{ size?: ImgSize }>`
-  /* font family taken from Notion */
-  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', NotoColorEmoji, 'Noto Color Emoji', 'Segoe UI Symbol',
-    'Android Emoji', EmojiSymbols;
   font-size: ${({ size }) => (size === 'large' ? '78px' : 'inherit')};
   overflow: hidden;
   white-space: nowrap;
@@ -38,13 +35,6 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
       `;
     }
   }}
-  span {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
   img {
     border-radius: ${({ size }) => (size === 'large' ? '6px' : '3px')};
     height: ${({ size }) => (size === 'large' ? '100%' : '18px')};
@@ -81,7 +71,6 @@ function EmojiIcon({
     iconContent = (
       <img
         src={icon}
-        // Transferred from notion
         style={{
           objectFit: 'cover'
         }}
