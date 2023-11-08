@@ -47,9 +47,18 @@ export function useRewardsBoardAdapter() {
     // use saved default block or build on the fly
     const viewBlock = rewardBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
-    return viewBlock
-      ? (blockToFBBlock(viewBlock) as BoardView)
-      : getDefaultTableView({ storedBoard: rewardPropertiesBlock });
+    if (!viewBlock) {
+      return getDefaultTableView({ storedBoard: rewardPropertiesBlock });
+    }
+
+    const boardView = blockToFBBlock(viewBlock) as BoardView;
+
+    // sort by created at desc by default
+    if (!boardView.fields.sortOptions?.length) {
+      boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+    }
+
+    return boardView;
   }, [rewardPropertiesBlock, rewardBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
