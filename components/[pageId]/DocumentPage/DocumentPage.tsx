@@ -82,7 +82,7 @@ export interface DocumentPageProps {
 function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
-  const { activeView: sidebarView, isInsideDialog } = usePageSidebar();
+  const { activeView: sidebarView } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
