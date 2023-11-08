@@ -1,28 +1,38 @@
+import type { PageMeta } from '@charmverse/core/pages';
+
 import { getSpace } from 'lib/spaces/getSpace';
 
 import type { SpaceDataExport } from './exportSpaceData';
-import { getImportData } from './getImportData';
 import { importProposalCategories } from './importProposalCategories';
 import { importRoles } from './importRoles';
 import { importSpacePermissions } from './importSpacePermissions';
 import { importWorkspacePages } from './importWorkspacePages';
 import type { ImportParams } from './interfaces';
 
-export type SpaceDataImportResult = SpaceDataExport;
+export type SpaceDataImportResult = Omit<SpaceDataExport, 'pages'> & {
+  pages: PageMeta[];
+  oldNewHashMaps: {
+    roles: Record<string, string>;
+    proposalCategories: Record<string, string>;
+    pages: Record<string, string>;
+  };
+};
 
 export async function importSpaceData(importParams: ImportParams): Promise<SpaceDataImportResult> {
   const targetSpace = await getSpace(importParams.targetSpaceIdOrDomain);
 
-  const { oldNewRecordIdHashMap, pages } = await importWorkspacePages({
+  const { roles, oldNewRecordIdHashMap } = await importRoles(importParams);
+
+  const { proposalCategories, oldNewIdMap } = await importProposalCategories(importParams);
+
+  const { proposalCategoryPermissions, spacePermissions } = await importSpacePermissions(importParams);
+
+  const { pages, oldNewRecordIdHashMap: oldNewPageIdMap } = await importWorkspacePages({
     ...importParams,
-    resetPaths: true
+    updateTitle: false,
+    resetPaths: true,
+    includePermissions: false
   });
-
-  const { roles } = await importRoles(importParams);
-
-  const { proposalCategories } = await importProposalCategories(importParams);
-
-  const { proposalCategoryPermissions, roles } = await importSpacePermissions(importParams);
 
   return {
     pages,
@@ -30,6 +40,12 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
     permissions: {
       proposalCategoryPermissions,
       spacePermissions
+    },
+    proposalCategories,
+    oldNewHashMaps: {
+      roles: oldNewRecordIdHashMap,
+      proposalCategories: oldNewIdMap,
+      pages: oldNewPageIdMap
     }
   };
 }

@@ -3,11 +3,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { getSpace } from 'lib/spaces/getSpace';
 
-export type RoleExport = {
+export type ProposalsExport = {
   proposalCategories: ProposalCategory[];
 };
 
-export async function exportSpaceProposalCategories({ spaceIdOrDomain }: { spaceIdOrDomain: string }) {
+export async function exportSpaceProposalCategories({
+  spaceIdOrDomain
+}: {
+  spaceIdOrDomain: string;
+}): Promise<ProposalsExport> {
   const space = await getSpace(spaceIdOrDomain);
 
   const proposalCategories = await prisma.proposalCategory.findMany({
