@@ -173,7 +173,13 @@ export async function createUserAndSpace({
   };
 }
 
-export async function generateUser({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {
+export async function generateUser({
+  walletAddress = Wallet.createRandom().address,
+  space
+}: {
+  walletAddress?: string;
+  space?: { id: string; isAdmin?: boolean };
+} = {}) {
   const user = await prisma.user.create({
     data: {
       identityType: 'Wallet',
@@ -186,8 +192,58 @@ export async function generateUser({ walletAddress = Wallet.createRandom().addre
       }
     }
   });
+  if (space) {
+    await prisma.spaceRole.create({
+      data: {
+        space: { connect: { id: space.id } },
+        user: { connect: { id: user.id } },
+        isAdmin: space.isAdmin,
+        onboarded: true
+      }
+    });
+  }
 
   return user;
+}
+
+export async function grantForumModeratorAccess({
+  userId,
+  spaceId,
+  categoryId
+}: {
+  userId: string;
+  spaceId: string;
+  categoryId: string;
+}) {
+  // Create a moderation role and assign it to the moderator
+  const moderationRole = await prisma.role.create({
+    data: {
+      space: { connect: { id: spaceId } },
+      name: 'Forum Moderator',
+      createdBy: userId,
+      spaceRolesToRole: {
+        create: {
+          spaceRole: {
+            connect: {
+              spaceUser: {
+                spaceId,
+                userId
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Allow the moderation role to moderate posts in this category
+  await prisma.postCategoryPermission.create({
+    data: {
+      permissionLevel: 'moderator',
+      postCategory: { connect: { id: categoryId } },
+      role: { connect: { id: moderationRole.id } }
+    }
+  });
 }
 
 export async function generateDiscordUser() {

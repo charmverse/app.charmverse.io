@@ -16,7 +16,7 @@ import { RewardApplicationPageComponent } from './RewardApplicationPage/RewardAp
 export function ApplicationDialog() {
   const mounted = useRef(false);
   const router = useRouter();
-  const { isOpen, hideApplication, currentApplicationId } = useApplicationDialog();
+  const { isOpen, hideApplication, currentApplicationId, currentRewardId } = useApplicationDialog();
 
   const { isLoading } = useApplication({ applicationId: currentApplicationId as string });
   const [contentUpdated, setContentUpdated] = useState(false);
@@ -77,9 +77,9 @@ export function ApplicationDialog() {
     >
       {isLoading ? (
         <LoadingComponent isLoading />
-      ) : currentApplicationId ? (
+      ) : currentApplicationId || currentRewardId ? (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <RewardApplicationPageComponent applicationId={currentApplicationId} />
+        <RewardApplicationPageComponent applicationId={currentApplicationId} rewardId={currentRewardId} />
       ) : null}
       <ConfirmDeleteModal
         onClose={() => {

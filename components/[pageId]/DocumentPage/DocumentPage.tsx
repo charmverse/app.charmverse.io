@@ -76,9 +76,10 @@ export interface DocumentPageProps {
   refreshPage: () => Promise<any>;
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
+  close?: VoidFunction;
 }
 
-function DocumentPage({ page, refreshPage, savePage, readOnly = false }: DocumentPageProps) {
+function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
   const { activeView: sidebarView, isInsideDialog } = usePageSidebar();
@@ -157,6 +158,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
 
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  // TODO: this logic should be removed when we release rewards in place of bounties
   const isRewardsPage = router.pathname.endsWith('/rewards');
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -307,7 +309,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       snapshotProposalId={page.snapshotProposalId}
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
-                      isTemplate={page.type === 'proposal_template'}
                       title={page.title}
                       proposalPage={page}
                     />
@@ -328,18 +329,12 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false }: Documen
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
+                      onClose={close}
+                      showApplications
                     />
                   )}
                 </CardPropertiesWrapper>
               </CharmEditor>
-
-              {/** REACTIVATE WHEN WORKING ON SUBMISSIONS AND READY TO MERGE 
-               * {page.bountyId && (
-                <Box mt='-100px'>
-                  <RewardSubmissionsTable openApplication={showApplication} rewardId={page.bountyId} />
-                </Box>
-              )}
-              */}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') &&
                 pagePermissions.comment && (

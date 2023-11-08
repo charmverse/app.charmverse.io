@@ -1,4 +1,4 @@
-import type { ProfilePictureSetFragment, ProfileFragment } from '@lens-protocol/client';
+import type { Profile } from '@lens-protocol/react-web';
 import LanguageIcon from '@mui/icons-material/Language';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import { Divider, Link, Stack, Typography } from '@mui/material';
@@ -27,10 +27,10 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
   );
 }
 
-export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
+export function LensProfileWidget({ lensProfile }: { lensProfile: Profile }) {
   return (
     <ProfileWidget
-      link={`https://www.lensfrens.xyz/${lensProfile.handle}`}
+      link={`https://www.lensfrens.xyz/${lensProfile.handle?.localName}`}
       title='Lens Protocol'
       avatarSrc='/images/logos/lens_logo.svg'
     >
@@ -38,8 +38,12 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
         <Stack direction='row' spacing={1}>
           <Avatar
             size='large'
-            name={lensProfile.name ?? ''}
-            avatar={(lensProfile.picture as ProfilePictureSetFragment)?.original?.url}
+            name={lensProfile.handle?.fullHandle ?? lensProfile.metadata?.displayName ?? lensProfile.id}
+            avatar={
+              lensProfile.metadata?.picture?.__typename === 'ImageSet'
+                ? lensProfile.metadata?.picture?.raw.uri
+                : lensProfile.metadata?.picture?.image?.raw?.uri
+            }
             variant='circular'
           />
           <Stack>
@@ -53,7 +57,7 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
               }}
             >
               <Typography variant='body1' fontWeight='bold'>
-                {lensProfile.name ?? lensProfile.handle}
+                {lensProfile.metadata?.displayName ?? lensProfile.handle?.fullHandle}
               </Typography>
               <Typography
                 variant='subtitle2'
@@ -66,18 +70,18 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
                 #{lensProfile.id}
               </Typography>
             </Stack>
-            <Typography variant='subtitle1'>{lensProfile.handle}</Typography>
+            <Typography variant='subtitle1'>{lensProfile.handle?.fullHandle}</Typography>
           </Stack>
         </Stack>
         <Stack direction='row'>
           <Typography variant='body2'>
-            Followers: {lensProfile.stats?.totalFollowers ?? 0} | Following: {lensProfile.stats?.totalFollowing ?? 0}
+            Followers: {lensProfile.stats?.followers ?? 0} | Following: {lensProfile.stats?.following ?? 0}
           </Typography>
         </Stack>
         <Divider />
-        <Typography variant='subtitle1'>{lensProfile.bio}</Typography>
+        <Typography variant='subtitle1'>{lensProfile.metadata?.bio}</Typography>
 
-        {(lensProfile.attributes ?? []).map((attribute) => {
+        {(lensProfile.metadata?.attributes ?? []).map((attribute) => {
           if (attribute.key === 'website') {
             return (
               <LensProfileAttributes

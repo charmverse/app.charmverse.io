@@ -12,15 +12,16 @@ import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
+import { ProposalDialog } from 'components/proposals/components/ProposalDialog/ProposalDialog';
 import { useProposalsBoardMutator } from 'components/proposals/components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
+import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
 import { ProposalsViewOptions } from './components/ProposalViewOptions/ProposalsViewOptions';
 import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
@@ -30,6 +31,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter, proposals } = useProposals();
+  const [newProposal, setNewProposal] = useState<Partial<ProposalPageAndPropertiesInput> | null>(null);
 
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
@@ -37,7 +39,7 @@ export function ProposalsPage({ title }: { title: string }) {
 
   const isAdmin = useIsAdmin();
 
-  const { showProposal, hideProposal } = useProposalDialog();
+  const { props, showProposal, hideProposal } = useProposalDialog();
   const { board: activeBoard, views, cardPages, activeView, cards } = useProposalsBoard();
   const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
@@ -61,19 +63,21 @@ export function ProposalsPage({ title }: { title: string }) {
 
   useProposalsBoardMutator();
 
-  function onClose() {
-    setUrlWithoutRerender(router.pathname, { id: null });
-    hideProposal();
-  }
-
   function openPage(pageId: string | null) {
     if (!pageId) return;
 
-    setUrlWithoutRerender(router.pathname, { id: pageId });
-    showProposal({
-      pageId,
-      onClose
-    });
+    const { pathname } = router;
+    router.push({ pathname, query: { domain: router.query.domain, id: pageId } }, undefined, { shallow: true });
+  }
+
+  function closeDialog() {
+    const { pathname } = router;
+    router.push({ pathname, query: { domain: router.query.domain } }, undefined, { shallow: true });
+    setNewProposal(null);
+  }
+
+  function showNewProposal(input: Partial<ProposalPageAndPropertiesInput> = {}) {
+    setNewProposal(input);
   }
 
   const onDelete = useCallback(async (proposalId: string) => {
@@ -83,9 +87,10 @@ export function ProposalsPage({ title }: { title: string }) {
   useEffect(() => {
     if (typeof router.query.id === 'string') {
       showProposal({
-        pageId: router.query.id,
-        onClose
+        pageId: router.query.id
       });
+    } else {
+      hideProposal();
     }
   }, [router.query.id]);
 
@@ -118,7 +123,7 @@ export function ProposalsPage({ title }: { title: string }) {
                       flexDirection: 'row-reverse'
                     }}
                   >
-                    <NewProposalButton />
+                    <NewProposalButton showProposal={openPage} showNewProposal={showNewProposal} />
                   </Box>
                 </Box>
               </Box>
@@ -218,6 +223,9 @@ export function ProposalsPage({ title }: { title: string }) {
           </>
         )}
       </Box>
+      {(props.pageId || newProposal) && (
+        <ProposalDialog pageId={props.pageId} newProposal={newProposal} closeDialog={closeDialog} />
+      )}
     </div>
   );
 }

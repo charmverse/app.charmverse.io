@@ -87,6 +87,13 @@ export const getTestWagmiConfig = () => {
               isAuthorized: true
             }
           }
+        }),
+        new InjectedConnector({
+          chains,
+          options: {
+            name: 'Injected',
+            shimDisconnect: true
+          }
         })
       ],
       publicClient: createPublicClient({

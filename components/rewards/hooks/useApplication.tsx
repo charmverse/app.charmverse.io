@@ -5,6 +5,8 @@ import { useGetApplication, useGetRewardPermissions } from 'charmClient/hooks/re
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 import type { WorkUpsertData } from 'lib/rewards/work';
 
+export type WorkInput = Omit<WorkUpsertData, 'userId'>;
+
 export function useApplication({ applicationId }: { applicationId: string }) {
   const { data: application, mutate: refreshApplication, isLoading } = useGetApplication({ applicationId });
 
@@ -19,7 +21,7 @@ export function useApplication({ applicationId }: { applicationId: string }) {
   );
 
   const updateApplication = useCallback(
-    async (input: Omit<WorkUpsertData, 'userId'>) => {
+    async (input: WorkInput) => {
       await charmClient.rewards.work(input);
       refreshApplication();
     },

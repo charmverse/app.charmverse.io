@@ -50,7 +50,7 @@ export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refre
   return (
     <>
       {/* Bounty price and status  */}
-      <Grid container mb={2}>
+      <Grid container mb={1}>
         <Grid item xs={6}>
           <Typography fontWeight='bold'>Reward information</Typography>
         </Grid>

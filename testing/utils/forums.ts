@@ -5,21 +5,33 @@ import { v4 } from 'uuid';
 import { getPostCategoryPath } from 'lib/forums/categories/getPostCategoryPath';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
+import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 
 export async function generatePostCategory({
   spaceId,
-  name = `Category-${Math.random()}`
+  name = `Category-${Math.random()}`,
+  fullAccess
 }: {
   spaceId: string;
   name?: string;
+  fullAccess?: boolean;
 }): Promise<Required<PostCategory>> {
-  return prisma.postCategory.create({
+  const category = await prisma.postCategory.create({
     data: {
       name,
       spaceId,
       path: getPostCategoryPath(name)
     }
   });
+  if (fullAccess) {
+    // Allow the entire space to create posts and participate in this category
+    await upsertPostCategoryPermission({
+      assignee: { group: 'space', id: spaceId },
+      permissionLevel: 'full_access',
+      postCategoryId: category.id
+    });
+  }
+  return category;
 }
 
 export async function generatePostWithComment({

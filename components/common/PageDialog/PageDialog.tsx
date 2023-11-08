@@ -139,7 +139,9 @@ export function PageDialog(props: Props) {
       }
       onClose={close}
     >
-      {page && <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} />}
+      {page && (
+        <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} close={close} />
+      )}
     </Dialog>
   );
 }

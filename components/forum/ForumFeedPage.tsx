@@ -6,13 +6,13 @@ import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { debounce } from 'lodash';
-import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -29,7 +29,7 @@ import { usePostCategoryPermissions } from './hooks/usePostCategoryPermissions';
 
 export function ForumPage() {
   const [search, setSearch] = useState('');
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
   const { createPost, showPost } = usePostDialog();
@@ -59,7 +59,7 @@ export function ForumPage() {
 
     // User tried to navigate to a category they cannot access or does not exist, redirect them to forum home
     if (category === undefined && !isCategoriesLoading && currentSpace) {
-      router.push(`/${currentSpace.domain}/forum`);
+      navigateToSpacePath(`/forum`);
     } else if (category && currentSpace) {
       charmClient.track.trackAction('main_feed_filtered', {
         categoryName: category.name,

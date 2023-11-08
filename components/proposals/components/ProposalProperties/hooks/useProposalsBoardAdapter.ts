@@ -1,3 +1,4 @@
+import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { useMemo, useState } from 'react';
@@ -20,11 +21,10 @@ import {
   CATEGORY_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
-  REVIEWERS_BLOCK_ID,
+  PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
-import type { ProposalFields, ProposalFieldsProp } from 'lib/proposal/blocks/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import type { ProposalFields, ProposalFieldsProp, ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 
 export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsProp;
 
@@ -75,7 +75,11 @@ export function useProposalsBoardAdapter() {
   });
 
   // card from current proposal
-  const card: Card = mapProposalToCardPage({ proposal: boardProposal, proposalPage, spaceId: space?.id }).card;
+  const card: Card<ProposalPropertyValue> = mapProposalToCardPage({
+    proposal: boardProposal,
+    proposalPage,
+    spaceId: space?.id
+  }).card;
 
   // each proposal with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
@@ -116,11 +120,18 @@ function mapProposalToCardPage({
     [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
     [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
-    [REVIEWERS_BLOCK_ID]:
-      (proposal && 'reviewers' in proposal && proposal.reviewers?.map((r) => r.userId).filter(isTruthy)) || ''
+    [PROPOSAL_REVIEWERS_BLOCK_ID]:
+      proposal && 'reviewers' in proposal
+        ? proposal.reviewers.map(
+            (r) =>
+              ({ group: r.userId ? 'user' : 'role', id: r.userId ?? r.roleId } as TargetPermissionGroup<
+                'user' | 'role'
+              >)
+          )
+        : []
   };
 
-  const card: Card = {
+  const card: Card<ProposalPropertyValue> = {
     id: proposal?.id || '',
     spaceId: proposalSpaceId,
     parentId: '',
