@@ -37,7 +37,7 @@ type Props = {
   rewardId?: string | null;
 };
 
-export function RewardApplicationPageComponent({ applicationId, rewardId }: Props) {
+export function RewardApplicationPage({ applicationId, rewardId }: Props) {
   const isNewApplication = !applicationId && !!rewardId;
 
   const { application, refreshApplication, applicationRewardPermissions, updateApplication, reviewApplication } =

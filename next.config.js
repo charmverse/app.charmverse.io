@@ -102,6 +102,12 @@ const config = {
         source: '/signup',
         destination: '/createSpace',
         permanent: true
+      },
+      // added 11/2023 to redirect old /bounties route to /rewards
+      {
+        source: '/:domain/bounties',
+        destination: '/:domain/rewards',
+        permanent: true
       }
     ];
   },

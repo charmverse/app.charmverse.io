@@ -1,5 +1,6 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 
@@ -11,9 +12,12 @@ import { useApplication } from 'components/rewards/hooks/useApplication';
 
 import { useApplicationDialog } from '../hooks/useApplicationDialog';
 
-import { RewardApplicationPageComponent } from './RewardApplicationPage/RewardApplicationPage';
+const RewardApplicationPage = dynamic(
+  () => import('./RewardApplicationPage/RewardApplicationPage').then((mod) => mod.RewardApplicationPage),
+  { ssr: false }
+);
 
-export function ApplicationDialog() {
+export function RewardApplicationDialog() {
   const mounted = useRef(false);
   const router = useRouter();
   const { isOpen, hideApplication, currentApplicationId, currentRewardId } = useApplicationDialog();
@@ -79,7 +83,7 @@ export function ApplicationDialog() {
         <LoadingComponent isLoading />
       ) : currentApplicationId || currentRewardId ? (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <RewardApplicationPageComponent applicationId={currentApplicationId} rewardId={currentRewardId} />
+        <RewardApplicationPage applicationId={currentApplicationId} rewardId={currentRewardId} />
       ) : null}
       <ConfirmDeleteModal
         onClose={() => {

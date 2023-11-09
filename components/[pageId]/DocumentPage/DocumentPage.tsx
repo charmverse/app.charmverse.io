@@ -38,7 +38,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
-const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
+// const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
@@ -92,7 +92,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
     bountyId: page.bountyId
   });
 
-  const { draftBounty } = useBounties();
+  // TODO: [bounties-cleanup]
+  // const { draftBounty } = useBounties();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -158,8 +159,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
 
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
-  // TODO: this logic should be removed when we release rewards in place of bounties
-  const isRewardsPage = router.pathname.endsWith('/rewards');
+
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
@@ -313,7 +313,9 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       proposalPage={page}
                     />
                   )}
-                  {(draftBounty || page.bountyId) && !isRewardsPage && (
+
+                  {/* TODO: [bounties-cleanup] */}
+                  {/* {(draftBounty || page.bountyId) && !isRewardsPage && (
                     <BountyProperties
                       bountyId={page.bountyId}
                       pageId={page.id}
@@ -322,8 +324,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       permissions={bountyPermissions}
                       refreshBountyPermissions={() => refreshBountyPermissions()}
                     />
-                  )}
-                  {page.bountyId && isRewardsPage && (
+                  )} */}
+                  {page.bountyId && (
                     <RewardProperties
                       rewardId={page.bountyId}
                       pageId={page.id}
