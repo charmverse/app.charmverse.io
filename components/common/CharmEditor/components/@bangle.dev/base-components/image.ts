@@ -1,10 +1,9 @@
 import type { Command, EditorView, Node, NodeType, Schema } from '@bangle.dev/pm';
 import { InputRule, NodeSelection, Plugin, PluginKey } from '@bangle.dev/pm';
+import { safeInsert } from 'prosemirror-utils';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-
-import { safeInsert } from '../../prosemirror/prosemirror-utils/transforms';
 
 export const plugins = pluginsFactory;
 export const commands = {};
