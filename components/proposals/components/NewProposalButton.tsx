@@ -31,7 +31,7 @@ export function NewProposalButton({
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
-  const { proposalTemplates, deleteProposalTemplate, isLoadingTemplates } = useProposalTemplates();
+  const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
@@ -57,6 +57,10 @@ export function NewProposalButton({
         type: 'proposal'
       });
     }
+  }
+
+  function deleteProposalTemplate(pageId: string) {
+    return charmClient.deletePage(pageId);
   }
 
   async function createProposalTemplate() {

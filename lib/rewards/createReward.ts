@@ -10,7 +10,7 @@ import { getRewardOrThrow } from './getReward';
 import type { UpdateableRewardFields } from './updateRewardSettings';
 
 export type RewardPageProps = Partial<
-  Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon'>
+  Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon' | 'type'>
 >;
 export type RewardCreationData = UpdateableRewardFields & {
   linkedPageId?: string;
@@ -107,8 +107,10 @@ export async function createReward({
     }
   });
 
+  let createdPageId: string | undefined;
+
   if (!linkedPageId) {
-    await prisma.bounty.create({
+    const results = await prisma.bounty.create({
       data: {
         ...rewardCreateInput,
         permissions: {
@@ -145,7 +147,7 @@ export async function createReward({
                 id: userId
               }
             },
-            type: 'bounty',
+            type: pageProps?.type ?? 'bounty',
             content: pageProps?.content ?? undefined,
             contentText: pageProps?.contentText ?? '',
             headerImage: pageProps?.headerImage,
@@ -154,8 +156,12 @@ export async function createReward({
             icon: pageProps?.icon
           }
         }
+      },
+      include: {
+        page: true
       }
     });
+    createdPageId = results.page?.id;
   } else {
     await prisma.$transaction([
       prisma.bounty.create({
@@ -174,5 +180,6 @@ export async function createReward({
     ]);
   }
 
-  return getRewardOrThrow({ rewardId });
+  const reward = await getRewardOrThrow({ rewardId });
+  return { reward, createdPageId };
 }

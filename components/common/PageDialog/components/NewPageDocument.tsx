@@ -1,4 +1,3 @@
-import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
@@ -6,11 +5,14 @@ import { useElementSize } from 'usehooks-ts';
 
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
+import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { CharmEditor } from 'components/common/CharmEditor';
-import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
+
+import { EMPTY_PAGE_VALUES } from '../hooks/useNewPage';
+import type { NewPageValues } from '../hooks/useNewPage';
 
 const StyledContainer = styled(Container)`
   margin-bottom: 180px;
@@ -19,20 +21,21 @@ const StyledContainer = styled(Container)`
 type Props = {
   children: React.ReactNode;
   placeholder?: string;
-  values: NewPageValues;
+  values: NewPageValues | null;
   onChange: (values: Partial<NewPageValues | null>) => void;
-  pageType: PageType;
   readOnly: boolean;
 };
 
 // Note: this component is only used before a page is saved to the DB
-export function NewPageDocument({ children, placeholder, values: newPageValues, onChange, pageType, readOnly }: Props) {
+export function NewPageDocument({ children, placeholder, values: newPageValues, onChange, readOnly }: Props) {
+  newPageValues ||= EMPTY_PAGE_VALUES;
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   return (
     <div className={`document-print-container ${fontClassName}`}>
       <Box display='flex' flexDirection='column'>
+        <PageTemplateBanner pageType={newPageValues.type} isNewPage />
         {newPageValues.headerImage && <PageBanner headerImage={newPageValues.headerImage} setPage={onChange} />}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(newPageValues)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
@@ -45,7 +48,7 @@ export function NewPageDocument({ children, placeholder, values: newPageValues, 
               }}
               enableVoting={false}
               containerWidth={containerWidth}
-              pageType={pageType}
+              pageType={newPageValues.type}
               disableNestedPages
               onContentChange={({ rawText, doc }) => onChange({ content: doc, contentText: rawText })}
               focusOnInit

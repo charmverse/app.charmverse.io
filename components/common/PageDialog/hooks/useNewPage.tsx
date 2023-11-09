@@ -1,6 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma-client';
-import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { PageHeaderValues } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -8,20 +7,11 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 export type NewPageValues = PageHeaderValues & {
   content: PageContent | null;
   contentText: string;
+  type?: PageType;
+  templateId?: string;
 };
 
-type NewPageContext = {
-  clearNewPage: () => void;
-  hasNewPage: boolean;
-  pageKey: string;
-  setPageKey: (key: string) => void;
-  newPageValues: NewPageValues | null;
-  updateNewPageValues: (updates: Partial<NewPageValues> | null) => void;
-  openNewPage: (initValues?: NewPageValues) => void;
-  isDirty: boolean;
-};
-
-const EMPTY_PAGE_VALUES = {
+export const EMPTY_PAGE_VALUES: NewPageValues = {
   content: null,
   contentText: '',
   title: '',
@@ -29,7 +19,7 @@ const EMPTY_PAGE_VALUES = {
   icon: null
 };
 
-export function useNewPage(): NewPageContext {
+export function useNewPage() {
   const [newPageValues, setNewPageValues] = useState<null | NewPageValues>(null);
   const [isDirty, setIsDirty] = useState(false);
 
@@ -38,16 +28,9 @@ export function useNewPage(): NewPageContext {
 
   function clearNewPage() {
     setNewPageValues(null);
+    setIsDirty(false);
+    setPageKey('');
   }
-
-  const hasNewPage = !!newPageValues;
-
-  useEffect(() => {
-    if (!hasNewPage) {
-      setPageKey('');
-      clearNewPage();
-    }
-  }, [hasNewPage]);
 
   const updateNewPageValues = useCallback((updates: Partial<NewPageValues> | null) => {
     setNewPageValues((prev) => {
@@ -61,18 +44,17 @@ export function useNewPage(): NewPageContext {
     });
   }, []);
 
-  const openNewPage = useCallback((initValues?: NewPageValues) => {
-    setNewPageValues(initValues || EMPTY_PAGE_VALUES);
+  const openNewPage = useCallback((defaultValues?: Partial<NewPageValues>) => {
+    setNewPageValues({ ...EMPTY_PAGE_VALUES, ...defaultValues });
   }, []);
 
   return {
     clearNewPage,
-    hasNewPage,
+    isDirty,
     pageKey,
     setPageKey,
     updateNewPageValues,
     newPageValues,
-    openNewPage,
-    isDirty
+    openNewPage
   };
 }

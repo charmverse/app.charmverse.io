@@ -144,7 +144,7 @@ export function RewardsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewRewardButton />
+                <NewRewardButton showPage={(pageId) => showReward({ pageId, onClose })} />
               </Box>
             </Box>
           </Box>

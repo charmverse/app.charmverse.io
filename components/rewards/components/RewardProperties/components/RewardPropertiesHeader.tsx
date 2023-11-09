@@ -31,7 +31,7 @@ export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refre
 
   const { isFreeSpace } = useIsFreeSpace();
 
-  const { data: editableCheck } = useSWR(!isFreeSpace ? `bounty-editable-${reward.id}` : null, () =>
+  const { data: editableCheck } = useSWR(!isFreeSpace && reward.id ? `bounty-editable-${reward.id}` : null, () =>
     charmClient.rewards.isRewardEditable(reward.id)
   );
   function restrictPermissions() {
