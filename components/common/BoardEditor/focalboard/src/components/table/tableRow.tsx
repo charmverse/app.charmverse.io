@@ -58,6 +58,7 @@ type Props = {
   isExpanded?: boolean | null;
   setIsExpanded?: (expanded: boolean) => void;
   indentTitle?: number;
+  isNested?: boolean;
   expandSubRowsOnLoad?: boolean;
 };
 
@@ -89,7 +90,8 @@ function TableRow(props: Props) {
     onDeleteCard,
     setIsExpanded,
     isExpanded,
-    indentTitle
+    indentTitle,
+    isNested
   } = props;
   const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
@@ -165,7 +167,7 @@ function TableRow(props: Props) {
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
       ref={cardRef}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+      style={{ opacity: isDragging ? 0.5 : 1, backgroundColor: isNested ? 'var(--input-bg)' : 'transparent' }}
     >
       {!props.readOnly && (
         <Box className='icons row-actions' onClick={handleClick}>
@@ -274,7 +276,9 @@ function TableRow(props: Props) {
   );
 }
 
-export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { subPages?: CardPage[] }) {
+export function ExpandableTableRow(
+  props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { isNested?: boolean; subPages?: CardPage[] }
+) {
   const isExpandedOnRender = props.subPages?.length ? !!props.expandSubRowsOnLoad : null;
   const [isExpanded, setIsExpanded] = useState<boolean | null>(isExpandedOnRender);
 
@@ -301,7 +305,8 @@ export function ExpandableTableRow(props: Omit<Props, 'isExpanded' | 'setIsExpan
             card={subPage.card}
             cardPage={subPage.page}
             subPages={subPage.subPages}
-            indentTitle={48}
+            indentTitle={30}
+            isNested
           />
         ))}
     </>
