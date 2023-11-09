@@ -231,11 +231,10 @@ describe(`Test proposal events and notifications`, () => {
     expect(proposalReviewStatusChangedMember2Notification).toBeFalsy();
 
     // Move to reviewed status
-
     await updateProposalStatus({
       newStatus: 'reviewed',
       proposalId: proposal.id,
-      userId: author1.id
+      userId: reviewer.id
     });
 
     await createProposalNotifications({

@@ -5,7 +5,7 @@ import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/c
 import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
 import { insertNode } from 'lib/prosemirror/insertNode';
 
-import type { PdfNodeAttrs } from '../ResizablePDF';
+import type { PdfNodeAttrs } from '../pdf/pdf';
 import { extractYoutubeLinkType } from '../video/utils';
 import type { VideoNodeAttrs } from '../video/videoSpec';
 import { name as videoName } from '../video/videoSpec';

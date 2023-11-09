@@ -9,6 +9,8 @@ import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
+import { useRoles } from 'hooks/useRoles';
+import { isUUID } from 'lib/utilities/strings';
 
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
@@ -36,6 +38,7 @@ export default function Mention({ node }: NodeViewProps) {
   const { getMemberById } = useMembers();
   const { pages } = usePages();
   const member = getMemberById(attrs.value);
+  const { roles } = useRoles();
   const { space } = useCurrentSpace();
   let value: ReactNode = null;
   if (attrs.type === 'page') {
@@ -67,6 +70,15 @@ export default function Mention({ node }: NodeViewProps) {
         >
           <span style={{ opacity: 0.5 }}>@</span>
           {member?.username}
+        </Typography>
+      </MentionContainer>
+    );
+  } else if (attrs.type === 'role') {
+    value = (
+      <MentionContainer color='secondary'>
+        <Typography component='span' color='secondary' sx={{ cursor: 'pointer' }} fontWeight={600}>
+          <span style={{ opacity: 0.5 }}>@</span>
+          {isUUID(attrs.value) ? roles?.find((role) => role.id === attrs.value)?.name : attrs.value}
         </Typography>
       </MentionContainer>
     );

@@ -10,7 +10,9 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 
-const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
+const StyledPageTemplateBanner = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'card'
+})<{ card?: boolean }>`
   top: ${({ card }) => (card ? '50px' : '55px')};
   width: '100%';
   z-index: var(--z-index-appBar);
@@ -22,22 +24,30 @@ const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
 `;
 
 type Props = {
+  isNewPage?: boolean;
   parentId?: string | null;
-  pageType: PageMeta['type'];
+  pageType?: PageMeta['type'];
 };
 
-export function PageTemplateBanner({ pageType, parentId }: Props) {
+const templateTypes = {
+  proposal_template: 'proposal',
+  bounty_template: 'reward'
+};
+
+type RewardTemplateType = keyof typeof templateTypes;
+
+export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const { space } = useCurrentSpace();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;
 
-  const isShowingCard = pageType.match('card') !== null;
+  const isShowingCard = pageType?.match('card') !== null;
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
 
-  if (!pageType.match('template')) {
+  if (!pageType?.match('template')) {
     return null;
   }
 
@@ -53,7 +63,9 @@ export function PageTemplateBanner({ pageType, parentId }: Props) {
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
-            <span>You're editing a {pageType.split('_template')[0]} template</span>
+            <span>
+              You're {isNewPage ? 'creating' : 'editing'} a {templateTypes[pageType as RewardTemplateType]} template
+            </span>
           ) : (
             <>
               <span>You're editing a template in</span>

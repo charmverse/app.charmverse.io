@@ -111,6 +111,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
     const proposalPage = await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
+      proposalStatus: 'discussion',
       authors: [],
       reviewers: [reviewer.id]
     });

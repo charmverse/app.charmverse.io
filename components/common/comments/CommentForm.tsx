@@ -8,6 +8,7 @@ import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent } from 'lib/comments';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import { LoadingIcon } from '../LoadingComponent';
 
@@ -28,17 +29,15 @@ export function CommentForm({
   placeholder,
   setPublishToLens,
   publishToLens,
-  lensPostLink,
-  isPublishingComments
+  isPublishingCommentsToLens
 }: {
-  isPublishingComments?: boolean;
-  lensPostLink?: string | null;
+  isPublishingCommentsToLens?: boolean;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
   showPublishToLens?: boolean;
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
-  handleCreateComment: (comment: CommentContent, lensPostLink?: string | null) => Promise<void>;
+  handleCreateComment: (comment: CommentContent) => Promise<void>;
   disabled?: boolean;
   placeholder?: string;
 }) {
@@ -55,13 +54,10 @@ export function CommentForm({
   }
 
   async function createPostComment() {
-    await handleCreateComment(
-      {
-        content: postContent.doc,
-        contentText: postContent.rawText
-      },
-      publishToLens ? lensPostLink : undefined
-    );
+    await handleCreateComment({
+      content: postContent.doc,
+      contentText: postContent.rawText
+    });
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);
@@ -107,9 +103,9 @@ export function CommentForm({
           {showPublishToLens && (
             <>
               <Typography variant='body2' color='text.secondary'>
-                {isPublishingComments ? 'Publishing to Lens...' : 'Publish to Lens'}
+                {isPublishingCommentsToLens ? 'Publishing to Lens...' : 'Publish to Lens'}
               </Typography>
-              {isPublishingComments ? (
+              {isPublishingCommentsToLens ? (
                 <LoadingIcon size={16} sx={{ mx: 1 }} />
               ) : (
                 <Switch
@@ -121,7 +117,11 @@ export function CommentForm({
               )}
             </>
           )}
-          <Button data-test='comment-button' disabled={!postContent.rawText || disabled} onClick={createPostComment}>
+          <Button
+            data-test='comment-button'
+            disabled={checkIsContentEmpty(postContent.doc) || disabled}
+            onClick={createPostComment}
+          >
             Comment
           </Button>
         </Stack>

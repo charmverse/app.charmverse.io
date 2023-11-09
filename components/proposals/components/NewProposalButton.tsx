@@ -1,40 +1,37 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
-import type { Theme } from '@mui/material';
-import { Box, ButtonGroup, Tooltip, useMediaQuery } from '@mui/material';
+import { Box, ButtonGroup, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 
-import { useProposalDialog } from './ProposalDialog/hooks/useProposalDialog';
+import type { ProposalPageAndPropertiesInput } from './ProposalDialog/NewProposalPage';
 
-export function NewProposalButton() {
-  const router = useRouter();
-  const { space: currentSpace } = useCurrentSpace();
-  const { showProposal } = useProposalDialog();
-  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+export function NewProposalButton({
+  showProposal,
+  showNewProposal
+}: {
+  showProposal: (pageId: string) => void;
+  showNewProposal: (input?: Partial<ProposalPageAndPropertiesInput>) => void;
+}) {
+  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
-  const { pages, mutatePage } = usePages();
-  const isXsScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const { pages } = usePages();
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
-  const { createProposal } = useProposalDialog();
-  const { proposalTemplates, deleteProposalTemplate, isLoadingTemplates } = useProposalTemplates();
+  const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
@@ -43,7 +40,7 @@ export function NewProposalButton() {
   async function createProposalFromTemplate(templateId: string) {
     const proposalTemplate = proposalTemplates?.find((proposal) => proposal.id === templateId);
     if (proposalTemplate) {
-      createProposal({
+      showNewProposal({
         contentText: proposalTemplate.page.contentText ?? '',
         content: proposalTemplate.page.content as PageContent,
         proposalTemplateId: templateId,
@@ -56,31 +53,25 @@ export function NewProposalButton() {
           id: (reviewer.roleId ?? reviewer.userId) as string
         })),
         rubricCriteria: proposalTemplate.rubricCriteria,
-        fields: (proposalTemplate.fields as ProposalFields) || {}
+        fields: (proposalTemplate.fields as ProposalFields) || {},
+        type: 'proposal'
       });
     }
+  }
+
+  function deleteProposalTemplate(pageId: string) {
+    return charmClient.deletePage(pageId);
   }
 
   async function createProposalTemplate() {
-    if (currentSpace) {
-      const newTemplate = await charmClient.proposals.createProposalTemplate({
-        spaceId: currentSpace.id,
-        categoryId: getDefaultCreateCategory()?.id as string
-      });
-
-      mutatePage(newTemplate);
-      setUrlWithoutRerender(router.pathname, { id: newTemplate.id });
-      showProposal({
-        pageId: newTemplate.id,
-        onClose() {
-          setUrlWithoutRerender(router.pathname, { id: null });
-        }
-      });
-    }
+    showNewProposal({
+      type: 'proposal_template'
+    });
+    popupState.close();
   }
 
   async function onClickCreate() {
-    createProposal();
+    showNewProposal();
   }
 
   return (
@@ -107,15 +98,7 @@ export function NewProposalButton() {
         pages={proposalTemplatePages}
         addPageFromTemplate={createProposalFromTemplate}
         createTemplate={createProposalTemplate}
-        editTemplate={(pageId) => {
-          setUrlWithoutRerender(router.pathname, { id: pageId });
-          showProposal({
-            pageId,
-            onClose() {
-              setUrlWithoutRerender(router.pathname, { id: null });
-            }
-          });
-        }}
+        editTemplate={(pageId) => showProposal(pageId)}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
         boardTitle='Proposals'

@@ -18,9 +18,9 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getProposalBlocksHandler)
-  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(createProposalBlocksHandler)
   .put(updateProposalBlocksHandler)
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .delete(deleteProposalBlocksHandler);
 
 async function getProposalBlocksHandler(req: NextApiRequest, res: NextApiResponse<ProposalBlockWithTypedFields[]>) {

@@ -23,7 +23,8 @@ import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
-import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
+import { mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import { Mention, MentionSuggest } from './components/mention/components';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as tabIndent from './components/tabIndent';
 

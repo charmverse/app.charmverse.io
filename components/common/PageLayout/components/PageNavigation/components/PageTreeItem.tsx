@@ -11,7 +11,6 @@ import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import type { ReactNode, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
@@ -24,11 +23,11 @@ import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import { isTouchScreen } from 'lib/utilities/browser';
 import { greyColor2 } from 'theme/colors';
 
 import AddNewCard from '../../AddNewCard';
@@ -406,7 +405,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
   const currentPage = usePageFromPath();
   const { deletePage, pages } = usePages();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const deletePageDisabled = !pagePermissions?.delete;
   const page = pages[pageId];
   async function deletePageWithBoard() {
@@ -422,7 +421,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
 
     if (!currentPage && newPage) {
       // If we are in a page that doesn't exist, redirect user to the created page
-      router.push(`/${router.query.domain}/${newPage.id}`);
+      navigateToSpacePath(`/${newPage.path}`);
     }
   }
 

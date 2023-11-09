@@ -44,7 +44,7 @@ exports[`src/components/kanban/kanbanCard return kanbanCard and click on delete 
         >
           <div>
             <div
-              class="css-emwlh8"
+              class="css-jm1ma0"
             >
               <img
                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -108,7 +108,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot 1`] = `
         >
           <div>
             <div
-              class="css-emwlh8"
+              class="css-jm1ma0"
             >
               <img
                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -151,7 +151,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot with readonly 1`
         >
           <div>
             <div
-              class="css-emwlh8"
+              class="css-jm1ma0"
             >
               <img
                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"

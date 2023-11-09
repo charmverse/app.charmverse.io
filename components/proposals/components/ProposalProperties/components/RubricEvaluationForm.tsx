@@ -32,7 +32,6 @@ const StyledIcon = styled.div`
   height: 2em;
   justify-content: center;
   padding: 10px;
-  background: #fff;
   border: 1px solid var(--input-border);
   text-align: center;
   font-size: 16px;
@@ -40,6 +39,7 @@ const StyledIcon = styled.div`
 
 const StyledRating = styled(Rating)`
   .icon {
+    background-color: var(--background-default);
     color: var(--primary-text);
   }
   .MuiRating-iconFilled .icon {

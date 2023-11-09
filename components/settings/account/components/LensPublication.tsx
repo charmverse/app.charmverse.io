@@ -55,7 +55,7 @@ export function LensPublication() {
       </Stack>
       {lensProfile && isAuthenticated && (
         <Typography variant='caption' my={0.5}>
-          Signed in as {lensProfile.handle}
+          Signed in as {lensProfile.handle?.localName}
         </Typography>
       )}
     </Stack>

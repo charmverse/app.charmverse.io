@@ -1,4 +1,4 @@
-import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
+import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Space, Role, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 

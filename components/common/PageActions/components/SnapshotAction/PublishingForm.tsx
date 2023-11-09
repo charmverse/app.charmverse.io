@@ -41,7 +41,7 @@ interface Props {
   pageId: string;
 }
 
-const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 14400;
+const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 20000;
 
 const MIN_VOTING_OPTIONS = 2;
 

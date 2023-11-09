@@ -1,4 +1,4 @@
-import type { DOMOutputSpec, EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
+import type { EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
@@ -11,13 +11,12 @@ import { Plugin } from 'prosemirror-state';
 import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
-import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import BlockAligner from 'components/common/CharmEditor/components/BlockAligner';
 import type { CharmNodeViewProps } from 'components/common/CharmEditor/components/nodeView/nodeView';
 import PdfSelector from 'components/common/PdfSelector';
-import { MIN_PDF_WIDTH, MAX_PDF_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { MIN_PDF_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
-import Resizable from './Resizable/Resizable';
+import Resizable from '../Resizable/Resizable';
 
 const PDFViewer = dynamic(() => import('./PDFViewer'), {
   ssr: false
@@ -89,41 +88,6 @@ function EmptyPDFContainer({
       </StyledEmptyPDFContainer>
     </ListItem>
   );
-}
-
-export type PdfNodeAttrs = {
-  src?: string | null;
-  size: number;
-};
-
-export function pdfSpec() {
-  const spec: BaseRawNodeSpec = {
-    name: 'pdf',
-    type: 'node',
-    schema: {
-      attrs: {
-        src: {
-          default: null
-        },
-        size: {
-          default: MAX_PDF_WIDTH
-        },
-        track: {
-          default: []
-        }
-      },
-      group: 'block',
-      draggable: false,
-      parseDOM: [{ tag: 'div.charm-pdf' }],
-      toDOM: (): DOMOutputSpec => {
-        return ['div.charm-pdf'];
-      }
-    },
-    markdown: {
-      toMarkdown: () => null
-    }
-  };
-  return spec;
 }
 
 type PDFViewerProps = {

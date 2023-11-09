@@ -18,6 +18,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
 import { BlockCounts } from 'components/settings/subscription/BlockCounts';
 import { charmverseDiscordInvite } from 'config/constants';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useFavoritePages } from 'hooks/useFavoritePages';
@@ -125,7 +126,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const { user, logoutUser } = useUser();
   const { space } = useCurrentSpace();
   const { categories } = useForumCategories();
@@ -159,7 +160,7 @@ export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
           spaceId: space.id
         };
 
-        addPageAndRedirect(newPage, router).then();
+        addPageAndRedirect(newPage, navigateToSpacePath);
       }
     },
     [user?.id, space?.id]

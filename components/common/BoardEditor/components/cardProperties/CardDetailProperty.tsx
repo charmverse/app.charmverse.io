@@ -44,7 +44,8 @@ export function CardDetailProperty({
   deleteDisabledMessage,
   onDrop,
   syncWithPageId,
-  mutator
+  mutator,
+  disableEditPropertyOption
 }: {
   syncWithPageId?: string | null;
   readOnly: boolean;
@@ -57,6 +58,7 @@ export function CardDetailProperty({
   pageUpdatedBy: string;
   deleteDisabledMessage?: string;
   mutator: Mutator;
+  disableEditPropertyOption?: boolean;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
@@ -77,8 +79,8 @@ export function CardDetailProperty({
       }}
       className='octo-propertyrow'
     >
-      {readOnly && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
-      {!readOnly && (
+      {(readOnly || disableEditPropertyOption) && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
+      {!readOnly && !disableEditPropertyOption && (
         <Box>
           <PropertyNameContainer
             className='octo-propertyname'

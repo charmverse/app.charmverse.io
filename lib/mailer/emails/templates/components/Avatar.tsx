@@ -1,13 +1,38 @@
-import { Container } from '@react-email/container';
 import { Img } from '@react-email/img';
-import { Section } from '@react-email/section';
-import { ReactNode } from 'react';
 
 import { stringToColor } from 'lib/utilities/strings';
 
 import Text from './Text';
 
-export default function Avatar({ name, avatar }: { name?: string; avatar: string | null | undefined }) {
+type AvatarSize = 'large' | 'medium' | 'small';
+
+const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
+  large: {
+    height: 54,
+    width: 54,
+    fontSize: '1.5rem'
+  },
+  medium: {
+    height: 32,
+    width: 32,
+    fontSize: '1.25rem'
+  },
+  small: {
+    height: 26,
+    width: 26,
+    fontSize: '1rem !important'
+  }
+};
+
+export default function Avatar({
+  size = 'medium',
+  name,
+  avatar
+}: {
+  size?: AvatarSize;
+  name?: string;
+  avatar: string | null | undefined;
+}) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
 
   return avatar ? (
@@ -16,8 +41,7 @@ export default function Avatar({ name, avatar }: { name?: string; avatar: string
         margin: 0,
         backgroundColor: 'initial',
         borderRadius: '50%',
-        width: '32px',
-        height: '32px'
+        ...sizeStyleMap[size]
       }}
       src={avatar}
     />
@@ -28,10 +52,8 @@ export default function Avatar({ name, avatar }: { name?: string; avatar: string
         margin: 0,
         backgroundColor: stringToColor(nameStr),
         borderRadius: '50%',
-        width: '32px',
-        height: '32px',
-        fontSize: '1.25rem',
-        textAlign: 'center'
+        textAlign: 'center',
+        ...sizeStyleMap[size]
       }}
     >
       {nameStr.charAt(0).toUpperCase()}

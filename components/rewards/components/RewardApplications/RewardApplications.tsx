@@ -1,55 +1,186 @@
-import type { BountyStatus } from '@charmverse/core/prisma-client';
-import { Box, Divider, Tooltip } from '@mui/material';
+import { useTheme } from '@emotion/react';
+import { Stack, Box } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 
-import charmClient from 'charmClient';
-import { Button } from 'components/common/Button';
+import { useGetReward } from 'charmClient/hooks/rewards';
+import { ExpandableSection } from 'components/common/ExpandableSection';
+import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
+import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useUser } from 'hooks/useUser';
-import type { BountyPermissionFlags } from 'lib/permissions/bounties/interfaces';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { statusesAcceptingNewWork } from 'lib/rewards/shared';
+import { countCompleteSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
 
-import { RewardSubmissionsTable } from './RewardSubmissionsTable';
+import { RewardApplicantTableRow } from './RewardApplicantTableRow';
+import type { ApplicationFilterStatus } from './RewardApplicationFilter';
+import { RewardApplicationFilter } from './RewardApplicationFilter';
 
 type Props = {
-  reward: RewardWithUsers;
-  refreshReward: (rewardId: string) => void;
-  permissions?: BountyPermissionFlags;
-  openApplication: (applicationId: string) => void;
+  rewardId: string;
+  onShowApplication?: VoidFunction;
 };
 
-export function RewardApplications({ reward, refreshReward, permissions, openApplication }: Props) {
-  const { user } = useUser();
-  const hasApplication = !!user && reward.applications.some((app) => app.createdBy === user.id);
+export function RewardApplications({ rewardId, onShowApplication }: Props) {
+  const theme = useTheme();
+  const { showApplication } = useApplicationDialog();
 
-  async function newApplication() {
-    const application = await charmClient.rewards.work({ rewardId: reward.id, message: '' });
-    refreshReward(reward.id);
-    openApplication(application.id);
+  const { user } = useUser();
+
+  const { data: reward } = useGetReward({ rewardId });
+
+  const [applicationsFilter, setApplicationsFilter] = useState<ApplicationFilterStatus>('all');
+
+  if (!reward) {
+    return null;
+  }
+
+  const openApplication = (applicationId: string) => {
+    showApplication(applicationId);
+    setTimeout(() => onShowApplication?.(), 50);
+  };
+
+  const validSubmissions = countCompleteSubmissions({ applications: reward.applications });
+
+  const filteredApplications =
+    !applicationsFilter || applicationsFilter === 'all'
+      ? reward.applications
+      : reward.applications.filter((a) => a.status === applicationsFilter);
+
+  const sortedApplications = filteredApplications.sort((appA, appB) => {
+    if (appA.createdBy === user?.id) {
+      return -1;
+    } else if (appB.createdBy === user?.id) {
+      return 1;
+    }
+    return 0;
+  });
+
+  if (reward.applications.length === 0) {
+    return (
+      <Stack mt={2} mb={1}>
+        <Stack>
+          <Stack direction='row' alignItems='center' justifyContent='space-between'>
+            <Typography fontWeight='bold'>Reward applications</Typography>
+          </Stack>
+        </Stack>
+        <Box display='flex' justifyContent='center' alignItems='center' gap={1}>
+          <Typography
+            variant='subtitle1'
+            sx={{
+              opacity: 0.5
+            }}
+          >
+            There are no submissions yet.
+          </Typography>
+          <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
+        </Box>
+      </Stack>
+    );
   }
 
   return (
-    <Box>
-      {(!hasApplication || (hasApplication && reward.allowMultipleApplications)) &&
-        statusesAcceptingNewWork.includes(reward.status) && (
+    <Stack mt={2}>
+      <ExpandableSection title='Reward applications'>
+        {!!reward.applications.length && (
           <>
-            <Tooltip title={!permissions?.work ? 'You do not have permission to work on this reward' : ''}>
-              <Box
-                alignItems='center'
-                display='flex'
-                flexDirection='column'
-                justifyContent='center'
-                sx={{ height: '100px' }}
-              >
-                <Button disabled={!permissions?.work} onClick={newApplication}>
-                  {reward.approveSubmitters ? 'New Application' : 'New Submission'}
-                </Button>
-              </Box>
-            </Tooltip>
+            <Box width='100%' display='flex' justifyContent='space-between' mb={1}>
+              <Box display='flex' gap={1} alignItems='center'>
+                <Chip
+                  size='small'
+                  sx={{
+                    my: 1
+                  }}
+                  label={`Complete: ${
+                    reward?.maxSubmissions ? `${validSubmissions} / ${reward.maxSubmissions}` : validSubmissions
+                  }`}
+                />
 
-            <Divider />
+                {/*
+          // Re-enable later
+          {permissions?.lock && isRewardLockable(reward) && (
+            <Tooltip
+              key='stop-new'
+              arrow
+              placement='top'
+              title={`${reward.submissionsLocked ? 'Enable' : 'Prevent'} new ${
+                reward.approveSubmitters ? 'applications' : 'submissions'
+              } from being made.`}
+            >
+              <IconButton
+                size='small'
+                onClick={() => {
+                  lockRewardSubmissions();
+                }}
+              >
+                {!reward.submissionsLocked ? (
+                  <LockOpen color='secondary' fontSize='small' />
+                ) : (
+                  <LockIcon color='secondary' fontSize='small' />
+                )}
+              </IconButton>
+            </Tooltip>
+          )} */}
+              </Box>
+
+              <RewardApplicationFilter status={applicationsFilter} onStatusSelect={setApplicationsFilter} />
+            </Box>
+            <Box sx={{ width: '100%', overflow: 'hidden', mb: 1 }}>
+              <TableContainer sx={{ maxHeight: 440, border: '1px solid var(--input-border)', borderRadius: 1 }}>
+                <Table stickyHeader aria-label='reward applicant table'>
+                  <TableHead
+                    sx={{
+                      background: theme.palette.background.dark,
+                      '.MuiTableCell-root': {
+                        background: theme.palette.settingsHeader.background
+                      }
+                    }}
+                  >
+                    <TableRow>
+                      <TableCell>Applicant</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Last updated</TableCell>
+                      <TableCell />
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sortedApplications.map((submission) => (
+                      <RewardApplicantTableRow
+                        onClickView={() => openApplication(submission.id)}
+                        submission={submission}
+                        key={submission.id}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+
+            {filteredApplications.length === 0 && (
+              <Box
+                display='flex'
+                justifyContent='center'
+                my={3}
+                sx={{
+                  opacity: 0.5,
+                  mb: 2
+                }}
+              >
+                <Typography variant='subtitle1'>No applications to display</Typography>
+              </Box>
+            )}
           </>
         )}
-      <RewardSubmissionsTable rewardId={reward.id} openApplication={openApplication} />
-    </Box>
+
+        <Stack flex={1} direction='row' justifyContent='flex-end' mb={1}>
+          <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
+        </Stack>
+      </ExpandableSection>
+    </Stack>
   );
 }

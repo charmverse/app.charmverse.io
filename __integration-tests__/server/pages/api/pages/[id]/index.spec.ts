@@ -6,7 +6,7 @@ import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/c
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
-import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
+import { createProposal } from 'lib/proposal/createProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 const updateContent = {
@@ -104,16 +104,23 @@ describe('PUT /api/pages/{id} - update page', () => {
       spaceId: space.id
     });
 
-    const template = await createProposalTemplate({
+    const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id
+      categoryId: proposalCategory.id,
+      pageProps: {
+        type: 'proposal_template'
+      }
     });
 
     const adminCookie = await loginUser(adminUser.id);
 
     const body = (
-      await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', adminCookie).send(updateContent).expect(200)
+      await request(baseUrl)
+        .put(`/api/pages/${template.page.id}`)
+        .set('Cookie', adminCookie)
+        .send(updateContent)
+        .expect(200)
     ).body as PageWithPermissions;
   });
 
@@ -122,21 +129,28 @@ describe('PUT /api/pages/{id} - update page', () => {
       spaceId: space.id
     });
 
-    const template = await createProposalTemplate({
+    const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id
+      categoryId: proposalCategory.id,
+      pageProps: {
+        type: 'proposal_template'
+      }
     });
 
     const memberCookie = await loginUser(normalMember.id);
 
-    await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', memberCookie).send(updateContent).expect(401);
+    await request(baseUrl)
+      .put(`/api/pages/${template.page.id}`)
+      .set('Cookie', memberCookie)
+      .send(updateContent)
+      .expect(401);
   });
 });
 
 describe('GET /api/pages/{id} - get page', () => {
   it('should return a page to a user with permission to access it and respond 200', async () => {
-    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+    const { createdAt, updatedAt, content, ...page } = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
       spaceId: space.id,
       pagePermissions: [
@@ -154,7 +168,7 @@ describe('GET /api/pages/{id} - get page', () => {
   });
 
   it('should support queries by page path and space domain for a user with permission to access the page and respond 200', async () => {
-    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+    const { createdAt, updatedAt, content, ...page } = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
       spaceId: space.id,
       pagePermissions: [
