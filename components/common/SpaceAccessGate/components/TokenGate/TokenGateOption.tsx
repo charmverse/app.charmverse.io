@@ -20,13 +20,13 @@ export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
   const [description, setDescription] = useState<string>('');
 
   useEffect(() => {
-    humanizeConditions({
-      ...(tokenGate.conditions as any),
-      myWalletAddress: account || ''
-    }).then((result) => {
-      setDescription(result || '');
-    });
-  }, [tokenGate]);
+    setDescription(
+      humanizeConditions({
+        ...(tokenGate.conditions as any),
+        myWalletAddress: account || ''
+      })
+    );
+  }, [tokenGate.conditions, account]);
 
   return (
     <GateOption isVerified={isVerified} isVerifying={isVerifying}>

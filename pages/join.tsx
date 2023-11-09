@@ -65,7 +65,7 @@ export default function JoinWorkspace() {
   return (
     <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-        <DialogTitle>Join a space</DialogTitle>
+        <DialogTitle>Join space</DialogTitle>
         <Divider />
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
