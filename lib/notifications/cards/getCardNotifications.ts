@@ -1,6 +1,8 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+
 import type { CardNotification } from '../interfaces';
 import type { QueryCondition } from '../utils';
 import { notificationMetadataSelectStatement, queryCondition } from '../utils';
@@ -13,7 +15,8 @@ export async function getCardNotifications({ id, userId }: QueryCondition): Prom
       type: true,
       personPropertyId: true,
       card: {
-        include: {
+        select: {
+          parentId: true,
           page: {
             select: {
               bountyId: true,
@@ -28,6 +31,32 @@ export async function getCardNotifications({ id, userId }: QueryCondition): Prom
         select: notificationMetadataSelectStatement
       }
     }
+  });
+
+  const boardIds = cardNotifications
+    .filter((cardNotification) => cardNotification.personPropertyId)
+    .map((cardNotification) => cardNotification.card.parentId);
+
+  const boards = await prisma.block.findMany({
+    where: {
+      id: {
+        in: boardIds
+      }
+    },
+    select: {
+      fields: true
+    }
+  });
+
+  const personPropertiesRecord: Record<string, IPropertyTemplate> = {};
+
+  boards.forEach((board) => {
+    const boardFields = board.fields as unknown as BoardFields;
+    boardFields.cardProperties.forEach((property) => {
+      if (property.type === 'person') {
+        personPropertiesRecord[property.id] = property;
+      }
+    });
   });
 
   return cardNotifications.map((notification) => {
@@ -45,7 +74,12 @@ export async function getCardNotifications({ id, userId }: QueryCondition): Prom
       spaceName: notificationMetadata.space.name,
       pageType: page.type,
       type: notification.type,
-      personPropertyId: notification.personPropertyId,
+      personProperty: notification.personPropertyId
+        ? {
+            id: notification.personPropertyId,
+            name: personPropertiesRecord[notification.personPropertyId].name
+          }
+        : null,
       archived: !!notificationMetadata.archivedAt,
       read: !!notificationMetadata.seenAt,
       group: 'card'

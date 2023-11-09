@@ -128,10 +128,10 @@ function getCardContent(n: CardNotification, actorUsername?: string): string | R
     case 'person_assigned': {
       return username ? (
         <span>
-          <strong>{username}</strong> assigned you to a card
+          <strong>{username}</strong> mentioned you in a page
         </span>
       ) : (
-        `You were assigned to a card`
+        `You were mentioned in a page`
       );
     }
     default: {
