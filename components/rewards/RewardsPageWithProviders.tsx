@@ -1,4 +1,3 @@
-import { NewPageProvider } from 'components/common/PageDialog/hooks/useNewPage';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
