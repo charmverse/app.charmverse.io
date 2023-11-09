@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
@@ -95,7 +96,7 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
     throw new UnauthorisedActionError('You do not have permissions to create a bounty.');
   }
 
-  const createdReward = await createReward({
+  const { reward: createdReward, createdPageId } = await createReward({
     ...req.body,
     userId: req.session.user.id
   });
@@ -108,22 +109,28 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
       },
       createdReward.spaceId
     );
+  } else if (createdPageId) {
+    const pages = await getPageMetaList([createdPageId]);
+    relay.broadcast(
+      {
+        type: 'pages_created',
+        payload: pages
+      },
+      createdReward.spaceId
+    );
   }
 
-  // add a little delay to capture the full bounty title after user has edited it
-  setTimeout(() => {
-    const { id, rewardAmount, rewardToken, customReward } = createdReward;
+  const { id, rewardAmount, rewardToken, customReward } = createdReward;
 
-    trackUserAction('bounty_created', {
-      userId,
-      spaceId,
-      resourceId: id,
-      rewardToken,
-      rewardAmount,
-      pageId: createdReward.id,
-      customReward
-    });
-  }, 60 * 1000);
+  trackUserAction('bounty_created', {
+    userId,
+    spaceId,
+    resourceId: id,
+    rewardToken,
+    rewardAmount,
+    pageId: createdReward.id,
+    customReward
+  });
 
   logWorkspaceFirstBountyEvents(createdReward);
   logUserFirstBountyEvents(createdReward);
