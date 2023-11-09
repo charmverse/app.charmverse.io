@@ -10,6 +10,7 @@ import { createPage } from 'lib/pages/server/createPage';
 import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
+import { getSpace } from 'lib/spaces/getSpace';
 import { typedKeys } from 'lib/utilities/objects';
 
 import type { ExportedPage } from './exportWorkspacePages';
@@ -381,6 +382,7 @@ export async function generateImportWorkspacePages({
       permissions.forEach(({ id, ...bountyPermission }) => {
         bountyPermissionArgs.push({
           ...bountyPermission,
+          userId: bountyPermission.userId ? oldNewPermissionMap[bountyPermission.userId] : null,
           spaceId: bountyPermission.spaceId ? space.id : null,
           bountyId: oldNewRecordIdHashMap[node.id]
         });
@@ -495,6 +497,8 @@ export async function importWorkspacePages({
   includePermissions,
   resetPaths
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
+  const _target = await getSpace(targetSpaceIdOrDomain);
+
   const {
     pageArgs,
     blockArgs,
@@ -519,6 +523,17 @@ export async function importWorkspacePages({
   const pagesToCreate = pageArgs.length;
 
   let totalCreatedPages = 0;
+
+  const bountyArgsData = bountyArgs.data as Prisma.BountyCreateManyInput[];
+
+  console.log(
+    'BOUNTY PERMS VALID-------------',
+    (bountyPermissionArgs.data as Prisma.BountyPermissionCreateManyInput[]).every((perm) =>
+      bountyArgsData.some((bounty) => bounty.id === perm.bountyId)
+    ),
+    'IS BOUNTY IN NEW SPACE?',
+    (bountyArgs.data as Prisma.BountyCreateManyInput[]).every((b) => b.spaceId === _target.id)
+  );
 
   const createdData = await prisma.$transaction([
     // The blocks needs to be created first before the page can connect with them
