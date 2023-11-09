@@ -1,4 +1,3 @@
-import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
@@ -8,7 +7,8 @@ import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { CharmEditor } from 'components/common/CharmEditor';
-import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
+import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
+import { usePreventReload } from 'hooks/usePreventReload';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
@@ -16,41 +16,43 @@ const StyledContainer = styled(Container)`
   margin-bottom: 180px;
 `;
 
-type Props = {
-  children: React.ReactNode;
-  placeholder?: string;
-  values: NewPageValues;
-  onChange: (values: Partial<NewPageValues | null>) => void;
-  pageType: PageType;
-  readOnly: boolean;
-};
-
 // Note: this component is only used before a page is saved to the DB
-export function NewPageDocument({ children, placeholder, values: newPageValues, onChange, pageType, readOnly }: Props) {
+export function NewPageDocument({ children }: { children: React.ReactNode }) {
+  const { newPageContext, pageKey, newPageValues, updateNewPageValues } = useNewPage();
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
+  const { readOnlyEditor, editorPlaceholder, type, contentUpdated } = newPageContext;
+
+  usePreventReload(!!contentUpdated);
+
+  if (!newPageValues) {
+    return null;
+  }
   return (
     <div className={`document-print-container ${fontClassName}`}>
       <Box display='flex' flexDirection='column'>
-        {newPageValues.headerImage && <PageBanner headerImage={newPageValues.headerImage} setPage={onChange} />}
+        {newPageValues.headerImage && (
+          <PageBanner headerImage={newPageValues.headerImage} setPage={updateNewPageValues} />
+        )}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(newPageValues)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
-              placeholderText={placeholder}
+              placeholderText={editorPlaceholder}
               content={newPageValues.content as PageContent}
               autoFocus={false}
               style={{
-                color: readOnly ? `var(--secondary-text)` : 'inherit'
+                color: readOnlyEditor ? `var(--secondary-text)` : 'inherit'
               }}
               enableVoting={false}
               containerWidth={containerWidth}
-              pageType={pageType}
+              pageType={type}
               disableNestedPages
-              onContentChange={({ rawText, doc }) => onChange({ content: doc, contentText: rawText })}
+              onContentChange={({ rawText, doc }) => updateNewPageValues({ content: doc, contentText: rawText })}
               focusOnInit
               isContentControlled
-              readOnly={readOnly}
+              readOnly={readOnlyEditor}
+              key={`${String(pageKey)}.${readOnlyEditor}`}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
@@ -59,7 +61,7 @@ export function NewPageDocument({ children, placeholder, values: newPageValues, 
                 updatedAt={new Date().toString()}
                 title={newPageValues.title || ''}
                 readOnly={false}
-                setPage={onChange}
+                setPage={updateNewPageValues}
               />
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>{children}</div>

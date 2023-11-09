@@ -1,15 +1,17 @@
+import { useRouter } from 'next/router';
+
 import { Button } from 'components/common/Button';
-import { NewPageDocument } from 'components/common/PageDialog/components/NewPageDocument';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
-import { useNewRewardPage } from 'components/rewards/hooks/useNewRewardPage';
+import { useNewReward } from 'components/rewards/hooks/useNewReward';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
 
 export function NewRewardButton() {
-  const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
-  const { clearFormInputs, contentUpdated, formInputs, setFormInputs, createReward, isSavingReward } = useNewRewardPage(
-    { isDirty, newPageValues, clearNewPage }
-  );
+  const { openNewPage } = useNewPage();
+  const { clearFormInputs, formInputs, setFormInputs, createReward, isSavingReward } = useNewReward();
 
   async function onClickCreate() {
     openNewPage();
@@ -21,16 +23,8 @@ export function NewRewardButton() {
         Create
       </Button>
 
-      <NewPageDialog
-        contentUpdated={contentUpdated}
-        isOpen={!!newPageValues}
-        onClose={clearFormInputs}
-        onSave={createReward}
-        isSaving={isSavingReward}
-      >
-        <NewPageDocument pageType='bounty' readOnly={false} values={newPageValues!} onChange={updateNewPageValues}>
-          <RewardPropertiesForm onChange={setFormInputs} values={formInputs} />
-        </NewPageDocument>
+      <NewPageDialog onClose={clearFormInputs} onSave={createReward} isSaving={isSavingReward}>
+        <RewardPropertiesForm onChange={setFormInputs} values={formInputs} />
       </NewPageDialog>
     </>
   );
