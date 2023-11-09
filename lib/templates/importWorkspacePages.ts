@@ -23,6 +23,7 @@ type WorkspaceImportOptions = ImportParams & {
   updateTitle?: boolean;
   includePermissions?: boolean;
   resetPaths?: boolean;
+  oldNewRoleIdHashMap?: Record<string, string>;
 };
 
 type UpdateRefs = {
@@ -127,7 +128,8 @@ export async function generateImportWorkspacePages({
   parentId: rootParentId,
   updateTitle,
   includePermissions,
-  resetPaths
+  resetPaths,
+  oldNewRoleIdHashMap
 }: WorkspaceImportOptions): Promise<
   {
     pageArgs: Prisma.PageCreateArgs[];
@@ -153,6 +155,14 @@ export async function generateImportWorkspacePages({
   const dataToImport = await getImportData({ exportData, exportName });
 
   const pageArgs: Prisma.PageCreateArgs[] = [];
+
+  const sourcePagesMap = (dataToImport.pages ?? []).reduce((acc, page) => {
+    acc[page.id] = page;
+    if (page.bountyId) {
+      acc[page.bountyId] = page;
+    }
+    return acc;
+  }, {} as Record<string, PageMeta>);
 
   const voteArgs: Prisma.VoteCreateManyInput[] = [];
   const voteOptionsArgs: Prisma.VoteOptionsCreateManyInput[] = [];
@@ -371,7 +381,13 @@ export async function generateImportWorkspacePages({
       });
     } else if ((node.type === 'bounty' || node.type === 'bounty_template') && node.bounty) {
       pageArgs.push(newPageContent);
-      const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
+      const {
+        createdAt,
+        updatedAt,
+        createdBy: bountyCreatedBy,
+        permissions: bountyPermissions,
+        ...bounty
+      } = node.bounty;
       bountyArgs.push({
         ...bounty,
         fields: (bounty.fields as any) || undefined,
@@ -379,13 +395,33 @@ export async function generateImportWorkspacePages({
         createdBy: space.createdBy,
         id: oldNewRecordIdHashMap[node.id]
       });
-      permissions.forEach(({ id, ...bountyPermission }) => {
-        bountyPermissionArgs.push({
-          ...bountyPermission,
-          userId: bountyPermission.userId ? oldNewPermissionMap[bountyPermission.userId] : null,
-          spaceId: bountyPermission.spaceId ? space.id : null,
-          bountyId: oldNewRecordIdHashMap[node.id]
-        });
+      bountyPermissions.forEach(({ id, ...sourceBountyPermission }) => {
+        const sourceBounty = sourcePagesMap[sourceBountyPermission.bountyId];
+
+        const permissionToCreate: Prisma.BountyPermissionCreateManyInput = {
+          id: uuid(),
+          userId: undefined,
+          spaceId: undefined,
+          roleId: undefined,
+          bountyId: newId,
+          permissionLevel: sourceBountyPermission.permissionLevel
+        };
+
+        if (sourceBountyPermission.spaceId) {
+          permissionToCreate.spaceId = space.id;
+        } else if (sourceBountyPermission.userId) {
+          if (sourceBounty.spaceId !== space.id) {
+            permissionToCreate.userId = space.createdBy;
+          }
+        } else if (sourceBountyPermission.roleId) {
+          if (sourceBounty.spaceId !== space.id && oldNewRoleIdHashMap?.[sourceBountyPermission.roleId]) {
+            permissionToCreate.roleId = oldNewRoleIdHashMap?.[sourceBountyPermission.roleId];
+          }
+        }
+
+        if (permissionToCreate.userId || permissionToCreate.roleId || permissionToCreate.spaceId) {
+          bountyPermissionArgs.push(permissionToCreate);
+        }
       });
     } else if ((node.type === 'proposal' || node.type === 'proposal_template') && node.proposal) {
       // TODO: Handle cross space reviewers and authors
@@ -436,6 +472,7 @@ export async function generateImportWorkspacePages({
           const { voteOptions, ...vote } = pageVote;
           voteArgs.push({
             ...vote,
+            spaceId: space.id,
             createdBy: space.createdBy,
             pageId: oldNewRecordIdHashMap[pageVote.pageId],
             id: extractedPoll.newPollId as string,
@@ -495,7 +532,8 @@ export async function importWorkspacePages({
   parentId,
   updateTitle,
   includePermissions,
-  resetPaths
+  resetPaths,
+  oldNewRoleIdHashMap
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const _target = await getSpace(targetSpaceIdOrDomain);
 
@@ -517,23 +555,13 @@ export async function importWorkspacePages({
     parentId,
     updateTitle,
     includePermissions,
-    resetPaths
+    resetPaths,
+    oldNewRoleIdHashMap
   });
 
   const pagesToCreate = pageArgs.length;
 
   let totalCreatedPages = 0;
-
-  const bountyArgsData = bountyArgs.data as Prisma.BountyCreateManyInput[];
-
-  console.log(
-    'BOUNTY PERMS VALID-------------',
-    (bountyPermissionArgs.data as Prisma.BountyPermissionCreateManyInput[]).every((perm) =>
-      bountyArgsData.some((bounty) => bounty.id === perm.bountyId)
-    ),
-    'IS BOUNTY IN NEW SPACE?',
-    (bountyArgs.data as Prisma.BountyCreateManyInput[]).every((b) => b.spaceId === _target.id)
-  );
 
   const createdData = await prisma.$transaction([
     // The blocks needs to be created first before the page can connect with them

@@ -7,7 +7,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { Block, prismaToBlock } from 'lib/focalboard/block';
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -256,7 +256,7 @@ describe('importWorkspacePages', () => {
   it('should accept a filename as the source data input', async () => {
     const { space: targetSpace } = await generateUserAndSpace();
 
-    const exportName = `test-${v4()}`;
+    const exportName = `test-${v4()}.json`;
 
     const { data, path } = await exportWorkspacePagesToDisk({
       sourceSpaceIdOrDomain: space.domain,

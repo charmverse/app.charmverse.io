@@ -226,7 +226,7 @@ export async function exportWorkspacePagesToDisk({
   }
 
   // Continue writing only if an export name was provided
-  const exportFilePath = path.join(exportFolder, `${exportName}.json`);
+  const exportFilePath = path.join(exportFolder, `${exportName}${exportName.endsWith('.json') ? '' : '.json'}`);
 
   await fs.writeFile(exportFilePath, JSON.stringify(exportData, null, 2));
 
