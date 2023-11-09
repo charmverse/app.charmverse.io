@@ -7,3 +7,4 @@ export const ASSIGNEES_BLOCK_ID = '__applicants';
 export const REWARD_REVIEWERS_BLOCK_ID = '__reviewers';
 export const REWARDS_AVAILABLE_BLOCK_ID = '__available';
 export const DUE_DATE_ID = '__limit';
+export const CREATED_AT_ID = '__createdAt';

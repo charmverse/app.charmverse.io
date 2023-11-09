@@ -15,6 +15,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
   ASSIGNEES_BLOCK_ID,
+  CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
   REWARDER_BLOCK_ID,
@@ -46,9 +47,18 @@ export function useRewardsBoardAdapter() {
     // use saved default block or build on the fly
     const viewBlock = rewardBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
-    return viewBlock
-      ? (blockToFBBlock(viewBlock) as BoardView)
-      : getDefaultTableView({ storedBoard: rewardPropertiesBlock });
+    if (!viewBlock) {
+      return getDefaultTableView({ storedBoard: rewardPropertiesBlock });
+    }
+
+    const boardView = blockToFBBlock(viewBlock) as BoardView;
+
+    // sort by created at desc by default
+    if (!boardView.fields.sortOptions?.length) {
+      boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+    }
+
+    return boardView;
   }, [rewardPropertiesBlock, rewardBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
@@ -120,6 +130,8 @@ function mapRewardToCardPage({
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     // focalboard component expects a timestamp
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
+    [CREATED_AT_ID]:
+      rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
     ...rewardFields.properties
   };

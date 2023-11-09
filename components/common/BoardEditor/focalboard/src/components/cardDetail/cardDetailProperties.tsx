@@ -34,6 +34,7 @@ type Props = {
   pageUpdatedAt: string;
   mutator?: Mutator;
   readOnlyProperties?: string[];
+  disableEditPropertyOption?: boolean;
 };
 
 function CardDetailProperties(props: Props) {
@@ -46,7 +47,8 @@ function CardDetailProperties(props: Props) {
     pageUpdatedAt,
     pageUpdatedBy,
     syncWithPageId,
-    mutator = defaultMutator
+    mutator = defaultMutator,
+    disableEditPropertyOption
   } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
@@ -269,6 +271,7 @@ function CardDetailProperties(props: Props) {
             property={propertyTemplate}
             readOnly={readOnly}
             mutator={mutator}
+            disableEditPropertyOption={disableEditPropertyOption}
           />
         );
       })}
@@ -284,7 +287,7 @@ function CardDetailProperties(props: Props) {
         />
       )}
 
-      {!props.readOnly && activeView && (
+      {!props.readOnly && !disableEditPropertyOption && activeView && (
         <>
           <div className='octo-propertyname add-property'>
             <Button {...bindTrigger(addPropertyPopupState)}>
