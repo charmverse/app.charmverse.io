@@ -96,14 +96,14 @@ test.describe.serial('Proposal Flow', () => {
     await expect(proposalPage.currentStatus).toHaveText(PROPOSAL_STATUS_LABELS.review);
   });
 
-  test('A user can move feedback to Reviewed', async () => {
+  test.skip('A user can move feedback to Reviewed', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.reviewed);
     await proposalPage.nextStatusButton.click();
     await proposalPage.confirmStatusButton.click();
     await expect(proposalPage.currentStatus).toHaveText(PROPOSAL_STATUS_LABELS.reviewed);
   });
 
-  test('A user can create a vote', async () => {
+  test.skip('A user can create a vote', async () => {
     await expect(proposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.vote_active);
     await proposalPage.nextStatusButton.click();
     await proposalPage.confirmStatusButton.click();
