@@ -97,21 +97,17 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
 
   useEffect(() => {
     async function main() {
-      const results = await Promise.all(
-        tokenGates.map((tokenGate) =>
-          humanizeConditions({
-            myWalletAddress: account || '',
-            ...(tokenGate.conditions as any)
-          }).catch((err) => {
-            log.warn('Could not retrieve humanized format of conditions', err);
-            return null;
-          })
-        )
+      const results = tokenGates.map((tokenGate) =>
+        humanizeConditions({
+          myWalletAddress: account || '',
+          ...(tokenGate.conditions as any)
+        })
       );
+
       setDescriptions(results.filter(isTruthy));
     }
     main();
-  }, [tokenGates]);
+  }, [tokenGates, account]);
 
   async function testConnect(tokenGate: TokenGate) {
     setTestResult({ status: 'loading' });
