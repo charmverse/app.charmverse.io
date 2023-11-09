@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { usePropertiesMutator } from 'components/proposals/components/ProposalProperties/hooks/usePropertiesMutator';
 import { useProposalsBoardAdapter } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFieldsProp, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 
@@ -15,6 +16,8 @@ type Props = {
 
 export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnlyProperties }: Props) {
   const { user } = useUser();
+  const isAdmin = useIsAdmin();
+
   // TODO - use value from context instead of raw hook
   const { boardCustomProperties, card, cards, activeView, views, proposalPage, setBoardProposal } =
     useProposalsBoardAdapter();
@@ -36,6 +39,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
       pageUpdatedBy={proposalPage?.updatedBy || user?.id || ''}
       mutator={mutator ?? undefined}
       readOnlyProperties={readOnlyProperties}
+      disableEditPropertyOption={!isAdmin}
     />
   );
 }

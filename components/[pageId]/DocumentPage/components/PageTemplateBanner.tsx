@@ -26,8 +26,15 @@ const StyledPageTemplateBanner = styled(Box, {
 type Props = {
   isNewPage?: boolean;
   parentId?: string | null;
-  pageType: PageMeta['type'];
+  pageType?: PageMeta['type'];
 };
+
+const templateTypes = {
+  proposal_template: 'proposal',
+  bounty_template: 'reward'
+};
+
+type RewardTemplateType = keyof typeof templateTypes;
 
 export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const { space } = useCurrentSpace();
@@ -35,12 +42,12 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;
 
-  const isShowingCard = pageType.match('card') !== null;
+  const isShowingCard = pageType?.match('card') !== null;
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
 
-  if (!pageType.match('template')) {
+  if (!pageType?.match('template')) {
     return null;
   }
 
@@ -57,7 +64,7 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
             <span>
-              You're {isNewPage ? 'creating' : 'editing'} a {pageType.split('_template')[0]} template
+              You're {isNewPage ? 'creating' : 'editing'} a {templateTypes[pageType as RewardTemplateType]} template
             </span>
           ) : (
             <>

@@ -1,3 +1,4 @@
+import type { User } from '@charmverse/core/prisma-client';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
@@ -85,7 +86,10 @@ const createCardNotification = ({
     pageTitle,
     type: 'person_assigned',
     createdBy: dummyUser,
-    personPropertyId: v4(),
+    personProperty: {
+      id: v4(),
+      name: 'Assignee'
+    },
     archived: false,
     group: 'card',
     read: false
@@ -198,6 +202,13 @@ const createBountyNotification = ({
   };
 };
 
+const user: Pick<User, 'id' | 'avatar' | 'username' | 'email'> = {
+  id: v4(),
+  avatar: '',
+  username: 'Doe John',
+  email: 'doejohn@gmail.com'
+};
+
 const templates = {
   'Notify the user about bounty notifications': () => {
     return emails.getPendingNotificationEmail(
@@ -205,7 +216,8 @@ const templates = {
         pageTitle: 'Create a new protocol',
         spaceName: 'Uniswap',
         status: 'open'
-      })
+      }),
+      user
     );
   },
   'Notify the user about proposal notifications': () => {
@@ -214,7 +226,8 @@ const templates = {
         pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
         spaceName: 'Uniswap',
         status: 'discussion'
-      })
+      }),
+      user
     );
   },
   'Notify the user about card notifications': () => {
@@ -222,7 +235,8 @@ const templates = {
       createCardNotification({
         pageTitle: 'Product Road Map',
         spaceName: 'CharmVerse'
-      })
+      }),
+      user
     );
   },
   'Notify the user about document notifications': () => {
@@ -231,7 +245,8 @@ const templates = {
         mentionText: 'Hey there, please respond to this message.',
         pageTitle: 'Attention please',
         spaceName: 'CharmVerse'
-      })
+      }),
+      user
     );
   },
   'Notify the user about post notifications': () => {
@@ -239,7 +254,8 @@ const templates = {
       createPostNotification({
         postTitle: 'New idea. Let us discuss!',
         spaceName: 'CharmVerse'
-      })
+      }),
+      user
     );
   },
   'Notify the user about vote notifications': () => {
@@ -249,7 +265,8 @@ const templates = {
         pageTitle: 'This is a really really long vote title',
         spaceName: 'CharmVerse',
         voteTitle: 'Should we add this section? I think it can be a great addition but need all of your votes to decide'
-      })
+      }),
+      user
     );
   }
 };

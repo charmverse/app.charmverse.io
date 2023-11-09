@@ -77,9 +77,11 @@ export function previousProposalStatusUpdateMessage(status: ProposalStatus) {
     case 'draft':
       return 'In the Draft stage, only authors and administrators can view and edit the proposal.';
     case 'discussion':
-      return 'Rejecting this proposal will return it to the Discussion stage for further consideration.';
+      return 'This proposal will return to the Discussion stage for further consideration before review can proceed again.';
     case 'review':
       return 'In the Review stage, the Proposal is visible to Members. Reviewer approval is required to proceed to the voting stage.';
+    case 'evaluation_active':
+      return 'Moving back to Evaluation active will enable reviewers to add new evaluations to this proposal.';
     default:
       return null;
   }

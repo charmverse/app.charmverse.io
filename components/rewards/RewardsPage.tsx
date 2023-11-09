@@ -13,6 +13,11 @@ import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
+import {
+  DatabaseContainer,
+  DatabaseTitle,
+  DatabaseStickyHeader
+} from 'components/common/PageLayout/components/DatabasePageContent';
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
@@ -121,49 +126,47 @@ export function RewardsPage({ title }: { title: string }) {
   }
 
   return (
-    <div className='focalboard-body full-page'>
-      <Box className='BoardComponent'>
-        <Box className='top-head' pt={8}>
-          <Grid container mb={6}>
-            <Grid item xs={12}>
-              <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
-                <Typography variant='h1' gutterBottom>
-                  {title}
-                </Typography>
+    <DatabaseContainer>
+      <DatabaseStickyHeader>
+        <DatabaseTitle>
+          <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
+            <Typography variant='h1' gutterBottom>
+              {title}
+            </Typography>
 
-                <Box display='flex'>
-                  <Box
-                    gap={3}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      flexDirection: 'row-reverse'
-                    }}
-                  >
-                    <NewRewardButton />
-                  </Box>
-                </Box>
+            <Box display='flex'>
+              <Box
+                gap={3}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  flexDirection: 'row-reverse'
+                }}
+              >
+                <NewRewardButton showPage={(pageId) => showReward({ pageId, onClose })} />
               </Box>
-            </Grid>
-          </Grid>
-          {!!rewards?.length && (
-            <>
-              <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-                <RewardsViewOptions
-                  rewardStatusFilter={statusFilter}
-                  setRewardStatusFilter={setStatusFilter}
-                  // Playwright-specific
-                  testKey='desktop'
-                />
+            </Box>
+          </Box>
+        </DatabaseTitle>
+        {!!rewards?.length && (
+          <>
+            <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
+              <RewardsViewOptions
+                rewardStatusFilter={statusFilter}
+                setRewardStatusFilter={setStatusFilter}
+                // Playwright-specific
+                testKey='desktop'
+              />
 
-                <ViewSortControl
-                  activeBoard={activeBoard}
-                  activeView={activeView}
-                  cards={cards as Card[]}
-                  viewSortPopup={viewSortPopup}
-                />
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards as Card[]}
+                viewSortPopup={viewSortPopup}
+              />
 
+              {isAdmin && (
                 <ViewHeaderActionsMenu
                   onClick={(e) => {
                     e.preventDefault();
@@ -171,53 +174,55 @@ export function RewardsPage({ title }: { title: string }) {
                     setShowSidebar(!showSidebar);
                   }}
                 />
-              </Stack>
-              <Divider />
-            </>
-          )}
-        </Box>
+              )}
+            </Stack>
+            <Divider />
+          </>
+        )}
+      </DatabaseStickyHeader>
 
-        {loadingData ? (
-          <Grid item xs={12} sx={{ mt: 12 }}>
-            <LoadingComponent height={500} isLoading size={50} />
-          </Grid>
-        ) : (
-          <>
-            {rewards?.length === 0 && (
-              <Grid item xs={12} position='relative'>
-                <Box sx={{ mt: 5 }}>
-                  <EmptyStateVideo
-                    description='Getting started with rewards'
-                    videoTitle='Rewards | Getting started with CharmVerse'
-                    videoUrl='https://tiny.charmverse.io/bounties'
+      {loadingData ? (
+        <Grid item xs={12} sx={{ mt: 12 }}>
+          <LoadingComponent height={500} isLoading size={50} />
+        </Grid>
+      ) : (
+        <>
+          {rewards?.length === 0 && (
+            <Grid item xs={12} position='relative'>
+              <Box sx={{ mt: 5 }}>
+                <EmptyStateVideo
+                  description='Getting started with rewards'
+                  videoTitle='Rewards | Getting started with CharmVerse'
+                  videoUrl='https://tiny.charmverse.io/bounties'
+                />
+              </Box>
+            </Grid>
+          )}
+          {rewards?.length > 0 && (
+            <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
+              <Stack>
+                <Box width='100%'>
+                  <Table
+                    board={activeBoard}
+                    activeView={activeView}
+                    cardPages={cardPages as CardPage[]}
+                    groupByProperty={groupByProperty}
+                    views={views}
+                    visibleGroups={[]}
+                    selectedCardIds={[]}
+                    readOnly={!isAdmin}
+                    disableAddingCards={true}
+                    showCard={showRewardOrApplication}
+                    readOnlyTitle={true}
+                    cardIdToFocusOnRender=''
+                    addCard={async () => {}}
+                    onCardClicked={() => {}}
+                    onDeleteCard={onDelete}
+                    expandSubRowsOnLoad
                   />
                 </Box>
-              </Grid>
-            )}
-            {rewards?.length > 0 && (
-              <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
-                <Stack>
-                  <Box width='100%'>
-                    <Table
-                      board={activeBoard}
-                      activeView={activeView}
-                      cardPages={cardPages as CardPage[]}
-                      groupByProperty={groupByProperty}
-                      views={views}
-                      visibleGroups={[]}
-                      selectedCardIds={[]}
-                      readOnly={!isAdmin}
-                      disableAddingCards={true}
-                      showCard={showRewardOrApplication}
-                      readOnlyTitle={true}
-                      cardIdToFocusOnRender=''
-                      addCard={async () => {}}
-                      onCardClicked={() => {}}
-                      onDeleteCard={onDelete}
-                      expandSubRowsOnLoad
-                    />
-                  </Box>
 
+                {isAdmin && (
                   <ViewSidebar
                     views={views}
                     board={activeBoard}
@@ -233,12 +238,12 @@ export function RewardsPage({ title }: { title: string }) {
                     pageId={undefined}
                     showView={() => {}}
                   />
-                </Stack>
-              </Box>
-            )}
-          </>
-        )}
-      </Box>
-    </div>
+                )}
+              </Stack>
+            </Box>
+          )}
+        </>
+      )}
+    </DatabaseContainer>
   );
 }

@@ -331,6 +331,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       readOnly={readOnly}
                       onClose={close}
                       showApplications
+                      isTemplate={page.type === 'bounty_template'}
                     />
                   )}
                 </CardPropertiesWrapper>
