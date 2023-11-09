@@ -1,3 +1,4 @@
+import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import * as mailer from 'lib/mailer';
@@ -12,7 +13,7 @@ import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotif
 
 const notificationSelectFields = {
   notificationMetadata: {
-    select: { user: { select: { id: true, email: true, username: true, emailNotifications: true } } }
+    select: { user: { select: { id: true, email: true, username: true, emailNotifications: true, avatar: true } } }
   }
 };
 
@@ -35,7 +36,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -58,7 +60,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -81,7 +84,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -104,7 +108,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -127,7 +132,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -150,7 +156,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -169,7 +176,7 @@ async function sendEmail({
   user
 }: {
   notification: Notification;
-  user: { username: string; email: string; id: string };
+  user: Pick<User, 'id' | 'username' | 'id' | 'avatar' | 'email'>;
 }) {
   const notificationSpaceId = notification.spaceId;
   const userId = notification.createdBy.id;
@@ -185,7 +192,7 @@ async function sendEmail({
   });
 
   if (memberProperty) {
-    const memberPropertyValue = await prisma.memberPropertyValue.findFirst({
+    const notificationAuthorNamePropertyValue = await prisma.memberPropertyValue.findFirst({
       where: {
         spaceId: notificationSpaceId,
         userId,
@@ -195,16 +202,31 @@ async function sendEmail({
         value: true
       }
     });
-    if (memberPropertyValue?.value) {
-      notification.createdBy.username = memberPropertyValue.value as string;
+
+    if (notificationAuthorNamePropertyValue?.value) {
+      notification.createdBy.username = notificationAuthorNamePropertyValue.value as string;
+    }
+
+    const notificationTargetNamePropertyValue = await prisma.memberPropertyValue.findFirst({
+      where: {
+        spaceId: notificationSpaceId,
+        userId: user.id,
+        memberPropertyId: memberProperty.id
+      },
+      select: {
+        value: true
+      }
+    });
+    if (notificationTargetNamePropertyValue?.value) {
+      user.username = notificationTargetNamePropertyValue.value as string;
     }
   }
 
-  const template = emails.getPendingNotificationEmail(notification);
+  const template = emails.getPendingNotificationEmail(notification, user);
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,
-      email: user.email,
+      email: user.email!,
       userId: user.id
     },
     subject: template.subject,
