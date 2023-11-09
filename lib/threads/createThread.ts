@@ -31,7 +31,7 @@ export async function createThread({
   });
 
   if (!existingPage) {
-    throw new DataNotFoundError(`Cannot create thread as linked page with id ${pageId} was not found.`);
+    throw new DataNotFoundError(`Cannot create thread as page with id ${pageId} was not found.`);
   }
 
   const thread = await prisma.thread.create({
