@@ -23,7 +23,7 @@ export function useRewardTemplates({ load } = { load: true }) {
     }
 
     function handleCreateEvent(createdPages: WebSocketPayload<'pages_created'>) {
-      if (createdPages.some((page) => page.type === 'proposal_template')) {
+      if (createdPages.some((page) => page.type === 'bounty_template')) {
         mutate();
       }
     }
@@ -38,7 +38,6 @@ export function useRewardTemplates({ load } = { load: true }) {
 
   return {
     templates,
-    isLoading,
-    refreshRewardTemplates: mutate
+    isLoading
   };
 }
