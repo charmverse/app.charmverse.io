@@ -1,11 +1,13 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, ButtonGroup, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
@@ -24,9 +26,11 @@ export function NewProposalButton({
   showProposal: (pageId: string) => void;
   showNewProposal: (input?: Partial<ProposalPageAndPropertiesInput>) => void;
 }) {
-  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
+  const router = useRouter();
+  const { space: currentSpace } = useCurrentSpace();
+  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
   const isAdmin = useIsAdmin();
-  const { pages } = usePages();
+  const { pages, mutatePage } = usePages();
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
