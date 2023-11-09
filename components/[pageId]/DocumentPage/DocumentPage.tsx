@@ -20,6 +20,8 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -88,12 +90,13 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
-  const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
-    bountyId: page.bountyId
-  });
-
   // TODO: [bounties-cleanup]
+  // const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
+  //   bountyId: page.bountyId
+  // });
   // const { draftBounty } = useBounties();
+
+  const { creatingInlineReward } = useRewards();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -336,6 +339,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       isTemplate={page.type === 'bounty_template'}
                     />
                   )}
+                  {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
                 </CardPropertiesWrapper>
               </CharmEditor>
 

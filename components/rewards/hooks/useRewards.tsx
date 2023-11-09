@@ -22,8 +22,8 @@ type RewardsContextType = {
   updateReward: (input: RewardUpdate) => Promise<void>;
   refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
   createReward: (input: Omit<RewardCreationData, 'userId'>) => Promise<RewardWithUsers | null>;
-  tempReward?: RewardCreationData | null;
-  setTempReward: (input?: RewardCreationData | null) => void;
+  creatingInlineReward: boolean;
+  setCreatingInlineReward: (isCreating: boolean) => void;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
@@ -38,8 +38,8 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   updateReward: () => Promise.resolve(),
   refreshReward: () => Promise.resolve() as any,
   createReward: () => Promise.resolve(null),
-  tempReward: null,
-  setTempReward: () => {}
+  creatingInlineReward: false,
+  setCreatingInlineReward: () => {}
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
@@ -50,7 +50,7 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
 
   const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
   const { trigger: createRewardTrigger } = useCreateReward();
-  const [tempRewardData, setTempRewardData] = useState<null | RewardCreationData>(null);
+  const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
 
   // filter out deleted and templates
   let filteredRewards = useMemo(
@@ -129,24 +129,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     },
     [createRewardTrigger, mutateRewards]
   );
-
-  const setTempReward = useCallback(
-    (data?: RewardCreationData | null) => {
-      if (!space || !user) return;
-
-      setTempRewardData(
-        data ?? {
-          chainId: 1,
-          spaceId: space.id,
-          rewardAmount: 1,
-          rewardToken: 'ETH',
-          userId: user.id
-        }
-      );
-    },
-    [space, user]
-  );
-
   const value = useMemo(
     () => ({
       rewards,
@@ -159,8 +141,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       refreshReward,
       setRewards: mutateRewards,
       createReward,
-      setTempReward,
-      tempReward: tempRewardData
+      setCreatingInlineReward,
+      creatingInlineReward
     }),
     [
       rewards,
@@ -172,8 +154,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       updateReward,
       refreshReward,
       createReward,
-      setTempReward,
-      tempRewardData
+      creatingInlineReward,
+      setCreatingInlineReward
     ]
   );
 
