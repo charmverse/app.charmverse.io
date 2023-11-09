@@ -42,7 +42,7 @@ export type NFTData = {
   isPinned: boolean;
   link: string;
   walletId: string | null;
-  contractName: string;
+  contractName?: string;
 };
 
 export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
