@@ -44,10 +44,6 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
     showApplication(applicationId);
     setTimeout(() => onShowApplication?.(), 50);
   };
-  const openNewApplication = (applicationId: string) => {
-    showApplication(applicationId);
-    setTimeout(() => onShowApplication?.(), 50);
-  };
 
   const validSubmissions = countCompleteSubmissions({ applications: reward.applications });
 
@@ -82,7 +78,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
           >
             There are no submissions yet.
           </Typography>
-          <NewWorkButton rewardId={rewardId} />
+          <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
         </Box>
       </Stack>
     );

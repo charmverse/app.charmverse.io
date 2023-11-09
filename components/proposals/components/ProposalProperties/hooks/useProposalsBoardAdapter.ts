@@ -22,7 +22,8 @@ import {
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
+  STATUS_BLOCK_ID,
+  CREATED_AT_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalFields, ProposalFieldsProp, ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 
@@ -48,9 +49,18 @@ export function useProposalsBoardAdapter() {
     // use saved default block or build on the fly
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
-    return viewBlock
-      ? (blockToFBBlock(viewBlock) as BoardView)
-      : getDefaultTableView({ storedBoard: proposalPropertiesBlock, categories });
+    if (!viewBlock) {
+      return getDefaultTableView({ storedBoard: proposalPropertiesBlock, categories });
+    }
+
+    const boardView = blockToFBBlock(viewBlock) as BoardView;
+
+    // sort by created at desc by default
+    if (!boardView.fields.sortOptions?.length) {
+      boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+    }
+
+    return boardView;
   }, [categories, proposalPropertiesBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
@@ -116,6 +126,10 @@ function mapProposalToCardPage({
   proposalFields.properties = {
     ...proposalFields.properties,
     // add default field values on the fly
+    [CREATED_AT_ID]:
+      proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
+        ? new Date(proposalPage?.createdAt).getTime()
+        : '',
     [CATEGORY_BLOCK_ID]: (proposal && 'categoryId' in proposal && proposal.categoryId) || '',
     [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
     [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',

@@ -166,13 +166,15 @@ export function RewardsPage({ title }: { title: string }) {
                 viewSortPopup={viewSortPopup}
               />
 
-              <ViewHeaderActionsMenu
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowSidebar(!showSidebar);
-                }}
-              />
+              {isAdmin && (
+                <ViewHeaderActionsMenu
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSidebar(!showSidebar);
+                  }}
+                />
+              )}
             </Stack>
             <Divider />
           </>
@@ -220,21 +222,23 @@ export function RewardsPage({ title }: { title: string }) {
                   />
                 </Box>
 
-                <ViewSidebar
-                  views={views}
-                  board={activeBoard}
-                  rootBoard={activeBoard}
-                  view={activeView}
-                  isOpen={!!showSidebar}
-                  closeSidebar={() => setShowSidebar(false)}
-                  hideLayoutOptions={true}
-                  hideSourceOptions={true}
-                  hideGroupOptions={true}
-                  groupByProperty={groupByProperty}
-                  page={undefined}
-                  pageId={undefined}
-                  showView={() => {}}
-                />
+                {isAdmin && (
+                  <ViewSidebar
+                    views={views}
+                    board={activeBoard}
+                    rootBoard={activeBoard}
+                    view={activeView}
+                    isOpen={!!showSidebar}
+                    closeSidebar={() => setShowSidebar(false)}
+                    hideLayoutOptions={true}
+                    hideSourceOptions={true}
+                    hideGroupOptions={true}
+                    groupByProperty={groupByProperty}
+                    page={undefined}
+                    pageId={undefined}
+                    showView={() => {}}
+                  />
+                )}
               </Stack>
             </Box>
           )}

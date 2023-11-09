@@ -40,7 +40,6 @@ export function RewardPropertiesForm({
   pageId,
   refreshPermissions
 }: Props) {
-  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [rewardType, setRewardType] = useState<RewardType>('Token');
   const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
