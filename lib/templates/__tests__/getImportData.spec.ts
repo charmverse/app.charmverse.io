@@ -23,10 +23,12 @@ describe('getImportData', () => {
     validExportData = {
       pages: [],
       roles: [],
+      postCategories: [],
       proposalCategories: [],
       permissions: {
         proposalCategoryPermissions: [],
-        spacePermissions: []
+        spacePermissions: [],
+        postCategoryPermissions: []
       }
     };
 

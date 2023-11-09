@@ -412,10 +412,14 @@ export async function generateImportWorkspacePages({
         } else if (sourceBountyPermission.userId) {
           if (sourceBounty.spaceId !== space.id) {
             permissionToCreate.userId = space.createdBy;
+          } else {
+            permissionToCreate.userId = sourceBountyPermission.userId;
           }
         } else if (sourceBountyPermission.roleId) {
           if (sourceBounty.spaceId !== space.id && oldNewRoleIdHashMap?.[sourceBountyPermission.roleId]) {
             permissionToCreate.roleId = oldNewRoleIdHashMap?.[sourceBountyPermission.roleId];
+          } else {
+            permissionToCreate.roleId = sourceBountyPermission.roleId;
           }
         }
 
