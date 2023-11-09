@@ -5,7 +5,7 @@ import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalb
 import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTransition';
 
 export const proposalDbProperties: {
-  [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate<key>;
+  [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
 } = {
   proposalCategory: (id?: string, name?: string) => ({
     id: id || uuid(),
@@ -60,6 +60,12 @@ export const proposalDbProperties: {
     name: name || 'Proposal Type',
     options: [],
     type: 'proposalEvaluationType'
+  }),
+  proposalCreatedAt: (id?: string, name?: string) => ({
+    id: id || uuid(),
+    name: name || 'Created Time',
+    options: [],
+    type: 'createdTime'
   })
 };
 
