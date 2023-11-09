@@ -1,16 +1,15 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
-import { KeyboardArrowDown } from '@mui/icons-material';
-import LaunchIcon from '@mui/icons-material/Launch';
-import { Collapse, Divider, FormLabel, IconButton, Stack, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import styled from '@emotion/styled';
+import { ArrowBack } from '@mui/icons-material';
+import { Box, Grid, Divider, FormLabel, Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
-import { ScrollableWindow } from 'components/common/PageLayout';
 import UserDisplay from 'components/common/UserDisplay';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import type { WorkInput } from 'components/rewards/hooks/useApplication';
@@ -22,7 +21,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -36,6 +34,10 @@ type Props = {
   applicationId: string | null;
   rewardId?: string | null;
 };
+
+const StyledContainer = styled(Container)`
+  margin-bottom: 180px;
+`;
 
 export function RewardApplicationPageComponent({ applicationId, rewardId }: Props) {
   const isNewApplication = !applicationId && !!rewardId;
@@ -117,28 +119,22 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
     (isNewApplication && !reward.approveSubmitters);
 
   return (
-    <ScrollableWindow>
-      {/** TODO - Use more elegant layout */}
-      <Grid container px='10%' gap={2}>
-        <Grid item xs={12} display='flex' flexDirection='column' justifyContent='space-between' sx={{ mb: 1 }}>
+    <div className='document-print-container'>
+      <Box display='flex' flexDirection='column'>
+        <StyledContainer top={0}>
           <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
           {space && rewardPageContent && (
-            <Box onClick={goToReward} sx={{ cursor: 'pointer' }}>
-              <Typography variant='body2' display='flex' gap={1} color='secondary'>
-                <LaunchIcon fontSize='small' sx={{ transform: 'rotate(270deg)' }} />
-                <span>Back to reward</span>
-              </Typography>
-            </Box>
+            <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
+              <span>Back to reward</span>
+            </Button>
           )}
-        </Grid>
 
-        <Grid item xs={12} className='focalboard-body' flexDirection='column'>
-          <Stack>
+          <div className='focalboard-body'>
             <RewardProperties
               rewardId={reward.id}
               pageId={reward.page.id}
               pagePath={reward.page.path}
-              readOnly={!rewardPagePermissions?.edit_content}
+              readOnly
               rewardChanged={refreshReward}
             />
             {rewardPageContent && (
@@ -147,39 +143,31 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
                 <Divider sx={{ mt: 2 }} />
               </>
             )}
-          </Stack>
-        </Grid>
+          </div>
 
-        {!!application && (
-          <Grid
-            item
-            container
-            xs={12}
-            gap={2}
-            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-          >
-            <Grid item display='flex' alignItems='center' gap={2}>
-              <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
-                {application?.status === 'rejected' || application?.status === 'applied' ? 'Applicant' : 'Submitter'}
-              </FormLabel>
-              <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
+          {!!application && (
+            <Grid container gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Grid item display='flex' alignItems='center' gap={2}>
+                <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
+                  {application?.status === 'rejected' || application?.status === 'applied' ? 'Applicant' : 'Submitter'}
+                </FormLabel>
+                <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
+              </Grid>
+
+              <Grid item>
+                <RewardReviewerActions
+                  application={application}
+                  reward={reward}
+                  rewardPermissions={rewardPermissions}
+                  refreshApplication={refreshApplication}
+                  reviewApplication={reviewApplication}
+                  hasCustomReward={!!reward.customReward}
+                />
+              </Grid>
             </Grid>
+          )}
 
-            <Grid item>
-              <RewardReviewerActions
-                application={application}
-                reward={reward}
-                rewardPermissions={rewardPermissions}
-                refreshApplication={refreshApplication}
-                reviewApplication={reviewApplication}
-                hasCustomReward={!!reward.customReward}
-              />
-            </Grid>
-          </Grid>
-        )}
-
-        {showApplicationInput && (
-          <Grid item xs={12}>
+          {showApplicationInput && (
             <ApplicationInput
               application={application}
               rewardId={reward.id}
@@ -193,11 +181,9 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
                 })
               }
             />
-          </Grid>
-        )}
+          )}
 
-        {showSubmissionInput && currentRewardId && (
-          <Grid item xs={12}>
+          {showSubmissionInput && currentRewardId && (
             <RewardSubmissionInput
               currentUserIsApplicant={(!!user && user?.id === application?.createdBy) || isNewApplication}
               submission={application}
@@ -215,14 +201,10 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
               permissions={applicationRewardPermissions}
               hasCustomReward={!!reward.customReward}
             />
-          </Grid>
-        )}
-        {application && (
-          <Grid item xs={12}>
-            <ApplicationComments applicationId={application.id} status={application.status} />
-          </Grid>
-        )}
-      </Grid>
-    </ScrollableWindow>
+          )}
+          {application && <ApplicationComments applicationId={application.id} status={application.status} />}
+        </StyledContainer>
+      </Box>
+    </div>
   );
 }

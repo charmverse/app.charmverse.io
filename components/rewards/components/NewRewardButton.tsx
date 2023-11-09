@@ -5,7 +5,7 @@ import { useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import { NewPageDocument } from 'components/common/PageDialog/components/NewPageDocument';
+import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
@@ -113,9 +113,9 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
         onSave={saveForm}
         isSaving={isSavingReward}
       >
-        <NewPageDocument titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
-          <RewardPropertiesForm onChange={setRewardValues} values={rewardValues} isNewReward />
-        </NewPageDocument>
+        <NewDocumentPage titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
+          <RewardPropertiesForm onChange={setRewardValues} values={rewardValues} isNewReward expandedByDefault />
+        </NewDocumentPage>
       </NewPageDialog>
     </>
   );

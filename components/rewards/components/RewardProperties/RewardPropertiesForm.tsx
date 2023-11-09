@@ -31,6 +31,7 @@ type Props = {
   pageId?: string;
   refreshPermissions?: VoidFunction;
   isNewReward?: boolean;
+  expandedByDefault?: boolean;
 };
 
 export function RewardPropertiesForm({
@@ -40,10 +41,11 @@ export function RewardPropertiesForm({
   useDebouncedInputs,
   isNewReward,
   pageId,
-  refreshPermissions
+  refreshPermissions,
+  expandedByDefault
 }: Props) {
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
   const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,

@@ -27,7 +27,7 @@ type Props = {
 };
 
 // Note: this component is only used before a page is saved to the DB
-export function NewPageDocument({ children, placeholder, titlePlaceholder, values: newPageValues, onChange }: Props) {
+export function NewDocumentPage({ children, placeholder, titlePlaceholder, values: newPageValues, onChange }: Props) {
   newPageValues ||= EMPTY_PAGE_VALUES;
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
