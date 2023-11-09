@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { use, useCallback, useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
-import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
+import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -14,11 +14,13 @@ import type { RewardPageAndPropertiesInput } from 'lib/rewards/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 type Props = {
-  initValues?: Partial<RewardPageAndPropertiesInput>;
+  defaultValues?: Partial<RewardPageAndPropertiesInput>;
+  newPageValues: Partial<NewPageValues> | null;
+  clearNewPage: VoidFunction;
+  isDirty: boolean;
 };
 
-export function useNewReward({ initValues }: Props = {}) {
-  const { updateNewPageContext, clearNewPage, isDirty, newPageValues } = useNewPage();
+export function useNewRewardPage({ clearNewPage, isDirty, newPageValues, defaultValues }: Props) {
   const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
@@ -29,7 +31,7 @@ export function useNewReward({ initValues }: Props = {}) {
   const [contentUpdated, setContentUpdated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formInputs, setFormInputsRaw] = useState<RewardPageAndPropertiesInput>(
-    emptyState({ ...initValues, userId: user?.id })
+    emptyState({ ...defaultValues, userId: user?.id })
   );
   const { createReward: createRewardTrigger } = useRewards();
 
@@ -41,7 +43,8 @@ export function useNewReward({ initValues }: Props = {}) {
   const clearFormInputs = useCallback(() => {
     setFormInputs(emptyState());
     setContentUpdated(false);
-  }, [setFormInputs]);
+    clearNewPage();
+  }, [setFormInputs, clearNewPage]);
 
   const createReward = useCallback(async () => {
     log.info('[user-journey] Create a proposal');
@@ -78,7 +81,6 @@ export function useNewReward({ initValues }: Props = {}) {
           }
         });
         setTimeout(() => {
-          clearNewPage();
           clearFormInputs();
         }, 100);
         setUrlWithoutRerender(router.pathname, { id: createdReward.id });
@@ -87,7 +89,6 @@ export function useNewReward({ initValues }: Props = {}) {
     }
   }, [
     clearFormInputs,
-    clearNewPage,
     createRewardTrigger,
     currentSpace,
     formInputs,
@@ -103,12 +104,6 @@ export function useNewReward({ initValues }: Props = {}) {
       setContentUpdated(true);
     }
   }, [isDirty]);
-
-  useEffect(() => {
-    updateNewPageContext({
-      contentUpdated
-    });
-  }, [contentUpdated, updateNewPageContext]);
 
   return {
     formInputs,

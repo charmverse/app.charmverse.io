@@ -3,22 +3,25 @@ import { useEffect, useRef, useState } from 'react';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { NewPageDocument } from 'components/common/PageDialog/components/NewPageDocument';
-import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
+import { usePreventReload } from 'hooks/usePreventReload';
 
 export function NewPageDialog({
   children,
+  contentUpdated,
   onClose,
   onSave,
-  isSaving
+  isSaving,
+  isOpen,
+  disabledTooltip
 }: {
   children: React.ReactNode;
+  contentUpdated: boolean;
   onClose?: VoidFunction;
   onSave: VoidFunction;
   isSaving?: boolean;
+  disabledTooltip?: string;
+  isOpen: boolean;
 }) {
-  const { newPageContext, clearNewPage, hasNewPage } = useNewPage();
-
   const mounted = useRef(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -33,15 +36,14 @@ export function NewPageDialog({
 
   function close() {
     onClose?.();
-    clearNewPage();
     setShowConfirmDialog(false);
   }
 
-  if (!hasNewPage) {
+  usePreventReload(contentUpdated);
+
+  if (!isOpen) {
     return null;
   }
-
-  const { contentUpdated, disabledTooltip } = newPageContext;
 
   return (
     <Dialog
@@ -64,7 +66,7 @@ export function NewPageDialog({
         </Button>
       }
     >
-      <NewPageDocument>{children}</NewPageDocument>
+      {children}
 
       <ConfirmDeleteModal
         onClose={() => {
