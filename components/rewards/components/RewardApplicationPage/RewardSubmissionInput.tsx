@@ -19,7 +19,7 @@ import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
 
-import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
+import { RewardApplicationStatusChip, applicationStatuses } from '../RewardApplicationStatusChip';
 
 const schema = (customReward?: boolean) => {
   return yup.object({
@@ -110,7 +110,9 @@ export function RewardSubmissionInput({
             {!submission || submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
           </FormLabel>
         </Box>
-        {submission && <RewardApplicationStatusChip status={submission?.status} />}
+        {submission && !applicationStatuses.includes(submission?.status) && (
+          <RewardApplicationStatusChip status={submission.status} />
+        )}
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={2}>
@@ -161,8 +163,8 @@ export function RewardSubmissionInput({
                 {...register('rewardInfo')}
                 type='text'
                 fullWidth
-                error={!!errors.walletAddress}
-                helperText={errors.walletAddress?.message}
+                error={!!errors.rewardInfo}
+                helperText={errors.rewardInfo?.message}
                 disabled={!currentUserIsApplicant}
               />
             </Grid>

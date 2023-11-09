@@ -14,7 +14,7 @@ import * as yup from 'yup';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 
-import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
+import { RewardApplicationStatusChip, applicationStatuses } from '../RewardApplicationStatusChip';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -24,6 +24,7 @@ interface IApplicationFormProps {
   rewardId: string;
   application?: Application;
   readOnly?: boolean;
+  disableCollapse?: boolean;
   expandedOnLoad?: boolean;
 }
 
@@ -33,11 +34,12 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export default function ApplicationInput({
+export function ApplicationInput({
   readOnly = false,
   onSubmit,
   rewardId,
   application,
+  disableCollapse,
   expandedOnLoad
 }: IApplicationFormProps) {
   const [isVisible, setIsVisible] = useState(expandedOnLoad);
@@ -70,24 +72,28 @@ export default function ApplicationInput({
         justifyContent='space-between'
         flexDirection='row'
         gap={0.5}
-        onClick={() => setIsVisible(!isVisible)}
+        onClick={() => !disableCollapse && setIsVisible(!isVisible)}
       >
         <Box display='flex' gap={0.5}>
           <FormLabel sx={{ fontWeight: 'bold' }}>
             {application?.createdBy === user?.id ? 'Your application' : 'Application'}
           </FormLabel>
 
-          <IconButton
-            sx={{
-              top: -2.5,
-              position: 'relative'
-            }}
-            size='small'
-          >
-            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-          </IconButton>
+          {!disableCollapse && (
+            <IconButton
+              sx={{
+                top: -2.5,
+                position: 'relative'
+              }}
+              size='small'
+            >
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+            </IconButton>
+          )}
         </Box>
-        {application && <RewardApplicationStatusChip status={application.status} />}
+        {application && applicationStatuses.includes(application?.status) && (
+          <RewardApplicationStatusChip status={application.status} />
+        )}
       </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form

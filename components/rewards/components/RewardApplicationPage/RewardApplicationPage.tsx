@@ -24,7 +24,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { ApplicationComments } from './ApplicationComments';
-import ApplicationInput from './RewardApplicationInput';
+import { ApplicationInput } from './RewardApplicationInput';
 import { RewardReviewerActions } from './RewardReviewerActions';
 import { RewardSubmissionInput } from './RewardSubmissionInput';
 
@@ -107,10 +107,8 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
       (['complete', 'paid', 'processing', 'rejected'] as ApplicationStatus[]).includes(application.status));
 
   const applicationStepRequired = reward.approveSubmitters;
-  // (reward.approveSubmitters && !!application && application.status === 'applied') ||
-  // (isNewApplication && reward.approveSubmitters);
 
-  const showSubmissionInput = !applicationStepRequired || (!isNewApplication && application.status !== 'applied');
+  const showSubmissionInput = !applicationStepRequired || (application && application.status !== 'applied');
 
   const isApplicationInReview = application?.status === 'applied';
 
@@ -133,7 +131,7 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
               readOnly
               rewardChanged={refreshReward}
             />
-            {rewardPageContent && (
+            {rewardPageContent?.content && (
               <>
                 <CharmEditor readOnly content={rewardPageContent.content as PageContent} isContentControlled />
                 <Divider sx={{ mt: 2 }} />
@@ -141,7 +139,7 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
             )}
           </div>
 
-          {!!application && (
+          {!!application && application?.createdBy !== user?.id && (
             <Grid container gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Grid item display='flex' alignItems='center' gap={2}>
                 <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
@@ -167,6 +165,7 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
             <ApplicationInput
               application={application}
               rewardId={reward.id}
+              disableCollapse={!showSubmissionInput}
               expandedOnLoad={isNewApplication || isApplicationInReview}
               readOnly={application?.createdBy !== user?.id && !isNewApplication}
               onSubmit={(updatedApplication) =>

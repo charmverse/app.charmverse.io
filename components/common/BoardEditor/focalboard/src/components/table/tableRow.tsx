@@ -12,10 +12,7 @@ import { mutate } from 'swr';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import {
-  REWARD_APPLICATION_STATUS_COLORS,
-  RewardApplicationStatusIcon
-} from 'components/rewards/components/RewardApplicationStatusChip';
+import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -213,7 +210,7 @@ function TableRow(props: Props) {
                       status={card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus}
                     />
                   )}
-                  {card.customIconType !== 'applicationStatus' && (
+                  {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
                     <PageIcon
                       isEditorEmpty={!hasContent}
                       pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}

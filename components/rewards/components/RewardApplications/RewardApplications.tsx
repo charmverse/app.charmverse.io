@@ -97,32 +97,6 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
               reward?.maxSubmissions ? `${validSubmissions} / ${reward.maxSubmissions}` : validSubmissions
             }`}
           />
-
-          {/*
-          // Re-enable later
-          {permissions?.lock && isRewardLockable(reward) && (
-            <Tooltip
-              key='stop-new'
-              arrow
-              placement='top'
-              title={`${reward.submissionsLocked ? 'Enable' : 'Prevent'} new ${
-                reward.approveSubmitters ? 'applications' : 'submissions'
-              } from being made.`}
-            >
-              <IconButton
-                size='small'
-                onClick={() => {
-                  lockRewardSubmissions();
-                }}
-              >
-                {!reward.submissionsLocked ? (
-                  <LockOpen color='secondary' fontSize='small' />
-                ) : (
-                  <LockIcon color='secondary' fontSize='small' />
-                )}
-              </IconButton>
-            </Tooltip>
-          )} */}
         </Box>
 
         <RewardApplicationFilter status={applicationsFilter} onStatusSelect={setApplicationsFilter} />

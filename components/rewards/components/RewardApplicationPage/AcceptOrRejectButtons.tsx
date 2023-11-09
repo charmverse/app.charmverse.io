@@ -15,13 +15,19 @@ type Props = {
   readOnly?: boolean;
 };
 
-export default function RewardReview({ onConfirmReview, reviewType, readOnly }: Props) {
+export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly }: Props) {
   const [reviewDecision, setReviewDecision] = useState<ReviewDecision | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const approveLabel = reviewType === 'application' ? 'Accept' : 'Approve';
 
   function cancel() {
     setReviewDecision(null);
+  }
+
+  function confirmReview(value: ReviewDecision) {
+    onConfirmReview(value);
+    setIsLoading(true);
   }
 
   return (
@@ -46,17 +52,17 @@ export default function RewardReview({ onConfirmReview, reviewType, readOnly }: 
           <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>This decision is permanent.</Typography>
           <Box display='flex' gap={2} mt={3}>
             {reviewDecision === 'reject' && (
-              <Button color='error' onClick={() => onConfirmReview('reject')}>
+              <Button color='error' onClick={() => confirmReview('reject')}>
                 Reject
               </Button>
             )}
             {reviewDecision === 'approve' && (
-              <Button color='success' onClick={() => onConfirmReview('approve')}>
+              <Button loading={isLoading} color='success' onClick={() => confirmReview('approve')}>
                 {approveLabel}
               </Button>
             )}
 
-            <Button variant='outlined' color='secondary' onClick={cancel}>
+            <Button loading={isLoading} variant='outlined' color='secondary' onClick={cancel}>
               Cancel
             </Button>
           </Box>

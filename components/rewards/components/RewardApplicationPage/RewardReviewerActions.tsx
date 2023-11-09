@@ -15,7 +15,7 @@ import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
 import { RewardPaymentButton } from '../RewardProperties/components/RewardApplicantsTable/RewardPaymentButton';
 
-import RewardReview from './RewardReview';
+import { AcceptOrRejectButtons } from './AcceptOrRejectButtons';
 
 type Props = {
   reward: RewardWithUsers;
@@ -61,14 +61,14 @@ export function RewardReviewerActions({
     <div>
       {/** This section contains all possible reviewer actions */}
       {application.status === 'applied' && rewardPermissions?.review && (
-        <RewardReview
+        <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='application'
           readOnly={!rewardPermissions?.approve_applications}
         />
       )}
       {(application.status === 'review' || application.status === 'inProgress') && rewardPermissions?.review && (
-        <RewardReview
+        <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='submission'
           readOnly={!rewardPermissions?.review}

@@ -32,7 +32,7 @@ export function useNewReward() {
   const createReward = useCallback(
     async (pageValues: RewardPageProps | null) => {
       pageValues ||= EMPTY_PAGE_VALUES;
-      log.info('[user-journey] Create a proposal');
+      log.info('[user-journey] Create a reward');
       if (currentSpace) {
         setIsSaving(true);
 
@@ -62,6 +62,7 @@ export function useNewReward() {
               { revalidate: false }
             );
             setContentUpdated(false);
+            return reward;
           })
           .finally(() => {
             setIsSaving(false);
