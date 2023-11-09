@@ -47,7 +47,7 @@ export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
 // // Mutative requests
 
 export function useCreateReward() {
-  return usePOST<RewardCreationData, RewardWithUsers>('/api/rewards');
+  return usePOST<Omit<RewardCreationData, 'userId'>, RewardWithUsers>('/api/rewards');
 }
 
 // export function useUpsertRubricCriteria({ rewardId }: { rewardId: string }) {

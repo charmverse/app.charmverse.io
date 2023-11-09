@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { useCallback, useState } from 'react';
 
+import { useCreateReward } from 'charmClient/hooks/rewards';
 import { EMPTY_PAGE_VALUES } from 'components/common/PageDialog/hooks/useNewPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -15,7 +16,8 @@ export function useNewReward() {
   const [contentUpdated, setContentUpdated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFields>(emptyState());
-  const { createReward: createRewardTrigger } = useRewards();
+  const { mutateRewards } = useRewards();
+  const { trigger: createRewardTrigger } = useCreateReward();
 
   const setRewardValues = useCallback((partialFormInputs: Partial<UpdateableRewardFields>) => {
     setContentUpdated(true);
@@ -51,17 +53,24 @@ export function useNewReward() {
             showMessage(err.message ?? 'Something went wrong', 'error');
             throw err;
           })
+          .then((reward) => {
+            mutateRewards(
+              (data) => {
+                if (!reward) return data;
+                return [...(data || []), reward];
+              },
+              { revalidate: false }
+            );
+            setContentUpdated(false);
+          })
           .finally(() => {
             setIsSaving(false);
           });
 
-        if (createdReward) {
-          setContentUpdated(false);
-          return createdReward;
-        }
+        return createdReward;
       }
     },
-    [createRewardTrigger, rewardValues, currentSpace, showMessage]
+    [createRewardTrigger, rewardValues, mutateRewards, currentSpace, showMessage]
   );
 
   return {

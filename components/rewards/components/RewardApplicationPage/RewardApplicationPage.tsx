@@ -2,7 +2,6 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, Grid, Divider, FormLabel, Stack } from '@mui/material';
-import { useState } from 'react';
 
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
@@ -20,7 +19,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
-import { usePagePermissions } from 'hooks/usePagePermissions';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -56,13 +54,11 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
 
   const { space } = useCurrentSpace();
 
-  const { permissions: rewardPagePermissions } = usePagePermissions({ pageIdOrPath: currentRewardId as string });
   const { data: rewardPermissions } = useGetRewardPermissions({ rewardId: currentRewardId });
 
   const { members } = useMembers();
   const { user } = useUser();
 
-  const [showProperties, setShowProperties] = useState(false);
   const { showPage: showReward, hidePage: hideReward } = usePageDialog();
   const { createNewWork } = useNewWork(currentRewardId);
 
@@ -110,13 +106,13 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
     (user?.id !== application?.createdBy ||
       (['complete', 'paid', 'processing', 'rejected'] as ApplicationStatus[]).includes(application.status));
 
-  const showApplicationInput =
-    (reward.approveSubmitters && !!application && application.status === 'applied') ||
-    (isNewApplication && reward.approveSubmitters);
+  const applicationStepRequired = reward.approveSubmitters;
+  // (reward.approveSubmitters && !!application && application.status === 'applied') ||
+  // (isNewApplication && reward.approveSubmitters);
 
-  const showSubmissionInput =
-    (reward.approveSubmitters && !!application && application.status === 'applied') ||
-    (isNewApplication && !reward.approveSubmitters);
+  const showSubmissionInput = !applicationStepRequired || (!isNewApplication && application.status !== 'applied');
+
+  const isApplicationInReview = application?.status === 'applied';
 
   return (
     <div className='document-print-container'>
@@ -167,11 +163,11 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
             </Grid>
           )}
 
-          {showApplicationInput && (
+          {applicationStepRequired && (
             <ApplicationInput
               application={application}
               rewardId={reward.id}
-              expandedOnLoad
+              expandedOnLoad={isNewApplication || isApplicationInReview}
               readOnly={application?.createdBy !== user?.id && !isNewApplication}
               onSubmit={(updatedApplication) =>
                 saveApplication({
@@ -183,12 +179,11 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
             />
           )}
 
-          {showSubmissionInput && currentRewardId && (
+          {showSubmissionInput && (
             <RewardSubmissionInput
               currentUserIsApplicant={(!!user && user?.id === application?.createdBy) || isNewApplication}
               submission={application}
               readOnly={readonlySubmission}
-              expandedOnLoad
               refreshSubmission={refreshApplication}
               onSubmit={(submission) =>
                 saveApplication({
