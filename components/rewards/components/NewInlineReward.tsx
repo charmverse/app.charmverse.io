@@ -1,4 +1,5 @@
 import { Stack } from '@mui/material';
+import { useEffect } from 'react';
 
 import { Button } from 'components/common/Button';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
@@ -23,6 +24,10 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
       refreshPage(pageId);
     }
   }
+
+  useEffect(() => {
+    return () => setCreatingInlineReward(false);
+  }, []);
 
   return (
     <Stack gap={1}>
