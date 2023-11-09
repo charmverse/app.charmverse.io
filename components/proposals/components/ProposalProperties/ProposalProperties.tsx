@@ -72,6 +72,7 @@ type ProposalPropertiesProps = {
   readOnlyCategory?: boolean;
   isAdmin?: boolean;
   isFromTemplate?: boolean;
+  isTemplateRequired?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   onSaveRubricCriteriaAnswers?: () => void;
   pageId?: string;
@@ -102,6 +103,7 @@ export function ProposalProperties({
   canViewRubricAnswers,
   isAdmin = false,
   isFromTemplate,
+  isTemplateRequired,
   onChangeRubricCriteria,
   onSaveRubricCriteriaAnswers,
   proposalFormInputs,
@@ -391,7 +393,7 @@ export function ProposalProperties({
           {isNewProposal && proposalFormInputs.type !== 'proposal_template' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
+                <PropertyLabel readOnly highlighted required={isTemplateRequired}>
                   Template
                 </PropertyLabel>
                 <Box display='flex' flex={1}>

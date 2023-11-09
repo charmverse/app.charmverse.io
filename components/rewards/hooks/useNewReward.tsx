@@ -80,9 +80,6 @@ export function emptyState({
 }: Partial<UpdateableRewardFields> & { userId?: string } = {}): UpdateableRewardFields {
   return {
     fields: { properties: {} },
-    chainId: 1,
-    rewardAmount: 1,
-    rewardToken: 'ETH',
     ...inputs
   };
 }

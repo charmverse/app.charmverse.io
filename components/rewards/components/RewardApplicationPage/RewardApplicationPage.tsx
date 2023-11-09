@@ -133,42 +133,21 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
         </Grid>
 
         <Grid item xs={12} className='focalboard-body' flexDirection='column'>
-          <Stack
-            direction='row'
-            gap={1}
-            alignItems='center'
-            sx={{ cursor: 'pointer' }}
-            onClick={() => setShowProperties((v) => !v)}
-          >
-            <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>Reward Details</FormLabel>
-            <IconButton size='small'>
-              <KeyboardArrowDown
-                fontSize='small'
-                sx={{ transform: `rotate(${showProperties ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
-              />
-            </IconButton>
+          <Stack>
+            <RewardProperties
+              rewardId={reward.id}
+              pageId={reward.page.id}
+              pagePath={reward.page.path}
+              readOnly={!rewardPagePermissions?.edit_content}
+              rewardChanged={refreshReward}
+            />
+            {rewardPageContent && (
+              <>
+                <CharmEditor readOnly content={rewardPageContent.content as PageContent} isContentControlled />
+                <Divider sx={{ mt: 2 }} />
+              </>
+            )}
           </Stack>
-          <Collapse in={showProperties} timeout='auto' unmountOnExit>
-            <Stack>
-              <RewardProperties
-                rewardId={reward.id}
-                pageId={reward.page.id}
-                pagePath={reward.page.path}
-                readOnly={!rewardPagePermissions?.edit_content}
-                rewardChanged={refreshReward}
-              />
-              {rewardPageContent && (
-                <>
-                  <CharmEditor
-                    pageId={rewardPageContent.id}
-                    readOnly
-                    content={rewardPageContent.content as PageContent}
-                  />
-                  <Divider sx={{ mt: 2 }} />
-                </>
-              )}
-            </Stack>
-          </Collapse>
         </Grid>
 
         {!!application && (

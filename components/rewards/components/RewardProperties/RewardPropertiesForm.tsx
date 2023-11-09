@@ -30,6 +30,7 @@ type Props = {
   useDebouncedInputs?: boolean;
   pageId?: string;
   refreshPermissions?: VoidFunction;
+  isNewReward?: boolean;
 };
 
 export function RewardPropertiesForm({
@@ -37,12 +38,13 @@ export function RewardPropertiesForm({
   values,
   readOnly,
   useDebouncedInputs,
+  isNewReward,
   pageId,
   refreshPermissions
 }: Props) {
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [rewardType, setRewardType] = useState<RewardType>('Token');
+  const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
   const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
@@ -61,10 +63,6 @@ export function RewardPropertiesForm({
         updates.rewardAmount = null;
         updates.chainId = null;
         updates.rewardToken = null;
-      } else {
-        updates.rewardAmount = updates.rewardAmount || 1;
-        updates.chainId = updates.chainId || 1;
-        updates.rewardToken = updates.rewardToken || 'ETH';
       }
     }
 
@@ -147,7 +145,7 @@ export function RewardPropertiesForm({
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
+              <PropertyLabel readOnly highlighted required={isNewReward}>
                 Reviewer
               </PropertyLabel>
               <UserAndRoleSelect
@@ -288,7 +286,7 @@ export function RewardPropertiesForm({
 
             {rewardType === 'Token' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
+                <PropertyLabel readOnly highlighted required={isNewReward}>
                   Reward Token
                 </PropertyLabel>
                 <RewardTokenProperty
