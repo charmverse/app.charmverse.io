@@ -138,3 +138,7 @@ export async function convertAndSavePage<
 
   return { page };
 }
+
+export function convertDoc(content: any) {
+  return content ? convertDocument(getNodeFromJson(content)).doc : null;
+}

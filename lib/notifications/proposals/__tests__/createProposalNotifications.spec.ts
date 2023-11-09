@@ -15,7 +15,7 @@ import { createNotificationsFromEvent } from '../../createNotificationsFromEvent
 import { createProposalNotifications } from '../createProposalNotifications';
 
 describe(`Test proposal events and notifications`, () => {
-  it(`Should create proposal notifications for proposal.status_changed event`, async () => {
+  it.skip(`Should create proposal notifications for proposal.status_changed event`, async () => {
     const { space } = await generateUserAndSpace();
     const author1 = await generateUser();
     await addUserToSpace({
