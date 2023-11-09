@@ -1,4 +1,4 @@
-import { Box, Divider, Stack, Tooltip } from '@mui/material';
+import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
@@ -41,6 +41,7 @@ export function RewardPropertiesForm({
   refreshPermissions
 }: Props) {
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [rewardType, setRewardType] = useState<RewardType>('Token');
   const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
@@ -137,11 +138,13 @@ export function RewardPropertiesForm({
         <RewardPropertiesHeader
           reward={values as RewardWithUsers}
           pageId={pageId || ''}
+          isExpanded={isExpanded}
+          toggleExpanded={() => setIsExpanded((v) => !v)}
           readOnly={readOnly || !pageId}
           refreshPermissions={refreshPermissions || (() => {})}
         />
 
-        <ExpandableSection title='Details' forceExpand>
+        <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted>
@@ -331,7 +334,7 @@ export function RewardPropertiesForm({
               }}
             />
           </>
-        </ExpandableSection>
+        </Collapse>
       </Stack>
     </Box>
   );

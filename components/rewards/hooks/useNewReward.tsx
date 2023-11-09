@@ -1,26 +1,21 @@
 import { log } from '@charmverse/core/log';
-import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 
 import { EMPTY_PAGE_VALUES } from 'components/common/PageDialog/hooks/useNewPage';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { RewardPageProps } from 'lib/rewards/createReward';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 export function useNewReward() {
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
-  const { showPage } = usePageDialog();
-  const router = useRouter();
 
   const [contentUpdated, setContentUpdated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFields>(emptyState());
-  const { createReward: createRewardTrigger, mutateRewards } = useRewards();
+  const { createReward: createRewardTrigger } = useRewards();
 
   const setRewardValues = useCallback((partialFormInputs: Partial<UpdateableRewardFields>) => {
     setContentUpdated(true);
@@ -30,7 +25,7 @@ export function useNewReward() {
   const clearRewardValues = useCallback(() => {
     setRewardValuesRaw(emptyState());
     setContentUpdated(false);
-  }, [setRewardValues]);
+  }, []);
 
   const createReward = useCallback(
     async (pageValues: RewardPageProps | null) => {
@@ -61,20 +56,12 @@ export function useNewReward() {
           });
 
         if (createdReward) {
-          mutateRewards();
-          showPage({
-            pageId: createdReward.id,
-            onClose() {
-              setUrlWithoutRerender(router.pathname, { id: null });
-            }
-          });
-          setUrlWithoutRerender(router.pathname, { id: createdReward.id });
           setContentUpdated(false);
           return createdReward;
         }
       }
     },
-    [createRewardTrigger, rewardValues, currentSpace, mutateRewards, router.pathname, showMessage, showPage]
+    [createRewardTrigger, rewardValues, currentSpace, showMessage]
   );
 
   return {

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { useGetReward } from 'charmClient/hooks/rewards';
+import { ExpandableSectionTitle } from 'components/common/ExpandableSectionTitle';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -45,7 +46,7 @@ export function RewardProperties(props: {
     }
   }, [initialReward]);
 
-  const { data: rewardPagePermissions, mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
+  const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
   async function resyncReward() {

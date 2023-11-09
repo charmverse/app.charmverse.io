@@ -34,7 +34,6 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     openNewPage({
       type: 'bounty_template'
     });
-    popupState.close();
   }
 
   function resetForm() {

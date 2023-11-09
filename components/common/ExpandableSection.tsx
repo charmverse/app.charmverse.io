@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function ExpandableSection({ title, forceExpand, children }: Props) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(!!forceExpand);
 
   useEffect(() => {
     if (typeof forceExpand !== 'undefined') {
