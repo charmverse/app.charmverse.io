@@ -502,6 +502,7 @@ function CharmEditor({
       }}
     >
       <FloatingMenu
+        pageType={pageType}
         palettePluginKey={inlinePalettePluginKey}
         // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}

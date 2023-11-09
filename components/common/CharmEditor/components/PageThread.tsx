@@ -6,7 +6,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
-import type { BoxProps, ButtonProps, SxProps, Theme } from '@mui/material';
+import type { BoxProps, ButtonProps, SelectProps, SxProps, Theme } from '@mui/material';
 import {
   Box,
   Collapse,
@@ -17,6 +17,7 @@ import {
   Menu,
   MenuItem,
   Paper,
+  Select,
   Tooltip,
   Typography,
   useMediaQuery
@@ -81,6 +82,8 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
     opacity: 0;
   }
 `;
+
+const ThreadAccessGroupBox = styled(Box)``;
 
 function ThreadHeaderButton({
   disabled = false,

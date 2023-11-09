@@ -56,20 +56,23 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
     { revalidateOnFocus: false }
   );
 
-  const populateThreads = useCallback((_threads: ThreadWithComments[]) => {
-    const threadsAndAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
-      const newThread: ThreadWithCommentsAndAuthors = {
-        ...thread,
-        comments: thread.comments.map((comment) => ({
-          ...comment,
-          user: members.find((m) => m.id === comment.userId) || ({} as any)
-        }))
-      };
-      acc[thread.id] = newThread;
-      return acc;
-    }, {});
-    return threadsAndAuthors;
-  }, []);
+  const populateThreads = useCallback(
+    (_threads: ThreadWithComments[]) => {
+      const threadsAndAuthors = _threads.reduce<CommentThreadsMap>((acc, thread) => {
+        const newThread: ThreadWithCommentsAndAuthors = {
+          ...thread,
+          comments: thread.comments.map((comment) => ({
+            ...comment,
+            user: members.find((m) => m.id === comment.userId) || ({} as any)
+          }))
+        };
+        acc[thread.id] = newThread;
+        return acc;
+      }, {});
+      return threadsAndAuthors;
+    },
+    [members]
+  );
 
   const threadsUpdatedHandler = useCallback(
     (payload: WebSocketPayload<'threads_updated'>) => {

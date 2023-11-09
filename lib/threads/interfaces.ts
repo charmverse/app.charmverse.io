@@ -14,14 +14,20 @@ export interface ThreadStatusUpdate {
   status: ThreadStatusType;
 }
 
+export interface ThreadAccessGroup {
+  id: string | null;
+  group: 'space' | 'user' | 'role' | 'reviewers' | 'authors';
+}
+
 /**
  * @context Prosemirror content for knowing where to display this thread inside the CharmEditor
  */
-export interface ThreadCreate {
+export interface ThreadCreatePayload {
   comment: string | PageContent;
   pageId: string;
   userId: string;
   context: string;
+  accessGroup: ThreadAccessGroup;
 }
 
 export interface ThreadWithComments extends Thread {

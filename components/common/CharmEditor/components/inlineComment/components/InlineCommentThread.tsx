@@ -1,4 +1,5 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';

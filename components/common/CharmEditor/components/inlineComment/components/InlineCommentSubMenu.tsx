@@ -1,8 +1,9 @@
 import { selectionTooltip } from '@bangle.dev/tooltip';
+import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import SendIcon from '@mui/icons-material/Send';
-import type { Theme } from '@mui/material';
-import { Box, Paper, useMediaQuery } from '@mui/material';
+import type { SelectProps, Theme } from '@mui/material';
+import { Box, MenuItem, Paper, Select, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
@@ -11,6 +12,7 @@ import React, { useState } from 'react';
 import { useCreateThread } from 'charmClient/hooks/comments';
 import { Button } from 'components/common/Button';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
@@ -40,7 +42,16 @@ export const ThreadContainer = styled(Paper)`
   }
 `;
 
-export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId: string | undefined }) {
+export function InlineCommentSubMenu({
+  pageType,
+  pluginKey,
+  pageId
+}: {
+  pageType?: 'post' | PageType;
+  pluginKey: PluginKey;
+  pageId: string | undefined;
+}) {
+  const { space } = useCurrentSpace();
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -50,6 +61,11 @@ export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginK
       }
     ]
   });
+  const [threadAccessGroup, setThreadAccessGroup] = useState<'space' | 'reviewers' | 'authors'>('space');
+
+  const handleThreadAccessGroupChange: SelectProps['onChange'] = (event) => {
+    setThreadAccessGroup(event.target.value as any);
+  };
   const { trigger: createThread, isMutating } = useCreateThread();
   const { extractTextFromSelection } = useInlineComment();
   const { refetchThreads } = useThreads();
@@ -62,7 +78,11 @@ export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginK
       const threadWithComment = await createThread({
         comment: commentContent,
         context: extractTextFromSelection(),
-        pageId
+        pageId,
+        accessGroup: {
+          group: threadAccessGroup,
+          id: threadAccessGroup === 'space' ? space?.id ?? null : null
+        }
       });
       // jsut refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
       refetchThreads();
@@ -78,32 +98,49 @@ export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginK
   };
 
   return (
-    <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
-      <Box flexGrow={1}>
-        <InlineCharmEditor
-          focusOnInit={true}
-          content={commentContent}
-          style={{
-            fontSize: '14px'
+    <Box>
+      {pageType === 'proposal' && (
+        <Select
+          sx={{
+            mt: 0.5,
+            height: 'fit-content'
           }}
-          onContentChange={({ doc }) => {
-            setCommentContent(doc);
+          size='small'
+          value={threadAccessGroup}
+          onChange={handleThreadAccessGroupChange}
+        >
+          <MenuItem value='space'>Everyone</MenuItem>
+          <MenuItem value='reviewers'>Reviewers</MenuItem>
+          <MenuItem value='authors'>Authors</MenuItem>
+        </Select>
+      )}
+      <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
+        <Box flexGrow={1}>
+          <InlineCharmEditor
+            focusOnInit={true}
+            content={commentContent}
+            style={{
+              fontSize: '14px'
+            }}
+            onContentChange={({ doc }) => {
+              setCommentContent(doc);
+            }}
+          />
+        </Box>
+        <Button
+          disabled={isEmpty || isMutating}
+          size='small'
+          onClick={handleSubmit}
+          sx={{
+            alignSelf: 'flex-end',
+            marginBottom: '4px',
+            minWidth: ['36px', '64px'],
+            px: ['4px', '10px']
           }}
-        />
+        >
+          {isSmallScreen ? <SendIcon /> : 'Start'}
+        </Button>
       </Box>
-      <Button
-        disabled={isEmpty || isMutating}
-        size='small'
-        onClick={handleSubmit}
-        sx={{
-          alignSelf: 'flex-end',
-          marginBottom: '4px',
-          minWidth: ['36px', '64px'],
-          px: ['4px', '10px']
-        }}
-      >
-        {isSmallScreen ? <SendIcon /> : 'Start'}
-      </Button>
     </Box>
   );
 }
