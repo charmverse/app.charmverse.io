@@ -24,7 +24,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const isAdmin = useIsAdmin();
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
-  const { templates, isLoading } = useRewardTemplates();
+  const { templates, isLoading, refreshRewardTemplates } = useRewardTemplates();
 
   function deleteTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
@@ -53,6 +53,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     const newReward = await createReward(newPageValues);
     if (newReward) {
       resetForm();
+    }
+
+    if (newPageValues?.type === 'bounty_template') {
+      refreshRewardTemplates();
     }
   }
 

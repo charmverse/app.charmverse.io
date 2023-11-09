@@ -29,7 +29,7 @@ export function useRewardTemplates({ load } = { load: true }) {
     }
 
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
-    const unsubscribeFromPageCreated = subscribe('pages_created', handleDeleteEvent);
+    const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
     return () => {
       unsubscribeFromPageDeletes();
       unsubscribeFromPageCreated();
@@ -38,6 +38,7 @@ export function useRewardTemplates({ load } = { load: true }) {
 
   return {
     templates,
-    isLoading
+    isLoading,
+    refreshRewardTemplates: mutate
   };
 }
