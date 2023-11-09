@@ -43,6 +43,11 @@ export function PendingNotificationTemplate() {
         spaceName: 'Example',
         type: 'mention.created'
       }}
+      user={{
+        avatar: null,
+        id: v4(),
+        username: 'Doe John'
+      }}
     />
   );
 }

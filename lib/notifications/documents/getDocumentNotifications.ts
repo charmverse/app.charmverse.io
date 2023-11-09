@@ -1,7 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
