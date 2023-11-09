@@ -42,10 +42,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     clearNewPage();
   }
 
-  function createProposal() {
+  function createNewReward() {
     clearRewardValues();
     openNewPage({
-      type: 'proposal'
+      type: 'bounty'
     });
   }
 
@@ -56,7 +56,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     }
   }
 
-  function createProposalFromTemplate(templateId: string) {
+  function createRewardFromTemplate(templateId: string) {
     const template = templates?.find((tpl) => tpl.page.id === templateId);
     if (template) {
       openNewPage({
@@ -72,7 +72,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   return (
     <>
       <ButtonGroup variant='contained' ref={buttonRef}>
-        <Button data-test='create-suggest-bounty' onClick={createProposal}>
+        <Button data-test='create-suggest-bounty' onClick={createNewReward}>
           Create
         </Button>
         <Button data-test='reward-template-select' size='small' onClick={popupState.open}>
@@ -82,7 +82,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       <TemplatesMenu
         isLoading={isLoading}
         pages={templates?.map((tpl) => tpl.page) ?? []}
-        addPageFromTemplate={createProposalFromTemplate}
+        addPageFromTemplate={createRewardFromTemplate}
         createTemplate={createTemplate}
         editTemplate={(pageId) => showPage(pageId)}
         deleteTemplate={deleteTemplate}
