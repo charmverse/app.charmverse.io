@@ -15,7 +15,7 @@ import { createNotificationsFromEvent } from '../../createNotificationsFromEvent
 import { createProposalNotifications } from '../createProposalNotifications';
 
 describe(`Test proposal events and notifications`, () => {
-  it.skip(`Should create proposal notifications for proposal.status_changed event`, async () => {
+  it(`Should create proposal notifications for proposal.status_changed event`, async () => {
     const { space } = await generateUserAndSpace();
     const author1 = await generateUser();
     await addUserToSpace({
@@ -231,11 +231,10 @@ describe(`Test proposal events and notifications`, () => {
     expect(proposalReviewStatusChangedMember2Notification).toBeFalsy();
 
     // Move to reviewed status
-
     await updateProposalStatus({
       newStatus: 'reviewed',
       proposalId: proposal.id,
-      userId: author1.id
+      userId: reviewer.id
     });
 
     await createProposalNotifications({
