@@ -11,7 +11,7 @@ import { useApplication } from 'components/rewards/hooks/useApplication';
 
 import { useApplicationDialog } from '../hooks/useApplicationDialog';
 
-import { RewardApplicationPageComponent } from './RewardApplicationPage/RewardApplicationPage';
+import { RewardApplicationPage } from './RewardApplicationPage/RewardApplicationPage';
 
 export function ApplicationDialog() {
   const mounted = useRef(false);
@@ -30,7 +30,6 @@ export function ApplicationDialog() {
     };
   }, []);
   function close() {
-    //    setFormInputs(emptyState());
     setContentUpdated(false);
     setShowConfirmDialog(false);
     hideApplication();
@@ -79,7 +78,7 @@ export function ApplicationDialog() {
         <LoadingComponent isLoading />
       ) : currentApplicationId || currentRewardId ? (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <RewardApplicationPageComponent applicationId={currentApplicationId} rewardId={currentRewardId} />
+        <RewardApplicationPage applicationId={currentApplicationId} rewardId={currentRewardId} closeDialog={close} />
       ) : null}
       <ConfirmDeleteModal
         onClose={() => {

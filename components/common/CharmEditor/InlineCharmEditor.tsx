@@ -120,7 +120,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ colorMode?: 'dark'; 
   ${({ colorMode }) =>
     colorMode === 'dark'
       ? `
-          background-color: var(--background-light);
+          background-color: var(--input-bg);
+          border: 1px solid var(--input-border);
           .ProseMirror[data-placeholder]::before {
             color: var(--primary-text);
             opacity: 0.5;

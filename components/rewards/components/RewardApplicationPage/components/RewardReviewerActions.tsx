@@ -13,9 +13,8 @@ import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
-import { RewardPaymentButton } from '../RewardProperties/components/RewardApplicantsTable/RewardPaymentButton';
-
-import RewardReview from './RewardReview';
+import { AcceptOrRejectButtons } from './AcceptOrRejectButtons';
+import { RewardPaymentButton } from './RewardPaymentButton';
 
 type Props = {
   reward: RewardWithUsers;
@@ -61,14 +60,14 @@ export function RewardReviewerActions({
     <div>
       {/** This section contains all possible reviewer actions */}
       {application.status === 'applied' && rewardPermissions?.review && (
-        <RewardReview
+        <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='application'
           readOnly={!rewardPermissions?.approve_applications}
         />
       )}
       {(application.status === 'review' || application.status === 'inProgress') && rewardPermissions?.review && (
-        <RewardReview
+        <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='submission'
           readOnly={!rewardPermissions?.review}

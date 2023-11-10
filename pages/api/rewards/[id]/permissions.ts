@@ -3,7 +3,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
+import { computeBountyPermissions } from 'lib/permissions/bounties/computeBountyPermissions';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

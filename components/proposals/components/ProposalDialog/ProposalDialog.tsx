@@ -117,6 +117,11 @@ export function ProposalDialog({ pageId, newProposal, closeDialog }: Props) {
     setShowConfirmDialog(false);
   }
 
+  function saveForm() {
+    createProposal();
+    close();
+  }
+
   return (
     <DocumentPageProviders isInsideDialog={true}>
       <Dialog
@@ -163,7 +168,7 @@ export function ProposalDialog({ pageId, newProposal, closeDialog }: Props) {
             <Button
               disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
               disabledTooltip={disabledTooltip}
-              onClick={createProposal}
+              onClick={saveForm}
               loading={isCreatingProposal}
               data-test='create-proposal-button'
             >
