@@ -124,21 +124,18 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
       (['complete', 'paid', 'processing', 'rejected'] as ApplicationStatus[]).includes(application.status));
 
   const applicationStepRequired = reward.approveSubmitters;
-
-  const showSubmissionInput = !applicationStepRequired || (application && application.status !== 'applied');
-
-  const isApplicationInReview = application?.status === 'applied';
+  const isApplicationStage =
+    applicationStepRequired && (application?.status === 'applied' || application?.status === 'rejected');
+  const showSubmissionInput = (applicationStepRequired && isNewApplication) || !isApplicationStage;
 
   return (
     <div className='document-print-container'>
       <Box display='flex' flexDirection='column'>
         <StyledContainer top={0}>
           <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
-          {space && rewardPageContent && (
-            <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
-              <span>Back to reward</span>
-            </Button>
-          )}
+          <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
+            <span>Back to reward</span>
+          </Button>
 
           <div className='focalboard-body'>
             <RewardProperties
@@ -183,7 +180,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
               application={application}
               rewardId={reward.id}
               disableCollapse={!showSubmissionInput}
-              expandedOnLoad={isNewApplication || isApplicationInReview}
+              expandedOnLoad={isNewApplication || isApplicationStage}
               readOnly={application?.createdBy !== user?.id && !isNewApplication}
               onSubmit={(updatedApplication) =>
                 saveApplication(
@@ -221,7 +218,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
               isSaving={isSaving}
             />
           )}
-          {application && <ApplicationComments applicationId={application.id} status={application.status} />}
+          {application && <ApplicationComments applicationId={application.id} />}
         </StyledContainer>
       </Box>
     </div>
