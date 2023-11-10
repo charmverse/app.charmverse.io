@@ -111,9 +111,8 @@ async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGate
       }
     }
   });
-
   // Add identifiable names to token gates
-  const updatedResult = await updateTokenGateDetails(result);
+  const updatedResult = await updateTokenGateDetails(result as TokenGateWithRoles[]);
 
   res.status(200).json(updatedResult);
 }

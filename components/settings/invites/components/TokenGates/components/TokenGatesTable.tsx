@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { TokenGate } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { HumanizedAccsProps } from '@lit-protocol/types';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
@@ -24,9 +23,8 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { humanizeConditions, humanizeConditionsData } from 'lib/tokenGates/humanizeConditions';
-import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
-import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
 import { TestConnectionModal } from './TestConnectionModal';
@@ -35,7 +33,7 @@ import TokenGateRolesSelect from './TokenGateRolesSelect';
 interface Props {
   tokenGates: TokenGateWithRoles[];
   isAdmin: boolean;
-  onDelete: (tokenGate: TokenGate) => void;
+  onDelete: (tokenGate: { id: string }) => void;
   refreshTokenGates: () => Promise<void>;
 }
 
@@ -97,7 +95,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates, refresh
     const tokenGate = tokenGates.find((_tokenGate) => _tokenGate.id === tokenGateId);
     if (tokenGate && space) {
       const roleIds = tokenGate.tokenGateToRoles
-        .map((tokenGateToRole) => tokenGateToRole.roleId)
+        .map((tokenGateToRole) => tokenGateToRole.role.id)
         .filter((tokenGateRoleId) => tokenGateRoleId !== roleId);
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
       await refreshTokenGates();
@@ -112,11 +110,11 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates, refresh
       }
       const authSig = walletAuthSignature ?? (await requestSignature());
       const jwt = await litClient.getSignedToken({
-        resourceId: tokenGate.resourceId as any,
+        resourceId: tokenGate.resourceId,
         authSig,
-        chain: (tokenGate.conditions as any).chains?.[0],
-        // chain: (tokenGate.conditions as any).chain || 'ethereum',
-        ...(tokenGate.conditions as any)
+        chain: tokenGate.conditions.chains?.[0],
+        // chain: (tokenGate.conditions).chain || 'ethereum',
+        ...tokenGate.conditions
       });
 
       await charmClient.tokenGates.verifyTokenGate({
@@ -203,7 +201,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates, refresh
                 <TableCell>
                   <TokenGateRolesSelect
                     isAdmin={isAdmin}
-                    selectedRoleIds={tokenGate.tokenGateToRoles.map((tokenGateToRole) => tokenGateToRole.roleId)}
+                    selectedRoleIds={tokenGate.tokenGateToRoles.map(({ role }) => role.id)}
                     onChange={(roleIds) => {
                       updateTokenGateRoles(tokenGate.id, roleIds);
                     }}

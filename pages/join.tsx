@@ -32,6 +32,10 @@ export function AlternateRouteButton({ href, children }: { href: string; childre
   );
 }
 
+export function TokenGateContainer({ children }: { children: ReactNode }) {
+  return <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>{children}</Box>;
+}
+
 export default function JoinWorkspace() {
   const { navigateToSpacePath, router } = useCharmRouter();
   const domain = router.query.domain as string;
@@ -56,7 +60,7 @@ export default function JoinWorkspace() {
   const spaceFromPathNotFound = domain && !isSpaceLoading && !spaceFromPath;
 
   return (
-    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
+    <TokenGateContainer>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <DialogTitle>Join space</DialogTitle>
         <Divider />
@@ -66,7 +70,7 @@ export default function JoinWorkspace() {
         {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
       <AlternateRouteButton href={`${getAppUrl()}createSpace`}>Create a space</AlternateRouteButton>
-    </Box>
+    </TokenGateContainer>
   );
 }
 

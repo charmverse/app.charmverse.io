@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { ALL_LIT_CHAINS, LIT_CHAINS } from '@lit-protocol/constants';
 import type { HumanizedAccsProps } from '@lit-protocol/types';
 import type { TypographyProps } from '@mui/material/Typography';
@@ -56,7 +57,6 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
   const myWalletAddress = conditions.myWalletAddress;
   const humanReadableConditions = conditions.unifiedAccessControlConditions
     ?.map((acc) => {
-      const row = 'row' as const;
       if ('operator' in acc && !!acc.operator) {
         // AND | OR
         return [{ type: 'operator', content: acc.operator }];
@@ -249,6 +249,8 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
             ];
           }
         }
+
+        log.error('Unsupported token gate conditions', { conditions: acc });
 
         // Show a simple error message
         return [{ type: 'text', content: 'Oops. something went wrong!' }];

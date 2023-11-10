@@ -2,10 +2,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Stack } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
-import type { TokenGateState } from './hooks/useTokenGates';
+import type { TokenGateContentProps } from './TokenGateContent';
 import { TokenGateContent } from './TokenGateContent';
 
-type Props = TokenGateState & {
+type Props = TokenGateContentProps & {
   displayAccordion?: boolean;
 };
 
