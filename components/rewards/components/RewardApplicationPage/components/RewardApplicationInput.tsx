@@ -4,13 +4,13 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { Button } from 'components/common/Button';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 
@@ -20,12 +20,13 @@ import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardAp
  * @expandedOnLoad Use this to expand the application initially
  */
 interface IApplicationFormProps {
-  onSubmit: (applicationMessage: string) => any;
+  onSubmit: (applicationMessage: string) => Promise<boolean>;
   rewardId: string;
   application?: Application;
   readOnly?: boolean;
   disableCollapse?: boolean;
   expandedOnLoad?: boolean;
+  isSaving?: boolean;
 }
 
 export const schema = yup.object({
@@ -40,7 +41,8 @@ export function ApplicationInput({
   rewardId,
   application,
   disableCollapse,
-  expandedOnLoad
+  expandedOnLoad,
+  isSaving
 }: IApplicationFormProps) {
   const [isVisible, setIsVisible] = useState(expandedOnLoad);
   const { user } = useUser();
@@ -134,6 +136,7 @@ export function ApplicationInput({
                     !isValid || (!!currentApplicationMessage && currentApplicationMessage === application?.message)
                   }
                   type='submit'
+                  loading={isSaving}
                 >
                   {!application ? ' Apply' : 'Update'}
                 </Button>

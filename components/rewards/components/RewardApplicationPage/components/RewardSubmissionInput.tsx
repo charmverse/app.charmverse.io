@@ -2,7 +2,6 @@ import type { Application } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormLabel } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
@@ -12,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { Button } from 'components/common/Button';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
@@ -41,9 +41,11 @@ type FormValues = yup.InferType<ReturnType<typeof schema>>;
 interface Props {
   submission?: Application;
   bountyId?: string;
-  onSubmit?: (
-    content: Partial<Pick<WorkUpsertData, 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo'>>
-  ) => void;
+  onSubmit: (
+    content: Partial<
+      Pick<WorkUpsertData, 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo' | 'applicationId'>
+    >
+  ) => Promise<boolean>;
   readOnly?: boolean;
   permissions?: BountyPermissionFlags;
   expandedOnLoad?: boolean;
@@ -51,6 +53,7 @@ interface Props {
   hasCustomReward: boolean;
   refreshSubmission: VoidFunction;
   currentUserIsApplicant: boolean;
+  isSaving?: boolean;
 }
 
 export function RewardSubmissionInput({
@@ -60,7 +63,8 @@ export function RewardSubmissionInput({
   onSubmit: onSubmitProp,
   bountyId,
   hasCustomReward,
-  currentUserIsApplicant
+  currentUserIsApplicant,
+  isSaving
 }: Props) {
   const { user } = useUser();
 
@@ -83,22 +87,14 @@ export function RewardSubmissionInput({
   const [formError, setFormError] = useState<SystemError | null>(null);
 
   async function onSubmit(values: FormValues) {
-    if (!bountyId) {
-      return;
-    }
-    setFormError(null);
-    await charmClient.rewards.work({
+    const hasSaved = await onSubmitProp({
       applicationId: submission?.id,
-      rewardId: bountyId,
       ...values
     });
-    try {
+
+    if (hasSaved) {
+      setFormError(null);
       setIsEditorTouched(false);
-      if (onSubmitProp) {
-        onSubmitProp(values);
-      }
-    } catch (err: any) {
-      setFormError(err);
     }
   }
 
@@ -172,7 +168,11 @@ export function RewardSubmissionInput({
 
           {!readOnly && (
             <Grid item display='flex' gap={1} justifyContent='flex-end'>
-              <Button disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched} type='submit'>
+              <Button
+                disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched}
+                type='submit'
+                loading={isSaving}
+              >
                 {submission?.submission ? 'Update' : 'Submit'}
               </Button>
             </Grid>

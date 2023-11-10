@@ -2,6 +2,7 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, Grid, Divider, FormLabel, Stack } from '@mui/material';
+import { useState } from 'react';
 
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
@@ -64,9 +65,11 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
 
   const { showPage: showReward, hidePage: hideReward } = usePageDialog();
   const { createNewWork } = useNewWork(currentRewardId);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const saveApplication = async (input: WorkInput) => {
+  const saveApplication = async (input: WorkInput, type?: 'application' | 'submission') => {
     try {
+      setIsSaving(true);
       if (isNewApplication) {
         await createNewWork(input);
         refreshReward();
@@ -74,8 +77,17 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
       } else {
         await updateApplication(input);
       }
+
+      const messageType = type === 'applcation' ? 'Application' : 'Submission';
+      showMessage(`${messageType} saved successfully`, 'success');
+
+      return true;
     } catch (error) {
       showMessage((error as Error).message, 'error');
+
+      return false;
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -174,12 +186,16 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
               expandedOnLoad={isNewApplication || isApplicationInReview}
               readOnly={application?.createdBy !== user?.id && !isNewApplication}
               onSubmit={(updatedApplication) =>
-                saveApplication({
-                  applicationId: application?.id,
-                  message: updatedApplication,
-                  rewardId: reward.id
-                })
+                saveApplication(
+                  {
+                    applicationId: application?.id,
+                    message: updatedApplication,
+                    rewardId: reward.id
+                  },
+                  'application'
+                )
               }
+              isSaving={isSaving}
             />
           )}
 
@@ -190,15 +206,19 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
               readOnly={readonlySubmission}
               refreshSubmission={refreshApplication}
               onSubmit={(submission) =>
-                saveApplication({
-                  rewardId: reward.id,
-                  submissionNodes: submission.submissionNodes,
-                  applicationId: application?.id
-                })
+                saveApplication(
+                  {
+                    rewardId: reward.id,
+                    submissionNodes: submission.submissionNodes,
+                    applicationId: application?.id
+                  },
+                  'submission'
+                )
               }
               bountyId={currentRewardId}
               permissions={applicationRewardPermissions}
               hasCustomReward={!!reward.customReward}
+              isSaving={isSaving}
             />
           )}
           {application && <ApplicationComments applicationId={application.id} status={application.status} />}
