@@ -1,4 +1,4 @@
-import type { Application, ApplicationComment } from '@charmverse/core/prisma';
+import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Box, FormLabel, Stack } from '@mui/material';
 import { useMemo } from 'react';
 
