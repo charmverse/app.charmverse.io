@@ -58,12 +58,14 @@ function generateComponent(condition: HumanizeConditionsContent) {
 
 function Condition({ conditions }: { conditions: HumanizeConditionsContent[] }) {
   const image = conditions.find((c) => c.type === 'image') || null;
+  const textConditions = conditions.filter((c) => c.type !== 'image');
+  const isOperator = textConditions.some((c) => c.type === 'operator');
   const isExternalImage = image?.url?.startsWith('http');
   const imageFittingType = isExternalImage ? 'cover' : undefined;
   const imageBorderRadius = isExternalImage ? '50%' : undefined;
 
   return (
-    <Box display='flex' alignItems='center' my={2}>
+    <Box display='flex' alignItems='center' my={isOperator ? 2 : undefined}>
       {image?.url && (
         <Box mr={2}>
           <Image
@@ -80,12 +82,7 @@ function Condition({ conditions }: { conditions: HumanizeConditionsContent[] }) 
           />
         </Box>
       )}
-      <Box width='100%'>
-        {conditions
-          .filter((c) => c.type !== 'image')
-          .map(generateComponent)
-          .filter(isTruthy)}
-      </Box>
+      <Box width='100%'>{textConditions.map(generateComponent).filter(isTruthy)}</Box>
     </Box>
   );
 }
