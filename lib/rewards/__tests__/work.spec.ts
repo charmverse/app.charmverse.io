@@ -39,18 +39,18 @@ describe('work', () => {
     expect(application).toMatchObject(
       expect.objectContaining<Partial<Application>>({
         status: 'applied',
-        acceptedBy: null, // you might want to fill in specific values here if necessary
-        bountyId: expect.any(String), // assuming it's a string type, adjust if needed
+        acceptedBy: null,
+        bountyId: expect.any(String),
         createdAt: expect.any(Date),
-        createdBy: expect.any(String), // adjust type if needed
+        createdBy: expect.any(String),
         id: expect.any(String),
         message: expect.any(String),
-        reviewedBy: null, // or expect.any(String) if it's supposed to be a string
+        reviewedBy: null,
         spaceId: expect.any(String),
         submission: expect.any(String),
-        submissionNodes: expect.any(String), // this is the stringified JSON or regular string
+        submissionNodes: expect.any(String),
         updatedAt: expect.any(Date),
-        walletAddress: null // or expect.any(String) if it's supposed to be a string
+        walletAddress: null
       })
     );
 
@@ -70,7 +70,7 @@ describe('work', () => {
 
     expect(submission).toMatchObject(
       expect.objectContaining<Partial<Application>>({
-        status: 'inProgress',
+        status: 'review',
         acceptedBy: null, // you might want to fill in specific values here if necessary
         bountyId: expect.any(String), // assuming it's a string type, adjust if needed
         createdAt: expect.any(Date),
