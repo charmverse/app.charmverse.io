@@ -40,9 +40,8 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 
-import InlineCharmEditor from '../InlineCharmEditor';
-
-import { scrollToThread } from './inlineComment/inlineComment.utils';
+import InlineCharmEditor from '../../InlineCharmEditor';
+import { scrollToThread } from '../inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`
   width: 3px;
@@ -82,8 +81,6 @@ const ThreadCommentListItem = styled(ListItem)<{ highlighted?: string }>`
     opacity: 0;
   }
 `;
-
-const ThreadAccessGroupBox = styled(Box)``;
 
 function ThreadHeaderButton({
   disabled = false,

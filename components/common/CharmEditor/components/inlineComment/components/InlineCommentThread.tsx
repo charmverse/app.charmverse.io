@@ -12,7 +12,7 @@ import { useThreads } from 'hooks/useThreads';
 import { isTruthy } from 'lib/utilities/types';
 
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import PageThread from '../../PageThread';
+import PageThread from '../../thread/PageThread';
 import type { InlineCommentPluginState } from '../inlineComment.plugins';
 
 export const ThreadContainer = styled(Paper)`

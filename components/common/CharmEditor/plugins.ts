@@ -40,6 +40,7 @@ import { plugins as trackPlugins } from './components/suggestions/suggestions.pl
 import * as tabIndent from './components/tabIndent';
 import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
+import { plugins as threadPlugins } from './components/thread/thread.plugins';
 import * as trailingNode from './components/trailingNode';
 import * as tweet from './components/tweet/tweet';
 import { plugins as videoPlugins } from './components/video/video';
@@ -56,6 +57,7 @@ const columnsPluginKey = new PluginKey('columns');
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const suggestionsPluginKey = new PluginKey('suggestions');
+export const threadPluginKey = new PluginKey('fetchedComments');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -205,7 +207,10 @@ export function charmEditorPlugins({
     tableOfContentPlugins(),
     filePlugins(),
     placeholderPlugin(placeholderText),
-    tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
+    tabIndent.plugins(), // tabIndent should be triggered last so other plugins can override the keymap,
+    threadPlugins({
+      key: threadPluginKey
+    })
   );
 
   if (!readOnly && !disableRowHandles) {
