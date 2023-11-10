@@ -27,7 +27,7 @@ interface TokenGatesProps {
 
 export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
-  const [removedTokenGate, setRemovedTokenGate] = useState<TokenGate | null>(null);
+  const [removedTokenGateId, setRemovedTokenGate] = useState<string | null>(null);
 
   const litClient = useLitProtocol();
   const { walletAuthSignature, requestSignature, chainId } = useWeb3Account();
@@ -89,8 +89,8 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
     await mutate();
   }
 
-  async function deleteTokenGate(tokenGate: TokenGate) {
-    setRemovedTokenGate(tokenGate);
+  async function deleteTokenGate(tokenGate: { id: string }) {
+    setRemovedTokenGate(tokenGate.id);
     deletePopupState.open();
   }
 
@@ -101,7 +101,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
         <LitShareModal onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any} />
       </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
-      {removedTokenGate && (
+      {removedTokenGateId && (
         <ConfirmDeleteModal
           title='Delete token gate'
           onClose={closeTokenGateDeleteModal}
@@ -109,7 +109,7 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
           buttonText='Delete token gate'
           question='Are you sure you want to delete this invite link?'
           onConfirm={async () => {
-            await charmClient.tokenGates.deleteTokenGate(removedTokenGate.id);
+            await charmClient.tokenGates.deleteTokenGate(removedTokenGateId);
             // update the list of links
             await mutate();
             setRemovedTokenGate(null);

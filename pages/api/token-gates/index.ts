@@ -111,7 +111,7 @@ async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGate
     }
   });
 
-  res.status(200).json(result);
+  res.status(200).json(result as TokenGateWithRoles[]);
 }
 
 export default withSessionRoute(handler);
