@@ -41,7 +41,7 @@ export const humanizeComparator = (comparator: string) => {
   return selected;
 };
 
-export type HumanizeConditionsType = 'text' | 'image' | 'button' | 'link' | 'break' | 'operator';
+export type HumanizeConditionsType = 'text' | 'image' | 'link' | 'operator';
 
 export type HumanizeConditionsContent = {
   type: HumanizeConditionsType;
@@ -70,10 +70,11 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
         const comparator = humanizeComparator(acc.returnValueTest.comparator);
         const isValidValueAddress = isAddress(value);
         const image = 'image' in acc && typeof acc.image === 'string' && acc.image ? acc.image : undefined;
-        const tokenName =
-          'name' in acc && typeof acc.name === 'string' && acc.name
-            ? acc.name
-            : shortWalletAddress(acc.contractAddress);
+        const hasName = 'name' in acc && typeof acc.name === 'string' && acc.name;
+        const tokenName = hasName ? acc.name : shortWalletAddress(acc.contractAddress);
+        const etherscanUrl = !hasName
+          ? { type: 'link', url: `https://etherscan.io/address/${acc.contractAddress}` }
+          : { type: 'text' };
         const chain = acc.chain.charAt(0).toUpperCase() + acc.chain.slice(1);
 
         if (acc.standardContractType === 'timestamp' && acc.method === 'eth_getBlockByNumber') {
@@ -89,7 +90,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           return [
             { type: 'image', url: image, content: acc.chain },
             { type: 'text', content: `Is a member of the DAO at` },
-            { type: 'text', content: shortWalletAddress(acc.contractAddress), props: { fontWeight: 'bold' } }
+            { ...etherscanUrl, content: shortWalletAddress(acc.contractAddress), props: { fontWeight: 'bold' } }
           ];
         } else if (acc.standardContractType === 'ERC721' && acc.method === 'ownerOf') {
           // specific erc721
@@ -97,7 +98,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           return [
             { type: 'image', url: image, content: tokenName },
             { type: 'text', content: 'Owner of' },
-            { type: 'button', content: tokenName, props: { fontWeight: 'bold' } },
+            { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
             { type: 'text', content: 'on' },
             { type: 'text', content: chain }
           ];
@@ -120,7 +121,11 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           return [
             { type: 'image', url: image, content: 'POAP' },
             { type: 'text', content: 'Owner of a' },
-            { type: 'button', content: value, props: { fontWeight: 'bold' } },
+            {
+              type: 'text',
+              content: value,
+              props: { fontWeight: 'bold' }
+            },
             { type: 'text', content: 'POAP on' },
             { type: 'text', content: chain }
           ];
@@ -130,7 +135,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           return [
             { type: 'image', url: image, content: 'POAP' },
             { type: 'text', content: 'Owner of a POAP from event ID' },
-            { type: 'button', content: value, props: { fontWeight: 'bold' } },
+            { type: 'text', content: value, props: { fontWeight: 'bold' } },
             { type: 'text', content: 'on' },
             { type: 'text', content: chain }
           ];
@@ -140,9 +145,9 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           return [
             { type: 'image', url: image, content: acc.chain },
             { type: 'text', content: `Cask subscriber to provider` },
-            { type: 'button', content: acc.parameters[1], props: { fontWeight: 'bold' } },
+            { type: 'text', content: acc.parameters[1], props: { fontWeight: 'bold' } },
             { type: 'text', content: `for plan` },
-            { type: 'button', content: acc.parameters[2], props: { fontWeight: 'bold' } },
+            { type: 'text', content: acc.parameters[2], props: { fontWeight: 'bold' } },
             { type: 'text', content: `on` },
             { type: 'text', content: chain }
           ];
@@ -155,7 +160,11 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
             { type: 'text', content: comparator },
             { type: 'text', content: value },
             { type: 'text', content: `of` },
-            { type: 'link', content: shortWalletAddress(acc.contractAddress), props: { fontWeight: 'bold' } },
+            {
+              type: 'text',
+              content: shortWalletAddress(acc.contractAddress),
+              props: { fontWeight: 'bold' }
+            },
             { type: 'text', content: `tokens with token id` },
             { type: 'text', content: acc.parameters[1] },
             { type: 'text', content: `on` },
@@ -170,7 +179,11 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
             { type: 'text', content: comparator },
             { type: 'text', content: value },
             { type: 'text', content: `of` },
-            { type: 'button', content: shortWalletAddress(acc.contractAddress), props: { fontWeight: 'bold' } },
+            {
+              type: 'text',
+              content: shortWalletAddress(acc.contractAddress),
+              props: { fontWeight: 'bold' }
+            },
             { type: 'text', content: `tokens with token id` },
             {
               type: 'text',
@@ -188,7 +201,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
             { type: 'text', content: comparator },
             { type: 'text', content: value },
             { type: 'text', content: `of` },
-            { type: 'button', content: tokenName, props: { fontWeight: 'bold' } },
+            { type: 'text', content: tokenName, props: { fontWeight: 'bold' } },
             { type: 'text', content: `nft on` },
             { type: 'text', content: chain }
           ];
@@ -200,7 +213,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
             { type: 'text', content: comparator },
             { type: 'text', content: balance },
             { type: 'text', content: `of` },
-            { type: 'button', content: tokenName, props: { fontWeight: 'bold' } },
+            { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
             { type: 'text', content: `tokens on` },
             { type: 'text', content: chain }
           ];
@@ -211,7 +224,8 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
             { type: 'text', content: `Owns` },
             { type: 'text', content: comparator },
             { type: 'text', content: balance },
-            { type: 'text', content: `${tokenSymbol} on` },
+            { type: 'text', content: tokenSymbol },
+            { type: 'text', content: `on` },
             { type: 'text', content: chain }
           ];
         } else if (acc.standardContractType === '' && acc.method === '' && isValidValueAddress) {
@@ -220,7 +234,11 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
             return [
               { type: 'image', url: image, content: acc.chain },
               { type: 'text', content: `Controls your wallet` },
-              { type: 'button', content: shortWalletAddress(myWalletAddress), props: { fontWeight: 'bold' } }
+              {
+                type: 'text',
+                content: shortWalletAddress(myWalletAddress),
+                props: { fontWeight: 'bold' }
+              }
             ];
           } else {
             // Controls wallet with address ${shortWalletAddress(value)}

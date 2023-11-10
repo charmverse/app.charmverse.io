@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
-import CopyToClipboard from 'react-copy-to-clipboard';
+import { Fragment } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { Button } from 'components/common/Button';
@@ -37,19 +37,22 @@ function generateComponent(condition: HumanizeConditionsContent) {
           {content}{' '}
         </Typography>
       );
-    case 'button':
-      return (
-        <CopyToClipboard key={content} text={content}>
-          <Typography component='span' {...props}>
-            {content}{' '}
-          </Typography>
-        </CopyToClipboard>
-      );
     case 'link':
       return (
-        <Button key={content} href={url} sx={{ p: 0 }} variant='text' external>
-          {content}{' '}
-        </Button>
+        <Fragment key={content}>
+          <Button
+            size='small'
+            href={url}
+            variant='text'
+            external
+            noPadding
+            target='_blank'
+            color='inherit'
+            sx={{ p: 0, fontWeight: 'bold', fontSize: 'inherit', '&:hover': { background: 'none' } }}
+          >
+            {content}
+          </Button>{' '}
+        </Fragment>
       );
     default:
       return null;
