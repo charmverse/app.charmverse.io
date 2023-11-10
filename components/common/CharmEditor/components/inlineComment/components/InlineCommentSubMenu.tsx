@@ -79,10 +79,12 @@ export function InlineCommentSubMenu({
         comment: commentContent,
         context: extractTextFromSelection(),
         pageId,
-        accessGroup: {
-          group: threadAccessGroup,
-          id: threadAccessGroup === 'space' ? space?.id ?? null : null
-        }
+        accessGroups: [
+          {
+            group: threadAccessGroup,
+            id: threadAccessGroup === 'space' ? space?.id ?? null : null
+          }
+        ]
       });
       // jsut refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
       refetchThreads();

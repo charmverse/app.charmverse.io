@@ -41,7 +41,7 @@ export const ThreadsContext = createContext<Readonly<IContext>>({
   refetchThreads: undefined as any
 });
 
-type CommentThreadsMap = Record<string, ThreadWithCommentsAndAuthors | undefined>;
+export type CommentThreadsMap = Record<string, ThreadWithCommentsAndAuthors | undefined>;
 
 export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();

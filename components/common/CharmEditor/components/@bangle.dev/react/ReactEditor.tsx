@@ -14,9 +14,11 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import type { BangleEditorProps as CoreBangleEditorProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
+import { threadPluginKey } from 'components/common/CharmEditor/plugins';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { CommentThreadsMap } from 'hooks/useThreads';
 import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
@@ -59,6 +61,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   enableComments?: boolean;
   onConnectionEvent?: (event: ConnectionEvent) => void;
   allowClickingFooter?: boolean;
+  threads?: CommentThreadsMap;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -82,7 +85,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     readOnly = false,
     enableComments = true,
     onConnectionEvent,
-    allowClickingFooter
+    allowClickingFooter,
+    threads
   },
   ref
 ) {
@@ -125,6 +129,12 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     },
     [editor]
   );
+
+  useEffect(() => {
+    if (editor && threads) {
+      editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, Object.keys(threads)));
+    }
+  }, [threads]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {

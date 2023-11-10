@@ -17,18 +17,14 @@ export const plugins = ({ key }: { key: PluginKey }) => {
         init: () => {
           return [];
         },
-        apply: (tr, pluginState) => {
-          const newPluginState = tr.getMeta(key);
-          if (newPluginState) {
-            return { ...pluginState, ...newPluginState };
-          }
-          return pluginState;
+        apply: (tr) => {
+          return tr.getMeta(key);
         }
       },
       props: {
         decorations(state: EditorState) {
           const threadIds = this.getState(state) as string[];
-          return buildInlineCommentDecoration(state, threadIds);
+          return buildInlineCommentDecoration(state, threadIds ?? []);
         }
       }
     })
@@ -40,7 +36,17 @@ export function buildInlineCommentDecoration(state: EditorState, threadIds: stri
   const decorations: Decoration[] = [];
   doc.descendants((node: Node, pos: number) => {
     if (node.marks.some((mark) => mark.type.name === inlineCommentMarkName && threadIds.includes(mark.attrs.id))) {
-      decorations.push(Decoration.inline(pos, pos + node.nodeSize, { class: 'active' }));
+      decorations.push(
+        Decoration.inline(
+          pos,
+          pos + node.nodeSize,
+          { nodeName: 'span', class: 'active' },
+          {
+            inclusiveStart: true,
+            inclusiveEnd: true
+          }
+        )
+      );
     }
   });
   return DecorationSet.create(doc, decorations);

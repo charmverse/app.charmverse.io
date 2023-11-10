@@ -21,6 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageSidebarContext } from 'hooks/usePageSidebar';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
@@ -226,6 +227,7 @@ function CharmEditor({
   const { space: currentSpace } = useCurrentSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
+  const { threads } = useThreads();
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
@@ -239,8 +241,8 @@ function CharmEditor({
         .then(() => {
           charmClient.comments
             .getThreads(_pageId)
-            .then((threads) => {
-              mutate(`pages/${_pageId}/threads`, threads);
+            .then((_threads) => {
+              mutate(`pages/${_pageId}/threads`, _threads);
             })
             .catch((err) => {
               log.warn(`Failed to fetch threads for page ${_pageId}`, err);
@@ -368,6 +370,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      threads={threads}
       allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
@@ -541,7 +544,7 @@ function CharmEditor({
                   state={suggestionState}
                 />
               )}
-              {sidebarView === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
+              {sidebarView === 'comments' && <CommentsSidebar threads={threads} permissions={pagePermissions} />}
             </SidebarDrawer>
           )}
           <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />

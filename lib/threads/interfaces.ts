@@ -1,4 +1,4 @@
-import type { Thread, Comment } from '@charmverse/core/prisma';
+import { type Thread, type Comment, Prisma } from '@charmverse/core/prisma';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -15,8 +15,8 @@ export interface ThreadStatusUpdate {
 }
 
 export interface ThreadAccessGroup {
-  id: string | null;
-  group: 'space' | 'user' | 'role' | 'reviewers' | 'authors';
+  id: string;
+  group: 'user' | 'role';
 }
 
 /**
@@ -27,7 +27,7 @@ export interface ThreadCreatePayload {
   pageId: string;
   userId: string;
   context: string;
-  accessGroup: ThreadAccessGroup;
+  accessGroups?: ThreadAccessGroup[];
 }
 
 export interface ThreadWithComments extends Thread {
