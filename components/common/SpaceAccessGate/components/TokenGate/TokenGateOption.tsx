@@ -34,14 +34,14 @@ export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
           <Typography sx={{ mr: 1 }} variant='caption'>
             Roles
           </Typography>
-          {tokenGate.tokenGateToRoles.map((role) => (
+          {tokenGate.tokenGateToRoles.map(({ role }) => (
             <Chip
               variant='outlined'
               size='small'
               sx={{ mr: 2, fontWeight: isVerified ? 'bold' : undefined }}
               color={isVerified ? 'success' : 'secondary'}
               key={role.id}
-              label={role.role.name}
+              label={role.name}
             />
           ))}
         </Box>

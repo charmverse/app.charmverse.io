@@ -19,5 +19,5 @@ export async function getSpaceWithTokenGates(spaceDomainOrCustomDomain: string):
         }
       }
     }
-  });
+  }) as Promise<SpaceWithGates | null>;
 }
