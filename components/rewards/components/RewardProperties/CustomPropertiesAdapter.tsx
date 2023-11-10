@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { usePropertiesMutator } from 'components/rewards/components/RewardProperties/hooks/useRewardsMutator';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { RewardCard, RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
@@ -14,6 +15,7 @@ type Props = {
 
 export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { user } = useUser();
+  const isAdmin = useIsAdmin();
   const { boardCustomProperties, card, cards, activeView, views, rewardPage, setBoardReward } = useRewardsBoard();
   const mutator = usePropertiesMutator({ reward, onChange });
 
@@ -33,6 +35,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
       pageUpdatedAt={rewardPage?.updatedAt.toString() || new Date().toString()}
       pageUpdatedBy={rewardPage?.updatedBy || user?.id || ''}
       mutator={mutator ?? undefined}
+      disableEditPropertyOption={!isAdmin}
     />
   );
 }

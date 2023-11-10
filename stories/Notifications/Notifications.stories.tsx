@@ -82,7 +82,10 @@ const cards: CardNotification[] = [
     pagePath: '/card',
     pageTitle: 'Test card',
     type: 'person_assigned' as const,
-    personPropertyId: '_',
+    personProperty: {
+      id: '_',
+      name: 'John Doe'
+    },
     group: 'card' as const
   }
 ].map((notification) => ({ ...baseFields, ...notification }));

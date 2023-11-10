@@ -1,6 +1,6 @@
 import type { Command, EditorView, Node, NodeType, Schema } from '@bangle.dev/pm';
 import { InputRule, NodeSelection, Plugin, PluginKey } from '@bangle.dev/pm';
-import { safeInsert } from '@bangle.dev/utils';
+import { safeInsert } from 'prosemirror-utils';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -68,10 +68,11 @@ function pluginsFactory({
                   top: event.clientY
                 });
 
-                createImageNodes(files, getTypeFromSchema(view.state.schema), view).then((imageNodes) => {
-                  addImagesToView(view, coordinates == null ? undefined : coordinates.pos, imageNodes);
-                });
-
+                if (coordinates?.pos) {
+                  createImageNodes(files, getTypeFromSchema(view.state.schema), view).then((imageNodes) => {
+                    addImagesToView(view, coordinates.pos, imageNodes);
+                  });
+                }
                 return true;
               }
             },
@@ -106,11 +107,10 @@ async function defaultCreateImageNodes(files: File[], imageType: NodeType, _view
   ];
 }
 
-function addImagesToView(view: EditorView, pos: number | undefined, imageNodes: Node[]) {
+function addImagesToView(view: EditorView, pos: number, imageNodes: Node[]) {
   for (const node of imageNodes) {
     const { tr } = view.state;
     const newTr = safeInsert(node, pos)(tr);
-
     if (newTr !== tr) {
       view.dispatch(newTr);
     }

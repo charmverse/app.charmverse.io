@@ -18,10 +18,12 @@
   overflow: auto;
 
   > * {
-    padding: 0 24px;
+    padding-left: 24px;
+    padding-right: 24px;
 
     @media screen and (min-width: 768px) {
-      padding: 0 80px;
+      padding-left: 80px;
+      padding-right: 80px;
     }
 
     &.PageBanner {

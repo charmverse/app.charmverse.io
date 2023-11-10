@@ -9,7 +9,8 @@ const rewardPropertyTypesList = [
   'rewardAssignees',
   'rewardReviewers',
   'rewardAvailableCount',
-  'rewardDueDate'
+  'rewardDueDate',
+  'rewardCreatedAt'
 ] as const;
 type DatabaseRewardPropertyType = (typeof rewardPropertyTypesList)[number];
 
@@ -45,6 +46,12 @@ export const rewardDbProperties: {
     name: name || 'Due Date',
     options: [],
     type: 'date'
+  }),
+  rewardCreatedAt: (id?: string, name?: string) => ({
+    id: id || uuid(),
+    name: name || 'Created Time',
+    options: [],
+    type: 'createdTime'
   })
 };
 

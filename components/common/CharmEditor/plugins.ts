@@ -120,9 +120,7 @@ export function charmEditorPlugins({
       key: linkedPagePluginKey
     }),
     nestedPagePlugins(),
-    imagePlugins({
-      handleDragAndDrop: false
-    })
+    imagePlugins()
   ];
 
   // Breaking the array in order to make sure the plugins order is correct

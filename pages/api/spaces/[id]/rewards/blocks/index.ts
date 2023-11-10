@@ -18,9 +18,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getRewardBlocksHandler)
-  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .post(createRewardBlocksHandler)
   .put(updateRewardBlocksHandler)
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .delete(deleteRewardBlocksHandler);
 
 async function getRewardBlocksHandler(req: NextApiRequest, res: NextApiResponse<RewardBlockWithTypedFields[]>) {

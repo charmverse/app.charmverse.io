@@ -1,13 +1,11 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, ButtonGroup, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
@@ -26,16 +24,14 @@ export function NewProposalButton({
   showProposal: (pageId: string) => void;
   showNewProposal: (input?: Partial<ProposalPageAndPropertiesInput>) => void;
 }) {
-  const router = useRouter();
-  const { space: currentSpace } = useCurrentSpace();
-  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
-  const { pages, mutatePage } = usePages();
+  const { pages } = usePages();
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
-  const { proposalTemplates, deleteProposalTemplate, isLoadingTemplates } = useProposalTemplates();
+  const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
@@ -61,6 +57,10 @@ export function NewProposalButton({
         type: 'proposal'
       });
     }
+  }
+
+  function deleteProposalTemplate(pageId: string) {
+    return charmClient.deletePage(pageId);
   }
 
   async function createProposalTemplate() {

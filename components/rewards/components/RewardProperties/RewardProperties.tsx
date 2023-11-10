@@ -21,8 +21,19 @@ export function RewardProperties(props: {
   rewardChanged?: () => void;
   onClose?: () => void;
   showApplications?: boolean;
+  isTemplate?: boolean;
+  expandedRewardProperties?: boolean;
 }) {
-  const { rewardId, pageId, readOnly: parentReadOnly = false, rewardChanged, onClose, showApplications } = props;
+  const {
+    rewardId,
+    pageId,
+    readOnly: parentReadOnly = false,
+    rewardChanged,
+    onClose,
+    showApplications,
+    isTemplate,
+    expandedRewardProperties
+  } = props;
   const { updateReward, refreshReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
 
@@ -36,7 +47,7 @@ export function RewardProperties(props: {
     }
   }, [initialReward]);
 
-  const { data: rewardPagePermissions, mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
+  const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
   async function resyncReward() {
@@ -76,19 +87,20 @@ export function RewardProperties(props: {
         values={currentReward}
         onChange={applyRewardUpdates}
         readOnly={readOnly}
+        expandedByDefault={expandedRewardProperties}
       />
 
-      {!!currentReward?.id && showApplications && (
-        <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+      {!isTemplate && (
+        <>
+          {!!currentReward?.id && showApplications && (
+            <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+          )}
+
+          <Divider sx={{ my: 1 }} />
+
+          {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
+        </>
       )}
-
-      <Divider
-        sx={{
-          my: 1
-        }}
-      />
-
-      {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
     </Stack>
   );
 }

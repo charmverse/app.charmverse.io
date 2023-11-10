@@ -7,6 +7,7 @@ import type {
   RewardBlockWithTypedFields
 } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
 import { useGET, usePOST, usePUT, useDELETE } from './helpers';
@@ -46,7 +47,7 @@ export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
 // // Mutative requests
 
 export function useCreateReward() {
-  return usePOST<RewardCreationData, RewardWithUsers>('/api/rewards');
+  return usePOST<Omit<RewardCreationData, 'userId'>, RewardWithUsers>('/api/rewards');
 }
 
 // export function useUpsertRubricCriteria({ rewardId }: { rewardId: string }) {
@@ -68,6 +69,10 @@ export function useCreateReward() {
 // export function useUpdateRewardLensProperties({ rewardId }: { rewardId: string }) {
 //   return usePUT<Omit<UpdateRewardLensPropertiesRequest, 'rewardId'>>(`/api/rewards/${rewardId}/update-lens-properties`);
 // }
+
+export function useGetRewardTemplatesBySpace(spaceId?: string | null) {
+  return useGET<RewardTemplate[]>(spaceId ? `/api/spaces/${spaceId}/reward-templates` : null);
+}
 
 export function useCreateRewardBlocks(spaceId: string) {
   return usePOST<RewardBlockInput[], RewardBlockWithTypedFields[]>(`/api/spaces/${spaceId}/rewards/blocks`);

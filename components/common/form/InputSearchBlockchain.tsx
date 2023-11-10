@@ -61,7 +61,7 @@ export function InputSearchBlockchain({
       defaultValue={defaultValueToAssign}
       // @ts-ignore - autocomplete types are a mess
       // dummy bounty object with chainName to show N/A for empty value
-      value={value ?? { chainName: 'N/A' }}
+      value={value}
       onChange={(_, _value: IChainDetails) => {
         if (_value?.chainId) {
           onChange(_value.chainId);
@@ -85,7 +85,8 @@ export function InputSearchBlockchain({
           {...params}
           InputProps={{
             ...params.InputProps,
-            startAdornment: !hideInputIcon && <IconLogo src={value?.iconUrl} ml={1} />
+            placeholder: 'Select a chain',
+            startAdornment: !hideInputIcon && value && <IconLogo src={value?.iconUrl} ml={1} />
           }}
         />
       )}

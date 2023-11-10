@@ -1,4 +1,4 @@
-import { Box, Divider, Stack, Tooltip } from '@mui/material';
+import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
@@ -30,6 +30,8 @@ type Props = {
   useDebouncedInputs?: boolean;
   pageId?: string;
   refreshPermissions?: VoidFunction;
+  isNewReward?: boolean;
+  expandedByDefault?: boolean;
 };
 
 export function RewardPropertiesForm({
@@ -37,12 +39,14 @@ export function RewardPropertiesForm({
   values,
   readOnly,
   useDebouncedInputs,
+  isNewReward,
   pageId,
-  refreshPermissions
+  refreshPermissions,
+  expandedByDefault
 }: Props) {
-  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
-  const [rewardType, setRewardType] = useState<RewardType>('Token');
+  const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
+  const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
   const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
@@ -61,10 +65,6 @@ export function RewardPropertiesForm({
         updates.rewardAmount = null;
         updates.chainId = null;
         updates.rewardToken = null;
-      } else {
-        updates.rewardAmount = updates.rewardAmount || 1;
-        updates.chainId = updates.chainId || 1;
-        updates.rewardToken = updates.rewardToken || 'ETH';
       }
     }
 
@@ -138,14 +138,16 @@ export function RewardPropertiesForm({
         <RewardPropertiesHeader
           reward={values as RewardWithUsers}
           pageId={pageId || ''}
+          isExpanded={isExpanded}
+          toggleExpanded={() => setIsExpanded((v) => !v)}
           readOnly={readOnly || !pageId}
           refreshPermissions={refreshPermissions || (() => {})}
         />
 
-        <ExpandableSection title='Details' forceExpand>
+        <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
+              <PropertyLabel readOnly highlighted required={isNewReward}>
                 Reviewer
               </PropertyLabel>
               <UserAndRoleSelect
@@ -286,7 +288,7 @@ export function RewardPropertiesForm({
 
             {rewardType === 'Token' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
+                <PropertyLabel readOnly highlighted required={isNewReward}>
                   Reward Token
                 </PropertyLabel>
                 <RewardTokenProperty
@@ -332,7 +334,7 @@ export function RewardPropertiesForm({
               }}
             />
           </>
-        </ExpandableSection>
+        </Collapse>
       </Stack>
     </Box>
   );

@@ -15,7 +15,8 @@ export const proposalPropertyTypesList = [
   'proposalEvaluationAverage',
   'proposalAuthor',
   'proposalReviewer',
-  'proposalEvaluationType'
+  'proposalEvaluationType',
+  'proposalCreatedAt'
 ] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 

@@ -97,6 +97,9 @@ export async function convertAndSavePage<
   T extends { id: string; content: any; version: number; createdBy: string; diffs: PageDiff[] }
 >(page: T) {
   const { id: pageId, content, createdBy, version } = page;
+  if (!content) {
+    return { page };
+  }
   const { doc, steps } = convertDocument(getNodeFromJson(content));
 
   if (steps.length) {
