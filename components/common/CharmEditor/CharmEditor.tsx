@@ -11,7 +11,7 @@ import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
-import { useSWRConfig } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
@@ -21,7 +21,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageSidebarContext } from 'hooks/usePageSidebar';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useThreads } from 'hooks/useThreads';
+import { getThreadsKey, useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
@@ -233,7 +233,8 @@ function CharmEditor({
   const { space: currentSpace } = useCurrentSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
-  const { threads, isValidating } = useThreads();
+  const { threads } = useThreads();
+
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
@@ -326,13 +327,10 @@ function CharmEditor({
       spaceId: currentSpace?.id,
       userId: user?.id,
       disableMention,
-      threadIds:
-        isValidating || !threads
-          ? []
-          : Object.values(threads)
-              .filter((thread) => !thread?.resolved)
-              .filter(isTruthy)
-              .map((thread) => thread.id)
+      threadIds: Object.values(threads)
+        .filter((thread) => !thread?.resolved)
+        .filter(isTruthy)
+        .map((thread) => thread.id)
     });
   }
 

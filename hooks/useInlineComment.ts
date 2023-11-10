@@ -19,12 +19,14 @@ export function useInlineComment() {
 
   return {
     updateThreadPluginState({ remove, threadId }: { threadId: string; remove: boolean }) {
+      const filteredThreadIds = Object.values(threads)
+        .filter(isTruthy)
+        .filter((thread) => !thread.resolved)
+        .map((thread) => thread.id);
       view.dispatch(
         view.state.tr.setMeta(
           threadPluginKey,
-          remove
-            ? Object.keys(threads).filter((_threadId) => isTruthy(_threadId) && _threadId !== threadId)
-            : [...Object.keys(threads).filter(isTruthy), threadId]
+          remove ? filteredThreadIds.filter((_threadId) => _threadId !== threadId) : [...filteredThreadIds, threadId]
         )
       );
     },

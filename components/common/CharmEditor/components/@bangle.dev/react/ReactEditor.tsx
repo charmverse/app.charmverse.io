@@ -61,7 +61,6 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   enableComments?: boolean;
   onConnectionEvent?: (event: ConnectionEvent) => void;
   allowClickingFooter?: boolean;
-  threads?: CommentThreadsMap;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -85,8 +84,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     readOnly = false,
     enableComments = true,
     onConnectionEvent,
-    allowClickingFooter,
-    threads
+    allowClickingFooter
   },
   ref
 ) {

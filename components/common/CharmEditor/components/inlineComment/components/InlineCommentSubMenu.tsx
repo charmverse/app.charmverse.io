@@ -1,9 +1,10 @@
 import { selectionTooltip } from '@bangle.dev/tooltip';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
+import PersonIcon from '@mui/icons-material/Person';
 import SendIcon from '@mui/icons-material/Send';
 import type { Theme } from '@mui/material';
-import { Box, Paper, Stack, useMediaQuery } from '@mui/material';
+import { Box, Divider, Paper, Stack, Typography, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
@@ -13,6 +14,7 @@ import { useCreateThread } from 'charmClient/hooks/comments';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
@@ -102,12 +104,17 @@ export function InlineCommentSubMenu({
     <Box>
       {pageType === 'proposal' && (
         <Stack height='fit-content' my={0.5}>
+          <Stack flexDirection='row' gap={0.5} m={0.5} alignItems='center'>
+            <PersonIcon fontSize='small' color='secondary' />
+            <Typography variant='subtitle2'>Accessible to:</Typography>
+          </Stack>
           <UserAndRoleSelect
             emptyPlaceholderContent='Everyone'
             readOnlyMessage='Everyone'
             value={threadAccessGroups}
             onChange={setThreadAccessGroups}
           />
+          <Divider />
         </Stack>
       )}
       <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
