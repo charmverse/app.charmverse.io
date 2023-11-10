@@ -96,7 +96,14 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
 
   return (
     <>
-      <TokenGatesTable isAdmin={isAdmin} tokenGates={data} onDelete={deleteTokenGate} />
+      <TokenGatesTable
+        isAdmin={isAdmin}
+        tokenGates={data}
+        onDelete={deleteTokenGate}
+        refreshTokenGates={async () => {
+          mutate();
+        }}
+      />
       <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size='large'>
         <LitShareModal onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any} />
       </Modal>

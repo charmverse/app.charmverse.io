@@ -5,6 +5,7 @@ import { flatten } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { updateTokenGateDetails } from 'lib/blockchain/updateTokenGateDetails';
 import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
@@ -110,8 +111,10 @@ async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGate
       }
     }
   });
+  // Add identifiable names to token gates
+  const updatedResult = await updateTokenGateDetails(result as TokenGateWithRoles[]);
 
-  res.status(200).json(result as TokenGateWithRoles[]);
+  res.status(200).json(updatedResult);
 }
 
 export default withSessionRoute(handler);
