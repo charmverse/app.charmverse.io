@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 
 import getPageLayout from 'components/common/PageLayout/getLayout';
-import { RewardApplicationPageComponent } from 'components/rewards/components/RewardApplicationPage/RewardApplicationPage';
+import { RewardApplicationPage as RewardApplicationPageComponent } from 'components/rewards/components/RewardApplicationPage/RewardApplicationPage';
 
 export default function RewardApplicationPage() {
   const router = useRouter();
