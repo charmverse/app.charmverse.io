@@ -106,7 +106,7 @@ export function InlineCommentSubMenu({
         <Stack height='fit-content' my={0.5}>
           <Stack flexDirection='row' gap={0.5} m={0.5} alignItems='center'>
             <PersonIcon fontSize='small' color='secondary' />
-            <Typography variant='subtitle2'>Accessible to:</Typography>
+            <Typography variant='subtitle2'>Viewable by:</Typography>
           </Stack>
           <UserAndRoleSelect
             emptyPlaceholderContent='Everyone'
@@ -123,7 +123,8 @@ export function InlineCommentSubMenu({
             focusOnInit={true}
             content={commentContent}
             style={{
-              fontSize: '14px'
+              fontSize: '14px',
+              minHeight: 100
             }}
             onContentChange={({ doc }) => {
               setCommentContent(doc);
