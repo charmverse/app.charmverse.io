@@ -23,9 +23,7 @@ export function useInlineComment() {
         view.state.tr.setMeta(
           threadPluginKey,
           remove
-            ? Object.keys(threads)
-                .filter(isTruthy)
-                .map((_threadId) => _threadId !== threadId)
+            ? Object.keys(threads).filter((_threadId) => isTruthy(_threadId) && _threadId !== threadId)
             : [...Object.keys(threads).filter(isTruthy), threadId]
         )
       );

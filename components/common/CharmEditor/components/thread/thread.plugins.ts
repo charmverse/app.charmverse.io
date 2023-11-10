@@ -40,7 +40,7 @@ export function buildInlineCommentDecoration(state: EditorState, threadIds: stri
   doc.descendants((node: Node, pos: number) => {
     if (node.marks.some((mark) => mark.type.name === inlineCommentMarkName && threadIds.includes(mark.attrs.id))) {
       decorations.push(
-        Decoration.inline(
+        Decoration.node(
           pos,
           pos + node.nodeSize,
           { nodeName: 'span', class: 'active' },
