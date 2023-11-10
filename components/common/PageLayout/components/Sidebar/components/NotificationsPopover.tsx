@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -32,6 +31,7 @@ import type { Member } from 'lib/members/interfaces';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
+import type { LoggedInUser } from 'models';
 
 import { sidebarItemStyles } from './SidebarButton';
 
@@ -439,24 +439,16 @@ export function NotificationContent({
   const read = notification.read;
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
-  const { formatDate, formatTime } = useDateFormatter();
-  const isSmallScreen = useSmallScreen();
-  let metadata: ReturnType<typeof getNotificationMetadata>;
-  try {
-    metadata = getNotificationMetadata(notification, actorUsername);
-  } catch (error) {
-    // handle the case where the notification type is not supported
-    log.warn('Cannot read notification type', { error, notification });
-    return null;
-  }
-  const { href, content, pageTitle } = metadata;
+  const { href, content, pageTitle } = getNotificationMetadata(notification, actorUsername);
   const notificationContent = notification.group === 'document' ? notification.content : null;
+  const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
   const todaysDate = new Date();
   const isDateEqual = date.setHours(0, 0, 0, 0) === todaysDate.setHours(0, 0, 0, 0);
   const notificationDate = isDateEqual
     ? `Today at ${formatTime(createdAt)}`
     : formatDate(createdAt, { withYear: false });
+  const isSmallScreen = useSmallScreen();
 
   return (
     <Link
