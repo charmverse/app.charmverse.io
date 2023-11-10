@@ -13,9 +13,8 @@ import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
-import { RewardPaymentButton } from '../RewardProperties/components/RewardApplicantsTable/RewardPaymentButton';
-
 import { AcceptOrRejectButtons } from './AcceptOrRejectButtons';
+import { RewardPaymentButton } from './RewardPaymentButton';
 
 type Props = {
   reward: RewardWithUsers;

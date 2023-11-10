@@ -85,7 +85,6 @@ test.describe.serial('Proposal Flow', () => {
     proposalId = pageWithProposal.proposal.id;
 
     // verify that the page list was updated
-    await authorBrowserProposalPage.closeDialog();
     await expect(authorBrowserProposalListPage.emptyState).not.toBeVisible();
     const proposalRow = authorBrowserProposalListPage.getProposalRowLocator(proposalId);
     await expect(proposalRow).toBeVisible();

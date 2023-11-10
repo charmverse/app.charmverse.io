@@ -19,7 +19,7 @@ import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
 
-import { RewardApplicationStatusChip, applicationStatuses } from '../RewardApplicationStatusChip';
+import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 
 const schema = (customReward?: boolean) => {
   return yup.object({

@@ -14,7 +14,7 @@ import * as yup from 'yup';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 
-import { RewardApplicationStatusChip, applicationStatuses } from '../RewardApplicationStatusChip';
+import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 
 /**
  * @expandedOnLoad Use this to expand the application initially

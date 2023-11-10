@@ -24,10 +24,10 @@ import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import { ApplicationComments } from './ApplicationComments';
-import { ApplicationInput } from './RewardApplicationInput';
-import { RewardReviewerActions } from './RewardReviewerActions';
-import { RewardSubmissionInput } from './RewardSubmissionInput';
+import { ApplicationComments } from './components/ApplicationComments';
+import { ApplicationInput } from './components/RewardApplicationInput';
+import { RewardReviewerActions } from './components/RewardReviewerActions';
+import { RewardSubmissionInput } from './components/RewardSubmissionInput';
 
 type Props = {
   applicationId: string | null;

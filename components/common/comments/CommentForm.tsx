@@ -69,7 +69,6 @@ export function CommentForm({
       style: {
         paddingTop: 0,
         paddingBottom: 0,
-        marginLeft: 8,
         minHeight: 100,
         left: 0
       },
