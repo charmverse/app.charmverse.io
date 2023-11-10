@@ -101,7 +101,7 @@ export function InlineCommentSubMenu({
   };
 
   return (
-    <Box>
+    <Box width='100%'>
       {pageType === 'proposal' && (
         <Stack height='fit-content' my={0.5}>
           <Stack flexDirection='row' gap={0.5} m={0.5} alignItems='center'>
@@ -109,6 +109,7 @@ export function InlineCommentSubMenu({
             <Typography variant='subtitle2'>Viewable by:</Typography>
           </Stack>
           <UserAndRoleSelect
+            wrapColumn
             emptyPlaceholderContent='Everyone'
             readOnlyMessage='Everyone'
             value={threadAccessGroups}

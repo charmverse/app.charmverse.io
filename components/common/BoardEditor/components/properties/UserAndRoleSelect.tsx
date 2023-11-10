@@ -75,7 +75,7 @@ function SelectedOptions({
     <Tooltip title={readOnlyMessage ?? null}>
       <Stack
         display='inline-flex'
-        width='min-content'
+        width={wrapColumn ? '100%' : 'min-content'}
         flexDirection='row'
         gap={1}
         flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
