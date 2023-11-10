@@ -78,7 +78,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
         await updateApplication(input);
       }
 
-      const messageType = type === 'applcation' ? 'Application' : 'Submission';
+      const messageType = type === 'application' ? 'Application' : 'Submission';
       showMessage(`${messageType} saved successfully`, 'success');
 
       return true;
