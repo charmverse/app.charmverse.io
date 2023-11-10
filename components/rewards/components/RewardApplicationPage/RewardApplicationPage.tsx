@@ -125,7 +125,8 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
 
   const applicationStepRequired = reward.approveSubmitters;
 
-  const showSubmissionInput = !applicationStepRequired || (application && application.status !== 'applied');
+  const showSubmissionInput =
+    !applicationStepRequired || (application && application.status !== 'applied' && application.status !== 'rejected');
 
   const isApplicationInReview = application?.status === 'applied';
 
@@ -221,7 +222,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
               isSaving={isSaving}
             />
           )}
-          {application && <ApplicationComments applicationId={application.id} status={application.status} />}
+          {application && <ApplicationComments applicationId={application.id} />}
         </StyledContainer>
       </Box>
     </div>
