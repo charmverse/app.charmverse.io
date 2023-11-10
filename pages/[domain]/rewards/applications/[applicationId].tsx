@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 
 import getPageLayout from 'components/common/PageLayout/getLayout';
-import { RewardApplicationPageComponent } from 'components/rewards/components/RewardApplicationPage/RewardApplicationPage';
+import { RewardApplicationPage } from 'components/rewards/components/RewardApplicationPage/RewardApplicationPage';
 
-export default function RewardApplicationPage() {
+export default function RewardApplicationPageComponent() {
   const router = useRouter();
 
   const applicationId = router.query.applicationId as string;
@@ -13,7 +13,7 @@ export default function RewardApplicationPage() {
   }
   // TODO - Add event type
   // useTrackPageView({ type: 'b' });
-  return <RewardApplicationPageComponent applicationId={applicationId} />;
+  return <RewardApplicationPage applicationId={applicationId} />;
 }
 
-RewardApplicationPage.getLayout = getPageLayout;
+RewardApplicationPageComponent.getLayout = getPageLayout;

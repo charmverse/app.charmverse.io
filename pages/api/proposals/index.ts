@@ -4,11 +4,13 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PageWithProposal } from 'lib/pages';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -52,6 +54,14 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     ...req.body,
     userId: req.session.user.id
   });
+  const pages = await getPageMetaList([proposalPage.page.id]);
+  relay.broadcast(
+    {
+      type: 'pages_created',
+      payload: pages
+    },
+    proposalPage.page.spaceId
+  );
 
   return res.status(201).json({
     ...proposalPage.page,
