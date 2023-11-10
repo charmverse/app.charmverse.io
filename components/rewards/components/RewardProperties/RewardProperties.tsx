@@ -22,6 +22,7 @@ export function RewardProperties(props: {
   onClose?: () => void;
   showApplications?: boolean;
   isTemplate?: boolean;
+  expandedRewardProperties?: boolean;
 }) {
   const {
     rewardId,
@@ -30,7 +31,8 @@ export function RewardProperties(props: {
     rewardChanged,
     onClose,
     showApplications,
-    isTemplate
+    isTemplate,
+    expandedRewardProperties
   } = props;
   const { updateReward, refreshReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
@@ -45,7 +47,7 @@ export function RewardProperties(props: {
     }
   }, [initialReward]);
 
-  const { data: rewardPagePermissions, mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
+  const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
   async function resyncReward() {
@@ -85,6 +87,7 @@ export function RewardProperties(props: {
         values={currentReward}
         onChange={applyRewardUpdates}
         readOnly={readOnly}
+        expandedByDefault={expandedRewardProperties}
       />
 
       {!isTemplate && (

@@ -34,7 +34,6 @@ export function RewardApplicationDialog() {
     };
   }, []);
   function close() {
-    //    setFormInputs(emptyState());
     setContentUpdated(false);
     setShowConfirmDialog(false);
     hideApplication();
@@ -83,7 +82,7 @@ export function RewardApplicationDialog() {
         <LoadingComponent isLoading />
       ) : currentApplicationId || currentRewardId ? (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
-        <RewardApplicationPage applicationId={currentApplicationId} rewardId={currentRewardId} />
+        <RewardApplicationPage applicationId={currentApplicationId} rewardId={currentRewardId} closeDialog={close} />
       ) : null}
       <ConfirmDeleteModal
         onClose={() => {

@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
-import { useCreateReward, useGetRewards } from 'charmClient/hooks/rewards';
+import { useGetRewards } from 'charmClient/hooks/rewards';
 import type { RewardStatusFilter } from 'components/rewards/components/RewardViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
@@ -21,7 +21,6 @@ type RewardsContextType = {
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
   refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
-  createReward: (input: Omit<RewardCreationData, 'userId'>) => Promise<RewardWithUsers | null>;
   creatingInlineReward: boolean;
   setCreatingInlineReward: (isCreating: boolean) => void;
 };
@@ -37,7 +36,6 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   isLoading: false,
   updateReward: () => Promise.resolve(),
   refreshReward: () => Promise.resolve() as any,
-  createReward: () => Promise.resolve(null),
   creatingInlineReward: false,
   setCreatingInlineReward: () => {}
 });
@@ -49,7 +47,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
 
   const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
-  const { trigger: createRewardTrigger } = useCreateReward();
   const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
 
   // filter out deleted and templates
@@ -106,29 +103,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     },
     [mutateRewards]
   );
-
-  const createReward = useCallback(
-    async (rewardData: Omit<RewardCreationData, 'userId'>) => {
-      const reward = await createRewardTrigger(rewardData as any);
-      if (!reward) {
-        return null;
-      }
-
-      mutateRewards(
-        (data) => {
-          if (!data) {
-            return [reward];
-          }
-
-          return [...data, reward];
-        },
-        { revalidate: false }
-      );
-
-      return reward;
-    },
-    [createRewardTrigger, mutateRewards]
-  );
   const value = useMemo(
     () => ({
       rewards,
@@ -140,7 +114,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       updateReward,
       refreshReward,
       setRewards: mutateRewards,
-      createReward,
       setCreatingInlineReward,
       creatingInlineReward
     }),
@@ -153,7 +126,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       loadingPages,
       updateReward,
       refreshReward,
-      createReward,
       creatingInlineReward,
       setCreatingInlineReward
     ]

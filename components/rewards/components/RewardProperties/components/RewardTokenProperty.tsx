@@ -39,12 +39,11 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
   const [paymentMethods] = usePaymentMethods();
   const {
     control,
-    register,
     handleSubmit,
     reset,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors, isValid }
   } = useForm<FormInput>({
     defaultValues: {
       rewardToken: currentReward?.rewardToken || '',
@@ -104,16 +103,22 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
     }
   }
 
-  useEffect(() => {
-    if (currentReward) {
-      refreshCryptoList(currentReward.chainId || 1, currentReward.rewardToken || undefined);
+  function openTokenSettings() {
+    if (readOnly) {
+      return;
     }
-
+    setIsOpen(true);
     reset({
       rewardToken: currentReward?.rewardToken || '',
       chainId: currentReward?.chainId || undefined,
       rewardAmount: currentReward?.rewardAmount || undefined
     });
+  }
+
+  useEffect(() => {
+    if (currentReward) {
+      refreshCryptoList(currentReward.chainId || 1, currentReward.rewardToken || undefined);
+    }
   }, [currentReward, reset]);
 
   useEffect(() => {
@@ -131,7 +136,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
   return (
     <>
-      <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={() => !readOnly && setIsOpen(true)}>
+      <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={openTokenSettings}>
         {tokenInfo ? (
           <Stack direction='row'>
             <Box
@@ -175,6 +180,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
             </Button>
 
             <Button
+              disabled={!isValid}
               onClick={handleSubmit(onSubmit)}
               sx={{
                 alignSelf: 'flex-start'
@@ -233,21 +239,29 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
             <PropertyLabel readOnly>Amount</PropertyLabel>
-            <TextField
-              {...register('rewardAmount', { required: true, validate: (value) => Number(value) > 0 })}
-              data-test='reward-property-amount'
-              type='number'
-              inputProps={{
-                step: 0.01,
-                style: { height: 'auto' }
-              }}
-              sx={{
-                width: '100%'
-              }}
-              required
-              disabled={readOnly}
-              placeholder='Number greater than 0'
-              error={!!errors.rewardAmount}
+            <Controller
+              name='rewardAmount'
+              control={control}
+              rules={{ required: true, validate: (value) => Number(value) > 0 }}
+              render={({ field: { onChange: _onChange, value } }) => (
+                <TextField
+                  onChange={_onChange}
+                  value={value ?? undefined}
+                  data-test='reward-property-amount'
+                  type='number'
+                  inputProps={{
+                    step: 0.01,
+                    style: { height: 'auto' }
+                  }}
+                  sx={{
+                    width: '100%'
+                  }}
+                  required
+                  disabled={readOnly}
+                  placeholder='Number greater than 0'
+                  error={!!errors.rewardAmount}
+                />
+              )}
             />
           </Box>
         </Stack>

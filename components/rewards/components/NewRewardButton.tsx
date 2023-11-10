@@ -5,7 +5,7 @@ import { useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import { NewPageDocument } from 'components/common/PageDialog/components/NewPageDocument';
+import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
@@ -34,10 +34,9 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     openNewPage({
       type: 'bounty_template'
     });
-    popupState.close();
   }
 
-  function resetForm() {
+  function closeDialog() {
     clearRewardValues();
     clearNewPage();
   }
@@ -52,7 +51,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   async function saveForm() {
     const newReward = await createReward(newPageValues);
     if (newReward) {
-      resetForm();
+      closeDialog();
     }
   }
 
@@ -69,6 +68,19 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       throw new Error('Reward template not found');
     }
   }
+  let disabledTooltip: string | undefined;
+
+  if (!newPageValues?.title) {
+    disabledTooltip = 'Page title is required';
+  } else if (!rewardValues.reviewers?.length) {
+    disabledTooltip = 'Reviewer is required';
+  } else if (
+    !rewardValues.customReward &&
+    (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
+  ) {
+    disabledTooltip = 'Reward is required';
+  }
+
   return (
     <>
       <ButtonGroup variant='contained' ref={buttonRef}>
@@ -95,14 +107,15 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
+        disabledTooltip={disabledTooltip}
         isOpen={!!newPageValues}
-        onClose={resetForm}
+        onClose={closeDialog}
         onSave={saveForm}
         isSaving={isSavingReward}
       >
-        <NewPageDocument readOnly={false} values={newPageValues} onChange={updateNewPageValues}>
-          <RewardPropertiesForm onChange={setRewardValues} values={rewardValues} />
-        </NewPageDocument>
+        <NewDocumentPage titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
+          <RewardPropertiesForm onChange={setRewardValues} values={rewardValues} isNewReward expandedByDefault />
+        </NewDocumentPage>
       </NewPageDialog>
     </>
   );

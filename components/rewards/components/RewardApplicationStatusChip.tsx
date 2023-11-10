@@ -12,7 +12,6 @@ import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import Tooltip from '@mui/material/Tooltip';
-import type { ReactNode } from 'react';
 
 import type { BrandColor } from 'theme/colors';
 
@@ -73,14 +72,14 @@ const REWARD_APPLICATION_STATUS_ICONS: Record<
   cancelled: DoDisturbOutlinedIcon
 };
 
+export const applicationStatuses = ['applied', 'rejected'];
+
 export function RewardApplicationStatusIcon({
   status,
-  showTooltip,
-  fontSize = 'small'
+  showTooltip
 }: {
   status: ApplicationStatus;
   showTooltip?: boolean;
-  fontSize?: 'small' | 'medium';
 }) {
   const Icon = REWARD_APPLICATION_STATUS_ICONS[status];
 
@@ -90,7 +89,10 @@ export function RewardApplicationStatusIcon({
 
   return (
     <Tooltip title={showTooltip ? REWARD_APPLICATION_STATUS_LABELS[status] : ''}>
-      <Icon color='secondary' />
+      <Icon
+        color='secondary'
+        style={{ color: `var(--text-${REWARD_APPLICATION_STATUS_COLORS[status]})`, opacity: 0.8 }}
+      />
     </Tooltip>
   );
 }

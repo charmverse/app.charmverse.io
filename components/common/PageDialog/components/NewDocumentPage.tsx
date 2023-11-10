@@ -21,13 +21,13 @@ const StyledContainer = styled(Container)`
 type Props = {
   children: React.ReactNode;
   placeholder?: string;
+  titlePlaceholder?: string;
   values: NewPageValues | null;
   onChange: (values: Partial<NewPageValues | null>) => void;
-  readOnly: boolean;
 };
 
 // Note: this component is only used before a page is saved to the DB
-export function NewPageDocument({ children, placeholder, values: newPageValues, onChange, readOnly }: Props) {
+export function NewDocumentPage({ children, placeholder, titlePlaceholder, values: newPageValues, onChange }: Props) {
   newPageValues ||= EMPTY_PAGE_VALUES;
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -43,9 +43,6 @@ export function NewPageDocument({ children, placeholder, values: newPageValues, 
               placeholderText={placeholder}
               content={newPageValues.content as PageContent}
               autoFocus={false}
-              style={{
-                color: readOnly ? `var(--secondary-text)` : 'inherit'
-              }}
               enableVoting={false}
               containerWidth={containerWidth}
               pageType={newPageValues.type}
@@ -53,7 +50,6 @@ export function NewPageDocument({ children, placeholder, values: newPageValues, 
               onContentChange={({ rawText, doc }) => onChange({ content: doc, contentText: rawText })}
               focusOnInit
               isContentControlled
-              readOnly={readOnly}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
               <PageHeader
@@ -63,6 +59,7 @@ export function NewPageDocument({ children, placeholder, values: newPageValues, 
                 title={newPageValues.title || ''}
                 readOnly={false}
                 setPage={onChange}
+                placeholder={titlePlaceholder}
               />
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>{children}</div>

@@ -52,9 +52,9 @@ export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...
 }>`
   width: ${({ fullWidth }) => (fullWidth ? '100%' : '860px')};
   max-width: 100%;
-  margin: 0 auto ${({ top }) => top}px;
+  margin: 0 auto ${({ top }) => top || 0}px;
   position: relative;
-  top: ${({ top }) => top}px;
+  top: ${({ top }) => top || 0}px;
   padding: 0 40px 0 30px;
 
   ${({ theme }) => theme.breakpoints.up('md')} {
@@ -336,6 +336,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       readOnly={readOnly}
                       onClose={close}
                       showApplications
+                      expandedRewardProperties
                       isTemplate={page.type === 'bounty_template'}
                     />
                   )}

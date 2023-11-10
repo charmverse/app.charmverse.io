@@ -54,12 +54,13 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
   const { proposalTemplates } = useProposalTemplates();
 
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
+  const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
 
   useEffect(() => {
-    if (currentSpace?.requireProposalTemplate) {
+    if (isTemplateRequired) {
       setReadOnlyEditor(!formInputs.proposalTemplateId);
     }
-  }, [formInputs.proposalTemplateId, currentSpace?.requireProposalTemplate]);
+  }, [formInputs.proposalTemplateId, isTemplateRequired]);
 
   const readOnlyReviewers = !!proposalTemplates?.some(
     (t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0
@@ -97,16 +98,9 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
         <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
             <CharmEditor
-              placeholderText={
-                readOnlyEditor
-                  ? `You must select a proposal template to begin writing`
-                  : `Describe the proposal. Type '/' to see the list of available commands`
-              }
+              placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
               content={formInputs.content as PageContent}
               autoFocus={false}
-              style={{
-                color: readOnlyEditor ? `var(--secondary-text)` : 'inherit'
-              }}
               enableVoting={false}
               containerWidth={containerWidth}
               pageType='proposal'
@@ -114,7 +108,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
               onContentChange={updateProposalContent}
               focusOnInit
               isContentControlled
-              readOnly={readOnlyEditor}
               key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
             >
               {/* temporary? disable editing of page title when in suggestion mode */}
@@ -134,6 +127,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                 <div className='CardDetail content'>
                   <ProposalProperties
                     isFromTemplate={isFromTemplateSource}
+                    isTemplateRequired={isTemplateRequired}
                     readOnlyRubricCriteria={isFromTemplateSource}
                     readOnlyReviewers={readOnlyReviewers}
                     readOnlyProposalEvaluationType={isFromTemplateSource}

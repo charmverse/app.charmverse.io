@@ -1,11 +1,9 @@
 import { log } from '@charmverse/core/log';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -20,8 +18,6 @@ export function useNewProposal({ newProposal }: Props) {
   const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
-  const { mutatePage } = usePages();
-  const router = useRouter();
   const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
 
   const [contentUpdated, setContentUpdated] = useState(false);
@@ -92,13 +88,7 @@ export function useNewProposal({ newProposal }: Props) {
       });
 
       if (createdProposal) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { proposal, ...page } = createdProposal;
-        mutatePage(page);
         mutate(`/api/spaces/${currentSpace.id}/proposals`);
-        router.push({ pathname: router.pathname, query: { domain: router.query.domain, id: page.id } }, undefined, {
-          shallow: true
-        });
         setContentUpdated(false);
       }
     }
@@ -113,7 +103,7 @@ export function useNewProposal({ newProposal }: Props) {
       return 'Category is required';
     }
 
-    if (currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
+    if (formInputs.type === 'proposal' && currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
       return 'Template is required';
     }
 
@@ -125,7 +115,8 @@ export function useNewProposal({ newProposal }: Props) {
     formInputs.categoryId,
     formInputs.proposalTemplateId,
     formInputs.reviewers.length,
-    formInputs.title
+    formInputs.title,
+    formInputs.type
   ]);
 
   return {

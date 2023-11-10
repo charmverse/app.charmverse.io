@@ -84,12 +84,7 @@ test.describe.serial('Proposal Flow', () => {
     pageWithProposal = response;
     proposalId = pageWithProposal.proposal.id;
 
-    // verify we are on the saved view
-    await expect(authorBrowserProposalPage.openAsPageButton).toBeVisible();
-    await expect(authorBrowserProposalPage.nextStatusButton).toBeEnabled();
-
     // verify that the page list was updated
-    await authorBrowserProposalPage.closeDialog();
     await expect(authorBrowserProposalListPage.emptyState).not.toBeVisible();
     const proposalRow = authorBrowserProposalListPage.getProposalRowLocator(proposalId);
     await expect(proposalRow).toBeVisible();
