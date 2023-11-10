@@ -31,7 +31,7 @@ export function Header() {
   const domain = router.query.domain as string;
   const { spaceFromPath, isSpaceLoading } = useSearchByDomain(domain);
 
-  if (isSpaceLoading) {
+  if (!spaceFromPath || isSpaceLoading) {
     return (
       <HeaderBox>
         <UserMenu />
