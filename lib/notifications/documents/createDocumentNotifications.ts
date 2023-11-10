@@ -127,7 +127,7 @@ export async function createDocumentNotifications(webhookData: {
       const targetUserIds = (
         await getUserIdsFromRoles({
           group: targetMention.type,
-          value: targetMention.id,
+          value: targetMention.value,
           spaceId: webhookData.spaceId
         })
       ).filter((userId) => userId !== mentionAuthorId);
