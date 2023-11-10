@@ -1,4 +1,4 @@
-import { humanizeAccessControlConditions } from '@lit-protocol/lit-node-client';
+import { humanizeConditions, humanizeConditionsData } from 'lib/tokenGates/humanizeConditions';
 
 const checkAndCleanNested = (entry) => {
   if (entry.length === 1) {
@@ -23,9 +23,10 @@ const cleanUnifiedAccessControlConditions = (acc) => {
 }
 
 const humanizeUnifiedAccessControlConditions = async (unifiedAccessControlConditions) => {
-  return humanizeAccessControlConditions({
-    unifiedAccessControlConditions,
-  });
+  const humanizeAccessControlConditionsData = humanizeConditionsData({ unifiedAccessControlConditions });
+  const humanizeAccessControlConditions = humanizeConditions(humanizeAccessControlConditionsData);
+
+  return humanizeAccessControlConditions
 };
 
 const humanizeNestedConditions = async (acc) => {

@@ -13,7 +13,6 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { mutate } from 'swr';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
@@ -37,6 +36,7 @@ interface Props {
   tokenGates: TokenGateWithRoles[];
   isAdmin: boolean;
   onDelete: (tokenGate: TokenGate) => void;
+  refreshTokenGates: () => Promise<void>;
 }
 
 const StyledTableRow = styled(TableRow)`
@@ -63,7 +63,7 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
   );
 }
 
-export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
+export default function TokenGatesTable({ isAdmin, onDelete, tokenGates, refreshTokenGates }: Props) {
   const { account, walletAuthSignature, requestSignature } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
@@ -89,7 +89,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
   async function updateTokenGateRoles(tokenGateId: string, roleIds: string[]) {
     if (space) {
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
-      mutate(`tokenGates/${space.id}`);
+      await refreshTokenGates();
     }
   }
 
@@ -100,7 +100,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
         .map((tokenGateToRole) => tokenGateToRole.roleId)
         .filter((tokenGateRoleId) => tokenGateRoleId !== roleId);
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
-      mutate(`tokenGates/${space.id}`);
+      await refreshTokenGates();
     }
   }
 
