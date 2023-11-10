@@ -2,20 +2,19 @@ import { Divider, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';
-import { useGetReward } from 'charmClient/hooks/rewards';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { RewardSignupButton } from './components/RewardSignupButton';
 
 export function RewardProperties(props: {
   readOnly?: boolean;
-  rewardId: string | null;
+  reward?: RewardWithUsersAndPageMeta;
   pageId: string;
   pagePath: string;
   rewardChanged?: () => void;
@@ -25,7 +24,7 @@ export function RewardProperties(props: {
   expandedRewardProperties?: boolean;
 }) {
   const {
-    rewardId,
+    reward: initialReward,
     pageId,
     readOnly: parentReadOnly = false,
     rewardChanged,
@@ -35,17 +34,15 @@ export function RewardProperties(props: {
     expandedRewardProperties
   } = props;
   const { updateReward, refreshReward } = useRewards();
-  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
-
-  const { data: initialReward } = useGetReward({
-    rewardId: rewardId as string
-  });
+  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
+    initialReward
+  );
 
   useEffect(() => {
     if (!currentReward && initialReward) {
-      setCurrentReward(initialReward as any);
+      setCurrentReward(initialReward);
     }
-  }, [initialReward]);
+  }, [currentReward, initialReward]);
 
   const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();

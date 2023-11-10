@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
+import { useGetReward } from 'charmClient/hooks/rewards';
 import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
@@ -110,8 +111,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
     }
   }, [printRef, _printRef]);
 
-  const cannotComment = readOnly || !pagePermissions.comment;
-
   const card = useAppSelector((state) => {
     if (page?.type !== 'card') {
       return null;
@@ -160,6 +159,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   const isSharedPage = router.pathname.startsWith('/share');
   // TODO: this logic should be removed when we release rewards in place of bounties
   const isRewardsPage = router.pathname.endsWith('/rewards');
+  const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
@@ -323,9 +323,9 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       refreshBountyPermissions={() => refreshBountyPermissions()}
                     />
                   )}
-                  {page.bountyId && isRewardsPage && (
+                  {reward && isRewardsPage && (
                     <RewardProperties
-                      rewardId={page.bountyId}
+                      reward={reward}
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}

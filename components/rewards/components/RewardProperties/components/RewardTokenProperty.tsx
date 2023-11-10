@@ -2,7 +2,7 @@ import type { PaymentMethod } from '@charmverse/core/prisma';
 import { Box, Stack, TextField, Typography } from '@mui/material';
 import type { CryptoCurrency } from 'connectors/chains';
 import { getChainById } from 'connectors/chains';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
@@ -13,12 +13,17 @@ import { Dialog } from 'components/common/Dialog/Dialog';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import TokenLogo from 'components/common/TokenLogo';
 import { RewardTokenSelect } from 'components/rewards/components/RewardProperties/components/RewardTokenSelect';
-import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/interfaces';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { isTruthy } from 'lib/utilities/types';
+
+export type RewardTokenDetails = {
+  chainId: number;
+  rewardToken: string;
+  rewardAmount: number;
+};
 
 type Props = {
   onChange: (value: RewardTokenDetails | null) => void;
