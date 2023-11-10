@@ -19,6 +19,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -31,14 +32,16 @@ import { RewardSubmissionInput } from './RewardSubmissionInput';
 type Props = {
   applicationId: string | null;
   rewardId?: string | null;
+  closeDialog?: VoidFunction;
 };
 
 const StyledContainer = styled(Container)`
   margin-bottom: 180px;
 `;
 
-export function RewardApplicationPageComponent({ applicationId, rewardId }: Props) {
+export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: Props) {
   const isNewApplication = !applicationId && !!rewardId;
+  const { showMessage } = useSnackbar();
 
   const { application, refreshApplication, applicationRewardPermissions, updateApplication, reviewApplication } =
     useApplication({
@@ -63,14 +66,16 @@ export function RewardApplicationPageComponent({ applicationId, rewardId }: Prop
   const { createNewWork } = useNewWork(currentRewardId);
 
   const saveApplication = async (input: WorkInput) => {
-    if (isNewApplication) {
-      const newApplication = await createNewWork(input);
-      refreshReward();
-      if (newApplication) {
-        showApplication(newApplication?.id);
+    try {
+      if (isNewApplication) {
+        await createNewWork(input);
+        refreshReward();
+        closeDialog?.();
+      } else {
+        await updateApplication(input);
       }
-    } else {
-      updateApplication(input);
+    } catch (error) {
+      showMessage((error as Error).message, 'error');
     }
   };
 
