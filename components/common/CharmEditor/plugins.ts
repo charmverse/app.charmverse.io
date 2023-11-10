@@ -57,7 +57,7 @@ const columnsPluginKey = new PluginKey('columns');
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const suggestionsPluginKey = new PluginKey('suggestions');
-export const threadPluginKey = new PluginKey('fetchedComments');
+export const threadPluginKey = new PluginKey('threads');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -72,7 +72,8 @@ export function charmEditorPlugins({
   spaceId = null,
   placeholderText,
   disableRowHandles = false,
-  disableMention = false
+  disableMention = false,
+  threadIds
 }: {
   disableMention?: boolean;
   disableRowHandles?: boolean;
@@ -87,6 +88,7 @@ export function charmEditorPlugins({
   enableVoting?: boolean;
   enableComments?: boolean;
   placeholderText?: string;
+  threadIds?: string[];
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
     pageNodeDropPlugin({
@@ -209,6 +211,7 @@ export function charmEditorPlugins({
     placeholderPlugin(placeholderText),
     tabIndent.plugins(), // tabIndent should be triggered last so other plugins can override the keymap,
     threadPlugins({
+      threadIds,
       key: threadPluginKey
     })
   );

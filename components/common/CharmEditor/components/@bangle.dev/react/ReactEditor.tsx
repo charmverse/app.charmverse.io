@@ -97,7 +97,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
-
   const { data: authResponse, error: authError } = useSWRImmutable(useSockets ? user?.id : null, () =>
     charmClient.socket()
   ); // refresh when user
@@ -129,12 +128,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     },
     [editor]
   );
-
-  useEffect(() => {
-    if (editor && threads) {
-      editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, Object.keys(threads)));
-    }
-  }, [threads]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {

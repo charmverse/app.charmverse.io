@@ -2,21 +2,22 @@ import { selectionTooltip } from '@bangle.dev/tooltip';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import SendIcon from '@mui/icons-material/Send';
-import type { SelectProps, Theme } from '@mui/material';
-import { Box, MenuItem, Paper, Select, useMediaQuery } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { Box, Paper, Stack, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { ThreadAccessGroup } from 'lib/threads';
 
 import { updateInlineComment } from '../inlineComment.utils';
 
@@ -51,7 +52,6 @@ export function InlineCommentSubMenu({
   pluginKey: PluginKey;
   pageId: string | undefined;
 }) {
-  const { space } = useCurrentSpace();
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -61,13 +61,10 @@ export function InlineCommentSubMenu({
       }
     ]
   });
-  const [threadAccessGroup, setThreadAccessGroup] = useState<'space' | 'reviewers' | 'authors'>('space');
+  const [threadAccessGroups, setThreadAccessGroups] = useState<ThreadAccessGroup[]>([]);
 
-  const handleThreadAccessGroupChange: SelectProps['onChange'] = (event) => {
-    setThreadAccessGroup(event.target.value as any);
-  };
   const { trigger: createThread, isMutating } = useCreateThread();
-  const { extractTextFromSelection } = useInlineComment();
+  const { extractTextFromSelection, updateThreadPluginState } = useInlineComment();
   const { refetchThreads } = useThreads();
   const isEmpty = checkIsContentEmpty(commentContent);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
@@ -79,17 +76,16 @@ export function InlineCommentSubMenu({
         comment: commentContent,
         context: extractTextFromSelection(),
         pageId,
-        accessGroups: [
-          {
-            group: threadAccessGroup,
-            id: threadAccessGroup === 'space' ? space?.id ?? null : null
-          }
-        ]
+        accessGroups: threadAccessGroups
       });
-      // jsut refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
+      // just refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
       refetchThreads();
       // setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
       if (threadWithComment) {
+        updateThreadPluginState({
+          remove: false,
+          threadId: threadWithComment.id
+        });
         updateInlineComment(threadWithComment.id)(view.state, view.dispatch);
         hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
         const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));
@@ -102,19 +98,14 @@ export function InlineCommentSubMenu({
   return (
     <Box>
       {pageType === 'proposal' && (
-        <Select
-          sx={{
-            mt: 0.5,
-            height: 'fit-content'
-          }}
-          size='small'
-          value={threadAccessGroup}
-          onChange={handleThreadAccessGroupChange}
-        >
-          <MenuItem value='space'>Everyone</MenuItem>
-          <MenuItem value='reviewers'>Reviewers</MenuItem>
-          <MenuItem value='authors'>Authors</MenuItem>
-        </Select>
+        <Stack height='fit-content' my={0.5}>
+          <UserAndRoleSelect
+            emptyPlaceholderContent='Everyone'
+            readOnlyMessage='Everyone'
+            value={threadAccessGroups}
+            onChange={setThreadAccessGroups}
+          />
+        </Stack>
       )}
       <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
         <Box flexGrow={1}>

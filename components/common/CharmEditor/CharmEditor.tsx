@@ -26,6 +26,7 @@ import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
@@ -227,7 +228,7 @@ function CharmEditor({
   const { space: currentSpace } = useCurrentSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
-  const { threads } = useThreads();
+  const { threads, isValidating } = useThreads();
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
@@ -319,7 +320,14 @@ function CharmEditor({
       pageId,
       spaceId: currentSpace?.id,
       userId: user?.id,
-      disableMention
+      disableMention,
+      threadIds:
+        isValidating || !threads
+          ? []
+          : Object.values(threads)
+              .filter((thread) => !thread?.resolved)
+              .filter(isTruthy)
+              .map((thread) => thread.id)
     });
   }
 
@@ -370,7 +378,6 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
-      threads={threads}
       allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}

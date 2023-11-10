@@ -55,6 +55,13 @@ export async function getPageThreads({ pageId, userId }: { pageId: string; userI
     },
     orderBy: {
       createdAt: 'desc'
+    },
+    include: {
+      comments: {
+        orderBy: {
+          createdAt: 'asc'
+        }
+      }
     }
   });
 

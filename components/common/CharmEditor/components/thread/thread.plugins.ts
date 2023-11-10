@@ -9,22 +9,25 @@ export interface ThreadPluginState {
   threadIds: string[];
 }
 
-export const plugins = ({ key }: { key: PluginKey }) => {
+export const plugins = ({ key, threadIds = [] }: { threadIds?: string[]; key: PluginKey }) => {
   return [
     new Plugin({
       key,
       state: {
         init: () => {
-          return [];
+          return threadIds;
         },
-        apply: (tr) => {
-          return tr.getMeta(key);
+        apply: (tr, pluginState) => {
+          const newPluginState = tr.getMeta(key);
+          if (newPluginState) {
+            return newPluginState;
+          }
+          return pluginState;
         }
       },
       props: {
         decorations(state: EditorState) {
-          const threadIds = this.getState(state) as string[];
-          return buildInlineCommentDecoration(state, threadIds ?? []);
+          return buildInlineCommentDecoration(state, (this.getState(state) as string[]) ?? []);
         }
       }
     })
