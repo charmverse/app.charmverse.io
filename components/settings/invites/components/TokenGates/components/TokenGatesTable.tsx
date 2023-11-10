@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { TokenGate } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
+import type { HumanizedAccsProps } from '@lit-protocol/types';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -23,7 +24,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { humanizeConditions } from 'lib/tokenGates/humanizeConditions';
+import { humanizeConditions, humanizeConditionsData } from 'lib/tokenGates/humanizeConditions';
 import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
@@ -67,11 +68,19 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
-  const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const shareLink = `${window.location.origin}/join?domain=${space?.domain}`;
   const { connectWallet } = useContext(Web3Connection);
+
+  const descriptions = tokenGates.map((tokenGate) => {
+    const conditionsData = humanizeConditionsData({
+      myWalletAddress: account || '',
+      ...(tokenGate.conditions as HumanizedAccsProps)
+    });
+
+    return humanizeConditions(conditionsData);
+  });
 
   function onCopy() {
     showMessage('Link copied to clipboard');
@@ -94,20 +103,6 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       mutate(`tokenGates/${space.id}`);
     }
   }
-
-  useEffect(() => {
-    async function main() {
-      const results = tokenGates.map((tokenGate) =>
-        humanizeConditions({
-          myWalletAddress: account || '',
-          ...(tokenGate.conditions as any)
-        })
-      );
-
-      setDescriptions(results.filter(isTruthy));
-    }
-    main();
-  }, [tokenGates, account]);
 
   async function testConnect(tokenGate: TokenGate) {
     setTestResult({ status: 'loading' });

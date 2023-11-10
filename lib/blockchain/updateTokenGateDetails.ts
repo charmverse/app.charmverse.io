@@ -1,5 +1,6 @@
 import { LIT_CHAINS } from '@lit-protocol/constants';
 import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
+import { getChainById } from 'connectors/chains';
 
 import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
@@ -23,6 +24,7 @@ export async function updateTokenGateDetails(tokenGates: TokenGateWithRoles[] | 
         if (isNft) {
           const hasTokenId = !!condition.parameters[0] && Number(condition.parameters[0]) >= 0;
           const tokenId = hasTokenId ? condition.parameters[0] : 1;
+          const chainDetails = getChainById(LIT_CHAINS[condition.chain].chainId);
 
           const nft = await getNFT({
             address: condition.contractAddress || '',
@@ -32,10 +34,14 @@ export async function updateTokenGateDetails(tokenGates: TokenGateWithRoles[] | 
 
           if (nft) {
             const nftName = hasTokenId ? nft.title || nft.contractName : nft.contractName;
-            return { ...condition, name: nftName, image: nft.image };
+            return {
+              ...condition,
+              name: nftName,
+              image: nft.image
+            };
           }
 
-          return condition;
+          return { ...condition, image: chainDetails?.iconUrl || chainDetails?.nativeCurrency?.logoURI };
         }
 
         if (isCustomToken) {
@@ -47,6 +53,11 @@ export async function updateTokenGateDetails(tokenGates: TokenGateWithRoles[] | 
           return { ...condition, name: tokenMetaData?.name, image: tokenMetaData?.logo };
         }
 
+        if ('chain' in condition && condition.chain && LIT_CHAINS[condition.chain].chainId) {
+          const chainDetails = getChainById(LIT_CHAINS[condition.chain].chainId);
+
+          return { ...condition, image: chainDetails?.iconUrl || chainDetails?.nativeCurrency?.logoURI };
+        }
         return condition;
       })
     );

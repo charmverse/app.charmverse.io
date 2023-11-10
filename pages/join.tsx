@@ -2,9 +2,7 @@ import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Alert, Box, Card, Divider } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
 
-import charmClient from 'charmClient';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -12,6 +10,7 @@ import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useSearchByDomain } from 'hooks/useSearchByDomain';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 import { getAppUrl, getSpaceUrl } from 'lib/utilities/browser';
@@ -38,13 +37,7 @@ export default function JoinWorkspace() {
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const [isRouterReady, setRouterReady] = useState(false);
-  const {
-    data: spaceFromPath,
-    isLoading: isSpaceLoading,
-    error: spaceError
-  } = useSWRImmutable(domain ? `space/${domain}` : null, () =>
-    charmClient.spaces.searchByDomain(stripUrlParts(domain || ''))
-  );
+  const { spaceFromPath, isSpaceLoading, spaceError } = useSearchByDomain(domain);
 
   useEffect(() => {
     const connectedSpace = filterSpaceByDomain(spaces, domain);
@@ -75,10 +68,6 @@ export default function JoinWorkspace() {
       <AlternateRouteButton href={`${getAppUrl()}createSpace`}>Create a space</AlternateRouteButton>
     </Box>
   );
-}
-
-function stripUrlParts(maybeUrl: string) {
-  return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
 }
 
 JoinWorkspace.getLayout = getBaseLayout;
