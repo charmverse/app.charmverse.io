@@ -32,7 +32,7 @@ export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsPr
 export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
-  const { members } = useMembers();
+  const { membersRecord } = useMembers();
   const { filteredProposals: proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
@@ -73,10 +73,10 @@ export function useProposalsBoardAdapter() {
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
-    const sortedCardPages = activeView ? sortCards(cards, board, activeView, members) : [];
+    const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
 
     return sortedCardPages;
-  }, [activeView, board, members, pages, proposals, space?.id]);
+  }, [activeView, board, membersRecord, pages, proposals, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: proposalPropertiesBlock,
