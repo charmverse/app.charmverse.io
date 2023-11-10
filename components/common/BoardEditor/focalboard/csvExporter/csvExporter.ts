@@ -18,8 +18,28 @@ export const CsvExporter = {
     formatters: Formatters,
     context: PropertyContext
   ): string {
+    const { csvContent, filename } = this.generateCSV(board, view, cards, formatters, context);
+
+    const csvData = `data:text/csv;charset=utf-8,${csvContent}`;
+
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.setAttribute('href', csvData);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link); // FireFox support
+
+    link.click();
+
+    // TODO: Review if this is needed in the future, this is to fix the problem with linux webview links
+    if (window.openInNewBrowser) {
+      window.openInNewBrowser(csvContent);
+    }
+
+    return csvContent;
+  },
+  generateCSV(board: Board, view: BoardView, cards: Card[], formatters: Formatters, context: PropertyContext) {
     const rows = generateTableArray(board, cards, view, formatters, context);
-    let csvContent = 'data:text/csv;charset=utf-8,';
+    let csvContent = '';
 
     rows.forEach((row) => {
       const encodedRow = row.join(',');
@@ -32,20 +52,11 @@ export const CsvExporter = {
     }
 
     const filename = `${Utils.sanitizeFilename(fileTitle || 'CharmVerse Table Export')}.csv`;
-    const link = document.createElement('a');
-    link.style.display = 'none';
-    link.setAttribute('href', csvContent);
-    link.setAttribute('download', filename);
-    document.body.appendChild(link); // FireFox support
 
-    link.click();
-
-    // TODO: Review if this is needed in the future, this is to fix the problem with linux webview links
-    if (window.openInNewBrowser) {
-      window.openInNewBrowser(csvContent);
-    }
-
-    return csvContent;
+    return {
+      filename,
+      csvContent
+    };
   }
 };
 

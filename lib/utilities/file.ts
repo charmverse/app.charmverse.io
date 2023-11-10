@@ -40,8 +40,13 @@ export async function writeToSameFolder({
   await (append ? fs.appendFile : fs.writeFile)(`${getCallerDirectory()}/${fileName}`, data);
 }
 
+export type MarkdownPageToCompress = {
+  title: string;
+  contentMarkdown: string;
+};
+
 export type ContentToCompress = {
-  pages?: { title: string; contentMarkdown: string }[];
+  pages?: MarkdownPageToCompress[];
   csv?: { title: string; content: string }[];
 };
 

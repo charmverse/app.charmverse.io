@@ -40,6 +40,7 @@ import { useUser } from 'hooks/useUser';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 import { isValidCsvResult, addNewCards } from '../utils/databasePageOptions';
 
@@ -102,6 +103,69 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     const cardIds = cards.map((card) => card.id).filter((cardId) => pages[cardId] && !pages[cardId]?.deletedAt);
     await mutator.deleteBlocks(cardIds);
     mutatePagesRemove(cardIds);
+  }
+
+  async function exportZippedDatabase(_board: Board, _view: BoardView) {
+    const cardPages: CardPage[] = cards
+      .map((card) => ({ card, page: pages[card.id] }))
+      .filter((item): item is CardPage => !!item.page);
+
+    const sortedCardPages = sortCards(cardPages, _board, _view, members);
+    const _cards = sortedCardPages.map(({ card, page: { title } }) => {
+      return {
+        ...card,
+        // update the title from correct model
+        title
+      };
+    });
+    try {
+      const proposalCategories = (categories || []).reduce<Record<string, string>>((map, category) => {
+        map[category.id] = category.title;
+        return map;
+      }, {});
+      const csvData = CsvExporter.generateCSV(
+        _board,
+        _view,
+        _cards,
+        {
+          date: formatDate,
+          dateTime: formatDateTime
+        },
+        {
+          spaceDomain: currentSpace?.domain ?? '',
+          users: membersRecord,
+          proposalCategories
+        }
+      );
+      const exportName = `${boardPage?.title ?? 'database'}-export.zip`;
+
+      const generatedZip = await charmClient.spaces.exportSpaceData({
+        spaceId: currentSpace?.id as string,
+        data: {
+          csv: [{ content: decodeURIComponent(csvData.csvContent), title: boardPage?.title ?? 'database-export' }],
+          pageIds: _cards.map((card) => card.id)
+        }
+      });
+
+      const zipDataUrl = URL.createObjectURL(generatedZip as Blob);
+
+      // Create a temporary link to trigger download
+      const link = document.createElement('a');
+      link.style.display = 'none';
+      link.href = zipDataUrl;
+      link.download = `${exportName}.zip`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      URL.revokeObjectURL(zipDataUrl);
+
+      showMessage('Database exported successfully', 'success');
+    } catch (error) {
+      log.error(error);
+      showMessage('Error exporting database', 'error');
+    }
   }
 
   const exportCsv = (_board: Board, _view: BoardView) => {
@@ -260,6 +324,15 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
           </ListItemButton>
         </div>
       </Tooltip>
+      <ListItemButton onClick={() => exportZippedDatabase(board, view)}>
+        <FormatListBulletedIcon
+          fontSize='small'
+          sx={{
+            mr: 1
+          }}
+        />
+        <ListItemText primary='Export Pages & Data' />
+      </ListItemButton>
       <ListItemButton onClick={() => exportCsv(board, view)}>
         <FormatListBulletedIcon
           fontSize='small'
