@@ -17,7 +17,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(requireKeys<ThreadCreatePayload>(['context', 'pageId', 'comment'], 'body'), startThread);
 
 async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithComments>) {
-  const { comment, accessGroup, context, pageId } = req.body as ThreadCreatePayload;
+  const { comment, accessGroups, context, pageId } = req.body as ThreadCreatePayload;
 
   const userId = req.session.user.id;
 
@@ -43,7 +43,7 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
     context,
     pageId,
     userId,
-    accessGroup
+    accessGroups
   });
 
   const inlineCommentId = newThread.comments[0].id;

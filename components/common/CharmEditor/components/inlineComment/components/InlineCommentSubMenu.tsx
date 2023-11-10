@@ -76,7 +76,10 @@ export function InlineCommentSubMenu({
         comment: commentContent,
         context: extractTextFromSelection(),
         pageId,
-        accessGroups: threadAccessGroups
+        accessGroups: threadAccessGroups.map((threadAccessGroup) => ({
+          id: threadAccessGroup.id,
+          group: threadAccessGroup.group
+        }))
       });
       // just refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
       refetchThreads();
