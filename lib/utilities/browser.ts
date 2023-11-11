@@ -113,10 +113,14 @@ function scrollIntoViewIfNeededPolyfill(element: HTMLElement, centerIfNeeded?: b
 }
 
 // @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
-export function getNewUrl(params: Record<string, string | null>, currentUrl = window.location.href) {
+export function getNewUrl(
+  params: Record<string, string | null>,
+  currentUrl = window.location.href,
+  urlBase = window.location.origin
+) {
   return addQueryToUrl({
     url: currentUrl || window.location.href,
-    urlBase: window.location.origin,
+    urlBase: urlBase || window.location.origin,
     query: params,
     replace: true
   });

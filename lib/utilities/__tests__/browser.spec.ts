@@ -1,24 +1,25 @@
 import { getNewUrl, getSubdomainPath } from '../browser';
 
 describe('getNewUrl()', () => {
-  const baseUrl = 'https://google.com/search?q=3531422';
+  const urlBase = 'https://google.com';
+  const url = `${urlBase}/search?q=3531422`;
 
   it('should add a property to the query string', () => {
-    const result = getNewUrl({ cardId: 'baz' }, baseUrl);
+    const result = getNewUrl({ cardId: 'baz' }, url, urlBase);
 
-    expect(result.toString()).toBe(`${baseUrl}&cardId=baz`);
+    expect(result.toString()).toBe(`${url}&cardId=baz`);
   });
 
   it('should replace a property from the query string', () => {
-    const result = getNewUrl({ cardId: 'baz' }, `${baseUrl}&cardId=foo`);
+    const result = getNewUrl({ cardId: 'baz' }, `${url}&cardId=foo`, urlBase);
 
-    expect(result.toString()).toEqual(`${baseUrl}&cardId=baz`);
+    expect(result.toString()).toEqual(`${url}&cardId=baz`);
   });
 
   it('should remove a property from the query string', () => {
-    const result = getNewUrl({ cardId: null }, `${baseUrl}&cardId=foo`);
+    const result = getNewUrl({ cardId: null }, `${url}&cardId=foo`, urlBase);
 
-    expect(result.toString()).toEqual(baseUrl);
+    expect(result.toString()).toEqual(url);
   });
 });
 
