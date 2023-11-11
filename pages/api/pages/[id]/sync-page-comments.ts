@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import { syncPageComments } from 'lib/pages/comments/syncPageComments';
+import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -54,7 +54,12 @@ async function syncProposalCommentsHandler(req: NextApiRequest, res: NextApiResp
     throw new Error("Proposal not found or it hasn't been posted in Lens yet");
   }
 
-  const pageCommentsWithVotes = await syncPageComments({ spaceId: page.spaceId, pageId, lensPostLink, userId });
+  const pageCommentsWithVotes = await syncPageCommentsWithLensPost({
+    spaceId: page.spaceId,
+    pageId,
+    lensPostLink,
+    userId
+  });
 
   res.status(200).json(pageCommentsWithVotes);
 }

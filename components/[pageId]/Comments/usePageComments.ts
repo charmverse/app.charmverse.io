@@ -72,8 +72,8 @@ export function usePageComments(pageId: string) {
     [mutate, pageId]
   );
 
-  const syncPageComments = useCallback(async () => {
-    const newComments = await charmClient.pages.syncPageComments({ pageId });
+  const syncPageCommentsWithLensPost = useCallback(async () => {
+    const newComments = await charmClient.pages.syncPageCommentsWithLensPost({ pageId });
     // Refetch newly created members
     await mutateMembers();
     mutate(() => newComments, {
@@ -82,7 +82,7 @@ export function usePageComments(pageId: string) {
   }, [mutate, pageId]);
 
   return {
-    syncPageComments,
+    syncPageCommentsWithLensPost,
     commentSort,
     setCommentSort,
     isLoadingComments,

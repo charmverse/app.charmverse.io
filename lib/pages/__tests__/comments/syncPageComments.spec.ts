@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 
 import { lensClient } from 'lib/lens/lensClient';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { syncPageComments } from 'lib/pages/comments/syncPageComments';
+import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
 import { createProposal } from 'lib/proposal/createProposal';
 import { createProposalCategory } from 'lib/proposal/createProposalCategory';
@@ -19,7 +19,7 @@ jest.mock('lib/lens/lensClient', () => ({
   }
 }));
 
-describe('syncPageComments', () => {
+describe('syncPageCommentsWithLensPost', () => {
   it(`Should sync lens post comment to CharmVerse`, async () => {
     const lensUser1 = {
       handle: {
@@ -260,7 +260,7 @@ describe('syncPageComments', () => {
       lensPostLink: lensPost2Id
     });
 
-    const pageComments = await syncPageComments({
+    const pageComments = await syncPageCommentsWithLensPost({
       lensPostLink: lensPost1Id,
       pageId: space1ProposalPage.page.id,
       spaceId: space1.id,
@@ -285,7 +285,7 @@ describe('syncPageComments', () => {
       }));
 
     // Sync page comments for space 2 proposal
-    await syncPageComments({
+    await syncPageCommentsWithLensPost({
       lensPostLink: lensPost2Id,
       pageId: space2ProposalPage.page.id,
       spaceId: space2.id,
