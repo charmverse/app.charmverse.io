@@ -107,7 +107,7 @@ const config = {
       {
         source: '/:domain/bounties',
         destination: '/:domain/rewards',
-        permanent: true
+        permanent: false // change this to true once we confirm success :)
       }
     ];
   },
