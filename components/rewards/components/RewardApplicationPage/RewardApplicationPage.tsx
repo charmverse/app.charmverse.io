@@ -149,14 +149,14 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
             {rewardPageContent?.content && (
               <>
                 <CharmEditor readOnly content={rewardPageContent.content as PageContent} isContentControlled />
-                <Divider sx={{ mt: 2 }} />
+                <Divider sx={{ my: 2 }} />
               </>
             )}
           </div>
           {isApplicationLoaded && (
             <>
               {application.createdBy !== user?.id && (
-                <Grid container gap={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
                   <Grid item display='flex' alignItems='center' gap={2}>
                     <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
                       {application.status === 'rejected' || application.status === 'applied'
@@ -166,17 +166,15 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                     <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
                   </Grid>
 
-                  <Grid item>
-                    <RewardReviewerActions
-                      application={application}
-                      reward={reward}
-                      rewardPermissions={rewardPermissions}
-                      refreshApplication={refreshApplication}
-                      reviewApplication={reviewApplication}
-                      hasCustomReward={!!reward.customReward}
-                    />
-                  </Grid>
-                </Grid>
+                  <RewardReviewerActions
+                    application={application}
+                    reward={reward}
+                    rewardPermissions={rewardPermissions}
+                    refreshApplication={refreshApplication}
+                    reviewApplication={reviewApplication}
+                    hasCustomReward={!!reward.customReward}
+                  />
+                </Box>
               )}
 
               {applicationStepRequired && (

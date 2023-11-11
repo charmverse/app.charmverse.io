@@ -76,7 +76,7 @@ export function RewardProperties(props: {
   }
 
   return (
-    <Stack mt={2} flex={1}>
+    <Stack flex={1}>
       <RewardPropertiesForm
         pageId={pageId}
         refreshPermissions={refreshPagePermissionsList}
@@ -90,12 +90,20 @@ export function RewardProperties(props: {
       {!isTemplate && (
         <>
           {!!currentReward?.id && showApplications && (
-            <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+            <>
+              <Divider sx={{ my: 1 }} />
+              <Stack mb={1}>
+                <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+              </Stack>
+            </>
           )}
-
+          {!isSpaceMember && (
+            <>
+              <Divider sx={{ my: 2 }} />
+              <RewardSignupButton pagePath={props.pagePath} />
+            </>
+          )}
           <Divider sx={{ my: 1 }} />
-
-          {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
         </>
       )}
     </Stack>
