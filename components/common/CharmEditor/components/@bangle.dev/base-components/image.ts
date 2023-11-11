@@ -1,6 +1,7 @@
 import type { Command, EditorView, Node, NodeType, Schema } from '@bangle.dev/pm';
 import { InputRule, NodeSelection, Plugin, PluginKey } from '@bangle.dev/pm';
 import { safeInsert } from 'prosemirror-utils';
+import { v4 } from 'uuid';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -16,6 +17,15 @@ export interface ImageNodeSchemaAttrs {
   caption: null | string;
   src: null | string;
   alt: null | string;
+}
+
+function convertFileToBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
 }
 
 function pluginsFactory({
@@ -71,25 +81,16 @@ function pluginsFactory({
                 }
                 const imageType = getTypeFromSchema(view.state.schema);
                 const { pos } = coordinates;
-                new Array(files.length).fill(0).forEach((_, index) => {
-                  view.dispatch(
-                    view.state.tr.insert(
-                      pos + index,
-                      imageType.create({
-                        src: null,
-                        uploading: true
-                      })
-                    )
-                  );
-                });
 
                 for (const [index, file] of files.entries()) {
-                  uploadToS3(file).then(({ url }) => {
+                  convertFileToBase64(file).then((base64) => {
                     view.dispatch(
-                      view.state.tr.setNodeMarkup(pos + 1 + index, undefined, {
-                        src: url,
-                        uploading: false
-                      })
+                      view.state.tr.insert(
+                        pos + index,
+                        imageType.create({
+                          src: base64
+                        })
+                      )
                     );
                   });
                 }

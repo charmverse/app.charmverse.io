@@ -2,7 +2,7 @@ import type { Node } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
-import { Box, CircularProgress, ListItem, Stack, Typography } from '@mui/material';
+import { Box, ListItem, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useState } from 'react';
@@ -97,9 +97,6 @@ function imageSpec(): RawSpecs {
         },
         track: {
           default: []
-        },
-        uploading: {
-          default: false
         }
       },
       group: 'block',
@@ -140,7 +137,6 @@ function ResizableImage({
   selected
 }: CharmNodeViewProps) {
   const imageSource = node.attrs.src;
-  const uploading = node.attrs.uploading;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -180,25 +176,6 @@ function ResizableImage({
   if (!imageSource) {
     if (readOnly) {
       return <div />;
-    } else if (uploading) {
-      return (
-        <Stack
-          flexDirection='row'
-          alignItems='center'
-          gap={1}
-          sx={{
-            background: (theme) => theme.palette.background.light
-          }}
-          p={2}
-          my={1}
-          justifyContent='center'
-        >
-          <Typography color='secondary' component='span' variant='subtitle1'>
-            Uploading:
-          </Typography>
-          <CircularProgress size={24} color='secondary' />
-        </Stack>
-      );
     } else {
       return (
         <ImageSelector
@@ -216,7 +193,11 @@ function ResizableImage({
   } else if (uploadFailed) {
     return <Alert severity='warning'>Image upload failed</Alert>;
   } else if (uploadingImage) {
-    return <LoadingComponent isLoading label='Uploading' />;
+    return (
+      <Box my={1}>
+        <LoadingComponent size={24} isLoading label='Uploading' />
+      </Box>
+    );
   } else if (readOnly) {
     return (
       <StyledImageContainer size={node.attrs.size}>
