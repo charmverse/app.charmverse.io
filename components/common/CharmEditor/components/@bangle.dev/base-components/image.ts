@@ -20,12 +20,10 @@ export interface ImageNodeSchemaAttrs {
 
 function pluginsFactory({
   handleDragAndDrop = true,
-  acceptFileType = 'image/*',
-  createImageNodes = defaultCreateImageNodes
+  acceptFileType = 'image/*'
 }: {
   handleDragAndDrop?: boolean;
   acceptFileType?: string;
-  createImageNodes?: (files: File[], imageType: NodeType, view: EditorView) => Promise<Node[]>;
 } = {}): RawPlugins {
   return ({ schema }) => {
     const type = getTypeFromSchema(schema);
@@ -68,9 +66,31 @@ function pluginsFactory({
                   top: event.clientY
                 });
 
-                if (coordinates?.pos) {
-                  createImageNodes(files, getTypeFromSchema(view.state.schema), view).then((imageNodes) => {
-                    addImagesToView(view, coordinates.pos, imageNodes);
+                if (!coordinates) {
+                  return true;
+                }
+                const imageType = getTypeFromSchema(view.state.schema);
+                const { pos } = coordinates;
+                new Array(files.length).fill(0).forEach((_, index) => {
+                  view.dispatch(
+                    view.state.tr.insert(
+                      pos + index,
+                      imageType.create({
+                        src: null,
+                        uploading: true
+                      })
+                    )
+                  );
+                });
+
+                for (const [index, file] of files.entries()) {
+                  uploadToS3(file).then(({ url }) => {
+                    view.dispatch(
+                      view.state.tr.setNodeMarkup(pos + 1 + index, undefined, {
+                        src: url,
+                        uploading: false
+                      })
+                    );
                   });
                 }
                 return true;
@@ -98,7 +118,7 @@ function pluginsFactory({
   };
 }
 
-async function defaultCreateImageNodes(files: File[], imageType: NodeType, _view: EditorView) {
+async function createImageNodes(files: File[], imageType: NodeType, _view: EditorView) {
   const { url } = await uploadToS3(files[0]);
   return [
     imageType.create({
