@@ -102,7 +102,7 @@ jobs:
             test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 2/4'
           - test_name: 'Library tests #3'
             test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/4'
-          - test_name: 'Library tests #3'
+          - test_name: 'Library tests #4'
             test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 4/4'
           - test_name: 'Server integration tests #1'
             test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 1/3'
