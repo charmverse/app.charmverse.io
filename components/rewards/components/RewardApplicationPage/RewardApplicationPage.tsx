@@ -127,7 +127,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   const isApplicationStage =
     applicationStepRequired && (application?.status === 'applied' || application?.status === 'rejected');
   const showSubmissionInput = (applicationStepRequired && isNewApplication) || !isApplicationStage;
-  const isApplicationLoaded = !!application;
+  const isApplicationLoaded = !!application || isNewApplication;
 
   return (
     <div className='document-print-container'>
@@ -155,7 +155,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
           </div>
           {isApplicationLoaded && (
             <>
-              {application.createdBy !== user?.id && (
+              {application && application?.createdBy !== user?.id && (
                 <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
                   <Grid item display='flex' alignItems='center' gap={2}>
                     <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
@@ -183,11 +183,11 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                   rewardId={reward.id}
                   disableCollapse={!showSubmissionInput}
                   expandedOnLoad={isNewApplication || isApplicationStage}
-                  readOnly={application.createdBy !== user?.id && !isNewApplication}
+                  readOnly={application?.createdBy !== user?.id && !isNewApplication}
                   onSubmit={(updatedApplication) =>
                     saveApplication(
                       {
-                        applicationId: application.id,
+                        applicationId: application?.id,
                         message: updatedApplication,
                         rewardId: reward.id
                       },
@@ -200,7 +200,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
 
               {showSubmissionInput && (
                 <RewardSubmissionInput
-                  currentUserIsApplicant={(!!user && user.id === application.createdBy) || isNewApplication}
+                  currentUserIsApplicant={(!!user && user.id === application?.createdBy) || isNewApplication}
                   submission={application}
                   readOnly={readonlySubmission}
                   refreshSubmission={refreshApplication}
@@ -220,7 +220,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                   isSaving={isSaving}
                 />
               )}
-              <ApplicationComments applicationId={application.id} />
+              {application && <ApplicationComments applicationId={application.id} />}
             </>
           )}
         </StyledContainer>
