@@ -130,101 +130,103 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   const isApplicationLoaded = !!application || isNewApplication;
 
   return (
-    <div className='document-print-container'>
-      <Box display='flex' flexDirection='column'>
-        <StyledContainer top={0}>
-          <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
-          <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
-            <span>Back to reward</span>
-          </Button>
+    <Box my={10}>
+      <div className='document-print-container'>
+        <Box display='flex' flexDirection='column'>
+          <StyledContainer top={0}>
+            <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
+            <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
+              <span>Back to reward</span>
+            </Button>
 
-          <div className='focalboard-body'>
-            <RewardProperties
-              reward={reward}
-              pageId={reward.page.id}
-              pagePath={reward.page.path}
-              readOnly
-              rewardChanged={refreshReward}
-            />
-            {rewardPageContent?.content && (
+            <div className='focalboard-body'>
+              <RewardProperties
+                reward={reward}
+                pageId={reward.page.id}
+                pagePath={reward.page.path}
+                readOnly
+                rewardChanged={refreshReward}
+              />
+              {rewardPageContent?.content && (
+                <>
+                  <CharmEditor readOnly content={rewardPageContent.content as PageContent} isContentControlled />
+                  <Divider sx={{ my: 2 }} />
+                </>
+              )}
+            </div>
+            {isApplicationLoaded && (
               <>
-                <CharmEditor readOnly content={rewardPageContent.content as PageContent} isContentControlled />
-                <Divider sx={{ my: 2 }} />
+                {application && application?.createdBy !== user?.id && (
+                  <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
+                    <Grid item display='flex' alignItems='center' gap={2}>
+                      <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
+                        {application.status === 'rejected' || application.status === 'applied'
+                          ? 'Applicant'
+                          : 'Submitter'}
+                      </FormLabel>
+                      <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
+                    </Grid>
+
+                    <RewardReviewerActions
+                      application={application}
+                      reward={reward}
+                      rewardPermissions={rewardPermissions}
+                      refreshApplication={refreshApplication}
+                      reviewApplication={reviewApplication}
+                      hasCustomReward={!!reward.customReward}
+                    />
+                  </Box>
+                )}
+
+                {applicationStepRequired && (
+                  <ApplicationInput
+                    application={application}
+                    rewardId={reward.id}
+                    disableCollapse={!showSubmissionInput}
+                    expandedOnLoad={isNewApplication || isApplicationStage}
+                    readOnly={application?.createdBy !== user?.id && !isNewApplication}
+                    onSubmit={(updatedApplication) =>
+                      saveApplication(
+                        {
+                          applicationId: application?.id,
+                          message: updatedApplication,
+                          rewardId: reward.id
+                        },
+                        'application'
+                      )
+                    }
+                    isSaving={isSaving}
+                  />
+                )}
+
+                {showSubmissionInput && (
+                  <RewardSubmissionInput
+                    currentUserIsAuthor={(!!user && user.id === application?.createdBy) || isNewApplication}
+                    submission={application}
+                    readOnly={readonlySubmission}
+                    refreshSubmission={refreshApplication}
+                    onSubmit={(submission) =>
+                      saveApplication(
+                        {
+                          rewardId: reward.id,
+                          submissionNodes: submission.submissionNodes,
+                          applicationId: application?.id
+                        },
+                        'submission'
+                      )
+                    }
+                    bountyId={currentRewardId}
+                    permissions={applicationRewardPermissions}
+                    hasCustomReward={!!reward.customReward}
+                    isSaving={isSaving}
+                  />
+                )}
+                {application && <ApplicationComments applicationId={application.id} />}
               </>
             )}
-          </div>
-          {isApplicationLoaded && (
-            <>
-              {application && application?.createdBy !== user?.id && (
-                <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
-                  <Grid item display='flex' alignItems='center' gap={2}>
-                    <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
-                      {application.status === 'rejected' || application.status === 'applied'
-                        ? 'Applicant'
-                        : 'Submitter'}
-                    </FormLabel>
-                    <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
-                  </Grid>
-
-                  <RewardReviewerActions
-                    application={application}
-                    reward={reward}
-                    rewardPermissions={rewardPermissions}
-                    refreshApplication={refreshApplication}
-                    reviewApplication={reviewApplication}
-                    hasCustomReward={!!reward.customReward}
-                  />
-                </Box>
-              )}
-
-              {applicationStepRequired && (
-                <ApplicationInput
-                  application={application}
-                  rewardId={reward.id}
-                  disableCollapse={!showSubmissionInput}
-                  expandedOnLoad={isNewApplication || isApplicationStage}
-                  readOnly={application?.createdBy !== user?.id && !isNewApplication}
-                  onSubmit={(updatedApplication) =>
-                    saveApplication(
-                      {
-                        applicationId: application?.id,
-                        message: updatedApplication,
-                        rewardId: reward.id
-                      },
-                      'application'
-                    )
-                  }
-                  isSaving={isSaving}
-                />
-              )}
-
-              {showSubmissionInput && (
-                <RewardSubmissionInput
-                  currentUserIsApplicant={(!!user && user.id === application?.createdBy) || isNewApplication}
-                  submission={application}
-                  readOnly={readonlySubmission}
-                  refreshSubmission={refreshApplication}
-                  onSubmit={(submission) =>
-                    saveApplication(
-                      {
-                        rewardId: reward.id,
-                        submissionNodes: submission.submissionNodes,
-                        applicationId: application?.id
-                      },
-                      'submission'
-                    )
-                  }
-                  bountyId={currentRewardId}
-                  permissions={applicationRewardPermissions}
-                  hasCustomReward={!!reward.customReward}
-                  isSaving={isSaving}
-                />
-              )}
-              {application && <ApplicationComments applicationId={application.id} />}
-            </>
-          )}
-        </StyledContainer>
-      </Box>
-    </div>
+          </StyledContainer>
+        </Box>
+      </div>
+    </Box>
   );
 }
