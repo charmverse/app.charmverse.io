@@ -29,6 +29,7 @@ export async function getPageThreads({ pageId, userId }: { pageId: string; userI
 
   const accessibleThreads = await prisma.thread.findMany({
     where: {
+      pageId,
       OR: [
         {
           userId
