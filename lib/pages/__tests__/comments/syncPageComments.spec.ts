@@ -22,7 +22,9 @@ jest.mock('lib/lens/lensClient', () => ({
 describe('syncPageComments', () => {
   it(`Should sync lens post comment to CharmVerse`, async () => {
     const lensUser1 = {
-      handle: v4().split(' ')[0],
+      handle: {
+        fullHandle: v4().split(' ')[0]
+      },
       coverPicture: {
         __typename: 'MediaSet',
         original: {
@@ -32,7 +34,9 @@ describe('syncPageComments', () => {
     };
 
     const lensUser2 = {
-      handle: v4().split(' ')[0],
+      handle: {
+        fullHandle: v4().split(' ')[0]
+      },
       convertPicture: {
         __typename: 'NftImage',
         uri: 'ipfs://123'
@@ -42,6 +46,7 @@ describe('syncPageComments', () => {
     const lensComment1 = {
       id: v4(),
       profile: lensUser1,
+      by: lensUser1,
       metadata: {
         content: 'Lens Comment 1'
       }
@@ -50,6 +55,7 @@ describe('syncPageComments', () => {
     const lensComment2 = {
       id: v4(),
       profile: lensUser2,
+      by: lensUser2,
       metadata: {
         content: 'Lens Comment 2'
       }
@@ -58,6 +64,7 @@ describe('syncPageComments', () => {
     const lensComment3 = {
       id: v4(),
       profile: lensUser2,
+      by: lensUser2,
       metadata: {
         content: 'Lens Comment 3'
       }
@@ -66,6 +73,7 @@ describe('syncPageComments', () => {
     const lensComment4 = {
       id: v4(),
       profile: lensUser1,
+      by: lensUser1,
       metadata: {
         content: 'Lens Comment 4'
       }
@@ -74,6 +82,7 @@ describe('syncPageComments', () => {
     const lensComment1NestedComment1 = {
       id: v4(),
       profile: lensUser1,
+      by: lensUser1,
       metadata: {
         content: 'Lens Comment 1 Nested Comment 1'
       }
@@ -82,6 +91,7 @@ describe('syncPageComments', () => {
     const lensComment1NestedComment2 = {
       id: v4(),
       profile: lensUser2,
+      by: lensUser2,
       metadata: {
         content: 'Lens Comment 1 Nested Comment 2'
       }
@@ -90,6 +100,7 @@ describe('syncPageComments', () => {
     const lensComment1NestedComment3 = {
       id: v4(),
       profile: lensUser2,
+      by: lensUser2,
       metadata: {
         content: 'Lens Comment 1 Nested Comment 3'
       }
@@ -98,6 +109,7 @@ describe('syncPageComments', () => {
     const lensComment2NestedComment1 = {
       id: v4(),
       profile: lensUser1,
+      by: lensUser1,
       metadata: {
         content: 'Lens Comment 2 Nested Comment 1'
       }
@@ -285,13 +297,13 @@ describe('syncPageComments', () => {
 
     const charmverseLensUser1 = await prisma.user.findFirstOrThrow({
       where: {
-        username: `${lensUser1.handle}-lens-imported`
+        username: `${lensUser1.handle.fullHandle.toLowerCase()}-lens-imported`
       }
     });
 
     const charmverseLensUser2 = await prisma.user.findFirstOrThrow({
       where: {
-        username: `${lensUser2.handle}-lens-imported`
+        username: `${lensUser2.handle.fullHandle.toLowerCase()}-lens-imported`
       }
     });
 
