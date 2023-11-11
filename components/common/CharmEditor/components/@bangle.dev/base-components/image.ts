@@ -1,7 +1,6 @@
 import type { Command, EditorView, Node, NodeType, Schema } from '@bangle.dev/pm';
 import { InputRule, NodeSelection, Plugin, PluginKey } from '@bangle.dev/pm';
 import { safeInsert } from 'prosemirror-utils';
-import { v4 } from 'uuid';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -107,35 +106,27 @@ function pluginsFactory({
               if (!files || files.length === 0) {
                 return false;
               }
-              createImageNodes(files, getTypeFromSchema(view.state.schema), view).then((imageNodes) => {
-                addImagesToView(view, view.state.selection.from, imageNodes);
-              });
 
+              const imageType = getTypeFromSchema(view.state.schema);
+              const pos = view.state.selection.from;
+              for (const [index, file] of files.entries()) {
+                convertFileToBase64(file).then((base64) => {
+                  view.dispatch(
+                    view.state.tr.insert(
+                      pos + index,
+                      imageType.create({
+                        src: base64
+                      })
+                    )
+                  );
+                });
+              }
               return true;
             }
           }
         })
     ];
   };
-}
-
-async function createImageNodes(files: File[], imageType: NodeType, _view: EditorView) {
-  const { url } = await uploadToS3(files[0]);
-  return [
-    imageType.create({
-      src: url
-    })
-  ];
-}
-
-function addImagesToView(view: EditorView, pos: number, imageNodes: Node[]) {
-  for (const node of imageNodes) {
-    const { tr } = view.state;
-    const newTr = safeInsert(node, pos)(tr);
-    if (newTr !== tr) {
-      view.dispatch(newTr);
-    }
-  }
 }
 
 function getFileData(data: DataTransfer, accept: string, multiple: boolean) {
