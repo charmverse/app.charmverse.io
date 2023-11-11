@@ -42,7 +42,7 @@ export function BountiesGalleryView({ bounties, publicMode }: Props) {
               openPage(bounty.page.id);
             }}
             readOnly={!!publicMode}
-            page={pages[bounty.page?.id] as PageMeta}
+            page={pages[bounty.page.id] as PageMeta}
             onDelete={onClickDelete}
           />
         );
