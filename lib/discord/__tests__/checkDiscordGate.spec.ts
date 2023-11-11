@@ -29,7 +29,7 @@ describe('checkDiscordGate', () => {
       getDiscordUserState: canJoinSpaceMock
     }));
 
-    const { checkDiscordGate } = await import('lib/discord/checkDiscordGate');
+    const { checkDiscordGate } = await import('lib/discord/collabland/checkDiscordGate');
 
     const res = await checkDiscordGate({ spaceDomain: space.domain, userId: user.id });
     expect(res.hasDiscordServer).toBe(true);
@@ -46,7 +46,7 @@ describe('checkDiscordGate', () => {
       getDiscordUserState: canJoinSpaceMock
     }));
 
-    const { checkDiscordGate } = await import('lib/discord/checkDiscordGate');
+    const { checkDiscordGate } = await import('lib/discord/collabland/checkDiscordGate');
 
     const res = await checkDiscordGate({ spaceDomain: space.domain, userId: user.id });
     expect(res.hasDiscordServer).toBe(false);
@@ -70,7 +70,7 @@ describe('checkDiscordGate', () => {
       getDiscordUserState: canJoinSpaceMock
     }));
 
-    const { checkDiscordGate } = await import('lib/discord/checkDiscordGate');
+    const { checkDiscordGate } = await import('lib/discord/collabland/checkDiscordGate');
 
     const res = await checkDiscordGate({ spaceDomain: space.domain, userId: user.id });
     expect(res.hasDiscordServer).toBe(true);

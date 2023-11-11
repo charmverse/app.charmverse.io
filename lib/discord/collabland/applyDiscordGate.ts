@@ -1,7 +1,7 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
+import { verifyDiscordGateForSpace } from 'lib/discord/collabland/verifyDiscordGateForSpace';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';

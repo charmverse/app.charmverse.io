@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import type { IntegrationModel } from 'components/settings/profile/components/IdentityModal';
 import { useUser } from 'hooks/useUser';
-import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
 import type { TelegramAccount } from 'pages/api/telegram/connect';

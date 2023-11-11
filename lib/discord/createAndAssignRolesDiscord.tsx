@@ -1,6 +1,7 @@
-import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import type { ExternalRole } from 'lib/roles';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
+
+import { getSpacesAndUserFromDiscord } from './getSpaceAndUserFromDiscord';
 
 export async function createAndAssignRolesDiscord({
   discordUserId,
