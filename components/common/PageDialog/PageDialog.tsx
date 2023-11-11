@@ -39,7 +39,7 @@ export function PageDialog(props: Props) {
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
-  const fullPageUrl = `/${domain}/${page?.path}`;
+  const fullPageUrl = page?.path ? `/${domain}/${page?.path}` : null;
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
