@@ -62,11 +62,9 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
 
   if (reward.applications.length === 0) {
     return (
-      <Stack mt={2} mb={1}>
-        <Stack>
-          <Stack direction='row' alignItems='center' justifyContent='space-between'>
-            <Typography fontWeight='bold'>Reward applications</Typography>
-          </Stack>
+      <>
+        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+          <Typography fontWeight='bold'>Reward applications</Typography>
         </Stack>
         <Box display='flex' justifyContent='center' alignItems='center' gap={1}>
           <Typography
@@ -79,12 +77,12 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
           </Typography>
           <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
         </Box>
-      </Stack>
+      </>
     );
   }
 
   return (
-    <Stack mt={2}>
+    <>
       <Typography fontWeight='bold'>Reward applications</Typography>
       <Box width='100%' display='flex' justifyContent='space-between' mb={1}>
         <Box display='flex' gap={1} alignItems='center'>
@@ -149,6 +147,6 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
       <Stack flex={1} direction='row' justifyContent='flex-end' mb={1}>
         <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
       </Stack>
-    </Stack>
+    </>
   );
 }

@@ -66,7 +66,7 @@ export function RewardReviewerActions({
           readOnly={!rewardPermissions?.approve_applications}
         />
       )}
-      {(application.status === 'review' || application.status === 'inProgress') && rewardPermissions?.review && (
+      {application.status === 'review' && rewardPermissions?.review && (
         <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='submission'
