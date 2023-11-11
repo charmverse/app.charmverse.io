@@ -20,6 +20,7 @@ import { useResize } from 'hooks/useResize';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
+import { getFileData } from 'lib/file/getFileData';
 
 import { AppBar } from './components/AppBar';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
@@ -224,7 +225,36 @@ function PageLayout({ children }: PageLayoutProps) {
               )}
               <PageContainer>
                 <HeaderSpacer />
-                {children}
+                <div
+                  style={{
+                    height: '100%'
+                  }}
+                  onDrop={(event) => {
+                    if (event.dataTransfer == null) {
+                      return false;
+                    }
+                    const files = getFileData(event.dataTransfer, 'image/*', true);
+
+                    if (!files || files.length === 0) {
+                      return false;
+                    }
+                    event.preventDefault();
+
+                    const imageFileDropEvent = new CustomEvent('imageFileDrop', {
+                      detail: {
+                        files
+                      }
+                    });
+
+                    const bangleEditorCoreElement = document.querySelector(`.bangle-editor-core`);
+
+                    if (bangleEditorCoreElement) {
+                      bangleEditorCoreElement.dispatchEvent(imageFileDropEvent as Event);
+                    }
+                  }}
+                >
+                  {children}
+                </div>
               </PageContainer>
             </PageDialogProvider>
           </DocumentPageProviders>

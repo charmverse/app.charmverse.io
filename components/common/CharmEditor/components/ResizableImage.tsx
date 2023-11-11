@@ -5,13 +5,13 @@ import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { HTMLAttributes } from 'react';
-import { memo, useEffect, useState } from 'react';
-import { v4 } from 'uuid';
+import { memo, useEffect, useRef, useState } from 'react';
 
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
+import { getFileBinary } from 'lib/file/getFileBinary';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import { enableDragAndDrop } from '../utils';
@@ -127,6 +127,7 @@ function imageSpec(): RawSpecs {
     }
   };
 }
+
 function ResizableImage({
   readOnly = false,
   getPos,
@@ -138,7 +139,7 @@ function ResizableImage({
 }: CharmNodeViewProps) {
   const imageSource = node.attrs.src;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
-
+  const imageRef = useRef<HTMLElement>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const [uploadFailed, setUploadFailed] = useState(false);
@@ -156,6 +157,14 @@ function ResizableImage({
       const file = getFileBinary(imageSource);
       if (file) {
         setUploadingImage(true);
+        // Scroll to the image while it's uploading
+        setTimeout(() => {
+          if (imageRef.current) {
+            imageRef.current.scrollIntoView({
+              behavior: 'smooth'
+            });
+          }
+        }, 0);
         uploadToS3(file)
           .then(({ url }) => {
             updateAttrs({
@@ -176,81 +185,54 @@ function ResizableImage({
   if (!imageSource) {
     if (readOnly) {
       return <div />;
-    } else {
-      return (
-        <ImageSelector
-          autoOpen={autoOpen}
-          onImageSelect={async (imageSrc) => {
-            updateAttrs({
-              src: imageSrc
-            });
-          }}
-        >
-          <EmptyImageContainer onDelete={deleteNode} readOnly={readOnly} isSelected={selected} />
-        </ImageSelector>
-      );
     }
+    return (
+      <ImageSelector
+        autoOpen={autoOpen}
+        onImageSelect={async (imageSrc) => {
+          updateAttrs({
+            src: imageSrc
+          });
+        }}
+      >
+        <EmptyImageContainer onDelete={deleteNode} readOnly={readOnly} isSelected={selected} />
+      </ImageSelector>
+    );
   } else if (uploadFailed) {
     return <Alert severity='warning'>Image upload failed</Alert>;
-  } else if (uploadingImage) {
-    return (
-      <Box my={1}>
-        <LoadingComponent size={24} isLoading label='Uploading' />
-      </Box>
-    );
-  } else if (readOnly) {
-    return (
-      <StyledImageContainer size={node.attrs.size}>
-        <StyledImage draggable={false} src={node.attrs.src} alt={node.attrs.alt} width={node.attrs.size} />
-      </StyledImageContainer>
-    );
-  } else {
-    return (
-      <Resizable initialSize={node.attrs.size} minWidth={MIN_IMAGE_WIDTH} updateAttrs={updateAttrs} onDelete={onDelete}>
-        <StyledImage
-          onDragStart={() => {
-            const nodePos = getPos();
-            if (typeof nodePos === 'number') {
-              enableDragAndDrop(view, nodePos);
-            }
-          }}
-          src={node.attrs.src}
-          alt={node.attrs.alt}
-        />
-      </Resizable>
-    );
   }
-}
 
-// example: <img src=”data:image/gif;base64, R0lGODlhCAAFAIABAMaAgP///yH5BAEAAAEALAAAAAAIAAUAAAIKBBKGebzqoJKtAAA7″ />
-// does not work for svg sources: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
-function getFileBinary(src: string): File | null {
-  if (src.startsWith('data')) {
-    const contentType = src.split('image/')[1].split(';')[0];
-    const fileExtension = contentType.split('+')[0]; // handle svg+xml
-    const fileName = `${v4()}.${fileExtension}`;
-    const rawFileContent = src.split(';base64,')[1];
-    // not all data sources are base64, like svg:
-    if (rawFileContent) {
-      const fileContent = Buffer.from(rawFileContent, 'base64');
-
-      // Break the buffer string into chunks of 1 kilobyte
-      const chunkSize = 1024 * 1;
-
-      const bufferLength = fileContent.length;
-
-      const bufferChunks = [];
-
-      for (let i = 0; i < bufferLength; i += chunkSize) {
-        const chunk = fileContent.slice(i, i + chunkSize);
-        bufferChunks.push(chunk);
-      }
-
-      const file: File = new File(bufferChunks, fileName, { type: `image/${contentType}` });
-      return file;
-    }
-  }
-  return null;
+  return (
+    <Box ref={imageRef}>
+      {uploadingImage ? (
+        <Box my={1}>
+          <LoadingComponent size={24} isLoading label='Uploading' />
+        </Box>
+      ) : readOnly ? (
+        <StyledImageContainer size={node.attrs.size}>
+          <StyledImage draggable={false} src={node.attrs.src} alt={node.attrs.alt} width={node.attrs.size} />
+        </StyledImageContainer>
+      ) : (
+        <Resizable
+          initialSize={node.attrs.size}
+          minWidth={MIN_IMAGE_WIDTH}
+          updateAttrs={updateAttrs}
+          onDelete={onDelete}
+        >
+          <StyledImage
+            onDragStart={() => {
+              const nodePos = getPos();
+              if (typeof nodePos === 'number') {
+                enableDragAndDrop(view, nodePos);
+              }
+            }}
+            src={node.attrs.src}
+            alt={node.attrs.alt}
+          />
+        </Resizable>
+      )}
+    </Box>
+  );
 }
 
 export function spec() {
