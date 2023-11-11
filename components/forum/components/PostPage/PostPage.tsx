@@ -30,6 +30,7 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { getFileData } from 'lib/file/getFileData';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';

@@ -26,6 +26,7 @@ import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useVotes } from 'hooks/useVotes';
+import { getFileData } from 'lib/file/getFileData';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
@@ -208,7 +209,41 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
       )}
       <div ref={printRef} className={`document-print-container ${fontClassName}`}>
         <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
-          <Box display='flex' flexDirection='column' ref={containerRef}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+            ref={containerRef}
+            onDrop={(event) => {
+              // prevent drop event from firing when dropping into the editor
+              if (
+                event.dataTransfer == null ||
+                readOnly ||
+                (event.target instanceof HTMLElement && event.target.parentElement?.id !== 'document-scroll-container')
+              ) {
+                return;
+              }
+              const files = getFileData(event.dataTransfer, 'image/*', true);
+
+              if (!files || files.length === 0) {
+                return;
+              }
+              event.preventDefault();
+
+              const imageFileDropEvent = new CustomEvent('imageFileDrop', {
+                detail: {
+                  files
+                }
+              });
+
+              const bangleEditorCoreElement = document.querySelector(`.bangle-editor-core`);
+
+              if (bangleEditorCoreElement) {
+                bangleEditorCoreElement.dispatchEvent(imageFileDropEvent as Event);
+              }
+            }}
+          >
             <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
             {/* temporary? disable editing of page meta data when in suggestion mode */}
             {page.headerImage && (
@@ -346,7 +381,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                   </Box>
                 )}
             </Container>
-          </Box>
+          </div>
         </ScrollContainer>
       </div>
     </>
