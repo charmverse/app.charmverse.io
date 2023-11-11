@@ -10,12 +10,12 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
-import { ExpandableSection } from 'components/common/ExpandableSection';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
+import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
+import type { RewardType } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
-import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';

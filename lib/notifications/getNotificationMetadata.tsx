@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
@@ -241,64 +242,74 @@ export function getNotificationMetadata(
   content: ReactNode;
   pageTitle: string;
 } {
-  switch (notification.group) {
-    case 'bounty': {
-      return {
-        content: getBountyContent(notification as BountyNotification, actorUsername),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+  try {
+    switch (notification.group) {
+      case 'bounty': {
+        return {
+          content: getBountyContent(notification as BountyNotification, actorUsername),
+          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'card': {
-      return {
-        content: getCardContent(notification as CardNotification, actorUsername),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'card': {
+        return {
+          content: getCardContent(notification as CardNotification, actorUsername),
+          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'document': {
-      const basePath = notification.pageType === 'post' ? '/forum/post' : '';
-      return {
-        content: getDocumentContent(notification as DocumentNotification, actorUsername),
-        href: `${basePath}/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'document': {
+        const basePath = notification.pageType === 'post' ? '/forum/post' : '';
+        return {
+          content: getDocumentContent(notification as DocumentNotification, actorUsername),
+          href: `${basePath}/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'post': {
-      return {
-        content: getPostContent(notification as PostNotification, actorUsername),
-        href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.postTitle
-      };
-    }
+      case 'post': {
+        return {
+          content: getPostContent(notification as PostNotification, actorUsername),
+          href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.postTitle
+        };
+      }
 
-    case 'proposal': {
-      return {
-        content: getProposalContent(notification as ProposalNotification, actorUsername),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'proposal': {
+        return {
+          content: getProposalContent(notification as ProposalNotification, actorUsername),
+          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'vote': {
-      return {
-        content: `Polling started for "${notification.title}"`,
-        href: `/${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
-          notification.voteId
-        }`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'vote': {
+        return {
+          content: `Polling started for "${notification.title}"`,
+          href: `/${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
+            notification.voteId
+          }`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    default: {
-      return {
-        content: '',
-        href: '',
-        pageTitle: ''
-      };
+      default: {
+        log.warn('Unrecognized notification type', { notification });
+        return {
+          content: '',
+          href: '',
+          pageTitle: ''
+        };
+      }
     }
+  } catch (error) {
+    log.warn('Cannot read notification type', { error, notification });
+    return {
+      content: '',
+      href: '',
+      pageTitle: ''
+    };
   }
 }
