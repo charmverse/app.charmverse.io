@@ -1,8 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
 import randomName from 'lib/utilities/randomName';
 import { uid } from 'lib/utilities/strings';
+
+import type { DiscordAccount } from './client/getDiscordAccount';
 
 type UserProps = { discordId: string; avatar?: string; username?: string; account?: Partial<DiscordAccount> };
 

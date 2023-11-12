@@ -4,7 +4,8 @@ import nc from 'next-connect';
 
 import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
-import { handleDiscordResponse } from 'lib/discord/handleDiscordResponse';
+import { getGuildMemberHandled } from 'lib/discord/client/getGuildMember';
+import { getGuildRolesHandled } from 'lib/discord/client/getGuildRoles';
 import type { DiscordServerRole } from 'lib/discord/interface';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
@@ -44,9 +45,7 @@ async function importRoles(req: NextApiRequest, res: NextApiResponse<ImportRoles
   const discordServerRoles: DiscordServerRole[] = [];
   const discordGuildMembers: DiscordGuildMember[] = [];
 
-  const discordServerRolesResponse = await handleDiscordResponse<DiscordServerRole[]>(
-    `https://discord.com/api/v8/guilds/${guildId}/roles`
-  );
+  const discordServerRolesResponse = await getGuildRolesHandled(guildId);
 
   if (discordServerRolesResponse.status === 'success') {
     discordServerRoles.push(...discordServerRolesResponse.data);
@@ -78,9 +77,7 @@ async function importRoles(req: NextApiRequest, res: NextApiResponse<ImportRoles
 
   const discordGuildMemberResponses = (await Promise.all(
     discordConnectedMembers.map((discordConnectedMember) =>
-      handleDiscordResponse<DiscordGuildMember>(
-        `https://discord.com/api/v8/guilds/${guildId}/members/${discordConnectedMember.discordUser!.discordId}`
-      )
+      getGuildMemberHandled({ guildId, memberId: discordConnectedMember.id })
     )
   )) as { status: 'success'; data: DiscordGuildMember | null }[];
 

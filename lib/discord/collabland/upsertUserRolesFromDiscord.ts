@@ -1,7 +1,7 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { verifyDiscordGateForSpace } from 'lib/discord/verifyDiscordGateForSpace';
+import { verifyDiscordGateForSpace } from 'lib/discord/collabland/verifyDiscordGateForSpace';
 import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 
 type Props = {
