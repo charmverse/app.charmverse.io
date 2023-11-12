@@ -54,7 +54,7 @@ export async function savePostNotification({
       }
     }
   });
-  log.info('Created post notification', { postId, notificationId: record.id, spaceId, userId: createdBy, type });
+  log.info('Created post notification', { postId, notificationId: record.id, spaceId, userId, createdBy, type });
   return record;
 }
 
@@ -96,7 +96,8 @@ export async function saveProposalNotification({
     proposalId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -184,7 +185,8 @@ export async function saveDocumentNotification({
     pageId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -228,7 +230,8 @@ export async function saveCardNotification({
     personPropertyId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -272,7 +275,8 @@ export async function savePollNotification({
     voteId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -334,7 +338,8 @@ export async function saveRewardNotification({
     applicationId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;

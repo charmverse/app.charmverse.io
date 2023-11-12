@@ -255,6 +255,7 @@ export async function createDocumentNotifications(webhookData: {
       });
 
       const extractedMentions = extractMentions(inlineCommentContent);
+
       for (const extractedMention of extractedMentions) {
         const targetUserIds = await getUserIdsFromMentionNode({
           targetMention: extractedMention,
@@ -291,6 +292,7 @@ export async function createDocumentNotifications(webhookData: {
           notificationSentUserIds.add(targetUserId);
         }
       }
+
       break;
     }
 
@@ -325,6 +327,7 @@ export async function createDocumentNotifications(webhookData: {
           });
 
       const notificationSentUserIds: Set<string> = new Set();
+
       // Send notification only for top-level comments
       if (!comment.parentId) {
         for (const authorId of authorIds) {
