@@ -16,6 +16,7 @@ import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/foca
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
+import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
@@ -208,7 +209,18 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
       )}
       <div ref={printRef} className={`document-print-container ${fontClassName}`}>
         <ScrollContainer id='document-scroll-container' showPageActionSidebar={showPageActionSidebar}>
-          <Box display='flex' flexDirection='column' ref={containerRef}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+            ref={containerRef}
+            onDrop={handleImageFileDrop({
+              pageId: page.id,
+              readOnly,
+              parentElementId: 'document-scroll-container'
+            })}
+          >
             <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
             {/* temporary? disable editing of page meta data when in suggestion mode */}
             {page.headerImage && (
@@ -346,7 +358,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                   </Box>
                 )}
             </Container>
-          </Box>
+          </div>
         </ScrollContainer>
       </div>
     </>

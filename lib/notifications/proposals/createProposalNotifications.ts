@@ -117,8 +117,9 @@ export async function createProposalNotifications(webhookData: {
         const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
-        const isReviewer = proposalReviewerIds.includes(spaceRole.userId);
-        const isReviewerRole = proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId));
+        const isReviewer =
+          proposalReviewerIds.includes(spaceRole.userId) ||
+          proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId));
         const isProposalCategoryAccessible = proposal.categoryId
           ? accessibleProposalCategoryIds.includes(proposal.categoryId)
           : true;
@@ -130,7 +131,7 @@ export async function createProposalNotifications(webhookData: {
         const action = getProposalAction({
           currentStatus: proposal.status,
           isAuthor,
-          isReviewer: isReviewer || isReviewerRole
+          isReviewer
         });
 
         if (!action) {

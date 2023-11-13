@@ -1,7 +1,7 @@
 import type { Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { DiscordAccount } from './getDiscordAccount';
+import type { DiscordAccount } from './client/getDiscordAccount';
 
 export interface DiscordGuildMember {
   user?: DiscordAccount;

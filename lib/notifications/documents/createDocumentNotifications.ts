@@ -228,6 +228,7 @@ export async function createDocumentNotifications(webhookData: {
       }
 
       const pageId = data.document.id;
+      const notificationSentUserIds: Set<string> = new Set();
       if (
         previousInlineComment &&
         previousInlineComment?.id !== inlineCommentId &&
@@ -244,6 +245,7 @@ export async function createDocumentNotifications(webhookData: {
           content: inlineCommentContent
         });
         ids.push(id);
+        notificationSentUserIds.add(previousInlineComment.userId);
       }
 
       const permissionsClient = await getPermissionsClient({
@@ -257,7 +259,12 @@ export async function createDocumentNotifications(webhookData: {
           userId
         });
 
-        if (pagePermission.read && inlineCommentAuthorId !== userId && previousInlineComment?.userId !== userId) {
+        if (
+          pagePermission.read &&
+          inlineCommentAuthorId !== userId &&
+          previousInlineComment?.userId !== userId &&
+          !notificationSentUserIds.has(userId)
+        ) {
           const { id } = await saveDocumentNotification({
             type: 'inline_comment.created',
             createdAt: webhookData.createdAt,
@@ -269,10 +276,12 @@ export async function createDocumentNotifications(webhookData: {
             content: inlineCommentContent
           });
           ids.push(id);
+          notificationSentUserIds.add(userId);
         }
       }
 
       const extractedMentions = extractMentions(inlineCommentContent);
+
       for (const extractedMention of extractedMentions) {
         const targetUserIds = (
           await getUserIdsFromRoles({
@@ -283,6 +292,10 @@ export async function createDocumentNotifications(webhookData: {
         ).filter((userId) => userId !== inlineCommentAuthorId);
 
         for (const targetUserId of targetUserIds) {
+          if (notificationSentUserIds.has(targetUserId)) {
+            continue;
+          }
+
           const pagePermission = await permissionsClient.client.pages.computePagePermissions({
             resourceId: pageId,
             userId: targetUserId
@@ -304,8 +317,10 @@ export async function createDocumentNotifications(webhookData: {
             inlineCommentId
           });
           ids.push(id);
+          notificationSentUserIds.add(targetUserId);
         }
       }
+
       break;
     }
 
@@ -339,6 +354,8 @@ export async function createDocumentNotifications(webhookData: {
             }
           });
 
+      const notificationSentUserIds: Set<string> = new Set();
+
       // Send notification only for top-level comments
       if (!comment.parentId) {
         for (const authorId of authorIds) {
@@ -357,6 +374,7 @@ export async function createDocumentNotifications(webhookData: {
               content: comment.content
             });
             ids.push(id);
+            notificationSentUserIds.add(authorId);
           }
         }
       } else {
@@ -394,6 +412,7 @@ export async function createDocumentNotifications(webhookData: {
             content: comment.content
           });
           ids.push(id);
+          notificationSentUserIds.add(parentCommentAuthorId);
         }
       }
 
@@ -416,6 +435,10 @@ export async function createDocumentNotifications(webhookData: {
         ).filter((userId) => userId !== commentAuthorId);
 
         for (const targetUserId of targetUserIds) {
+          if (notificationSentUserIds.has(targetUserId)) {
+            continue;
+          }
+
           let hasReadPermission = false;
           if (documentId) {
             const pagePermission = await permissionsClient.client.pages.computePagePermissions({
@@ -452,6 +475,7 @@ export async function createDocumentNotifications(webhookData: {
             commentId
           });
           ids.push(id);
+          notificationSentUserIds.add(targetUserId);
         }
       }
 
