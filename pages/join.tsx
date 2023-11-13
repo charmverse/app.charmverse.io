@@ -3,6 +3,7 @@ import { Alert, Box, Card, Divider } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
+import { useSearchByDomain } from 'charmClient/hooks/spaces';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -10,7 +11,6 @@ import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useSearchByDomain } from 'hooks/useSearchByDomain';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 import { getAppUrl, getSpaceUrl } from 'lib/utilities/browser';
@@ -41,7 +41,7 @@ export default function JoinWorkspace() {
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const [isRouterReady, setRouterReady] = useState(false);
-  const { spaceFromPath, isSpaceLoading, spaceError } = useSearchByDomain(domain);
+  const { data: spaceFromPath, isLoading: isSpaceLoading, error: spaceError } = useSearchByDomain(domain);
 
   useEffect(() => {
     const connectedSpace = filterSpaceByDomain(spaces, domain);
