@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useMemo, useState } from 'react';
 
@@ -29,8 +30,10 @@ export function CommentForm({
   placeholder,
   setPublishToLens,
   publishToLens,
-  isPublishingCommentsToLens
+  isPublishingCommentsToLens,
+  pageType
 }: {
+  pageType?: PageType | 'post';
   isPublishingCommentsToLens?: boolean;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
@@ -79,7 +82,8 @@ export function CommentForm({
       onContentChange: updatePostContent,
       content: postContent.doc,
       isContentControlled: true,
-      disableNestedPages: true
+      disableNestedPages: true,
+      pageType
     };
 
     if (!inlineCharmEditor) {

@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useState } from 'react';
 
@@ -26,8 +27,10 @@ export function CommentReply({
   onCancelComment,
   setPublishToLens,
   publishToLens,
-  showPublishToLens
+  showPublishToLens,
+  pageType
 }: {
+  pageType?: PageType | 'post';
   isPublishingComments?: boolean;
   showPublishToLens?: boolean;
   publishToLens?: boolean;
@@ -79,6 +82,7 @@ export function CommentReply({
             placeholderText='What are your thoughts?'
             disableNestedPages
             disableRowHandles
+            pageType={pageType}
           />
 
           <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>

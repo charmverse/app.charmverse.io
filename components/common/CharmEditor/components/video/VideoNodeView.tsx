@@ -64,7 +64,6 @@ export function VideoNodeView({
     });
   }
 
-  // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxAssetId) {
     if (readOnly || (!pageId && !isPost && !isPollOrVote)) {
       // hide the row completely
@@ -87,9 +86,14 @@ export function VideoNodeView({
                   onSubmit={(videoUrl) => {
                     // check for other embed types (e.g. Loom, Odysee)
                     const embedType = extractIframeEmbedType(videoUrl);
-                    if (embedType) {
+                    const youtubeEmbedLink = extractYoutubeEmbedLink(videoUrl);
+                    if (youtubeEmbedLink) {
+                      updateAttrs({
+                        src: videoUrl
+                      });
+                    } else if (embedType) {
                       const pos = getPos();
-                      if (!pos) return;
+                      if (pos === undefined || pos === null) return;
                       const newConfig = embeds[embedType] as Embed;
                       const width = attrs.width;
                       let height = width / VIDEO_ASPECT_RATIO;

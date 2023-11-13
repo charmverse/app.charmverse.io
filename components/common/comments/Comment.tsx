@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -51,6 +52,7 @@ export type CommentProps = {
   inlineCharmEditor?: boolean;
   lensPostLink?: string | null;
   isPublishingComments?: boolean;
+  pageType?: PageType | 'post';
 };
 
 export function Comment({
@@ -64,7 +66,8 @@ export function Comment({
   handleDeleteComment,
   handleVoteComment,
   lensPostLink,
-  isPublishingComments
+  isPublishingComments,
+  pageType
 }: CommentProps) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
@@ -289,6 +292,7 @@ export function Comment({
           <Box mt={2}>
             {showCommentReply && (
               <CommentReply
+                pageType={pageType}
                 isPublishingComments={isPublishingComments}
                 publishToLens={publishCommentsToLens}
                 setPublishToLens={setPublishCommentsToLens}
@@ -313,6 +317,7 @@ export function Comment({
             handleUpdateComment={handleUpdateComment}
             handleCreateComment={handleCreateComment}
             lensPostLink={lensPostLink}
+            pageType={pageType}
           />
         ))}
       </Box>

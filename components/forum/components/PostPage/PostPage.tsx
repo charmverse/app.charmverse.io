@@ -440,6 +440,7 @@ export function PostPage({
                               handleDeleteComment={deleteComment}
                               handleVoteComment={voteComment}
                               deletingDisabled={!!post?.proposalId}
+                              pageType='post'
                             />
                           ))}
                         </Stack>
