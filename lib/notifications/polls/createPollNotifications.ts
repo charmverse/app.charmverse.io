@@ -23,17 +23,9 @@ export async function createPollNotifications(webhookData: {
         },
         select: {
           spaceId: true,
-          page: {
-            select: { id: true }
-          },
-          post: {
-            select: { id: true }
-          },
-          author: {
-            select: {
-              id: true
-            }
-          }
+          pageId: true,
+          postId: true,
+          createdBy: true
         }
       });
 
@@ -48,23 +40,23 @@ export async function createPollNotifications(webhookData: {
         }
       });
 
-      const spaceUserIds = spaceRoles.map(({ userId }) => userId).filter((userId) => userId !== vote.author.id);
+      const spaceUserIds = spaceRoles.map(({ userId }) => userId).filter((userId) => userId !== vote.createdBy);
 
       const permissionClient = await getPermissionsClient({
         resourceId: spaceId,
         resourceIdType: 'space'
       });
 
-      if (vote.page) {
+      if (vote.pageId) {
         for (const spaceUserId of spaceUserIds) {
           const pagePermission = await permissionClient.client.pages.computePagePermissions({
-            resourceId: vote.page.id,
+            resourceId: vote.pageId,
             userId: spaceUserId
           });
           if (pagePermission.comment) {
             const { id } = await savePollNotification({
               createdAt: webhookData.createdAt,
-              createdBy: vote.author.id,
+              createdBy: vote.createdBy,
               spaceId,
               type: 'new_vote',
               userId: spaceUserId,
@@ -73,17 +65,17 @@ export async function createPollNotifications(webhookData: {
             ids.push(id);
           }
         }
-      } else if (vote.post) {
+      } else if (vote.postId) {
         for (const spaceUserId of spaceUserIds) {
           const postPermission = await permissionClient.client.forum.computePostPermissions({
-            resourceId: vote.post.id,
+            resourceId: vote.postId,
             userId: spaceUserId
           });
 
           if (postPermission.add_comment) {
             const { id } = await savePollNotification({
               createdAt: webhookData.createdAt,
-              createdBy: vote.author.id,
+              createdBy: vote.createdBy,
               spaceId,
               type: 'new_vote',
               userId: spaceUserId,
