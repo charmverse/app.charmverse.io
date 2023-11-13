@@ -223,6 +223,7 @@ export default function CharmEditor({
         width: '100%',
         height: '100%'
       }}
+      inline
       readOnly={readOnly}
       noPadding={noPadding}
       pmViewOpts={{
