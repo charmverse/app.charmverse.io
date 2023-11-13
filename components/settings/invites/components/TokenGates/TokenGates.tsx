@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { TokenGate } from '@charmverse/core/prisma';
 import type { JsonSigningResourceId } from '@lit-protocol/types';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
