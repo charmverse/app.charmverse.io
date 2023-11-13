@@ -3,7 +3,9 @@ import { Box, Typography } from '@mui/material';
 import type { TokenGateState } from './hooks/useTokenGates';
 import { TokenGateOption } from './TokenGateOption';
 
-export function TokenGateContent({ tokenGates, tokenGateResult, isVerifying }: TokenGateState) {
+export type TokenGateContentProps = Pick<TokenGateState, 'tokenGates' | 'tokenGateResult' | 'isVerifying'>;
+
+export function TokenGateContent({ tokenGates, tokenGateResult, isVerifying }: TokenGateContentProps) {
   return (
     <div data-test='token-gate-form'>
       {tokenGates?.map((gate, index, list) => (

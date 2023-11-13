@@ -4,7 +4,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { TokenGateWithRoles } from './interfaces';
+import type { TokenGateConditions, TokenGateWithRoles } from './interfaces';
 
 export type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
 
@@ -66,6 +66,7 @@ export async function verifyTokenGates({ spaceId, userId, tokens }: Props): Prom
             return {
               ...matchingTokenGate,
               jwt: tk.signedToken,
+              conditions: matchingTokenGate.conditions as TokenGateConditions,
               verified: true,
               grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.roleId)
             };
