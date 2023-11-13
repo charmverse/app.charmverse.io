@@ -27,7 +27,14 @@ export function paramsToHumanFormat(params: Record<string, any>) {
 
 export function validateMixPanelEvent(params: MixpanelTrackBase) {
   if (isUUID(params.distinct_id)) {
-    return 'spaceId' in params && params.spaceId === 'string' ? isUUID(params.spaceId) : true;
+    if ('spaceId' in params && params.spaceId === 'string' && !isUUID(params.spaceId)) {
+      return false;
+    }
+    if ('pageId' in params && params.pageId === 'string' && !isUUID(params.pageId)) {
+      return false;
+    }
+
+    return true;
   } else {
     return false;
   }
