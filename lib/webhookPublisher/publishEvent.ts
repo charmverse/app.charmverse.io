@@ -14,8 +14,7 @@ import {
   getDocumentEntity,
   getInlineCommentEntity,
   getVoteEntity,
-  getApplicationEntity,
-  getBlockCommentEntity
+  getApplicationEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
