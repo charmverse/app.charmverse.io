@@ -11,8 +11,8 @@ import {
   useUpsertRubricCriteria
 } from 'charmClient/hooks/proposals';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
-import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
-import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
+import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
+import { ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
