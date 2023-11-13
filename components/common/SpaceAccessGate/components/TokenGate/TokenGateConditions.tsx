@@ -45,7 +45,6 @@ function generateComponent(condition: HumanizeConditionsContent) {
             href={url}
             variant='text'
             external
-            noPadding
             target='_blank'
             color='inherit'
             sx={{ p: 0, fontWeight: 'bold', fontSize: 'inherit', '&:hover': { background: 'none' } }}

@@ -180,7 +180,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
               { type: 'text', content: `of` },
               {
                 type: 'text',
-                content: shortWalletAddress(acc.contractAddress),
+                content: tokenName,
                 props: { fontWeight: 'bold' }
               },
               { type: 'text', content: `tokens with token id` },
@@ -201,7 +201,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
               { type: 'text', content: `of` },
               {
                 type: 'text',
-                content: shortWalletAddress(acc.contractAddress),
+                content: tokenName,
                 props: { fontWeight: 'bold' }
               },
               { type: 'text', content: `tokens with token id` },
