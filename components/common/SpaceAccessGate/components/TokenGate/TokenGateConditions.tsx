@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { Button } from 'components/common/Button';
-import type { HumanizeConditionsContent, HumanizeConditionsData } from 'lib/tokenGates/humanizeConditions';
+import type { HumanizeConditionsContent, HumanizeCondition } from 'lib/tokenGates/humanizeConditions';
 import { isTruthy } from 'lib/utilities/types';
 
 const StyledOperator = styled(Box)`
@@ -59,29 +59,28 @@ function generateComponent(condition: HumanizeConditionsContent) {
   }
 }
 
-function Condition({ conditions }: { conditions: HumanizeConditionsContent[] }) {
-  const image = conditions.find((c) => c.type === 'image') || null;
-  const textConditions = conditions.filter((c) => c.type !== 'image');
-  const isOperator = textConditions.some((c) => c.type === 'operator');
-  const isExternalImage = image?.url?.startsWith('http');
+function Condition({ condition }: { condition: HumanizeCondition }) {
+  const image = condition.image;
+  const textConditions = condition.content;
+  const isOperator = condition.content.some((c) => c.type === 'operator');
+  const isExternalImage = condition.image?.startsWith('http');
   const imageFittingType = isExternalImage ? 'cover' : undefined;
   const imageBorderRadius = isExternalImage ? '50%' : undefined;
 
   return (
     <Box display='flex' alignItems='center' my={isOperator ? 2 : undefined}>
-      {image?.url && (
+      {image && (
         <Box mr={2}>
           <Image
-            src={image.url}
+            src={image}
             width={35}
             height={35}
             style={{
               display: 'block',
               borderRadius: imageBorderRadius,
-              objectFit: imageFittingType,
-              ...image.props?.style
+              objectFit: imageFittingType
             }}
-            alt={image.content}
+            alt='Token Gate Condition'
           />
         </Box>
       )}
@@ -90,11 +89,11 @@ function Condition({ conditions }: { conditions: HumanizeConditionsContent[] }) 
   );
 }
 
-export function ConditionsGroup({ conditions }: { conditions: HumanizeConditionsData }) {
+export function ConditionsGroup({ conditions }: { conditions: HumanizeCondition[] }) {
   return (
     <Box>
       {conditions.map((condition) => (
-        <Condition key={uuid()} conditions={condition} />
+        <Condition key={uuid()} condition={condition} />
       ))}
     </Box>
   );
