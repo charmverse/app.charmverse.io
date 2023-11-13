@@ -271,7 +271,8 @@ describe('humanizeConditions', () => {
             comparator: '>='
           },
           standardContractType: 'ERC721',
-          name: 'Charmed & Optimistic'
+          name: 'Charmed & Optimistic',
+          image: 'https://nft-cdn.alchemy.com/opt-mainnet/15fbbfc26e8d7d51b9b7031faff07333'
         }
       ]
     };
@@ -349,7 +350,8 @@ describe('humanizeConditions', () => {
             comparator: '>='
           },
           standardContractType: 'ERC1155',
-          name: 'Pepe'
+          name: 'Pepe',
+          image: 'https://static.alchemyapi.io/images/assets/24478.png'
         }
       ]
     };
