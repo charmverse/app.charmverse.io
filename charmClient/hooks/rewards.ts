@@ -28,7 +28,7 @@ export function useGetApplicationComments({ applicationId }: { applicationId?: s
   );
 }
 
-export function useGetReward({ rewardId }: { rewardId?: string }) {
+export function useGetReward({ rewardId }: { rewardId?: string | null }) {
   return useGET<RewardWithUsersAndPageMeta>(rewardId ? `/api/rewards/${rewardId}` : null);
 }
 

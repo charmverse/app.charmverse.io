@@ -111,7 +111,7 @@ export function getDefaultTableView({
 
   view.id = DEFAULT_VIEW_BLOCK_ID;
   view.fields.columnWidths = {
-    [Constants.titleColumnId]: 310,
+    [Constants.titleColumnId]: 400,
     [CATEGORY_BLOCK_ID]: 200,
     [STATUS_BLOCK_ID]: 150,
     [AUTHORS_BLOCK_ID]: 150,

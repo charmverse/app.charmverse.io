@@ -2,7 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
+import { applyDiscordGate } from 'lib/discord/collabland/applyDiscordGate';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';

@@ -139,7 +139,7 @@ export function ProposalDialog({ pageId, newProposal, closeDialog }: Props) {
                 data-test='open-as-page'
                 size='small'
                 color='secondary'
-                href={`/${page?.path}`}
+                href={page ? `/${page?.path}` : null}
                 variant='text'
                 startIcon={<OpenInFullIcon fontSize='small' />}
                 sx={{ px: 1.5 }}

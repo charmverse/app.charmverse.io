@@ -60,7 +60,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const boards = useAppSelector(getSortedBoards);
   const boardViews = useAppSelector(getCurrentBoardViews);
   const { showMessage } = useSnackbar();
-  const { members, membersRecord } = useMembers();
+  const { membersRecord } = useMembers();
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const { formatDateTime, formatDate } = useDateFormatter();
@@ -109,7 +109,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
       .map((card) => ({ card, page: pages[card.id] }))
       .filter((item): item is CardPage => !!item.page);
 
-    const sortedCardPages = sortCards(cardPages, _board, _view, members);
+    const sortedCardPages = sortCards(cardPages, _board, _view, membersRecord);
     const _cards = sortedCardPages.map(({ card, page: { title } }) => {
       return {
         ...card,
@@ -188,7 +188,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
             try {
               await addNewCards({
                 board,
-                members,
+                members: membersRecord,
                 results,
                 spaceId: currentSpace.id,
                 userId: user.id,

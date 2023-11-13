@@ -99,7 +99,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
     });
   }
 
-  const relativePath = `/${router.query.domain}/forum/post/${post?.path}`;
+  const relativePath = post ? `/${router.query.domain}/forum/post/${post?.path}` : null;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {

@@ -92,7 +92,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
       ? `
           background-color: var(--input-bg);
           border: 1px solid var(--input-border);
-          .ProseMirror[data-placeholder]::before {
+          .loaded .ProseMirror[data-placeholder]::before {
             color: var(--primary-text);
             opacity: 0.5;
           }`
@@ -376,6 +376,8 @@ function CharmEditor({
       allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
+      postId={postId}
+      pageType={pageType}
       focusOnInit={focusOnInit}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}

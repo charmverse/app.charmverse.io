@@ -19,11 +19,38 @@ export async function getPollNotifications({ id, userId }: QueryCondition): Prom
       id: true,
       type: true,
       vote: {
-        include: {
-          page: true,
-          post: true,
-          userVotes: true,
-          voteOptions: true
+        select: {
+          id: true,
+          deadline: true,
+          type: true,
+          status: true,
+          threshold: true,
+          title: true,
+          page: {
+            select: {
+              id: true,
+              path: true,
+              title: true
+            }
+          },
+          post: {
+            select: {
+              categoryId: true,
+              path: true,
+              title: true
+            }
+          },
+          userVotes: {
+            select: {
+              choices: true,
+              userId: true
+            }
+          },
+          voteOptions: {
+            select: {
+              name: true
+            }
+          }
         }
       },
       notificationMetadata: {

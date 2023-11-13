@@ -40,7 +40,7 @@ describe('computeProposalFlowPermissions', () => {
       userId: author.id
     });
 
-    expect(flowFlags.draft).toBe(true);
+    expect(flowFlags.discussion).toBe(true);
   });
 
   it('Proposal reviewer should be able to change the proposal status from review to reviewed', async () => {
