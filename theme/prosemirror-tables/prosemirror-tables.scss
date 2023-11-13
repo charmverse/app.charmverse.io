@@ -312,18 +312,38 @@
   background-color: rgb(var(--button-bg-rgb));
 }
 
-.deleteMenuButton {
-  content: '';
-  width: 24px;
-  height: 24px;
-  display: block;
-  background-color: rgb(var(--sidebar-text-rgb));
-  mask-position: center center;
-  mask-image: url(/images/prosemirror/trash_can.svg);
-  mask-size: cover;
+.bangle-editor-core.readonly {
+  .tableColHandleButton,
+  .tableRowHandleButton,
+  .tableAddBottomRow,
+  .tableAddRightColumn,
+  .tableDeleteButton {
+    display: none;
+  }
+}
+
+.charm-table:hover .tableDeleteButton {
+  opacity: 1;
+  transition: opacity 250ms ease-in-out;
+}
+
+.tableDeleteButton {
+  width: 32px;
+  height: 32px;
+  padding: 9px;
+  top: 0px;
+  position: absolute;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 250ms ease-in-out;
+  opacity: 0;
+  background-color: var(--background-light);
 
   &:hover {
-    transform: none;
+    background-color: var(--background-dark);
   }
 }
 
