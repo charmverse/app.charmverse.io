@@ -11,11 +11,11 @@ import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { getFileBinary } from 'lib/file/getFileBinary';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import { enableDragAndDrop } from '../utils';
 
+import { getFileBinary } from './@bangle.dev/base-components/image';
 import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
 import BlockAligner from './BlockAligner';
 import type { CharmNodeViewProps } from './nodeView/nodeView';

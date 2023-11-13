@@ -20,12 +20,12 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
-import { convertFileToBase64 } from 'lib/file/convertFileToBase64';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
@@ -183,6 +183,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       for (const file of files) {
         const base64 = await convertFileToBase64(file);
 
+        // Add image to the end of the document
         editor.view.dispatch(
           editor.view.state.tr.insert(
             editor.view.state.doc.nodeSize - 2,
@@ -204,11 +205,11 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       pageType?.match(/(page|card|post|proposal|bounty)/)
     ) {
       editorRef.current.addEventListener(undoEventName, editorUndoListener);
-      editorRef.current.addEventListener('imageFileDrop', handleImageFileDrop);
+      editorRef.current.addEventListener(imageFileDropEventName, handleImageFileDrop);
 
       return () => {
         editorRef.current?.removeEventListener(undoEventName, editorUndoListener);
-        editorRef.current?.removeEventListener('imageFileDrop', handleImageFileDrop);
+        editorRef.current?.removeEventListener(imageFileDropEventName, handleImageFileDrop);
       };
     }
   }, [editorRef, editor, readOnly, inline, pageType, postId, pageId]);
@@ -285,6 +286,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         ref={editorRef}
         className={`bangle-editor-core ${readOnly ? 'readonly' : ''}${!isLoadingRef.current ? ' content-loaded' : ''}`}
         data-page-id={pageId}
+        data-post-id={postId}
         style={{
           minHeight: showLoader && isLoadingRef.current ? '200px' : undefined
         }}

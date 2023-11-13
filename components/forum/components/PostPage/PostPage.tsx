@@ -11,6 +11,7 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import { Comment } from 'components/common/comments/Comment';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { CommentSort } from 'components/common/comments/CommentSort';
@@ -30,7 +31,6 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getFileData } from 'lib/file/getFileData';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -325,8 +325,16 @@ export function PostPage({
         style={{
           overflowY: 'auto'
         }}
+        id={`post-charmeditor-${post?.id}`}
       >
-        <Stack flexDirection='row'>
+        <Stack
+          flexDirection='row'
+          onDrop={handleImageFileDrop({
+            parentElementId: `post-charmeditor-${post?.id}`,
+            readOnly: !canEdit,
+            postId: post?.id
+          })}
+        >
           <Container top={50}>
             <Box minHeight={300} data-test='post-charmeditor'>
               <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
