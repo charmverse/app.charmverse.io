@@ -22,7 +22,7 @@ export function RewardSignupButton({ pagePath }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3Account();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const { space } = useCurrentSpace();
-  const { data: spaceWithGates } = useSearchByDomain(space!.domain);
+  const { data: spaceWithGates } = useSearchByDomain(space?.domain);
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const [loggingIn, setLoggingIn] = useState(false);
 
