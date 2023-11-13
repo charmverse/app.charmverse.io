@@ -117,3 +117,38 @@ body {
   /* wallet connect modal */
   --wcm-z-index: 1500;
 }
+
+.bangle-editor-core.readonly {
+  .tableColHandleButton,
+  .tableRowHandleButton,
+  .tableAddBottomRow,
+  .tableAddRightColumn,
+  .tableDeleteButton {
+    display: none;
+  }
+}
+
+.charm-table:hover .tableDeleteButton {
+  opacity: 1;
+  transition: opacity 250ms ease-in-out;
+}
+
+.tableDeleteButton {
+  width: 32px;
+  height: 32px;
+  padding: 9px;
+  top: 0px;
+  position: absolute;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 250ms ease-in-out;
+  opacity: 0;
+  background-color: var(--background-light);
+
+  &:hover {
+    background-color: var(--background-dark);
+  }
+}

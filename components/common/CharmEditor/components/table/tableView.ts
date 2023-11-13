@@ -30,8 +30,6 @@ export class TableView {
 
   dom: HTMLElement;
 
-  // getPos: (() => number);
-
   node: Node;
 
   table: HTMLTableElement;
@@ -46,10 +44,9 @@ export class TableView {
 
   view: EditorView;
 
-  constructor(node: Node, cellMinWidth: number, view: EditorView, getPos?: () => number) {
+  constructor(node: Node, cellMinWidth: number, view: EditorView) {
     this.node = node;
     this.view = view;
-    // this.getPos = getPos;
     this.cellMinWidth = cellMinWidth;
     const tableScrollWrapper = createElementWithClass('div', 'tableScrollWrapper');
     this.tableWrapper = tableScrollWrapper.appendChild(createElementWithClass('div', 'tableWrapper'));
@@ -78,6 +75,38 @@ export class TableView {
     this.colgroup = this.table.appendChild(document.createElement('colgroup'));
     updateColumnsOnResize(node, this.colgroup, this.table, cellMinWidth);
     this.contentDOM = this.table.appendChild(document.createElement('tbody'));
+
+    const tableDeleteButton = document.createElement('div');
+    tableDeleteButton.classList.add('tableDeleteButton', 'MuiButtonBase-root');
+    let nodePosition: null | number = null;
+    view.state.doc.descendants((descendantNode, pos) => {
+      if (descendantNode === node) {
+        nodePosition = pos;
+        return false;
+      }
+    });
+
+    tableDeleteButton.onclick = () => {
+      if (nodePosition !== null) {
+        const tr = view.state.tr;
+        tr.deleteRange(nodePosition, nodePosition + node.nodeSize);
+        view.dispatch(tr);
+      }
+    };
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('MuiSvgIcon-root');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute(
+      'd',
+      'M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z'
+    );
+    svg.appendChild(path);
+    tableDeleteButton.appendChild(svg);
+    this.table.appendChild(tableDeleteButton);
+
+    this.table.classList.add('charm-table');
   }
 
   updateMarkers() {

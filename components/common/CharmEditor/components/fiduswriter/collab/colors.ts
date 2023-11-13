@@ -16,18 +16,6 @@ import type { ModCollab } from './index';
 //   '255,165,0'
 // ];
 
-const CSS_COLORS = [
-  '--bg-turquoise',
-  '--bg-orange',
-  '--bg-yellow',
-  '--bg-teal',
-  '--bg-blue',
-  '--bg-purple',
-  '--bg-red',
-  '--bg-pink',
-  '--bg-gray'
-];
-
 /* Create a CSS stylesheet for the colors of all users. */
 export class ModCollabColors {
   mod: ModCollab;
