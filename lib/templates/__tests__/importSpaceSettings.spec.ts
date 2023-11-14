@@ -1,27 +1,28 @@
 import type { MemberProperty, MemberPropertyPermission, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 
-import { generateUserAndSpace } from 'testing/setupDatabase';
-
+import type { SpaceDataExport } from '../exportSpaceData';
 import type { SpaceSettingsExport } from '../exportSpaceSettings';
-import { exportSpaceSettings } from '../exportSpaceSettings';
+import { importSpaceSettings } from '../importSpaceSettings';
 
-describe('exportSpaceSettings', () => {
+describe('importSpaceSettings', () => {
   let user: User;
-  let space: Space;
+  let sourceSpace: Space;
   let role: Role;
   let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
 
+  let dataToImport: Pick<SpaceDataExport, 'roles' | 'space'>;
+
   beforeAll(async () => {
-    ({ user, space } = await generateUserAndSpace({ isAdmin: true }));
+    ({ user, space: sourceSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
     role = await testUtilsMembers.generateRole({
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: sourceSpace.id
     });
 
-    space = await prisma.space.update({
-      where: { id: space.id },
+    sourceSpace = await prisma.space.update({
+      where: { id: sourceSpace.id },
       data: {
         features: [
           {
@@ -91,7 +92,7 @@ describe('exportSpaceSettings', () => {
         name: 'Test Member Property',
         type: 'name',
         updatedBy: user.id,
-        space: { connect: { id: space.id } },
+        space: { connect: { id: sourceSpace.id } },
         permissions: {
           create: {
             memberPropertyPermissionLevel: 'view',
@@ -103,27 +104,62 @@ describe('exportSpaceSettings', () => {
         permissions: true
       }
     });
+
+    dataToImport = {
+      roles: [role],
+      space: {
+        ...sourceSpace,
+        memberProperties: [memberProperty]
+      }
+    };
   });
 
-  it('should export space settings correctly', async () => {
-    const exportedSettings = await exportSpaceSettings({ spaceIdOrDomain: space.id });
+  it('should import space settings correctly', async () => {
+    // Simulate export data
+    const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
 
-    expect(exportedSettings).toMatchObject<{ space: SpaceSettingsExport }>({
-      space: {
-        features: space.features,
-        memberProfiles: space.memberProfiles,
+    await importSpaceSettings({ targetSpaceIdOrDomain: targetSpace.id, exportData: dataToImport });
+
+    const updatedSpace = await prisma.space.findUniqueOrThrow({
+      where: { id: targetSpace.id },
+      include: {
+        roles: true,
+        memberProperties: {
+          include: {
+            permissions: true
+          }
+        }
+      }
+    });
+
+    expect(updatedSpace).toMatchObject(
+      expect.objectContaining<SpaceSettingsExport>({
+        features: sourceSpace.features,
+        memberProfiles: sourceSpace.memberProfiles,
         memberProperties: [
           {
             ...memberProperty,
-            permissions: memberProperty.permissions
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date),
+            id: expect.any(String),
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            spaceId: targetSpace.id,
+            permissions: [
+              {
+                id: expect.any(String),
+                memberPropertyId: updatedSpace.memberProperties[0].id,
+                roleId: updatedSpace.roles[0].id,
+                memberPropertyPermissionLevel: 'view'
+              }
+            ]
           }
         ]
-      }
-    });
+      })
+    );
   });
 
-  it('should throw an error for invalid spaceIdOrDomain', async () => {
-    await expect(exportSpaceSettings({ spaceIdOrDomain: 'invalid-id' })).rejects.toThrow();
-    await expect(exportSpaceSettings({ spaceIdOrDomain: undefined as any })).rejects.toThrow();
+  it('should throw an error for missing space in import data', async () => {
+    await expect(importSpaceSettings({ targetSpaceIdOrDomain: null as any, exportData: {} })).rejects.toThrow();
   });
 });

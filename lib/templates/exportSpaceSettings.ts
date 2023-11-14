@@ -2,27 +2,25 @@ import type { MemberProperty, MemberPropertyPermission, Space } from '@charmvers
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-export type SpaceSettingsExport = {
-  space: Pick<Space, 'features' | 'memberProfiles'> & {
-    memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
-  };
+export type SpaceSettingsExport = Pick<Space, 'features' | 'memberProfiles'> & {
+  memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
 };
 
 export async function exportSpaceSettings({
-  targetSpaceIdOrDomain
+  spaceIdOrDomain
 }: {
-  targetSpaceIdOrDomain: string;
-}): Promise<SpaceSettingsExport> {
-  if (!targetSpaceIdOrDomain) {
-    throw new Error('Missing targetSpaceIdOrDomain');
+  spaceIdOrDomain: string;
+}): Promise<{ space: SpaceSettingsExport }> {
+  if (!spaceIdOrDomain) {
+    throw new Error('Missing spaceIdOrDomain');
   }
 
-  const isUuid = stringUtils.isUUID(targetSpaceIdOrDomain);
+  const isUuid = stringUtils.isUUID(spaceIdOrDomain);
 
   const spaceWithSettings = await prisma.space.findUniqueOrThrow({
     where: {
-      domain: isUuid ? undefined : targetSpaceIdOrDomain,
-      id: isUuid ? targetSpaceIdOrDomain : undefined
+      domain: isUuid ? undefined : spaceIdOrDomain,
+      id: isUuid ? spaceIdOrDomain : undefined
     },
     select: {
       features: true,

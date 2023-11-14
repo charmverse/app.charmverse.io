@@ -6,6 +6,7 @@ import type { ExportedPermissions, SpacePermissionsExport } from './exportSpaceP
 import { exportSpacePermissions } from './exportSpacePermissions';
 import { exportSpacePostCategories } from './exportSpacePostCategories';
 import { exportSpaceProposalCategories } from './exportSpaceProposalCategories';
+import type { SpaceSettingsExport } from './exportSpaceSettings';
 import type { ExportedPage } from './exportWorkspacePages';
 import { exportWorkspacePages } from './exportWorkspacePages';
 
@@ -15,6 +16,7 @@ export type SpaceDataExport = {
   proposalCategories: ProposalCategory[];
   roles: Role[];
   permissions: ExportedPermissions;
+  space: SpaceSettingsExport;
 };
 
 /**
