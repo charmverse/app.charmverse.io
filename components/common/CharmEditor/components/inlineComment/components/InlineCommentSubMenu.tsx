@@ -125,7 +125,7 @@ export function InlineCommentSubMenu({
             content={commentContent}
             style={{
               fontSize: '14px',
-              minHeight: 100
+              minHeight: pageType === 'proposal' ? 100 : 'fit-content'
             }}
             onContentChange={({ doc }) => {
               setCommentContent(doc);

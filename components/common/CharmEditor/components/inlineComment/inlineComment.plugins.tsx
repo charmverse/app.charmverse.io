@@ -1,5 +1,6 @@
-import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
+import type { PluginKey, EditorState, EditorView } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
+import isEqual from 'lodash/isEqual';
 import { Plugin } from 'prosemirror-state';
 import { createRoot } from 'react-dom/client';
 
@@ -98,8 +99,10 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
         init(_, state) {
           return getDecorations(state);
         },
-        apply(tr, old, _, editorState) {
-          return tr.docChanged ? getDecorations(editorState) : old;
+        apply(tr, old, oldState, newState) {
+          const previousThreadIds = threadPluginKey.getState(oldState);
+          const newThreadIds = threadPluginKey.getState(newState);
+          return tr.docChanged || isEqual(previousThreadIds, newThreadIds) ? getDecorations(newState) : old;
         }
       },
       props: {

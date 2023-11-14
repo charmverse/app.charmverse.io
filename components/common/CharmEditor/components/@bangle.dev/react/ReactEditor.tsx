@@ -107,7 +107,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const { data: authResponse, error: authError } = useSWRImmutable(useSockets ? user?.id : null, () =>
     charmClient.socket()
   ); // refresh when user
-
+  const initThreadPluginState = useRef(false);
   pmViewOpts ||= {};
   pmViewOpts.editable = () => !readOnly && !isLoadingRef.current;
 
@@ -136,9 +136,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     [editor]
   );
 
+  // Make sure views are updated after we get the doc_data
   useEffect(() => {
-    if (editor?.view && threadIds && threadIds.length && isLoadingRef.current) {
+    if (editor?.view && threadIds && threadIds.length && (isLoadingRef.current || !initThreadPluginState.current)) {
       editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
+      if (!isLoadingRef.current) {
+        initThreadPluginState.current = true;
+      }
     }
   }, [editor?.view, threadIds]);
 

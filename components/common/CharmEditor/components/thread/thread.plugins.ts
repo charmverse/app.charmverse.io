@@ -9,7 +9,7 @@ export interface ThreadPluginState {
   threadIds: string[];
 }
 
-export const plugins = ({ key, threadIds = [] }: { threadIds?: string[]; key: PluginKey }) => {
+export const plugins = ({ key, threadIds }: { threadIds: string[]; key: PluginKey }) => {
   return [
     new Plugin({
       key,
