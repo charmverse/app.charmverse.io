@@ -32,10 +32,8 @@ export function VideoNodeView({
   getPos,
   view,
   selected,
-  updateAttrs,
-  isPost = false,
-  isPollOrVote = false
-}: CharmNodeViewProps & { isPost?: boolean; isPollOrVote?: boolean }) {
+  updateAttrs
+}: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
   const { space } = useCurrentSpace();
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
@@ -64,9 +62,8 @@ export function VideoNodeView({
     });
   }
 
-  // If there are no source for the node, return the image select component
   if (!attrs.src && !attrs.muxAssetId) {
-    if (readOnly || (!pageId && !isPost && !isPollOrVote)) {
+    if (readOnly) {
       // hide the row completely
       return <div />;
     } else {
@@ -87,9 +84,14 @@ export function VideoNodeView({
                   onSubmit={(videoUrl) => {
                     // check for other embed types (e.g. Loom, Odysee)
                     const embedType = extractIframeEmbedType(videoUrl);
-                    if (embedType) {
+                    const youtubeEmbedLink = extractYoutubeEmbedLink(videoUrl);
+                    if (youtubeEmbedLink) {
+                      updateAttrs({
+                        src: videoUrl
+                      });
+                    } else if (embedType) {
                       const pos = getPos();
-                      if (!pos) return;
+                      if (typeof pos !== 'number') return;
                       const newConfig = embeds[embedType] as Embed;
                       const width = attrs.width;
                       let height = width / VIDEO_ASPECT_RATIO;

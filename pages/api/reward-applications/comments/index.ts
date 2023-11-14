@@ -42,14 +42,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
     }
   });
 
-  const permissions = await computeBountyPermissions({
-    resourceId: application.bountyId,
-    userId
-  });
-
-  if (!permissions.review && application.createdBy !== userId) {
-    throw new ActionNotPermittedError(`Only reward reviewers and the creator of this submission can comment`);
-  }
+  // no permissons check - everyone can comment on others applications
 
   const applicationComment = await prisma.applicationComment.create({
     data: {

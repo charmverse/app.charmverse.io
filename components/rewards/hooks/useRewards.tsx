@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -8,9 +8,11 @@ import type { RewardStatusFilter } from 'components/rewards/components/RewardVie
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type RewardsContextType = {
   rewards: RewardWithUsers[] | undefined;
@@ -48,6 +50,7 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
 
   const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
   const [tempRewardData, setTempRewardData] = useState<null | RewardCreationData>(null);
+  const { subscribe } = useWebSocketClient();
 
   // filter out deleted and templates
   let filteredRewards = useMemo(
@@ -120,6 +123,33 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     },
     [space, user]
   );
+
+  useEffect(() => {
+    function handleDeleteEvent(deletedPages: WebSocketPayload<'pages_deleted'>) {
+      mutateRewards(
+        (_rewards) => {
+          return _rewards?.filter((reward) => !deletedPages.some((page) => page.id === reward.id));
+        },
+        {
+          revalidate: false
+        }
+      );
+    }
+
+    function handleCreateEvent(createdPages: WebSocketPayload<'pages_created'>) {
+      if (createdPages.some((page) => page.type === 'bounty')) {
+        mutateRewards();
+      }
+    }
+
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
+    const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
+
+    return () => {
+      unsubscribeFromPageDeletes();
+      unsubscribeFromPageCreated();
+    };
+  }, [mutateRewards, subscribe]);
 
   const value = useMemo(
     () => ({

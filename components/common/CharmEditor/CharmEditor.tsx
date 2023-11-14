@@ -197,6 +197,7 @@ interface CharmEditorProps {
   isPollOrVote?: boolean;
   disableMention?: boolean;
   allowClickingFooter?: boolean;
+  disableVideo?: boolean;
 }
 
 function CharmEditor({
@@ -223,9 +224,9 @@ function CharmEditor({
   disableRowHandles = false,
   disableNestedPages = false,
   onConnectionEvent,
-  isPollOrVote = false,
   disableMention = false,
-  allowClickingFooter
+  allowClickingFooter,
+  disableVideo = false
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -319,6 +320,7 @@ function CharmEditor({
   function getPlugins() {
     return charmEditorPlugins({
       disableRowHandles,
+      disableVideo,
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
@@ -476,7 +478,7 @@ function CharmEditor({
           case 'iframe': {
             // support old video nodes which piggybacked on iframe type
             if (props.node.attrs.type === 'video') {
-              return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
+              return disableVideo ? null : <VideoNodeView {...allProps} />;
             }
             return <iframe.Component {...allProps} />;
           }
@@ -514,7 +516,7 @@ function CharmEditor({
             return <NFTNodeView {...allProps} />;
           }
           case 'video': {
-            return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
+            return disableVideo ? null : <VideoNodeView {...allProps} />;
           }
           default: {
             return null;

@@ -73,7 +73,8 @@ export function charmEditorPlugins({
   placeholderText,
   disableRowHandles = false,
   disableMention = false,
-  threadIds
+  threadIds,
+  disableVideo = false
 }: {
   disableMention?: boolean;
   disableRowHandles?: boolean;
@@ -89,6 +90,7 @@ export function charmEditorPlugins({
   enableComments?: boolean;
   placeholderText?: string;
   threadIds?: string[];
+  disableVideo?: boolean;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
     pageNodeDropPlugin({
@@ -203,7 +205,6 @@ export function charmEditorPlugins({
     nft.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    videoPlugins(),
     iframe.plugins(),
     markdownPlugins(),
     tableOfContentPlugins(),
@@ -219,6 +220,10 @@ export function charmEditorPlugins({
         key: threadPluginKey
       })
     );
+  }
+
+  if (!disableVideo) {
+    basePlugins.push(videoPlugins());
   }
 
   if (!readOnly && !disableRowHandles) {
