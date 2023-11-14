@@ -195,7 +195,7 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      <Box sx={{ position: 'absolute', right: 0 }} px={1.5}>
+      <Box sx={{ position: 'absolute', right: 0 }} pr={1}>
         {currentSpace && (
           <Tooltip title='Close sidebar' placement='bottom'>
             <IconButton onClick={closeSidebar} size='small'>
