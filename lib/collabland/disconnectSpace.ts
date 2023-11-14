@@ -1,4 +1,3 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function disconnectSpace({
@@ -19,7 +18,8 @@ export async function disconnectSpace({
         where: {
           space: {
             discordServerId
-          }
+          },
+          isAdmin: true
         },
         select: {
           spaceId: true,
@@ -30,32 +30,35 @@ export async function disconnectSpace({
   });
 
   if (!user) {
-    throw new DataNotFoundError('Cannot find user to disconnect');
+    return {
+      spaceIds: []
+    };
   }
 
-  const adminSpaceIds = user.spaceRoles.filter((role) => role.isAdmin).map((role) => role.spaceId);
+  const spaceIds = user.spaceRoles.map((role) => role.spaceId);
 
-  await prisma.space.updateMany({
-    where: {
-      id: {
-        in: adminSpaceIds
+  await prisma.$transaction([
+    prisma.space.updateMany({
+      where: {
+        id: {
+          in: spaceIds
+        }
+      },
+      data: {
+        discordServerId: null
       }
-    },
-    data: {
-      discordServerId: null
-    }
-  });
-
-  await prisma.role.deleteMany({
-    where: {
-      source: 'collabland',
-      spaceId: {
-        in: adminSpaceIds
+    }),
+    prisma.role.deleteMany({
+      where: {
+        source: 'collabland',
+        spaceId: {
+          in: spaceIds
+        }
       }
-    }
-  });
+    })
+  ]);
 
   return {
-    spaceIds: adminSpaceIds
+    spaceIds
   };
 }

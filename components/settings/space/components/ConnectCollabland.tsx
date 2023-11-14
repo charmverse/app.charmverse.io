@@ -8,6 +8,7 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 const collablandStoreUrl = isProdEnv ? 'https://cc.collab.land/dashboard' : 'https://cc-qa.collab.land/dashboard';
@@ -17,7 +18,7 @@ export function ConnectCollabland() {
   const isAdmin = useIsAdmin();
   const [isConnecting, setIsConnecting] = useState(false);
   const { showMessage } = useSnackbar();
-
+  const isCharmverseSpace = useIsCharmverseSpace();
   const redirectToCollablandStore = async () => {
     if (!space) return;
 
@@ -40,7 +41,7 @@ export function ConnectCollabland() {
             <Chip size='small' label='Connected' color='success' icon={<CheckCircleOutlineOutlined />} />
           </Stack>
         </FieldWrapper>
-        {isAdmin && (
+        {isAdmin && isCharmverseSpace && (
           <Stack>
             <Button
               sx={{

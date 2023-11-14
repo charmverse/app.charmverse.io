@@ -94,7 +94,7 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       const result = await disconnectSpace({ discordUserId, discordServerId });
 
       return {
-        spaceIds: result?.spaceIds ?? [],
+        spaceIds: result.spaceIds,
         success: true,
         message: 'Uninstalled miniapp.'
       };
