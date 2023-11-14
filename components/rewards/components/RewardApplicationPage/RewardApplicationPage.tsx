@@ -100,15 +100,16 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
     if (space && rewardPageContent) {
       hideApplication();
 
-      if (openedFromModal && currentRewardId) {
-        navigateToSpacePath(`/rewards`, { id: currentRewardId });
-        showReward({
-          pageId: currentRewardId,
-          onClose
-        });
-      } else {
-        navigateToSpacePath(`/${rewardPageContent.path}`);
-      }
+      // TODO - reenable this when we fix UX for content switching in dialog
+      // if (openedFromModal && currentRewardId) {
+      //   navigateToSpacePath(`/rewards`, { id: currentRewardId });
+      //   showReward({
+      //     pageId: currentRewardId,
+      //     onClose
+      //   });
+      // } else {
+      //   navigateToSpacePath(`/${rewardPageContent.path}`);
+      // }
     }
   }
 
@@ -137,7 +138,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
             <StyledContainer top={0}>
               <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
               <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
-                <span>Back to reward</span>
+                <span>Back to rewards</span>
               </Button>
 
               <div className='focalboard-body'>
