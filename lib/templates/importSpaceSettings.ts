@@ -27,7 +27,8 @@ export async function importSpaceSettings({ targetSpaceIdOrDomain, ...importPara
     },
     data: {
       features: features as Prisma.InputJsonValue[],
-      memberProfiles: memberProfiles as Prisma.InputJsonValue[]
+      memberProfiles: memberProfiles as Prisma.InputJsonValue[],
+      notificationToggles: space.notificationToggles as Prisma.InputJsonValue
     }
   });
 

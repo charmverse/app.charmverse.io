@@ -23,6 +23,7 @@ describe('exportSpaceSettings', () => {
     space = await prisma.space.update({
       where: { id: space.id },
       data: {
+        notificationToggles: { polls: false, proposals: false },
         features: [
           {
             id: 'rewards',
@@ -110,6 +111,7 @@ describe('exportSpaceSettings', () => {
 
     expect(exportedSettings).toMatchObject<{ space: SpaceSettingsExport }>({
       space: {
+        notificationToggles: space.notificationToggles,
         features: space.features,
         memberProfiles: space.memberProfiles,
         memberProperties: [

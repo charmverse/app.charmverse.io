@@ -2,7 +2,7 @@ import type { MemberProperty, MemberPropertyPermission, Space } from '@charmvers
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-export type SpaceSettingsExport = Pick<Space, 'features' | 'memberProfiles'> & {
+export type SpaceSettingsExport = Pick<Space, 'features' | 'memberProfiles' | 'notificationToggles'> & {
   memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
 };
 
@@ -25,6 +25,7 @@ export async function exportSpaceSettings({
     select: {
       features: true,
       memberProfiles: true,
+      notificationToggles: true,
       memberProperties: {
         include: {
           permissions: true

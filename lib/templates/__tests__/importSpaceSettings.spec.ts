@@ -24,6 +24,7 @@ describe('importSpaceSettings', () => {
     sourceSpace = await prisma.space.update({
       where: { id: sourceSpace.id },
       data: {
+        notificationToggles: { polls: false, proposals: false },
         features: [
           {
             id: 'rewards',
@@ -134,6 +135,7 @@ describe('importSpaceSettings', () => {
 
     expect(updatedSpace).toMatchObject(
       expect.objectContaining<SpaceSettingsExport>({
+        notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
         memberProfiles: sourceSpace.memberProfiles,
         memberProperties: [
