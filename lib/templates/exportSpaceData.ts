@@ -6,7 +6,7 @@ import type { ExportedPermissions, SpacePermissionsExport } from './exportSpaceP
 import { exportSpacePermissions } from './exportSpacePermissions';
 import { exportSpacePostCategories } from './exportSpacePostCategories';
 import { exportSpaceProposalCategories } from './exportSpaceProposalCategories';
-import type { SpaceSettingsExport } from './exportSpaceSettings';
+import { exportSpaceSettings, type SpaceSettingsExport } from './exportSpaceSettings';
 import type { ExportedPage } from './exportWorkspacePages';
 import { exportWorkspacePages } from './exportWorkspacePages';
 
@@ -31,13 +31,15 @@ export async function exportSpaceData({ spaceIdOrDomain, filename }: ExportParam
   const { proposalCategories } = await exportSpaceProposalCategories({ spaceIdOrDomain });
   const { postCategories } = await exportSpacePostCategories({ spaceIdOrDomain });
   const { pages } = await exportWorkspacePages({ sourceSpaceIdOrDomain: spaceIdOrDomain });
+  const { space } = await exportSpaceSettings({ spaceIdOrDomain });
 
   const exportedData: SpaceDataExport = {
     pages,
     roles,
     permissions,
     proposalCategories,
-    postCategories
+    postCategories,
+    space
   };
 
   if (filename) {

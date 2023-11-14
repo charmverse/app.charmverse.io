@@ -1,5 +1,11 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
-import type { MemberPropertyPermission, MemberPropertyPermissionLevel, Prisma } from '@charmverse/core/prisma-client';
+import type {
+  MemberProperty,
+  MemberPropertyPermission,
+  MemberPropertyPermissionLevel,
+  Prisma,
+  Space
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
@@ -9,7 +15,12 @@ import { getImportData } from './getImportData';
 import { importRoles } from './importRoles';
 import type { ImportParams } from './interfaces';
 
-export async function importSpaceSettings({ targetSpaceIdOrDomain, ...importParams }: ImportParams) {
+type SpaceImportResult = Space & { memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[] };
+
+export async function importSpaceSettings({
+  targetSpaceIdOrDomain,
+  ...importParams
+}: ImportParams): Promise<SpaceImportResult> {
   const { space } = await getImportData(importParams);
   if (!space) {
     throw new DataNotFoundError(`No space to import`);
@@ -66,4 +77,17 @@ export async function importSpaceSettings({ targetSpaceIdOrDomain, ...importPara
       data: permissionsToCreate
     })
   ]);
+
+  return prisma.space.findUniqueOrThrow({
+    where: {
+      id: targetSpace.id
+    },
+    include: {
+      memberProperties: {
+        include: {
+          permissions: true
+        }
+      }
+    }
+  });
 }

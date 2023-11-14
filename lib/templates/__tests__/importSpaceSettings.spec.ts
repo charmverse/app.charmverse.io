@@ -119,17 +119,11 @@ describe('importSpaceSettings', () => {
     // Simulate export data
     const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
 
-    await importSpaceSettings({ targetSpaceIdOrDomain: targetSpace.id, exportData: dataToImport });
+    const updatedSpace = await importSpaceSettings({ targetSpaceIdOrDomain: targetSpace.id, exportData: dataToImport });
 
-    const updatedSpace = await prisma.space.findUniqueOrThrow({
-      where: { id: targetSpace.id },
-      include: {
-        roles: true,
-        memberProperties: {
-          include: {
-            permissions: true
-          }
-        }
+    const targetSpaceRoles = await prisma.role.findMany({
+      where: {
+        spaceId: targetSpace.id
       }
     });
 
@@ -151,7 +145,7 @@ describe('importSpaceSettings', () => {
               {
                 id: expect.any(String),
                 memberPropertyId: updatedSpace.memberProperties[0].id,
-                roleId: updatedSpace.roles[0].id,
+                roleId: targetSpaceRoles[0].id,
                 memberPropertyPermissionLevel: 'view'
               }
             ]

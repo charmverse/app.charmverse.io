@@ -6,7 +6,16 @@ import type {
   AssignedPostCategoryPermission,
   AssignedProposalCategoryPermission
 } from '@charmverse/core/dist/cjs/permissions';
-import type { PostCategory, Proposal, ProposalCategory, Role, Space, User } from '@charmverse/core/prisma-client';
+import type {
+  MemberProperty,
+  MemberPropertyPermission,
+  PostCategory,
+  Proposal,
+  ProposalCategory,
+  Role,
+  Space,
+  User
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
@@ -41,6 +50,9 @@ describe('exportSpaceData', () => {
 
   let proposalInCategory2: ExportedPage;
   let proposalInCategory3: ExportedPage;
+
+  let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
+
   beforeAll(async () => {
     ({ space, user } = await testUtilsUser.generateUserAndSpace());
 
@@ -208,6 +220,91 @@ describe('exportSpaceData', () => {
         })
       )
       .then((p) => ({ ...p, children: [], permissions: [] }));
+
+    space = await prisma.space.update({
+      where: { id: space.id },
+      data: {
+        notificationToggles: { polls: false, proposals: false },
+        features: [
+          {
+            id: 'rewards',
+            path: 'rewards',
+            title: 'Jobs',
+            isHidden: false
+          },
+          {
+            id: 'member_directory',
+            path: 'members',
+            title: 'Membership Registry',
+            isHidden: false
+          },
+          {
+            id: 'proposals',
+            path: 'proposals',
+            title: 'Proposals',
+            isHidden: true
+          },
+          {
+            id: 'bounties',
+            path: 'bounties',
+            title: 'Bounties',
+            isHidden: true
+          },
+          {
+            id: 'forum',
+            path: 'forum',
+            title: 'Forum',
+            isHidden: false
+          }
+        ],
+        memberProfiles: [
+          {
+            id: 'charmverse',
+            title: 'CharmVerse',
+            isHidden: false
+          },
+          {
+            id: 'collection',
+            title: 'Collection',
+            isHidden: true
+          },
+          {
+            id: 'ens',
+            title: 'ENS',
+            isHidden: true
+          },
+          {
+            id: 'lens',
+            title: 'Lens',
+            isHidden: false
+          },
+          {
+            id: 'summon',
+            title: 'Summon',
+            isHidden: false
+          }
+        ]
+      }
+    });
+
+    memberProperty = await prisma.memberProperty.create({
+      data: {
+        createdBy: user.id,
+        name: 'Test Member Property',
+        type: 'name',
+        updatedBy: user.id,
+        space: { connect: { id: space.id } },
+        permissions: {
+          create: {
+            memberPropertyPermissionLevel: 'view',
+            roleId: proposalReviewerRole.id
+          }
+        }
+      },
+      include: {
+        permissions: true
+      }
+    });
   });
 
   it('should export space data successfully by space ID', async () => {
@@ -220,6 +317,12 @@ describe('exportSpaceData', () => {
     expect(exportedData).toHaveProperty('proposalCategories');
 
     expect(exportedData).toMatchObject<SpaceDataExport>({
+      space: {
+        features: space.features,
+        memberProfiles: space.memberProfiles,
+        memberProperties: [memberProperty],
+        notificationToggles: space.notificationToggles
+      },
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
         postCategoryPermissions: expect.arrayContaining(postCategoryPermissions),
@@ -242,6 +345,12 @@ describe('exportSpaceData', () => {
     // High level assertions for documentation purposes
 
     expect(exportedData).toMatchObject<SpaceDataExport>({
+      space: {
+        features: space.features,
+        memberProfiles: space.memberProfiles,
+        memberProperties: [memberProperty],
+        notificationToggles: space.notificationToggles
+      },
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
         proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
@@ -269,6 +378,18 @@ describe('exportSpaceData', () => {
     const fileContent = JSON.parse(await fs.readFile(filePath, { encoding: 'utf-8' }));
 
     expect(fileContent).toMatchObject<SpaceDataExport>({
+      space: {
+        features: space.features,
+        memberProfiles: space.memberProfiles,
+        memberProperties: [
+          {
+            ...memberProperty,
+            createdAt: memberProperty.createdAt.toISOString() as any,
+            updatedAt: memberProperty.updatedAt.toISOString() as any
+          }
+        ],
+        notificationToggles: space.notificationToggles
+      },
       roles: expect.arrayContaining([
         { ...proposalReviewerRole, createdAt: proposalReviewerRole.createdAt.toISOString() },
         { ...secondProposalReviewerRole, createdAt: secondProposalReviewerRole.createdAt.toISOString() }
