@@ -1,40 +1,45 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { decryptData } from 'lib/utilities/dataEncryption';
-
-export async function disconnectSpace(state: string) {
-  const spaceData = decryptData(state);
-
-  if (
-    !spaceData ||
-    typeof spaceData !== 'object' ||
-    !spaceData.hasOwnProperty('spaceId') ||
-    !spaceData.hasOwnProperty('userId')
-  ) {
-    throw new InvalidInputError('Invalid data provided');
-  }
-
-  const { userId, spaceId } = spaceData as { userId: string; spaceId: string };
-
-  const spaceRole = await prisma.spaceRole.findFirst({
+export async function disconnectSpace({
+  discordServerId,
+  discordUserId
+}: {
+  discordUserId: string;
+  discordServerId: string;
+}) {
+  const user = await prisma.user.findFirst({
     where: {
-      userId,
-      spaceId,
-      isAdmin: true
+      discordUser: {
+        discordId: discordUserId
+      }
     },
     select: {
-      space: true
+      spaceRoles: {
+        where: {
+          space: {
+            discordServerId
+          }
+        },
+        select: {
+          spaceId: true,
+          isAdmin: true
+        }
+      }
     }
   });
 
-  if (!spaceRole || !spaceRole.space) {
-    throw new InvalidInputError('Cannot find space to connect');
+  if (!user) {
+    throw new DataNotFoundError('Cannot find user to disconnect');
   }
 
-  const updatedSpace = await prisma.space.update({
+  const adminSpaceIds = user.spaceRoles.filter((role) => role.isAdmin).map((role) => role.spaceId);
+
+  await prisma.space.updateMany({
     where: {
-      id: spaceId
+      id: {
+        in: adminSpaceIds
+      }
     },
     data: {
       discordServerId: null
@@ -43,9 +48,14 @@ export async function disconnectSpace(state: string) {
 
   await prisma.role.deleteMany({
     where: {
-      source: 'collabland'
+      source: 'collabland',
+      spaceId: {
+        in: adminSpaceIds
+      }
     }
   });
 
-  return updatedSpace;
+  return {
+    spaceIds: adminSpaceIds
+  };
 }

@@ -1,4 +1,5 @@
 import { assignRolesCollabland } from 'lib/collabland/assignRolesCollabland';
+import { disconnectSpace } from 'lib/collabland/disconnectSpace';
 import { getSpacesFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
@@ -76,6 +77,31 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       return {
         success: false,
         message: e?.message || 'Failed to process guildMemberRemove event.'
+      };
+    }
+  },
+  uninstallMiniapp: async (message: WebhookMessage) => {
+    try {
+      const payload = message?.data?.payload?.[0];
+      if (!payload) {
+        return {
+          success: false,
+          message: 'Invalid payload.'
+        };
+      }
+
+      const { userId: discordUserId, guildId: discordServerId } = payload;
+      const result = await disconnectSpace({ discordUserId, discordServerId });
+
+      return {
+        spaceIds: result?.spaceIds ?? [],
+        success: true,
+        message: 'Uninstalled miniapp.'
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        message: e?.message || 'Failed to process uninstall event.'
       };
     }
   }

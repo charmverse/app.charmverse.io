@@ -1,4 +1,4 @@
-export type MessageType = 'guildMemberUpdate' | 'guildMemberRemove';
+export type MessageType = 'guildMemberUpdate' | 'guildMemberRemove' | 'uninstallMiniapp';
 
 export type MemberWebhookData = {
   guildId: string;

@@ -10,8 +10,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import { DisconnectCollabland } from './DisconnectCollabland';
-
 const collablandStoreUrl = isProdEnv ? 'https://cc.collab.land/dashboard' : 'https://cc-qa.collab.land/dashboard';
 
 export function ConnectCollabland() {
@@ -42,7 +40,20 @@ export function ConnectCollabland() {
             <Chip size='small' label='Connected' color='success' icon={<CheckCircleOutlineOutlined />} />
           </Stack>
         </FieldWrapper>
-        <DisconnectCollabland />
+        {isAdmin && (
+          <Stack>
+            <Button
+              sx={{
+                width: 'fit-content'
+              }}
+              target='_blank'
+              external
+              href={collablandStoreUrl}
+            >
+              Disconnect
+            </Button>
+          </Stack>
+        )}
       </Stack>
     );
   }
