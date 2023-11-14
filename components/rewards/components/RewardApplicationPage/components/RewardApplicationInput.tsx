@@ -125,6 +125,12 @@ export function ApplicationInput({
                     shouldValidate: true
                   });
                 }}
+                sx={{
+                  '.Mui-disabled': {
+                    color: 'var(--text-primary) !important',
+                    WebkitTextFillColor: 'var(--text-primary) !important'
+                  }
+                }}
               />
               {errors?.message && <Alert severity='error'>{errors.message.message}</Alert>}
             </Grid>

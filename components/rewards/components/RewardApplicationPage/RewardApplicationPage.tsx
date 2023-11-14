@@ -44,10 +44,16 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   const isNewApplication = !applicationId && !!rewardId;
   const { showMessage } = useSnackbar();
 
-  const { application, refreshApplication, applicationRewardPermissions, updateApplication, reviewApplication } =
-    useApplication({
-      applicationId: applicationId || ''
-    });
+  const {
+    application,
+    refreshApplication,
+    applicationRewardPermissions,
+    updateApplication,
+    reviewApplication,
+    hasApplicationSlots
+  } = useApplication({
+    applicationId: applicationId || ''
+  });
 
   const { navigateToSpacePath, router } = useCharmRouter();
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
@@ -100,15 +106,16 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
     if (space && rewardPageContent) {
       hideApplication();
 
-      if (openedFromModal && currentRewardId) {
-        navigateToSpacePath(`/rewards`, { id: currentRewardId });
-        showReward({
-          pageId: currentRewardId,
-          onClose
-        });
-      } else {
-        navigateToSpacePath(`/${rewardPageContent.path}`);
-      }
+      // TODO - reenable this when we fix UX for content switching in dialog
+      // if (openedFromModal && currentRewardId) {
+      //   navigateToSpacePath(`/rewards`, { id: currentRewardId });
+      //   showReward({
+      //     pageId: currentRewardId,
+      //     onClose
+      //   });
+      // } else {
+      //   navigateToSpacePath(`/${rewardPageContent.path}`);
+      // }
     }
   }
 
@@ -125,8 +132,9 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
 
   const applicationStepRequired = reward.approveSubmitters;
   const isApplicationStage =
-    applicationStepRequired && (application?.status === 'applied' || application?.status === 'rejected');
-  const showSubmissionInput = (applicationStepRequired && isNewApplication) || !isApplicationStage;
+    applicationStepRequired &&
+    (isNewApplication || application?.status === 'applied' || application?.status === 'rejected');
+  const showSubmissionInput = (!applicationStepRequired && isNewApplication) || !isApplicationStage;
   const isApplicationLoaded = !!application || isNewApplication;
 
   return (
@@ -137,7 +145,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
             <StyledContainer top={0}>
               <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
               <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
-                <span>Back to reward</span>
+                <span>Back to rewards</span>
               </Button>
 
               <div className='focalboard-body'>
@@ -169,6 +177,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                       </Grid>
 
                       <RewardReviewerActions
+                        hasApplicationSlots={hasApplicationSlots}
                         application={application}
                         reward={reward}
                         rewardPermissions={rewardPermissions}
@@ -185,7 +194,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                       rewardId={reward.id}
                       disableCollapse={!showSubmissionInput}
                       expandedOnLoad={isNewApplication || isApplicationStage}
-                      readOnly={application?.createdBy !== user?.id && !isNewApplication}
+                      readOnly={(application?.createdBy !== user?.id && !isNewApplication) || !isApplicationStage}
                       onSubmit={(updatedApplication) =>
                         saveApplication(
                           {

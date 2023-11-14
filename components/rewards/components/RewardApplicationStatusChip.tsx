@@ -17,10 +17,10 @@ import type { BrandColor } from 'theme/colors';
 
 export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: 'Applied',
-  submission_rejected: 'Submission rejected',
+  submission_rejected: 'Submission denied',
   cancelled: 'Cancelled',
   inProgress: 'In progress',
-  rejected: 'Application rejected',
+  rejected: 'Application denied',
   review: 'Review',
   complete: 'Approved',
   processing: 'Processing payment',

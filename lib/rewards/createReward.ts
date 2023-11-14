@@ -36,7 +36,8 @@ export async function createReward({
   dueDate,
   fields,
   reviewers,
-  pageProps
+  pageProps,
+  allowMultipleApplications
 }: RewardCreationData) {
   if (!rewardAmount && !customReward) {
     throw new InvalidInputError('A reward must have a reward amount or a custom reward assigned');
@@ -81,7 +82,8 @@ export async function createReward({
     maxSubmissions,
     rewardAmount,
     rewardToken,
-    customReward
+    customReward,
+    allowMultipleApplications
   };
 
   const rewardPermissions: Prisma.BountyPermissionCreateManyBountyInput[] = [];
