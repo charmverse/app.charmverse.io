@@ -52,7 +52,7 @@ export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, h
           {approveLabel}
         </Button>
         <Button color='error' variant='outlined' disabled={readOnly} onClick={() => setReviewDecision('reject')}>
-          Reject
+          Deny
         </Button>
       </Grid>
       <Modal title='Confirm your review' open={reviewDecision !== null} onClose={cancel}>
@@ -60,7 +60,7 @@ export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, h
           <Typography sx={{ mb: 1, whiteSpace: 'pre-wrap' }}>
             Please confirm you want to{' '}
             <b>
-              {reviewDecision} this {reviewType}
+              {reviewDecision === 'approve' ? 'approve' : 'deny'} this {reviewType}
             </b>
             .
           </Typography>
@@ -68,7 +68,7 @@ export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, h
           <Box display='flex' gap={2} mt={3}>
             {reviewDecision === 'reject' && (
               <Button color='error' onClick={() => confirmReview('reject')}>
-                Reject
+                Deny
               </Button>
             )}
             {reviewDecision === 'approve' && (
