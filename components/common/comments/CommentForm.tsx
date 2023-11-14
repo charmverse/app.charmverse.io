@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useMemo, useState } from 'react';
 
