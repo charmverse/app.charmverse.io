@@ -19,8 +19,8 @@ import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
-import type { ProposalPropertiesInput } from '../ProposalProperties/ProposalProperties';
-import { ProposalProperties } from '../ProposalProperties/ProposalProperties';
+import type { ProposalPropertiesInput } from '../ProposalProperties/ProposalPropertiesBase';
+import { ProposalPropertiesBase } from '../ProposalProperties/ProposalPropertiesBase';
 
 export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   title?: string; // title is saved to the same state that's used in ProposalPage
@@ -125,7 +125,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
               />
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>
-                  <ProposalProperties
+                  <ProposalPropertiesBase
                     isFromTemplate={isFromTemplateSource}
                     isTemplateRequired={isTemplateRequired}
                     readOnlyRubricCriteria={isFromTemplateSource}
