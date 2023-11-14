@@ -113,7 +113,6 @@ export function PageComments({ page, permissions }: Props) {
             Boolean(lensProfile)
           }
           handleCreateComment={createComment}
-          pageType={page.type}
         />
       )}
 
@@ -137,7 +136,6 @@ export function PageComments({ page, permissions }: Props) {
                   handleDeleteComment={deleteComment}
                   handleVoteComment={isProposal ? voteComment : undefined}
                   lensPostLink={proposal?.lensPostLink}
-                  pageType={page.type}
                 />
               ))}
             </Stack>

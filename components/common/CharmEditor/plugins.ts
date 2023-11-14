@@ -70,7 +70,8 @@ export function charmEditorPlugins({
   spaceId = null,
   placeholderText,
   disableRowHandles = false,
-  disableMention = false
+  disableMention = false,
+  disableVideo = false
 }: {
   disableMention?: boolean;
   disableRowHandles?: boolean;
@@ -85,6 +86,7 @@ export function charmEditorPlugins({
   enableVoting?: boolean;
   enableComments?: boolean;
   placeholderText?: string;
+  disableVideo?: boolean;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
     pageNodeDropPlugin({
@@ -199,7 +201,6 @@ export function charmEditorPlugins({
     nft.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    videoPlugins(),
     iframe.plugins(),
     markdownPlugins(),
     tableOfContentPlugins(),
@@ -207,6 +208,10 @@ export function charmEditorPlugins({
     placeholderPlugin(placeholderText),
     tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
   );
+
+  if (!disableVideo) {
+    basePlugins.push(videoPlugins());
+  }
 
   if (!readOnly && !disableRowHandles) {
     // add rowActions before the table plugin, or else mousedown is not triggered

@@ -52,7 +52,6 @@ export type CommentProps = {
   inlineCharmEditor?: boolean;
   lensPostLink?: string | null;
   isPublishingComments?: boolean;
-  pageType?: PageType | 'post';
 };
 
 export function Comment({
@@ -66,8 +65,7 @@ export function Comment({
   handleDeleteComment,
   handleVoteComment,
   lensPostLink,
-  isPublishingComments,
-  pageType
+  isPublishingComments
 }: CommentProps) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
@@ -292,7 +290,6 @@ export function Comment({
           <Box mt={2}>
             {showCommentReply && (
               <CommentReply
-                pageType={pageType}
                 isPublishingComments={isPublishingComments}
                 publishToLens={publishCommentsToLens}
                 setPublishToLens={setPublishCommentsToLens}
@@ -317,7 +314,6 @@ export function Comment({
             handleUpdateComment={handleUpdateComment}
             handleCreateComment={handleCreateComment}
             lensPostLink={lensPostLink}
-            pageType={pageType}
           />
         ))}
       </Box>

@@ -27,10 +27,8 @@ export function CommentReply({
   onCancelComment,
   setPublishToLens,
   publishToLens,
-  showPublishToLens,
-  pageType
+  showPublishToLens
 }: {
-  pageType?: PageType | 'post';
   isPublishingComments?: boolean;
   showPublishToLens?: boolean;
   publishToLens?: boolean;
@@ -82,7 +80,6 @@ export function CommentReply({
             placeholderText='What are your thoughts?'
             disableNestedPages
             disableRowHandles
-            pageType={pageType}
           />
 
           <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>

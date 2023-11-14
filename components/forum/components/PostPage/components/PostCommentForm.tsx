@@ -22,12 +22,5 @@ export function PostCommentForm({
     setPostComments((postComments) => (postComments ? [postComment, ...postComments] : [postComment]));
   }
 
-  return (
-    <CommentForm
-      pageType='post'
-      disabled={disabled}
-      handleCreateComment={handleCreateComment}
-      placeholder={placeholder}
-    />
-  );
+  return <CommentForm disabled={disabled} handleCreateComment={handleCreateComment} placeholder={placeholder} />;
 }

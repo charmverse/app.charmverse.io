@@ -30,10 +30,8 @@ export function CommentForm({
   placeholder,
   setPublishToLens,
   publishToLens,
-  isPublishingCommentsToLens,
-  pageType
+  isPublishingCommentsToLens
 }: {
-  pageType?: PageType | 'post';
   isPublishingCommentsToLens?: boolean;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
@@ -82,8 +80,7 @@ export function CommentForm({
       onContentChange: updatePostContent,
       content: postContent.doc,
       isContentControlled: true,
-      disableNestedPages: true,
-      pageType
+      disableNestedPages: true
     };
 
     if (!inlineCharmEditor) {
