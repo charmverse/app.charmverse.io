@@ -571,7 +571,7 @@ export function NotificationContent({
                 }}
               />
             )}
-            {notification.type === 'person_assigned' ? (
+            {notification.type === 'person_assigned' && notification.personProperty ? (
               <Stack my={1} gap={0.5}>
                 <Stack flexDirection='row' gap={0.5} alignItems='center'>
                   <PersonIcon fontSize='small' />
