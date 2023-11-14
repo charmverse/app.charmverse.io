@@ -22,8 +22,7 @@ export async function disconnectSpace({
           isAdmin: true
         },
         select: {
-          spaceId: true,
-          isAdmin: true
+          spaceId: true
         }
       }
     }
@@ -36,6 +35,12 @@ export async function disconnectSpace({
   }
 
   const spaceIds = user.spaceRoles.map((role) => role.spaceId);
+
+  if (spaceIds.length === 0) {
+    return {
+      spaceIds: []
+    };
+  }
 
   await prisma.$transaction([
     prisma.space.updateMany({
