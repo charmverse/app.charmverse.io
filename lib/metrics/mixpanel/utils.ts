@@ -1,6 +1,8 @@
 import { capitalize } from 'lodash';
 
-import type { MixpanelEventName } from './interfaces';
+import { isUUID } from 'lib/utilities/strings';
+
+import type { MixpanelEventName, MixpanelTrackBase } from './interfaces';
 
 // format event_name to Event name
 export function eventNameToHumanFormat(eventName: MixpanelEventName) {
@@ -21,4 +23,19 @@ export function paramsToHumanFormat(params: Record<string, any>) {
   });
 
   return humanReadableParams;
+}
+
+export function validateMixPanelEvent(params: MixpanelTrackBase) {
+  if (isUUID(params.distinct_id)) {
+    if ('spaceId' in params && params.spaceId === 'string' && !isUUID(params.spaceId)) {
+      return false;
+    }
+    if ('pageId' in params && params.pageId === 'string' && !isUUID(params.pageId)) {
+      return false;
+    }
+
+    return true;
+  } else {
+    return false;
+  }
 }
