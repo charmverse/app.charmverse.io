@@ -308,6 +308,14 @@ function CharmEditor({
     });
   }
 
+  const threadIds =
+    typeof pageType === 'string'
+      ? Object.values(threads)
+          .filter((thread) => !thread?.resolved)
+          .filter(isTruthy)
+          .map((thread) => thread.id)
+      : undefined;
+
   function getPlugins() {
     return charmEditorPlugins({
       disableRowHandles,
@@ -327,10 +335,7 @@ function CharmEditor({
       spaceId: currentSpace?.id,
       userId: user?.id,
       disableMention,
-      threadIds: Object.values(threads)
-        .filter((thread) => !thread?.resolved)
-        .filter(isTruthy)
-        .map((thread) => thread.id)
+      threadIds
     });
   }
 
@@ -381,6 +386,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      threadIds={threadIds}
       allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}

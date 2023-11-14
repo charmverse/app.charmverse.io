@@ -254,30 +254,35 @@ export async function createDocumentNotifications(webhookData: {
       });
 
       for (const userId of new Set(notificationTargetUserIds)) {
+        if (
+          notificationSentUserIds.has(userId) ||
+          userId === inlineCommentAuthorId ||
+          previousInlineComment?.userId === userId
+        ) {
+          continue;
+        }
+
         const pagePermission = await permissionsClient.client.pages.computePagePermissions({
           resourceId: pageId,
           userId
         });
 
-        if (
-          pagePermission.read &&
-          inlineCommentAuthorId !== userId &&
-          previousInlineComment?.userId !== userId &&
-          !notificationSentUserIds.has(userId)
-        ) {
-          const { id } = await saveDocumentNotification({
-            type: 'inline_comment.created',
-            createdAt: webhookData.createdAt,
-            createdBy: inlineCommentAuthorId,
-            inlineCommentId,
-            pageId,
-            spaceId,
-            userId,
-            content: inlineCommentContent
-          });
-          ids.push(id);
-          notificationSentUserIds.add(userId);
+        if (!pagePermission.read) {
+          continue;
         }
+
+        const { id } = await saveDocumentNotification({
+          type: 'inline_comment.created',
+          createdAt: webhookData.createdAt,
+          createdBy: inlineCommentAuthorId,
+          inlineCommentId,
+          pageId,
+          spaceId,
+          userId,
+          content: inlineCommentContent
+        });
+        ids.push(id);
+        notificationSentUserIds.add(userId);
       }
 
       const extractedMentions = extractMentions(inlineCommentContent);

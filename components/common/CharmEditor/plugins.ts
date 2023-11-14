@@ -209,12 +209,17 @@ export function charmEditorPlugins({
     tableOfContentPlugins(),
     filePlugins(),
     placeholderPlugin(placeholderText),
-    tabIndent.plugins(), // tabIndent should be triggered last so other plugins can override the keymap,
-    threadPlugins({
-      threadIds,
-      key: threadPluginKey
-    })
+    tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap,
   );
+
+  if (threadIds) {
+    basePlugins.push(
+      threadPlugins({
+        threadIds,
+        key: threadPluginKey
+      })
+    );
+  }
 
   if (!readOnly && !disableRowHandles) {
     // add rowActions before the table plugin, or else mousedown is not triggered

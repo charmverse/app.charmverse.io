@@ -7,9 +7,9 @@ import type { RawPlugins } from 'components/common/CharmEditor/components/@bangl
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
+import { threadPluginKey } from '../../plugins';
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { getLinkElement } from '../link/getLinkElement';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
 import { markName } from './inlineComment.constants';
@@ -95,11 +95,11 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
     // a plugin to display icons to the right of each paragraph and header
     new Plugin({
       state: {
-        init(_, { doc, schema }) {
-          return getDecorations({ schema, doc });
+        init(_, state) {
+          return getDecorations(state);
         },
         apply(tr, old, _, editorState) {
-          return tr.docChanged ? getDecorations({ schema: editorState.schema, doc: tr.doc }) : old;
+          return tr.docChanged ? getDecorations(editorState) : old;
         }
       },
       props: {
@@ -126,8 +126,9 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
   ];
 }
 
-function getDecorations({ schema, doc }: { doc: Node; schema: Schema }) {
-  const rows = extractInlineCommentRows(schema, doc);
+function getDecorations(state: EditorState) {
+  const threadIds = threadPluginKey.getState(state);
+  const rows = extractInlineCommentRows(state.schema, state.doc, threadIds);
   const uniqueCommentIds: Set<string> = new Set();
 
   const decorations: Decoration[] = [];
@@ -149,5 +150,5 @@ function getDecorations({ schema, doc }: { doc: Node; schema: Schema }) {
     }
   });
 
-  return DecorationSet.create(doc, decorations);
+  return DecorationSet.create(state.doc, decorations);
 }

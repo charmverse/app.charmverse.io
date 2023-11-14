@@ -66,6 +66,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   inline?: boolean;
   pageType?: PageType | 'post';
   postId?: string;
+  threadIds?: string[];
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -92,7 +93,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     onConnectionEvent,
     allowClickingFooter,
     pageType,
-    postId
+    postId,
+    threadIds
   },
   ref
 ) {
@@ -133,6 +135,12 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     },
     [editor]
   );
+
+  useEffect(() => {
+    if (editor?.view && threadIds && threadIds.length && isLoadingRef.current) {
+      editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
+    }
+  }, [editor?.view, threadIds]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {
