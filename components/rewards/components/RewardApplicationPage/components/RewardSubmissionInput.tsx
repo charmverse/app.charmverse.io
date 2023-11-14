@@ -173,7 +173,7 @@ export function RewardSubmissionInput({
                 type='submit'
                 loading={isSaving}
               >
-                {submission?.submission ? 'Update' : 'Submit'}
+                {submission?.id ? 'Update' : 'Submit'}
               </Button>
             </Grid>
           )}

@@ -78,7 +78,7 @@ async function fetchLensComments({
   return nestedComments.flat().sort((a, b) => a.depth - b.depth);
 }
 
-export async function syncPageComments({
+export async function syncPageCommentsWithLensPost({
   userId,
   pageId,
   lensPostLink,

@@ -376,6 +376,8 @@ function CharmEditor({
       allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
+      postId={postId}
+      pageType={pageType}
       focusOnInit={focusOnInit}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}

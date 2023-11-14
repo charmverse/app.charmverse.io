@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Typography, Checkbox, FormControlLabel } from '@mui/material';
+import clsx from 'clsx';
 import React from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -29,7 +30,7 @@ function Switch(props: Props): JSX.Element {
   const isCardView = displayType === 'kanban' || displayType === 'gallery' || displayType === 'calendar';
   return (
     <StyledFormControlLabel
-      className='octo-propertyvalue'
+      className={clsx('octo-propertyvalue', { readonly: props.disabled })}
       label={
         <Typography fontSize={14} sx={{ pl: 1 }}>
           {isCardView ? props.label : <>&nbsp;</>}

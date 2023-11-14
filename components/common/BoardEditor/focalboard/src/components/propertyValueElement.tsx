@@ -1,6 +1,7 @@
 import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import Tooltip from '@mui/material/Tooltip';
+import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
@@ -261,7 +262,11 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
-      propertyValueElement = <div className='octo-propertyvalue'>{displayValue}</div>;
+      propertyValueElement = (
+        <div className='octo-propertyvalue readonly'>
+          {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
+        </div>
+      );
     } else {
       propertyValueElement = (
         <DateRange
@@ -340,7 +345,7 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyValueElement === null) {
     propertyValueElement = (
-      <div className='octo-propertyvalue'>
+      <div className={clsx('octo-propertyvalue', { readonly: readOnly })}>
         {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
       </div>
     );

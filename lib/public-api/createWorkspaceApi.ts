@@ -2,9 +2,9 @@ import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prism
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
-import { upsertSpaceRolesFromDiscord } from 'lib/discord/upsertSpaceRolesFromDiscord';
+import { upsertSpaceRolesFromDiscord } from 'lib/discord/collabland/upsertSpaceRolesFromDiscord';
+import { upsertUserRolesFromDiscord } from 'lib/discord/collabland/upsertUserRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
-import { upsertUserRolesFromDiscord } from 'lib/discord/upsertUserRolesFromDiscord';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import type { SpaceApiResponse } from 'lib/public-api/interfaces';

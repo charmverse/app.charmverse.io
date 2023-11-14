@@ -1,7 +1,9 @@
 import type { Application, ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { WrongStateError } from 'lib/utilities/errors';
+import { getReward } from 'lib/rewards/getReward';
+import { verifyOrRejectApplications } from 'lib/rewards/verifyOrRejectApplications';
+import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
 
 import { rollupRewardStatus } from './rollupRewardStatus';
 
@@ -26,6 +28,14 @@ export async function reviewApplication({ applicationId, decision, userId }: App
       bountyId: true
     }
   });
+
+  if (decision === 'approve') {
+    // if there are no slots left, reject all the applications for this reward
+    const canBeAccepted = await verifyOrRejectApplications(application.bountyId);
+    if (!canBeAccepted) {
+      throw new WrongStateError('This reward has no more slots left');
+    }
+  }
 
   const reviewableStatuses: ApplicationStatus[] = ['applied', 'inProgress', 'review'];
 
@@ -53,6 +63,7 @@ export async function reviewApplication({ applicationId, decision, userId }: App
     }
   })) as Application;
 
+  await verifyOrRejectApplications(application.bountyId);
   await rollupRewardStatus({ rewardId: application.bountyId });
 
   return updated;

@@ -71,7 +71,7 @@ export type CardNotification = NotificationBase & {
   personProperty: {
     id: string;
     name: string;
-  };
+  } | null;
   group: 'card';
 };
 

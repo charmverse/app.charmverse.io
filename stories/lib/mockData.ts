@@ -96,7 +96,7 @@ export const members: Member[] = seeds.map((seed) => {
 
 export const spaceRoles: ListSpaceRolesResponse[] = [
   { id: '1', name: 'Moderator', spacePermissions: [], source: null },
-  { id: '1', name: 'Grant Reviewer', spacePermissions: [], source: null }
+  { id: '2', name: 'Grant Reviewer', spacePermissions: [], source: null }
 ];
 
 export const proposalCategories: ProposalCategoryWithPermissions[] = generateDefaultProposalCategoriesInput(
