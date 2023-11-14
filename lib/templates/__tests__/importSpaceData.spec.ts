@@ -6,7 +6,17 @@ import type {
   TargetPermissionGroup
 } from '@charmverse/core/permissions';
 import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permissions';
-import type { Page, PostCategory, Proposal, ProposalCategory, Role, Space, User } from '@charmverse/core/prisma-client';
+import type {
+  MemberProperty,
+  MemberPropertyPermission,
+  Page,
+  PostCategory,
+  Proposal,
+  ProposalCategory,
+  Role,
+  Space,
+  User
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import {
   testUtilsForum,
@@ -53,6 +63,8 @@ describe('importSpaceData', () => {
   let spacePermissions: AssignedSpacePermission[];
   let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
   let postCategoryPermissions: AssignedPostCategoryPermission[];
+
+  let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
 
   const fileExportName = 'jest-test-space-data-import.json';
 
@@ -210,6 +222,91 @@ describe('importSpaceData', () => {
       })
       .then((p) => prisma.page.findUniqueOrThrow({ where: { id: p.id }, select: pageMetaSelect() }));
 
+    sourceSpace = await prisma.space.update({
+      where: { id: sourceSpace.id },
+      data: {
+        notificationToggles: { polls: false, proposals: false },
+        features: [
+          {
+            id: 'rewards',
+            path: 'rewards',
+            title: 'Jobs',
+            isHidden: false
+          },
+          {
+            id: 'member_directory',
+            path: 'members',
+            title: 'Membership Registry',
+            isHidden: false
+          },
+          {
+            id: 'proposals',
+            path: 'proposals',
+            title: 'Proposals',
+            isHidden: true
+          },
+          {
+            id: 'bounties',
+            path: 'bounties',
+            title: 'Bounties',
+            isHidden: true
+          },
+          {
+            id: 'forum',
+            path: 'forum',
+            title: 'Forum',
+            isHidden: false
+          }
+        ],
+        memberProfiles: [
+          {
+            id: 'charmverse',
+            title: 'CharmVerse',
+            isHidden: false
+          },
+          {
+            id: 'collection',
+            title: 'Collection',
+            isHidden: true
+          },
+          {
+            id: 'ens',
+            title: 'ENS',
+            isHidden: true
+          },
+          {
+            id: 'lens',
+            title: 'Lens',
+            isHidden: false
+          },
+          {
+            id: 'summon',
+            title: 'Summon',
+            isHidden: false
+          }
+        ]
+      }
+    });
+
+    memberProperty = await prisma.memberProperty.create({
+      data: {
+        createdBy: sourceSpaceUser.id,
+        name: 'Test Member Property',
+        type: 'name',
+        updatedBy: sourceSpaceUser.id,
+        space: { connect: { id: sourceSpace.id } },
+        permissions: {
+          create: {
+            memberPropertyPermissionLevel: 'view',
+            roleId: firstSourceRole.id
+          }
+        }
+      },
+      include: {
+        permissions: true
+      }
+    });
+
     exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id, filename: fileExportName });
   });
 
@@ -221,7 +318,44 @@ describe('importSpaceData', () => {
       exportData: exportedData
     });
 
+    const updatedTargetSpace = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: targetSpace.id
+      },
+      include: {
+        memberProperties: {
+          include: {
+            permissions: true
+          }
+        }
+      }
+    });
+
     expect(importResult).toMatchObject<SpaceDataImportResult>({
+      space: {
+        notificationToggles: sourceSpace.notificationToggles,
+        features: sourceSpace.features,
+        memberProfiles: sourceSpace.memberProfiles,
+        memberProperties: [
+          {
+            ...memberProperty,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date),
+            id: expect.any(String),
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            spaceId: targetSpace.id,
+            permissions: [
+              {
+                id: expect.any(String),
+                memberPropertyId: updatedTargetSpace.memberProperties[0].id,
+                roleId: importResult.oldNewHashMaps.roles[firstSourceRole.id],
+                memberPropertyPermissionLevel: 'view'
+              }
+            ]
+          }
+        ]
+      },
       postCategories: expect.arrayContaining([
         { ...firstSourcePostCategory, spaceId: targetSpace.id, id: expect.any(String) }
       ]),
@@ -324,7 +458,44 @@ describe('importSpaceData', () => {
       exportName: fileExportName
     });
 
+    const updatedTargetSpace = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: targetSpace.id
+      },
+      include: {
+        memberProperties: {
+          include: {
+            permissions: true
+          }
+        }
+      }
+    });
+
     expect(importResult).toMatchObject<SpaceDataImportResult>({
+      space: {
+        notificationToggles: sourceSpace.notificationToggles,
+        features: sourceSpace.features,
+        memberProfiles: sourceSpace.memberProfiles,
+        memberProperties: [
+          {
+            ...memberProperty,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date),
+            id: expect.any(String),
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            spaceId: targetSpace.id,
+            permissions: [
+              {
+                id: expect.any(String),
+                memberPropertyId: updatedTargetSpace.memberProperties[0].id,
+                roleId: importResult.oldNewHashMaps.roles[firstSourceRole.id],
+                memberPropertyPermissionLevel: 'view'
+              }
+            ]
+          }
+        ]
+      },
       postCategories: expect.arrayContaining([
         { ...firstSourcePostCategory, spaceId: targetSpace.id, id: expect.any(String) }
       ]),

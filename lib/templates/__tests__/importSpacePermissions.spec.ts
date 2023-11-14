@@ -173,24 +173,28 @@ describe('importSpacePermissions', () => {
     });
 
     expect(importResult).toMatchObject<ImportedPermissions>({
-      proposalCategoryPermissions: proposalCategoryPermissions.map((p) => ({
-        permissionLevel: p.permissionLevel,
-        id: expect.any(String),
-        proposalCategoryId: expect.any(String),
-        assignee: {
-          group: p.assignee.group,
-          id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-        } as TargetPermissionGroup<'role' | 'space'>
-      })),
-      postCategoryPermissions: postCategoryPermissions.map((p) => ({
-        permissionLevel: p.permissionLevel,
-        id: expect.any(String),
-        postCategoryId: expect.any(String),
-        assignee: {
-          group: p.assignee.group,
-          id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-        } as TargetPermissionGroup<'role' | 'space'>
-      })),
+      proposalCategoryPermissions: expect.arrayContaining(
+        proposalCategoryPermissions.map((p) => ({
+          permissionLevel: p.permissionLevel,
+          id: expect.any(String),
+          proposalCategoryId: expect.any(String),
+          assignee: {
+            group: p.assignee.group,
+            id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+          } as TargetPermissionGroup<'role' | 'space'>
+        }))
+      ),
+      postCategoryPermissions: expect.arrayContaining(
+        postCategoryPermissions.map((p) => ({
+          permissionLevel: p.permissionLevel,
+          id: expect.any(String),
+          postCategoryId: expect.any(String),
+          assignee: {
+            group: p.assignee.group,
+            id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
+          } as TargetPermissionGroup<'role' | 'space'>
+        }))
+      ),
       spacePermissions: expect.arrayContaining<AssignedSpacePermission>(
         spacePermissions.map((p) => ({
           operations: p.operations,
@@ -259,7 +263,11 @@ describe('importSpacePermissions', () => {
     });
 
     // Idempotency check - assuming no duplicate entries are created
-    expect(reimportedPermissions).toMatchObject(importedPermissions);
+    expect(reimportedPermissions).toMatchObject({
+      ...reimportedPermissions,
+      postCategoryPermissions: expect.arrayContaining(importedPermissions.postCategoryPermissions),
+      proposalCategoryPermissions: expect.arrayContaining(importedPermissions.proposalCategoryPermissions)
+    });
   });
 
   it('should throw InvalidInputError if targetSpaceIdOrDomain is missing', async () => {

@@ -7,6 +7,7 @@ import { importPostCategories } from './importPostCategories';
 import { importProposalCategories } from './importProposalCategories';
 import { importRoles } from './importRoles';
 import { importSpacePermissions } from './importSpacePermissions';
+import { importSpaceSettings } from './importSpaceSettings';
 import { importWorkspacePages } from './importWorkspacePages';
 import type { ImportParams } from './interfaces';
 
@@ -39,9 +40,12 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
     includePermissions: false
   });
 
+  const importedSpaceSettings = await importSpaceSettings(importParams);
+
   return {
     pages,
     roles,
+    space: importedSpaceSettings,
     permissions: {
       proposalCategoryPermissions,
       spacePermissions,
