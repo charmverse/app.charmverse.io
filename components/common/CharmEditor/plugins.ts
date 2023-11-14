@@ -35,6 +35,7 @@ import * as nft from './components/nft/nft.plugins';
 import { plugins as paragraphPlugins } from './components/paragraph/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
+import { plugins as quotePlugins } from './components/quote/quote';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
@@ -206,6 +207,7 @@ export function charmEditorPlugins({
     tableOfContentPlugins(),
     filePlugins(),
     placeholderPlugin(placeholderText),
+    quotePlugins(),
     tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
   );
 
