@@ -91,7 +91,7 @@ export function VideoNodeView({
                       });
                     } else if (embedType) {
                       const pos = getPos();
-                      if (pos === undefined || pos === null) return;
+                      if (typeof pos !== 'number') return;
                       const newConfig = embeds[embedType] as Embed;
                       const width = attrs.width;
                       let height = width / VIDEO_ASPECT_RATIO;
