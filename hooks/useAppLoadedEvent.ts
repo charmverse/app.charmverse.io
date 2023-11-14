@@ -10,7 +10,9 @@ export function useAppLoadedEvent() {
   const { isLoaded } = useUser();
   const { space, isLoading: isSpaceLoading } = useCurrentSpace();
 
-  const debouncedTrackAction = useRef(debounce(charmClient.track.trackAction, 2000)).current;
+  const debouncedTrackAction = useRef(
+    debounce(charmClient.track.trackAction, 2000, { leading: true, trailing: false })
+  ).current;
 
   const trackAppLoaded = useCallback(() => {
     if (isLoaded && !isSpaceLoading) {

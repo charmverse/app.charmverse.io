@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { useSearchByDomain } from 'charmClient/hooks/spaces';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
@@ -68,9 +69,7 @@ export const useSharedPage = () => {
     () => charmClient.getPublicPage(pageKey || '')
   );
 
-  const { data: space, isLoading: isSpaceLoading } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
-    charmClient.spaces.searchByDomain(spaceDomain || '')
-  );
+  const { data: space, isLoading: isSpaceLoading } = useSearchByDomain(spaceDomain || '');
 
   const hasPublicRewards = space?.publicBountyBoard || space?.paidTier === 'free';
   const hasPublicProposals = space?.publicProposals || space?.paidTier === 'free';

@@ -74,12 +74,13 @@ export async function getCardNotifications({ id, userId }: QueryCondition): Prom
       spaceName: notificationMetadata.space.name,
       pageType: page.type,
       type: notification.type,
-      personProperty: notification.personPropertyId
-        ? {
-            id: notification.personPropertyId,
-            name: personPropertiesRecord[notification.personPropertyId].name
-          }
-        : null,
+      personProperty:
+        notification.personPropertyId && personPropertiesRecord[notification.personPropertyId]
+          ? {
+              id: notification.personPropertyId,
+              name: personPropertiesRecord[notification.personPropertyId].name
+            }
+          : null,
       archived: !!notificationMetadata.archivedAt,
       read: !!notificationMetadata.seenAt,
       group: 'card'

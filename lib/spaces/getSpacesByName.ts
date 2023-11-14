@@ -27,5 +27,5 @@ export async function getSpacesByName(spaceName: string): Promise<SpaceWithGates
         }
       }
     }
-  });
+  }) as Promise<SpaceWithGates[]>;
 }
