@@ -44,10 +44,16 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   const isNewApplication = !applicationId && !!rewardId;
   const { showMessage } = useSnackbar();
 
-  const { application, refreshApplication, applicationRewardPermissions, updateApplication, reviewApplication } =
-    useApplication({
-      applicationId: applicationId || ''
-    });
+  const {
+    application,
+    refreshApplication,
+    applicationRewardPermissions,
+    updateApplication,
+    reviewApplication,
+    hasApplicationSlots
+  } = useApplication({
+    applicationId: applicationId || ''
+  });
 
   const { navigateToSpacePath, router } = useCharmRouter();
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
@@ -170,6 +176,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                       </Grid>
 
                       <RewardReviewerActions
+                        hasApplicationSlots={hasApplicationSlots}
                         application={application}
                         reward={reward}
                         rewardPermissions={rewardPermissions}
