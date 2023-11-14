@@ -30,6 +30,7 @@ import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
+import { BaseCurrentDomainProvider } from 'hooks/useBaseCurrentDomain';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
@@ -251,13 +252,15 @@ function DataProviders({ children }: { children: ReactNode }) {
                               <RewardsProvider>
                                 <PaymentMethodsProvider>
                                   <PagesProvider>
-                                    <MemberPropertiesProvider>
-                                      <LensProvider config={lensConfig}>
-                                        <UserProfileProvider>
-                                          <PageTitleProvider>{children}</PageTitleProvider>
-                                        </UserProfileProvider>
-                                      </LensProvider>
-                                    </MemberPropertiesProvider>
+                                    <BaseCurrentDomainProvider>
+                                      <MemberPropertiesProvider>
+                                        <LensProvider config={lensConfig}>
+                                          <UserProfileProvider>
+                                            <PageTitleProvider>{children}</PageTitleProvider>
+                                          </UserProfileProvider>
+                                        </LensProvider>
+                                      </MemberPropertiesProvider>
+                                    </BaseCurrentDomainProvider>
                                   </PagesProvider>
                                 </PaymentMethodsProvider>
                               </RewardsProvider>

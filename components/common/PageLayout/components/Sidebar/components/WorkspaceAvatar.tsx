@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 import type { AvatarSize } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
@@ -12,13 +13,15 @@ type WorkspaceAvatarProps = {
   name: string;
   image: string | null;
   size?: AvatarSize;
+  sx?: SxProps<Theme>;
 };
 
 export default function WorkspaceAvatar({
   active = false,
   name = '',
   image = '',
-  size = 'medium'
+  size = 'medium',
+  sx = {}
 }: WorkspaceAvatarProps) {
-  return <StyledAvatar active={active} avatar={image} name={name} size={size} variant='rounded' />;
+  return <StyledAvatar active={active} avatar={image} name={name} size={size} variant='rounded' sx={sx} />;
 }
