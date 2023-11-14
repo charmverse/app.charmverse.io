@@ -13,7 +13,9 @@ import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { isTruthy } from 'lib/utilities/types';
 
+import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
@@ -70,7 +72,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
     () =>
       activeView.fields.visiblePropertyIds
         .map((id) => board.fields.cardProperties.find((t) => t.id === id))
-        .filter((i) => i) as IPropertyTemplate[],
+        .filter((i) => isTruthy(i) && i.id !== Constants.titleColumnId) as IPropertyTemplate[],
     [board.fields.cardProperties, activeView.fields.visiblePropertyIds]
   );
 
