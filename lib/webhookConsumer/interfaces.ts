@@ -1,4 +1,4 @@
-export type MessageType = 'guildMemberUpdate' | 'guildMemberRemove';
+export type MessageType = 'guildMemberUpdate' | 'guildMemberRemove' | 'uninstallMiniapp';
 
 export type MemberWebhookData = {
   guildId: string;
@@ -6,10 +6,22 @@ export type MemberWebhookData = {
   roles: string[];
 };
 
-export type WebhookMessageData = {
-  event: MessageType;
+export type UninstallWebhookData = {
+  guildId: string;
+  userId: string;
+};
+
+export type MemberUpdateWebhookMessageData = {
+  event: 'guildMemberUpdate' | 'guildMemberRemove';
   payload: MemberWebhookData[];
 };
+
+export type UninstallWebhookMessageData = {
+  event: 'uninstallMiniapp';
+  payload: UninstallWebhookData;
+};
+
+export type WebhookMessageData = MemberUpdateWebhookMessageData | UninstallWebhookMessageData;
 
 export type WebhookMessageHeaders = {
   Authorization?: string;
@@ -19,8 +31,8 @@ export type WebhookMessageQuery = {
   api_key?: string;
 };
 
-export type WebhookMessage = {
-  data?: WebhookMessageData;
+export type WebhookMessage<Data extends WebhookMessageData = WebhookMessageData> = {
+  data?: Data;
   headers?: WebhookMessageHeaders;
   query?: WebhookMessageQuery;
 };
