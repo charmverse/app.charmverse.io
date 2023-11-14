@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
+import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -27,7 +28,7 @@ interface Props {
   hideToolsMenu?: boolean;
 }
 
-export function PageDialog(props: Props) {
+function PageDialogBase(props: Props) {
   const { hideToolsMenu = false, pageId, readOnly } = props;
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
@@ -143,5 +144,14 @@ export function PageDialog(props: Props) {
         <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} close={close} />
       )}
     </Dialog>
+  );
+}
+
+// PageDialogBase must be wrapped by DocumentPageProviders so that it can control context about the page
+export function PageDialog(props: Props): JSX.Element | null {
+  return (
+    <DocumentPageProviders isInsideDialog={true}>
+      <PageDialogBase {...props} />
+    </DocumentPageProviders>
   );
 }

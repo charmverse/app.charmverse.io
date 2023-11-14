@@ -55,7 +55,6 @@ import '@bangle.dev/tooltip/style.css';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetail.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
