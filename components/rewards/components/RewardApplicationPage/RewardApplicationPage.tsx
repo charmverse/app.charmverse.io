@@ -132,8 +132,9 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
 
   const applicationStepRequired = reward.approveSubmitters;
   const isApplicationStage =
-    applicationStepRequired && (application?.status === 'applied' || application?.status === 'rejected');
-  const showSubmissionInput = (applicationStepRequired && isNewApplication) || !isApplicationStage;
+    applicationStepRequired &&
+    (isNewApplication || application?.status === 'applied' || application?.status === 'rejected');
+  const showSubmissionInput = (!applicationStepRequired && isNewApplication) || !isApplicationStage;
   const isApplicationLoaded = !!application || isNewApplication;
 
   return (
@@ -193,7 +194,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                       rewardId={reward.id}
                       disableCollapse={!showSubmissionInput}
                       expandedOnLoad={isNewApplication || isApplicationStage}
-                      readOnly={application?.createdBy !== user?.id && !isNewApplication}
+                      readOnly={(application?.createdBy !== user?.id && !isNewApplication) || !isApplicationStage}
                       onSubmit={(updatedApplication) =>
                         saveApplication(
                           {
