@@ -1,6 +1,6 @@
 import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
-import { keymap, wrappingInputRule } from '@bangle.dev/pm';
 import { getNodeType } from '@bangle.dev/utils';
+import { wrappingInputRule } from 'prosemirror-inputrules';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
