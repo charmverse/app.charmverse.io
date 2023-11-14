@@ -1,5 +1,5 @@
-import { getAddress, verifyMessage } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
+import { getAddress, verifyMessage } from 'viem';
 
 import { InvalidInputError } from '../utilities/errors';
 import { lowerCaseEqual } from '../utilities/strings';

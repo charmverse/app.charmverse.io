@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
+import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
-import { Wallet } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 
 import { generateSignaturePayload } from 'lib/blockchain/signAndVerify';

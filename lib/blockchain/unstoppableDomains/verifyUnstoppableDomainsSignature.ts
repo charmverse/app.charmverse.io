@@ -1,5 +1,5 @@
-import { verifyMessage } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
+import { verifyMessage } from 'viem';
 
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
