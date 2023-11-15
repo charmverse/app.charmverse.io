@@ -21,6 +21,7 @@ import {
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -29,26 +30,13 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { RewardsViewOptions } from './components/RewardViewOptions';
-import { useApplicationDialog } from './hooks/useApplicationDialog';
 import { useRewards } from './hooks/useRewards';
 
 export function RewardsPage({ title }: { title: string }) {
   const router = useRouter();
-  const { currentApplicationId, showApplication, isOpen } = useApplicationDialog();
-
-  const mounted = useRef(false);
-
-  useEffect(() => {
-    // Only auto-open application on initial render of the page
-    if (router.query.applicationId && !currentApplicationId && mounted.current === false) {
-      showApplication(router.query.applicationId as string);
-    } else if (!currentApplicationId) {
-      setUrlWithoutRerender(router.pathname, { applicationId: null });
-    }
-    mounted.current = true;
-  }, [currentApplicationId]);
 
   const { space: currentSpace } = useCurrentSpace();
+  const { updateURLQuery } = useCharmRouter();
 
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, rewards } = useRewards();
@@ -110,8 +98,7 @@ export function RewardsPage({ title }: { title: string }) {
       if (id && (!rewardId || id === rewardId)) {
         openPage(id);
       } else if (id) {
-        setUrlWithoutRerender(router.pathname, { applicationId: id });
-        showApplication(id);
+        updateURLQuery({ applicationId: id });
       }
     },
     [showReward]

@@ -15,6 +15,7 @@ export function PageDialogGlobal() {
       readOnly={readOnly}
       pageId={bountyId || (pageId as string)}
       onClose={closeDialog}
+      pageDialogContext={props}
     />
   );
 }

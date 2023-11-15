@@ -12,7 +12,7 @@ import { useState } from 'react';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useUser } from 'hooks/useUser';
 import { countCompleteSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
 
@@ -27,7 +27,8 @@ type Props = {
 
 export function RewardApplications({ rewardId, onShowApplication }: Props) {
   const theme = useTheme();
-  const { showApplication } = useApplicationDialog();
+
+  const { updateURLQuery } = useCharmRouter();
 
   const { user } = useUser();
 
@@ -40,8 +41,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
   }
 
   const openApplication = (applicationId: string) => {
-    showApplication(applicationId);
-    setTimeout(() => onShowApplication?.(), 50);
+    updateURLQuery({ id: rewardId, applicationId });
   };
 
   const validSubmissions = countCompleteSubmissions({ applications: reward.applications });
@@ -75,7 +75,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
           >
             There are no submissions yet.
           </Typography>
-          <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
+          <NewWorkButton rewardId={rewardId} />
         </Box>
       </>
     );
@@ -145,7 +145,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
       )}
 
       <Stack flex={1} direction='row' justifyContent='flex-end' mb={1}>
-        <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
+        <NewWorkButton rewardId={rewardId} />
       </Stack>
     </>
   );

@@ -7,27 +7,18 @@ import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { setTitle } from 'hooks/usePageTitle';
 import { RewardBlocksProvider } from 'hooks/useRewardBlocks';
 
-import { ApplicationDialog } from './components/RewardApplicationDialog';
-import { ApplicationDialogProvider } from './hooks/useApplicationDialog';
-
 export function RewardsPageWithProviders() {
   const { mappedFeatures } = useFeaturesAndMembers();
   const rewardsTitle = mappedFeatures.rewards?.title || 'Rewards';
   setTitle(rewardsTitle);
 
   return (
-    <PageDialogProvider>
-      <RewardsProvider>
-        <RewardBlocksProvider>
-          <RewardsBoardProvider>
-            <ApplicationDialogProvider>
-              <RewardsPage title={rewardsTitle} />
-              <ApplicationDialog />
-              <PageDialogGlobal />
-            </ApplicationDialogProvider>
-          </RewardsBoardProvider>
-        </RewardBlocksProvider>
-      </RewardsProvider>
-    </PageDialogProvider>
+    <RewardsProvider>
+      <RewardBlocksProvider>
+        <RewardsBoardProvider>
+          <RewardsPage title={rewardsTitle} />
+        </RewardsBoardProvider>
+      </RewardBlocksProvider>
+    </RewardsProvider>
   );
 }
