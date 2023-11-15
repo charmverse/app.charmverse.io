@@ -220,7 +220,9 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                           {
                             rewardId: reward.id,
                             submissionNodes: submission.submissionNodes,
-                            applicationId: application?.id
+                            applicationId: application?.id,
+                            submission: submission.submission,
+                            walletAddress: submission.walletAddress
                           },
                           'submission'
                         )

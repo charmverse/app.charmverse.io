@@ -30,23 +30,26 @@ export function useNewReward() {
   }, []);
 
   const createReward = useCallback(
-    async (pageValues: RewardPageProps | null) => {
+    async (pageValues: (RewardPageProps & { linkedPageId?: string }) | null) => {
       pageValues ||= EMPTY_PAGE_VALUES;
       log.info('[user-journey] Create a reward');
       if (currentSpace) {
         setIsSaving(true);
 
         const createdReward = await createRewardTrigger({
-          pageProps: {
-            content: pageValues.content,
-            contentText: pageValues.contentText ?? '',
-            title: pageValues.title,
-            sourceTemplateId: pageValues.sourceTemplateId,
-            headerImage: pageValues.headerImage,
-            icon: pageValues.icon,
-            type: pageValues.type
-          },
+          pageProps: pageValues?.linkedPageId
+            ? undefined
+            : {
+                content: pageValues.content,
+                contentText: pageValues.contentText ?? '',
+                title: pageValues.title,
+                sourceTemplateId: pageValues.sourceTemplateId,
+                headerImage: pageValues.headerImage,
+                icon: pageValues.icon,
+                type: pageValues.type
+              },
           ...rewardValues,
+          linkedPageId: pageValues.linkedPageId,
           spaceId: currentSpace.id
         })
           .catch((err: any) => {

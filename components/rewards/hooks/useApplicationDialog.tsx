@@ -2,9 +2,6 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-
 type Context = {
   currentApplicationId: string | null;
   currentRewardId: string | null;

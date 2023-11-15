@@ -73,8 +73,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -175,8 +174,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -244,8 +242,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -298,8 +295,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -349,8 +345,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -400,8 +395,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -558,8 +552,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -645,8 +638,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -732,8 +724,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -819,8 +810,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -870,8 +860,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -939,8 +928,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1026,8 +1014,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1309,8 +1296,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 2,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1432,8 +1418,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 2,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1698,8 +1683,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1749,8 +1733,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1800,8 +1783,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1851,8 +1833,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1920,8 +1901,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -1971,8 +1951,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2123,8 +2102,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2184,8 +2162,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2245,8 +2222,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2306,8 +2282,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2524,8 +2499,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2635,8 +2609,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2696,8 +2669,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2857,8 +2829,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -2918,8 +2889,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3001,8 +2971,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3269,8 +3238,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3330,8 +3298,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3391,8 +3358,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3452,8 +3418,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3513,8 +3478,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3574,8 +3538,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3635,8 +3598,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {
@@ -3696,8 +3658,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
           type: 'heading',
           attrs: {
             level: 1,
-            track: [],
-            collapseContent: null
+            track: []
           },
           content: [
             {

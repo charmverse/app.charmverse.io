@@ -4,7 +4,6 @@ import { BigNumber } from '@ethersproject/bignumber';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import ERC20ABI from 'abis/ERC20.json';
 import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
@@ -15,6 +14,7 @@ import { parseEther, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
+import { Button } from 'components/common/Button';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -96,6 +96,7 @@ export function RewardPaymentButton({
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const [hasPendingTx, setHasPendingTx] = useState(false);
 
   const { data: safeInfos } = useSWR(
     signer && account ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
@@ -127,6 +128,8 @@ export function RewardPaymentButton({
     }
 
     try {
+      setHasPendingTx(true);
+
       if (chainIdToUse !== chainId) {
         await switchActiveNetwork(chainIdToUse);
       }
@@ -179,6 +182,8 @@ export function RewardPaymentButton({
       const { message, level } = getPaymentErrorMessage(error);
       log.warn(`Error sending payment on blockchain: ${message}`, { amount, chainId, error });
       onError(message, level);
+    } finally {
+      setHasPendingTx(false);
     }
   };
 
@@ -197,10 +202,11 @@ export function RewardPaymentButton({
   return (
     <>
       <Button
+        loading={hasPendingTx}
         color='primary'
-        endIcon={hasSafes ? <KeyboardArrowDownIcon /> : null}
+        endIcon={hasSafes && !hasPendingTx ? <KeyboardArrowDownIcon /> : null}
         size='small'
-        onClick={(e) => {
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
           if (!hasSafes) {
             makePayment();
           } else {
