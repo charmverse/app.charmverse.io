@@ -3,6 +3,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import { getSpace } from 'lib/spaces/getSpace';
 
 import type { SpaceDataExport } from './exportSpaceData';
+import { importForumPosts } from './importForumPosts';
 import { importPostCategories } from './importPostCategories';
 import { importProposalCategories } from './importProposalCategories';
 import { importRoles } from './importRoles';
@@ -18,6 +19,7 @@ export type SpaceDataImportResult = Omit<SpaceDataExport, 'pages'> & {
     postCategories: Record<string, string>;
     proposalCategories: Record<string, string>;
     pages: Record<string, string>;
+    posts: Record<string, string>;
   };
 };
 
@@ -42,9 +44,12 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
 
   const importedSpaceSettings = await importSpaceSettings(importParams);
 
+  const { posts, postsIdHashmap } = await importForumPosts(importParams);
+
   return {
     pages,
     roles,
+    posts,
     space: importedSpaceSettings,
     permissions: {
       proposalCategoryPermissions,
@@ -57,7 +62,8 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
       roles: oldNewRecordIdHashMap,
       proposalCategories: oldNewProposalCategoryIdMap,
       postCategories: oldNewPostCategoryIdMap,
-      pages: oldNewPageIdMap
+      pages: oldNewPageIdMap,
+      posts: postsIdHashmap
     }
   };
 }

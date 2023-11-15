@@ -13,6 +13,7 @@ import type {
   MemberProperty,
   MemberPropertyPermission,
   Page,
+  Post,
   PostCategory,
   Proposal,
   ProposalCategory,
@@ -58,6 +59,8 @@ describe('importSpaceData', () => {
   let firstSourcePostCategory: PostCategory;
   let secondSourcePostCategory: PostCategory;
 
+  let posts: Post[];
+
   let firstSourceRole: Role;
   let secondSourceRole: Role;
 
@@ -69,7 +72,7 @@ describe('importSpaceData', () => {
 
   let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
 
-  const fileExportName = 'jest-test-export-space-data-import.json';
+  const fileExportName = 'jest-test-import-space-data-import.json';
 
   beforeAll(async () => {
     ({ space: sourceSpace, user: sourceSpaceUser } = await testUtilsUser.generateUserAndSpace());
@@ -310,6 +313,13 @@ describe('importSpaceData', () => {
       }
     });
 
+    posts = await testUtilsForum.generateForumPosts({
+      spaceId: sourceSpace.id,
+      count: 3,
+      createdBy: sourceSpaceUser.id,
+      categoryId: firstSourcePostCategory.id
+    });
+
     exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id, filename: fileExportName });
   });
 
@@ -335,6 +345,18 @@ describe('importSpaceData', () => {
     });
 
     expect(importResult).toMatchObject<SpaceDataImportResult>({
+      posts: expect.arrayContaining(
+        posts.map((post) => ({
+          ...post,
+          id: expect.any(String),
+          path: expect.any(String),
+          spaceId: targetSpace.id,
+          createdBy: targetSpace.createdBy,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+          categoryId: expect.any(String)
+        }))
+      ),
       space: {
         notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
@@ -448,6 +470,11 @@ describe('importSpaceData', () => {
         roles: {
           [firstSourceRole.id]: expect.any(String),
           [secondSourceRole.id]: expect.any(String)
+        },
+        posts: {
+          [posts[0].id]: expect.any(String),
+          [posts[1].id]: expect.any(String),
+          [posts[2].id]: expect.any(String)
         }
       }
     });
@@ -475,6 +502,18 @@ describe('importSpaceData', () => {
     });
 
     expect(importResult).toMatchObject<SpaceDataImportResult>({
+      posts: expect.arrayContaining(
+        posts.map((post) => ({
+          ...post,
+          id: expect.any(String),
+          path: expect.any(String),
+          spaceId: targetSpace.id,
+          createdBy: targetSpace.createdBy,
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date),
+          categoryId: expect.any(String)
+        }))
+      ),
       space: {
         notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
@@ -588,6 +627,11 @@ describe('importSpaceData', () => {
         roles: {
           [firstSourceRole.id]: expect.any(String),
           [secondSourceRole.id]: expect.any(String)
+        },
+        posts: {
+          [posts[0].id]: expect.any(String),
+          [posts[1].id]: expect.any(String),
+          [posts[2].id]: expect.any(String)
         }
       }
     });
@@ -628,7 +672,7 @@ describe('importSpaceData', () => {
     const files = await fs.readdir(exportDir);
 
     for (const fileName of files) {
-      if (fileName.startsWith('jest-test-export-')) {
+      if (fileName.startsWith('jest-test-import-')) {
         await fs.unlink(path.join(exportDir, fileName));
       }
     }

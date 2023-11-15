@@ -154,7 +154,7 @@ import type { Application } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
-import { generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateBounty } from 'testing/setupDatabase';
 import type { WorkUpsertData } from '../work';
 import { work } from '../work';
 
@@ -162,7 +162,7 @@ let user: any;
 let space: any;
 
 beforeAll(async () => {
-  ({ user, space } = await generateUserAndSpace());
+  ({ user, space } = await testUtilsUser.generateUserAndSpace());
 });
 
 describe('work', () => {
@@ -329,7 +329,7 @@ const reward = await generateBounty({
 final_instruction=""""
 Only write the code if I confirm. If you have any questions, ask me before you write the code
 
-Never mock unless asked to. Use generators or prisma directly. Generate basic test data inside describe blocks. Make each unit test from state of other tests when the test would mutate data
+Never mock unless asked to. Use generators or prisma directly. Generate basic test data inside describe blocks. Make each unit test independent from state of other tests when the test would mutate data
 
 Always confirm Success and Error cases with me before writing code
 
