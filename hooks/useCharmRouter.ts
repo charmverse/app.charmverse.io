@@ -27,17 +27,13 @@ export function useCharmRouter() {
       });
     },
     // update the URL, trigger a digest but do not re-run SSR
-    updateURLQuery(query: ParsedUrlQueryInput, replaceQuery = false) {
-      if (replaceQuery) {
-        // always keep space domain
-        const replacedQuery = router.query.domain ? { domain: router.query.domain, ...query } : query;
+    updateURLQuery(query: ParsedUrlQueryInput) {
+      // filter empty query params
+      const updatedQuery = Object.fromEntries(
+        Object.entries({ ...router.query, ...query }).filter(([_, v]) => v != null)
+      );
 
-        return router.push({ pathname: router.pathname, query: replacedQuery }, undefined, {
-          shallow: true
-        });
-      }
-
-      return router.push({ pathname: router.pathname, query: { ...router.query, ...query } }, undefined, {
+      return router.push({ pathname: router.pathname, query: updatedQuery }, undefined, {
         shallow: true
       });
     }
