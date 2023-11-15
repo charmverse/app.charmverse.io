@@ -189,8 +189,7 @@ beforeAll(async () => {
               {
                 type: 'heading',
                 attrs: {
-                  level: 2,
-                  collapseContent: null
+                  level: 2
                 },
                 text: proposalText
                 // content: [

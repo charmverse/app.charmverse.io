@@ -11,7 +11,7 @@ describe('generateMarkdown()', () => {
       content: [
         {
           type: 'heading',
-          attrs: { level: 1, collapseContent: null },
+          attrs: { level: 1 },
           content: [{ text: 'Description', type: 'text' }]
         }
       ]
@@ -26,7 +26,7 @@ describe('generateMarkdown()', () => {
       content: [
         {
           type: 'heading',
-          attrs: { level: 2, collapseContent: null },
+          attrs: { level: 2 },
           content: [{ text: 'Description', type: 'text' }]
         }
       ]
@@ -41,7 +41,7 @@ describe('generateMarkdown()', () => {
       content: [
         {
           type: 'heading',
-          attrs: { level: 3, collapseContent: null },
+          attrs: { level: 3 },
           content: [{ text: 'Description', type: 'text' }]
         }
       ]
@@ -168,7 +168,7 @@ describe('generateMarkdown()', () => {
       content: [
         {
           type: 'heading',
-          attrs: { id: null, level: 1, track: [], collapseContent: null },
+          attrs: { id: null, level: 1, track: [] },
           content: [
             {
               text: 'Header',

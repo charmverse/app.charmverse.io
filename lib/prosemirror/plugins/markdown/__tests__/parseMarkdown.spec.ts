@@ -70,7 +70,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 1,
-            collapseContent: null,
             track: []
           },
           content: [
@@ -85,7 +84,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 2,
-            collapseContent: null,
             track: []
           },
           content: [
@@ -128,7 +126,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 2,
-            collapseContent: null,
             track: []
           },
           content: [
@@ -254,7 +251,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 2,
-            collapseContent: null,
             track: []
           },
           content: [
@@ -269,7 +265,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 3,
-            collapseContent: null,
             track: []
           },
           content: [
@@ -296,7 +291,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 1,
-            collapseContent: null,
             track: []
           },
           content: [
@@ -311,7 +305,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 2,
-            collapseContent: null,
             track: []
           },
           content: [
@@ -326,7 +319,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           attrs: {
             id: null,
             level: 3,
-            collapseContent: null,
             track: []
           },
           content: [
