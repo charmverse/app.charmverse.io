@@ -39,7 +39,6 @@ export function plugins({ key }: { key: PluginKey }) {
         },
         apply(tr, pluginState) {
           const meta = tr.getMeta(key);
-          // console.log('apply state', key, pluginState, meta, pages);
           if (meta === undefined) {
             return pluginState;
           }
