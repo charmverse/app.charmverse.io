@@ -44,14 +44,14 @@ Results for domain: ${domain}
 }
 
 function userRow(
-  user: { createdAt: Date; username: string; email: string | null; wallets: { address: string }[] },
+  user: { id: string; createdAt: Date; username: string; email: string | null; wallets: { address: string }[] },
   isAdmin: boolean
 ) {
   const email = user.email && user.username !== user.email ? `${user.email}` : '';
   const wallet = user.wallets.map((w) => w.address).join(', ');
   return `${user.username}${email}${wallet ? ' ' + wallet : ''}${
     isAdmin ? ' (admin)' : ''
-  } - joined ${user.createdAt.toLocaleDateString()}`;
+  } - joined ${user.createdAt.toLocaleDateString()} id: ${user.id}`;
 }
 
 async function deleteSpace(domain: string) {
