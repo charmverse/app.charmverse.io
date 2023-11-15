@@ -94,7 +94,7 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
       iconComponent = <StyledDatabaseIcon />;
     } else if (pageType === 'proposal' || pageType === 'proposals') {
       iconComponent = <ProposalIcon />;
-    } else if (pageType === 'bounty' || pageType === 'bounties' || pageType === 'rewards') {
+    } else if (pageType === 'rewards') {
       iconComponent = <BountyIcon />;
     } else if (pageType === 'members') {
       iconComponent = <AccountCircleIcon />;

@@ -28,9 +28,7 @@ const schema = (customReward?: boolean) => {
     walletAddress: (customReward ? yup.string() : yup.string().required()).test(
       'verifyContractFormat',
       'Invalid wallet address',
-      (value) => {
-        return !value || isValidChainAddress(value);
-      }
+      isValidChainAddress
     ),
     rewardInfo: yup.string()
   });
@@ -69,6 +67,7 @@ export function RewardSubmissionInput({
   const { user } = useUser();
 
   const [isEditorTouched, setIsEditorTouched] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -79,7 +78,7 @@ export function RewardSubmissionInput({
     defaultValues: {
       submission: submission?.submission as string,
       submissionNodes: submission?.submissionNodes as any as JSON,
-      walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address
+      walletAddress: submission ? submission?.walletAddress || '' : user?.wallets[0]?.address
     },
     resolver: yupResolver(schema(hasCustomReward))
   });
@@ -91,7 +90,6 @@ export function RewardSubmissionInput({
       applicationId: submission?.id,
       ...values
     });
-
     if (hasSaved) {
       setFormError(null);
       setIsEditorTouched(false);

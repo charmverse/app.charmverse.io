@@ -28,6 +28,7 @@ import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
+import { ApplicationDialogProvider } from 'components/rewards/hooks/useApplicationDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
 import { BountiesProvider } from 'hooks/useBounties';
@@ -182,36 +183,38 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
         <ReactDndProvider>
           <DataProviders>
             <SettingsDialogProvider>
-              <LocalizationProvider>
-                <FocalBoardProvider>
-                  <NotionProvider>
-                    <IntlProvider>
-                      <PageHead {...pageProps} />
+              <ApplicationDialogProvider>
+                <LocalizationProvider>
+                  <FocalBoardProvider>
+                    <NotionProvider>
+                      <IntlProvider>
+                        <PageHead {...pageProps} />
 
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          <Snackbar
-                            isOpen={isOldBuild}
-                            message='New CharmVerse platform update available. Please refresh.'
-                            actions={[
-                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                <RefreshIcon fontSize='small' />
-                              </IconButton>
-                            ]}
-                            origin={{ vertical: 'top', horizontal: 'center' }}
-                            severity='warning'
-                            handleClose={() => setIsOldBuild(false)}
-                          />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
 
-                          {getLayout(<Component {...pageProps} />)}
+                            {getLayout(<Component {...pageProps} />)}
 
-                          <GlobalComponents />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </IntlProvider>
-                  </NotionProvider>
-                </FocalBoardProvider>
-              </LocalizationProvider>
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </IntlProvider>
+                    </NotionProvider>
+                  </FocalBoardProvider>
+                </LocalizationProvider>
+              </ApplicationDialogProvider>
             </SettingsDialogProvider>
           </DataProviders>
         </ReactDndProvider>

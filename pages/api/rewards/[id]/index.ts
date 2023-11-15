@@ -28,10 +28,20 @@ handler
 
 async function getRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsersAndPageMeta>) {
   const { id } = req.query;
-
   const reward = await getRewardOrThrow({ rewardId: id as string });
 
-  const pageId = reward.id;
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: reward.id
+    },
+    select: {
+      id: true,
+      title: true,
+      path: true
+    }
+  });
+
+  const pageId = rewardPage.id;
 
   const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
@@ -41,17 +51,6 @@ async function getRewardController(req: NextApiRequest, res: NextApiResponse<Rew
   if (!permissions.read) {
     throw new UnauthorisedActionError('You do not have permissions to view this reward.');
   }
-
-  const rewardPage = await prisma.page.findUniqueOrThrow({
-    where: {
-      id: reward.id
-    },
-    select: {
-      id: true,
-      title: true,
-      path: true
-    }
-  });
 
   res.status(200).json({ ...reward, page: rewardPage });
 }

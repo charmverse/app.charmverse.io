@@ -9,7 +9,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
@@ -23,8 +22,8 @@ type RewardsContextType = {
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
   refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
-  tempReward?: RewardCreationData | null;
-  setTempReward: (input?: RewardCreationData | null) => void;
+  creatingInlineReward: boolean;
+  setCreatingInlineReward: (isCreating: boolean) => void;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
@@ -38,8 +37,8 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   isLoading: false,
   updateReward: () => Promise.resolve(),
   refreshReward: () => Promise.resolve() as any,
-  tempReward: null,
-  setTempReward: () => {}
+  creatingInlineReward: false,
+  setCreatingInlineReward: () => {}
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
@@ -49,9 +48,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
 
   const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
-  const [tempRewardData, setTempRewardData] = useState<null | RewardCreationData>(null);
+  const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
   const { subscribe } = useWebSocketClient();
-
   // filter out deleted and templates
   let filteredRewards = useMemo(
     () =>
@@ -107,23 +105,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     [mutateRewards]
   );
 
-  const setTempReward = useCallback(
-    (data?: RewardCreationData | null) => {
-      if (!space || !user) return;
-
-      setTempRewardData(
-        data ?? {
-          chainId: 1,
-          spaceId: space.id,
-          rewardAmount: 1,
-          rewardToken: 'ETH',
-          userId: user.id
-        }
-      );
-    },
-    [space, user]
-  );
-
   useEffect(() => {
     function handleDeleteEvent(deletedPages: WebSocketPayload<'pages_deleted'>) {
       mutateRewards(
@@ -162,8 +143,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       updateReward,
       refreshReward,
       setRewards: mutateRewards,
-      setTempReward,
-      tempReward: tempRewardData
+      setCreatingInlineReward,
+      creatingInlineReward
     }),
     [
       rewards,
@@ -174,8 +155,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       loadingPages,
       updateReward,
       refreshReward,
-      setTempReward,
-      tempRewardData
+      creatingInlineReward,
+      setCreatingInlineReward
     ]
   );
 
