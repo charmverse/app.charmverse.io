@@ -38,11 +38,11 @@ interface Props {
   onClose: () => void;
   readOnly?: boolean;
   hideToolsMenu?: boolean;
-  pageDialogContext?: PageDialogContext;
+  applicationContext?: PageDialogContext;
 }
 
 function PageDialogBase(props: Props) {
-  const { hideToolsMenu = false, pageId, readOnly, pageDialogContext } = props;
+  const { hideToolsMenu = false, pageId, readOnly, applicationContext } = props;
 
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
@@ -59,12 +59,13 @@ function PageDialogBase(props: Props) {
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
   const contentType: ContentViewType | null = useMemo(() => {
-    if (pageDialogContext?.applicationId || (pageDialogContext?.isNewApplication && pageDialogContext?.pageId)) {
+    if (applicationContext?.applicationId || (applicationContext?.isNewApplication && applicationContext?.pageId)) {
       return 'application';
     }
 
     return pageId ? 'page' : null;
-  }, [pageDialogContext?.applicationId, pageDialogContext?.isNewApplication, pageDialogContext?.pageId, pageId]);
+  }, [applicationContext?.applicationId, applicationContext?.isNewApplication, applicationContext?.pageId, pageId]);
+
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
     mounted.current = true;
@@ -177,10 +178,10 @@ function PageDialogBase(props: Props) {
       {page && contentType === 'page' && (
         <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} close={close} />
       )}
-      {contentType === 'application' && pageDialogContext && (
+      {contentType === 'application' && applicationContext && (
         <RewardApplicationPage
-          applicationId={pageDialogContext.applicationId || null}
-          rewardId={pageDialogContext.pageId || null}
+          applicationId={applicationContext.applicationId || null}
+          rewardId={applicationContext.pageId || null}
           closeDialog={close}
         />
       )}
