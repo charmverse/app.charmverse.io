@@ -11,6 +11,31 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { saveDocumentNotification } from '../saveNotification';
 
+async function getUserIdsFromRole(roleId: string) {
+  const role = await prisma.role.findFirstOrThrow({
+    where: {
+      id: roleId
+    },
+    select: {
+      spaceRolesToRole: {
+        select: {
+          spaceRole: {
+            select: {
+              user: {
+                select: {
+                  id: true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return role.spaceRolesToRole.map(({ spaceRole }) => spaceRole.user.id);
+}
+
 async function getUserIdsFromMentionNode({
   targetMention,
   mentionAuthorId,
@@ -44,29 +69,10 @@ async function getUserIdsFromMentionNode({
         }
       });
     } else {
-      const role = await prisma.role.findFirstOrThrow({
-        where: {
-          id: targetMention.value
-        },
-        select: {
-          spaceRolesToRole: {
-            select: {
-              spaceRole: {
-                select: {
-                  user: {
-                    select: {
-                      id: true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      });
-      role.spaceRolesToRole.forEach(({ spaceRole }) => {
-        if (spaceRole.user.id !== mentionAuthorId) {
-          targetUserIds.push(spaceRole.user.id);
+      const userIds = await getUserIdsFromRole(targetMention.value);
+      userIds.forEach((userId) => {
+        if (userId !== mentionAuthorId) {
+          targetUserIds.push(userId);
         }
       });
     }
@@ -443,6 +449,154 @@ export async function createDocumentNotifications(webhookData: {
             pageCommentId: documentId ? commentId : undefined,
             postCommentId: postId ? commentId : undefined,
             commentId
+          });
+          ids.push(id);
+          notificationSentUserIds.add(targetUserId);
+        }
+      }
+
+      break;
+    }
+
+    case WebhookEventNames.DocumentApplicationCommentCreated: {
+      const spaceId = webhookData.spaceId;
+      const applicationCommentAuthorId = webhookData.event.applicationComment.author.id;
+      const applicationCommentId = webhookData.event.applicationComment.id;
+      const documentId = webhookData.event.document.id;
+
+      const applicationComment = await prisma.applicationComment.findFirstOrThrow({
+        where: {
+          id: applicationCommentId
+        },
+        select: {
+          parentId: true,
+          content: true,
+          application: {
+            select: {
+              createdBy: true
+            }
+          }
+        }
+      });
+
+      const applicationAuthorId = applicationComment.application.createdBy;
+      const applicationCommentContent = applicationComment.content as PageContent;
+
+      const reward = await prisma.bounty.findFirstOrThrow({
+        where: {
+          page: {
+            id: documentId
+          }
+        },
+        select: {
+          permissions: {
+            select: {
+              roleId: true,
+              userId: true,
+              permissionLevel: true
+            }
+          }
+        }
+      });
+
+      const notificationSentUserIds: Set<string> = new Set();
+      const notificationTargetUserIds: string[] = [applicationAuthorId];
+      const reviewerPermissions = reward.permissions.filter((permission) => permission.permissionLevel === 'reviewer');
+      for (const permission of reviewerPermissions) {
+        if (permission.userId) {
+          notificationTargetUserIds.push(permission.userId);
+        } else if (permission.roleId) {
+          const userIds = await getUserIdsFromRole(permission.roleId);
+          notificationTargetUserIds.push(...userIds);
+        }
+      }
+
+      // Send notification only for top-level comments
+      if (!applicationComment.parentId) {
+        for (const targetUserId of notificationTargetUserIds) {
+          if (targetUserId !== applicationCommentAuthorId && !notificationSentUserIds.has(targetUserId)) {
+            const { id } = await saveDocumentNotification({
+              type: 'application_comment.created',
+              createdAt: webhookData.createdAt,
+              createdBy: applicationCommentAuthorId,
+              applicationCommentId,
+              pageId: documentId,
+              spaceId,
+              userId: targetUserId,
+              content: applicationCommentContent
+            });
+            ids.push(id);
+            notificationSentUserIds.add(targetUserId);
+          }
+        }
+      } else {
+        const parentApplicationComment = await prisma.applicationComment.findUniqueOrThrow({
+          where: {
+            id: applicationComment.parentId
+          },
+          select: {
+            createdBy: true
+          }
+        });
+
+        const parentApplicationCommentAuthorId = parentApplicationComment.createdBy;
+
+        if (parentApplicationCommentAuthorId !== applicationCommentAuthorId) {
+          const { id } = await saveDocumentNotification({
+            type: 'application_comment.replied',
+            createdAt: webhookData.createdAt,
+            createdBy: applicationCommentAuthorId,
+            applicationCommentId,
+            spaceId,
+            pageId: documentId,
+            userId: parentApplicationCommentAuthorId,
+            content: applicationCommentContent
+          });
+          ids.push(id);
+          notificationSentUserIds.add(parentApplicationCommentAuthorId);
+        }
+      }
+
+      const extractedMentions = extractMentions(applicationCommentContent);
+
+      const permissionsClient = await getPermissionsClient({
+        resourceId: webhookData.spaceId,
+        resourceIdType: 'space'
+      });
+
+      for (const extractedMention of extractedMentions) {
+        const targetUserIds = await getUserIdsFromMentionNode({
+          targetMention: extractedMention,
+          mentionAuthorId: applicationCommentAuthorId,
+          spaceId: webhookData.spaceId
+        });
+
+        for (const targetUserId of targetUserIds) {
+          if (notificationSentUserIds.has(targetUserId)) {
+            continue;
+          }
+
+          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+            resourceId: documentId,
+            userId: targetUserId
+          });
+
+          const hasReadPermission = pagePermission.read;
+
+          if (!hasReadPermission) {
+            continue;
+          }
+
+          const { id } = await saveDocumentNotification({
+            type: 'application_comment.mention.created',
+            createdAt: webhookData.createdAt,
+            createdBy: applicationCommentAuthorId,
+            mentionId: extractedMention.id,
+            pageId: documentId,
+            spaceId,
+            userId: targetUserId,
+            content: extractedMention.parentNode ?? null,
+            applicationCommentId
           });
           ids.push(id);
           notificationSentUserIds.add(targetUserId);

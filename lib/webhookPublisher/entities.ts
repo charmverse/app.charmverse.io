@@ -13,7 +13,8 @@ import type {
   ProposalEntity,
   SpaceEntity,
   UserEntity,
-  VoteEntity
+  VoteEntity,
+  ApplicationCommentEntity
 } from './interfaces';
 
 export async function getRewardEntity(id: string): Promise<RewardEntity> {
@@ -267,5 +268,25 @@ export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
     url: `${baseUrl}/${document.space.domain}/${document.path}`,
     type: document.type,
     authors
+  };
+}
+
+export async function getApplicationCommentEntity(id: string): Promise<ApplicationCommentEntity> {
+  const applicationComment = await prisma.applicationComment.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdAt: true,
+      createdBy: true,
+      applicationId: true
+    }
+  });
+
+  return {
+    applicationId: applicationComment.applicationId,
+    id,
+    author: await getUserEntity(applicationComment.createdBy),
+    createdAt: applicationComment.createdAt.toISOString()
   };
 }

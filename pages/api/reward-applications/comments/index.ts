@@ -10,6 +10,8 @@ import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/mi
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 export type CreateApplicationCommentPayload = {
   content: PageContent | null;
@@ -31,7 +33,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
   const { contentText, content, parentCommentId } = req.body as CreateApplicationCommentPayload;
   const { id: userId } = req.session.user;
 
-  const application = await prisma.application.findUniqueOrThrow({
+  await prisma.application.findUniqueOrThrow({
     where: {
       id: applicationId
     },
@@ -52,6 +54,29 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
       content: content ?? Prisma.JsonNull,
       contentText
     }
+  });
+
+  const page = await prisma.page.findFirstOrThrow({
+    where: {
+      bounty: {
+        applications: {
+          some: {
+            id: applicationId
+          }
+        }
+      }
+    },
+    select: {
+      id: true,
+      spaceId: true
+    }
+  });
+
+  await publishDocumentEvent({
+    documentId: page.id,
+    scope: WebhookEventNames.DocumentApplicationCommentCreated,
+    applicationCommentId: applicationComment.id,
+    spaceId: page.spaceId
   });
 
   return res.status(201).json(applicationComment);
