@@ -1,10 +1,11 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import MuxVideo from '@mux/mux-video-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSwr from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
+import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
@@ -32,17 +33,19 @@ export function VideoNodeView({
   getPos,
   view,
   selected,
-  updateAttrs
+  updateAttrs,
+  postId
 }: CharmNodeViewProps) {
   const attrs = node.attrs as VideoNodeAttrs;
   const { space } = useCurrentSpace();
   const [playbackIdWithToken, setPlaybackIdWithToken] = useState('');
+  const parentId = pageId || postId;
 
   // poll endpoint until video is ready
   const { data: asset } = useSwr(
-    () => (attrs.muxAssetId && !playbackIdWithToken && pageId && space ? `/api/mux/asset/${attrs.muxAssetId}` : null),
+    () => (attrs.muxAssetId && !playbackIdWithToken && parentId && space ? `/api/mux/asset/${attrs.muxAssetId}` : null),
     () => {
-      return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId: pageId!, spaceId: space!.id });
+      return charmClient.mux.getAsset({ id: attrs.muxAssetId!, pageId: parentId!, spaceId: space!.id });
     },
     {
       refreshInterval: 5000
@@ -117,7 +120,15 @@ export function VideoNodeView({
                   placeholder='https://youtube.com...'
                 />
               ],
-              ['Upload', <VideoUploadForm key='upload' onComplete={onUploadComplete} pageId={pageId ?? null} />]
+              // Before a post is created, we don't have a parentId, so we can't upload a video
+              ...(parentId
+                ? [
+                    [
+                      'Upload',
+                      <VideoUploadForm key='upload' onComplete={onUploadComplete} pageId={parentId} />
+                    ] as TabConfig
+                  ]
+                : [])
             ]}
           />
         </MediaSelectionPopup>
@@ -144,7 +155,7 @@ export function VideoNodeView({
             playbackId={playbackIdWithToken} // asset.playbackId includes signed token
             // for analytics
             metadata={{
-              custom_1: pageId
+              custom_1: parentId
               // video_id: 'video-id-123456'
               // video_title: 'Super Interesting Video',
               // viewer_user_id: 'user-id-bc-789'
