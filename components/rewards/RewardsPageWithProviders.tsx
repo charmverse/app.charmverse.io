@@ -13,12 +13,16 @@ export function RewardsPageWithProviders() {
   setTitle(rewardsTitle);
 
   return (
-    <RewardsProvider>
-      <RewardBlocksProvider>
-        <RewardsBoardProvider>
-          <RewardsPage title={rewardsTitle} />
-        </RewardsBoardProvider>
-      </RewardBlocksProvider>
-    </RewardsProvider>
+    <PageDialogProvider>
+      <RewardsProvider>
+        <RewardBlocksProvider>
+          <RewardsBoardProvider>
+            <RewardsPage title={rewardsTitle} />
+
+            <PageDialogGlobal />
+          </RewardsBoardProvider>
+        </RewardBlocksProvider>
+      </RewardsProvider>
+    </PageDialogProvider>
   );
 }

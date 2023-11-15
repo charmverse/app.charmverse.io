@@ -41,7 +41,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
   }
 
   const openApplication = (applicationId: string) => {
-    updateURLQuery({ id: rewardId, applicationId });
+    updateURLQuery({ applicationId });
   };
 
   const validSubmissions = countCompleteSubmissions({ applications: reward.applications });

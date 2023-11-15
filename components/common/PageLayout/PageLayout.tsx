@@ -9,7 +9,6 @@ import { useMemo, useState } from 'react';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
-import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { AnnouncementBanner } from 'components/common/PageLayout/components/AnnouncementBanner';
 import { BlocksExceededBanner } from 'components/common/PageLayout/components/BlocksExceededBanner';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
@@ -227,8 +226,6 @@ function PageLayout({ children }: PageLayoutProps) {
                 <HeaderSpacer />
                 {children}
               </PageContainer>
-
-              <PageDialogGlobal />
             </PageDialogProvider>
           </DocumentPageProviders>
         </FocalboardViewsProvider>
