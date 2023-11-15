@@ -6,6 +6,7 @@ import { InputRule, Plugin } from '@bangle.dev/pm';
 import { mapSlice, matchAllPlus } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import type { PluginKey } from 'prosemirror-state';
+import { v4 } from 'uuid';
 
 import { insertNode } from 'lib/prosemirror/insertNode';
 
@@ -87,7 +88,8 @@ function pasteLink(regexp: RegExp) {
   });
 }
 
-function replaceLinkWithPage(key: PluginKey) {
+// convert links into page mentions
+function replaceLinkWithPageMention(key: PluginKey) {
   return new Plugin({
     props: {
       handlePaste: function handlePastedLink(view, _, slice) {
@@ -104,7 +106,7 @@ function replaceLinkWithPage(key: PluginKey) {
             const pagePathMaybe = url.split('/').pop() || '';
             const foundPageId = pageMap[pagePathMaybe];
             if (foundPageId) {
-              insertNode('linkedPage', view.state, view.dispatch, view, { id: foundPageId });
+              insertNode('mention', view.state, view.dispatch, view, { id: v4(), type: 'page', value: foundPageId });
               return true;
             }
           }
@@ -149,7 +151,7 @@ export function linkPlugins({ key }: { key: PluginKey }) {
     return [
       autoLinkInputRule(type),
       pasteLink(LINK_REGEX),
-      replaceLinkWithPage(key),
+      replaceLinkWithPageMention(key),
       markPasteRule(LINK_REGEX, type, (match) => ({ href: match }))
     ];
   };
