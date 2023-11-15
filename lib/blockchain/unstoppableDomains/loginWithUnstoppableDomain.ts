@@ -23,7 +23,7 @@ export async function loginWithUnstoppableDomain({
   authSig,
   signupAnalytics = {}
 }: UnstoppableDomainsLoginRequest): Promise<LoggedInUser> {
-  const isValid = verifyUnstoppableDomainsSignature(authSig);
+  const isValid = await verifyUnstoppableDomainsSignature(authSig);
 
   if (!isValid) {
     throw new UnauthorisedActionError(`Wallet signature is invalid`);

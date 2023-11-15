@@ -1,11 +1,11 @@
 import { SiweMessage } from 'lit-siwe';
-import { verifyMessage } from 'viem';
+import { recoverMessageAddress } from 'viem';
 
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import type { ProofContent, UnstoppableDomainsAuthSig } from './interfaces';
 
-export function verifyUnstoppableDomainsSignature(authSig: UnstoppableDomainsAuthSig): boolean {
+export async function verifyUnstoppableDomainsSignature(authSig: UnstoppableDomainsAuthSig): Promise<boolean> {
   const { idToken } = authSig;
 
   const verificationKey = idToken.amr.find((item) => item.match('v1.sig.ethereum.'));
@@ -44,7 +44,10 @@ export function verifyUnstoppableDomainsSignature(authSig: UnstoppableDomainsAut
 
   const body = message.prepareMessage();
 
-  const signatureAddress = verifyMessage(body, verificationProof.signature);
+  const signatureAddress = await recoverMessageAddress({
+    message: body,
+    signature: verificationProof.signature
+  });
   if (!lowerCaseEqual(signatureAddress, address)) {
     return false;
   }
