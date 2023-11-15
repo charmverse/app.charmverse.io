@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
  * Use this script to retrieve and blacklist a space
  */
 
-const spaceDomain = 'file';
+const spaceDomain = 'life';
 
 async function search(domain: string) {
   const space = await prisma.space.findUniqueOrThrow({
@@ -47,7 +47,7 @@ function userRow(
   user: { id: string; createdAt: Date; username: string; email: string | null; wallets: { address: string }[] },
   isAdmin: boolean
 ) {
-  const email = user.email && user.username !== user.email ? ` ${user.email}` : '';
+  const email = user.email && user.username !== user.email ? `${user.email}` : '';
   const wallet = user.wallets.map((w) => w.address).join(', ');
   return `${user.username}${email}${wallet ? ' ' + wallet : ''}${
     isAdmin ? ' (admin)' : ''
@@ -66,8 +66,6 @@ async function deleteSpace(domain: string) {
   console.log('Deleted space', result);
 }
 
-// search(spaceDomain)
-//   .then(() => process.exit())
-//   .catch((err) => console.error(err));
+search(spaceDomain).then(() => process.exit());
 
-deleteSpace(spaceDomain).then(() => process.exit());
+//deleteSpace(spaceDomain).then(() => process.exit());
