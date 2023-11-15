@@ -21,8 +21,7 @@ export const gettingStartedPage: GettingStartedPage = {
         type: 'heading',
         attrs: {
           level: 1,
-          track: [],
-          collapseContent: null
+          track: []
         },
         content: [
           {

@@ -170,19 +170,19 @@ function getBountyContent(n: BountyNotification, authorUsername?: string): strin
       );
     }
     case 'application.approved': {
-      return `Your application for a bounty was accepted`;
+      return `Your application for a reward was accepted`;
     }
     case 'application.rejected': {
-      return `Your application for a bounty has been rejected`;
+      return `Your application for a reward has been rejected`;
     }
     case 'submission.approved': {
-      return `Your application for a bounty was approved`;
+      return `Your application for a reward was approved`;
     }
     case 'application.payment_pending': {
-      return `Payment required for a bounty`;
+      return `Payment required for a reward`;
     }
     case 'application.payment_completed': {
-      return `You have been paid for a bounty`;
+      return `You have been paid for a reward`;
     }
     case 'suggestion.created': {
       return username ? (

@@ -213,7 +213,7 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  } else if (pageType === 'bounty' && router.route.startsWith('/[domain]/rewards/')) {
+  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/rewards/')) {
     const baseTitle = mappedFeatures.rewards.title;
     return (
       <RewardsPageTitle
@@ -222,9 +222,11 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
         applicationId={router.query.applicationId as string}
       />
     );
-  } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/bounties/')) {
-    const baseTitle = mappedFeatures.bounties.title;
-    return <BountyPageTitle baseTitle={baseTitle} basePath={`/${router.query.domain}`} />;
+
+    // TODO: [bounties-cleanup]
+    // } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/bounties/')) {
+    //   const baseTitle = mappedFeatures.bounties.title;
+    //   return <BountyPageTitle baseTitle={baseTitle} basePath={`/${router.query.domain}`} />;
     // Switch over when we use rewards
   } else if (pageType === 'proposal' || pageType === 'proposal_template') {
     const baseTitle = mappedFeatures.proposals.title;

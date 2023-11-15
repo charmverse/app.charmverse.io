@@ -14,6 +14,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { isTruthy } from 'lib/utilities/types';
 
+import { Constants } from '../../constants';
 import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
@@ -252,6 +253,10 @@ function CardDetailProperties(props: Props) {
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields?.cardProperties.map((propertyTemplate) => {
+        if (propertyTemplate.id === Constants.titleColumnId) {
+          return null;
+        }
+
         const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
 
         return (
