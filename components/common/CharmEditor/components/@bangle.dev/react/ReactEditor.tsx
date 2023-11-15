@@ -15,7 +15,6 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import type { BangleEditorProps as CoreBangleEditorProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
-import { threadPluginKey } from 'components/common/CharmEditor/plugins';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -27,6 +26,7 @@ import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 

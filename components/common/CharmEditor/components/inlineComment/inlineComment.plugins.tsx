@@ -1,4 +1,4 @@
-import type { PluginKey, EditorState, EditorView } from '@bangle.dev/pm';
+import type { EditorState, EditorView, PluginKey } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import isEqual from 'lodash/isEqual';
 import { Plugin } from 'prosemirror-state';
@@ -8,9 +8,9 @@ import type { RawPlugins } from 'components/common/CharmEditor/components/@bangl
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
-import { threadPluginKey } from '../../plugins';
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { threadPluginKey } from '../thread/thread.plugins';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
 import { markName } from './inlineComment.constants';

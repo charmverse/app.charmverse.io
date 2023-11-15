@@ -58,7 +58,6 @@ const columnsPluginKey = new PluginKey('columns');
 const inlineVotePluginKey = new PluginKey(inlineVote.pluginKeyName);
 
 export const suggestionsPluginKey = new PluginKey('suggestions');
-export const threadPluginKey = new PluginKey('threads');
 
 export function charmEditorPlugins({
   onContentChange,
@@ -218,8 +217,7 @@ export function charmEditorPlugins({
   if (threadIds) {
     basePlugins.push(
       threadPlugins({
-        threadIds,
-        key: threadPluginKey
+        threadIds
       })
     );
   }

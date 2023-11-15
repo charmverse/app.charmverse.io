@@ -1,7 +1,7 @@
 import type { Node } from '@bangle.dev/pm';
 
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import { threadPluginKey } from 'components/common/CharmEditor/plugins';
+import { threadPluginKey } from 'components/common/CharmEditor/components/thread/thread.plugins';
 import { extractTextFromSelection } from 'lib/prosemirror/plugins/inlineComments/extractTextFromSelection';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';

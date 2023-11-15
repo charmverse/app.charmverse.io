@@ -1,24 +1,25 @@
 import type { EditorState, Node } from '@bangle.dev/pm';
-import type { PluginKey } from 'prosemirror-state';
-import { Plugin } from 'prosemirror-state';
+import { PluginKey, Plugin } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
-import { markName as inlineCommentMarkName } from '../inlineComment';
+import { markName as inlineCommentMarkName } from '../inlineComment/inlineComment.constants';
+
+export const threadPluginKey = new PluginKey('threads');
 
 export interface ThreadPluginState {
   threadIds: string[];
 }
 
-export const plugins = ({ key, threadIds }: { threadIds: string[]; key: PluginKey }) => {
+export const plugins = ({ threadIds }: { threadIds: string[] }) => {
   return [
     new Plugin({
-      key,
+      key: threadPluginKey,
       state: {
         init: () => {
           return threadIds;
         },
         apply: (tr, pluginState) => {
-          const newPluginState = tr.getMeta(key);
+          const newPluginState = tr.getMeta(threadPluginKey);
           if (newPluginState) {
             return newPluginState;
           }

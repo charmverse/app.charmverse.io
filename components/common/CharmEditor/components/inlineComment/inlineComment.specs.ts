@@ -1,5 +1,3 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
-
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { markName } from './inlineComment.constants';
