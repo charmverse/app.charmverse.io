@@ -1,3 +1,4 @@
+import type { ButtonProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
@@ -14,6 +15,7 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   secondaryButtonText?: string;
   onClose: () => void;
   disabled?: boolean;
+  primaryButtonColor?: ButtonProps['color'];
 };
 
 export default function ConfirmDeleteModal({
@@ -25,7 +27,8 @@ export default function ConfirmDeleteModal({
   onConfirm,
   size,
   secondaryButtonText = 'Cancel',
-  disabled
+  disabled,
+  primaryButtonColor = 'error'
 }: Props) {
   function _onConfirm() {
     onConfirm();
@@ -38,7 +41,7 @@ export default function ConfirmDeleteModal({
 
       <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
         <Button
-          color='error'
+          color={primaryButtonColor}
           sx={{
             mr: 2,
             fontWeight: 'bold',
