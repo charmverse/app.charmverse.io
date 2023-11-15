@@ -7,7 +7,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { computeBountyPermissions } from 'lib/permissions/bounties';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -44,7 +43,7 @@ async function createApplicationCommentController(req: NextApiRequest, res: Next
     }
   });
 
-  // no permissons check - everyone can comment on others applications
+  // no permissions check - everyone can comment on others applications
 
   const applicationComment = await prisma.applicationComment.create({
     data: {
