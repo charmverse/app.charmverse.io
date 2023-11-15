@@ -1,7 +1,7 @@
 import type { Bounty } from '@charmverse/core/prisma';
+import { Interface } from '@ethersproject/abi';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getChainById } from 'connectors/chains';
-import { ethers } from 'ethers';
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import { getAddress, parseUnits } from 'viem';
@@ -77,7 +77,7 @@ export function useMultiBountyPayment({
                 safeAddress && reward.rewardToken !== getChainById(reward.chainId as number)?.nativeCurrency.symbol;
               if (isERC20Token) {
                 const paymentMethod = paymentMethods.find((method) => method.contractAddress === reward.rewardToken);
-                const erc20 = new ethers.utils.Interface(ERC20_ABI);
+                const erc20 = new Interface(ERC20_ABI);
                 const parsedAmount = parseUnits(
                   eToNumber(reward.rewardAmount as number),
                   paymentMethod!.tokenDecimals
