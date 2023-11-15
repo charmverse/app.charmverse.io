@@ -1,6 +1,5 @@
 import type { EditorState, EditorView, PluginKey } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
-import isEqual from 'lodash/isEqual';
 import { Plugin } from 'prosemirror-state';
 import { createRoot } from 'react-dom/client';
 
@@ -10,7 +9,6 @@ import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { threadPluginKey } from '../thread/thread.plugins';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
 import { markName } from './inlineComment.constants';
@@ -99,10 +97,8 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
         init(_, state) {
           return getDecorations(state);
         },
-        apply(tr, old, oldState, newState) {
-          const previousThreadIds = threadPluginKey.getState(oldState);
-          const newThreadIds = threadPluginKey.getState(newState);
-          return tr.docChanged || isEqual(previousThreadIds, newThreadIds) ? getDecorations(newState) : old;
+        apply(tr, old, _, newState) {
+          return tr.docChanged ? getDecorations(newState) : old;
         }
       },
       props: {
@@ -130,8 +126,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
 }
 
 function getDecorations(state: EditorState) {
-  const threadIds = threadPluginKey.getState(state);
-  const rows = extractInlineCommentRows(state.schema, state.doc, threadIds);
+  const rows = extractInlineCommentRows(state.schema, state.doc);
   const uniqueCommentIds: Set<string> = new Set();
 
   const decorations: Decoration[] = [];
