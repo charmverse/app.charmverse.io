@@ -1,3 +1,6 @@
+import fs from 'fs/promises';
+import path from 'path';
+
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageMeta } from '@charmverse/core/pages';
 import type {
@@ -66,7 +69,7 @@ describe('importSpaceData', () => {
 
   let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
 
-  const fileExportName = 'jest-test-space-data-import.json';
+  const fileExportName = 'jest-test-export-space-data-import.json';
 
   beforeAll(async () => {
     ({ space: sourceSpace, user: sourceSpaceUser } = await testUtilsUser.generateUserAndSpace());
@@ -617,5 +620,17 @@ describe('importSpaceData', () => {
       roles: [],
       spacePermissions: []
     });
+  });
+
+  afterAll(async () => {
+    const exportDir = path.resolve(`lib/templates/exports/`);
+
+    const files = await fs.readdir(exportDir);
+
+    for (const fileName of files) {
+      if (fileName.startsWith('jest-test-export-')) {
+        await fs.unlink(path.join(exportDir, fileName));
+      }
+    }
   });
 });

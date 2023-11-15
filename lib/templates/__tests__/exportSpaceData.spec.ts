@@ -1,4 +1,3 @@
-// Assume this test file is at the same level as the folder where `exportSpaceData` is located.
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -10,7 +9,6 @@ import type {
   MemberProperty,
   MemberPropertyPermission,
   PostCategory,
-  Proposal,
   ProposalCategory,
   Role,
   Space,
@@ -369,7 +367,7 @@ describe('exportSpaceData', () => {
 
   it('should export space data and write to a file when a filename is provided', async () => {
     // Params for calling export
-    const filename = `test-export-${Date.now()}.json`;
+    const filename = `jest-test-export-${Date.now()}.json`;
 
     await exportSpaceData({ spaceIdOrDomain: space.id, filename });
 
@@ -413,5 +411,17 @@ describe('exportSpaceData', () => {
       ]),
       postCategories: expect.arrayContaining([postCategoryWithPermissions])
     });
+  });
+
+  afterAll(async () => {
+    const exportDir = path.resolve(`lib/templates/exports/`);
+
+    const files = await fs.readdir(exportDir);
+
+    for (const fileName of files) {
+      if (fileName.startsWith('jest-test-export-')) {
+        await fs.unlink(path.join(exportDir, fileName));
+      }
+    }
   });
 });
