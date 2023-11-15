@@ -9,12 +9,10 @@ import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/Page
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import UserDisplay from 'components/common/UserDisplay';
 import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import type { WorkInput } from 'components/rewards/hooks/useApplication';
 import { useApplication } from 'components/rewards/hooks/useApplication';
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useNewWork } from 'components/rewards/hooks/useNewApplication';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -23,7 +21,6 @@ import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { ApplicationComments } from './components/ApplicationComments';
 import { ApplicationInput } from './components/RewardApplicationInput';
@@ -54,12 +51,9 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   } = useApplication({
     applicationId: applicationId || ''
   });
-
-  const { navigateToSpacePath, router } = useCharmRouter();
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
   const currentRewardId = rewardId || reward?.id;
 
-  const { hideApplication, openedFromModal, showApplication } = useApplicationDialog();
   const { page: rewardPageContent } = usePage({ pageIdOrPath: currentRewardId });
 
   const { space } = useCurrentSpace();
@@ -68,8 +62,11 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
 
   const { members } = useMembers();
   const { user } = useUser();
+  const {
+    updateURLQuery,
+    router: { query }
+  } = useCharmRouter();
 
-  const { showPage: showReward, hidePage: hideReward } = usePageDialog();
   const { createNewWork } = useNewWork(currentRewardId);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -79,6 +76,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
       if (isNewApplication) {
         await createNewWork(input);
         refreshReward();
+        // use nav instead
         closeDialog?.();
       } else {
         await updateApplication(input);
@@ -97,25 +95,11 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
     }
   };
 
-  function onClose() {
-    setUrlWithoutRerender(router.pathname, { id: null });
-    hideReward();
-  }
-
   function goToReward() {
     if (space && rewardPageContent) {
-      hideApplication();
+      const { applicationId: _, ...restQuery } = query;
 
-      // TODO - reenable this when we fix UX for content switching in dialog
-      // if (openedFromModal && currentRewardId) {
-      //   navigateToSpacePath(`/rewards`, { id: currentRewardId });
-      //   showReward({
-      //     pageId: currentRewardId,
-      //     onClose
-      //   });
-      // } else {
-      //   navigateToSpacePath(`/${rewardPageContent.path}`);
-      // }
+      updateURLQuery(restQuery, true);
     }
   }
 
@@ -145,7 +129,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
             <StyledContainer top={0}>
               <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
               <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
-                <span>Back to rewards</span>
+                <span>Back to {query.id ? 'reward' : 'rewards'}</span>
               </Button>
 
               <div className='focalboard-body'>

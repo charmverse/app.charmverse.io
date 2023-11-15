@@ -18,6 +18,7 @@ export function RewardsPageWithProviders() {
         <RewardBlocksProvider>
           <RewardsBoardProvider>
             <RewardsPage title={rewardsTitle} />
+
             <PageDialogGlobal />
           </RewardsBoardProvider>
         </RewardBlocksProvider>

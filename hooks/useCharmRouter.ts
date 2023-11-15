@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 export function useCharmRouter() {
   const router = useRouter();
+
   return {
     router,
     navigateToPath(pathname: string, query?: ParsedUrlQueryInput) {
@@ -26,7 +27,16 @@ export function useCharmRouter() {
       });
     },
     // update the URL, trigger a digest but do not re-run SSR
-    updateURLQuery(query: ParsedUrlQueryInput) {
+    updateURLQuery(query: ParsedUrlQueryInput, replaceQuery = false) {
+      if (replaceQuery) {
+        // always keep space domain
+        const replacedQuery = router.query.domain ? { domain: router.query.domain, ...query } : query;
+
+        return router.push({ pathname: router.pathname, query: replacedQuery }, undefined, {
+          shallow: true
+        });
+      }
+
       return router.push({ pathname: router.pathname, query: { ...router.query, ...query } }, undefined, {
         shallow: true
       });
