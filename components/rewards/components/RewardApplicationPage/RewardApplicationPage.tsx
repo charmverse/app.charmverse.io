@@ -97,9 +97,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
 
   function goToReward() {
     if (space && rewardPageContent) {
-      const { applicationId: _, ...restQuery } = query;
-
-      updateURLQuery(restQuery, true);
+      updateURLQuery({ applicationId: null });
     }
   }
 

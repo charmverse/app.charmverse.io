@@ -58,13 +58,10 @@ function PageDialogBase(props: Props) {
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
-  const contentType: ContentViewType | null = useMemo(() => {
-    if (applicationContext?.applicationId || (applicationContext?.isNewApplication && applicationContext?.pageId)) {
-      return 'application';
-    }
-
-    return pageId ? 'page' : null;
-  }, [applicationContext?.applicationId, applicationContext?.isNewApplication, applicationContext?.pageId, pageId]);
+  let contentType = pageId ? 'page' : null;
+  if (applicationContext?.applicationId || (applicationContext?.isNewApplication && applicationContext?.pageId)) {
+    contentType = 'application';
+  }
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {

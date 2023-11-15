@@ -12,8 +12,7 @@ export function useRewardsNavigation() {
   } = useCharmRouter();
 
   const onClose = () => {
-    const { applicationId, isNewApplication, id, ...rest } = query;
-    updateURLQuery(rest, true);
+    updateURLQuery({ applicationId: null, isNewApplication: null, id: null });
   };
 
   useEffect(() => {
