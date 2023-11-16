@@ -18,7 +18,6 @@ import charmClient from 'charmClient';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageSidebarContext } from 'hooks/usePageSidebar';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -164,7 +163,7 @@ const defaultContent: PageContent = {
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
-interface CharmEditorProps {
+type CharmEditorProps = {
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -173,7 +172,8 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  PageSidebar?: IPageSidebarContext['activeView'];
+  sidebarView?: IPageSidebarContext['activeView'];
+  setSidebarView?: IPageSidebarContext['setActiveView'];
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
@@ -196,7 +196,7 @@ interface CharmEditorProps {
   disableVideo?: boolean;
   setSuggestionState?: (state: EditorState) => void;
   threadIds?: string[];
-}
+};
 
 function CharmEditor({
   colorMode,
@@ -226,13 +226,14 @@ function CharmEditor({
   disableMention = false,
   allowClickingFooter,
   disableVideo = false,
+  sidebarView,
+  setSidebarView,
   threadIds
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
   const { space: currentSpace } = useCurrentSpace();
-  const { setActiveView } = usePageSidebar();
   const { user } = useUser();
 
   const isTemplate = pageType ? pageType.includes('template') : false;
@@ -294,15 +295,15 @@ function CharmEditor({
     // update state that triggers updates in the sidebar
     setSuggestionState?.(state);
     // expand the sidebar if the user is selecting a suggestion
-    setActiveView((sidebarState) => {
-      if (sidebarState) {
+    setSidebarView?.((currentView) => {
+      if (currentView) {
         const selected = getSelectedChanges(state);
         const hasSelection = Object.values(selected).some((value) => value);
         if (hasSelection) {
           return 'suggestions';
         }
       }
-      return sidebarState;
+      return currentView;
     });
   }
 
@@ -540,9 +541,14 @@ function CharmEditor({
       {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
-          <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
+          <InlineCommentThread
+            isCommentSidebarOpen={sidebarView === 'comments'}
+            permissions={pagePermissions}
+            pluginKey={inlineCommentPluginKey}
+          />
           {currentSpace && pageId && (
             <SuggestionsPopup
+              isSuggestionSidebarOpen={sidebarView === 'suggestions'}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}

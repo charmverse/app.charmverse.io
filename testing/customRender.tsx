@@ -73,7 +73,9 @@ export const customRenderWithContext = (
                 setMessage: () => {}
               }}
             >
-              <PageSidebarContext.Provider value={{ activeView: null, setActiveView: () => {} }}>
+              <PageSidebarContext.Provider
+                value={{ activeView: null, setActiveView: () => {}, closeSidebar: () => {} }}
+              >
                 {ui}
               </PageSidebarContext.Provider>
             </SnackbarContext.Provider>

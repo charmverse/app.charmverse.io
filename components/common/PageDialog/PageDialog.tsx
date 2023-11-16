@@ -145,7 +145,7 @@ function PageDialogBase(props: Props) {
         contentType === 'page' &&
         !hideToolsMenu &&
         !readOnly &&
-        page && <FullPageActionsMenuButton page={page} onDelete={close} />
+        page && <FullPageActionsMenuButton isInsideDialog page={page} onDelete={close} />
       }
       toolbar={
         contentType === 'page' && (
@@ -189,7 +189,7 @@ function PageDialogBase(props: Props) {
 // PageDialogBase must be wrapped by DocumentPageProviders so that it can control context about the page
 export function PageDialog(props: Props): JSX.Element | null {
   return (
-    <DocumentPageProviders isInsideDialog={true}>
+    <DocumentPageProviders>
       <PageDialogBase {...props} />
     </DocumentPageProviders>
   );

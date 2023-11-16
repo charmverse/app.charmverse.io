@@ -2,16 +2,11 @@ import { useTheme } from '@emotion/react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { IconButton } from '@mui/material';
 
-import { usePageSidebar } from 'hooks/usePageSidebar';
-
-export function PageSidebarViewToggle() {
-  const { activeView, setActiveView } = usePageSidebar();
+export function PageSidebarViewToggle({ onClick }: { onClick: VoidFunction }) {
   const theme = useTheme();
   return (
     <IconButton
-      onClick={() => {
-        setActiveView(activeView === null ? 'comments' : null);
-      }}
+      onClick={onClick}
       size='small'
       sx={{
         '&.MuiIconButton-root': {

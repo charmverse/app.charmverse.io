@@ -158,7 +158,7 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
       toolsMenu={
         pageId ? (
           <Stack flexDirection='row' gap={1}>
-            <FullPageActionsMenuButton pageId={pageId} onDelete={close} />
+            <FullPageActionsMenuButton isInsideDialog pageId={pageId} onDelete={close} />
           </Stack>
         ) : null
       }
@@ -202,7 +202,7 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
 // ProposalDialogBase must be wrapped by DocumentPageProviders so that it can control context about the page
 export function ProposalDialog(props: Props): JSX.Element | null {
   return (
-    <DocumentPageProviders isInsideDialog={true}>
+    <DocumentPageProviders>
       <ProposalDialogBase {...props} />
     </DocumentPageProviders>
   );

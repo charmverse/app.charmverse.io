@@ -5,19 +5,13 @@ import { ThreadsProvider } from 'hooks/useThreads';
 import { VotesProvider } from 'hooks/useVotes';
 
 // context that is needed for DocumentPage to work
-export function DocumentPageProviders({
-  children,
-  isInsideDialog
-}: {
-  children: React.ReactNode;
-  isInsideDialog?: boolean;
-}) {
+export function DocumentPageProviders({ children }: { children: React.ReactNode }) {
   return (
     <CurrentPageProvider>
       <CharmEditorProvider>
         <ThreadsProvider>
           <VotesProvider>
-            <PageSidebarProvider isInsideDialog={isInsideDialog}>{children}</PageSidebarProvider>
+            <PageSidebarProvider>{children}</PageSidebarProvider>
           </VotesProvider>
         </ThreadsProvider>
       </CharmEditorProvider>

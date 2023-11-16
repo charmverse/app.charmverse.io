@@ -37,7 +37,7 @@ import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import InlineCharmEditor from '../../InlineCharmEditor';
 import { scrollToThread } from '../inlineComment/inlineComment.utils';
@@ -120,13 +120,21 @@ function AddCommentCharmEditor({
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkIsContentEmpty(commentContent);
   const { addComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
+  const thread = threads[threadId];
   const touched = useRef(false);
 
   usePreventReload(touched.current);
 
   return (
-    <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
+    <Box
+      display='flex'
+      px={1}
+      pb={1}
+      sx={sx}
+      flexDirection='column'
+      gap={1}
+      mt={thread && thread.comments.length !== 0 ? 1 : 0}
+    >
       <InlineCharmEditor
         style={{
           backgroundColor: 'var(--input-bg)',
@@ -179,8 +187,8 @@ function EditCommentCharmEditor({
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkIsContentEmpty(commentContent);
   const { editComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
-  const comment = thread.comments.find((_comment) => _comment.id === commentId);
+  const thread = threads[threadId];
+  const comment = thread?.comments.find((_comment) => _comment.id === commentId);
 
   if (!comment) {
     return null;
@@ -292,7 +300,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const { updateThreadPluginState } = useInlineComment();
 
     const view = useEditorViewContext();
-    const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
+    const thread = threadId ? threads[threadId] : null;
     const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const [counter, setCounter] = useState(0);
 

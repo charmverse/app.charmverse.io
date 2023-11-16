@@ -153,7 +153,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
                 View {draftedPosts.length > 0 ? `${draftedPosts.length} ` : ''}drafts
               </Button>
             ) : null}
-            <FullPageActionsMenuButton post={post} onDelete={close} />
+            <FullPageActionsMenuButton isInsideDialog post={post} onDelete={close} />
           </Stack>
         }
         onClose={() => {

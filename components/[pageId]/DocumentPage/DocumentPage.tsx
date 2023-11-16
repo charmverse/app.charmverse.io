@@ -26,6 +26,7 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
+import { useLgScreen } from 'hooks/useMediaScreens';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
@@ -91,6 +92,7 @@ export interface DocumentPageProps {
 function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
+  const isLargeScreen = useLgScreen();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
@@ -146,21 +148,11 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
     return [];
   });
 
-  useEffect(() => {
-    if (page?.type === 'card') {
-      if (!card) {
-        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
-        blocksDispatch(blockLoad({ blockId: page.id }));
-        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
-      }
-    }
-  }, [page.id]);
-
-  const activeView = boardViews[0];
+  const activeBoardView = boardViews[0];
 
   const pageTop = getPageTop(page);
 
-  const { threads } = useThreads();
+  const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
@@ -188,10 +180,25 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
       setConnectionError(null);
     }
   }
-  // reset error whenever page id changes
+
+  useEffect(() => {
+    if (page?.type === 'card') {
+      if (!card) {
+        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+        blocksDispatch(blockLoad({ blockId: page.id }));
+        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+      }
+    }
+  }, [page.id]);
+
+  // reset error and sidebar state whenever page id changes
   useEffect(() => {
     setConnectionError(null);
-  }, [page.id]);
+    // check page id has changed, otherwwise this runs on every refresh in dev
+    if (threadsPageId !== page.id) {
+      closeSidebar();
+    }
+  }, [page.id, threadsPageId]);
 
   const threadIds = useMemo(
     () =>
@@ -203,6 +210,31 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
         : undefined,
     [threads, page.type]
   );
+
+  // show page sidebar by default if there are comments or votes
+  useEffect(() => {
+    const highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
+    const unresolvedThreads = Object.values(threads)
+      .filter((thread) => !thread?.resolved)
+      .filter(isTruthy);
+    if (sidebarView && !highlightedCommentId) {
+      // dont redirect if sidebar is already open
+      return;
+    }
+    if (page.id !== threadsPageId) {
+      // threads result is from a different page, maybe during navigation
+      return;
+    }
+
+    if (!isLoadingThreads) {
+      if (highlightedCommentId || (isLargeScreen && unresolvedThreads.length)) {
+        // commentSidebarOpened.current = true;
+        return setActiveView('comments');
+      } else {
+        closeSidebar();
+      }
+    }
+  }, [isLoadingThreads, page.id, threadsPageId]);
 
   return (
     <>
@@ -260,7 +292,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 content={page.content as PageContent}
                 readOnly={readOnly || !!page.syncWithPageId}
                 autoFocus={false}
-                PageSidebar={sidebarView}
+                sidebarView={sidebarView}
+                setSidebarView={setActiveView}
                 pageId={page.id}
                 disablePageSpecificFeatures={isSharedPage}
                 enableSuggestingMode={enableSuggestingMode}
@@ -320,7 +353,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                         board={board}
                         card={card}
                         cards={cards}
-                        activeView={activeView}
+                        activeView={activeBoardView}
                         views={boardViews}
                         readOnly={readOnly}
                         pageUpdatedAt={page.updatedAt.toString()}
@@ -358,7 +391,9 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                     <SidebarDrawer
                       id='page-action-sidebar'
                       title={sidebarView ? SIDEBAR_VIEWS[sidebarView].title : ''}
-                      open={!!sidebarView}
+                      sidebarView={sidebarView}
+                      closeSidebar={closeSidebar}
+                      openSidebar={setActiveView}
                     >
                       {sidebarView === 'proposal_evaluation' && (
                         <ProposalEvaluationSidebar
@@ -376,7 +411,11 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                         />
                       )}
                       {sidebarView === 'comments' && (
-                        <CommentsSidebar threads={threads} canCreateComments={pagePermissions.comment} />
+                        <CommentsSidebar
+                          openSidebar={setActiveView}
+                          threads={threads}
+                          canCreateComments={pagePermissions.comment}
+                        />
                       )}
                     </SidebarDrawer>
                   )}

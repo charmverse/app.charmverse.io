@@ -3,7 +3,7 @@ import type { Space, Thread, User } from '@charmverse/core/prisma';
 import { testUtilsPages } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { ThreadCreatePayload, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { ThreadCreatePayload, ThreadWithComments } from 'lib/threads';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -54,7 +54,7 @@ describe('POST /api/threads - create a thread', () => {
 
     const createdThread = (
       await request(baseUrl).post('/api/threads').set('Cookie', nonAdminCookie).send(creationContent).expect(201)
-    ).body as ThreadWithCommentsAndAuthors;
+    ).body as ThreadWithComments;
 
     expect(createdThread).toEqual(
       expect.objectContaining<Partial<Thread>>({

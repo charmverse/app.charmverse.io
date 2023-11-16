@@ -5,11 +5,11 @@ import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
 
-import { PageSidebarViewToggle } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebarViewToggle';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { PageSidebarView } from 'hooks/usePageSidebar';
-import { usePageSidebar } from 'hooks/usePageSidebar';
+
+import { PageSidebarViewToggle } from './PageSidebarViewToggle';
 
 const DesktopSidebarHeader = styled.div`
   position: fixed;
@@ -45,23 +45,34 @@ export const SIDEBAR_VIEWS = {
 function SidebarDrawerComponent({
   children,
   id,
-  open,
+  sidebarView,
+  openSidebar,
+  closeSidebar,
   title
 }: {
   children: ReactNode;
   id: string;
-  open: boolean;
+  sidebarView: PageSidebarView | null;
+  openSidebar: (view: PageSidebarView) => void;
+  closeSidebar: () => void;
   title: string;
 }) {
-  const { setActiveView } = usePageSidebar();
   const isMdScreen = useMdScreen();
   const theme = useTheme();
+  const isOpen = sidebarView !== null;
 
+  function togglePageSidebar() {
+    if (sidebarView === null) {
+      openSidebar('comments');
+    } else {
+      closeSidebar();
+    }
+  }
   return isMdScreen ? (
     <Slide
       appear={false}
       direction='left'
-      in={open}
+      in={isOpen}
       style={{
         transformOrigin: 'left top'
       }}
@@ -81,17 +92,16 @@ function SidebarDrawerComponent({
           }}
         >
           <Box display='flex' gap={1} alignItems='center'>
-            <PageSidebarViewToggle />
+            <PageSidebarViewToggle onClick={togglePageSidebar} />
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
               {title}
             </Typography>
             <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-              <SidebarViewIcon view='proposal_evaluation' />
-              <SidebarViewIcon view='comments' />
-              <SidebarViewIcon view='suggestions' />
+              <SidebarViewIcon view='proposal_evaluation' activeView={sidebarView} onClick={openSidebar} />
+              <SidebarViewIcon view='comments' activeView={sidebarView} onClick={openSidebar} />
+              <SidebarViewIcon view='suggestions' activeView={sidebarView} onClick={openSidebar} />
             </Box>
           </Box>
-
           {children}
         </Box>
       </DesktopSidebarHeader>
@@ -99,13 +109,13 @@ function SidebarDrawerComponent({
   ) : (
     <MobileDialog
       title={title}
-      open={open}
-      onClose={() => setActiveView(null)}
+      open={isOpen}
+      onClose={closeSidebar}
       rightActions={
         <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-          <SidebarViewIcon view='proposal_evaluation' size='medium' />
-          <SidebarViewIcon view='comments' size='medium' />
-          <SidebarViewIcon view='suggestions' size='medium' />
+          <SidebarViewIcon view='proposal_evaluation' size='medium' activeView={sidebarView} onClick={openSidebar} />
+          <SidebarViewIcon view='comments' size='medium' activeView={sidebarView} onClick={openSidebar} />
+          <SidebarViewIcon view='suggestions' size='medium' activeView={sidebarView} onClick={openSidebar} />
         </Box>
       }
       PaperProps={{ sx: { background: theme.palette.background.light } }}
@@ -118,16 +128,20 @@ function SidebarDrawerComponent({
   );
 }
 
-function SidebarViewIcon({ view, size = 'small' }: { view: PageSidebarView; size?: 'small' | 'medium' }) {
-  const { activeView, setActiveView } = usePageSidebar();
-
-  function setView() {
-    setActiveView(view);
-  }
-
+function SidebarViewIcon({
+  view,
+  activeView,
+  size = 'small',
+  onClick
+}: {
+  activeView: PageSidebarView | null;
+  view: PageSidebarView;
+  size?: 'small' | 'medium';
+  onClick: (view: PageSidebarView) => void;
+}) {
   return (
     <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
-      <IconButton color={activeView === view ? 'inherit' : 'secondary'} size={size} onClick={setView}>
+      <IconButton color={activeView === view ? 'inherit' : 'secondary'} size={size} onClick={() => onClick(view)}>
         {SIDEBAR_VIEWS[view].icon}
       </IconButton>
     </Tooltip>
