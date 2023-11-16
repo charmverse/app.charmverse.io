@@ -74,7 +74,7 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
     force: true,
     targetPosition: {
       x: 0,
-      y: 0
+      y: -5
     },
     sourcePosition: {
       x: 0,
