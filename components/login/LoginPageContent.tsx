@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 
 import Image from 'components/common/Image';
 import LoadingComponent from 'components/common/LoadingComponent';
+import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
+import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
@@ -25,6 +27,7 @@ type Props = {
 export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Props) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
+  const { customDomain, spaceFromPath, isCustomDomain } = useBaseCurrentDomain();
 
   // We either have disabled account error (handled by our modal) or discord error (handled with snackbar)
   const [discordLoginError, setDiscordLoginError] = useState<string | null>(null);
@@ -46,6 +49,12 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
       clearError();
     }
   }, [discordLoginError]);
+
+  const image = isCustomDomain ? (
+    <WorkspaceAvatar image={spaceFromPath?.spaceImage || ''} name={spaceFromPath?.name || ''} size='3xLarge' />
+  ) : customDomain === null ? (
+    <Image src={splashImage} px={3} />
+  ) : null;
 
   return (
     <Container px={3} data-test='login-page-content'>
@@ -73,23 +82,29 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
                 mb: 3
               }}
             >
-              Powering the Future <br />
-              of Work through Web3
+              {isCustomDomain ? (
+                `Login to ${spaceFromPath?.name}`
+              ) : (
+                <>
+                  Powering the Future <br /> of Work through Web3
+                </>
+              )}
             </Typography>
-
             <Box display={{ xs: 'flex', md: 'none' }} mb={2} mx={2} justifyContent='center'>
-              <Image src={splashImage} maxWidth={400} />
+              {image}
             </Box>
-            <Typography
-              sx={{
-                display: { xs: 'none', md: 'block' },
-                fontSize: 20,
-                mb: { sm: 2, md: 6 },
-                maxWidth: { md: '520px' }
-              }}
-            >
-              The solution for token communities to build relationships, work together and vote
-            </Typography>
+            {customDomain === null && (
+              <Typography
+                sx={{
+                  display: { xs: 'none', md: 'block' },
+                  fontSize: 20,
+                  mb: { sm: 2, md: 6 },
+                  maxWidth: { md: '520px' }
+                }}
+              >
+                The solution for token communities to build relationships, work together and vote
+              </Typography>
+            )}
             <Box
               display={{ md: 'flex' }}
               gap={2}
@@ -103,7 +118,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
           </Box>
         </Grid>
         <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
-          <Image px={3} src={splashImage} />
+          {image}
         </Grid>
       </Grid>
       <LoginErrorModal open={isDisabledAccountError(discordLoginError)} onClose={clearError} />

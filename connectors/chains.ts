@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
+import type { Chain } from 'viem/chains';
 import {
   arbitrum,
   avalanche,
@@ -43,6 +44,7 @@ export interface IChainDetails {
   testnet?: boolean;
   shortName: string;
   litNetwork?: string;
+  viem: Chain;
 }
 
 // Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
@@ -67,6 +69,7 @@ const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     ...EVM_DEFAULT,
     chainId: mainnet.id,
+    viem: mainnet,
     chainName: 'Ethereum',
     alchemyUrl: 'https://eth-mainnet.g.alchemy.com',
     blockExplorerUrls: ['https://etherscan.io'],
@@ -79,6 +82,7 @@ const RPC: Record<string, IChainDetails> = {
   GOERLI: {
     ...EVM_DEFAULT,
     chainId: goerli.id,
+    viem: goerli,
     chainName: 'Ethereum - Goerli',
     alchemyUrl: 'https://eth-goerli.g.alchemy.com',
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
@@ -92,6 +96,7 @@ const RPC: Record<string, IChainDetails> = {
   SEPOLIA: {
     ...EVM_DEFAULT,
     chainId: sepolia.id,
+    viem: sepolia,
     chainName: 'Ethereum - Sepolia',
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
     blockExplorerUrls: ['https://sepolia.etherscan.io/'],
@@ -102,6 +107,7 @@ const RPC: Record<string, IChainDetails> = {
   OPTIMISM: {
     ...EVM_DEFAULT,
     chainId: optimism.id,
+    viem: optimism,
     chainName: 'Optimism',
     alchemyUrl: 'https://opt-mainnet.g.alchemy.com',
     rpcUrls: ['https://mainnet.optimism.io'],
@@ -115,6 +121,7 @@ const RPC: Record<string, IChainDetails> = {
   BASE: {
     ...EVM_DEFAULT,
     chainId: base.id,
+    viem: base,
     chainName: 'Base',
     alchemyUrl: 'https://base-mainnet.g.alchemy.com',
     rpcUrls: ['https://mainnet.base.org'],
@@ -127,6 +134,7 @@ const RPC: Record<string, IChainDetails> = {
   BASE_TESTNET: {
     ...EVM_DEFAULT,
     chainId: baseGoerli.id,
+    viem: baseGoerli,
     chainName: 'Base - Goerli Testnet',
     rpcUrls: ['https://goerli.base.org'],
     gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
@@ -140,6 +148,7 @@ const RPC: Record<string, IChainDetails> = {
   ZORA: {
     ...EVM_DEFAULT,
     chainId: zora.id,
+    viem: zora,
     chainName: 'Zora',
     rpcUrls: ['https://rpc.zora.energy'],
     blockExplorerUrls: ['https://explorer.zora.energy'],
@@ -149,6 +158,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   POLYGON: {
     chainId: polygon.id,
+    viem: polygon,
     chainName: 'Polygon',
     nativeCurrency: {
       name: 'Polygon',
@@ -167,6 +177,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   MUMBAI: {
     chainId: polygonMumbai.id,
+    viem: polygonMumbai,
     chainName: 'Polygon - Mumbai',
     nativeCurrency: {
       name: 'Polygon',
@@ -186,6 +197,7 @@ const RPC: Record<string, IChainDetails> = {
   ARBITRUM: {
     ...EVM_DEFAULT,
     chainId: arbitrum.id,
+    viem: arbitrum,
     chainName: 'Arbitrum One',
     alchemyUrl: 'https://arb-mainnet.g.alchemy.com',
     rpcUrls: ['https://arb1.arbitrum.io/rpc'],
@@ -197,6 +209,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   AVALANCHE: {
     chainId: avalanche.id,
+    viem: avalanche,
     chainName: 'Avalanche',
     nativeCurrency: {
       name: 'Avalanche',
@@ -214,6 +227,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   BSC: {
     chainId: bsc.id,
+    viem: bsc,
     chainName: 'Binance Smart Chain',
     nativeCurrency: {
       name: 'Binance Coin',
@@ -231,6 +245,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   XDAI: {
     chainId: gnosis.id,
+    viem: gnosis,
     chainName: 'Gnosis',
     nativeCurrency: {
       name: 'xDAI',
@@ -248,6 +263,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   FANTOM: {
     chainId: fantom.id,
+    viem: fantom,
     chainName: 'Fantom Opera',
     nativeCurrency: {
       name: 'Fantom',
@@ -264,6 +280,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   CELO: {
     chainId: celo.id,
+    viem: celo,
     chainName: 'Celo',
     nativeCurrency: {
       name: 'Celo',
@@ -280,6 +297,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   HARMONY: {
     chainId: harmonyOne.id,
+    viem: harmonyOne,
     chainName: 'Harmony',
     nativeCurrency: {
       name: 'Harmony',
@@ -296,6 +314,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   HARMONY_DEVNET: {
     chainId: 1666900000,
+    viem: harmonyOne,
     chainName: 'Harmony - Devnet',
     nativeCurrency: {
       name: 'Harmony',
@@ -313,6 +332,7 @@ const RPC: Record<string, IChainDetails> = {
   ZKSYNC: {
     ...EVM_DEFAULT,
     chainId: zkSync.id,
+    viem: zkSync,
     chainName: 'zkSync Era',
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
@@ -321,6 +341,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   MANTLE: {
     chainId: mantle.id,
+    viem: mantle,
     chainName: 'Mantle',
     nativeCurrency: {
       name: 'Mantle',
@@ -338,6 +359,7 @@ const RPC: Record<string, IChainDetails> = {
   },
   MANTLE_TESTNET: {
     chainId: mantleTestnet.id,
+    viem: mantleTestnet,
     chainName: 'Mantle - Testnet',
     nativeCurrency: {
       name: 'Testnet Mantle',

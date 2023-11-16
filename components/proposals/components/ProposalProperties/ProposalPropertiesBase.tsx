@@ -4,7 +4,7 @@ import type { PageType, ProposalEvaluationType, ProposalRubricCriteria, Proposal
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
-import { Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { Alert, Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -72,6 +72,7 @@ type ProposalPropertiesProps = {
   readOnlyCategory?: boolean;
   isAdmin?: boolean;
   isFromTemplate?: boolean;
+  isTemplateRequired?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   onSaveRubricCriteriaAnswers?: () => void;
   pageId?: string;
@@ -95,13 +96,14 @@ type ProposalPropertiesProps = {
   readOnlyCustomProperties?: string[];
 };
 
-export function ProposalProperties({
+export function ProposalPropertiesBase({
   proposalLensLink,
   archived,
   canAnswerRubric,
   canViewRubricAnswers,
   isAdmin = false,
   isFromTemplate,
+  isTemplateRequired,
   onChangeRubricCriteria,
   onSaveRubricCriteriaAnswers,
   proposalFormInputs,
@@ -391,7 +393,7 @@ export function ProposalProperties({
           {isNewProposal && proposalFormInputs.type !== 'proposal_template' && (
             <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
+                <PropertyLabel readOnly highlighted required={isTemplateRequired}>
                   Template
                 </PropertyLabel>
                 <Box display='flex' flex={1}>
@@ -594,6 +596,7 @@ export function ProposalProperties({
 
         {evaluationTabs.length > 0 && (
           <Card variant='outlined' sx={{ my: 2 }}>
+            <Alert severity='info'>Your evaluation is only viewable by the Reviewers assigned to this Proposal</Alert>
             <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
           </Card>
         )}

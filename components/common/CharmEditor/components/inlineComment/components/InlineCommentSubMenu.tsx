@@ -1,20 +1,25 @@
 import { selectionTooltip } from '@bangle.dev/tooltip';
+import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
+import PersonIcon from '@mui/icons-material/Person';
 import SendIcon from '@mui/icons-material/Send';
 import type { Theme } from '@mui/material';
-import { Box, Paper, useMediaQuery } from '@mui/material';
+import { Box, Divider, Paper, Stack, Typography, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { ThreadAccessGroup } from 'lib/threads';
 
 import { updateInlineComment } from '../inlineComment.utils';
 
@@ -40,7 +45,15 @@ export const ThreadContainer = styled(Paper)`
   }
 `;
 
-export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId: string | undefined }) {
+export function InlineCommentSubMenu({
+  pageType,
+  pluginKey,
+  pageId
+}: {
+  pageType?: 'post' | PageType;
+  pluginKey: PluginKey;
+  pageId: string | undefined;
+}) {
   const view = useEditorViewContext();
   const [commentContent, setCommentContent] = useState<PageContent>({
     type: 'doc',
@@ -50,8 +63,10 @@ export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginK
       }
     ]
   });
+  const [threadAccessGroups, setThreadAccessGroups] = useState<ThreadAccessGroup[]>([]);
+
   const { trigger: createThread, isMutating } = useCreateThread();
-  const { extractTextFromSelection } = useInlineComment();
+  const { extractTextFromSelection, updateThreadPluginState } = useInlineComment();
   const { refetchThreads } = useThreads();
   const isEmpty = checkIsContentEmpty(commentContent);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
@@ -62,12 +77,20 @@ export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginK
       const threadWithComment = await createThread({
         comment: commentContent,
         context: extractTextFromSelection(),
-        pageId
+        pageId,
+        accessGroups: threadAccessGroups.map((threadAccessGroup) => ({
+          id: threadAccessGroup.id,
+          group: threadAccessGroup.group
+        }))
       });
-      // jsut refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
+      // just refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
       refetchThreads();
       // setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
       if (threadWithComment) {
+        updateThreadPluginState({
+          remove: false,
+          threadId: threadWithComment.id
+        });
         updateInlineComment(threadWithComment.id)(view.state, view.dispatch);
         hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
         const tr = view.state.tr.setSelection(new TextSelection(view.state.doc.resolve(view.state.selection.$to.pos)));
@@ -78,32 +101,51 @@ export function InlineCommentSubMenu({ pluginKey, pageId }: { pluginKey: PluginK
   };
 
   return (
-    <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
-      <Box flexGrow={1}>
-        <InlineCharmEditor
-          focusOnInit={true}
-          content={commentContent}
-          style={{
-            fontSize: '14px'
+    <Box width='100%'>
+      {pageType === 'proposal' && (
+        <Stack height='fit-content' my={0.5}>
+          <Stack flexDirection='row' gap={0.5} m={0.5} alignItems='center'>
+            <PersonIcon fontSize='small' color='secondary' />
+            <Typography variant='subtitle2'>Viewable by:</Typography>
+          </Stack>
+          <UserAndRoleSelect
+            wrapColumn
+            emptyPlaceholderContent='Everyone'
+            readOnlyMessage='Everyone'
+            value={threadAccessGroups}
+            onChange={setThreadAccessGroups}
+          />
+          <Divider />
+        </Stack>
+      )}
+      <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
+        <Box flexGrow={1}>
+          <InlineCharmEditor
+            focusOnInit={true}
+            content={commentContent}
+            style={{
+              fontSize: '14px',
+              minHeight: pageType === 'proposal' ? 100 : 'fit-content'
+            }}
+            onContentChange={({ doc }) => {
+              setCommentContent(doc);
+            }}
+          />
+        </Box>
+        <Button
+          disabled={isEmpty || isMutating}
+          size='small'
+          onClick={handleSubmit}
+          sx={{
+            alignSelf: 'flex-end',
+            marginBottom: '4px',
+            minWidth: ['36px', '64px'],
+            px: ['4px', '10px']
           }}
-          onContentChange={({ doc }) => {
-            setCommentContent(doc);
-          }}
-        />
+        >
+          {isSmallScreen ? <SendIcon /> : 'Start'}
+        </Button>
       </Box>
-      <Button
-        disabled={isEmpty || isMutating}
-        size='small'
-        onClick={handleSubmit}
-        sx={{
-          alignSelf: 'flex-end',
-          marginBottom: '4px',
-          minWidth: ['36px', '64px'],
-          px: ['4px', '10px']
-        }}
-      >
-        {isSmallScreen ? <SendIcon /> : 'Start'}
-      </Button>
     </Box>
   );
 }

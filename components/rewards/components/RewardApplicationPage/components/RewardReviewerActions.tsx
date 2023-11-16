@@ -13,9 +13,8 @@ import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
-import { RewardPaymentButton } from '../RewardProperties/components/RewardApplicantsTable/RewardPaymentButton';
-
-import RewardReview from './RewardReview';
+import { AcceptOrRejectButtons } from './AcceptOrRejectButtons';
+import { RewardPaymentButton } from './RewardPaymentButton';
 
 type Props = {
   reward: RewardWithUsers;
@@ -24,6 +23,7 @@ type Props = {
   refreshApplication: () => void;
   reviewApplication: (input: { decision: ReviewDecision }) => Promise<void>;
   hasCustomReward: boolean;
+  hasApplicationSlots: boolean;
 };
 export function RewardReviewerActions({
   application,
@@ -31,7 +31,8 @@ export function RewardReviewerActions({
   refreshApplication,
   rewardPermissions,
   reviewApplication,
-  hasCustomReward
+  hasCustomReward,
+  hasApplicationSlots
 }: Props) {
   const { showMessage } = useSnackbar();
 
@@ -61,17 +62,19 @@ export function RewardReviewerActions({
     <div>
       {/** This section contains all possible reviewer actions */}
       {application.status === 'applied' && rewardPermissions?.review && (
-        <RewardReview
+        <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='application'
           readOnly={!rewardPermissions?.approve_applications}
+          hasApplicationSlots={hasApplicationSlots}
         />
       )}
-      {(application.status === 'review' || application.status === 'inProgress') && rewardPermissions?.review && (
-        <RewardReview
+      {application.status === 'review' && rewardPermissions?.review && (
+        <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='submission'
           readOnly={!rewardPermissions?.review}
+          hasApplicationSlots={hasApplicationSlots}
         />
       )}
       {application.status === 'complete' && !hasCustomReward && rewardPermissions?.review && (

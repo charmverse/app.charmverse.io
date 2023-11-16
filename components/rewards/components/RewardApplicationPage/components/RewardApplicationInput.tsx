@@ -4,27 +4,29 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { Button } from 'components/common/Button';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useUser } from 'hooks/useUser';
 
-import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
+import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
  */
 interface IApplicationFormProps {
-  onSubmit: (applicationMessage: string) => any;
+  onSubmit: (applicationMessage: string) => Promise<boolean>;
   rewardId: string;
   application?: Application;
   readOnly?: boolean;
+  disableCollapse?: boolean;
   expandedOnLoad?: boolean;
+  isSaving?: boolean;
 }
 
 export const schema = yup.object({
@@ -33,12 +35,14 @@ export const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export default function ApplicationInput({
+export function ApplicationInput({
   readOnly = false,
   onSubmit,
   rewardId,
   application,
-  expandedOnLoad
+  disableCollapse,
+  expandedOnLoad,
+  isSaving
 }: IApplicationFormProps) {
   const [isVisible, setIsVisible] = useState(expandedOnLoad);
   const { user } = useUser();
@@ -70,24 +74,28 @@ export default function ApplicationInput({
         justifyContent='space-between'
         flexDirection='row'
         gap={0.5}
-        onClick={() => setIsVisible(!isVisible)}
+        onClick={() => !disableCollapse && setIsVisible(!isVisible)}
       >
         <Box display='flex' gap={0.5}>
           <FormLabel sx={{ fontWeight: 'bold' }}>
             {application?.createdBy === user?.id ? 'Your application' : 'Application'}
           </FormLabel>
 
-          <IconButton
-            sx={{
-              top: -2.5,
-              position: 'relative'
-            }}
-            size='small'
-          >
-            {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
-          </IconButton>
+          {!disableCollapse && (
+            <IconButton
+              sx={{
+                top: -2.5,
+                position: 'relative'
+              }}
+              size='small'
+            >
+              {isVisible ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
+            </IconButton>
+          )}
         </Box>
-        {application && <RewardApplicationStatusChip status={application.status} />}
+        {application && applicationStatuses.includes(application?.status) && (
+          <RewardApplicationStatusChip status={application.status} />
+        )}
       </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form
@@ -117,6 +125,12 @@ export default function ApplicationInput({
                     shouldValidate: true
                   });
                 }}
+                sx={{
+                  '.Mui-disabled': {
+                    color: 'var(--text-primary) !important',
+                    WebkitTextFillColor: 'var(--text-primary) !important'
+                  }
+                }}
               />
               {errors?.message && <Alert severity='error'>{errors.message.message}</Alert>}
             </Grid>
@@ -128,6 +142,7 @@ export default function ApplicationInput({
                     !isValid || (!!currentApplicationMessage && currentApplicationMessage === application?.message)
                   }
                   type='submit'
+                  loading={isSaving}
                 >
                   {!application ? ' Apply' : 'Update'}
                 </Button>

@@ -40,7 +40,7 @@ export function PageComments({ page, permissions }: Props) {
     updateComment,
     deleteComment,
     voteComment,
-    syncPageComments
+    syncPageCommentsWithLensPost
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
@@ -68,7 +68,7 @@ export function PageComments({ page, permissions }: Props) {
 
   useEffect(() => {
     if (page.type === 'proposal' && proposal?.lensPostLink) {
-      syncPageComments();
+      syncPageCommentsWithLensPost();
     }
   }, [page.id, proposal?.lensPostLink, page.type]);
 
@@ -160,7 +160,7 @@ export function PageComments({ page, permissions }: Props) {
           content={createdComment.content as PageContent}
           parentPublicationId={lensParentPublicationId}
           onSuccess={async () => {
-            await syncPageComments();
+            await syncPageCommentsWithLensPost();
             setIsPublishingToLens(false);
             setCreatedComment(null);
           }}

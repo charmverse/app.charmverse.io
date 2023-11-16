@@ -2,7 +2,7 @@ import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { applyDiscordGate } from 'lib/discord/applyDiscordGate';
+import { applyDiscordGate } from 'lib/discord/collabland/applyDiscordGate';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
@@ -103,9 +103,9 @@ export async function applyTokenGates({
   }
 
   const roleIdsToAssign: string[] = verifiedTokenGates.reduce((roleList, tokenGate) => {
-    tokenGate.tokenGateToRoles.forEach((roleMapping) => {
-      if (!roleList.includes(roleMapping.roleId) && space.roles.some((role) => role.id === roleMapping.roleId)) {
-        roleList.push(roleMapping.roleId);
+    tokenGate.tokenGateToRoles.forEach(({ role }) => {
+      if (!roleList.includes(role.id) && space.roles.some((_role) => _role.id === role.id)) {
+        roleList.push(role.id);
       }
     });
 

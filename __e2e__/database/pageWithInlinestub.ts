@@ -10,7 +10,7 @@ export function generatePageContentWithInlineDatabaseRefs({
     content: [
       {
         type: 'heading',
-        attrs: { id: null, level: 2, track: [], collapseContent: null },
+        attrs: { id: null, level: 2, track: [] },
         content: [
           {
             text: 'Inline database',
@@ -23,7 +23,7 @@ export function generatePageContentWithInlineDatabaseRefs({
       { type: 'paragraph', attrs: { track: [] } },
       {
         type: 'heading',
-        attrs: { id: null, level: 2, track: [], collapseContent: null },
+        attrs: { id: null, level: 2, track: [] },
         content: [
           {
             text: 'Inline Linked Database',

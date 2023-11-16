@@ -28,7 +28,7 @@ export function useGetApplicationComments({ applicationId }: { applicationId?: s
   );
 }
 
-export function useGetReward({ rewardId }: { rewardId?: string }) {
+export function useGetReward({ rewardId }: { rewardId?: string | null }) {
   return useGET<RewardWithUsersAndPageMeta>(rewardId ? `/api/rewards/${rewardId}` : null);
 }
 
@@ -47,7 +47,7 @@ export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
 // // Mutative requests
 
 export function useCreateReward() {
-  return usePOST<RewardCreationData, RewardWithUsers>('/api/rewards');
+  return usePOST<Omit<RewardCreationData, 'userId'>, RewardWithUsers>('/api/rewards');
 }
 
 // export function useUpsertRubricCriteria({ rewardId }: { rewardId: string }) {

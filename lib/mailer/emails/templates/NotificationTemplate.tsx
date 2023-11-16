@@ -100,7 +100,7 @@ function NotificationSection({
           </Text>
         </Column>
       </Row>
-      {notification.type === 'person_assigned' ? (
+      {notification.type === 'person_assigned' && notification.personProperty ? (
         <>
           <Row>
             <Column style={{ width: 50, verticalAlign: 'top' }} />

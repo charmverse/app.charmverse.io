@@ -16,10 +16,6 @@ export class SpacesApi {
     return http.GET<Space>(`/api/spaces/${spaceId}`);
   }
 
-  searchByDomain(search: string) {
-    return http.GET<SpaceWithGates | null>('/api/spaces/search-domain', { search });
-  }
-
   searchByName(search: string) {
     return http.GET<SpaceWithGates[]>('/api/spaces/search-name', { search });
   }

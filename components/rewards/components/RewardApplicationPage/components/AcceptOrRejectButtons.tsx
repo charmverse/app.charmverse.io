@@ -4,19 +4,23 @@ import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
  */
 type Props = {
-  onConfirmReview: (review: ReviewDecision) => any;
+  onConfirmReview: (review: ReviewDecision) => Promise<void>;
   reviewType: 'application' | 'submission';
   readOnly?: boolean;
+  hasApplicationSlots: boolean;
 };
 
-export default function RewardReview({ onConfirmReview, reviewType, readOnly }: Props) {
+export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, hasApplicationSlots }: Props) {
   const [reviewDecision, setReviewDecision] = useState<ReviewDecision | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { showMessage } = useSnackbar();
 
   const approveLabel = reviewType === 'application' ? 'Accept' : 'Approve';
 
@@ -24,14 +28,31 @@ export default function RewardReview({ onConfirmReview, reviewType, readOnly }: 
     setReviewDecision(null);
   }
 
+  async function confirmReview(value: ReviewDecision) {
+    try {
+      setIsLoading(true);
+      await onConfirmReview(value);
+    } catch (error: any) {
+      const message = error.message || 'Something went wrong';
+      showMessage(message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <Box my={1} gap={1}>
       <Grid item display='flex' gap={1}>
-        <Button color='success' variant='outlined' disabled={readOnly} onClick={() => setReviewDecision('approve')}>
+        <Button
+          color='success'
+          variant='outlined'
+          disabled={readOnly || !hasApplicationSlots}
+          onClick={() => setReviewDecision('approve')}
+        >
           {approveLabel}
         </Button>
         <Button color='error' variant='outlined' disabled={readOnly} onClick={() => setReviewDecision('reject')}>
-          Reject
+          Deny
         </Button>
       </Grid>
       <Modal title='Confirm your review' open={reviewDecision !== null} onClose={cancel}>
@@ -39,19 +60,19 @@ export default function RewardReview({ onConfirmReview, reviewType, readOnly }: 
           <Typography sx={{ mb: 1, whiteSpace: 'pre-wrap' }}>
             Please confirm you want to{' '}
             <b>
-              {reviewDecision} this {reviewType}
+              {reviewDecision === 'approve' ? 'approve' : 'deny'} this {reviewType}
             </b>
             .
           </Typography>
           <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>This decision is permanent.</Typography>
           <Box display='flex' gap={2} mt={3}>
             {reviewDecision === 'reject' && (
-              <Button color='error' onClick={() => onConfirmReview('reject')}>
-                Reject
+              <Button color='error' onClick={() => confirmReview('reject')}>
+                Deny
               </Button>
             )}
             {reviewDecision === 'approve' && (
-              <Button color='success' onClick={() => onConfirmReview('approve')}>
+              <Button loading={isLoading} color='success' onClick={() => confirmReview('approve')}>
                 {approveLabel}
               </Button>
             )}

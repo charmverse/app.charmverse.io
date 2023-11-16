@@ -1,8 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
 import { unassignRole } from 'lib/roles';
+
+import { getSpacesAndUserFromDiscord } from './getSpaceAndUserFromDiscord';
 
 export async function unassignRolesDiscord({
   discordUserId,

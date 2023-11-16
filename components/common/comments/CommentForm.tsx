@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useMemo, useState } from 'react';
 
@@ -69,7 +70,6 @@ export function CommentForm({
       style: {
         paddingTop: 0,
         paddingBottom: 0,
-        marginLeft: 8,
         minHeight: 100,
         left: 0
       },

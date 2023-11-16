@@ -10,7 +10,7 @@ import { validate } from 'uuid';
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-import type { TokenGateWithRoles } from './interfaces';
+import type { TokenGateConditions, TokenGateWithRoles } from './interfaces';
 
 type TokenGateJwt = {
   signedToken: string;
@@ -34,7 +34,7 @@ export type TokenGateEvaluationResult = {
   walletAddress: string;
   canJoinSpace: boolean;
   gateTokens: TokenGateJwt[];
-  roles: Role[];
+  roles: { id: string; name: string }[];
 };
 
 export async function evaluateTokenGateEligibility({
@@ -84,14 +84,14 @@ export async function evaluateTokenGateEligibility({
               authSig,
               // note that we used to store 'chain' but now it is an array
               // TODO: migrate old token gate conditions to all be an array?
-              chain: (tokenGate.conditions as any).chains?.[0],
-              resourceId: tokenGate.resourceId,
-              ...(tokenGate.conditions as any)
+              chain: (tokenGate.conditions as TokenGateConditions).chains?.[0],
+              resourceId: tokenGate.resourceId as any,
+              ...(tokenGate.conditions as TokenGateConditions)
             })
             .then((signedToken: string) => {
               return {
                 signedToken,
-                tokenGate
+                tokenGate: tokenGate as TokenGateWithRoles
               };
             })
             .catch((error) => {
@@ -136,14 +136,14 @@ export async function evaluateTokenGateEligibility({
   }
 
   const eligibleRoles = successGates.reduce((roleList, result) => {
-    result.tokenGate.tokenGateToRoles.forEach((tokenGateRoleMapping) => {
-      if (roleList.every((role) => role.id !== tokenGateRoleMapping.roleId)) {
-        roleList.push(tokenGateRoleMapping.role);
+    result.tokenGate.tokenGateToRoles.forEach(({ role }) => {
+      if (roleList.every((_role) => _role.id !== role.id)) {
+        roleList.push(role);
       }
     });
 
     return roleList;
-  }, [] as Role[]);
+  }, [] as { id: string; name: string }[]);
 
   return {
     canJoinSpace: true,

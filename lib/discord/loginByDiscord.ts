@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import { getDiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

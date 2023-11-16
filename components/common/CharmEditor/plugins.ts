@@ -35,11 +35,13 @@ import * as nft from './components/nft/nft.plugins';
 import { plugins as paragraphPlugins } from './components/paragraph/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
+import { plugins as quotePlugins } from './components/quote/quote';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
 import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
+import { plugins as threadPlugins } from './components/thread/thread.plugins';
 import * as trailingNode from './components/trailingNode';
 import * as tweet from './components/tweet/tweet';
 import { plugins as videoPlugins } from './components/video/video';
@@ -70,7 +72,9 @@ export function charmEditorPlugins({
   spaceId = null,
   placeholderText,
   disableRowHandles = false,
-  disableMention = false
+  disableMention = false,
+  threadIds,
+  disableVideo = false
 }: {
   disableMention?: boolean;
   disableRowHandles?: boolean;
@@ -85,6 +89,8 @@ export function charmEditorPlugins({
   enableVoting?: boolean;
   enableComments?: boolean;
   placeholderText?: string;
+  threadIds?: string[];
+  disableVideo?: boolean;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
     pageNodeDropPlugin({
@@ -199,14 +205,26 @@ export function charmEditorPlugins({
     nft.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    videoPlugins(),
     iframe.plugins(),
     markdownPlugins(),
     tableOfContentPlugins(),
     filePlugins(),
     placeholderPlugin(placeholderText),
+    quotePlugins(),
     tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
   );
+
+  if (threadIds) {
+    basePlugins.push(
+      threadPlugins({
+        threadIds
+      })
+    );
+  }
+
+  if (!disableVideo) {
+    basePlugins.push(videoPlugins());
+  }
 
   if (!readOnly && !disableRowHandles) {
     // add rowActions before the table plugin, or else mousedown is not triggered

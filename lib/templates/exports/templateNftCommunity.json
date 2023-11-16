@@ -399,8 +399,7 @@
             "attrs": {
               "id": null,
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -609,8 +608,7 @@
             "attrs": {
               "id": null,
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -688,8 +686,7 @@
             "attrs": {
               "id": null,
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -767,8 +764,7 @@
             "attrs": {
               "id": null,
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -846,8 +842,7 @@
             "attrs": {
               "id": null,
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1189,8 +1184,7 @@
                 "type": "heading",
                 "attrs": {
                   "level": 3,
-                  "track": [],
-                  "collapseContent": null
+                  "track": []
                 },
                 "content": [
                   {
@@ -2958,8 +2952,7 @@
                 "attrs": {
                   "id": null,
                   "level": 1,
-                  "track": [],
-                  "collapseContent": null
+                  "track": []
                 },
                 "content": [
                   {
@@ -3423,8 +3416,7 @@
                 "attrs": {
                   "id": null,
                   "level": 1,
-                  "track": [],
-                  "collapseContent": null
+                  "track": []
                 },
                 "content": [
                   {
@@ -3724,8 +3716,7 @@
                     "attrs": {
                       "id": null,
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -3881,8 +3872,7 @@
                     "attrs": {
                       "id": null,
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -3954,8 +3944,7 @@
                     "attrs": {
                       "id": null,
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -5267,10 +5256,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "__title",
-                    "11eefd10-f082-40d6-abc0-0a8cec44fb90"
-                  ]
+                  "visiblePropertyIds": ["__title", "11eefd10-f082-40d6-abc0-0a8cec44fb90"]
                 }
               }
             ]
@@ -7790,9 +7776,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -7915,9 +7899,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "f7d47848-f993-4d16-8008-e1f5b23b8ad3"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["f7d47848-f993-4d16-8008-e1f5b23b8ad3"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -8030,9 +8012,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "181ec031-6afc-4414-b1b8-87d2ecc74b82",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "e5dba747-be62-49be-a7ba-71cf27b17174"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["e5dba747-be62-49be-a7ba-71cf27b17174"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -8147,9 +8127,7 @@
                       "sortOptions": [],
                       "columnWidths": {},
                       "linkedSourceId": null,
-                      "hiddenOptionIds": [
-                        ""
-                      ],
+                      "hiddenOptionIds": [""],
                       "visibleOptionIds": [
                         "35bbea47-5c02-431b-89cd-ee7b796aba04",
                         "181ec031-6afc-4414-b1b8-87d2ecc74b82",
@@ -8159,9 +8137,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "c55a109e-a5b5-4cdd-9902-483ec65d58ee"
-                      ]
+                      "visiblePropertyIds": ["c55a109e-a5b5-4cdd-9902-483ec65d58ee"]
                     }
                   }
                 ]

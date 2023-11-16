@@ -49,7 +49,7 @@ export async function createForumNotifications(webhookData: {
         );
         if (
           userId !== postAuthorId &&
-          postCategoryPermission &&
+          postCategoryPermission?.permissions.view_posts &&
           postCategoriesUserRecord.subscriptions[post.category.id]
         ) {
           const { id } = await savePostNotification({

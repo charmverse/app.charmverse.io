@@ -23,8 +23,15 @@ export interface IRewardBadgeProps {
   layout?: 'row' | 'stacked';
   truncate?: boolean;
   hideStatus?: boolean;
+  showEmptyStatus?: boolean;
 }
-export function RewardStatusBadge({ truncate = false, hideStatus, reward, layout = 'row' }: IRewardBadgeProps) {
+export function RewardStatusBadge({
+  truncate = false,
+  showEmptyStatus,
+  hideStatus,
+  reward,
+  layout = 'row'
+}: IRewardBadgeProps) {
   const { space } = useCurrentSpace();
 
   const rewardLink = `/${space?.domain}/bounties/${reward.id}`;
@@ -46,7 +53,7 @@ export function RewardStatusBadge({ truncate = false, hideStatus, reward, layout
             }}
           >
             <RewardAmount reward={reward} truncate={truncate} />
-            {!hideStatus && <RewardStatusChip status={reward.status} />}
+            {!hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
           </Box>
         </Grid>
       </Grid>
@@ -60,7 +67,7 @@ export function RewardStatusBadge({ truncate = false, hideStatus, reward, layout
             <LaunchIcon fontSize='small' />
           </IconButton>
         </Box>
-        <RewardStatusChip status={reward.status} />
+        {hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
       </Box>
     );
   }
@@ -148,8 +155,9 @@ export function RewardAmount({
               variant='h6'
               fontSize={18}
               data-test='reward-amount'
+              textTransform='uppercase'
             >
-              {truncate ? truncatedAmount() : rewardAmount}
+              {truncate ? truncatedAmount() : rewardAmount} {tokenInfo.isContract && tokenInfo.tokenSymbol}
             </Typography>
           </>
         )}

@@ -9,7 +9,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
       class="TableRow octo-table-row"
       data-test="database-row-card-1"
       draggable="true"
-      style="opacity: 1;"
+      style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
@@ -106,7 +106,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
       draggable="true"
-      style="opacity: 1;"
+      style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
@@ -203,7 +203,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
       draggable="true"
-      style="opacity: 1;"
+      style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
@@ -348,7 +348,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
       class="TableRow octo-table-row selected"
       data-test="database-row-card-1"
       draggable="true"
-      style="opacity: 1;"
+      style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
@@ -445,7 +445,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
       class="TableRow octo-table-row"
       data-test="database-row-card-1"
       draggable="true"
-      style="opacity: 1;"
+      style="opacity: 1; background-color: transparent;"
     >
       <div
         class="octo-table-cell title-cell MuiBox-root css-v7v99c"
@@ -524,7 +524,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
       draggable="true"
-      style="opacity: 1;"
+      style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"

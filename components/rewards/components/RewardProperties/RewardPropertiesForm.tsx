@@ -1,5 +1,6 @@
-import { Box, Divider, Stack, Tooltip } from '@mui/material';
+import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import clsx from 'clsx';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
@@ -10,12 +11,12 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
-import { ExpandableSection } from 'components/common/ExpandableSection';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
+import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
+import type { RewardType } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
-import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
@@ -30,6 +31,8 @@ type Props = {
   useDebouncedInputs?: boolean;
   pageId?: string;
   refreshPermissions?: VoidFunction;
+  isNewReward?: boolean;
+  expandedByDefault?: boolean;
 };
 
 export function RewardPropertiesForm({
@@ -37,11 +40,14 @@ export function RewardPropertiesForm({
   values,
   readOnly,
   useDebouncedInputs,
+  isNewReward,
   pageId,
-  refreshPermissions
+  refreshPermissions,
+  expandedByDefault
 }: Props) {
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
-  const [rewardType, setRewardType] = useState<RewardType>('Token');
+  const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
+  const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
   const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
@@ -60,10 +66,6 @@ export function RewardPropertiesForm({
         updates.rewardAmount = null;
         updates.chainId = null;
         updates.rewardToken = null;
-      } else {
-        updates.rewardAmount = updates.rewardAmount || 1;
-        updates.chainId = updates.chainId || 1;
-        updates.rewardToken = updates.rewardToken || 'ETH';
       }
     }
 
@@ -137,14 +139,16 @@ export function RewardPropertiesForm({
         <RewardPropertiesHeader
           reward={values as RewardWithUsers}
           pageId={pageId || ''}
+          isExpanded={isExpanded}
+          toggleExpanded={() => setIsExpanded((v) => !v)}
           readOnly={readOnly || !pageId}
           refreshPermissions={refreshPermissions || (() => {})}
         />
 
-        <ExpandableSection title='Details' forceExpand>
+        <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
+              <PropertyLabel readOnly highlighted required={isNewReward}>
                 Reviewer
               </PropertyLabel>
               <UserAndRoleSelect
@@ -165,7 +169,7 @@ export function RewardPropertiesForm({
 
               <DateTimePicker
                 minDate={DateTime.fromMillis(Date.now())}
-                value={values?.dueDate}
+                value={values?.dueDate || null}
                 disableMaskedInput
                 disabled={readOnly}
                 onAccept={async (value) => {
@@ -180,7 +184,7 @@ export function RewardPropertiesForm({
                     inputProps={{
                       ..._props.inputProps,
                       readOnly: true,
-                      className: 'Editable octo-propertyvalue',
+                      className: clsx('Editable octo-propertyvalue', { readonly: readOnly }),
                       placeholder: 'Empty'
                     }}
                     fullWidth
@@ -267,7 +271,12 @@ export function RewardPropertiesForm({
                 defaultValue={values?.maxSubmissions}
                 type='number'
                 size='small'
-                inputProps={{ step: 1, min: 1, style: { height: 'auto' }, className: 'Editable octo-propertyvalue' }}
+                inputProps={{
+                  step: 1,
+                  min: 1,
+                  style: { height: 'auto' },
+                  className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+                }}
                 sx={{
                   width: '100%'
                 }}
@@ -285,7 +294,7 @@ export function RewardPropertiesForm({
 
             {rewardType === 'Token' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
+                <PropertyLabel readOnly highlighted required={isNewReward}>
                   Reward Token
                 </PropertyLabel>
                 <RewardTokenProperty
@@ -308,7 +317,10 @@ export function RewardPropertiesForm({
                   required
                   defaultValue={values?.maxSubmissions}
                   size='small'
-                  inputProps={{ style: { height: 'auto' }, className: 'Editable octo-propertyvalue' }}
+                  inputProps={{
+                    style: { height: 'auto' },
+                    className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+                  }}
                   sx={{
                     width: '100%'
                   }}
@@ -331,7 +343,7 @@ export function RewardPropertiesForm({
               }}
             />
           </>
-        </ExpandableSection>
+        </Collapse>
       </Stack>
     </Box>
   );

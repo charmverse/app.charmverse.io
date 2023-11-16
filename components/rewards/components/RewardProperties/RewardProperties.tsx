@@ -2,50 +2,49 @@ import { Divider, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';
-import { useGetReward } from 'charmClient/hooks/rewards';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { RewardSignupButton } from './components/RewardSignupButton';
 
 export function RewardProperties(props: {
   readOnly?: boolean;
-  rewardId: string | null;
+  reward?: RewardWithUsersAndPageMeta;
   pageId: string;
   pagePath: string;
   rewardChanged?: () => void;
   onClose?: () => void;
   showApplications?: boolean;
   isTemplate?: boolean;
+  expandedRewardProperties?: boolean;
 }) {
   const {
-    rewardId,
+    reward: initialReward,
     pageId,
     readOnly: parentReadOnly = false,
     rewardChanged,
     onClose,
     showApplications,
-    isTemplate
+    isTemplate,
+    expandedRewardProperties
   } = props;
   const { updateReward, refreshReward } = useRewards();
-  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | null>();
-
-  const { data: initialReward } = useGetReward({
-    rewardId: rewardId as string
-  });
+  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
+    initialReward
+  );
 
   useEffect(() => {
     if (!currentReward && initialReward) {
-      setCurrentReward(initialReward as any);
+      setCurrentReward(initialReward);
     }
-  }, [initialReward]);
+  }, [currentReward, initialReward]);
 
-  const { data: rewardPagePermissions, mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
+  const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
   async function resyncReward() {
@@ -77,7 +76,7 @@ export function RewardProperties(props: {
   }
 
   return (
-    <Stack mt={2} flex={1}>
+    <Stack flex={1}>
       <RewardPropertiesForm
         pageId={pageId}
         refreshPermissions={refreshPagePermissionsList}
@@ -85,17 +84,26 @@ export function RewardProperties(props: {
         values={currentReward}
         onChange={applyRewardUpdates}
         readOnly={readOnly}
+        expandedByDefault={expandedRewardProperties}
       />
 
       {!isTemplate && (
         <>
           {!!currentReward?.id && showApplications && (
-            <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+            <>
+              <Divider sx={{ my: 1 }} />
+              <Stack mb={1}>
+                <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+              </Stack>
+            </>
           )}
-
+          {!isSpaceMember && (
+            <>
+              <Divider sx={{ my: 2 }} />
+              <RewardSignupButton pagePath={props.pagePath} />
+            </>
+          )}
           <Divider sx={{ my: 1 }} />
-
-          {!isSpaceMember && <RewardSignupButton pagePath={props.pagePath} />}
         </>
       )}
     </Stack>

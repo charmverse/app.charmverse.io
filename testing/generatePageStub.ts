@@ -814,8 +814,7 @@ export function pageContentStub(): Pick<Prisma.PageCreateInput, 'content' | 'con
         {
           type: 'heading',
           attrs: {
-            level: 3,
-            collapseContent: null
+            level: 3
           },
           content: [
             {
@@ -1147,8 +1146,7 @@ export function pageContentStub(): Pick<Prisma.PageCreateInput, 'content' | 'con
         {
           type: 'heading',
           attrs: {
-            level: 2,
-            collapseContent: null
+            level: 2
           },
           content: [
             {

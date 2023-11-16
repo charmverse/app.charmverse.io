@@ -47,6 +47,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse<Bounty[]>) 
     spaceId: spaceId as string,
     userId: publicResourcesOnly ? undefined : userId
   });
+
   return res.status(200).json(bounties);
 }
 

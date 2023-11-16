@@ -190,7 +190,7 @@ const contentWithColumnsAndTables = {
           content: [
             {
               type: 'heading',
-              attrs: { id: null, level: 2, track: [], collapseContent: null },
+              attrs: { id: null, level: 2, track: [] },
               content: [
                 {
                   text: 'Column 1',
@@ -239,7 +239,7 @@ const contentWithColumnsAndTables = {
           content: [
             {
               type: 'heading',
-              attrs: { id: null, level: 2, track: [], collapseContent: null },
+              attrs: { id: null, level: 2, track: [] },
               content: [
                 {
                   text: 'Column 2',

@@ -8,12 +8,12 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import { ExpandableSectionTitle } from 'components/common/ExpandableSectionTitle';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Reward } from 'lib/rewards/interfaces';
 
 import { RewardStatusBadge } from '../../RewardStatusBadge';
-
 /**
  * Permissions left optional so this component can initialise without them
  */
@@ -21,10 +21,19 @@ interface Props {
   reward: Reward;
   pageId: string;
   readOnly?: boolean;
+  isExpanded: boolean;
+  toggleExpanded: () => void;
   refreshPermissions: () => void;
 }
 
-export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refreshPermissions }: Props) {
+export function RewardPropertiesHeader({
+  readOnly = false,
+  reward,
+  isExpanded,
+  pageId,
+  toggleExpanded,
+  refreshPermissions
+}: Props) {
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
@@ -52,7 +61,7 @@ export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refre
       {/* Bounty price and status  */}
       <Grid container mb={1}>
         <Grid item xs={6}>
-          <Typography fontWeight='bold'>Reward information</Typography>
+          <ExpandableSectionTitle title='Reward details' isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
         </Grid>
         <Grid item xs={6}>
           <Box
@@ -65,7 +74,7 @@ export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refre
           >
             {/* Provide the bounty menu options */}
             <Box data-test='bounty-header-amount' display='flex'>
-              <RewardStatusBadge reward={reward} truncate />
+              <RewardStatusBadge reward={reward} truncate showEmptyStatus />
             </Box>
           </Box>
         </Grid>

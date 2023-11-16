@@ -1,16 +1,17 @@
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
-import { useCreateReward, useGetRewards } from 'charmClient/hooks/rewards';
+import { useGetRewards } from 'charmClient/hooks/rewards';
 import type { RewardStatusFilter } from 'components/rewards/components/RewardViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
-import type { RewardCreationData } from 'lib/rewards/createReward';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type RewardsContextType = {
   rewards: RewardWithUsers[] | undefined;
@@ -21,9 +22,8 @@ type RewardsContextType = {
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
   refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
-  createReward: (input: Omit<RewardCreationData, 'userId'>) => Promise<RewardWithUsers | null>;
-  tempReward?: RewardCreationData | null;
-  setTempReward: (input?: RewardCreationData | null) => void;
+  creatingInlineReward: boolean;
+  setCreatingInlineReward: (isCreating: boolean) => void;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
@@ -37,9 +37,8 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   isLoading: false,
   updateReward: () => Promise.resolve(),
   refreshReward: () => Promise.resolve() as any,
-  createReward: () => Promise.resolve(null),
-  tempReward: null,
-  setTempReward: () => {}
+  creatingInlineReward: false,
+  setCreatingInlineReward: () => {}
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
@@ -49,9 +48,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
 
   const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
-  const { trigger: createRewardTrigger } = useCreateReward();
-  const [tempRewardData, setTempRewardData] = useState<null | RewardCreationData>(null);
-
+  const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
+  const { subscribe } = useWebSocketClient();
   // filter out deleted and templates
   let filteredRewards = useMemo(
     () =>
@@ -107,45 +105,32 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     [mutateRewards]
   );
 
-  const createReward = useCallback(
-    async (rewardData: Omit<RewardCreationData, 'userId'>) => {
-      const reward = await createRewardTrigger(rewardData as any);
-      if (!reward) {
-        return null;
-      }
-
+  useEffect(() => {
+    function handleDeleteEvent(deletedPages: WebSocketPayload<'pages_deleted'>) {
       mutateRewards(
-        (data) => {
-          if (!data) {
-            return [reward];
-          }
-
-          return [...data, reward];
+        (_rewards) => {
+          return _rewards?.filter((reward) => !deletedPages.some((page) => page.id === reward.id));
         },
-        { revalidate: false }
-      );
-
-      return reward;
-    },
-    [createRewardTrigger, mutateRewards]
-  );
-
-  const setTempReward = useCallback(
-    (data?: RewardCreationData | null) => {
-      if (!space || !user) return;
-
-      setTempRewardData(
-        data ?? {
-          chainId: 1,
-          spaceId: space.id,
-          rewardAmount: 1,
-          rewardToken: 'ETH',
-          userId: user.id
+        {
+          revalidate: false
         }
       );
-    },
-    [space, user]
-  );
+    }
+
+    function handleCreateEvent(createdPages: WebSocketPayload<'pages_created'>) {
+      if (createdPages.some((page) => page.type === 'bounty')) {
+        mutateRewards();
+      }
+    }
+
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
+    const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
+
+    return () => {
+      unsubscribeFromPageDeletes();
+      unsubscribeFromPageCreated();
+    };
+  }, [mutateRewards, subscribe]);
 
   const value = useMemo(
     () => ({
@@ -158,9 +143,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       updateReward,
       refreshReward,
       setRewards: mutateRewards,
-      createReward,
-      setTempReward,
-      tempReward: tempRewardData
+      setCreatingInlineReward,
+      creatingInlineReward
     }),
     [
       rewards,
@@ -171,9 +155,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       loadingPages,
       updateReward,
       refreshReward,
-      createReward,
-      setTempReward,
-      tempRewardData
+      creatingInlineReward,
+      setCreatingInlineReward
     ]
   );
 

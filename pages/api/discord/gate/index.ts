@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { checkDiscordGate } from 'lib/discord/checkDiscordGate';
+import { checkDiscordGate } from 'lib/discord/collabland/checkDiscordGate';
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -181,6 +181,7 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
     isHidden: false,
     isPinned: false,
     link,
-    walletId
+    walletId,
+    contractName: nft.contractMetadata.name
   };
 }

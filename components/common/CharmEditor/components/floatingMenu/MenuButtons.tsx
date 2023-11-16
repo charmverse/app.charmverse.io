@@ -38,7 +38,7 @@ const { defaultKeys: boldKeys, queryIsBoldActive, toggleBold } = bold;
 const { defaultKeys: codeKeys, queryIsCodeActive, toggleCode } = code;
 const { defaultKeys: underlineKeys, queryIsUnderlineActive, toggleUnderline } = underline;
 const { defaultKeys: strikeKeys, queryIsStrikeActive, toggleStrike } = strike;
-const { defaultKeys: headingKeys, queryIsHeadingActive, toggleHeading } = heading;
+const { keybindings: headingKeys, queryIsHeadingActive, toggleHeading } = heading;
 
 const { createLink, queryIsLinkActive } = link;
 interface ButtonProps {

@@ -11,8 +11,8 @@ import {
   useUpsertRubricCriteria
 } from 'charmClient/hooks/proposals';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
-import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalProperties';
-import { ProposalProperties as ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalProperties';
+import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
+import { ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -70,7 +70,8 @@ export function ProposalProperties({
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
   const canAnswerRubric = proposalPermissions?.evaluate;
-  const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
+  const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
+  const canViewRubricAnswers = isAdmin || isReviewer;
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
   const isTemplate = proposalPage.type === 'proposal_template';
   const sourceTemplate = isFromTemplateSource
@@ -160,6 +161,8 @@ export function ProposalProperties({
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
   const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
   const readOnlyReviewers = readOnlyProperties || (!isAdmin && sourceTemplate && sourceTemplate.reviewers.length > 0);
+  // rubric criteria can always be updated by reviewers and admins
+  const readOnlyRubricCriteria = (readOnlyProperties || isFromTemplateSource) && !(isAdmin || isReviewer);
 
   return (
     <>
@@ -174,7 +177,7 @@ export function ProposalProperties({
         readOnlyAuthors={readOnlyProperties}
         readOnlyCategory={readOnlyCategory}
         isAdmin={isAdmin}
-        readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
+        readOnlyRubricCriteria={readOnlyRubricCriteria}
         readOnlyProposalEvaluationType={
           readOnlyProperties ||
           // dont let users change type after status moves to Feedback, and forward

@@ -1,4 +1,4 @@
-import type { Application, ApplicationComment } from '@charmverse/core/prisma';
+import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Box, FormLabel, Stack } from '@mui/material';
 import { useMemo } from 'react';
 
@@ -12,13 +12,7 @@ import { useUser } from 'hooks/useUser';
 import type { CommentWithChildren } from 'lib/comments';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
-export function ApplicationComments({
-  applicationId,
-  status
-}: {
-  status: Application['status'];
-  applicationId: string;
-}) {
+export function ApplicationComments({ applicationId }: { applicationId: string }) {
   const { user } = useUser();
   const {
     data: applicationComments = [],
@@ -148,25 +142,23 @@ export function ApplicationComments({
         )}
       </Stack>
 
-      {status !== 'rejected' && (
-        <Stack gap={1}>
-          <FormLabel>
-            <strong>Send a message</strong>
-          </FormLabel>
-          <CommentForm
-            inlineCharmEditor
-            handleCreateComment={onSendClicked}
-            initialValue={
-              user?.id
-                ? {
-                    doc: emptyDocument,
-                    rawText: ''
-                  }
-                : undefined
-            }
-          />
-        </Stack>
-      )}
+      <Stack gap={1}>
+        <FormLabel>
+          <strong>Send a message</strong>
+        </FormLabel>
+        <CommentForm
+          inlineCharmEditor
+          handleCreateComment={onSendClicked}
+          initialValue={
+            user?.id
+              ? {
+                  doc: emptyDocument,
+                  rawText: ''
+                }
+              : undefined
+          }
+        />
+      </Stack>
     </Stack>
   );
 }
