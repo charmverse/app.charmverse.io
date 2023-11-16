@@ -24,7 +24,7 @@ export const contentWithBlocksAndMarks = {
     },
     {
       type: 'heading',
-      attrs: { id: null, level: 1, track: [], collapseContent: null },
+      attrs: { id: null, level: 1, track: [] },
       content: [
         {
           text: 'Heading 1',
@@ -45,7 +45,7 @@ export const contentWithBlocksAndMarks = {
     },
     {
       type: 'heading',
-      attrs: { id: null, level: 2, track: [], collapseContent: null },
+      attrs: { id: null, level: 2, track: [] },
       content: [
         {
           text: 'Heading 2',
@@ -66,7 +66,7 @@ export const contentWithBlocksAndMarks = {
     },
     {
       type: 'heading',
-      attrs: { id: null, level: 3, track: [], collapseContent: null },
+      attrs: { id: null, level: 3, track: [] },
       content: [
         {
           text: 'Heading 3',

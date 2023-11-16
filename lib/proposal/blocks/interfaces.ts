@@ -17,21 +17,6 @@ export type ProposalPropertiesBlock = ProposalBlock & {
 // TODO: Add other block types i.e. view.
 export type ProposalBlockWithTypedFields = ProposalPropertiesBlock;
 
-export type ProposalBlockInput = {
-  id?: string;
-  type: string;
-  spaceId?: string;
-  title?: string;
-  schema?: number;
-  fields?: ProposalPropertiesBlockFields;
-  parentId?: string;
-  rootId?: string;
-};
-
-export type ProposalBlockUpdateInput = ProposalBlockInput & {
-  id: string;
-};
-
 export type ProposalPropertyValue = string | string[] | number | TargetPermissionGroup<'user' | 'role'>[];
 
 export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
@@ -41,3 +26,18 @@ export type ProposalPropertyValues = { properties: ProposalPropertiesField };
 export type ProposalFields = ProposalPropertyValues;
 
 export type ProposalFieldsProp = { fields: ProposalFields };
+
+export type ProposalBlockInput = {
+  id?: string;
+  type: string;
+  spaceId?: string;
+  title?: string;
+  schema?: number;
+  fields?: ProposalPropertiesBlockFields | ProposalPropertyValues;
+  parentId?: string;
+  rootId?: string;
+};
+
+export type ProposalBlockUpdateInput = ProposalBlockInput & {
+  id: string;
+};

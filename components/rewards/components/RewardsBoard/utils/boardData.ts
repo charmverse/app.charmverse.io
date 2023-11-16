@@ -64,7 +64,7 @@ export function getDefaultTableView({ storedBoard }: { storedBoard: RewardProper
 
   view.id = DEFAULT_VIEW_BLOCK_ID;
   view.fields.columnWidths = {
-    [Constants.titleColumnId]: 310,
+    [Constants.titleColumnId]: 400,
     [DUE_DATE_ID]: 150,
     [ASSIGNEES_BLOCK_ID]: 200,
     [REWARD_REVIEWERS_BLOCK_ID]: 150,

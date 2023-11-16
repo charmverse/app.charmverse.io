@@ -13,6 +13,7 @@ import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import type { Member } from 'lib/members/interfaces';
 import {
   ASSIGNEES_BLOCK_ID,
   CREATED_AT_ID,
@@ -32,7 +33,7 @@ export type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
 export function useRewardsBoardAdapter() {
   const [boardReward, setBoardReward] = useState<BoardReward | null>(null);
   const { space } = useCurrentSpace();
-  const { members } = useMembers();
+  const { membersRecord } = useMembers();
   const { filteredRewards: rewards } = useRewards();
   const { pages } = usePages();
   const { rewardPropertiesBlock, rewardBlocks } = useRewardBlocks();
@@ -67,14 +68,14 @@ export function useRewardsBoardAdapter() {
         ?.map((p) => {
           const page = pages[p?.id];
 
-          return mapRewardToCardPage({ reward: p, rewardPage: page, spaceId: space?.id });
+          return mapRewardToCardPage({ reward: p, rewardPage: page, spaceId: space?.id, members: membersRecord });
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
-    const sortedCardPages = activeView ? sortCards(cards, board, activeView, members) : [];
+    const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
 
     return sortedCardPages;
-  }, [activeView, board, members, pages, rewards, space?.id]);
+  }, [activeView, board, membersRecord, pages, rewards, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: rewardPropertiesBlock,
@@ -82,7 +83,12 @@ export function useRewardsBoardAdapter() {
   });
 
   // card from current reward
-  const card = mapRewardToCardPage({ reward: boardReward, rewardPage, spaceId: space?.id }).card;
+  const card = mapRewardToCardPage({
+    reward: boardReward,
+    rewardPage,
+    spaceId: space?.id,
+    members: membersRecord
+  }).card;
 
   // each reward with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
@@ -107,15 +113,19 @@ export function useRewardsBoardAdapter() {
 function mapRewardToCardPage({
   reward,
   rewardPage,
-  spaceId
+  spaceId,
+  members
 }: {
   reward: BoardReward | RewardWithUsers | null;
   rewardPage?: PageMeta;
   spaceId?: string;
+  members: Record<string, Member>;
 }): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
+
   rewardFields.properties = {
+    ...rewardFields.properties,
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]:
       reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
@@ -132,8 +142,7 @@ function mapRewardToCardPage({
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
-    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
-    ...rewardFields.properties
+    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || []
   };
 
   const card: Card<RewardPropertyValue> = {
@@ -163,7 +172,8 @@ function mapRewardToCardPage({
               application,
               rewardPage,
               spaceId,
-              reward
+              reward,
+              members
             })
           )
         : undefined
@@ -175,12 +185,14 @@ function mapApplicationToCardPage({
   application,
   rewardPage,
   reward,
-  spaceId
+  spaceId,
+  members
 }: {
   application: ApplicationMeta;
   rewardPage: PageMeta;
   reward: RewardWithUsers;
   spaceId?: string;
+  members: Record<string, Member>;
 }) {
   const applicationFields = { properties: {} };
   const applicationSpaceId = rewardPage?.spaceId || spaceId || '';
@@ -201,7 +213,7 @@ function mapApplicationToCardPage({
     spaceId: applicationSpaceId,
     parentId: reward.id,
     schema: 1,
-    title: 'APP - rewardPage?.title' || '',
+    title: '',
     rootId: applicationSpaceId,
     type: 'card' as BlockTypes,
     customIconType: 'applicationStatus',
@@ -212,13 +224,13 @@ function mapApplicationToCardPage({
     deletedAt: null,
     fields: { ...applicationFields, contentOrder: [] }
   };
-
+  const authorName = members[application.createdBy]?.username;
   const applicationPage: PageMeta = {
     id: application.id || '',
     spaceId: rewardPage?.spaceId || '',
     boardId: null,
     bountyId: rewardPage?.id || '',
-    title: rewardPage?.title || '',
+    title: `Application ${authorName ? `from ${authorName}` : ''}`,
     type: 'bounty',
     cardId: application.id || '',
     createdAt: new Date(application.createdAt),

@@ -2,7 +2,6 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
-import React from 'react';
 import { createPortal } from 'react-dom';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
@@ -11,7 +10,7 @@ import { useThreads } from 'hooks/useThreads';
 import { isTruthy } from 'lib/utilities/types';
 
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import PageThread from '../../PageThread';
+import PageThread from '../../thread/PageThread';
 import type { InlineCommentPluginState } from '../inlineComment.plugins';
 
 export const ThreadContainer = styled(Paper)`

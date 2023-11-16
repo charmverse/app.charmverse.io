@@ -140,7 +140,7 @@ describe('Database options util', () => {
     // Needed for any server around the world to return the same value. In CV this is not needed because we need only the date and not the hour
     jest.spyOn(Date.prototype, 'getTime').mockReturnValue(1639692000000);
 
-    const cardProperties = createCardFieldProperties(mockCsvRow, mockMappedBoardProperties, [member]);
+    const cardProperties = createCardFieldProperties(mockCsvRow, mockMappedBoardProperties, { [member.id]: member });
 
     expect(cardProperties).toEqual(expectedResult);
   });

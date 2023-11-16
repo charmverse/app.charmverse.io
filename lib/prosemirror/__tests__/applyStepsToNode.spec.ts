@@ -62,7 +62,7 @@ const testDoc = {
     },
     {
       type: 'heading',
-      attrs: { level: 1, collapseContent: null },
+      attrs: { level: 1 },
       content: [
         { text: 'Heading ', type: 'text' },
         {

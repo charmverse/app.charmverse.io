@@ -4,20 +4,19 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useUser } from 'hooks/useUser';
 import { statusesAcceptingNewWork } from 'lib/rewards/shared';
 
 type Props = {
   rewardId?: string;
-  onShowApplication?: VoidFunction;
 };
 
-export function NewWorkButton({ rewardId, onShowApplication }: Props) {
+export function NewWorkButton({ rewardId }: Props) {
   const { rewards } = useRewards();
   const { user } = useUser();
-  const { createApplication } = useApplicationDialog();
+  const { updateURLQuery } = useCharmRouter();
 
   const reward = useMemo(() => {
     return rewards?.find((r) => r.id === rewardId);
@@ -35,9 +34,7 @@ export function NewWorkButton({ rewardId, onShowApplication }: Props) {
     if (!reward) return;
 
     // open modal with empty submission
-    createApplication(reward.id);
-
-    onShowApplication?.();
+    updateURLQuery({ id: rewardId, applicationId: 'new' });
   }
 
   if (

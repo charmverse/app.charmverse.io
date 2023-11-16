@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 export function useCharmRouter() {
   const router = useRouter();
+
   return {
     router,
     navigateToPath(pathname: string, query?: ParsedUrlQueryInput) {
@@ -27,7 +28,12 @@ export function useCharmRouter() {
     },
     // update the URL, trigger a digest but do not re-run SSR
     updateURLQuery(query: ParsedUrlQueryInput) {
-      return router.push({ pathname: router.pathname, query: { ...router.query, ...query } }, undefined, {
+      // filter empty query params
+      const updatedQuery = Object.fromEntries(
+        Object.entries({ ...router.query, ...query }).filter(([_, v]) => v != null)
+      );
+
+      return router.push({ pathname: router.pathname, query: updatedQuery }, undefined, {
         shallow: true
       });
     }

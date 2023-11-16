@@ -85,15 +85,10 @@ export function SharedPage({ publicPage }: Props) {
   }
 
   return currentPage.type.match(/board/) ? (
-    <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
+    <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
     <Box sx={{ overflowY: 'auto' }}>
-      <DocumentPage
-        page={publicPage.page}
-        refreshPage={() => Promise.resolve()}
-        savePage={() => null}
-        readOnly={true}
-      />
+      <DocumentPage page={publicPage.page} refreshPage={() => Promise.resolve()} savePage={() => null} readOnly />
     </Box>
   );
 }

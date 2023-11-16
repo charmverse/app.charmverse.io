@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import type { TokenGate } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
+import type { HumanizedAccsProps } from '@lit-protocol/types';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -12,7 +12,6 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useContext, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { mutate } from 'swr';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import charmClient from 'charmClient';
@@ -23,10 +22,9 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { humanizeConditions } from 'lib/tokenGates/humanizeConditions';
-import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import { humanizeConditions, humanizeConditionsData } from 'lib/tokenGates/humanizeConditions';
+import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { shortenHex } from 'lib/utilities/blockchain';
-import { isTruthy } from 'lib/utilities/types';
 
 import type { TestResult } from './TestConnectionModal';
 import { TestConnectionModal } from './TestConnectionModal';
@@ -35,7 +33,8 @@ import TokenGateRolesSelect from './TokenGateRolesSelect';
 interface Props {
   tokenGates: TokenGateWithRoles[];
   isAdmin: boolean;
-  onDelete: (tokenGate: TokenGate) => void;
+  onDelete: (tokenGate: { id: string }) => void;
+  refreshTokenGates: () => Promise<void>;
 }
 
 const StyledTableRow = styled(TableRow)`
@@ -62,16 +61,24 @@ function CopyLinkButton({ clickable = false }: { clickable?: boolean }) {
   );
 }
 
-export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props) {
+export default function TokenGatesTable({ isAdmin, onDelete, tokenGates, refreshTokenGates }: Props) {
   const { account, walletAuthSignature, requestSignature } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const litClient = useLitProtocol();
-  const [descriptions, setDescriptions] = useState<(string | null)[]>([]);
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const shareLink = `${window.location.origin}/join?domain=${space?.domain}`;
   const { connectWallet } = useContext(Web3Connection);
+
+  const descriptions = tokenGates.map((tokenGate) => {
+    const conditionsData = humanizeConditionsData({
+      myWalletAddress: account || '',
+      ...(tokenGate.conditions as HumanizedAccsProps)
+    });
+
+    return humanizeConditions(conditionsData);
+  });
 
   function onCopy() {
     showMessage('Link copied to clipboard');
@@ -80,7 +87,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
   async function updateTokenGateRoles(tokenGateId: string, roleIds: string[]) {
     if (space) {
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
-      mutate(`tokenGates/${space.id}`);
+      await refreshTokenGates();
     }
   }
 
@@ -88,30 +95,12 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
     const tokenGate = tokenGates.find((_tokenGate) => _tokenGate.id === tokenGateId);
     if (tokenGate && space) {
       const roleIds = tokenGate.tokenGateToRoles
-        .map((tokenGateToRole) => tokenGateToRole.roleId)
+        .map((tokenGateToRole) => tokenGateToRole.role.id)
         .filter((tokenGateRoleId) => tokenGateRoleId !== roleId);
       await charmClient.updateTokenGateRoles(tokenGateId, space.id, roleIds);
-      mutate(`tokenGates/${space.id}`);
+      await refreshTokenGates();
     }
   }
-
-  useEffect(() => {
-    async function main() {
-      const results = await Promise.all(
-        tokenGates.map((tokenGate) =>
-          humanizeConditions({
-            myWalletAddress: account || '',
-            ...(tokenGate.conditions as any)
-          }).catch((err) => {
-            log.warn('Could not retrieve humanized format of conditions', err);
-            return null;
-          })
-        )
-      );
-      setDescriptions(results.filter(isTruthy));
-    }
-    main();
-  }, [tokenGates]);
 
   async function testConnect(tokenGate: TokenGate) {
     setTestResult({ status: 'loading' });
@@ -121,11 +110,11 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
       }
       const authSig = walletAuthSignature ?? (await requestSignature());
       const jwt = await litClient.getSignedToken({
-        resourceId: tokenGate.resourceId as any,
+        resourceId: tokenGate.resourceId,
         authSig,
-        chain: (tokenGate.conditions as any).chains?.[0],
-        // chain: (tokenGate.conditions as any).chain || 'ethereum',
-        ...(tokenGate.conditions as any)
+        chain: tokenGate.conditions.chains?.[0],
+        // chain: (tokenGate.conditions).chain || 'ethereum',
+        ...tokenGate.conditions
       });
 
       await charmClient.tokenGates.verifyTokenGate({
@@ -212,7 +201,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates }: Props
                 <TableCell>
                   <TokenGateRolesSelect
                     isAdmin={isAdmin}
-                    selectedRoleIds={tokenGate.tokenGateToRoles.map((tokenGateToRole) => tokenGateToRole.roleId)}
+                    selectedRoleIds={tokenGate.tokenGateToRoles.map(({ role }) => role.id)}
                     onChange={(roleIds) => {
                       updateTokenGateRoles(tokenGate.id, roleIds);
                     }}

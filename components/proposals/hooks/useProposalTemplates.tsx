@@ -37,9 +37,17 @@ export function useProposalTemplates({ load } = { load: true }) {
       );
     }
 
+    function handleCreateEvent(createdPages: WebSocketPayload<'pages_created'>) {
+      if (createdPages.some((page) => page.type === 'proposal_template')) {
+        mutate();
+      }
+    }
+
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
+    const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
     return () => {
       unsubscribeFromPageDeletes();
+      unsubscribeFromPageCreated();
     };
   }, [mutate, subscribe]);
 

@@ -53,7 +53,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const boards = useAppSelector(getSortedBoards);
   const boardViews = useAppSelector(getCurrentBoardViews);
   const { showMessage } = useSnackbar();
-  const { members, membersRecord } = useMembers();
+  const { membersRecord } = useMembers();
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const { formatDateTime, formatDate } = useDateFormatter();
@@ -168,7 +168,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
             try {
               await addNewCards({
                 board,
-                members,
+                members: membersRecord,
                 results,
                 spaceId: currentSpace.id,
                 userId: user.id,

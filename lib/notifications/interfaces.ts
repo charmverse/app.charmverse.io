@@ -42,6 +42,21 @@ export type InlineCommentNotification =
       inlineCommentId: string;
     };
 
+export type ApplicationCommentNotification =
+  | {
+      type: 'application_comment.created';
+      applicationCommentId: string;
+    }
+  | {
+      type: 'application_comment.replied';
+      applicationCommentId: string;
+    }
+  | {
+      type: 'application_comment.mention.created';
+      mentionId: string;
+      applicationCommentId: string;
+    };
+
 export type MentionNotification = {
   type: 'mention.created';
   mentionId: string;
@@ -49,6 +64,7 @@ export type MentionNotification = {
 
 export type CommentNotificationType = CommentNotification['type'];
 export type InlineCommentNotificationType = InlineCommentNotification['type'];
+export type ApplicationCommentNotificationType = ApplicationCommentNotification['type'];
 export type MentionNotificationType = MentionNotification['type'];
 
 export interface NotificationBase {
@@ -71,7 +87,7 @@ export type CardNotification = NotificationBase & {
   personProperty: {
     id: string;
     name: string;
-  };
+  } | null;
   group: 'card';
 };
 
@@ -81,17 +97,28 @@ interface DocumentNotificationBase extends NotificationBase {
   pageId: string;
   pagePath: string;
   pageTitle: string;
-  type: InlineCommentNotificationType | MentionNotificationType | CommentNotificationType;
+  type:
+    | InlineCommentNotificationType
+    | MentionNotificationType
+    | CommentNotificationType
+    | ApplicationCommentNotificationType;
   content: PageContent | null;
   mentionId: null | string;
   inlineCommentId: null | string;
   commentId: null | string;
   pageType: PageType | 'post';
   group: 'document';
+  applicationId: null | string;
+  applicationCommentId: null | string;
 }
 
 export type DocumentNotification = DocumentNotificationBase &
-  (CommentNotification | MentionNotification | InlineCommentNotification);
+  (
+    | CommentNotification
+    | MentionNotification
+    | InlineCommentNotification
+    | (ApplicationCommentNotification & { applicationId: string })
+  );
 
 export type DocumentNotificationType = DocumentNotification['type'];
 

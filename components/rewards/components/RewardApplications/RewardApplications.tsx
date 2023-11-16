@@ -12,7 +12,7 @@ import { useState } from 'react';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
-import { useApplicationDialog } from 'components/rewards/hooks/useApplicationDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useUser } from 'hooks/useUser';
 import { countCompleteSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
 
@@ -27,7 +27,8 @@ type Props = {
 
 export function RewardApplications({ rewardId, onShowApplication }: Props) {
   const theme = useTheme();
-  const { showApplication } = useApplicationDialog();
+
+  const { updateURLQuery } = useCharmRouter();
 
   const { user } = useUser();
 
@@ -40,8 +41,7 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
   }
 
   const openApplication = (applicationId: string) => {
-    showApplication(applicationId);
-    setTimeout(() => onShowApplication?.(), 50);
+    updateURLQuery({ applicationId });
   };
 
   const validSubmissions = countCompleteSubmissions({ applications: reward.applications });
@@ -62,11 +62,9 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
 
   if (reward.applications.length === 0) {
     return (
-      <Stack mt={2} mb={1}>
-        <Stack>
-          <Stack direction='row' alignItems='center' justifyContent='space-between'>
-            <Typography fontWeight='bold'>Reward applications</Typography>
-          </Stack>
+      <>
+        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+          <Typography fontWeight='bold'>Reward applications</Typography>
         </Stack>
         <Box display='flex' justifyContent='center' alignItems='center' gap={1}>
           <Typography
@@ -77,14 +75,14 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
           >
             There are no submissions yet.
           </Typography>
-          <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
+          <NewWorkButton rewardId={rewardId} />
         </Box>
-      </Stack>
+      </>
     );
   }
 
   return (
-    <Stack mt={2}>
+    <>
       <Typography fontWeight='bold'>Reward applications</Typography>
       <Box width='100%' display='flex' justifyContent='space-between' mb={1}>
         <Box display='flex' gap={1} alignItems='center'>
@@ -147,8 +145,8 @@ export function RewardApplications({ rewardId, onShowApplication }: Props) {
       )}
 
       <Stack flex={1} direction='row' justifyContent='flex-end' mb={1}>
-        <NewWorkButton rewardId={rewardId} onShowApplication={onShowApplication} />
+        <NewWorkButton rewardId={rewardId} />
       </Stack>
-    </Stack>
+    </>
   );
 }

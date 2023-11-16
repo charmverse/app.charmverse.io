@@ -4,13 +4,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { DiscordGuildMember } from 'lib/discord/assignRoles';
 import { assignRolesFromDiscord } from 'lib/discord/assignRoles';
-import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
-import { getDiscordAccount } from 'lib/discord/getDiscordAccount';
+import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
+import { getDiscordAccount } from 'lib/discord/client/getDiscordAccount';
+import { getGuildMember } from 'lib/discord/client/getGuildMember';
+import { getGuildRoles } from 'lib/discord/client/getGuildRoles';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
-import { authenticatedRequest } from 'lib/discord/handleDiscordResponse';
-import type { DiscordServerRole } from 'lib/discord/interface';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
@@ -148,24 +147,22 @@ async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectD
   for (const space of spacesWithDiscord) {
     // Get all the roles from the discord server
     try {
-      const discordServerRoles = await authenticatedRequest<DiscordServerRole[]>(
-        `https://discord.com/api/v8/guilds/${space.discordServerId}/roles`
-      );
-      // Dont create new roles
-      const rolesRecord = await findOrCreateRoles(discordServerRoles, space.id, req.session.user.id, {
-        createRoles: false
-      });
-      const guildMemberResponse = await authenticatedRequest<DiscordGuildMember>(
-        `https://discord.com/api/v8/guilds/${space.discordServerId}/members/${id}`
-      );
-      // Remove the roles imported from guild.xyz
-      for (const roleId of Object.keys(rolesRecord)) {
-        const role = rolesRecord[roleId];
-        if (role?.sourceId && role.source === 'guild_xyz') {
-          delete rolesRecord[roleId];
+      if (space.discordServerId) {
+        const discordServerRoles = await getGuildRoles(space.discordServerId);
+        // Dont create new roles
+        const rolesRecord = await findOrCreateRoles(discordServerRoles, space.id, req.session.user.id, {
+          createRoles: false
+        });
+        const guildMemberResponse = await getGuildMember({ guildId: space.discordServerId, memberId: id });
+        // Remove the roles imported from guild.xyz
+        for (const roleId of Object.keys(rolesRecord)) {
+          const role = rolesRecord[roleId];
+          if (role?.sourceId && role.source === 'guild_xyz') {
+            delete rolesRecord[roleId];
+          }
         }
+        await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], space.id);
       }
-      await assignRolesFromDiscord(rolesRecord, [guildMemberResponse], space.id);
     } catch (error) {
       log.warn('Could not add Discord roles to user on connect', error);
     }

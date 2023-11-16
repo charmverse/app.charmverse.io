@@ -166,15 +166,16 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
   return indexA - indexB;
 }
 
-export function sortCards(cardPages: CardPage[], board: Board, activeView: BoardView, members: Member[]): CardPage[] {
+export function sortCards(
+  cardPages: CardPage[],
+  board: Board,
+  activeView: BoardView,
+  members: Record<string, Member>
+): CardPage[] {
   if (!activeView) {
     return cardPages;
   }
   const { sortOptions } = activeView.fields;
-  const membersById = members.reduce<{ [id: string]: string }>((acc, member) => {
-    acc[member.id] = member.username;
-    return acc;
-  }, {});
 
   if (sortOptions?.length < 1) {
     return cardPages.sort((a, b) => manualOrder(activeView, a, b));
@@ -195,17 +196,16 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
         Utils.logError(`Missing template for property id: ${sortPropertyId}`);
         return sortedCards;
       }
-      Utils.log(`Sort by property: ${template?.name}`);
       sortedCards = sortedCards.sort((a, b) => {
         let aValue = a.card.fields.properties[sortPropertyId] || '';
         let bValue = b.card.fields.properties[sortPropertyId] || '';
 
         if (template.type === 'createdBy') {
-          aValue = membersById[a.page.createdBy] || '';
-          bValue = membersById[b.page.createdBy] || '';
+          aValue = members[a.page.createdBy]?.username || '';
+          bValue = members[b.page.createdBy]?.username || '';
         } else if (template.type === 'updatedBy') {
-          aValue = membersById[a.page.updatedBy] || '';
-          bValue = membersById[b.page.updatedBy] || '';
+          aValue = members[a.page.updatedBy]?.username || '';
+          bValue = members[b.page.updatedBy]?.username || '';
         } else if (template.type === 'date') {
           aValue = aValue === '' ? '' : JSON.parse(aValue as string).from;
           bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;

@@ -2,9 +2,8 @@ import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Alert, Box, Card, Divider } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
 
-import charmClient from 'charmClient';
+import { useSearchByDomain } from 'charmClient/hooks/spaces';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -33,18 +32,16 @@ export function AlternateRouteButton({ href, children }: { href: string; childre
   );
 }
 
+export function TokenGateContainer({ children }: { children: ReactNode }) {
+  return <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>{children}</Box>;
+}
+
 export default function JoinWorkspace() {
   const { navigateToSpacePath, router } = useCharmRouter();
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const [isRouterReady, setRouterReady] = useState(false);
-  const {
-    data: spaceFromPath,
-    isLoading: isSpaceLoading,
-    error: spaceError
-  } = useSWRImmutable(domain ? `space/${domain}` : null, () =>
-    charmClient.spaces.searchByDomain(stripUrlParts(domain || ''))
-  );
+  const { data: spaceFromPath, isLoading: isSpaceLoading, error: spaceError } = useSearchByDomain(domain);
 
   useEffect(() => {
     const connectedSpace = filterSpaceByDomain(spaces, domain);
@@ -63,9 +60,9 @@ export default function JoinWorkspace() {
   const spaceFromPathNotFound = domain && !isSpaceLoading && !spaceFromPath;
 
   return (
-    <Box sx={{ width: 600, maxWidth: '100%', mx: 'auto', mb: 6, px: 2 }}>
+    <TokenGateContainer>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-        <DialogTitle>Join a space</DialogTitle>
+        <DialogTitle>Join space</DialogTitle>
         <Divider />
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
@@ -73,12 +70,8 @@ export default function JoinWorkspace() {
         {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
       <AlternateRouteButton href={`${getAppUrl()}createSpace`}>Create a space</AlternateRouteButton>
-    </Box>
+    </TokenGateContainer>
   );
-}
-
-function stripUrlParts(maybeUrl: string) {
-  return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
 }
 
 JoinWorkspace.getLayout = getBaseLayout;

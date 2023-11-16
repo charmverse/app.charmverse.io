@@ -100,7 +100,7 @@ function CenterPanel(props: Props) {
   const router = useRouter();
   const { space } = useCurrentSpace();
   const { pages, refreshPage } = usePages();
-  const { members } = useMembers();
+  const { membersRecord } = useMembers();
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
@@ -162,7 +162,7 @@ function CenterPanel(props: Props) {
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
 
-    return isActiveView ? sortCards(result, activeBoard, activeView, members) : [];
+    return isActiveView ? sortCards(result, activeBoard, activeView, membersRecord) : [];
   }, [isActiveView, _cards, pages]);
 
   const cards = cardPages.map(({ card }) => card);

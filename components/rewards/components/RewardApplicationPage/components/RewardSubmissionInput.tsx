@@ -28,9 +28,7 @@ const schema = (customReward?: boolean) => {
     walletAddress: (customReward ? yup.string() : yup.string().required()).test(
       'verifyContractFormat',
       'Invalid wallet address',
-      (value) => {
-        return !value || isValidChainAddress(value);
-      }
+      isValidChainAddress
     ),
     rewardInfo: yup.string()
   });
@@ -52,7 +50,7 @@ interface Props {
   alwaysExpanded?: boolean;
   hasCustomReward: boolean;
   refreshSubmission: VoidFunction;
-  currentUserIsApplicant: boolean;
+  currentUserIsAuthor: boolean;
   isSaving?: boolean;
 }
 
@@ -63,12 +61,13 @@ export function RewardSubmissionInput({
   onSubmit: onSubmitProp,
   bountyId,
   hasCustomReward,
-  currentUserIsApplicant,
+  currentUserIsAuthor,
   isSaving
 }: Props) {
   const { user } = useUser();
 
   const [isEditorTouched, setIsEditorTouched] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -79,7 +78,7 @@ export function RewardSubmissionInput({
     defaultValues: {
       submission: submission?.submission as string,
       submissionNodes: submission?.submissionNodes as any as JSON,
-      walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address
+      walletAddress: submission ? submission?.walletAddress || '' : user?.wallets[0]?.address
     },
     resolver: yupResolver(schema(hasCustomReward))
   });
@@ -91,7 +90,6 @@ export function RewardSubmissionInput({
       applicationId: submission?.id,
       ...values
     });
-
     if (hasSaved) {
       setFormError(null);
       setIsEditorTouched(false);
@@ -103,7 +101,7 @@ export function RewardSubmissionInput({
       <Box display='flex' justifyContent='space-between' flexDirection='row' gap={0.5}>
         <Box display='flex' gap={0.5}>
           <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer' }}>
-            {!submission || submission?.createdBy === user?.id ? 'Your submission' : 'Submission'}
+            {!submission || currentUserIsAuthor ? 'Your submission' : 'Submission'}
           </FormLabel>
         </Box>
         {submission && !applicationStatuses.includes(submission?.status) && (
@@ -131,12 +129,12 @@ export function RewardSubmissionInput({
                 minHeight: 130
               }}
               readOnly={readOnly || submission?.status === 'complete' || submission?.status === 'paid'}
-              placeholderText={permissions?.review ? 'No submission yet' : 'Enter the content of your submission here.'}
+              placeholderText={currentUserIsAuthor ? 'Enter your submission here' : 'No submission yet'}
               key={`${readOnly}.${submission?.status}`}
             />
           </Grid>
 
-          {(currentUserIsApplicant || permissions?.review) && !hasCustomReward && (
+          {(currentUserIsAuthor || permissions?.review) && !hasCustomReward && (
             <Grid item>
               <InputLabel>Address to receive reward</InputLabel>
               <TextField
@@ -150,7 +148,7 @@ export function RewardSubmissionInput({
             </Grid>
           )}
 
-          {(currentUserIsApplicant || permissions?.review) && hasCustomReward && (
+          {(currentUserIsAuthor || permissions?.review) && hasCustomReward && (
             <Grid item>
               <InputLabel>Information for custom reward</InputLabel>
               <TextField
@@ -161,7 +159,7 @@ export function RewardSubmissionInput({
                 fullWidth
                 error={!!errors.rewardInfo}
                 helperText={errors.rewardInfo?.message}
-                disabled={!currentUserIsApplicant}
+                disabled={!currentUserIsAuthor}
               />
             </Grid>
           )}
@@ -173,7 +171,7 @@ export function RewardSubmissionInput({
                 type='submit'
                 loading={isSaving}
               >
-                {submission?.submission ? 'Update' : 'Submit'}
+                {submission?.id ? 'Update' : 'Submit'}
               </Button>
             </Grid>
           )}

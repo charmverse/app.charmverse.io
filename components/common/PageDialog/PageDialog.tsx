@@ -4,13 +4,16 @@ import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
+import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import type { PageDialogContext } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
@@ -20,15 +23,27 @@ import debouncePromise from 'lib/utilities/debouncePromise';
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
 
+const RewardApplicationPage = dynamic(
+  () =>
+    import('../../rewards/components/RewardApplicationPage/RewardApplicationPage').then(
+      (mod) => mod.RewardApplicationPage
+    ),
+  { ssr: false }
+);
+
+type ContentViewType = 'page' | 'application';
+
 interface Props {
   pageId?: string;
   onClose: () => void;
   readOnly?: boolean;
   hideToolsMenu?: boolean;
+  applicationContext?: PageDialogContext;
 }
 
-export function PageDialog(props: Props) {
-  const { hideToolsMenu = false, pageId, readOnly } = props;
+function PageDialogBase(props: Props) {
+  const { hideToolsMenu = false, pageId, readOnly, applicationContext } = props;
+
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
@@ -39,9 +54,14 @@ export function PageDialog(props: Props) {
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
-  const fullPageUrl = `/${domain}/${page?.path}`;
+  const fullPageUrl = page?.path ? `/${domain}/${page?.path}` : null;
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
+
+  let contentType = pageId ? 'page' : null;
+  if (applicationContext?.applicationId || (applicationContext?.isNewApplication && applicationContext?.pageId)) {
+    contentType = 'application';
+  }
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -53,10 +73,10 @@ export function PageDialog(props: Props) {
 
   // open modal when page is set
   useEffect(() => {
-    if (page) {
+    if (contentType) {
       popupState.open();
     }
-  }, [!!page]);
+  }, [!!contentType]);
 
   useEffect(() => {
     if (page?.id) {
@@ -68,6 +88,12 @@ export function PageDialog(props: Props) {
     popupState.close();
     props.onClose();
   }
+
+  useEffect(() => {
+    if (contentType === null && popupState.isOpen) {
+      close();
+    }
+  }, [contentType, popupState.isOpen]);
 
   useEffect(() => {
     if (page?.id) {
@@ -115,33 +141,56 @@ export function PageDialog(props: Props) {
 
   return (
     <Dialog
-      toolsMenu={!hideToolsMenu && !readOnly && page && <FullPageActionsMenuButton page={page} onDelete={close} />}
+      toolsMenu={
+        contentType === 'page' &&
+        !hideToolsMenu &&
+        !readOnly &&
+        page && <FullPageActionsMenuButton page={page} onDelete={close} />
+      }
       toolbar={
-        <Box display='flex' justifyContent='space-between'>
-          <Button
-            data-test='open-as-page'
-            size='small'
-            color='secondary'
-            href={fullPageUrl}
-            onClick={close}
-            variant='text'
-            startIcon={<OpenInFullIcon fontSize='small' />}
-            sx={{ px: 1.5 }}
-          >
-            Open as Page
-          </Button>
-          {page && (
-            <Box display='flex' alignItems='center' gap={0.5}>
-              <DocumentHeaderElements headerHeight={0} page={page} />
-            </Box>
-          )}
-        </Box>
+        contentType === 'page' && (
+          <Box display='flex' justifyContent='space-between'>
+            <Button
+              data-test='open-as-page'
+              size='small'
+              color='secondary'
+              href={fullPageUrl}
+              onClick={close}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+              sx={{ px: 1.5 }}
+            >
+              Open as Page
+            </Button>
+            {page && (
+              <Box display='flex' alignItems='center' gap={0.5}>
+                <DocumentHeaderElements headerHeight={0} page={page} />
+              </Box>
+            )}
+          </Box>
+        )
       }
       onClose={close}
     >
-      {page && (
+      {page && contentType === 'page' && (
         <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} close={close} />
       )}
+      {contentType === 'application' && applicationContext && (
+        <RewardApplicationPage
+          applicationId={applicationContext.applicationId || null}
+          rewardId={applicationContext.pageId || null}
+          closeDialog={close}
+        />
+      )}
     </Dialog>
+  );
+}
+
+// PageDialogBase must be wrapped by DocumentPageProviders so that it can control context about the page
+export function PageDialog(props: Props): JSX.Element | null {
+  return (
+    <DocumentPageProviders isInsideDialog={true}>
+      <PageDialogBase {...props} />
+    </DocumentPageProviders>
   );
 }

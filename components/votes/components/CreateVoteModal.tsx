@@ -198,7 +198,6 @@ export function CreateVoteModal({
                 backgroundColor: 'var(--input-bg)'
               }}
               disableMention
-              isPollOrVote
               colorMode='dark'
               placeholderText='Details (Optional)'
               content={voteContent.content as PageContent}

@@ -24,18 +24,17 @@ export async function getPostCategoriesUsersRecord({ spaceId }: { spaceId: strin
 
   const postCategories = await getPostCategories(spaceId);
   const userIds = spaceRoles.map((spaceRole) => spaceRole.userId);
+  const permissionClient = await getPermissionsClient({
+    resourceId: spaceId,
+    resourceIdType: 'space'
+  });
 
   for (const userId of userIds) {
     const spaceNotifications = await getUserSpaceNotifications({ spaceId, userId });
-    const visiblePostCategories = await getPermissionsClient({
-      resourceId: spaceId,
-      resourceIdType: 'space'
-    }).then(({ client }) =>
-      client.forum.getPermissionedCategories({
-        postCategories,
-        userId
-      })
-    );
+    const visiblePostCategories = await permissionClient.client.forum.getPermissionedCategories({
+      postCategories,
+      userId
+    });
     const subscriptions = spaceNotifications.forums.categories;
     postCategoriesUsersRecord[userId] = {
       subscriptions,

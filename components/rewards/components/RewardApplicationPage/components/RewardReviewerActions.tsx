@@ -23,6 +23,7 @@ type Props = {
   refreshApplication: () => void;
   reviewApplication: (input: { decision: ReviewDecision }) => Promise<void>;
   hasCustomReward: boolean;
+  hasApplicationSlots: boolean;
 };
 export function RewardReviewerActions({
   application,
@@ -30,7 +31,8 @@ export function RewardReviewerActions({
   refreshApplication,
   rewardPermissions,
   reviewApplication,
-  hasCustomReward
+  hasCustomReward,
+  hasApplicationSlots
 }: Props) {
   const { showMessage } = useSnackbar();
 
@@ -64,13 +66,15 @@ export function RewardReviewerActions({
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='application'
           readOnly={!rewardPermissions?.approve_applications}
+          hasApplicationSlots={hasApplicationSlots}
         />
       )}
-      {(application.status === 'review' || application.status === 'inProgress') && rewardPermissions?.review && (
+      {application.status === 'review' && rewardPermissions?.review && (
         <AcceptOrRejectButtons
           onConfirmReview={(decision) => reviewApplication({ decision })}
           reviewType='submission'
           readOnly={!rewardPermissions?.review}
+          hasApplicationSlots={hasApplicationSlots}
         />
       )}
       {application.status === 'complete' && !hasCustomReward && rewardPermissions?.review && (

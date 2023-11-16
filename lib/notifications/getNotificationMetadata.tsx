@@ -1,7 +1,9 @@
+import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
 import type {
+  ApplicationCommentNotificationType,
   BountyNotification,
   CardNotification,
   CommentNotificationType,
@@ -28,6 +30,12 @@ function getUrlSearchParamsFromNotificationType(notification: Notification): str
       urlSearchParams.set('inlineCommentId', notification.inlineCommentId);
       break;
     }
+    case 'application_comment.created':
+    case 'application_comment.replied':
+    case 'application_comment.mention.created': {
+      urlSearchParams.set('commentId', notification.applicationCommentId);
+      break;
+    }
     default: {
       break;
     }
@@ -43,13 +51,18 @@ function getCommentTypeNotificationContent({
   actorUsername
 }: {
   actorUsername?: string;
-  notificationType: InlineCommentNotificationType | CommentNotificationType | 'mention.created';
+  notificationType:
+    | InlineCommentNotificationType
+    | CommentNotificationType
+    | ApplicationCommentNotificationType
+    | 'mention.created';
   createdBy: NotificationActor | null;
-  pageType: PageType | 'post';
+  pageType: PageType | 'post' | 'reward';
 }): string | ReactNode {
   const username = actorUsername ?? createdBy?.username;
   switch (notificationType) {
     case 'inline_comment.created':
+    case 'application_comment.created':
     case 'comment.created': {
       return username ? (
         <span>
@@ -60,6 +73,7 @@ function getCommentTypeNotificationContent({
       );
     }
     case 'inline_comment.replied':
+    case 'application_comment.replied':
     case 'comment.replied': {
       return username ? (
         <span>
@@ -81,6 +95,7 @@ function getCommentTypeNotificationContent({
     }
 
     case 'inline_comment.mention.created':
+    case 'application_comment.mention.created':
     case 'comment.mention.created': {
       return username ? (
         <span>
@@ -145,7 +160,7 @@ function getDocumentContent(n: DocumentNotification, actorUsername?: string): st
   return getCommentTypeNotificationContent({
     createdBy,
     notificationType: type,
-    pageType,
+    pageType: pageType === 'bounty' ? 'reward' : pageType,
     actorUsername
   });
 }
@@ -169,19 +184,19 @@ function getBountyContent(n: BountyNotification, authorUsername?: string): strin
       );
     }
     case 'application.approved': {
-      return `Your application for a bounty was accepted`;
+      return `Your application for a reward was accepted`;
     }
     case 'application.rejected': {
-      return `Your application for a bounty has been rejected`;
+      return `Your application for a reward has been rejected`;
     }
     case 'submission.approved': {
-      return `Your application for a bounty was approved`;
+      return `Your application for a reward was approved`;
     }
     case 'application.payment_pending': {
-      return `Payment required for a bounty`;
+      return `Payment required for a reward`;
     }
     case 'application.payment_completed': {
-      return `You have been paid for a bounty`;
+      return `You have been paid for a reward`;
     }
     case 'suggestion.created': {
       return username ? (
@@ -241,64 +256,79 @@ export function getNotificationMetadata(
   content: ReactNode;
   pageTitle: string;
 } {
-  switch (notification.group) {
-    case 'bounty': {
-      return {
-        content: getBountyContent(notification as BountyNotification, actorUsername),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+  try {
+    switch (notification.group) {
+      case 'bounty': {
+        return {
+          content: getBountyContent(notification as BountyNotification, actorUsername),
+          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'card': {
-      return {
-        content: getCardContent(notification as CardNotification, actorUsername),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'card': {
+        return {
+          content: getCardContent(notification as CardNotification, actorUsername),
+          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'document': {
-      const basePath = notification.pageType === 'post' ? '/forum/post' : '';
-      return {
-        content: getDocumentContent(notification as DocumentNotification, actorUsername),
-        href: `${basePath}/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'document': {
+        const basePath =
+          notification.pageType === 'post'
+            ? `/forum/post/${notification.pagePath}`
+            : notification.pageType === 'bounty' && notification.applicationId
+            ? `/rewards/applications/${notification.applicationId}`
+            : notification.pagePath;
+        return {
+          content: getDocumentContent(notification as DocumentNotification, actorUsername),
+          href: `${basePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'post': {
-      return {
-        content: getPostContent(notification as PostNotification, actorUsername),
-        href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.postTitle
-      };
-    }
+      case 'post': {
+        return {
+          content: getPostContent(notification as PostNotification, actorUsername),
+          href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.postTitle
+        };
+      }
 
-    case 'proposal': {
-      return {
-        content: getProposalContent(notification as ProposalNotification, actorUsername),
-        href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'proposal': {
+        return {
+          content: getProposalContent(notification as ProposalNotification, actorUsername),
+          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    case 'vote': {
-      return {
-        content: `Polling started for "${notification.title}"`,
-        href: `/${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
-          notification.voteId
-        }`,
-        pageTitle: notification.pageTitle
-      };
-    }
+      case 'vote': {
+        return {
+          content: `Polling started for "${notification.title}"`,
+          href: `/${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
+            notification.voteId
+          }`,
+          pageTitle: notification.pageTitle
+        };
+      }
 
-    default: {
-      return {
-        content: '',
-        href: '',
-        pageTitle: ''
-      };
+      default: {
+        log.warn('Unrecognized notification type', { notification });
+        return {
+          content: '',
+          href: '',
+          pageTitle: ''
+        };
+      }
     }
+  } catch (error) {
+    log.warn('Cannot read notification type', { error, notification });
+    return {
+      content: '',
+      href: '',
+      pageTitle: ''
+    };
   }
 }

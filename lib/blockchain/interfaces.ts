@@ -13,7 +13,7 @@ export interface ExtendedPoap {
  * @param rawAddress - Account as detected, without any lowercasing
  */
 export interface AuthSig {
-  sig: string;
+  sig: `0x${string}`;
   derivedVia: string;
   signedMessage: string;
   address: string;

@@ -46,6 +46,8 @@ const createDocumentNotification = ({
 }): DocumentNotification => {
   const id = v4();
   return {
+    applicationCommentId: null,
+    applicationId: null,
     commentId: null,
     mentionId: id,
     id,

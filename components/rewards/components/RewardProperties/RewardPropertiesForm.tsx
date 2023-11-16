@@ -1,5 +1,6 @@
 import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import clsx from 'clsx';
 import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
@@ -10,12 +11,12 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
-import { ExpandableSection } from 'components/common/ExpandableSection';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
+import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
+import type { RewardType } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
-import type { RewardTokenDetails, RewardType } from 'components/rewards/components/RewardProperties/interfaces';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
@@ -168,7 +169,7 @@ export function RewardPropertiesForm({
 
               <DateTimePicker
                 minDate={DateTime.fromMillis(Date.now())}
-                value={values?.dueDate}
+                value={values?.dueDate || null}
                 disableMaskedInput
                 disabled={readOnly}
                 onAccept={async (value) => {
@@ -183,7 +184,7 @@ export function RewardPropertiesForm({
                     inputProps={{
                       ..._props.inputProps,
                       readOnly: true,
-                      className: 'Editable octo-propertyvalue',
+                      className: clsx('Editable octo-propertyvalue', { readonly: readOnly }),
                       placeholder: 'Empty'
                     }}
                     fullWidth
@@ -270,7 +271,12 @@ export function RewardPropertiesForm({
                 defaultValue={values?.maxSubmissions}
                 type='number'
                 size='small'
-                inputProps={{ step: 1, min: 1, style: { height: 'auto' }, className: 'Editable octo-propertyvalue' }}
+                inputProps={{
+                  step: 1,
+                  min: 1,
+                  style: { height: 'auto' },
+                  className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+                }}
                 sx={{
                   width: '100%'
                 }}
@@ -311,7 +317,10 @@ export function RewardPropertiesForm({
                   required
                   defaultValue={values?.maxSubmissions}
                   size='small'
-                  inputProps={{ style: { height: 'auto' }, className: 'Editable octo-propertyvalue' }}
+                  inputProps={{
+                    style: { height: 'auto' },
+                    className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+                  }}
                   sx={{
                     width: '100%'
                   }}

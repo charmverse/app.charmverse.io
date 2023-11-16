@@ -13,7 +13,7 @@ export type ProofParams = {
 };
 export type ProofContent = {
   message: string;
-  signature: string;
+  signature: `0x${string}`;
   template: {
     params: ProofParams;
   };

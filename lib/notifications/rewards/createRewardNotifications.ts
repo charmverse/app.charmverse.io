@@ -169,7 +169,7 @@ export async function createRewardNotifications(webhookData: {
       const bountyReviewerIds = await getRewardReviewerIds(bountyId);
 
       for (const bountyReviewerId of bountyReviewerIds) {
-        if (userId !== bountyReviewerId) {
+        if (userId !== bountyReviewerId && application.createdBy !== bountyReviewerId) {
           const { id: _id } = await saveRewardNotification({
             bountyId,
             createdAt: webhookData.createdAt,

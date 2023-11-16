@@ -3,7 +3,9 @@ import { EditorState } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
+import type { PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -16,6 +18,7 @@ import type { BangleEditorProps as CoreBangleEditorProps } from 'components/comm
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -24,6 +27,8 @@ import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { threadPluginKey } from '../../thread/thread.plugins';
+import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
@@ -47,6 +52,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   pageId?: string;
   children?: React.ReactNode;
   renderNodeViews?: RenderNodeViewsFunction;
+  linksPluginKey?: PluginKey;
   className?: string;
   style?: React.CSSProperties;
   editorRef?: RefObject<HTMLDivElement>;
@@ -59,18 +65,24 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   enableComments?: boolean;
   onConnectionEvent?: (event: ConnectionEvent) => void;
   allowClickingFooter?: boolean;
+  inline?: boolean;
+  pageType?: PageType | 'post';
+  postId?: string;
+  threadIds?: string[];
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
 
 export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, BangleEditorProps>(function ReactEditor(
   {
+    inline = false,
     pageId,
     state,
     children,
     isContentControlled,
     initialContent,
     focusOnInit,
+    linksPluginKey,
     pmViewOpts,
     renderNodeViews,
     className,
@@ -82,22 +94,23 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     readOnly = false,
     enableComments = true,
     onConnectionEvent,
-    allowClickingFooter
+    allowClickingFooter,
+    pageType,
+    postId,
+    threadIds
   },
   ref
 ) {
   focusOnInit = focusOnInit ?? (!readOnly && !isTouchScreen());
-
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
+  const { pages, loadingPages } = usePages();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
-
   const { data: authResponse, error: authError } = useSWRImmutable(useSockets ? user?.id : null, () =>
     charmClient.socket()
   ); // refresh when user
-
   pmViewOpts ||= {};
   pmViewOpts.editable = () => !readOnly && !isLoadingRef.current;
 
@@ -125,6 +138,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     },
     [editor]
   );
+
+  // Make sure views are updated after we get the doc_data
+  useEffect(() => {
+    if (editor && threadIds && !isLoadingRef.current) {
+      editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
+    }
+  }, [(threadIds ?? []).join(','), isLoadingRef.current]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {
@@ -154,7 +174,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }
 
   useEffect(() => {
-    function listener(event: Event) {
+    function editorUndoListener(event: Event) {
       if (editor) {
         const detail = (event as CustomEvent).detail as { pageId: string } | null;
         if (detail && detail.pageId === pageId) {
@@ -163,13 +183,49 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       }
     }
 
-    if (editorRef && editorRef.current && editor) {
-      editorRef.current.addEventListener(undoEventName, listener);
+    async function handleImageFileDrop(e: Event) {
+      if (!editor) {
+        return;
+      }
+      const imageType = editor.view.state.schema.nodes.image;
+      const files = (e as CustomEvent).detail.files as File[];
+
+      if (!files || files.length === 0) {
+        return;
+      }
+      for (const file of files) {
+        const base64 = await convertFileToBase64(file);
+
+        // Add image to the end of the document
+        editor.view.dispatch(
+          editor.view.state.tr.insert(
+            editor.view.state.doc.nodeSize - 2,
+            imageType.create({
+              src: base64
+            })
+          )
+        );
+      }
+    }
+
+    if (
+      editorRef &&
+      editorRef.current &&
+      editor &&
+      !readOnly &&
+      !inline &&
+      (pageId || postId) &&
+      pageType?.match(/(page|card|post|proposal|bounty)/)
+    ) {
+      editorRef.current.addEventListener(undoEventName, editorUndoListener);
+      editorRef.current.addEventListener(imageFileDropEventName, handleImageFileDrop);
+
       return () => {
-        editorRef.current?.removeEventListener(undoEventName, listener);
+        editorRef.current?.removeEventListener(undoEventName, editorUndoListener);
+        editorRef.current?.removeEventListener(imageFileDropEventName, handleImageFileDrop);
       };
     }
-  }, [editorRef, editor]);
+  }, [editorRef, editor, readOnly, inline, pageType, postId, pageId]);
 
   let fEditor: FidusEditor | null = null;
 
@@ -184,7 +240,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     };
 
     window.addEventListener('beforeunload', handleWindowClose);
-
     return () => {
       window.removeEventListener('beforeunload', handleWindowClose);
     };
@@ -233,6 +288,24 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     return () => clearTimeout(timer);
   }, [setShowLoader]);
 
+  useEffect(() => {
+    /// wait for isLoadingRef.current so that we set meta after fiduseditor has init
+    if (editor?.view && !isLoadingRef.current && !loadingPages && linksPluginKey) {
+      // pass in a list of page paths and ids for the link component to check during input
+      const pageMap = Object.entries(pages).reduce<Record<string, string>>((acc, [key, page]) => {
+        if (page) {
+          acc[page.path] = page.id;
+        }
+        return acc;
+      }, {});
+      editor.view.dispatch(
+        editor.view.state.tr.setMeta(linksPluginKey, {
+          pages: pageMap
+        })
+      );
+    }
+  }, [!!editor?.view, isLoadingRef.current, loadingPages]);
+
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
   }
@@ -242,8 +315,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       {editor ? children : null}
       <div
         ref={editorRef}
-        className={`bangle-editor-core ${readOnly ? 'readonly' : ''}`}
+        className={`bangle-editor-core ${readOnly ? 'readonly' : ''}${!isLoadingRef.current ? ' content-loaded' : ''}`}
         data-page-id={pageId}
+        data-post-id={postId}
         style={{
           minHeight: showLoader && isLoadingRef.current ? '200px' : undefined
         }}

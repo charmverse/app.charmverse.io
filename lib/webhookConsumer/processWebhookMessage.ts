@@ -1,14 +1,21 @@
 import { assignRolesCollabland } from 'lib/collabland/assignRolesCollabland';
+import { disconnectSpace } from 'lib/collabland/disconnectSpace';
 import { getSpacesFromDiscord } from 'lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
 import { isTruthy } from 'lib/utilities/types';
-import type { MessageType, WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
+import type {
+  MemberUpdateWebhookMessageData,
+  MessageType,
+  UninstallWebhookMessageData,
+  WebhookMessage,
+  WebhookMessageProcessResult
+} from 'lib/webhookConsumer/interfaces';
 
-const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<WebhookMessageProcessResult>> = {
-  guildMemberUpdate: async (message: WebhookMessage) => {
+const messageHandlers: Record<MessageType, (message: WebhookMessage<any>) => Promise<WebhookMessageProcessResult>> = {
+  guildMemberUpdate: async (message: WebhookMessage<MemberUpdateWebhookMessageData>) => {
     let spaceIds: string[] = [];
     try {
       const payload = message?.data?.payload;
@@ -54,7 +61,7 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       };
     }
   },
-  guildMemberRemove: async (message: WebhookMessage) => {
+  guildMemberRemove: async (message: WebhookMessage<MemberUpdateWebhookMessageData>) => {
     try {
       const payload = message?.data?.payload?.[0];
       if (!payload) {
@@ -76,6 +83,31 @@ const messageHandlers: Record<MessageType, (message: WebhookMessage) => Promise<
       return {
         success: false,
         message: e?.message || 'Failed to process guildMemberRemove event.'
+      };
+    }
+  },
+  uninstallMiniapp: async (message: WebhookMessage<UninstallWebhookMessageData>) => {
+    try {
+      const payload = message?.data?.payload;
+      if (!payload) {
+        return {
+          success: false,
+          message: 'Invalid payload.'
+        };
+      }
+
+      const { userId: discordUserId, guildId: discordServerId } = payload;
+      const result = await disconnectSpace({ discordUserId, discordServerId });
+
+      return {
+        spaceIds: result.spaceIds,
+        success: true,
+        message: 'Uninstalled miniapp.'
+      };
+    } catch (e: any) {
+      return {
+        success: false,
+        message: e?.message || 'Failed to process uninstall event.'
       };
     }
   }
@@ -105,7 +137,7 @@ export async function processWebhookMessage(message: WebhookMessage): Promise<We
 }
 
 export async function verifyWebhookMessagePermission(message: WebhookMessage) {
-  const payload = message?.data?.payload?.[0];
+  const payload = message?.data?.event === 'uninstallMiniapp' ? message?.data?.payload : message?.data?.payload?.[0];
   const discordServerId = payload?.guildId;
   const apiKey = getRequestApiKey({ headers: message?.headers || {}, query: message?.query });
 
