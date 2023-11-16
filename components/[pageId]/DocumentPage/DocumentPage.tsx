@@ -337,7 +337,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       snapshotProposalId={page.snapshotProposalId}
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
-                      title={page.title}
                       proposalPage={page}
                       openEvaluation={() => setActiveView('proposal_evaluation')}
                     />
