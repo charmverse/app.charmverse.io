@@ -84,7 +84,15 @@ export function RewardsPage({ title }: { title: string }) {
     if (id && (!rewardId || id === rewardId)) {
       openPage(id);
     } else if (id) {
-      updateURLQuery({ applicationId: id });
+      const page = rewardId ? pages[rewardId] : null;
+
+      if (openPageIn === 'center_peek') {
+        updateURLQuery({ applicationId: id });
+      } else if (openPageIn === 'full_page' && page) {
+        navigateToSpacePath(`/${page.path}`, {
+          applicationId: id
+        });
+      }
     }
   };
 
