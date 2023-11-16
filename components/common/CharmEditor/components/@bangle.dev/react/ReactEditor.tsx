@@ -144,7 +144,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     if (editor && threadIds && !isLoadingRef.current) {
       editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
     }
-  }, [threadIds]);
+  }, [(threadIds ?? []).join(','), isLoadingRef.current]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {
