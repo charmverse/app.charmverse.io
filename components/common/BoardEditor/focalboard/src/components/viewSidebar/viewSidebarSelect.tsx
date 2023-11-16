@@ -1,3 +1,4 @@
+import { Apps } from '@mui/icons-material';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -15,7 +16,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 
-export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source';
+export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source' | 'proposalCategories';
 
 function MenuRow({
   icon,
@@ -62,6 +63,8 @@ type Props = {
   hideLayoutOptions?: boolean;
   hideSourceOptions?: boolean;
   hideGroupOptions?: boolean;
+  hidePropertiesRow?: boolean;
+  withProposalCategories?: boolean;
 };
 
 type SourceIconType = DataSourceType | 'linked';
@@ -92,7 +95,9 @@ export function ViewSidebarSelect({
   groupByProperty,
   hideLayoutOptions,
   hideSourceOptions,
-  hideGroupOptions
+  hideGroupOptions,
+  hidePropertiesRow,
+  withProposalCategories
 }: Props) {
   const { pages } = usePages();
 
@@ -131,12 +136,14 @@ export function ViewSidebarSelect({
           value={capitalize(currentLayout)}
         />
       )}
-      <MenuRow
-        onClick={() => setSidebarView('card-properties')}
-        icon={<FormatListBulletedIcon color='secondary' />}
-        title='Properties'
-        value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
-      />
+      {!hidePropertiesRow && (
+        <MenuRow
+          onClick={() => setSidebarView('card-properties')}
+          icon={<FormatListBulletedIcon color='secondary' />}
+          title='Properties'
+          value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
+        />
+      )}
       {withGroupBy && !hideGroupOptions && (
         <MenuRow
           onClick={() => setSidebarView('group-by')}
@@ -152,6 +159,14 @@ export function ViewSidebarSelect({
           icon={<SourceIcon sourceType={sourceIconType} />}
           title='Source'
           value={sourceTitle}
+        />
+      )}
+
+      {withProposalCategories && (
+        <MenuRow
+          onClick={() => setSidebarView('proposalCategories')}
+          icon={<Apps color='secondary' />}
+          title='Categories'
         />
       )}
     </>

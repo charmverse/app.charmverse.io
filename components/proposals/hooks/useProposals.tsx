@@ -5,7 +5,6 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
-import type { ProposalStatusFilter } from 'components/proposals/components/ProposalViewOptions/ProposalsViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';

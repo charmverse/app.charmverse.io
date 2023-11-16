@@ -197,23 +197,23 @@ export function ProposalsPage({ title }: { title: string }) {
                   />
                 </Box>
 
-                {isAdmin && (
-                  <ViewSidebar
-                    views={views}
-                    board={activeBoard}
-                    rootBoard={activeBoard}
-                    view={activeView}
-                    isOpen={!!showSidebar}
-                    closeSidebar={() => setShowSidebar(false)}
-                    hideLayoutOptions={true}
-                    hideSourceOptions={true}
-                    hideGroupOptions={true}
-                    groupByProperty={groupByProperty}
-                    page={undefined}
-                    pageId={undefined}
-                    showView={() => {}}
-                  />
-                )}
+                <ViewSidebar
+                  views={views}
+                  board={activeBoard}
+                  rootBoard={activeBoard}
+                  view={activeView}
+                  isOpen={!!showSidebar}
+                  closeSidebar={() => setShowSidebar(false)}
+                  hideLayoutOptions={true}
+                  hideSourceOptions={true}
+                  hideGroupOptions={true}
+                  hidePropertiesRow={!isAdmin}
+                  groupByProperty={groupByProperty}
+                  page={undefined}
+                  pageId={undefined}
+                  showView={() => {}}
+                  withProposalCategories
+                />
               </Stack>
             </Box>
           )}
