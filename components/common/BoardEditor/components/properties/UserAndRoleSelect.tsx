@@ -1,6 +1,7 @@
 import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
+import type { SxProps } from '@mui/material';
 import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -74,7 +75,7 @@ function SelectedOptions({
     <Tooltip title={readOnlyMessage ?? null}>
       <Stack
         display='inline-flex'
-        width='min-content'
+        width={wrapColumn ? '100%' : 'min-content'}
         flexDirection='row'
         gap={1}
         flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
@@ -132,6 +133,7 @@ function SelectedOptions({
 }
 
 type Props = {
+  emptyPlaceholderContent?: string;
   displayType?: 'details';
   onChange: (value: GroupedOptionPopulated[]) => void;
   proposalCategoryId?: string | null;
@@ -152,6 +154,7 @@ export function UserAndRoleSelect({
   readOnly,
   readOnlyMessage,
   showEmptyPlaceholder = true,
+  emptyPlaceholderContent = 'Empty',
   variant = 'standard',
   value: inputValue,
   'data-test': dataTest,
@@ -260,7 +263,7 @@ export function UserAndRoleSelect({
       >
         <Stack gap={0.5}>
           {applicableValues.length === 0 ? (
-            showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
+            showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
           ) : (
             <SelectedOptions
               readOnlyMessage={readOnlyMessage}

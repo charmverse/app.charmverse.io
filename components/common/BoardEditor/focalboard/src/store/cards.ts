@@ -196,7 +196,6 @@ export function sortCards(
         Utils.logError(`Missing template for property id: ${sortPropertyId}`);
         return sortedCards;
       }
-      Utils.log(`Sort by property: ${template?.name}`);
       sortedCards = sortedCards.sort((a, b) => {
         let aValue = a.card.fields.properties[sortPropertyId] || '';
         let bValue = b.card.fields.properties[sortPropertyId] || '';

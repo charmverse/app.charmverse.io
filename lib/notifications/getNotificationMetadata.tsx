@@ -3,6 +3,7 @@ import type { PageType } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
 import type {
+  ApplicationCommentNotificationType,
   BountyNotification,
   CardNotification,
   CommentNotificationType,
@@ -29,6 +30,12 @@ function getUrlSearchParamsFromNotificationType(notification: Notification): str
       urlSearchParams.set('inlineCommentId', notification.inlineCommentId);
       break;
     }
+    case 'application_comment.created':
+    case 'application_comment.replied':
+    case 'application_comment.mention.created': {
+      urlSearchParams.set('commentId', notification.applicationCommentId);
+      break;
+    }
     default: {
       break;
     }
@@ -44,13 +51,18 @@ function getCommentTypeNotificationContent({
   actorUsername
 }: {
   actorUsername?: string;
-  notificationType: InlineCommentNotificationType | CommentNotificationType | 'mention.created';
+  notificationType:
+    | InlineCommentNotificationType
+    | CommentNotificationType
+    | ApplicationCommentNotificationType
+    | 'mention.created';
   createdBy: NotificationActor | null;
-  pageType: PageType | 'post';
+  pageType: PageType | 'post' | 'reward';
 }): string | ReactNode {
   const username = actorUsername ?? createdBy?.username;
   switch (notificationType) {
     case 'inline_comment.created':
+    case 'application_comment.created':
     case 'comment.created': {
       return username ? (
         <span>
@@ -61,6 +73,7 @@ function getCommentTypeNotificationContent({
       );
     }
     case 'inline_comment.replied':
+    case 'application_comment.replied':
     case 'comment.replied': {
       return username ? (
         <span>
@@ -82,6 +95,7 @@ function getCommentTypeNotificationContent({
     }
 
     case 'inline_comment.mention.created':
+    case 'application_comment.mention.created':
     case 'comment.mention.created': {
       return username ? (
         <span>
@@ -146,7 +160,7 @@ function getDocumentContent(n: DocumentNotification, actorUsername?: string): st
   return getCommentTypeNotificationContent({
     createdBy,
     notificationType: type,
-    pageType,
+    pageType: pageType === 'bounty' ? 'reward' : pageType,
     actorUsername
   });
 }
@@ -261,10 +275,15 @@ export function getNotificationMetadata(
       }
 
       case 'document': {
-        const basePath = notification.pageType === 'post' ? '/forum/post' : '';
+        const basePath =
+          notification.pageType === 'post'
+            ? `/forum/post/${notification.pagePath}`
+            : notification.pageType === 'bounty' && notification.applicationId
+            ? `/rewards/applications/${notification.applicationId}`
+            : notification.pagePath;
         return {
           content: getDocumentContent(notification as DocumentNotification, actorUsername),
-          href: `${basePath}/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          href: `${basePath}${getUrlSearchParamsFromNotificationType(notification)}`,
           pageTitle: notification.pageTitle
         };
       }

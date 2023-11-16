@@ -3,6 +3,7 @@ import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type {
+  ApplicationCommentNotification,
   BountyNotificationType,
   CommentNotification,
   DocumentNotificationType,
@@ -110,9 +111,10 @@ type DocumentNotificationInput = NotificationInput & {
   inlineCommentId?: string;
   postCommentId?: string;
   pageCommentId?: string;
+  applicationCommentId?: string;
   type: DocumentNotificationType;
   content: Prisma.JsonValue | null;
-} & (CommentNotification | MentionNotification | InlineCommentNotification);
+} & (CommentNotification | MentionNotification | InlineCommentNotification | ApplicationCommentNotification);
 
 export async function saveDocumentNotification({
   createdAt,
@@ -126,7 +128,8 @@ export async function saveDocumentNotification({
   content,
   type,
   pageCommentId,
-  postCommentId
+  postCommentId,
+  applicationCommentId
 }: DocumentNotificationInput) {
   const notificationId = v4();
   const record = await prisma.documentNotification.create({
@@ -162,6 +165,13 @@ export async function saveDocumentNotification({
         ? {
             connect: {
               id: pageCommentId
+            }
+          }
+        : undefined,
+      applicationComment: applicationCommentId
+        ? {
+            connect: {
+              id: applicationCommentId
             }
           }
         : undefined,

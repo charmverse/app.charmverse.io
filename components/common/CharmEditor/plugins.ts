@@ -41,6 +41,7 @@ import { plugins as trackPlugins } from './components/suggestions/suggestions.pl
 import * as tabIndent from './components/tabIndent';
 import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
+import { plugins as threadPlugins } from './components/thread/thread.plugins';
 import * as trailingNode from './components/trailingNode';
 import * as tweet from './components/tweet/tweet';
 import { plugins as videoPlugins } from './components/video/video';
@@ -72,6 +73,7 @@ export function charmEditorPlugins({
   placeholderText,
   disableRowHandles = false,
   disableMention = false,
+  threadIds,
   disableVideo = false
 }: {
   disableMention?: boolean;
@@ -87,6 +89,7 @@ export function charmEditorPlugins({
   enableVoting?: boolean;
   enableComments?: boolean;
   placeholderText?: string;
+  threadIds?: string[];
   disableVideo?: boolean;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
@@ -210,6 +213,14 @@ export function charmEditorPlugins({
     quotePlugins(),
     tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
   );
+
+  if (threadIds) {
+    basePlugins.push(
+      threadPlugins({
+        threadIds
+      })
+    );
+  }
 
   if (!disableVideo) {
     basePlugins.push(videoPlugins());

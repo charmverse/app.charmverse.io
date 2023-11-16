@@ -1,4 +1,3 @@
-import type { PageType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -11,15 +10,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
+import { isProdEnv } from 'config/constants';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
@@ -71,6 +71,7 @@ export function Comment({
   const { lensProfile } = useLensProfile();
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
   const router = useRouter();
+  const { updateURLQuery } = useCharmRouter();
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { getMemberById } = useMembers();
@@ -130,9 +131,10 @@ export function Comment({
         commentContainerRef.current.scrollIntoView({
           behavior: 'smooth'
         });
+        updateURLQuery({ commentId: null });
       }
     }, 1500);
-  }, [commentId, commentContainerRef, comment.id]);
+  }, [commentId, updateURLQuery, commentContainerRef, comment.id]);
 
   const isCommentAuthor = comment.createdBy === user?.id;
   const canEditComment = isCommentAuthor;

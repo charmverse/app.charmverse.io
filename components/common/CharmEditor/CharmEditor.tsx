@@ -11,7 +11,7 @@ import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
-import { useSWRConfig } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
@@ -21,10 +21,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageSidebarContext } from 'hooks/usePageSidebar';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getThreadsKey, useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
@@ -63,11 +65,11 @@ import {
   inlinePalettePluginKey,
   floatingMenuPluginKey,
   linkedPagePluginKey,
+  linksPluginKey,
   mentionPluginKey,
   emojiPluginKey,
   actionsPluginKey,
   inlineCommentPluginKey,
-  linksPluginKey,
   charmEditorPlugins
 } from './plugins';
 import { specRegistry } from './specRegistry';
@@ -141,7 +143,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${({ disablePageSpecificFeatures }) =>
     !disablePageSpecificFeatures &&
     `
-    .charm-inline-comment.active {
+    .charm-inline-comment span.active {
       background: rgba(255,212,0,0.14);
       border-bottom: 2px solid rgb(255, 212, 0);
       padding-bottom: 2px;
@@ -232,6 +234,8 @@ function CharmEditor({
   const { space: currentSpace } = useCurrentSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
+  const { threads } = useThreads();
+
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
@@ -245,8 +249,8 @@ function CharmEditor({
         .then(() => {
           charmClient.comments
             .getThreads(_pageId)
-            .then((threads) => {
-              mutate(`pages/${_pageId}/threads`, threads);
+            .then((_threads) => {
+              mutate(`pages/${_pageId}/threads`, _threads);
             })
             .catch((err) => {
               log.warn(`Failed to fetch threads for page ${_pageId}`, err);
@@ -305,6 +309,14 @@ function CharmEditor({
     });
   }
 
+  const threadIds =
+    typeof pageType === 'string'
+      ? Object.values(threads)
+          .filter((thread) => !thread?.resolved)
+          .filter(isTruthy)
+          .map((thread) => thread.id)
+      : undefined;
+
   function getPlugins() {
     return charmEditorPlugins({
       disableRowHandles,
@@ -324,7 +336,8 @@ function CharmEditor({
       pageId,
       spaceId: currentSpace?.id,
       userId: user?.id,
-      disableMention
+      disableMention,
+      threadIds
     });
   }
 
@@ -375,6 +388,7 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      threadIds={threadIds}
       allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
@@ -386,6 +400,7 @@ function CharmEditor({
       isContentControlled={isContentControlled}
       initialContent={content}
       enableSuggestions={enableSuggestingMode}
+      linksPluginKey={linksPluginKey}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}
@@ -511,6 +526,7 @@ function CharmEditor({
       }}
     >
       <FloatingMenu
+        pageType={pageType}
         palettePluginKey={inlinePalettePluginKey}
         // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}
@@ -549,7 +565,7 @@ function CharmEditor({
                   state={suggestionState}
                 />
               )}
-              {sidebarView === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
+              {sidebarView === 'comments' && <CommentsSidebar threads={threads} permissions={pagePermissions} />}
             </SidebarDrawer>
           )}
           <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />

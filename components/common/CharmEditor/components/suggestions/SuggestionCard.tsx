@@ -12,7 +12,7 @@ import type { Member } from 'lib/members/interfaces';
 import { accept } from '../fiduswriter/track/accept';
 import type { TrackType } from '../fiduswriter/track/interfaces';
 import { reject } from '../fiduswriter/track/reject';
-import { RelativeDate } from '../PageThread';
+import { RelativeDate } from '../thread/PageThread';
 
 import type { TrackedEvent } from './getEvents';
 

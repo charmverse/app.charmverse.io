@@ -49,10 +49,21 @@ const documents: DocumentNotification[] = [
     type: 'inline_comment.mention.created' as const
   },
   {
+    type: 'application_comment.created' as const
+  },
+  {
+    type: 'application_comment.replied' as const
+  },
+  {
+    type: 'application_comment.mention.created' as const
+  },
+  {
     type: 'mention.created' as const
   }
 ].map((notification) => ({
   ...baseFields,
+  applicationCommentId: '_',
+  applicationId: '_',
   content: null,
   group: 'document' as const,
   commentId: '_',
