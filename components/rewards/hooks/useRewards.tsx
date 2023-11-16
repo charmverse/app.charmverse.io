@@ -4,7 +4,6 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetRewards } from 'charmClient/hooks/rewards';
-import type { RewardStatusFilter } from 'components/rewards/components/RewardViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
