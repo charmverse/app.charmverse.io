@@ -10,13 +10,13 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
 import { charmverseDiscordInvite } from 'config/constants';
+import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 import { Container } from './LoginLayout';
 
 const Background = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
-  flex-grow: 1;
 `;
 
 const LinkHeader = styled(Typography)`
@@ -46,47 +46,55 @@ const StyledIconButton = styled(IconButton)`
 ` as typeof IconButton;
 
 export default function Footer() {
+  const { customDomain } = useBaseCurrentDomain();
+
   return (
-    <Background mt={6} sx={{ flexGrow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+    <Background mt={6} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
       <Container pt={5} pb={9} px={3}>
-        <Grid container spacing={6}>
-          <Grid item xs={12} sm={4}>
-            <LinkHeader>Links</LinkHeader>
-            <StyledLink href='https://charmverse.io' target='_blank'>
-              What is CharmVerse?
-            </StyledLink>
-            <StyledLink href='https://charmverse.io/privacy-policy' target='_blank'>
-              Privacy Policy
-            </StyledLink>
-            <StyledLink href='https://charmverse.io/terms' target='_blank'>
-              Terms
-            </StyledLink>
+        {customDomain ? (
+          <Box>
+            Powered by <Link href='https://charmverse.io'>Charmverse</Link>
+          </Box>
+        ) : customDomain === null ? (
+          <Grid container spacing={6}>
+            <Grid item xs={12} sm={4}>
+              <LinkHeader>Links</LinkHeader>
+              <StyledLink href='https://charmverse.io' target='_blank'>
+                What is CharmVerse?
+              </StyledLink>
+              <StyledLink href='https://charmverse.io/privacy-policy' target='_blank'>
+                Privacy Policy
+              </StyledLink>
+              <StyledLink href='https://charmverse.io/terms' target='_blank'>
+                Terms
+              </StyledLink>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <LinkHeader>About</LinkHeader>
+              <StyledLink href='mailto:hello@charmverse.io'>hello@charmverse.io</StyledLink>
+              <Typography color='secondary'>New York, NY</Typography>
+            </Grid>
+            <Grid item xs={12} sm={4} alignItems='center'>
+              <LinkHeader>Social</LinkHeader>
+              <Box display='flex' alignItems='center' sx={{ justifyContent: { xs: 'center', sm: 'left' } }}>
+                <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>
+                  <LinkedInIcon />
+                </StyledIconButton>
+                <StyledIconButton href='https://twitter.com/charmverse' target='_blank'>
+                  <TwitterIcon />
+                </StyledIconButton>
+                <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>
+                  <FacebookIcon />
+                </StyledIconButton>
+                <StyledIconButton href={charmverseDiscordInvite} target='_blank'>
+                  <SvgIcon viewBox='0 -5 70 70'>
+                    <DiscordIcon />
+                  </SvgIcon>
+                </StyledIconButton>
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <LinkHeader>About</LinkHeader>
-            <StyledLink href='mailto:hello@charmverse.io'>hello@charmverse.io</StyledLink>
-            <Typography color='secondary'>New York, NY</Typography>
-          </Grid>
-          <Grid item xs={12} sm={4} alignItems='center'>
-            <LinkHeader>Social</LinkHeader>
-            <Box display='flex' alignItems='center' sx={{ justifyContent: { xs: 'center', sm: 'left' } }}>
-              <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>
-                <LinkedInIcon />
-              </StyledIconButton>
-              <StyledIconButton href='https://twitter.com/charmverse' target='_blank'>
-                <TwitterIcon />
-              </StyledIconButton>
-              <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>
-                <FacebookIcon />
-              </StyledIconButton>
-              <StyledIconButton href={charmverseDiscordInvite} target='_blank'>
-                <SvgIcon viewBox='0 -5 70 70'>
-                  <DiscordIcon />
-                </SvgIcon>
-              </StyledIconButton>
-            </Box>
-          </Grid>
-        </Grid>
+        ) : null}
       </Container>
     </Background>
   );
