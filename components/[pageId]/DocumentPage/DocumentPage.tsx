@@ -5,11 +5,12 @@ import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useRef, useState } from 'react';
+import type { EditorState } from 'prosemirror-state';
+import { memo, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { PageComments } from 'components/[pageId]/Comments/PageComments';
+import { SIDEBAR_VIEWS, SidebarDrawer } from 'components/[pageId]/DocumentPage/components/Sidebar/SidebarDrawer';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -24,16 +25,17 @@ import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useBounties } from 'hooks/useBounties';
-import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageSidebar } from 'hooks/usePageSidebar';
+import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
+import { PageComments } from './components/CommentsFooter/PageComments';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -41,6 +43,9 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
+import { CommentsSidebar } from './components/Sidebar/CommentsSidebar';
+import { ProposalEvaluationSidebar } from './components/Sidebar/ProposalEvaulationSidebar/ProposalEvaluationSidebar';
+import { SuggestionsSidebar } from './components/Sidebar/SuggestionsSidebar';
 
 // const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
@@ -86,18 +91,13 @@ export interface DocumentPageProps {
 function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
-  const { activeView: sidebarView } = usePageSidebar();
+  const { activeView: sidebarView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
-  // TODO: [bounties-cleanup]
-  // const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
-  //   bountyId: page.bountyId
-  // });
-  // const { draftBounty } = useBounties();
-
+  const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
 
   const pagePermissions = page.permissionFlags;
@@ -160,6 +160,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
 
   const pageTop = getPageTop(page);
 
+  const { threads } = useThreads();
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
@@ -191,6 +192,17 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   useEffect(() => {
     setConnectionError(null);
   }, [page.id]);
+
+  const threadIds = useMemo(
+    () =>
+      typeof page.type === 'string'
+        ? Object.values(threads)
+            .filter((thread) => !thread?.resolved)
+            .filter(isTruthy)
+            .map((thread) => thread.id)
+        : undefined,
+    [threads, page.type]
+  );
 
   return (
     <>
@@ -258,6 +270,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onConnectionEvent={onConnectionEvent}
+                setSuggestionState={setSuggestionState}
                 snapshotProposalId={page.snapshotProposalId}
                 onParticipantUpdate={onParticipantUpdate}
                 style={{
@@ -265,6 +278,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 }}
                 disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
                 allowClickingFooter={true}
+                threadIds={threadIds}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}
                 <PageHeader
@@ -340,6 +354,32 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                     />
                   )}
                   {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
+                  {(enableComments || enableSuggestingMode) && (
+                    <SidebarDrawer
+                      id='page-action-sidebar'
+                      title={sidebarView ? SIDEBAR_VIEWS[sidebarView].title : ''}
+                      open={!!sidebarView}
+                    >
+                      {sidebarView === 'proposal_evaluation' && (
+                        <ProposalEvaluationSidebar
+                          pageId={page.id}
+                          proposalId={proposalId}
+                          onSaveRubricCriteriaAnswers={closeSidebar}
+                        />
+                      )}
+                      {sidebarView === 'suggestions' && (
+                        <SuggestionsSidebar
+                          pageId={page.id}
+                          spaceId={page.spaceId}
+                          readOnly={!pagePermissions?.edit_content}
+                          state={suggestionState}
+                        />
+                      )}
+                      {sidebarView === 'comments' && (
+                        <CommentsSidebar threads={threads} canCreateComments={pagePermissions.comment} />
+                      )}
+                    </SidebarDrawer>
+                  )}
                 </CardPropertiesWrapper>
               </CharmEditor>
 
@@ -347,7 +387,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 pagePermissions.comment && (
                   <Box mt='-100px'>
                     {/* add negative margin to offset height of .charm-empty-footer */}
-                    <PageComments page={page} permissions={pagePermissions} />
+                    <PageComments page={page} canCreateComments={pagePermissions.comment} />
                   </Box>
                 )}
             </Container>

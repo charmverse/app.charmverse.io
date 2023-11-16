@@ -8,12 +8,13 @@ import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 
 import { useThreads } from './useThreads';
 
-export type PageAction = 'comments' | 'suggestions';
+export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation';
 
 export interface IPageSidebarContext {
-  activeView: PageAction | null;
+  activeView: PageSidebarView | null;
   setActiveView: React.Dispatch<React.SetStateAction<IPageSidebarContext['activeView']>>;
   isInsideDialog?: boolean;
+  closeSidebar?: () => void;
 }
 
 export const PageSidebarContext = createContext<IPageSidebarContext>({
@@ -29,6 +30,10 @@ export function PageSidebarProvider({ children, isInsideDialog }: { children: Re
   const { cache } = useSWRConfig();
   const [activeView, setActiveView] = useState<IPageSidebarContext['activeView']>(null);
   const commentPageActionToggledOnce = useRef<boolean>(false);
+
+  function closeSidebar() {
+    setActiveView(null);
+  }
 
   // show page sidebar by default if there are comments or votes
   useEffect(() => {
@@ -56,7 +61,7 @@ export function PageSidebarProvider({ children, isInsideDialog }: { children: Re
           commentPageActionToggledOnce.current = true;
           return setActiveView('comments');
         } else {
-          return setActiveView(null);
+          closeSidebar();
         }
       }
     }
@@ -67,7 +72,8 @@ export function PageSidebarProvider({ children, isInsideDialog }: { children: Re
     () => ({
       activeView,
       setActiveView,
-      isInsideDialog
+      isInsideDialog,
+      closeSidebar
     }),
     [activeView, setActiveView, isInsideDialog]
   );

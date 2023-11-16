@@ -1,4 +1,3 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Comment } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Check } from '@mui/icons-material';
@@ -239,7 +238,7 @@ interface PageThreadProps {
   threadId: string;
   inline?: boolean;
   showFindButton?: boolean;
-  permissions?: PagePermissionFlags;
+  canCreateComments?: boolean;
 }
 
 export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
@@ -281,7 +280,7 @@ export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; up
 );
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
-  ({ showFindButton = false, threadId, inline = false, permissions }, ref) => {
+  ({ showFindButton = false, threadId, inline = false, canCreateComments }, ref) => {
     showFindButton = showFindButton ?? !inline;
     const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
     const { user } = useUser();
@@ -414,7 +413,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                          disabled={isMutating || !permissions?.comment}
+                          disabled={isMutating || !canCreateComments}
                           onClick={toggleResolved}
                         />
                       )}
@@ -507,7 +506,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {permissions?.comment && (
+        {canCreateComments && (
           <AddCommentCharmEditor
             readOnly={Boolean(editedCommentId)}
             key={counter}

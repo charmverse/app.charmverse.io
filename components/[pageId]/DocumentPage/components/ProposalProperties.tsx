@@ -129,10 +129,6 @@ export function ProposalProperties({
     }
   }
 
-  function onSaveRubricCriteriaAnswers() {
-    return refreshProposal();
-  }
-
   async function onChangeRubricCriteria(rubricCriteria: ProposalPropertiesInput['rubricCriteria']) {
     // @ts-ignore TODO: unify types for rubricCriteria
     await upsertRubricCriteria({ rubricCriteria });
@@ -187,18 +183,12 @@ export function ProposalProperties({
         readOnlyReviewers={readOnlyReviewers}
         rubricAnswers={proposal?.rubricAnswers}
         isTemplate={isTemplate}
-        draftRubricAnswers={proposal?.draftRubricAnswers}
         rubricCriteria={proposal?.rubricCriteria}
-        userId={user?.id}
         snapshotProposalId={snapshotProposalId}
         updateProposalStatus={updateProposalStatus}
-        onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
         onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
         proposalFormInputs={proposalFormInputs}
         setProposalFormInputs={onChangeProperties}
-        canAnswerRubric={canAnswerRubric}
-        canViewRubricAnswers={canViewRubricAnswers}
-        title={title || ''}
         isPublishingToLens={isPublishingToLens}
         readOnlyCustomProperties={readOnlyCustomProperties}
       />
