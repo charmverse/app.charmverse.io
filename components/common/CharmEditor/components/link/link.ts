@@ -103,11 +103,32 @@ function replaceLinkWithPageMention(key: PluginKey) {
         if (url && url.includes(window.location.origin)) {
           const pageMap = key.getState(view.state).pages;
           if (pageMap) {
-            const pagePathMaybe = url.split('/').pop() || '';
-            const foundPageId = pageMap[pagePathMaybe];
-            if (foundPageId) {
-              insertNode('mention', view.state, view.dispatch, view, { id: v4(), type: 'page', value: foundPageId });
-              return true;
+            try {
+              const urlObject = new URL(url);
+              const pagePathMaybe = urlObject.pathname.split('/').pop() || '';
+              const pageIdFromQuery = urlObject.searchParams.get('cardId') || urlObject.searchParams.get('id');
+              if (pageIdFromQuery) {
+                const isPageId = Object.values(pageMap).includes(pageIdFromQuery);
+                if (isPageId) {
+                  insertNode('mention', view.state, view.dispatch, view, {
+                    id: v4(),
+                    type: 'page',
+                    value: pageIdFromQuery
+                  });
+                  return true;
+                }
+              }
+              const pageIdFromPath = pageMap[pagePathMaybe];
+              if (pageIdFromPath) {
+                insertNode('mention', view.state, view.dispatch, view, {
+                  id: v4(),
+                  type: 'page',
+                  value: pageIdFromPath
+                });
+                return true;
+              }
+            } catch (error) {
+              // string is most likely not a valid URL
             }
           }
         }
