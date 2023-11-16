@@ -24,6 +24,8 @@ type WorkspaceImportOptions = ImportParams & {
   includePermissions?: boolean;
   resetPaths?: boolean;
   oldNewRoleIdHashMap?: Record<string, string>;
+  oldNewCustomProposalPropertyIdHashMap?: Record<string, string>;
+  oldNewCustomRewardPropertyIdHashMap?: Record<string, string>;
 };
 
 type UpdateRefs = {

@@ -28,20 +28,9 @@ export async function importSpaceSettings({
 
   const targetSpace = await getSpace(targetSpaceIdOrDomain);
 
-  const { features, memberProfiles, memberProperties } = space;
+  const { features, memberProfiles, memberProperties, proposalBlocks, rewardBlocks, notificationToggles } = space;
 
   const { oldNewRecordIdHashMap } = await importRoles({ targetSpaceIdOrDomain, ...importParams });
-
-  await prisma.space.update({
-    where: {
-      id: targetSpace.id
-    },
-    data: {
-      features: features as Prisma.InputJsonValue[],
-      memberProfiles: memberProfiles as Prisma.InputJsonValue[],
-      notificationToggles: space.notificationToggles as Prisma.InputJsonValue
-    }
-  });
 
   const propertiesToCreate: (Prisma.MemberPropertyCreateManyInput & { permissions: MemberPropertyPermission[] })[] =
     memberProperties.map((prop) => {
@@ -70,12 +59,48 @@ export async function importSpaceSettings({
   });
 
   await prisma.$transaction([
+    prisma.space.update({
+      where: {
+        id: targetSpace.id
+      },
+      data: {
+        features: features as Prisma.InputJsonValue[],
+        memberProfiles: memberProfiles as Prisma.InputJsonValue[],
+        notificationToggles: notificationToggles as Prisma.InputJsonValue
+      }
+    }),
     prisma.memberProperty.createMany({
       data: propertiesToCreate.map(({ permissions, ...prop }) => prop)
     }),
     prisma.memberPropertyPermission.createMany({
       data: permissionsToCreate
-    })
+    }),
+    ...rewardBlocks.map((b) =>
+      prisma.rewardBlock.upsert({
+        where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },
+        create: {
+          ...(b as any),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          spaceId: targetSpace.id,
+          createdBy: targetSpace.createdBy
+        },
+        update: { fields: b.fields as Prisma.InputJsonValue, updatedAt: new Date() }
+      })
+    ),
+    ...proposalBlocks.map((b) =>
+      prisma.proposalBlock.upsert({
+        where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },
+        create: {
+          ...(b as any),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          spaceId: targetSpace.id,
+          createdBy: targetSpace.createdBy
+        },
+        update: { fields: b.fields as Prisma.InputJsonValue, updatedAt: new Date() }
+      })
+    )
   ]);
 
   return prisma.space.findUniqueOrThrow({
