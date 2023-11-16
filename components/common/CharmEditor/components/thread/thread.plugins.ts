@@ -44,7 +44,7 @@ export function buildInlineCommentDecoration(state: EditorState, threadIds: stri
         Decoration.inline(
           pos,
           pos + node.nodeSize,
-          { nodeName: 'span', class: 'active' },
+          { nodeName: 'span', class: 'active charm-thread-comment' },
           {
             inclusiveStart: true,
             inclusiveEnd: true

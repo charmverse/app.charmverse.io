@@ -43,7 +43,9 @@ export function extractInlineCommentRows(schema: Schema, node: Node): { pos: num
       pos: _node.pos,
       nodes: findChildrenByMark(_node.node, inlineCommentMarkSchema)
         .map((nodeWithPos) => nodeWithPos.node)
-        .filter((__node) => __node.marks[0].attrs.id && !__node.marks[0].attrs.resolved)
+        .filter((__node) =>
+          __node.marks.find((mark) => mark.type.name === 'inline-comment' && mark.attrs.id && !mark.attrs.resolved)
+        )
     }))
     .filter(({ nodes }) => nodes.length > 0);
 }

@@ -60,11 +60,9 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
       key,
       props: {
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          const className =
-            (event.target as HTMLElement).className +
-            ((event.target as HTMLElement).parentNode as HTMLElement).className;
-
-          if (/charm-inline-comment/.test(className)) {
+          const domNode = view.domAtPos(pos);
+          const className = domNode.node.parentElement?.className ?? '';
+          if (className.includes('active') && className.includes('charm-thread-comment')) {
             return highlightMarkedElement({
               view,
               elementId: 'page-action-sidebar',
@@ -73,6 +71,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
               prefix: 'thread'
             });
           }
+
           return false;
         }
       }
@@ -128,13 +127,13 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
 function getDecorations(state: EditorState) {
   const rows = extractInlineCommentRows(state.schema, state.doc);
   const uniqueCommentIds: Set<string> = new Set();
-
   const decorations: Decoration[] = [];
-
   rows.forEach((row) => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
-    const commentIds = row.nodes.map((node) => node.marks[0]?.attrs.id).filter(Boolean);
+    const commentIds = row.nodes
+      .map((node) => node.marks.find((mark) => mark.type.name === 'inline-comment')?.attrs.id)
+      .filter(Boolean);
     const newIds = Array.from(new Set(commentIds.filter((commentId) => !uniqueCommentIds.has(commentId))));
     commentIds.forEach((commentId) => uniqueCommentIds.add(commentId));
 
