@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import UndoIcon from '@mui/icons-material/Undo';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
 import { Divider, List } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -241,7 +241,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
         </div>
       </Tooltip>
       <ListItemButton onClick={() => exportZippedDatabase()}>
-        <FormatListBulletedIcon
+        <UploadFileIcon
           fontSize='small'
           sx={{
             mr: 1
