@@ -2,7 +2,7 @@ import { Constants } from 'components/common/BoardEditor/focalboard/src/constant
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
-import { rewardAndApplicationStatusBoardColors, rewardDbProperties } from 'lib/focalboard/rewardDbProperties';
+import { rewardDbProperties } from 'lib/focalboard/rewardDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {
   ASSIGNEES_BLOCK_ID,

@@ -1,8 +1,6 @@
-import { stringUtils } from '@charmverse/core/utilities';
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
@@ -12,11 +10,10 @@ import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import {
   DatabaseContainer,
-  DatabaseTitle,
-  DatabaseStickyHeader
+  DatabaseStickyHeader,
+  DatabaseTitle
 } from 'components/common/PageLayout/components/DatabasePageContent';
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
@@ -27,6 +24,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { usePages } from 'hooks/usePages';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
 import { RewardsViewOptions } from './components/RewardViewOptions';
@@ -36,7 +34,8 @@ export function RewardsPage({ title }: { title: string }) {
   useRewardsNavigation();
 
   const { space: currentSpace } = useCurrentSpace();
-  const { updateURLQuery } = useCharmRouter();
+  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
+  const { pages } = usePages();
 
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, rewards } = useRewards();
@@ -64,22 +63,30 @@ export function RewardsPage({ title }: { title: string }) {
 
   useRewardsBoardMutator();
 
+  const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
+
   function openPage(pageId: string | null) {
     if (!pageId) return;
-    updateURLQuery({ id: pageId });
+    const page = pages[pageId];
+
+    if (openPageIn === 'center_peek') {
+      updateURLQuery({ id: pageId });
+    } else if (openPageIn === 'full_page' && page) {
+      navigateToSpacePath(`/${page.path}`);
+    }
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
     await charmClient.deletePage(rewardId);
   }, []);
 
-  const showRewardOrApplication = useCallback((id: string | null, rewardId?: string) => {
+  const showRewardOrApplication = (id: string | null, rewardId?: string) => {
     if (id && (!rewardId || id === rewardId)) {
       openPage(id);
     } else if (id) {
       updateURLQuery({ applicationId: id });
     }
-  }, []);
+  };
 
   if (isLoadingAccess) {
     return null;
@@ -175,9 +182,9 @@ export function RewardsPage({ title }: { title: string }) {
                     visibleGroups={[]}
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
-                    disableAddingCards={true}
+                    disableAddingCards
                     showCard={showRewardOrApplication}
-                    readOnlyTitle={true}
+                    readOnlyTitle
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
                     onCardClicked={() => {}}
@@ -194,9 +201,9 @@ export function RewardsPage({ title }: { title: string }) {
                     view={activeView}
                     isOpen={!!showSidebar}
                     closeSidebar={() => setShowSidebar(false)}
-                    hideLayoutOptions={true}
-                    hideSourceOptions={true}
-                    hideGroupOptions={true}
+                    hideLayoutSelectOptions
+                    hideSourceOptions
+                    hideGroupOptions
                     groupByProperty={groupByProperty}
                     page={undefined}
                     pageId={undefined}
