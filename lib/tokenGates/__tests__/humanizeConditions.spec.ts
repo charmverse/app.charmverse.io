@@ -78,7 +78,7 @@ describe('humanizeConditions', () => {
     };
     const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
-    expect(result).toBe('Owns at least 1.0 ETH on Optimism');
+    expect(result).toBe('Owns at least 1 ETH on Optimism');
   });
 
   it('should return owned token on a supported blockchain condition', () => {
@@ -104,7 +104,7 @@ describe('humanizeConditions', () => {
     };
     const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
-    expect(result).toBe('Owns at least 12.0 BNB on Bsc');
+    expect(result).toBe('Owns at least 12 BNB on Bsc');
   });
 
   it('should return owned eth on etherum condition', () => {
@@ -157,7 +157,7 @@ describe('humanizeConditions', () => {
     };
     const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
-    expect(result).toBe('Owns at least 12.0 of Pepe tokens on Ethereum');
+    expect(result).toBe('Owns at least 12 of Pepe tokens on Ethereum');
   });
 
   it('should return specific POAP condition', () => {

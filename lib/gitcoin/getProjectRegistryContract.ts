@@ -1,6 +1,6 @@
+import { Contract } from '@ethersproject/contracts';
 import type { Provider } from '@ethersproject/providers';
 import type { Signer } from 'ethers';
-import { Contract } from 'ethers';
 
 import { PROJECT_REGISTRY_ADDRESSES } from 'lib/gitcoin/constants';
 

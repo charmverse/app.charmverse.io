@@ -1,6 +1,6 @@
 // References: https://github.com/bangle-io/bangle-editor/blob/13127cf2e4187ebaa6d5e01d80f4e9018fae02a5/lib/core/src/plugin-loader.ts
 
-import type { EditorProps, Schema } from '@bangle.dev/pm';
+import type { EditorProps, Schema, EditorState } from '@bangle.dev/pm';
 import {
   baseKeymap as pmBaseKeymap,
   gapCursor as pmGapCursor,
@@ -103,7 +103,8 @@ export function pluginLoader<T = any>(
   return flatPlugins;
 }
 
-function processInputRules(plugins: Plugin[], { inputRules = true, undoInputRule = true } = {}) {
+// extract the InputRules from regular prosemiror plugins
+function processInputRules(plugins: Plugin[]) {
   const newPlugins: any[] = [];
   const match: InputRule[] = [];
   plugins.forEach((plugin) => {
@@ -114,22 +115,16 @@ function processInputRules(plugins: Plugin[], { inputRules = true, undoInputRule
     newPlugins.push(plugin);
   });
 
-  if (inputRules) {
-    plugins = [
-      ...newPlugins,
-      pmInputRules({
-        rules: match
-      })
-    ];
-  }
-
-  if (undoInputRule) {
-    plugins.push(
-      keymap({
-        Backspace: pmUndoInputRule
-      })
-    );
-  }
+  plugins = [
+    ...newPlugins,
+    pmInputRules({
+      rules: match
+    }),
+    // Allow undoing an input rule by hitting backspace. For example, typing "# " will create a heading, but backspace can be used to just have a plain #
+    keymap({
+      Backspace: pmUndoInputRule
+    })
+  ];
 
   return plugins;
 }

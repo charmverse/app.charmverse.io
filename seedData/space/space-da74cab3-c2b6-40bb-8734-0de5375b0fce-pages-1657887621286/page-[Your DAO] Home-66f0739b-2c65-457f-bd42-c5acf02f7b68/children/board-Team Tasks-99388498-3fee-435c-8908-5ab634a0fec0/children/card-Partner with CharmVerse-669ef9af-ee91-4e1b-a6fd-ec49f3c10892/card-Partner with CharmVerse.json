@@ -13,8 +13,7 @@
       {
         "type": "heading",
         "attrs": {
-          "level": 1,
-          "collapseContent": null
+          "level": 1
         },
         "content": [
           {
@@ -35,8 +34,7 @@
       {
         "type": "heading",
         "attrs": {
-          "level": 1,
-          "collapseContent": null
+          "level": 1
         },
         "content": [
           {

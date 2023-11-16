@@ -22,6 +22,8 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
+import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useBounties } from 'hooks/useBounties';
 import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -40,7 +42,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 
-const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
+// const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
@@ -90,11 +92,13 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
-  const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
-    bountyId: page.bountyId
-  });
+  // TODO: [bounties-cleanup]
+  // const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
+  //   bountyId: page.bountyId
+  // });
+  // const { draftBounty } = useBounties();
 
-  const { draftBounty } = useBounties();
+  const { creatingInlineReward } = useRewards();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -158,8 +162,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
 
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
-  // TODO: this logic should be removed when we release rewards in place of bounties
-  const isRewardsPage = router.pathname.endsWith('/rewards');
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -325,17 +327,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       proposalPage={page}
                     />
                   )}
-                  {(draftBounty || page.bountyId) && !isRewardsPage && (
-                    <BountyProperties
-                      bountyId={page.bountyId}
-                      pageId={page.id}
-                      pagePath={page.path}
-                      readOnly={readOnly}
-                      permissions={bountyPermissions}
-                      refreshBountyPermissions={() => refreshBountyPermissions()}
-                    />
-                  )}
-                  {reward && isRewardsPage && (
+                  {reward && (
                     <RewardProperties
                       reward={reward}
                       pageId={page.id}
@@ -347,6 +339,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       isTemplate={page.type === 'bounty_template'}
                     />
                   )}
+                  {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
                 </CardPropertiesWrapper>
               </CharmEditor>
 

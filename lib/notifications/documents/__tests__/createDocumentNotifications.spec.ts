@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
+import { createSubmission } from 'lib/applications/actions';
 import { addComment } from 'lib/comments/addComment';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { createForumPost } from 'lib/forums/posts/createForumPost';
@@ -11,9 +12,12 @@ import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCa
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import { createReward } from 'lib/rewards/createReward';
 import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
+import { randomETHWallet, randomETHWalletAddress } from 'lib/utilities/blockchain';
 import {
+  getApplicationCommentEntity,
   getCommentEntity,
   getDocumentEntity,
   getInlineCommentEntity,
@@ -22,6 +26,7 @@ import {
   getUserEntity
 } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 import { builders as _ } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
@@ -530,6 +535,264 @@ describe(`Test document events and notifications`, () => {
     expect(inlineCommentRepliedNotification).toBeTruthy();
     // Don't send multiple notification to the same user for the same event
     expect(inlineCommentMention2CreatedNotification).toBeFalsy();
+  });
+
+  it(`Should create document notifications for application_comment.created event`, async () => {
+    const { space, user: rewardAuthor } = await generateUserAndSpaceWithApiToken();
+    const rewardApplicant = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+    const rewardReviewer1 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const rewardReviewer2 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const rewardReviewer3 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const role = await createRole({
+      spaceId: space.id
+    });
+
+    await assignRole({
+      roleId: role.id,
+      userId: rewardReviewer1.id
+    });
+
+    const { reward, createdPageId } = await createReward({
+      spaceId: space.id,
+      userId: rewardAuthor.id,
+      reviewers: [
+        {
+          group: 'role',
+          id: role.id
+        },
+        {
+          group: 'user',
+          id: rewardReviewer2.id
+        },
+        {
+          group: 'user',
+          id: rewardReviewer3.id
+        }
+      ]
+    });
+
+    const submission = await createSubmission({
+      bountyId: reward.id,
+      submissionContent: {
+        submission: 'Hello world',
+        submissionNodes: _.doc(_.p('Hello world')).toJSON(),
+        walletAddress: randomETHWalletAddress()
+      },
+      userId: rewardApplicant.id,
+      customReward: false
+    });
+
+    const applicationComment = await prisma.applicationComment.create({
+      data: {
+        applicationId: submission.id,
+        content: _.doc(_.p('Hello World')).toJSON(),
+        contentText: 'Hello World',
+        createdBy: rewardReviewer3.id
+      }
+    });
+
+    const document = await getDocumentEntity(createdPageId!);
+    const spaceEntity = await getSpaceEntity(space.id);
+
+    await createDocumentNotifications({
+      event: {
+        scope: WebhookEventNames.DocumentApplicationCommentCreated,
+        document,
+        space: spaceEntity,
+        applicationComment: await getApplicationCommentEntity(applicationComment.id)
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
+    const rewardApplicationComment1Reviewer1Notification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.created',
+        pageId: createdPageId!,
+        applicationCommentId: applicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardReviewer1.id
+        }
+      }
+    });
+
+    const rewardApplicationComment1Reviewer2Notification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.created',
+        pageId: createdPageId!,
+        applicationCommentId: applicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardReviewer2.id
+        }
+      }
+    });
+
+    const rewardApplicationComment1Reviewer3Notification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.created',
+        pageId: createdPageId!,
+        applicationCommentId: applicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardReviewer3.id
+        }
+      }
+    });
+
+    const rewardApplicationComment1RewardAuthorNotification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.created',
+        pageId: createdPageId!,
+        applicationCommentId: applicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardAuthor.id
+        }
+      }
+    });
+
+    const rewardApplicationComment1RewardApplicantNotification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.created',
+        pageId: createdPageId!,
+        applicationCommentId: applicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardApplicant.id
+        }
+      }
+    });
+
+    expect(rewardApplicationComment1Reviewer1Notification).toBeTruthy();
+    expect(rewardApplicationComment1Reviewer2Notification).toBeTruthy();
+    expect(rewardApplicationComment1Reviewer3Notification).toBeFalsy();
+    expect(rewardApplicationComment1RewardAuthorNotification).toBeFalsy();
+    expect(rewardApplicationComment1RewardApplicantNotification).toBeTruthy();
+
+    const mentionId = v4();
+    const replyApplicationComment = await prisma.applicationComment.create({
+      data: {
+        applicationId: submission.id,
+        content: _.doc(
+          _.p('Hello World'),
+          _.mention({
+            id: mentionId,
+            type: 'user',
+            value: rewardReviewer1.id,
+            createdAt: new Date().toISOString(),
+            createdBy: rewardApplicant.id
+          })
+        ).toJSON(),
+        contentText: 'Hello World',
+        createdBy: rewardApplicant.id,
+        parentId: applicationComment.id
+      }
+    });
+
+    await createDocumentNotifications({
+      event: {
+        scope: WebhookEventNames.DocumentApplicationCommentCreated,
+        document,
+        space: spaceEntity,
+        applicationComment: await getApplicationCommentEntity(replyApplicationComment.id)
+      },
+      spaceId: space.id,
+      createdAt: new Date().toISOString()
+    });
+
+    const rewardApplicationCommentReplyReviewer1Notification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.replied',
+        pageId: createdPageId!,
+        applicationCommentId: replyApplicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardReviewer1.id
+        }
+      }
+    });
+
+    const rewardApplicationCommentReplyReviewer2Notification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.replied',
+        pageId: createdPageId!,
+        applicationCommentId: replyApplicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardReviewer2.id
+        }
+      }
+    });
+
+    const rewardApplicationCommentReplyReviewer3Notification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.replied',
+        pageId: createdPageId!,
+        applicationCommentId: replyApplicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardReviewer3.id
+        }
+      }
+    });
+
+    const rewardApplicationCommentReplyRewardAuthorNotification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.replied',
+        pageId: createdPageId!,
+        applicationCommentId: replyApplicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardAuthor.id
+        }
+      }
+    });
+
+    const rewardApplicationCommentReplyRewardApplicantNotification = await prisma.documentNotification.findFirst({
+      where: {
+        type: 'application_comment.replied',
+        pageId: createdPageId!,
+        applicationCommentId: replyApplicationComment.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: rewardApplicant.id
+        }
+      }
+    });
+
+    const rewardApplicationCommentReplyMentionRewardReviewer1Notification = await prisma.documentNotification.findFirst(
+      {
+        where: {
+          type: 'application_comment.mention.created',
+          pageId: createdPageId!,
+          applicationCommentId: replyApplicationComment.id,
+          notificationMetadata: {
+            spaceId: space.id,
+            userId: rewardReviewer1.id
+          }
+        }
+      }
+    );
+
+    expect(rewardApplicationCommentReplyReviewer1Notification).toBeFalsy();
+    expect(rewardApplicationCommentReplyReviewer2Notification).toBeFalsy();
+    expect(rewardApplicationCommentReplyReviewer3Notification).toBeTruthy();
+    expect(rewardApplicationCommentReplyRewardAuthorNotification).toBeFalsy();
+    expect(rewardApplicationCommentReplyRewardApplicantNotification).toBeFalsy();
+    expect(rewardApplicationCommentReplyMentionRewardReviewer1Notification).toBeTruthy();
   });
 
   it(`Should create document notifications for page.comment.created event`, async () => {

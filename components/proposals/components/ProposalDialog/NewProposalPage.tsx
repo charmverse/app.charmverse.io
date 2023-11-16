@@ -15,6 +15,7 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
@@ -45,9 +46,11 @@ const StyledContainer = styled(Container)`
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const [, { width: containerWidth }] = useElementSize();
+  const { user } = useUser();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
+  const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
 
   usePreventReload(contentUpdated);
 
@@ -55,6 +58,8 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
 
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
+  // rubric criteria can always be updated by reviewers and admins
+  const readOnlyRubricCriteria = isFromTemplateSource && !(isAdmin || isReviewer);
 
   useEffect(() => {
     if (isTemplateRequired) {
@@ -128,7 +133,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                   <ProposalPropertiesBase
                     isFromTemplate={isFromTemplateSource}
                     isTemplateRequired={isTemplateRequired}
-                    readOnlyRubricCriteria={isFromTemplateSource}
+                    readOnlyRubricCriteria={readOnlyRubricCriteria}
                     readOnlyReviewers={readOnlyReviewers}
                     readOnlyProposalEvaluationType={isFromTemplateSource}
                     proposalStatus='draft'

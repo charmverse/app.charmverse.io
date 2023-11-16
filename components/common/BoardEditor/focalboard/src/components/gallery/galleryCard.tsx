@@ -11,6 +11,7 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import PropertyValueElement from '../propertyValueElement';
@@ -42,7 +43,9 @@ const GalleryCard = React.memo((props: Props) => {
   );
   const cardPage = pages[card.id];
 
-  const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
+  const visiblePropertyTemplates = (props.visiblePropertyTemplates || []).filter(
+    (property) => property.id !== Constants.titleColumnId
+  );
 
   let className = props.isSelected ? 'GalleryCard selected' : 'GalleryCard';
   if (isOver) {

@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import {
@@ -20,6 +19,7 @@ import {
 } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
@@ -158,9 +158,9 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             page={page}
           />
           {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-            <CardDialog
+            <PageDialog
               key={shownCardId}
-              cardId={shownCardId}
+              pageId={shownCardId}
               onClose={() => {
                 showCard(null);
               }}

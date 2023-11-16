@@ -155,8 +155,9 @@ export function RewardAmount({
               variant='h6'
               fontSize={18}
               data-test='reward-amount'
+              textTransform='uppercase'
             >
-              {truncate ? truncatedAmount() : rewardAmount}
+              {truncate ? truncatedAmount() : rewardAmount} {tokenInfo.isContract && tokenInfo.tokenSymbol}
             </Typography>
           </>
         )}

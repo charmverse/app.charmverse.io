@@ -159,7 +159,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
               {currentReward.rewardAmount}
             </Typography>
             <Typography ml={0.5} component='span' variant='subtitle1' fontWeight='normal'>
-              {tokenInfo.tokenSymbol} {currentChain ? `(${currentChain.chainName})` : ''}
+              {tokenInfo.tokenSymbol?.toUpperCase()} {currentChain ? `(${currentChain.chainName})` : ''}
             </Typography>
           </Stack>
         ) : (

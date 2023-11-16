@@ -1,8 +1,10 @@
 import { readFileSync } from 'fs';
 
 import type { Page as BrowserPage } from '@playwright/test';
-import { Wallet } from 'ethers';
+import { getChainById } from 'connectors/chains';
 import { SiweMessage } from 'lit-siwe';
+import { createWalletClient, http } from 'viem';
+import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
 
 import { generateSignaturePayload } from 'lib/blockchain/signAndVerify';
 import { baseUrl } from 'testing/mockApiCall';
@@ -56,7 +58,6 @@ type InitParams<T> = {
 
 type MockWeb3Options<T> = {
   page: BrowserPage;
-  wallet?: Wallet;
   context?: Partial<T>;
   init(params: InitParams<T>): void;
 };
@@ -64,15 +65,14 @@ type MockWeb3Options<T> = {
 type MockContext = { address: string; chainId?: number; privateKey: string | false };
 
 // load web3 mock library https:// massimilianomirra.com/notes/mocking-window-ethereum-in-playwright-for-end-to-end-dapp-testing
-export async function mockWeb3<T extends MockContext>({
-  page,
-  wallet = Wallet.createRandom(),
-  context,
-  init
-}: MockWeb3Options<T>) {
+export async function mockWeb3<T extends MockContext>({ page, context, init }: MockWeb3Options<T>) {
   context ||= {} as T;
-  context.address ||= wallet.address;
-  context.privateKey ??= wallet.privateKey; // allow setting to false to skip signing
+
+  const privateKey = generatePrivateKey();
+  const account = privateKeyToAccount(privateKey);
+
+  context.address ||= account.address;
+  context.privateKey ??= privateKey; // allow setting to false to skip signing
 
   const walletSig = await mockWalletSignature(context as MockContext);
 
@@ -117,10 +117,17 @@ export async function mockWalletSignature({ address, chainId = 1, privateKey }: 
   const message = new SiweMessage(payload);
   const prepared = message.prepareMessage();
 
-  // sign message
-  const etherswallet = new Wallet(privateKey);
-
-  const signedMessage = await etherswallet.signMessage(prepared);
+  const account = privateKeyToAccount(privateKey as `0x${string}`);
+  const chain = getChainById(chainId)?.viem;
+  if (!chain) {
+    return null;
+  }
+  const client = createWalletClient({
+    account,
+    chain,
+    transport: http()
+  });
+  const signedMessage = await client.signMessage({ message: prepared });
 
   const authSig = {
     address,
