@@ -27,7 +27,7 @@ type Props = {
 export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Props) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
-  const { customDomain, spaceFromPath } = useBaseCurrentDomain();
+  const { customDomain, spaceFromPath, isCustomDomain } = useBaseCurrentDomain();
 
   // We either have disabled account error (handled by our modal) or discord error (handled with snackbar)
   const [discordLoginError, setDiscordLoginError] = useState<string | null>(null);
@@ -50,14 +50,8 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
     }
   }, [discordLoginError]);
 
-  const isCustomDomain = customDomain && spaceFromPath?.name && spaceFromPath.isCustomDomainVerified;
-
   const image = isCustomDomain ? (
-    <WorkspaceAvatar
-      image={spaceFromPath?.spaceImage || ''}
-      name={spaceFromPath?.name || ''}
-      sx={{ width: '100%', paddingTop: '50%', paddingBottom: '50%', fontSize: '10rem' }}
-    />
+    <WorkspaceAvatar image={spaceFromPath?.spaceImage || ''} name={spaceFromPath?.name || ''} size='3xLarge' />
   ) : customDomain === null ? (
     <Image src={splashImage} px={3} />
   ) : null;

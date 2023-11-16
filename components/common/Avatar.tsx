@@ -5,10 +5,21 @@ import React from 'react';
 
 import { stringToColor } from 'lib/utilities/strings';
 
-export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge';
+export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge' | '3xLarge';
 export type AvatarVariant = 'circular' | 'rounded' | 'square';
 
-const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
+const sizeStyleMap: Record<AvatarSize, SxProps<Theme>> = {
+  '3xLarge': {
+    height: {
+      xs: '300px',
+      sm: '500px'
+    },
+    width: {
+      xs: '300px',
+      sm: '500px'
+    },
+    fontSize: '10rem'
+  },
   '2xLarge': {
     height: 150,
     width: 150,
@@ -41,7 +52,12 @@ const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
   }
 };
 
-const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, React.CSSProperties | null>>> = {
+const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, SxProps<Theme>>>> = {
+  '3xLarge': {
+    rounded: { borderRadius: '1.625rem' },
+    circular: null,
+    square: null
+  },
   '2xLarge': {
     rounded: { borderRadius: '1.625rem' },
     circular: null,

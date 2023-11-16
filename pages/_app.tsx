@@ -24,14 +24,12 @@ import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/compo
 import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
-import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDialog';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
-import { BaseCurrentDomainProvider } from 'hooks/useBaseCurrentDomain';
 import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
@@ -252,15 +250,13 @@ function DataProviders({ children }: { children: ReactNode }) {
                               <RewardsProvider>
                                 <PaymentMethodsProvider>
                                   <PagesProvider>
-                                    <BaseCurrentDomainProvider>
-                                      <MemberPropertiesProvider>
-                                        <LensProvider config={lensConfig}>
-                                          <UserProfileProvider>
-                                            <PageTitleProvider>{children}</PageTitleProvider>
-                                          </UserProfileProvider>
-                                        </LensProvider>
-                                      </MemberPropertiesProvider>
-                                    </BaseCurrentDomainProvider>
+                                    <MemberPropertiesProvider>
+                                      <LensProvider config={lensConfig}>
+                                        <UserProfileProvider>
+                                          <PageTitleProvider>{children}</PageTitleProvider>
+                                        </UserProfileProvider>
+                                      </LensProvider>
+                                    </MemberPropertiesProvider>
                                   </PagesProvider>
                                 </PaymentMethodsProvider>
                               </RewardsProvider>
