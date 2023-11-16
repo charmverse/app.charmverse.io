@@ -23,12 +23,14 @@ interface LayoutOptionsProps {
   board?: Board;
   view: BoardView;
   intl: IntlShape;
+  hideLayoutSelectOptions?: boolean;
 }
 
 function LayoutOptions(props: LayoutOptionsProps) {
   const dispatch = useAppDispatch();
 
   const intl = props.intl;
+  const hideLayoutSelectOptions = props.hideLayoutSelectOptions ?? false;
   const activeView = props.view;
 
   const boardText = intl.formatMessage({
@@ -130,24 +132,26 @@ function LayoutOptions(props: LayoutOptionsProps) {
 
   return (
     <Box onClick={(e) => e.stopPropagation()}>
-      <Grid container spacing={1} px={1}>
-        <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
-          <BoardIcon />
-          {boardText}
-        </LayoutOption>
-        <LayoutOption active={activeView.fields.viewType === 'table'} onClick={handleAddViewTable}>
-          <TableIcon />
-          {tableText}
-        </LayoutOption>
-        <LayoutOption active={activeView.fields.viewType === 'gallery'} onClick={handleAddViewGallery}>
-          <GalleryIcon />
-          {galleryText}
-        </LayoutOption>
-        <LayoutOption active={activeView.fields.viewType === 'calendar'} onClick={handleAddViewCalendar}>
-          <CalendarIcon />
-          Calendar
-        </LayoutOption>
-      </Grid>
+      {!hideLayoutSelectOptions && (
+        <Grid container spacing={1} px={1}>
+          <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
+            <BoardIcon />
+            {boardText}
+          </LayoutOption>
+          <LayoutOption active={activeView.fields.viewType === 'table'} onClick={handleAddViewTable}>
+            <TableIcon />
+            {tableText}
+          </LayoutOption>
+          <LayoutOption active={activeView.fields.viewType === 'gallery'} onClick={handleAddViewGallery}>
+            <GalleryIcon />
+            {galleryText}
+          </LayoutOption>
+          <LayoutOption active={activeView.fields.viewType === 'calendar'} onClick={handleAddViewCalendar}>
+            <CalendarIcon />
+            Calendar
+          </LayoutOption>
+        </Grid>
+      )}
       <Stack pr={1} pl={2} my={1} alignItems='center' flexDirection='row' justifyContent='space-between'>
         <Typography variant='subtitle2'>Open pages in</Typography>
         <SelectMenu

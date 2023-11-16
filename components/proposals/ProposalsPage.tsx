@@ -20,10 +20,12 @@ import { NewProposalButton } from 'components/proposals/components/NewProposalBu
 import { ProposalDialog } from 'components/proposals/components/ProposalDialog/ProposalDialog';
 import { useProposalsBoardMutator } from 'components/proposals/components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { usePages } from 'hooks/usePages';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
@@ -37,11 +39,11 @@ export function ProposalsPage({ title }: { title: string }) {
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter, proposals } = useProposals();
   const [newProposal, setNewProposal] = useState<Partial<ProposalPageAndPropertiesInput> | null>(null);
-
+  const { pages } = usePages();
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
-
+  const { navigateToSpacePath, updateURLQuery } = useCharmRouter();
   const isAdmin = useIsAdmin();
 
   const { props, showProposal, hideProposal } = useProposalDialog();
@@ -70,14 +72,17 @@ export function ProposalsPage({ title }: { title: string }) {
 
   function openPage(pageId: string | null) {
     if (!pageId) return;
-
-    const { pathname } = router;
-    router.push({ pathname, query: { domain: router.query.domain, id: pageId } }, undefined, { shallow: true });
+    const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
+    const page = pages[pageId];
+    if (openPageIn === 'center_peek') {
+      updateURLQuery({ id: pageId });
+    } else if (openPageIn === 'full_page' && page) {
+      navigateToSpacePath(`/${page.path}`);
+    }
   }
 
   function closeDialog() {
-    const { pathname } = router;
-    router.push({ pathname, query: { domain: router.query.domain } }, undefined, { shallow: true });
+    updateURLQuery({ id: null });
     setNewProposal(null);
   }
 
@@ -196,9 +201,9 @@ export function ProposalsPage({ title }: { title: string }) {
                     visibleGroups={[]}
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
-                    disableAddingCards={true}
+                    disableAddingCards
                     showCard={openPage}
-                    readOnlyTitle={true}
+                    readOnlyTitle
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
                     onCardClicked={() => {}}
@@ -214,9 +219,9 @@ export function ProposalsPage({ title }: { title: string }) {
                     view={activeView}
                     isOpen={!!showSidebar}
                     closeSidebar={() => setShowSidebar(false)}
-                    hideLayoutOptions={true}
-                    hideSourceOptions={true}
-                    hideGroupOptions={true}
+                    hideLayoutSelectOptions
+                    hideSourceOptions
+                    hideGroupOptions
                     groupByProperty={groupByProperty}
                     page={undefined}
                     pageId={undefined}
