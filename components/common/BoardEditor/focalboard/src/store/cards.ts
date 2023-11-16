@@ -6,10 +6,10 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
 import type { Member } from 'lib/members/interfaces';
 import type { PagesMap } from 'lib/pages';
 
-import { Constants } from '../../../../../../lib/focalboard/constants';
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';

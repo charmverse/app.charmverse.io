@@ -5,8 +5,7 @@ import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-
-import { Constants } from '../../../../../lib/focalboard/constants';
+import { Constants } from 'lib/focalboard/constants';
 
 declare let window: IAppWindow;
 

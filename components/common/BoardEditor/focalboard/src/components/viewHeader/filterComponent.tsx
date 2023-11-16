@@ -10,12 +10,12 @@ import { v4 } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { createFilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroupOperation } from 'lib/focalboard/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
-import { Constants } from '../../../../../../../lib/focalboard/constants';
 import mutator from '../../mutator';
 
 import FilterEntry from './filterEntry';

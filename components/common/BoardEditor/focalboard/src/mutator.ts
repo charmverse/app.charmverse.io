@@ -10,11 +10,11 @@ import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalb
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import { Constants } from '../../../../../lib/focalboard/constants';
 import { publishIncrementalUpdate } from '../../publisher';
 
 import octoClient from './octoClient';

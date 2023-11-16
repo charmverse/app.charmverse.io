@@ -6,8 +6,8 @@ import { injectIntl } from 'react-intl';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../../../../../../../lib/focalboard/constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';

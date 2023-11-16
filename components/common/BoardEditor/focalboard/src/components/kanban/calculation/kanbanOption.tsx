@@ -3,8 +3,8 @@ import { Box } from '@mui/material';
 import { useState } from 'react';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../../../../../../../../lib/focalboard/constants';
 import type { Option as SelectOption } from '../../calculations/options';
 import { typesByOptions } from '../../calculations/options';
 
