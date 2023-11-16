@@ -31,8 +31,6 @@ const RewardApplicationPage = dynamic(
   { ssr: false }
 );
 
-type ContentViewType = 'page' | 'application';
-
 interface Props {
   pageId?: string;
   onClose: () => void;

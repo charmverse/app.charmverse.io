@@ -1,8 +1,9 @@
-import { Box, Card, Grid, Typography } from '@mui/material';
+import { Box, Card, Grid, Stack, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
+import SelectMenu from 'components/common/Menu';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -42,6 +43,16 @@ function LayoutOptions(props: LayoutOptionsProps) {
     id: 'View.Gallery',
     defaultMessage: 'Gallery'
   });
+
+  const handleViewOpenPage = useCallback(
+    async (openPageIn: 'full_page' | 'center_peek') => {
+      const newView = createBoardView(activeView);
+      newView.fields.openPageIn = openPageIn;
+      dispatch(updateView(newView));
+      await mutator.updateBlock(newView, activeView, 'change view open page');
+    },
+    [activeView]
+  );
 
   const handleAddViewBoard = useCallback(async () => {
     const newView = createBoardView(activeView);
@@ -137,6 +148,28 @@ function LayoutOptions(props: LayoutOptionsProps) {
           Calendar
         </LayoutOption>
       </Grid>
+      <Stack pr={1} pl={2} my={1} alignItems='center' flexDirection='row' justifyContent='space-between'>
+        <Typography variant='subtitle2'>Open pages in</Typography>
+        <SelectMenu
+          buttonSize='small'
+          selectedValue={activeView.fields.openPageIn ?? 'center_peek'}
+          options={[
+            {
+              primary: 'Center peek',
+              secondary: 'Open pages in a focused, centered modal.',
+              value: 'center_peek'
+            },
+            {
+              primary: 'Full page',
+              secondary: 'Open pages in full page.',
+              value: 'full_page'
+            }
+          ]}
+          valueUpdated={(openPageIn) => {
+            handleViewOpenPage(openPageIn as 'center_peek' | 'full_page');
+          }}
+        />
+      </Stack>
     </Box>
   );
 }
