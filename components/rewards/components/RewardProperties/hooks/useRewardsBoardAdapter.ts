@@ -13,6 +13,7 @@ import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
 import {
   ASSIGNEES_BLOCK_ID,
@@ -34,7 +35,7 @@ export function useRewardsBoardAdapter() {
   const [boardReward, setBoardReward] = useState<BoardReward | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { filteredRewards: rewards } = useRewards();
+  const { rewards } = useRewards();
   const { pages } = usePages();
   const { rewardPropertiesBlock, rewardBlocks } = useRewardBlocks();
   const rewardPage = pages[boardReward?.id || ''];
@@ -63,7 +64,7 @@ export function useRewardsBoardAdapter() {
   }, [rewardPropertiesBlock, rewardBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
-    const cards =
+    let cards =
       rewards
         ?.map((p) => {
           const page = pages[p?.id];
@@ -71,6 +72,18 @@ export function useRewardsBoardAdapter() {
           return mapRewardToCardPage({ reward: p, rewardPage: page, spaceId: space?.id, members: membersRecord });
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+
+    // filter cards by active view filter
+    if (activeView?.fields.filter) {
+      const cardsRaw = cards.map((cp) => cp.card);
+      const filteredCardsIds = CardFilter.applyFilterGroup(
+        activeView.fields.filter,
+        board.fields.cardProperties,
+        cardsRaw
+      ).map((c) => c.id);
+
+      cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
+    }
 
     const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
 

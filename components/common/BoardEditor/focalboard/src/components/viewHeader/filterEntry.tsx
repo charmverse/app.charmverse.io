@@ -30,7 +30,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
-import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilities';
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
@@ -82,6 +81,7 @@ function FilterPropertyValue({
   properties: IPropertyTemplate[];
 }) {
   const [filter, setFilter] = useState(initialFilter);
+
   const propertyRecord = properties.reduce<Record<string, IPropertyTemplate>>((acc, property) => {
     acc[property.id] = property;
     return acc;

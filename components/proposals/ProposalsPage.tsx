@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFIlterControl';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
@@ -32,10 +33,10 @@ import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage({ title }: { title: string }) {
-  const { categories = [] } = useProposalCategories();
+  // const { categories = [] } = useProposalCategories();
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter, proposals } = useProposals();
+  const { proposals } = useProposals();
   const [newProposal, setNewProposal] = useState<Partial<ProposalPageAndPropertiesInput> | null>(null);
 
   const loadingData = !proposals;
@@ -49,6 +50,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
+  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -134,15 +136,7 @@ export function ProposalsPage({ title }: { title: string }) {
         {!!proposals?.length && (
           <>
             <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-              <ProposalsViewOptions
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                categoryIdFilter={categoryIdFilter}
-                setCategoryIdFilter={setCategoryIdFilter}
-                categories={categories}
-                // Playwright-specific
-                testKey='desktop'
-              />
+              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
               <ViewSortControl
                 activeBoard={activeBoard}
