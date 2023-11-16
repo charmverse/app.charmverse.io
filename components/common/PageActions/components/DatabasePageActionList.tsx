@@ -105,49 +105,15 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     mutatePagesRemove(cardIds);
   }
 
-  async function exportZippedDatabase(_board: Board, _view: BoardView) {
-    const cardPages: CardPage[] = cards
-      .map((card) => ({ card, page: pages[card.id] }))
-      .filter((item): item is CardPage => !!item.page);
-
-    const sortedCardPages = sortCards(cardPages, _board, _view, members);
-    const _cards = sortedCardPages.map(({ card, page: { title } }) => {
-      return {
-        ...card,
-        // update the title from correct model
-        title
-      };
-    });
+  async function exportZippedDatabase() {
     try {
-      const proposalCategories = (categories || []).reduce<Record<string, string>>((map, category) => {
-        map[category.id] = category.title;
-        return map;
-      }, {});
-      const csvData = CsvExporter.generateCSV(
-        _board,
-        _view,
-        _cards,
-        {
-          date: formatDate,
-          dateTime: formatDateTime
-        },
-        {
-          spaceDomain: currentSpace?.domain ?? '',
-          users: membersRecord,
-          proposalCategories
-        }
-      );
-      const exportName = `${boardPage?.title ?? 'database'}-export.zip`;
+      const exportName = `${boardPage?.title ?? 'Untitled'} database export.zip`;
 
-      const generatedZip = await charmClient.spaces.exportSpaceData({
-        spaceId: currentSpace?.id as string,
-        data: {
-          csv: [{ content: decodeURIComponent(csvData.csvContent), title: boardPage?.title ?? 'database-export' }],
-          pageIds: _cards.map((card) => card.id)
-        }
+      const generatedZip = await charmClient.pages.exportZippedDatabasePage({
+        databaseId: pageId
       });
 
-      const zipDataUrl = URL.createObjectURL(generatedZip as Blob);
+      const zipDataUrl = URL.createObjectURL(generatedZip as any);
 
       // Create a temporary link to trigger download
       const link = document.createElement('a');
@@ -324,7 +290,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
           </ListItemButton>
         </div>
       </Tooltip>
-      <ListItemButton onClick={() => exportZippedDatabase(board, view)}>
+      <ListItemButton onClick={() => exportZippedDatabase()}>
         <FormatListBulletedIcon
           fontSize='small'
           sx={{

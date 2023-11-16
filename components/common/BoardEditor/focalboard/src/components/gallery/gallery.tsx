@@ -5,7 +5,7 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../../../../../../lib/focalboard/constants';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 

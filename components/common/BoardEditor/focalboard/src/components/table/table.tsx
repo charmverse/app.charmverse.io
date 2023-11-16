@@ -9,7 +9,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { CardPage, Card } from 'lib/focalboard/card';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../../../../../../lib/focalboard/constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';

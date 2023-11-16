@@ -34,7 +34,7 @@ import { mapProposalStatusPropertyToDisplayValue } from 'lib/focalboard/utilitie
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../../../../../../lib/focalboard/constants';
 import mutator from '../../mutator';
 
 import { iconForPropertyType } from './viewHeaderPropertiesMenu';

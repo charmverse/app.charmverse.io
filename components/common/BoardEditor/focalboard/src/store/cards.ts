@@ -9,7 +9,7 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
 import type { PagesMap } from 'lib/pages';
 
-import { Constants } from '../constants';
+import { Constants } from '../../../../../../lib/focalboard/constants';
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';

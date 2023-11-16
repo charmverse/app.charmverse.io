@@ -22,7 +22,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { createTableView } from 'lib/focalboard/tableView';
 
-import { Constants } from '../constants';
+import { Constants } from '../../../../../../lib/focalboard/constants';
 import mutator from '../mutator';
 import { IDType, Utils } from '../utils';
 import IconButton from '../widgets/buttons/iconButton';

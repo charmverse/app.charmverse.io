@@ -20,8 +20,8 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
+import { Constants } from '../../../../../../../lib/focalboard/constants';
 import { TextInput } from '../../../../components/properties/TextInput';
-import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';

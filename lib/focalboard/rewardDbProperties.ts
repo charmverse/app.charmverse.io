@@ -1,8 +1,8 @@
 import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import type { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { Constants } from 'lib/focalboard/constants';
 
 const rewardPropertyTypesList = [
   'rewardStatus',

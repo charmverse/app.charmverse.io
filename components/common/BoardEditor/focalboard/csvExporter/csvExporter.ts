@@ -6,7 +6,7 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
-import { Constants } from '../src/constants';
+import { Constants } from '../../../../../lib/focalboard/constants';
 
 declare let window: IAppWindow;
 

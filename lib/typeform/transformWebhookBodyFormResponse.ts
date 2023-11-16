@@ -1,7 +1,7 @@
 import uniqBy from 'lodash/uniqBy';
 import { v4 as uuid } from 'uuid';
 
-import { randomBoardColor } from 'components/common/BoardEditor/focalboard/src/constants';
+import { randomBoardColor } from 'lib/focalboard/constants';
 import type { PageProperty } from 'lib/public-api';
 import { isTruthy } from 'lib/utilities/types';
 

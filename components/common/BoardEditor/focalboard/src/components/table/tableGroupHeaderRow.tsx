@@ -14,7 +14,7 @@ import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../../../../../../lib/focalboard/constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';

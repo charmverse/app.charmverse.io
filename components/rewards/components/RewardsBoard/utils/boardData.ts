@@ -1,7 +1,7 @@
-import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
+import { Constants } from 'lib/focalboard/constants';
 import { rewardAndApplicationStatusBoardColors, rewardDbProperties } from 'lib/focalboard/rewardDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {

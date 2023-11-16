@@ -15,7 +15,7 @@ import { createFilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroupOperation } from 'lib/focalboard/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../../../../../../lib/focalboard/constants';
 import mutator from '../../mutator';
 
 import FilterEntry from './filterEntry';

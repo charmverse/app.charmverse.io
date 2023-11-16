@@ -39,7 +39,7 @@ import {
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 
-import { Constants } from '../../constants';
+import { Constants } from '../../../../../../../lib/focalboard/constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';

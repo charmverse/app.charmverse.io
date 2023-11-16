@@ -14,9 +14,9 @@ import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import { Constants } from '../../../../../lib/focalboard/constants';
 import { publishIncrementalUpdate } from '../../publisher';
 
-import { Constants } from './constants';
 import octoClient from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';
