@@ -33,7 +33,7 @@ interface ProposalPropertiesProps {
   snapshotProposalId: string | null;
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
-  title?: string;
+  openEvaluation?: () => void;
   proposalPage: PageWithContent;
 }
 
@@ -44,7 +44,7 @@ export function ProposalProperties({
   proposalId,
   snapshotProposalId,
   readOnly,
-  title,
+  openEvaluation,
   proposalPage
 }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
@@ -191,6 +191,7 @@ export function ProposalProperties({
         setProposalFormInputs={onChangeProperties}
         isPublishingToLens={isPublishingToLens}
         readOnlyCustomProperties={readOnlyCustomProperties}
+        openEvaluation={openEvaluation}
       />
       {isPublishingToLens && (
         <CreateLensPublication

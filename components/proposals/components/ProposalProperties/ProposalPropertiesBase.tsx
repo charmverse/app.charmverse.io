@@ -83,6 +83,7 @@ type ProposalPropertiesProps = {
   snapshotProposalId?: string | null;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   readOnlyCustomProperties?: string[];
+  openEvaluation?: () => void;
 };
 
 export function ProposalPropertiesBase({
@@ -108,6 +109,7 @@ export function ProposalPropertiesBase({
   snapshotProposalId,
   updateProposalStatus,
   isPublishingToLens,
+  openEvaluation,
   readOnlyCustomProperties
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
@@ -519,7 +521,11 @@ export function ProposalPropertiesBase({
           }}
         />
 
-        {proposalFormInputs.evaluationType === 'rubric' && <Button>Review this proposal</Button>}
+        {proposalFormInputs.evaluationType === 'rubric' && (
+          <Box display='flex' justifyContent='center' py={2}>
+            <Button onClick={openEvaluation}>Review this proposal</Button>
+          </Box>
+        )}
 
         <ConfirmDeleteModal
           onClose={() => {

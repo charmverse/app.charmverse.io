@@ -91,7 +91,7 @@ export interface DocumentPageProps {
 function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
-  const { activeView: sidebarView, closeSidebar } = usePageSidebar();
+  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -339,6 +339,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                       readOnly={readonlyProposalProperties}
                       title={page.title}
                       proposalPage={page}
+                      openEvaluation={() => setActiveView('proposal_evaluation')}
                     />
                   )}
                   {reward && (
