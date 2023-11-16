@@ -142,15 +142,13 @@ export function ProposalsPage({ title }: { title: string }) {
                 viewSortPopup={viewSortPopup}
               />
 
-              {isAdmin && (
-                <ViewHeaderActionsMenu
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowSidebar(!showSidebar);
-                  }}
-                />
-              )}
+              <ViewHeaderActionsMenu
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowSidebar(!showSidebar);
+                }}
+              />
             </Stack>
             <Divider />
           </>

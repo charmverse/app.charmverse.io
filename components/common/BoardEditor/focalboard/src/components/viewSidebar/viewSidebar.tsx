@@ -57,7 +57,7 @@ function ViewSidebar(props: Props) {
         orientation='horizontal'
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}
       >
-        <StyledSidebar>
+        <StyledSidebar data-test='view-sidebar-content'>
           {sidebarView === 'view-options' && <ViewSidebarSelect {...props} setSidebarView={setSidebarView} />}
 
           {props.view && (
