@@ -296,7 +296,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         })
       );
     }
-  }, [editor?.view.state, isLoadingRef.current, loadingPages]);
+  }, [isLoadingRef.current, loadingPages]);
 
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
