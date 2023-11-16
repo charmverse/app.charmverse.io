@@ -30,7 +30,7 @@ interface Props {
   closeDialog: () => void;
 }
 
-export function ProposalDialog({ pageId, newProposal, closeDialog }: Props) {
+function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
   const mounted = useRef(false);
   const { updatePage } = usePages();
   // This is needed so that the surrounding currentPage context provides the correct pageId
@@ -123,80 +123,87 @@ export function ProposalDialog({ pageId, newProposal, closeDialog }: Props) {
   }
 
   return (
-    <DocumentPageProviders isInsideDialog={true}>
-      <Dialog
-        onClose={() => {
-          if (contentUpdated) {
-            setShowConfirmDialog(true);
-          } else {
-            close();
-          }
-        }}
-        toolbar={
-          pageId ? (
-            <Box display='flex' justifyContent='space-between'>
-              <Button
-                data-test='open-as-page'
-                size='small'
-                color='secondary'
-                href={page ? `/${page?.path}` : null}
-                variant='text'
-                startIcon={<OpenInFullIcon fontSize='small' />}
-                sx={{ px: 1.5 }}
-              >
-                Open as Page
-              </Button>
-              {page && (
-                <Box display='flex' alignItems='center' gap={0.5}>
-                  <DocumentHeaderElements headerHeight={0} page={page} />
-                </Box>
-              )}
-            </Box>
-          ) : (
-            <div />
-          )
+    <Dialog
+      onClose={() => {
+        if (contentUpdated) {
+          setShowConfirmDialog(true);
+        } else {
+          close();
         }
-        toolsMenu={
-          pageId ? (
-            <Stack flexDirection='row' gap={1}>
-              <FullPageActionsMenuButton pageId={pageId} onDelete={close} />
-            </Stack>
-          ) : null
-        }
-        footerActions={
-          isLoading || page || !newProposal ? null : (
+      }}
+      toolbar={
+        pageId ? (
+          <Box display='flex' justifyContent='space-between'>
             <Button
-              disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
-              disabledTooltip={disabledTooltip}
-              onClick={saveForm}
-              loading={isCreatingProposal}
-              data-test='create-proposal-button'
+              data-test='open-as-page'
+              size='small'
+              color='secondary'
+              href={page ? `/${page?.path}` : null}
+              variant='text'
+              startIcon={<OpenInFullIcon fontSize='small' />}
+              sx={{ px: 1.5 }}
             >
-              Save
+              Open as Page
             </Button>
-          )
-        }
-      >
-        {isLoading ? (
-          <LoadingComponent isLoading />
-        ) : page ? (
-          // Document page is used in a few places, so it is responsible for retrieving its own permissions
-          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+            {page && (
+              <Box display='flex' alignItems='center' gap={0.5}>
+                <DocumentHeaderElements headerHeight={0} page={page} />
+              </Box>
+            )}
+          </Box>
         ) : (
-          <NewProposalPage formInputs={formInputs} setFormInputs={setFormInputs} contentUpdated={contentUpdated} />
-        )}
-        <ConfirmDeleteModal
-          onClose={() => {
-            setShowConfirmDialog(false);
-          }}
-          title='Unsaved changes'
-          open={showConfirmDialog}
-          buttonText='Discard'
-          secondaryButtonText='Cancel'
-          question='Are you sure you want to close this proposal? You have unsaved changes'
-          onConfirm={close}
-        />
-      </Dialog>
+          <div />
+        )
+      }
+      toolsMenu={
+        pageId ? (
+          <Stack flexDirection='row' gap={1}>
+            <FullPageActionsMenuButton pageId={pageId} onDelete={close} />
+          </Stack>
+        ) : null
+      }
+      footerActions={
+        isLoading || page || !newProposal ? null : (
+          <Button
+            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+            disabledTooltip={disabledTooltip}
+            onClick={saveForm}
+            loading={isCreatingProposal}
+            data-test='create-proposal-button'
+          >
+            Save
+          </Button>
+        )
+      }
+    >
+      {isLoading ? (
+        <LoadingComponent isLoading />
+      ) : page ? (
+        // Document page is used in a few places, so it is responsible for retrieving its own permissions
+        <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+      ) : (
+        <NewProposalPage formInputs={formInputs} setFormInputs={setFormInputs} contentUpdated={contentUpdated} />
+      )}
+      <ConfirmDeleteModal
+        onClose={() => {
+          setShowConfirmDialog(false);
+        }}
+        title='Unsaved changes'
+        open={showConfirmDialog}
+        buttonText='Discard'
+        secondaryButtonText='Cancel'
+        question='Are you sure you want to close this proposal? You have unsaved changes'
+        onConfirm={close}
+      />
+    </Dialog>
+  );
+}
+
+// ProposalDialogBase must be wrapped by DocumentPageProviders so that it can control context about the page
+export function ProposalDialog(props: Props): JSX.Element | null {
+  return (
+    <DocumentPageProviders isInsideDialog={true}>
+      <ProposalDialogBase {...props} />
     </DocumentPageProviders>
   );
 }
