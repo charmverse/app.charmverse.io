@@ -1,9 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
-import { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
-import React from 'react';
 import { createPortal } from 'react-dom';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
