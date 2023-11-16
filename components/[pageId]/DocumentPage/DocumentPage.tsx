@@ -87,9 +87,10 @@ export interface DocumentPageProps {
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   close?: VoidFunction;
+  enableSidebar?: boolean;
 }
 
-function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
+function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, enableSidebar }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
   const isLargeScreen = useLgScreen();
@@ -213,6 +214,9 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
 
   // show page sidebar by default if there are comments or votes
   useEffect(() => {
+    if (!enableSidebar) {
+      return;
+    }
     const highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
     const unresolvedThreads = Object.values(threads)
       .filter((thread) => !thread?.resolved)
@@ -234,7 +238,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
         closeSidebar();
       }
     }
-  }, [isLoadingThreads, page.id, threadsPageId]);
+  }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   return (
     <>
