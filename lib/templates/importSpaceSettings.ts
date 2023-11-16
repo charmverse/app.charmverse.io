@@ -80,8 +80,10 @@ export async function importSpaceSettings({
         where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },
         create: {
           ...(b as any),
+          id: uuid(),
           createdAt: new Date(),
           updatedAt: new Date(),
+          rootId: targetSpace.id,
           spaceId: targetSpace.id,
           createdBy: targetSpace.createdBy
         },
@@ -93,6 +95,7 @@ export async function importSpaceSettings({
         where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },
         create: {
           ...(b as any),
+          id: uuid(),
           createdAt: new Date(),
           updatedAt: new Date(),
           spaceId: targetSpace.id,
