@@ -175,7 +175,7 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  PageSidebar?: IPageSidebarContext['activeView'];
+  // PageSidebar?: IPageSidebarContext['activeView'];
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;

@@ -248,7 +248,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 content={page.content as PageContent}
                 readOnly={readOnly || !!page.syncWithPageId}
                 autoFocus={false}
-                PageSidebar={sidebarView}
                 pageId={page.id}
                 disablePageSpecificFeatures={isSharedPage}
                 enableSuggestingMode={enableSuggestingMode}
