@@ -14,7 +14,8 @@ import {
   getDocumentEntity,
   getInlineCommentEntity,
   getVoteEntity,
-  getApplicationEntity
+  getApplicationEntity,
+  getApplicationCommentEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -228,6 +229,12 @@ type DocumentEventContext = (
       postId?: string;
       documentId?: string;
     }
+  | {
+      scope: WebhookEventNames.DocumentApplicationCommentCreated;
+      applicationCommentId: string;
+      spaceId: string;
+      documentId: string;
+    }
 ) & {
   spaceId: string;
 };
@@ -244,6 +251,16 @@ export async function publishDocumentEvent(context: DocumentEventContext) {
         document,
         space,
         inlineComment
+      });
+    }
+    case WebhookEventNames.DocumentApplicationCommentCreated: {
+      const document = await getDocumentEntity(context.documentId);
+      const applicationComment = await getApplicationCommentEntity(context.applicationCommentId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: WebhookEventNames.DocumentApplicationCommentCreated,
+        document,
+        space,
+        applicationComment
       });
     }
     case WebhookEventNames.DocumentMentionCreated: {

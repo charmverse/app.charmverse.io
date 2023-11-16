@@ -15,6 +15,8 @@ export function PendingNotificationTemplate() {
   return (
     <PendingNotification
       notification={{
+        applicationCommentId: null,
+        applicationId: null,
         group: 'document',
         archived: false,
         commentId: null,
