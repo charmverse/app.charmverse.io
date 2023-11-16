@@ -1,14 +1,13 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
-import { verifyMessage } from '@ethersproject/wallet';
 import type { Signer } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { recoverMessageAddress, getAddress } from 'viem';
 import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
@@ -120,7 +119,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const newSignature = await signMessageAsync({
         message: body
       });
-      const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
+      const signatureAddress = await recoverMessageAddress({ message: body, signature: newSignature });
 
       if (!lowerCaseEqual(signatureAddress, account)) {
         throw new Error('Signature address does not match account');

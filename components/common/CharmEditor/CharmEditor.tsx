@@ -65,11 +65,11 @@ import {
   inlinePalettePluginKey,
   floatingMenuPluginKey,
   linkedPagePluginKey,
+  linksPluginKey,
   mentionPluginKey,
   emojiPluginKey,
   actionsPluginKey,
   inlineCommentPluginKey,
-  linksPluginKey,
   charmEditorPlugins
 } from './plugins';
 import { specRegistry } from './specRegistry';
@@ -400,6 +400,7 @@ function CharmEditor({
       isContentControlled={isContentControlled}
       initialContent={content}
       enableSuggestions={enableSuggestingMode}
+      linksPluginKey={linksPluginKey}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}

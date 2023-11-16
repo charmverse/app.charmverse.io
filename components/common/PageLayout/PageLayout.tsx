@@ -12,7 +12,6 @@ import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDi
 import { AnnouncementBanner } from 'components/common/PageLayout/components/AnnouncementBanner';
 import { BlocksExceededBanner } from 'components/common/PageLayout/components/BlocksExceededBanner';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
-import { RewardApplicationDialog } from 'components/rewards/components/RewardApplicationDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -227,8 +226,6 @@ function PageLayout({ children }: PageLayoutProps) {
                 <HeaderSpacer />
                 {children}
               </PageContainer>
-
-              <RewardApplicationDialog />
             </PageDialogProvider>
           </DocumentPageProviders>
         </FocalboardViewsProvider>

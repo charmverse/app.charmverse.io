@@ -21,21 +21,6 @@ export type RewardPropertiesBlock = RewardBlock & {
 // TODO: Add other block types i.e. view.
 export type RewardBlockWithTypedFields = RewardPropertiesBlock;
 
-export type RewardBlockInput = {
-  id?: string;
-  type: string;
-  spaceId?: string;
-  title?: string;
-  schema?: number;
-  fields?: RewardPropertiesBlockFields;
-  parentId?: string;
-  rootId?: string;
-};
-
-export type RewardBlockUpdateInput = RewardBlockInput & {
-  id: string;
-};
-
 export type RewardPropertyValue = CardPropertyValue | ApplicationMeta[] | TargetPermissionGroup<'user' | 'role'>[];
 
 export type RewardPropertiesField = Record<string, RewardPropertyValue>;
@@ -47,3 +32,18 @@ export type RewardFields = RewardPropertyValues;
 export type RewardFieldsProp = { fields: RewardFields };
 
 export type RewardCard = Card<RewardPropertyValue>;
+
+export type RewardBlockInput = {
+  id?: string;
+  type: string;
+  spaceId?: string;
+  title?: string;
+  schema?: number;
+  fields?: RewardPropertiesBlockFields | RewardPropertyValues;
+  parentId?: string;
+  rootId?: string;
+};
+
+export type RewardBlockUpdateInput = RewardBlockInput & {
+  id: string;
+};

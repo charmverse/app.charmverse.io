@@ -1,5 +1,5 @@
-import { getAddress, verifyMessage } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
+import { getAddress, recoverMessageAddress } from 'viem';
 
 import { InvalidInputError } from '../utilities/errors';
 import { lowerCaseEqual } from '../utilities/strings';
@@ -47,7 +47,7 @@ export type SignatureVerification = {
 /**
  * Use this for
  */
-export function isValidWalletSignature({ address, host, signature }: SignatureVerification): boolean {
+export async function isValidWalletSignature({ address, host, signature }: SignatureVerification): Promise<boolean> {
   if (!address || !host || !signature) {
     throw new InvalidInputError('A wallet address, host and signature are required');
   }
@@ -66,7 +66,7 @@ export function isValidWalletSignature({ address, host, signature }: SignatureVe
 
   const body = message.prepareMessage();
 
-  const signatureAddress = verifyMessage(body, signature.sig);
+  const signatureAddress = await recoverMessageAddress({ message: body, signature: signature.sig });
 
   if (!lowerCaseEqual(signatureAddress, address)) {
     return false;

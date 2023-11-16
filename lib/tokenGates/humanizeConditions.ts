@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { ALL_LIT_CHAINS, LIT_CHAINS } from '@lit-protocol/constants';
 import type { HumanizedAccsProps } from '@lit-protocol/types';
 import type { TypographyProps } from '@mui/material/Typography';
-import { formatEther, isAddress } from 'ethers/lib/utils';
+import { formatEther, isAddress } from 'viem';
 import { base } from 'viem/chains';
 
 import { shortWalletAddress } from 'lib/utilities/blockchain';
@@ -71,7 +71,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
         const chainDetails = ALL_LIT_CHAINS[acc.chain];
         const tokenSymbol = chainDetails?.symbol;
         const value = acc.returnValueTest.value;
-        const balance = Number(value) ? formatEther(value) : value;
+        const balance = Number(value) ? formatEther(BigInt(value)) : value;
         const comparator = humanizeComparator(acc.returnValueTest.comparator);
         const isValidValueAddress = isAddress(value);
         const image = 'image' in acc && typeof acc.image === 'string' && acc.image ? acc.image : undefined;

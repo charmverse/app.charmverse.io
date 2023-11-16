@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -123,6 +124,9 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       return (
         <Box height='100%' sx={{ overflowY: 'auto' }}>
           <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+
+          {/* needed to handle applications for rewards */}
+          <PageDialogGlobal />
         </Box>
       );
     }

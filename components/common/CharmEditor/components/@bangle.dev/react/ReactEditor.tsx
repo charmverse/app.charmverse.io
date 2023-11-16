@@ -5,6 +5,7 @@ import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
+import type { PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -17,6 +18,7 @@ import type { BangleEditorProps as CoreBangleEditorProps } from 'components/comm
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { CommentThreadsMap } from 'hooks/useThreads';
 import { getThreadsKey } from 'hooks/useThreads';
@@ -51,6 +53,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   pageId?: string;
   children?: React.ReactNode;
   renderNodeViews?: RenderNodeViewsFunction;
+  linksPluginKey?: PluginKey;
   className?: string;
   style?: React.CSSProperties;
   editorRef?: RefObject<HTMLDivElement>;
@@ -80,6 +83,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     isContentControlled,
     initialContent,
     focusOnInit,
+    linksPluginKey,
     pmViewOpts,
     renderNodeViews,
     className,
@@ -101,6 +105,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   focusOnInit = focusOnInit ?? (!readOnly && !isTouchScreen());
   const renderRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
+  const { pages, loadingPages } = usePages();
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
@@ -287,6 +292,24 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     const timer = setTimeout(() => setShowLoader(true), 300);
     return () => clearTimeout(timer);
   }, [setShowLoader]);
+
+  useEffect(() => {
+    /// wait for isLoadingRef.current so that we set meta after fiduseditor has init
+    if (editor?.view && !isLoadingRef.current && !loadingPages && linksPluginKey) {
+      // pass in a list of page paths and ids for the link component to check during input
+      const pageMap = Object.entries(pages).reduce<Record<string, string>>((acc, [key, page]) => {
+        if (page) {
+          acc[page.path] = page.id;
+        }
+        return acc;
+      }, {});
+      editor.view.dispatch(
+        editor.view.state.tr.setMeta(linksPluginKey, {
+          pages: pageMap
+        })
+      );
+    }
+  }, [isLoadingRef.current, loadingPages]);
 
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');

@@ -79,7 +79,6 @@ export default function NestedPage({
     pageTitle = 'No access';
   }
   const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
-
   const pagePath = documentPage ? `${space?.domain}/${documentPage.path}` : '';
   const staticPath = staticPage ? `${space?.domain}/${staticPage.path}` : '';
   const categoryPath = forumCategoryPage ? `${space?.domain}/forum/${forumCategoryPage.path}` : '';

@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTestEnv } from 'config/constants';
 import { addMessageToSQS } from 'lib/aws/SQS';
+import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;

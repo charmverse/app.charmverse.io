@@ -35,7 +35,7 @@ export function ProposalEvaluationTypeSelect({ readOnly, readOnlyMessage, value,
     <TagSelect
       wrapColumn
       readOnly={readOnly}
-      readOnlyMessage={readOnlyMessage}
+      readOnlyMessage={readOnly && readOnlyMessage ? readOnlyMessage : undefined}
       options={evaluationTypeOptions}
       propertyValue={value}
       onChange={onValueChange}
