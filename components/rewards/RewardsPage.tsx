@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFControl';
+import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';

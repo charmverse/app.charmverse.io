@@ -8,7 +8,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
-import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFControl';
+import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
