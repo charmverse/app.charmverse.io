@@ -17,7 +17,6 @@ import { Container } from './LoginLayout';
 
 const Background = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
-  flex-grow: 1;
 `;
 
 const LinkHeader = styled(Typography)`
@@ -50,7 +49,7 @@ export default function Footer() {
   const { customDomain } = useBaseCurrentDomain();
 
   return (
-    <Background mt={6} sx={{ flexGrow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+    <Background mt={6} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
       <Container pt={5} pb={9} px={3}>
         {customDomain ? (
           <Box>
