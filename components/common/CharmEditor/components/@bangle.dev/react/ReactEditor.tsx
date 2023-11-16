@@ -27,6 +27,7 @@ import { isTouchScreen } from 'lib/utilities/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 
@@ -67,6 +68,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   inline?: boolean;
   pageType?: PageType | 'post';
   postId?: string;
+  threadIds?: string[];
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -94,7 +96,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     onConnectionEvent,
     allowClickingFooter,
     pageType,
-    postId
+    postId,
+    threadIds
   },
   ref
 ) {
@@ -105,11 +108,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   const enableFidusEditor = Boolean(user && pageId && trackChanges && !isContentControlled);
   const isLoadingRef = useRef(enableFidusEditor);
   const useSockets = user && pageId && trackChanges && (!readOnly || enableComments) && !isContentControlled;
-
   const { data: authResponse, error: authError } = useSWRImmutable(useSockets ? user?.id : null, () =>
     charmClient.socket()
   ); // refresh when user
-
   pmViewOpts ||= {};
   pmViewOpts.editable = () => !readOnly && !isLoadingRef.current;
 
@@ -137,6 +138,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     },
     [editor]
   );
+
+  // Make sure views are updated after we get the doc_data
+  useEffect(() => {
+    if (editor && threadIds && !isLoadingRef.current) {
+      editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
+    }
+  }, [(threadIds ?? []).join(','), isLoadingRef.current]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {

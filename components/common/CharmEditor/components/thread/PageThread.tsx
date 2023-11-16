@@ -30,6 +30,7 @@ import { Button } from 'components/common/Button';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useDateFormatter } from 'hooks/useDateFormatter';
+import { useInlineComment } from 'hooks/useInlineComment';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
@@ -39,9 +40,8 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
 
-import InlineCharmEditor from '../InlineCharmEditor';
-
-import { scrollToThread } from './inlineComment/inlineComment.utils';
+import InlineCharmEditor from '../../InlineCharmEditor';
+import { scrollToThread } from '../inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`
   width: 3px;
@@ -290,6 +290,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | Comment>(null);
     const { members } = useMembers();
+    const { updateThreadPluginState } = useInlineComment();
 
     const view = useEditorViewContext();
     const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
@@ -320,6 +321,10 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
           setIsMutating(true);
           await deleteThread(threadId);
           removeInlineCommentMark(view, thread.id, true);
+          updateThreadPluginState({
+            remove: true,
+            threadId
+          });
           setIsMutating(false);
         } else {
           setIsMutating(true);
@@ -338,6 +343,17 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
       await resolveThread(threadId);
       removeInlineCommentMark(view, threadId);
       setIsMutating(false);
+      if (thread?.resolved) {
+        updateThreadPluginState({
+          remove: false,
+          threadId
+        });
+      } else if (!thread?.resolved) {
+        updateThreadPluginState({
+          remove: true,
+          threadId
+        });
+      }
     }
 
     if (!thread) {

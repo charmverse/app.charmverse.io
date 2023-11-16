@@ -3,7 +3,7 @@ import type { Space, Thread, User } from '@charmverse/core/prisma';
 import { testUtilsPages } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { ThreadCreate, ThreadWithCommentsAndAuthors } from 'lib/threads';
+import type { ThreadCreatePayload, ThreadWithCommentsAndAuthors } from 'lib/threads';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -46,7 +46,7 @@ describe('POST /api/threads - create a thread', () => {
       ]
     });
 
-    const creationContent: Omit<ThreadCreate, 'userId'> = {
+    const creationContent: Omit<ThreadCreatePayload, 'userId'> = {
       comment: 'My comment',
       context: 'context',
       pageId: page.id
@@ -74,7 +74,7 @@ describe('POST /api/threads - create a thread', () => {
       spaceId: nonAdminUserSpace.id
     });
 
-    const creationContent: Omit<ThreadCreate, 'userId'> = {
+    const creationContent: Omit<ThreadCreatePayload, 'userId'> = {
       comment: 'My comment',
       context: 'context',
       pageId: page.id

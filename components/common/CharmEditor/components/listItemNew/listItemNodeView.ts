@@ -1,9 +1,8 @@
 import { createElement } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
-import type { NodeView, Decoration, EditorView } from 'prosemirror-view';
+import type { EditorView, NodeView } from 'prosemirror-view';
 
-import { MARK_TEXT_COLOR, MARK_FONT_SIZE } from './markNames';
 import { LIST_ITEM } from './nodeNames';
 
 // This implements the `NodeView` interface

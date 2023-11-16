@@ -9,10 +9,10 @@ import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import PageThread from 'components/common/CharmEditor/components/PageThread';
+import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { usePageSidebar } from 'hooks/usePageSidebar';
-import { useThreads } from 'hooks/useThreads';
+import type { CommentThreadsMap } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
@@ -48,9 +48,16 @@ const EmptyThreadContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; permissions?: PagePermissionFlags }) {
+function CommentsSidebarComponent({
+  inline,
+  permissions,
+  threads
+}: {
+  threads: CommentThreadsMap;
+  inline?: boolean;
+  permissions?: PagePermissionFlags;
+}) {
   const router = useRouter();
-  const { threads } = useThreads();
   const { user } = useUser();
 
   const allThreads = useMemo(() => Object.values(threads).filter(isTruthy), [threads]);
@@ -79,6 +86,7 @@ function CommentsSidebarComponent({ inline, permissions }: { inline?: boolean; p
   }
 
   const view = useEditorViewContext();
+
   // view.state.doc stays the same (empty content) even when the document content changes
   const extractedThreadIds = isEmptyDocument(view.state.doc)
     ? new Set(Object.keys(threads))

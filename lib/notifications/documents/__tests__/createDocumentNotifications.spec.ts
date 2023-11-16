@@ -15,7 +15,7 @@ import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { createReward } from 'lib/rewards/createReward';
 import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
-import { randomETHWallet, randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import {
   getApplicationCommentEntity,
   getCommentEntity,
@@ -26,7 +26,6 @@ import {
   getUserEntity
 } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 import { builders as _ } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
