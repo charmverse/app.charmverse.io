@@ -100,7 +100,7 @@ function replaceLinkWithPageMention(key: PluginKey) {
             url = linkMark.attrs.href;
           }
         });
-        if (url) {
+        if (url && url.includes(window.location.origin)) {
           const pageMap = key.getState(view.state).pages;
           if (pageMap) {
             const pagePathMaybe = url.split('/').pop() || '';
