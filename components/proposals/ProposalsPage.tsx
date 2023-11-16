@@ -28,12 +28,9 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
-import { ProposalsViewOptions } from './components/ProposalViewOptions/ProposalsViewOptions';
-import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage({ title }: { title: string }) {
-  // const { categories = [] } = useProposalCategories();
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { proposals } = useProposals();
