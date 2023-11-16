@@ -70,7 +70,8 @@ export function ProposalProperties({
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
   const canAnswerRubric = proposalPermissions?.evaluate;
-  const canViewRubricAnswers = isAdmin || !!(user?.id && reviewerUserIds?.includes(user.id));
+  const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
+  const canViewRubricAnswers = isAdmin || isReviewer;
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
   const isTemplate = proposalPage.type === 'proposal_template';
   const sourceTemplate = isFromTemplateSource
@@ -160,6 +161,8 @@ export function ProposalProperties({
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
   const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
   const readOnlyReviewers = readOnlyProperties || (!isAdmin && sourceTemplate && sourceTemplate.reviewers.length > 0);
+  // rubric criteria can always be updated by reviewers and admins
+  const readOnlyRubricCriteria = (readOnlyProperties || isFromTemplateSource) && !(isAdmin || isReviewer);
 
   return (
     <>
@@ -174,7 +177,7 @@ export function ProposalProperties({
         readOnlyAuthors={readOnlyProperties}
         readOnlyCategory={readOnlyCategory}
         isAdmin={isAdmin}
-        readOnlyRubricCriteria={readOnlyProperties || isFromTemplateSource}
+        readOnlyRubricCriteria={readOnlyRubricCriteria}
         readOnlyProposalEvaluationType={
           readOnlyProperties ||
           // dont let users change type after status moves to Feedback, and forward

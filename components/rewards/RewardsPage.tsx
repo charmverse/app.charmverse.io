@@ -21,34 +21,22 @@ import {
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import type { Card, CardPage } from 'lib/focalboard/card';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { RewardsViewOptions } from './components/RewardViewOptions';
-import { useApplicationDialog } from './hooks/useApplicationDialog';
 import { useRewards } from './hooks/useRewards';
 
 export function RewardsPage({ title }: { title: string }) {
-  const router = useRouter();
-  const { currentApplicationId, showApplication, isOpen } = useApplicationDialog();
-
-  const mounted = useRef(false);
-
-  useEffect(() => {
-    // Only auto-open application on initial render of the page
-    if (router.query.applicationId && !currentApplicationId && mounted.current === false) {
-      showApplication(router.query.applicationId as string);
-    } else if (!currentApplicationId) {
-      setUrlWithoutRerender(router.pathname, { applicationId: null });
-    }
-    mounted.current = true;
-  }, [currentApplicationId]);
+  useRewardsNavigation();
 
   const { space: currentSpace } = useCurrentSpace();
+  const { updateURLQuery } = useCharmRouter();
 
   const { isFreeSpace } = useIsFreeSpace();
   const { statusFilter, setStatusFilter, rewards } = useRewards();
@@ -58,7 +46,7 @@ export function RewardsPage({ title }: { title: string }) {
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
 
   const isAdmin = useIsAdmin();
-  const { showPage: showReward, hidePage: hideReward } = usePageDialog();
+
   const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
 
   const [showSidebar, setShowSidebar] = useState(false);
@@ -76,46 +64,22 @@ export function RewardsPage({ title }: { title: string }) {
 
   useRewardsBoardMutator();
 
-  function onClose() {
-    setUrlWithoutRerender(router.pathname, { id: null });
-    hideReward();
-  }
-
   function openPage(pageId: string | null) {
     if (!pageId) return;
-
-    setUrlWithoutRerender(router.pathname, { id: pageId });
-    showReward({
-      pageId,
-      onClose
-    });
+    updateURLQuery({ id: pageId });
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
     await charmClient.deletePage(rewardId);
   }, []);
 
-  useEffect(() => {
-    const rewardIdFromUrl = router.query.bountyId ?? router.query.id;
-    if (rewardIdFromUrl && stringUtils.isUUID(rewardIdFromUrl as string)) {
-      showReward({
-        pageId: rewardIdFromUrl as string,
-        onClose
-      });
+  const showRewardOrApplication = useCallback((id: string | null, rewardId?: string) => {
+    if (id && (!rewardId || id === rewardId)) {
+      openPage(id);
+    } else if (id) {
+      updateURLQuery({ applicationId: id });
     }
-  }, [router.query.id, router.query.bountyId]);
-
-  const showRewardOrApplication = useCallback(
-    (id: string | null, rewardId?: string) => {
-      if (id && (!rewardId || id === rewardId)) {
-        openPage(id);
-      } else if (id) {
-        setUrlWithoutRerender(router.pathname, { applicationId: id });
-        showApplication(id);
-      }
-    },
-    [showReward]
-  );
+  }, []);
 
   if (isLoadingAccess) {
     return null;
@@ -144,7 +108,7 @@ export function RewardsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewRewardButton showPage={(pageId) => showReward({ pageId, onClose })} />
+                <NewRewardButton showPage={openPage} />
               </Box>
             </Box>
           </Box>

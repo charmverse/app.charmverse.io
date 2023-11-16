@@ -6,8 +6,8 @@ import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById, RPCList } from 'connectors/chains';
 import type { Signer } from 'ethers';
 import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
 import uniqBy from 'lodash/uniqBy';
+import { getAddress } from 'viem';
 
 import { getSafesByOwner, getSafeData } from './mantleClient';
 

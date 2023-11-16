@@ -129,8 +129,9 @@ export function getNewUrl(
 /**
  * update URL without Next.js re-rendering the page
  * source: https://github.com/vercel/next.js/discussions/18072
- *
  * To remove a param from the query, set it as null
+ *
+ * @deprecated - use useCharmRouter instead to update query params
  */
 export function setUrlWithoutRerender(
   pathname: string,
