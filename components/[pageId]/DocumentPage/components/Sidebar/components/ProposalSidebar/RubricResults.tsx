@@ -8,29 +8,19 @@ import {
   ListItemIcon,
   Menu,
   MenuItem,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
   Typography,
   AccordionDetails,
   AccordionSummary as MuiAccordionSummary,
   Accordion as MuiAccordion
 } from '@mui/material';
 import { mean, sum } from 'lodash';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
-import { MiniOpenButton } from 'components/common/MiniOpenButton';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { isNumber } from 'lib/utilities/numbers';
-
-import { RubricResultDetailsModal } from './RubricResultDetailsModal';
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
@@ -83,7 +73,7 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
     const criteriaMax = parameters.max;
     const totalDenominator = criteriaMax * criteriaAnswers.length;
     const allScores = criteriaAnswers.map((answer) => answer.response.score).filter(isNumber);
-    const averageResult = mean(allScores);
+    const averageResult = roundNumber(mean(allScores));
     const totalResult = sum(allScores);
     return {
       id: criteria.id,
@@ -109,7 +99,7 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
   });
 
   const allCriteriaScores = populatedCriteria.map((criteria) => criteria.totalResult);
-  const allCriteriaAverage = mean(allCriteriaScores);
+  const allCriteriaAverage = roundNumber(mean(allCriteriaScores));
   const allCriteriaTotal = sum(allCriteriaScores);
   const allCriteriaTotalDenominator = sum(populatedCriteria.map((criteria) => criteria.totalDenominator));
 
