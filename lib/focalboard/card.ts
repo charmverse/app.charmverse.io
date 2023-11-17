@@ -3,7 +3,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 
-export type CardPropertyValue = string | string[] | number;
+export type CardPropertyValue = string | string[] | number | Record<string, any>[];
 
 export type CardFields<V = CardPropertyValue> = {
   icon?: string;
