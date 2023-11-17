@@ -11,9 +11,9 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import { isTruthy } from 'lib/utilities/types';
 
-import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
