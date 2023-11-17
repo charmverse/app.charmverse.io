@@ -221,28 +221,32 @@ export function RubricEvaluationForm({
             index={index}
             control={control}
             register={register}
+            disabled={disabled}
           />
         ))}
         <Box display='flex' gap={2}>
           <Stack direction='row' gap={2}>
             <Button
               sx={{ alignSelf: 'start' }}
-              disabled={!isDirty && !showDraftAnswers}
+              disabled={disabled || (!isDirty && !showDraftAnswers)}
+              disabledTooltip={disabled ? 'You must be a reviewer to submit an evaluation' : undefined}
               loading={isSaving}
               onClick={handleSubmit(submitAnswers)}
             >
               Submit
             </Button>
-            <Button
-              sx={{ alignSelf: 'start' }}
-              color='secondary'
-              variant='outlined'
-              disabled={!isDirty}
-              loading={draftIsSaving}
-              onClick={handleSubmit(submitDraftAnswers)}
-            >
-              {showDraftAnswers ? 'Update' : 'Save'} draft
-            </Button>
+            {!disabled && (
+              <Button
+                sx={{ alignSelf: 'start' }}
+                color='secondary'
+                variant='outlined'
+                disabled={!isDirty}
+                loading={draftIsSaving}
+                onClick={handleSubmit(submitDraftAnswers)}
+              >
+                {showDraftAnswers ? 'Update' : 'Save'} draft
+              </Button>
+            )}
             {showDraftAnswers && (
               <Button sx={{ alignSelf: 'start' }} color='secondary' variant='text' onClick={deleteDraftAnswers}>
                 Delete draft
@@ -262,12 +266,14 @@ export function RubricEvaluationForm({
 
 function CriteriaInput({
   criteria,
+  disabled,
   field,
   index,
   control,
   register
 }: {
   criteria: ProposalRubricCriteria;
+  disabled?: boolean;
   field: FieldArrayWithId<FormInput, 'answers', 'id'>;
   index: number;
   control: any;
@@ -306,6 +312,7 @@ function CriteriaInput({
             render={({ field: _field }) =>
               useRatingsInput ? (
                 <StyledRating
+                  disabled={disabled}
                   value={
                     typeof _field.value === 'number' ? convertActualToMUIRating(_field.value, parameters.min) : null
                   }
@@ -327,6 +334,7 @@ function CriteriaInput({
                     onChange={(score) => {
                       _field.onChange(score);
                     }}
+                    disabled={disabled}
                     inputProps={{
                       min: parameters.min,
                       max: parameters.max
@@ -343,7 +351,12 @@ function CriteriaInput({
             defaultValue={(field.response as any)?.score}
           />
         </Box>
-        <TextField multiline placeholder='Add comments' {...register(`answers.${index}.comment`)}></TextField>
+        <TextField
+          disabled={disabled}
+          multiline
+          placeholder='Add comments'
+          {...register(`answers.${index}.comment`)}
+        ></TextField>
       </FormGroup>
     </CriteriaRow>
   );

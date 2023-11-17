@@ -248,7 +248,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     saveSidebarView({
       [page.id]: sidebarView
     });
-  }, [page.id, sidebarView]);
+  }, [sidebarView]);
 
   useEffect(() => {
     const defaultView = defaultSidebarView?.[page.id];
