@@ -14,9 +14,10 @@ type Props = {
     id: string;
     type: string;
   };
+  isInsideDialog?: boolean;
 };
 
-export function DocumentHeaderElements({ headerHeight, page }: Props) {
+export function DocumentHeaderElements({ headerHeight, isInsideDialog, page }: Props) {
   const { deletedAt, id, type } = page;
   const isBasePageDocument = documentTypes.includes(type as PageType);
   return (
@@ -24,7 +25,7 @@ export function DocumentHeaderElements({ headerHeight, page }: Props) {
       {isBasePageDocument && <DocumentParticipants />}
       {isBasePageDocument && <EditingModeToggle />}
       {!deletedAt && <ShareButton headerHeight={headerHeight} pageId={id} />}
-      {type === 'proposal' && <ToggleEvaluationButton />}
+      {type === 'proposal' && <ToggleEvaluationButton isInsideDialog pageId={id} />}
     </>
   );
 }

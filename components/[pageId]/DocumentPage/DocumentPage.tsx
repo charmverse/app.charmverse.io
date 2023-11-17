@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { EditorState } from 'prosemirror-state';
-import { memo, useEffect, useRef, useState, useMemo } from 'react';
+import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
@@ -26,9 +26,8 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
-import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useLgScreen } from 'hooks/useMediaScreens';
-import type { PageSidebarView } from 'hooks/usePageSidebar';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
@@ -46,6 +45,7 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
+import { useLastSidebarView } from './hooks/useLastSidebarView';
 
 // const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
@@ -93,6 +93,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
   const isLargeScreen = useLgScreen();
+  const { navigateToSpacePath } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
@@ -200,10 +201,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     }
   }, [page.id, threadsPageId]);
 
-  const [defaultSidebarView, saveSidebarView] = useLocalStorage<Record<string, PageSidebarView | null>>(
-    'active-sidebar-view',
-    {}
-  );
+  const [defaultSidebarView, saveSidebarView] = useLastSidebarView();
 
   const threadIds = useMemo(
     () =>
@@ -248,7 +246,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     saveSidebarView({
       [page.id]: sidebarView
     });
-  }, [sidebarView]);
+  }, [saveSidebarView, sidebarView]);
 
   useEffect(() => {
     const defaultView = defaultSidebarView?.[page.id];
@@ -256,6 +254,18 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
       setActiveView(defaultView);
     }
   }, [!!defaultSidebarView, page.id]);
+
+  const openEvaluation = useCallback(() => {
+    if (enableSidebar) {
+      setActiveView('proposal_evaluation');
+    } else {
+      saveSidebarView({
+        [page.id]: 'proposal_evaluation'
+      });
+      // go to full page view
+      navigateToSpacePath(`/${page.path}`);
+    }
+  }, [enableSidebar, setActiveView]);
 
   return (
     <>
@@ -393,7 +403,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
                       proposalPage={page}
-                      openEvaluation={() => setActiveView('proposal_evaluation')}
+                      openEvaluation={openEvaluation}
                     />
                   )}
                   {reward && (

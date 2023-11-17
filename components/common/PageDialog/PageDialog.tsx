@@ -164,7 +164,7 @@ function PageDialogBase(props: Props) {
             </Button>
             {page && (
               <Box display='flex' alignItems='center' gap={0.5}>
-                <DocumentHeaderElements headerHeight={0} page={page} />
+                <DocumentHeaderElements isInsideDialog headerHeight={0} page={page} />
               </Box>
             )}
           </Box>
