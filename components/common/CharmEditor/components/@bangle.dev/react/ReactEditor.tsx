@@ -298,13 +298,16 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         }
         return acc;
       }, {});
-      editor.view.dispatch(
-        editor.view.state.tr.setMeta(linksPluginKey, {
-          pages: pageMap
-        })
-      );
+
+      if (!editor.view.isDestroyed) {
+        editor.view.dispatch(
+          editor.view.state.tr.setMeta(linksPluginKey, {
+            pages: pageMap
+          })
+        );
+      }
     }
-  }, [isLoadingRef.current, loadingPages]);
+  }, [!!editor?.view, isLoadingRef.current, loadingPages]);
 
   if (nodeViews.length > 0 && renderNodeViews == null) {
     throw new Error('When using nodeViews, you must provide renderNodeViews callback');
