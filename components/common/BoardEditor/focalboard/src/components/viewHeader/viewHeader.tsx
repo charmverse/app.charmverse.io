@@ -8,6 +8,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
+import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
@@ -75,8 +76,6 @@ function ViewHeader(props: Props) {
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
-  const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
-
   async function addPageFromTemplate(pageId: string) {
     const [blocks] = await mutator.duplicateCard({
       board: activeBoard as Board,
@@ -128,10 +127,7 @@ function ViewHeader(props: Props) {
 
       <div className='octo-spacer' />
 
-      <Box
-        sx={{ opacity: viewSortPopup.isOpen || viewFilterPopup.isOpen ? '1 !important' : undefined }}
-        className='view-actions'
-      >
+      <Box className='view-actions'>
         {!props.readOnly && activeView && (
           <>
             {/* Display by */}
@@ -145,30 +141,9 @@ function ViewHeader(props: Props) {
             )}
 
             {/* Filter */}
-            <Button
-              color={hasFilter ? 'primary' : 'secondary'}
-              variant='text'
-              size='small'
-              sx={{ minWidth: 0 }}
-              {...bindTrigger(viewFilterPopup)}
-            >
-              <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
-            </Button>
-            <Popover
-              {...bindPopover(viewFilterPopup)}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left'
-              }}
-              sx={{
-                overflow: 'auto'
-              }}
-            >
-              <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
-            </Popover>
+            <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
             {/* Sort */}
-
             {withSortBy && (
               <ViewSortControl
                 activeBoard={activeBoard}

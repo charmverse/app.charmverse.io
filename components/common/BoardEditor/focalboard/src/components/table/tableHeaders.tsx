@@ -12,9 +12,9 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 
 import { filterPropertyTemplates } from '../../../../utils/updateVisibilePropertyIds';
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';

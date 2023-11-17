@@ -29,6 +29,7 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
   CATEGORY_BLOCK_ID,
@@ -39,7 +40,6 @@ import {
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 
-import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';

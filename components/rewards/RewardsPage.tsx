@@ -3,6 +3,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
@@ -27,7 +28,6 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePages } from 'hooks/usePages';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
-import { RewardsViewOptions } from './components/RewardViewOptions';
 import { useRewards } from './hooks/useRewards';
 
 export function RewardsPage({ title }: { title: string }) {
@@ -38,7 +38,7 @@ export function RewardsPage({ title }: { title: string }) {
   const { pages } = usePages();
 
   const { isFreeSpace } = useIsFreeSpace();
-  const { statusFilter, setStatusFilter, rewards } = useRewards();
+  const { rewards } = useRewards();
 
   const loadingData = !rewards;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
@@ -50,6 +50,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
+  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -131,12 +132,7 @@ export function RewardsPage({ title }: { title: string }) {
         {!!rewards?.length && (
           <>
             <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-              <RewardsViewOptions
-                rewardStatusFilter={statusFilter}
-                setRewardStatusFilter={setStatusFilter}
-                // Playwright-specific
-                testKey='desktop'
-              />
+              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
               <ViewSortControl
                 activeBoard={activeBoard}

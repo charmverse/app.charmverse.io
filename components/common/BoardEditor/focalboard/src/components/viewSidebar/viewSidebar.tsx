@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import { ClickAwayListener, Collapse } from '@mui/material';
 import { memo, useEffect, useState } from 'react';
 
+import { ProposalCategoriesList } from 'components/proposals/components/ProposalCategoriesList';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
@@ -29,6 +30,8 @@ interface Props {
   hideSourceOptions?: boolean;
   hideGroupOptions?: boolean;
   hideLayoutSelectOptions?: boolean;
+  hidePropertiesRow?: boolean;
+  withProposalCategories?: boolean;
 }
 
 function getDefaultView(hasBoardView: boolean): SidebarView {
@@ -55,7 +58,7 @@ function ViewSidebar(props: Props) {
         orientation='horizontal'
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}
       >
-        <StyledSidebar>
+        <StyledSidebar data-test='view-sidebar-content'>
           {sidebarView === 'view-options' && <ViewSidebarSelect {...props} setSidebarView={setSidebarView} />}
 
           {props.view && (
@@ -84,6 +87,16 @@ function ViewSidebar(props: Props) {
                     view={props.view}
                     groupByProperty={props.groupByProperty}
                   />
+                </>
+              )}
+              {sidebarView === 'proposalCategories' && (
+                <>
+                  <DatabaseSidebarHeader
+                    goBack={goToSidebarHome}
+                    title='Proposal categories'
+                    onClose={props.closeSidebar}
+                  />
+                  <ProposalCategoriesList />
                 </>
               )}
             </>
