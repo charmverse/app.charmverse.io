@@ -27,13 +27,13 @@ const HeaderBox = styled.div`
 export function Header() {
   const theme = useTheme();
   const logo = theme.palette.mode === 'dark' ? whiteLogoImage : darkLogoImage;
-  const { customDomain, spaceFromPath, isCustomDomain } = useBaseCurrentDomain();
+  const { customDomain, spaceFromPath } = useBaseCurrentDomain();
 
   return (
     <HeaderBox>
-      {isCustomDomain ? (
+      {spaceFromPath ? (
         <Box display='flex' alignItems='center'>
-          <WorkspaceAvatar name={spaceFromPath?.name || ''} image={spaceFromPath?.spaceImage || null} />
+          <WorkspaceAvatar name={spaceFromPath.name || ''} image={spaceFromPath.spaceImage || null} />
           <Typography variant='body1' noWrap ml={1}>
             {spaceFromPath?.name}
           </Typography>
