@@ -12,7 +12,7 @@ import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -20,6 +20,7 @@ import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/st
 import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import LoadingComponent from 'components/common/LoadingComponent';
 import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
 import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
@@ -49,6 +50,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const pageId = page.id;
   const router = useRouter();
   const { pages, deletePage, mutatePagesRemove } = usePages();
+  const [exportingDatabase, setExportingDatabase] = useState(false);
   const view = useAppSelector(getView(router.query.viewId as string));
   const boards = useAppSelector(getSortedBoards);
   const boardViews = useAppSelector(getCurrentBoardViews);
@@ -98,6 +100,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   }
 
   async function exportZippedDatabase() {
+    setExportingDatabase(true);
     try {
       const exportName = `${boardPage?.title ?? 'Untitled'} database export.zip`;
 
@@ -125,6 +128,8 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     } catch (error) {
       log.error(error);
       showMessage('Error exporting database', 'error');
+    } finally {
+      setExportingDatabase(false);
     }
   }
 
@@ -240,14 +245,16 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
           </ListItemButton>
         </div>
       </Tooltip>
-      <ListItemButton onClick={() => exportZippedDatabase()}>
+      <ListItemButton disabled={exportingDatabase} onClick={() => exportZippedDatabase()}>
         <UploadFileIcon
           fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='Export Pages & Data' />
+
+        <ListItemText primary={exportingDatabase ? 'Exporting data' : 'Export Pages & Data'} />
+        {exportingDatabase && <LoadingComponent size={14} />}
       </ListItemButton>
       <ListItemButton
         component='label'
