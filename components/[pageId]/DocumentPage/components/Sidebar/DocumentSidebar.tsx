@@ -42,12 +42,13 @@ export const SIDEBAR_VIEWS = {
   }
 } as const;
 
-function SidebarDrawerComponent({
+function DocumentSidebarComponent({
   children,
   id,
   sidebarView,
   openSidebar,
   closeSidebar,
+  showEvaluation,
   title
 }: {
   children: ReactNode;
@@ -55,6 +56,7 @@ function SidebarDrawerComponent({
   sidebarView: PageSidebarView | null;
   openSidebar: (view: PageSidebarView) => void;
   closeSidebar: () => void;
+  showEvaluation: boolean;
   title: string;
 }) {
   const isMdScreen = useMdScreen();
@@ -97,7 +99,9 @@ function SidebarDrawerComponent({
               {title}
             </Typography>
             <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-              <SidebarViewIcon view='proposal_evaluation' activeView={sidebarView} onClick={openSidebar} />
+              {showEvaluation && (
+                <SidebarViewIcon view='proposal_evaluation' activeView={sidebarView} onClick={openSidebar} />
+              )}
               <SidebarViewIcon view='comments' activeView={sidebarView} onClick={openSidebar} />
               <SidebarViewIcon view='suggestions' activeView={sidebarView} onClick={openSidebar} />
             </Box>
@@ -113,7 +117,9 @@ function SidebarDrawerComponent({
       onClose={closeSidebar}
       rightActions={
         <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-          <SidebarViewIcon view='proposal_evaluation' size='medium' activeView={sidebarView} onClick={openSidebar} />
+          {showEvaluation && (
+            <SidebarViewIcon view='proposal_evaluation' size='medium' activeView={sidebarView} onClick={openSidebar} />
+          )}
           <SidebarViewIcon view='comments' size='medium' activeView={sidebarView} onClick={openSidebar} />
           <SidebarViewIcon view='suggestions' size='medium' activeView={sidebarView} onClick={openSidebar} />
         </Box>
@@ -148,4 +154,4 @@ function SidebarViewIcon({
   );
 }
 
-export const SidebarDrawer = memo(SidebarDrawerComponent);
+export const DocumentSidebar = memo(DocumentSidebarComponent);

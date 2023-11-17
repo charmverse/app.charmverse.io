@@ -2,7 +2,6 @@ import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
-import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -11,8 +10,7 @@ import { Popover } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
-import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
 
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
@@ -125,7 +123,7 @@ interface SidebarProps {
   navAction?: () => void;
 }
 
-export function Sidebar({ closeSidebar, navAction }: SidebarProps) {
+export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   const { navigateToSpacePath, router } = useCharmRouter();
   const { user, logoutUser } = useUser();
   const { space } = useCurrentSpace();

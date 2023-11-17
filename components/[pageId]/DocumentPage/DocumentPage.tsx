@@ -10,7 +10,7 @@ import { memo, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { SIDEBAR_VIEWS, SidebarDrawer } from 'components/[pageId]/DocumentPage/components/Sidebar/SidebarDrawer';
+import { SIDEBAR_VIEWS, DocumentSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/DocumentSidebar';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -392,12 +392,13 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                   )}
                   {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
                   {(enableComments || enableSuggestingMode) && (
-                    <SidebarDrawer
+                    <DocumentSidebar
                       id='page-action-sidebar'
                       title={sidebarView ? SIDEBAR_VIEWS[sidebarView].title : ''}
                       sidebarView={sidebarView}
                       closeSidebar={closeSidebar}
                       openSidebar={setActiveView}
+                      showEvaluation={!!proposalId}
                     >
                       {sidebarView === 'proposal_evaluation' && (
                         <ProposalEvaluationSidebar
@@ -421,7 +422,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                           canCreateComments={pagePermissions.comment}
                         />
                       )}
-                    </SidebarDrawer>
+                    </DocumentSidebar>
                   )}
                 </CardPropertiesWrapper>
               </CharmEditor>
