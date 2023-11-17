@@ -10,7 +10,7 @@ import { memo, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { SIDEBAR_VIEWS, DocumentSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/DocumentSidebar';
+import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -26,7 +26,9 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useLgScreen } from 'hooks/useMediaScreens';
+import type { PageSidebarView } from 'hooks/usePageSidebar';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
@@ -44,9 +46,6 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
-import { CommentsSidebar } from './components/Sidebar/CommentsSidebar';
-import { ProposalEvaluationSidebar } from './components/Sidebar/ProposalEvaulationSidebar/ProposalEvaluationSidebar';
-import { SuggestionsSidebar } from './components/Sidebar/SuggestionsSidebar';
 
 // const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
@@ -100,13 +99,13 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
-  const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
+  const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
+  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
   // keep a ref in sync for printing
@@ -201,6 +200,11 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     }
   }, [page.id, threadsPageId]);
 
+  const [defaultSidebarView, saveSidebarView] = useLocalStorage<Record<string, PageSidebarView | null>>(
+    'active-sidebar-view',
+    {}
+  );
+
   const threadIds = useMemo(
     () =>
       typeof page.type === 'string'
@@ -239,6 +243,19 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
       }
     }
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
+
+  useEffect(() => {
+    saveSidebarView({
+      [page.id]: sidebarView
+    });
+  }, [page.id, sidebarView]);
+
+  useEffect(() => {
+    const defaultView = defaultSidebarView?.[page.id];
+    if (defaultView) {
+      setActiveView(defaultView);
+    }
+  }, [!!defaultSidebarView, page.id]);
 
   return (
     <>
@@ -307,7 +324,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onConnectionEvent={onConnectionEvent}
-                setSuggestionState={setSuggestionState}
+                setEditorState={setEditorState}
                 snapshotProposalId={page.snapshotProposalId}
                 onParticipantUpdate={onParticipantUpdate}
                 style={{
@@ -368,6 +385,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                   )}
                   {proposalId && (
                     <ProposalProperties
+                      enableSidebar={enableSidebar}
                       pageId={page.id}
                       proposalId={proposalId}
                       pagePermissions={pagePermissions}
@@ -392,37 +410,18 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                   )}
                   {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
                   {(enableComments || enableSuggestingMode) && (
-                    <DocumentSidebar
+                    <PageSidebar
                       id='page-action-sidebar'
-                      title={sidebarView ? SIDEBAR_VIEWS[sidebarView].title : ''}
+                      pageId={page.id}
+                      spaceId={page.spaceId}
+                      proposalId={proposalId}
+                      pagePermissions={pagePermissions}
+                      editorState={editorState}
                       sidebarView={sidebarView}
                       closeSidebar={closeSidebar}
                       openSidebar={setActiveView}
-                      showEvaluation={!!proposalId}
-                    >
-                      {sidebarView === 'proposal_evaluation' && (
-                        <ProposalEvaluationSidebar
-                          pageId={page.id}
-                          proposalId={proposalId}
-                          onSaveRubricCriteriaAnswers={closeSidebar}
-                        />
-                      )}
-                      {sidebarView === 'suggestions' && (
-                        <SuggestionsSidebar
-                          pageId={page.id}
-                          spaceId={page.spaceId}
-                          readOnly={!pagePermissions?.edit_content}
-                          state={suggestionState}
-                        />
-                      )}
-                      {sidebarView === 'comments' && (
-                        <CommentsSidebar
-                          openSidebar={setActiveView}
-                          threads={threads}
-                          canCreateComments={pagePermissions.comment}
-                        />
-                      )}
-                    </DocumentSidebar>
+                      threads={threads}
+                    />
                   )}
                 </CardPropertiesWrapper>
               </CharmEditor>

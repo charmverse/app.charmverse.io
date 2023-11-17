@@ -194,7 +194,7 @@ type CharmEditorProps = {
   disableMention?: boolean;
   allowClickingFooter?: boolean;
   disableVideo?: boolean;
-  setSuggestionState?: (state: EditorState) => void;
+  setEditorState?: (state: EditorState) => void; // this is used to pass the state to the suggestions sidebar
   threadIds?: string[];
 };
 
@@ -214,7 +214,7 @@ function CharmEditor({
   postId,
   containerWidth,
   pageType,
-  setSuggestionState,
+  setEditorState,
   snapshotProposalId,
   pagePermissions,
   placeholderText,
@@ -293,7 +293,7 @@ function CharmEditor({
 
   function onSelectionSet(state: EditorState) {
     // update state that triggers updates in the sidebar
-    setSuggestionState?.(state);
+    setEditorState?.(state);
     // expand the sidebar if the user is selecting a suggestion
     setSidebarView?.((currentView) => {
       if (currentView) {

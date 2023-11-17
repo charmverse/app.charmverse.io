@@ -83,7 +83,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
-          {isProposalsPage && <RewardsShareButton headerHeight={headerHeight} />}
           {isRewardsList && <RewardsShareButton headerHeight={headerHeight} />}
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
 

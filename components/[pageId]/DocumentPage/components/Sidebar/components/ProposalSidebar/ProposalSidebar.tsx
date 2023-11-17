@@ -1,5 +1,6 @@
-import { Alert, Box, Card } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { Alert, SvgIcon } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { RiChatCheckLine } from 'react-icons/ri';
 
 import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -8,24 +9,24 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
+
+import { NoCommentsMessage } from '../CommentsSidebar';
 
 import { RubricEvaluationForm } from './RubricEvaluationForm';
 import { RubricResults } from './RubricResults';
 
 type Props = {
-  onSaveRubricCriteriaAnswers?: () => void;
   pageId?: string;
   proposalId: string | null;
+  proposal?: ProposalWithUsersAndRubric;
 };
 
-export function ProposalEvaluationSidebar({ onSaveRubricCriteriaAnswers, pageId, proposalId }: Props) {
-  // app state
+export function ProposalSidebar({ pageId, proposal, proposalId }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  // db state
-  const { data: proposal } = useGetProposalDetails(proposalId);
   const { permissions: proposalPermissions } = useProposalPermissions({
     proposalIdOrPath: proposalId
   });
@@ -48,7 +49,6 @@ export function ProposalEvaluationSidebar({ onSaveRubricCriteriaAnswers, pageId,
   const canViewRubricAnswers = isAdmin || isReviewer;
 
   async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
-    await onSaveRubricCriteriaAnswers?.();
     if (!isDraft) {
       // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
       setRubricView(1);
@@ -67,32 +67,32 @@ export function ProposalEvaluationSidebar({ onSaveRubricCriteriaAnswers, pageId,
       return [];
     }
     const tabs = [
-      canAnswerRubric &&
-        ([
-          'Evaluate',
-          <LoadingComponent key='evaluate' isLoading={!rubricCriteria}>
-            <RubricEvaluationForm
-              proposalId={proposalId!}
-              answers={myRubricAnswers}
-              draftAnswers={myDraftRubricAnswers}
-              criteriaList={rubricCriteria!}
-              onSubmit={onSubmitEvaluation}
-            />
-          </LoadingComponent>,
-          { sx: { p: 0 } } // disable default padding of tab panel
-        ] as TabConfig),
       [
-        'Results',
-        <LoadingComponent key='results' isLoading={!rubricCriteria}>
-          <RubricResults
-            answers={proposal?.rubricAnswers ?? []}
-            criteriaList={rubricCriteria || []}
-            reviewerUserIds={reviewerUserIds ?? []}
-            disabled={!canViewRubricAnswers}
+        'Evaluate',
+        <LoadingComponent key='evaluate' isLoading={!rubricCriteria}>
+          <RubricEvaluationForm
+            proposalId={proposalId!}
+            answers={myRubricAnswers}
+            draftAnswers={myDraftRubricAnswers}
+            criteriaList={rubricCriteria!}
+            onSubmit={onSubmitEvaluation}
+            disabled={!canAnswerRubric}
           />
         </LoadingComponent>,
-        { sx: { p: 0 } }
-      ] as TabConfig
+        { sx: { p: 0 } } // disable default padding of tab panel
+      ] as TabConfig,
+      canViewRubricAnswers &&
+        ([
+          'Results',
+          <LoadingComponent key='results' isLoading={!rubricCriteria}>
+            <RubricResults
+              answers={proposal?.rubricAnswers ?? []}
+              criteriaList={rubricCriteria || []}
+              reviewerUserIds={reviewerUserIds ?? []}
+            />
+          </LoadingComponent>,
+          { sx: { p: 0 } }
+        ] as TabConfig)
     ].filter(isTruthy);
     return tabs;
   }, [
@@ -105,14 +105,28 @@ export function ProposalEvaluationSidebar({ onSaveRubricCriteriaAnswers, pageId,
     reviewerUserIds,
     rubricCriteria
   ]);
+
   return (
-    <Box>
+    <>
       {evaluationTabs.length > 0 && (
-        <Card variant='outlined' sx={{ my: 2 }}>
+        <>
           <Alert severity='info'>Your evaluation is only viewable by the Reviewers assigned to this Proposal</Alert>
           <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
-        </Card>
+        </>
       )}
-    </Box>
+      {evaluationTabs.length === 0 && (
+        <NoCommentsMessage
+          icon={
+            <SvgIcon
+              component={RiChatCheckLine}
+              color='secondary'
+              fontSize='large'
+              sx={{ mb: '1px', height: '2em', width: '2em' }}
+            />
+          }
+          message='Evaluation is not enabled for this proposal'
+        />
+      )}
+    </>
   );
 }

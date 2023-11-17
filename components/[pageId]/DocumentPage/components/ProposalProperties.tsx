@@ -1,7 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { debounce } from 'lodash';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import {
@@ -28,6 +28,7 @@ import { CreateLensPublication } from './CreateLensPublication';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
+  enableSidebar?: boolean;
   pageId: string;
   proposalId: string;
   snapshotProposalId: string | null;
@@ -38,6 +39,7 @@ interface ProposalPropertiesProps {
 }
 
 export function ProposalProperties({
+  enableSidebar,
   pagePermissions,
   refreshPagePermissions = () => null,
   pageId,
@@ -157,6 +159,16 @@ export function ProposalProperties({
   const readOnlyReviewers = readOnlyProperties || (!isAdmin && sourceTemplate && sourceTemplate.reviewers.length > 0);
   // rubric criteria can always be updated by reviewers and admins
   const readOnlyRubricCriteria = (readOnlyProperties || isFromTemplateSource) && !(isAdmin || isReviewer);
+
+  const canSeeEvaluation =
+    (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
+
+  // open the rubric sidebar by default
+  useEffect(() => {
+    if (enableSidebar && isReviewer && proposal?.evaluationType === 'rubric') {
+      openEvaluation?.();
+    }
+  }, [canSeeEvaluation]);
 
   return (
     <>

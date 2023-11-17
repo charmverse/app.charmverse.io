@@ -91,20 +91,22 @@ export function SuggestionsSidebar({
           </Button>
         </Box>
       )}
-      <Stack gap={2}>
-        {suggestions.map((mark) => (
-          <div onClick={() => highlightMark(mark)} key={mark.pos}>
-            <SuggestionCard
-              key={mark.pos + mark.type}
-              {...mark}
-              pageId={pageId}
-              spaceId={spaceId}
-              readOnly={readOnly}
-              isOwner={mark.data.user === user?.id}
-            />
-          </div>
-        ))}
-      </Stack>
+      {suggestions.length > 0 && (
+        <Stack gap={2}>
+          {suggestions.map((mark) => (
+            <div onClick={() => highlightMark(mark)} key={mark.pos}>
+              <SuggestionCard
+                key={mark.pos + mark.type}
+                {...mark}
+                pageId={pageId}
+                spaceId={spaceId}
+                readOnly={readOnly}
+                isOwner={mark.data.user === user?.id}
+              />
+            </div>
+          ))}
+        </Stack>
+      )}
       {suggestions.length === 0 && (
         <NoCommentsMessage
           icon={

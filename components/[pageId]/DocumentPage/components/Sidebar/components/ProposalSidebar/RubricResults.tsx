@@ -30,12 +30,11 @@ type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
   reviewerUserIds: string[];
-  disabled: boolean;
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
 
-export function RubricResults({ criteriaList = [], answers = [], reviewerUserIds = [], disabled }: Props) {
+export function RubricResults({ criteriaList = [], answers = [], reviewerUserIds = [] }: Props) {
   const userContainerRef = useRef<HTMLDivElement>(null);
   const [maxColWidth, setMaxColWidth] = useState<number | undefined>(undefined);
 

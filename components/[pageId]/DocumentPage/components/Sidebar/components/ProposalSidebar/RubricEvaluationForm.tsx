@@ -20,6 +20,7 @@ export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
 type Props = {
   proposalId: string;
+  disabled: boolean; // for non-reviewers
   answers?: ProposalRubricCriteriaAnswer[];
   draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
@@ -54,7 +55,14 @@ const StyledRating = styled(Rating)`
   }
 `;
 
-export function RubricEvaluationForm({ proposalId, criteriaList = [], answers, draftAnswers, onSubmit }: Props) {
+export function RubricEvaluationForm({
+  proposalId,
+  criteriaList = [],
+  answers,
+  disabled,
+  draftAnswers,
+  onSubmit
+}: Props) {
   const hasDraft = !!draftAnswers?.length;
 
   const [showDraftAnswers, setShowDraftAnswers] = useState(hasDraft);
@@ -285,15 +293,15 @@ function CriteriaInput({
   return (
     <CriteriaRow key={field.id} mb={2}>
       <FormGroup sx={{ display: 'flex', gap: 1 }}>
+        <div>
+          <Typography>{criteria.title}</Typography>
+          {criteria.description && (
+            <Typography color='secondary' sx={{ whiteSpace: 'pre-line' }} variant='body2'>
+              {criteria.description}
+            </Typography>
+          )}
+        </div>
         <Box display='flex' justifyContent='space-between'>
-          <div>
-            <Typography variant='subtitle1'>{criteria.title}</Typography>
-            {criteria.description && (
-              <Typography sx={{ whiteSpace: 'pre-line' }} variant='body2'>
-                {criteria.description}
-              </Typography>
-            )}
-          </div>
           <Controller
             render={({ field: _field }) =>
               useRatingsInput ? (
@@ -335,7 +343,7 @@ function CriteriaInput({
             defaultValue={(field.response as any)?.score}
           />
         </Box>
-        <TextField multiline placeholder='Leave a comment' {...register(`answers.${index}.comment`)}></TextField>
+        <TextField multiline placeholder='Add comments' {...register(`answers.${index}.comment`)}></TextField>
       </FormGroup>
     </CriteriaRow>
   );

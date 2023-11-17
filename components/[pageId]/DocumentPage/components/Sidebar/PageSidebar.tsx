@@ -1,18 +1,25 @@
+import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
 import { Box, IconButton, Slide, SvgIcon, Tooltip, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
+import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
+import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { PageSidebarView } from 'hooks/usePageSidebar';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 
-import { PageSidebarViewToggle } from './PageSidebarViewToggle';
+import { CommentsSidebar } from './components/CommentsSidebar';
+import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
+import { ProposalSidebar } from './components/ProposalSidebar/ProposalSidebar';
+import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 
-const DesktopSidebarHeader = styled.div`
+const DesktopContainer = styled.div`
   position: fixed;
   right: 0px;
   width: 430px;
@@ -28,49 +35,56 @@ const DesktopSidebarHeader = styled.div`
 export const SIDEBAR_VIEWS = {
   proposal_evaluation: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'View rubric evaluation',
-    title: 'Evaluation'
+    tooltip: 'View proposal evaluation',
+    title: 'Evaluation rubric'
   },
   comments: {
     icon: <MessageOutlined fontSize='small' />,
-    tooltip: 'View comments',
+    tooltip: 'View all omments',
     title: 'Comments'
   },
   suggestions: {
     icon: <RateReviewOutlined fontSize='small' />,
-    tooltip: 'View suggestions',
+    tooltip: 'View all suggestions',
     title: 'Suggestions'
   }
 } as const;
 
-function DocumentSidebarComponent({
-  children,
-  id,
-  sidebarView,
-  openSidebar,
-  closeSidebar,
-  showEvaluation,
-  title
-}: {
-  children: ReactNode;
+type SidebarProps = {
+  // eslint-disable-next-line react/no-unused-prop-types
   id: string;
+  pageId: string;
+  spaceId: string;
+  threads: Record<string, ThreadWithComments | undefined>;
+  editorState: EditorState | null;
+  pagePermissions: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
   openSidebar: (view: PageSidebarView) => void;
+  // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
-  showEvaluation: boolean;
-  title: string;
-}) {
+  proposalId: string | null;
+};
+
+function PageSidebarComponent(props: SidebarProps) {
+  const { id, proposalId, sidebarView, openSidebar, closeSidebar } = props;
   const isMdScreen = useMdScreen();
   const theme = useTheme();
   const isOpen = sidebarView !== null;
+  const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
+  const { data: proposal } = useGetProposalDetails(proposalId);
 
-  function togglePageSidebar() {
+  const showEvaluationSidebar =
+    proposal?.evaluationType === 'rubric' &&
+    (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed');
+
+  function toggleSidebar() {
     if (sidebarView === null) {
       openSidebar('comments');
     } else {
       closeSidebar();
     }
   }
+
   return isMdScreen ? (
     <Slide
       appear={false}
@@ -85,7 +99,7 @@ function DocumentSidebarComponent({
       }}
       timeout={250}
     >
-      <DesktopSidebarHeader id={id}>
+      <DesktopContainer id={id}>
         <Box
           sx={{
             height: 'calc(100%)',
@@ -95,30 +109,30 @@ function DocumentSidebarComponent({
           }}
         >
           <Box display='flex' gap={1} alignItems='center'>
-            <PageSidebarViewToggle onClick={togglePageSidebar} />
+            <PageSidebarViewToggle onClick={toggleSidebar} />
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
-              {title}
+              {sidebarTitle}
             </Typography>
             <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-              {showEvaluation && (
+              {showEvaluationSidebar && (
                 <SidebarViewIcon view='proposal_evaluation' activeView={sidebarView} onClick={openSidebar} />
               )}
               <SidebarViewIcon view='comments' activeView={sidebarView} onClick={openSidebar} />
               <SidebarViewIcon view='suggestions' activeView={sidebarView} onClick={openSidebar} />
             </Box>
           </Box>
-          {children}
+          <SidebarContents {...props} proposal={proposal} />
         </Box>
-      </DesktopSidebarHeader>
+      </DesktopContainer>
     </Slide>
   ) : (
     <MobileDialog
-      title={title}
+      title={sidebarTitle}
       open={isOpen}
       onClose={closeSidebar}
       rightActions={
         <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-          {showEvaluation && (
+          {showEvaluationSidebar && (
             <SidebarViewIcon view='proposal_evaluation' size='medium' activeView={sidebarView} onClick={openSidebar} />
           )}
           <SidebarViewIcon view='comments' size='medium' activeView={sidebarView} onClick={openSidebar} />
@@ -129,9 +143,40 @@ function DocumentSidebarComponent({
       contentSx={{ pr: 0, pb: 0, pl: 1 }}
     >
       <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
-        {children}
+        <SidebarContents {...props} proposal={proposal} />
       </Box>
     </MobileDialog>
+  );
+}
+
+function SidebarContents({
+  sidebarView,
+  pageId,
+  spaceId,
+  pagePermissions,
+  editorState,
+  threads,
+  openSidebar,
+  proposalId,
+  proposal
+}: SidebarProps & { proposal?: ProposalWithUsersAndRubric }) {
+  return (
+    <>
+      {sidebarView === 'proposal_evaluation' && (
+        <ProposalSidebar pageId={pageId} proposal={proposal} proposalId={proposalId} />
+      )}
+      {sidebarView === 'suggestions' && (
+        <SuggestionsSidebar
+          pageId={pageId}
+          spaceId={spaceId}
+          readOnly={!pagePermissions?.edit_content}
+          state={editorState}
+        />
+      )}
+      {sidebarView === 'comments' && (
+        <CommentsSidebar openSidebar={openSidebar} threads={threads} canCreateComments={!!pagePermissions?.comment} />
+      )}
+    </>
   );
 }
 
@@ -155,4 +200,4 @@ function SidebarViewIcon({
   );
 }
 
-export const DocumentSidebar = memo(DocumentSidebarComponent);
+export const PageSidebar = memo(PageSidebarComponent);

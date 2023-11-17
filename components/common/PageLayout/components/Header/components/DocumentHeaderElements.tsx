@@ -24,7 +24,7 @@ export function DocumentHeaderElements({ headerHeight, page }: Props) {
       {isBasePageDocument && <DocumentParticipants />}
       {isBasePageDocument && <EditingModeToggle />}
       {!deletedAt && <ShareButton headerHeight={headerHeight} pageId={id} />}
-      {!deletedAt && <ToggleEvaluationButton />}
+      {type === 'proposal' && <ToggleEvaluationButton />}
     </>
   );
 }
