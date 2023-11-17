@@ -27,7 +27,7 @@ type Props = {
 export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Props) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
-  const { customDomain, spaceFromPath, isCustomDomain } = useBaseCurrentDomain();
+  const { customDomain, spaceFromPath, isSpaceLoading } = useBaseCurrentDomain();
 
   // We either have disabled account error (handled by our modal) or discord error (handled with snackbar)
   const [discordLoginError, setDiscordLoginError] = useState<string | null>(null);
@@ -50,10 +50,43 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
     }
   }, [discordLoginError]);
 
-  const image = isCustomDomain ? (
+  if (customDomain === undefined) {
+    return <Container px={3} data-test='login-page-content' />;
+  }
+
+  if (customDomain && isSpaceLoading) {
+    return (
+      <Container px={3} data-test='login-page-content'>
+        <LoadingComponent isLoading={true} size={60} />
+      </Container>
+    );
+  }
+
+  const image = spaceFromPath ? (
     <WorkspaceAvatar image={spaceFromPath?.spaceImage || ''} name={spaceFromPath?.name || ''} size='3xLarge' />
   ) : customDomain === null ? (
     <Image src={splashImage} px={3} />
+  ) : null;
+
+  const subtitle = customDomain === null && (
+    <Typography
+      sx={{
+        display: { xs: 'none', md: 'block' },
+        fontSize: 20,
+        mb: { sm: 2, md: 6 },
+        maxWidth: { md: '520px' }
+      }}
+    >
+      The solution for token communities to build relationships, work together and vote
+    </Typography>
+  );
+
+  const title = spaceFromPath ? (
+    `Login to ${spaceFromPath?.name}`
+  ) : customDomain === null ? (
+    <>
+      Powering the Future <br /> of Work through Web3
+    </>
   ) : null;
 
   return (
@@ -82,29 +115,12 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
                 mb: 3
               }}
             >
-              {isCustomDomain ? (
-                `Login to ${spaceFromPath?.name}`
-              ) : (
-                <>
-                  Powering the Future <br /> of Work through Web3
-                </>
-              )}
+              {title}
             </Typography>
             <Box display={{ xs: 'flex', md: 'none' }} mb={2} mx={2} justifyContent='center'>
               {image}
             </Box>
-            {customDomain === null && (
-              <Typography
-                sx={{
-                  display: { xs: 'none', md: 'block' },
-                  fontSize: 20,
-                  mb: { sm: 2, md: 6 },
-                  maxWidth: { md: '520px' }
-                }}
-              >
-                The solution for token communities to build relationships, work together and vote
-              </Typography>
-            )}
+            {subtitle}
             <Box
               display={{ md: 'flex' }}
               gap={2}
