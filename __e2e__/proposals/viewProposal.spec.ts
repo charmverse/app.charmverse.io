@@ -163,11 +163,7 @@ test.describe.serial('View proposal', () => {
     await proposalListPage.getSidebarLink('proposals').click();
     await proposalListPage.waitForProposalsList();
 
-    const categoriesDropDown = proposalListPage.getProposalCategoryListButtonLocator();
-
-    await expect(categoriesDropDown).toBeVisible();
-
-    await categoriesDropDown.click();
+    await proposalListPage.openProposalCategoryList();
 
     const visibleCategoryButton = proposalListPage.getProposalCategoryLocator(visibleProposalCategory.id);
     const hiddenCategoryButton = proposalListPage.getProposalCategoryLocator(hiddenProposalCategory.id);

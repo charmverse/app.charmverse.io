@@ -107,6 +107,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
         </button>
         <div
           class="MuiBox-root css-jw1lpn"
+          data-test="view-header-actions-menu"
         >
           <button
             class="Button IconButton css-w119tu"

@@ -16,6 +16,7 @@ import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { CardFilter } from 'lib/focalboard/cardFilter';
 import {
   AUTHORS_BLOCK_ID,
   CATEGORY_BLOCK_ID,
@@ -33,7 +34,7 @@ export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { filteredProposals: proposals } = useProposals();
+  const { proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
   const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
@@ -64,7 +65,7 @@ export function useProposalsBoardAdapter() {
   }, [categories, proposalPropertiesBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
-    const cards =
+    let cards =
       proposals
         ?.map((p) => {
           const page = pages[p?.id];
@@ -72,6 +73,18 @@ export function useProposalsBoardAdapter() {
           return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+
+    // filter cards by active view filter
+    if (activeView?.fields.filter) {
+      const cardsRaw = cards.map((cp) => cp.card);
+      const filteredCardsIds = CardFilter.applyFilterGroup(
+        activeView.fields.filter,
+        board.fields.cardProperties,
+        cardsRaw
+      ).map((c) => c.id);
+
+      cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
+    }
 
     const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
 

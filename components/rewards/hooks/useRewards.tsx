@@ -4,7 +4,6 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetRewards } from 'charmClient/hooks/rewards';
-import type { RewardStatusFilter } from 'components/rewards/components/RewardViewOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
@@ -15,9 +14,6 @@ import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type RewardsContextType = {
   rewards: RewardWithUsers[] | undefined;
-  filteredRewards: RewardWithUsers[] | undefined;
-  statusFilter: RewardStatusFilter;
-  setStatusFilter: (status: RewardStatusFilter) => void;
   mutateRewards: KeyedMutator<RewardWithUsers[]>;
   isLoading: boolean;
   updateReward: (input: RewardUpdate) => Promise<void>;
@@ -28,9 +24,6 @@ type RewardsContextType = {
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   rewards: undefined,
-  filteredRewards: undefined,
-  statusFilter: 'all',
-  setStatusFilter: () => {},
   mutateRewards: async () => {
     return undefined;
   },
@@ -42,31 +35,19 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
-  const [statusFilter, setStatusFilter] = useState<RewardStatusFilter>('all');
   const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
   const { user } = useUser();
 
-  const { data: rewards, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
+  const { data, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
   const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
   const { subscribe } = useWebSocketClient();
+
   // filter out deleted and templates
-  let filteredRewards = useMemo(
-    () =>
-      rewards ? rewards.filter((reward) => !pages[reward.id]?.deletedAt && pages[reward.id]?.type === 'bounty') : [],
-    [pages, rewards]
+  const rewards = useMemo(
+    () => (data ? data.filter((reward) => !pages[reward.id]?.deletedAt && pages[reward.id]?.type === 'bounty') : []),
+    [pages, data]
   );
-
-  if (statusFilter && statusFilter !== 'all') {
-    filteredRewards = filteredRewards?.filter((reward) => reward.status === statusFilter);
-  }
-
-  filteredRewards = filteredRewards?.sort((p1, p2) => {
-    const page1 = pages[p1.id];
-    const page2 = pages[p2.id];
-    if (!page1 || !page2) return 0;
-    return page1.createdAt > page2.createdAt ? -1 : 1;
-  });
 
   const updateReward = useCallback(
     async (rewardUpdate: RewardUpdate) => {
@@ -83,8 +64,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     async (rewardId: string) => {
       const reward = await charmClient.rewards.getReward(rewardId);
       mutateRewards(
-        (data) => {
-          const rewardList = data ? [...data] : [];
+        (rData) => {
+          const rewardList = rData ? [...rData] : [];
           const rewardIndex = rewardList.findIndex((p) => p.id === rewardId);
 
           if (rewardIndex >= 0) {
@@ -135,9 +116,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       rewards,
-      filteredRewards,
-      statusFilter,
-      setStatusFilter,
       mutateRewards,
       isLoading: isLoading || loadingPages,
       updateReward,
@@ -148,8 +126,6 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     }),
     [
       rewards,
-      filteredRewards,
-      statusFilter,
       mutateRewards,
       isLoading,
       loadingPages,
