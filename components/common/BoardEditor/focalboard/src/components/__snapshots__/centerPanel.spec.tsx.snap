@@ -114,6 +114,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
             </button>
             <div
               class="MuiBox-root css-jw1lpn"
+              data-test="view-header-actions-menu"
             >
               <button
                 class="Button IconButton css-w119tu"
@@ -461,6 +462,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
               >
                 <div
                   class="css-1tk713d"
+                  data-test="view-sidebar-content"
                 >
                   <div
                     class="MuiBox-root css-xwa5xa"
@@ -818,6 +820,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
             </button>
             <div
               class="MuiBox-root css-jw1lpn"
+              data-test="view-header-actions-menu"
             >
               <button
                 class="Button IconButton css-w119tu"
@@ -904,6 +907,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
               >
                 <div
                   class="css-1tk713d"
+                  data-test="view-sidebar-content"
                 >
                   <div
                     class="MuiBox-root css-xwa5xa"
@@ -1200,6 +1204,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
             </button>
             <div
               class="MuiBox-root css-jw1lpn"
+              data-test="view-header-actions-menu"
             >
               <button
                 class="Button IconButton css-w119tu"
@@ -1437,6 +1442,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
               >
                 <div
                   class="css-1tk713d"
+                  data-test="view-sidebar-content"
                 >
                   <div
                     class="MuiBox-root css-xwa5xa"
@@ -1794,6 +1800,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
             </button>
             <div
               class="MuiBox-root css-jw1lpn"
+              data-test="view-header-actions-menu"
             >
               <button
                 class="Button IconButton css-w119tu"
@@ -2070,6 +2077,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
               >
                 <div
                   class="css-1tk713d"
+                  data-test="view-sidebar-content"
                 >
                   <div
                     class="MuiBox-root css-xwa5xa"

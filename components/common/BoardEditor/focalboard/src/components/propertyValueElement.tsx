@@ -215,6 +215,9 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
+    // do not show value in reward row
+  } else if (propertyTemplate.id === ASSIGNEES_BLOCK_ID && Array.isArray(propertyValue)) {
+    propertyValueElement = null;
   } else if (
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||

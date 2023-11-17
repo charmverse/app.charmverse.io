@@ -13,6 +13,7 @@ import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
 import {
   ASSIGNEES_BLOCK_ID,
@@ -34,7 +35,7 @@ export function useRewardsBoardAdapter() {
   const [boardReward, setBoardReward] = useState<BoardReward | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { filteredRewards: rewards } = useRewards();
+  const { rewards } = useRewards();
   const { pages } = usePages();
   const { rewardPropertiesBlock, rewardBlocks } = useRewardBlocks();
   const rewardPage = pages[boardReward?.id || ''];
@@ -63,7 +64,7 @@ export function useRewardsBoardAdapter() {
   }, [rewardPropertiesBlock, rewardBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
-    const cards =
+    let cards =
       rewards
         ?.map((p) => {
           const page = pages[p?.id];
@@ -71,6 +72,18 @@ export function useRewardsBoardAdapter() {
           return mapRewardToCardPage({ reward: p, rewardPage: page, spaceId: space?.id, members: membersRecord });
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+
+    // filter cards by active view filter
+    if (activeView?.fields.filter) {
+      const cardsRaw = cards.map((cp) => cp.card);
+      const filteredCardsIds = CardFilter.applyFilterGroup(
+        activeView.fields.filter,
+        board.fields.cardProperties,
+        cardsRaw
+      ).map((c) => c.id);
+
+      cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
+    }
 
     const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
 
@@ -142,7 +155,8 @@ function mapRewardToCardPage({
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
-    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || []
+    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
+    [ASSIGNEES_BLOCK_ID]: (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || []
   };
 
   const card: Card<RewardPropertyValue> = {
@@ -200,11 +214,11 @@ function mapApplicationToCardPage({
   applicationFields.properties = {
     ...applicationFields.properties,
     // add default field values on the fly
-    [REWARDS_AVAILABLE_BLOCK_ID]: '-',
-    [ASSIGNEES_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
+    [REWARDS_AVAILABLE_BLOCK_ID]: null,
+    [ASSIGNEES_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
     [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
-    [DUE_DATE_ID]: '-',
+    [DUE_DATE_ID]: null,
     [REWARD_REVIEWERS_BLOCK_ID]: []
   };
 
