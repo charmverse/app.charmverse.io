@@ -69,9 +69,7 @@ export function ProposalProperties({
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
-  const canAnswerRubric = proposalPermissions?.evaluate;
   const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
-  const canViewRubricAnswers = isAdmin || isReviewer;
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
   const isTemplate = proposalPage.type === 'proposal_template';
   const sourceTemplate = isFromTemplateSource

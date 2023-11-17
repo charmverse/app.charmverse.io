@@ -1,9 +1,10 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Grading, MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
-import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
+import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
+import { Box, IconButton, Slide, SvgIcon, Tooltip, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
+import { RiChatCheckLine } from 'react-icons/ri';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -26,7 +27,7 @@ const DesktopSidebarHeader = styled.div`
 
 export const SIDEBAR_VIEWS = {
   proposal_evaluation: {
-    icon: <Grading fontSize='small' />,
+    icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
     tooltip: 'View rubric evaluation',
     title: 'Evaluation'
   },
