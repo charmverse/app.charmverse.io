@@ -14,16 +14,30 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 async function search() {
 
-  const acc = await prisma.user.findMany({
+  const spaceRoles = await prisma.spaceRole.findFirstOrThrow({
     where: {
-      username: {
-        contains: '0x036'
-      } 
+      space: {
+        name: "Raid Guild"
+      }
+    },
+    select: {
+      user: {
+        select: {
+          username: true,
+          id: true,
+        }
+      }
     }
   })
 
+  const spaces = await prisma.space.findMany({
+    where: {
+      name: "Raid Guild"
+    }
+  })
 
-  console.log(JSON.stringify({acc}, null, 2))
+  console.log(spaceRoles)
+  console.log(spaces)
 }
 
 search().then(() => console.log('Done'));
