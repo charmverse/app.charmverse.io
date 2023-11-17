@@ -9,9 +9,9 @@ import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
-import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import PropertyValueElement from '../propertyValueElement';

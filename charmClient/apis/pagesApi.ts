@@ -69,4 +69,8 @@ export class PagesApi {
   syncPageCommentsWithLensPost({ pageId }: { pageId: string }): Promise<PageCommentWithVote[]> {
     return http.POST(`/api/pages/${pageId}/sync-page-comments`);
   }
+
+  exportZippedDatabasePage({ databaseId }: { databaseId: string }) {
+    return http.GET(`/api/pages/${databaseId}/export-database`);
+  }
 }

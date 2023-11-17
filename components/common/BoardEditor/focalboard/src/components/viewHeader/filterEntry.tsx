@@ -27,6 +27,7 @@ import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
@@ -34,7 +35,6 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID, AUTHORS_BLOCK_ID } from 'lib/proposal/bloc
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 
 import { iconForPropertyType } from './viewHeaderPropertiesMenu';

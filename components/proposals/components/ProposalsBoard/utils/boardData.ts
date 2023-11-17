@@ -1,11 +1,11 @@
 import type { ProposalCategory } from '@charmverse/core/prisma';
 
-import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { mapMUIColorToProperty } from 'components/common/BoardEditor/utils/mapMUIColorToProperty';
 import { evaluationTypeOptions } from 'components/proposals/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
+import { Constants } from 'lib/focalboard/constants';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {

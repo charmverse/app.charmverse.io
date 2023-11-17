@@ -1,29 +1,26 @@
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import UndoIcon from '@mui/icons-material/Undo';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import VerticalAlignBottomOutlinedIcon from '@mui/icons-material/VerticalAlignBottomOutlined';
-import { List, Divider } from '@mui/material';
+import { Divider, List } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
-import { useMemo } from 'react';
 import type { ChangeEvent } from 'react';
+import { useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { CsvExporter } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import {
-  makeSelectViewCardsSortedFilteredAndGrouped,
-  sortCards
-} from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import LoadingComponent from 'components/common/LoadingComponent';
 import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
 import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
@@ -37,11 +34,8 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { CardPage } from 'lib/focalboard/card';
 
-import { isValidCsvResult, addNewCards } from '../utils/databasePageOptions';
+import { addNewCards, isValidCsvResult } from '../utils/databasePageOptions';
 
 import { DocumentHistory } from './DocumentHistory';
 import type { PageActionMeta } from './DocumentPageActionList';
@@ -56,6 +50,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const pageId = page.id;
   const router = useRouter();
   const { pages, deletePage, mutatePagesRemove } = usePages();
+  const [exportingDatabase, setExportingDatabase] = useState(false);
   const view = useAppSelector(getView(router.query.viewId as string));
   const boards = useAppSelector(getSortedBoards);
   const boardViews = useAppSelector(getCurrentBoardViews);
@@ -104,49 +99,39 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     mutatePagesRemove(cardIds);
   }
 
-  const exportCsv = (_board: Board, _view: BoardView) => {
-    const cardPages: CardPage[] = cards
-      .map((card) => ({ card, page: pages[card.id] }))
-      .filter((item): item is CardPage => !!item.page);
-
-    const sortedCardPages = sortCards(cardPages, _board, _view, membersRecord);
-    const _cards = sortedCardPages.map(({ card, page: { title } }) => {
-      return {
-        ...card,
-        // update the title from correct model
-        title
-      };
-    });
+  async function exportZippedDatabase() {
+    setExportingDatabase(true);
     try {
-      const proposalCategories = (categories || []).reduce<Record<string, string>>((map, category) => {
-        map[category.id] = category.title;
-        return map;
-      }, {});
-      CsvExporter.exportTableCsv(
-        _board,
-        _view,
-        _cards,
-        {
-          date: formatDate,
-          dateTime: formatDateTime
-        },
-        {
-          spaceDomain: currentSpace?.domain ?? '',
-          users: membersRecord,
-          proposalCategories
-        }
-      );
-      showMessage('Export complete!');
+      const exportName = `${boardPage?.title ?? 'Untitled'} database export.zip`;
+
+      const generatedZip = await charmClient.pages.exportZippedDatabasePage({
+        databaseId: pageId
+      });
+
+      const zipDataUrl = URL.createObjectURL(generatedZip as any);
+
+      // Create a temporary link to trigger download
+      const link = document.createElement('a');
+      link.style.display = 'none';
+      link.href = zipDataUrl;
+      link.download = `${exportName}.zip`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      URL.revokeObjectURL(zipDataUrl);
+
+      showMessage('Database exported successfully', 'success');
+
+      charmClient.track.trackAction('export_page_csv', { pageId, spaceId: currentSpace?.id as string });
     } catch (error) {
-      log.error('CSV export failed', error);
-      showMessage('Export failed', 'error');
+      log.error(error);
+      showMessage('Error exporting database', 'error');
+    } finally {
+      setExportingDatabase(false);
     }
-    onComplete();
-    const spaceId = pages[pageId]?.spaceId;
-    if (spaceId) {
-      charmClient.track.trackAction('export_page_csv', { pageId, spaceId });
-    }
-  };
+  }
 
   const importCsv = (event: ChangeEvent<HTMLInputElement>, importAction?: ImportAction): void => {
     if (board && event.target.files && event.target.files[0]) {
@@ -260,14 +245,16 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
           </ListItemButton>
         </div>
       </Tooltip>
-      <ListItemButton onClick={() => exportCsv(board, view)}>
-        <FormatListBulletedIcon
+      <ListItemButton disabled={exportingDatabase} onClick={() => exportZippedDatabase()}>
+        <UploadFileIcon
           fontSize='small'
           sx={{
             mr: 1
           }}
         />
-        <ListItemText primary='Export to CSV' />
+
+        <ListItemText primary={exportingDatabase ? 'Exporting data' : 'Export Pages & Data'} />
+        {exportingDatabase && <LoadingComponent size={14} />}
       </ListItemButton>
       <ListItemButton
         component='label'
