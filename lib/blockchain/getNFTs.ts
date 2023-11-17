@@ -18,13 +18,18 @@ import {
 } from './provider/ankr/client';
 import { supportedMainnets as supportedMainnetsByAnkr } from './provider/ankr/config';
 import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr/config';
+import type { SupportedChainId as SupportedChainIdByZkSync } from './provider/zksync/config';
+import { supportedNetworks as supportedZkSyncNetwork } from './provider/zksync/config';
+import { getNFT as getNftFromZKSync } from './provider/zksync/getNFT';
+import { getNFTs as getNftsFromZKSync } from './provider/zksync/getNFTs';
+import { verifyNFTOwner as verifyNFTOwnerInZkSync } from './provider/zksync/verifyNFTOwner';
 import type { SupportedChainId as SupportedChainIdByZora } from './provider/zora/config';
 import { supportedNetworks as supportedNetworksByZora } from './provider/zora/config';
 import { getNFT as getNFTFromZora } from './provider/zora/getNFT';
 import { getNFTs as getNFTsFromZora } from './provider/zora/getNFTs';
 import { verifyNFTOwner as verifyNFTOwnerFromZora } from './provider/zora/verifyNFTOwner';
 
-export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnkr;
+export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnkr | SupportedChainIdByZkSync;
 
 export type NFTData = {
   id: string;
@@ -46,7 +51,7 @@ export type NFTData = {
 };
 
 export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
-  const [alchemyNFTs, ankrNFTs, zoraNFTs] = await Promise.all([
+  const [alchemyNFTs, ankrNFTs, zoraNFTs, zksyncNFTs] = await Promise.all([
     (async (): Promise<NFTData[]> => {
       const nftsByChain = await Promise.all(
         supportedMainnetsByAlchemy
@@ -86,6 +91,12 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
         log.error('Error requesting nfts from Zora', { address: wallets[0]?.address, error });
       }
       return [] as NFTData[];
+    }),
+    getNftsFromZKSync({ wallets }).catch((error) => {
+      if (!isTestEnv) {
+        log.error('Error requesting nfts from Zora', { address: wallets[0]?.address, error });
+      }
+      return [] as NFTData[];
     })
   ]);
   const nfts = [...alchemyNFTs, ...ankrNFTs, ...zoraNFTs];
@@ -106,6 +117,8 @@ export async function getNFT({ address, tokenId, chainId = 1 }: NFTRequest) {
     return getNFTFromAnkr({ address, tokenId, chainId: chainId as SupportedChainIdByAnkr });
   } else if (supportedNetworksByZora.includes(chainId as SupportedChainIdByZora)) {
     return getNFTFromZora({ address, tokenId, chainId: chainId as SupportedChainIdByZora });
+  } else if (supportedZkSyncNetwork.includes(chainId as SupportedChainIdByZkSync)) {
+    return getNftFromZKSync({ chainId: chainId as SupportedChainIdByZkSync, tokenId: tokenId as any });
   }
   log.warn('NFT requested from unsupported chainId', { chainId });
   return null;
@@ -134,6 +147,11 @@ export async function verifyNFTOwner({
   } else if (supportedNetworksByZora.includes(chainId as SupportedChainIdByZora)) {
     return verifyNFTOwnerFromZora({
       contractAddress: address,
+      ownerAddresses: userAddresses,
+      tokenId
+    });
+  } else if (supportedZkSyncNetwork.includes(chainId as SupportedChainIdByZkSync)) {
+    return verifyNFTOwnerInZkSync({
       ownerAddresses: userAddresses,
       tokenId
     });

@@ -1,4 +1,4 @@
-import { getClient } from './client';
+import { zkMainnetClient, zkTestnetClient } from './client';
 
 /**
  * @tokenId - An integer representing the ZKSync token id
@@ -10,12 +10,16 @@ export async function verifyNFTOwner({
   ownerAddresses: string[];
   tokenId: number | string;
 }): Promise<boolean> {
-  const provider = await getClient({ chainId: 324 });
-
   for (const wallet of ownerAddresses) {
-    const state = await provider.getAccountState(wallet);
+    const mainnetState = await zkMainnetClient.getAccountState(wallet);
 
-    if (state.committed.nfts[Number(tokenId)]) {
+    if (mainnetState.committed.nfts[Number(tokenId)]) {
+      return true;
+    }
+
+    const testnetState = await zkTestnetClient.getAccountState(wallet);
+
+    if (testnetState.committed.nfts[Number(tokenId)]) {
       return true;
     }
   }
