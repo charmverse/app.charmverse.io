@@ -2,7 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
@@ -24,7 +24,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 /**
  *
@@ -51,7 +50,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const { pages } = usePages();
+  const { pages, refreshPage } = usePages();
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -121,38 +120,32 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     }
   });
 
-  const showCard = useCallback(
-    (cardId: string | null = null) => {
-      if (cardId === null) {
-        setShownCardId(null);
-        return;
+  const showCard = async (cardId: string | null) => {
+    if (cardId === null) {
+      setShownCardId(null);
+      return;
+    }
+
+    const cardPage = cardId && pages ? pages[cardId] ?? (await refreshPage(cardId)) : null;
+
+    if (activeView.fields.openPageIn === 'center_peek' || cardPage?.type.includes('template')) {
+      updateURLQuery({ viewId: router.query.viewId as string, cardId });
+      setShownCardId(cardId);
+    } else if (activeView.fields.openPageIn === 'full_page' && cardPage) {
+      navigateToSpacePath(`/${cardPage.path}`);
+    }
+  };
+
+  const showView = (viewId: string) => {
+    const { cardId, ...rest } = router.query;
+    router.replace({
+      pathname: router.pathname,
+      query: {
+        ...rest,
+        viewId: viewId || ''
       }
-
-      const cardPage = cardId && pages ? pages[cardId] : null;
-
-      if (activeView.fields.openPageIn === 'center_peek') {
-        updateURLQuery({ viewId: router.query.viewId as string, cardId });
-        setShownCardId(cardId);
-      } else if (activeView.fields.openPageIn === 'full_page' && cardPage) {
-        navigateToSpacePath(`/${cardPage.path}`);
-      }
-    },
-    [router.query, activeView, pages]
-  );
-
-  const showView = useCallback(
-    (viewId: string) => {
-      const { cardId, ...rest } = router.query;
-      router.replace({
-        pathname: router.pathname,
-        query: {
-          ...rest,
-          viewId: viewId || ''
-        }
-      });
-    },
-    [router.query]
-  );
+    });
+  };
 
   if (board) {
     return (

@@ -9,7 +9,7 @@ import { Box, Link, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Hotkeys from 'react-hot-keys';
 import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -226,146 +226,144 @@ function CenterPanel(props: Props) {
     }
   }
 
-  const showCard = React.useCallback(
-    (cardId: string | null) => {
-      if (state.selectedCardIds.length > 0) {
-        setState({ ...state, selectedCardIds: [] });
-      }
-      props.showCard(cardId);
-    },
-    [props.showCard, state.selectedCardIds]
-  );
+  const showCard = (cardId: string | null) => {
+    if (state.selectedCardIds.length > 0) {
+      setState({ ...state, selectedCardIds: [] });
+    }
+    props.showCard(cardId);
+  };
 
   const __addCard = props.addCard;
   const _updateView = props.updateView;
 
-  const addCard = useCallback(
-    async (
-      groupByOptionId?: string,
-      show = false,
-      properties: Record<string, string> = {},
-      insertLast = true,
-      isTemplate = false
-    ) => {
-      if (!activeBoard) {
-        throw new Error('No active board');
+  const addCard = async ({
+    groupByOptionId,
+    show = false,
+    properties = {},
+    insertLast = true,
+    isTemplate = false
+  }: {
+    groupByOptionId?: string;
+    show?: boolean;
+    properties?: Record<string, string>;
+    insertLast?: boolean;
+    isTemplate?: boolean;
+  }) => {
+    if (!activeBoard) {
+      throw new Error('No active board');
+    }
+    if (!activeView) {
+      throw new Error('No active view');
+    }
+
+    const card = createCard();
+
+    card.parentId = activeBoard.id;
+    card.rootId = activeBoard.rootId;
+    const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
+      activeView.fields.filter,
+      activeBoard.fields.cardProperties
+    );
+
+    if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
+      if (groupByOptionId) {
+        propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
+      } else {
+        delete propertiesThatMeetFilters[groupByProperty.id];
       }
-      if (!activeView) {
-        throw new Error('No active view');
-      }
+    }
+    card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
 
-      const card = createCard();
+    card.fields.contentOrder = [];
+    card.fields.isTemplate = isTemplate;
 
-      card.parentId = activeBoard.id;
-      card.rootId = activeBoard.rootId;
-      const propertiesThatMeetFilters = CardFilter.propertiesThatMeetFilterGroup(
-        activeView.fields.filter,
-        activeBoard.fields.cardProperties
-      );
+    mutator.performAsUndoGroup(async () => {
+      const newCardOrder = insertLast
+        ? [...activeView.fields.cardOrder, card.id]
+        : [card.id, ...activeView.fields.cardOrder];
 
-      if ((activeView.fields.viewType === 'board' || activeView.fields.viewType === 'table') && groupByProperty) {
-        if (groupByOptionId) {
-          propertiesThatMeetFilters[groupByProperty.id] = groupByOptionId;
-        } else {
-          delete propertiesThatMeetFilters[groupByProperty.id];
-        }
-      }
-      card.fields.properties = { ...card.fields.properties, ...properties, ...propertiesThatMeetFilters };
+      // update view order first so that when we add the block it appears in the right spot
+      await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
 
-      card.fields.contentOrder = [];
-      card.fields.isTemplate = isTemplate;
-
-      mutator.performAsUndoGroup(async () => {
-        const newCardOrder = insertLast
-          ? [...activeView.fields.cardOrder, card.id]
-          : [card.id, ...activeView.fields.cardOrder];
-
-        // update view order first so that when we add the block it appears in the right spot
-        await mutator.changeViewCardOrder(activeView, newCardOrder, 'add-card');
-
-        await mutator.insertBlock(
-          card,
-          'add card',
-          async (block: Block) => {
-            if (space) {
-              await refreshPage(block.id);
-            }
-
-            if (isTemplate) {
-              showCard(block.id);
-            } else if (show) {
-              __addCard(createCard(block));
-              _updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
-              showCard(block.id);
-            } else {
-              // Focus on this card's title inline on next render
-              setState((_state) => ({ ..._state, cardIdToFocusOnRender: card.id }));
-              setTimeout(() => setState((_state) => ({ ..._state, cardIdToFocusOnRender: '' })), 100);
-            }
-          },
-          async () => {
-            showCard(null);
+      await mutator.insertBlock(
+        card,
+        'add card',
+        async (block: Block) => {
+          if (space) {
+            await refreshPage(block.id);
           }
-        );
-      });
-    },
-    [activeBoard, activeView, __addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
-  );
+
+          if (isTemplate) {
+            showCard(block.id);
+          } else if (show) {
+            __addCard(createCard(block));
+            _updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
+            showCard(block.id);
+          } else {
+            // Focus on this card's title inline on next render
+            setState((_state) => ({ ..._state, cardIdToFocusOnRender: card.id }));
+            setTimeout(() => setState((_state) => ({ ..._state, cardIdToFocusOnRender: '' })), 100);
+          }
+        },
+        async () => {
+          showCard(null);
+        }
+      );
+    });
+  };
 
   const editCardTemplate = (cardTemplateId: string) => {
     showCard(cardTemplateId);
   };
 
-  const cardClicked = useCallback(
-    (e: React.MouseEvent, card: Card): void => {
-      if (!activeView) {
-        return;
-      }
+  const cardClicked = (e: React.MouseEvent, card: Card): void => {
+    if (!activeView) {
+      return;
+    }
 
-      if (e.shiftKey) {
-        let selectedCardIds = state.selectedCardIds.slice();
-        if (selectedCardIds.length > 0 && (e.metaKey || e.ctrlKey)) {
-          // Cmd+Shift+Click: Extend the selection
-          const orderedCardIds = cards.map((o) => o.id);
-          const lastCardId = selectedCardIds[selectedCardIds.length - 1];
-          const srcIndex = orderedCardIds.indexOf(lastCardId);
-          const destIndex = orderedCardIds.indexOf(card.id);
-          const newCardIds =
-            srcIndex < destIndex
-              ? orderedCardIds.slice(srcIndex, destIndex + 1)
-              : orderedCardIds.slice(destIndex, srcIndex + 1);
-          for (const newCardId of newCardIds) {
-            if (!selectedCardIds.includes(newCardId)) {
-              selectedCardIds.push(newCardId);
-            }
+    if (e.shiftKey) {
+      let selectedCardIds = state.selectedCardIds.slice();
+      if (selectedCardIds.length > 0 && (e.metaKey || e.ctrlKey)) {
+        // Cmd+Shift+Click: Extend the selection
+        const orderedCardIds = cards.map((o) => o.id);
+        const lastCardId = selectedCardIds[selectedCardIds.length - 1];
+        const srcIndex = orderedCardIds.indexOf(lastCardId);
+        const destIndex = orderedCardIds.indexOf(card.id);
+        const newCardIds =
+          srcIndex < destIndex
+            ? orderedCardIds.slice(srcIndex, destIndex + 1)
+            : orderedCardIds.slice(destIndex, srcIndex + 1);
+        for (const newCardId of newCardIds) {
+          if (!selectedCardIds.includes(newCardId)) {
+            selectedCardIds.push(newCardId);
           }
-          setState({ ...state, selectedCardIds });
-        } else {
-          // Shift+Click: add to selection
-          if (selectedCardIds.includes(card.id)) {
-            selectedCardIds = selectedCardIds.filter((o) => o !== card.id);
-          } else {
-            selectedCardIds.push(card.id);
-          }
-          setState({ ...state, selectedCardIds });
         }
-      } else if (activeView.fields.viewType === 'board' || activeView.fields.viewType === 'gallery') {
-        showCard(card.id);
+        setState({ ...state, selectedCardIds });
+      } else {
+        // Shift+Click: add to selection
+        if (selectedCardIds.includes(card.id)) {
+          selectedCardIds = selectedCardIds.filter((o) => o !== card.id);
+        } else {
+          selectedCardIds.push(card.id);
+        }
+        setState({ ...state, selectedCardIds });
       }
+    } else if (activeView.fields.viewType === 'board' || activeView.fields.viewType === 'gallery') {
+      showCard(card.id);
+    }
 
-      if (activeView?.fields.viewType !== 'table') {
-        e.stopPropagation();
-      }
-    },
-    [activeView]
-  );
+    if (activeView?.fields.viewType !== 'table') {
+      e.stopPropagation();
+    }
+  };
 
-  const calendarAddCard = useCallback(
-    (properties: Record<string, string>) => {
-      addCard('', true, properties);
-    },
-    [addCard]
-  );
+  const calendarAddCard = (properties: Record<string, string>) => {
+    addCard({
+      groupByOptionId: '',
+      show: true,
+      properties
+    });
+  };
 
   async function deleteSelectedCards() {
     const { selectedCardIds } = state;
@@ -536,10 +534,23 @@ function CenterPanel(props: Props) {
               cards={cards}
               views={views}
               dateDisplayProperty={dateDisplayProperty}
-              addCard={() => addCard('', true)}
+              addCard={() =>
+                addCard({
+                  groupByOptionId: '',
+                  show: true
+                })
+              }
               showCard={showCard}
               // addCardFromTemplate={addCardFromTemplate}
-              addCardTemplate={() => addCard('', true, {}, false, true)}
+              addCardTemplate={() => {
+                addCard({
+                  groupByOptionId: '',
+                  show: true,
+                  isTemplate: true,
+                  insertLast: false,
+                  properties: {}
+                });
+              }}
               editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
@@ -609,7 +620,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     onCardClicked={cardClicked}
-                    addCard={addCard}
+                    addCard={(groupByOptionId) => addCard({ groupByOptionId })}
                     showCard={showCard}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
@@ -627,7 +638,7 @@ function CenterPanel(props: Props) {
                     readOnly={props.readOnly}
                     cardIdToFocusOnRender={state.cardIdToFocusOnRender}
                     showCard={showCard}
-                    addCard={addCard}
+                    addCard={(groupByOptionId) => addCard({ groupByOptionId })}
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
@@ -653,7 +664,12 @@ function CenterPanel(props: Props) {
                     readOnly={props.readOnly}
                     onCardClicked={cardClicked}
                     selectedCardIds={state.selectedCardIds}
-                    addCard={(show) => addCard('', show)}
+                    addCard={(show) =>
+                      addCard({
+                        groupByOptionId: '',
+                        show
+                      })
+                    }
                     disableAddingCards={disableAddingNewCards}
                   />
                 )}
