@@ -1,5 +1,4 @@
 import { IconButton, Tooltip } from '@mui/material';
-import { useCallback } from 'react';
 
 import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { useLastSidebarView } from 'components/[pageId]/DocumentPage/hooks/useLastSidebarView';

@@ -88,7 +88,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
 
-          <FullPageActionsMenuButton isInsideDialog={false} page={basePage} post={forumPostInfo?.forumPost} />
+          <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
         </Box>
       </Box>
     </StyledToolbar>

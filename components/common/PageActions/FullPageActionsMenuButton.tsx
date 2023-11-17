@@ -22,7 +22,7 @@ type Props = {
   page?: PageActionMeta | null;
   post?: PostWithVotes | null;
   onDelete?: VoidFunction;
-  isInsideDialog: boolean;
+  isInsideDialog?: boolean;
 };
 
 export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pageProp, post, onDelete }: Props) {
