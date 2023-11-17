@@ -12,9 +12,9 @@ export async function getNFT({
   tokenId: number;
   chainId: SupportedChainId;
 }): Promise<NFTData | null> {
-  const provider = await getClient({ chainId });
+  const client = getClient({ chainId });
 
-  const token = await provider.getNFT(tokenId);
+  const token = await client.getNFTInfo(tokenId);
 
   return mapNFTData(token);
 }
@@ -44,3 +44,6 @@ export function mapNFTData(
     walletId
   };
 }
+getNFT({ chainId: 324, tokenId: '0xd909923f63516220afad2922850c757db4e47ee6a83031e39f8495a5715c522c' })
+  .then(console.log)
+  .catch(console.error);
