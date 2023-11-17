@@ -21,9 +21,10 @@ type Props = {
   pageId?: string;
   proposalId: string | null;
   proposal?: ProposalWithUsersAndRubric;
+  refreshProposal: VoidFunction;
 };
 
-export function ProposalSidebar({ pageId, proposal, proposalId }: Props) {
+export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
@@ -50,6 +51,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId }: Props) {
 
   async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
     if (!isDraft) {
+      await refreshProposal();
       // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
       setRubricView(1);
     }

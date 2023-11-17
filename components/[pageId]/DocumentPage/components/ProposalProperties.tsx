@@ -132,9 +132,7 @@ export function ProposalProperties({
   async function onChangeRubricCriteria(rubricCriteria: ProposalPropertiesInput['rubricCriteria']) {
     // @ts-ignore TODO: unify types for rubricCriteria
     await upsertRubricCriteria({ rubricCriteria });
-    if (proposal?.status === 'evaluation_active') {
-      refreshProposal();
-    }
+    refreshProposal();
   }
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {

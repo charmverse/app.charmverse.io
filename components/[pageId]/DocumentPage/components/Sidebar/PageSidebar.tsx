@@ -69,10 +69,9 @@ type SidebarProps = {
 function PageSidebarComponent(props: SidebarProps) {
   const { id, proposalId, sidebarView, openSidebar, closeSidebar } = props;
   const isMdScreen = useMdScreen();
-  const theme = useTheme();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
-  const { data: proposal } = useGetProposalDetails(proposalId);
+  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
 
   const showEvaluationSidebar =
     proposal?.evaluationType === 'rubric' &&
@@ -122,7 +121,7 @@ function PageSidebarComponent(props: SidebarProps) {
               <SidebarViewIcon view='suggestions' activeView={sidebarView} onClick={openSidebar} />
             </Box>
           </Box>
-          <SidebarContents {...props} proposal={proposal} />
+          <SidebarContents {...props} proposal={proposal} refreshProposal={refreshProposal} />
         </Box>
       </DesktopContainer>
     </Slide>
@@ -143,7 +142,7 @@ function PageSidebarComponent(props: SidebarProps) {
       contentSx={{ pr: 0, pb: 0, pl: 1 }}
     >
       <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
-        <SidebarContents {...props} proposal={proposal} />
+        <SidebarContents {...props} proposal={proposal} refreshProposal={refreshProposal} />
       </Box>
     </MobileDialog>
   );
@@ -158,12 +157,18 @@ function SidebarContents({
   threads,
   openSidebar,
   proposalId,
-  proposal
-}: SidebarProps & { proposal?: ProposalWithUsersAndRubric }) {
+  proposal,
+  refreshProposal
+}: SidebarProps & { proposal?: ProposalWithUsersAndRubric; refreshProposal: VoidFunction }) {
   return (
     <>
       {sidebarView === 'proposal_evaluation' && (
-        <ProposalSidebar pageId={pageId} proposal={proposal} proposalId={proposalId} />
+        <ProposalSidebar
+          pageId={pageId}
+          proposal={proposal}
+          proposalId={proposalId}
+          refreshProposal={refreshProposal}
+        />
       )}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar
