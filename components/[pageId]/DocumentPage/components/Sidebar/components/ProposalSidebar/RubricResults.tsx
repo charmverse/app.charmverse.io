@@ -35,7 +35,6 @@ import { RubricResultDetailsModal } from './RubricResultDetailsModal';
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
-  reviewerUserIds: string[];
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
@@ -63,45 +62,19 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
   }
 }));
 
-export function RubricResults({ criteriaList = [], answers: allAnswers = [], reviewerUserIds = [] }: Props) {
-  const userContainerRef = useRef<HTMLDivElement>(null);
-  const [maxColWidth, setMaxColWidth] = useState<number | undefined>(undefined);
-
+export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
-  // const { criteriaSummary, reviewersResults, allScores } = aggregateResults({
-  //   criteria: criteriaList,
-  //   answers
-  // });
 
   const { membersRecord } = useMembers();
 
-  const [detailsUserId, setDetailsUserId] = useState<string | null>(null);
   const summaryTypeLabel = criteriaSummaryType === 'average' ? 'Average' : 'Sum';
-
-  useLayoutEffect(() => {
-    if (userContainerRef.current) {
-      setMaxColWidth(userContainerRef.current.clientWidth + 1);
-    }
-  }, []);
 
   const selectSummaryType = (type: CriteriaSummaryType) => {
     setCriteriaSummaryType(type);
     setAnchorEl(null);
   };
 
-  // Also include reviewers that haven't answered yet
-  // const listWithAllReviewers = useMemo(() => {
-  //   const answerList = Object.values(reviewersResults);
-
-  //   // Also add in reviewers that have not responded yet
-  //   for (const reviewer of reviewerUserIds) {
-  //     if (!reviewersResults[reviewer]) {
-  //       answerList.push({ id: reviewer, answersMap: {}, average: null, sum: null });
-  //     }
-  //   }
-  //   return answerList;
-  // }, [criteriaList, answers, reviewerUserIds]);
   const [expandedCriteria, setExpandedCriteria] = useState<string | false>(false);
 
   const populatedCriteria = criteriaList.map((criteria) => {

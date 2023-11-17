@@ -2,7 +2,7 @@ import { Alert, SvgIcon } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
-import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
@@ -85,11 +85,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId }: Props) {
         ([
           'Results',
           <LoadingComponent key='results' isLoading={!rubricCriteria}>
-            <RubricResults
-              answers={proposal?.rubricAnswers ?? []}
-              criteriaList={rubricCriteria || []}
-              reviewerUserIds={reviewerUserIds ?? []}
-            />
+            <RubricResults answers={proposal?.rubricAnswers ?? []} criteriaList={rubricCriteria || []} />
           </LoadingComponent>,
           { sx: { p: 0 } }
         ] as TabConfig)
@@ -102,7 +98,6 @@ export function ProposalSidebar({ pageId, proposal, proposalId }: Props) {
     proposalId,
     myDraftRubricAnswers,
     myRubricAnswers,
-    reviewerUserIds,
     rubricCriteria
   ]);
 
