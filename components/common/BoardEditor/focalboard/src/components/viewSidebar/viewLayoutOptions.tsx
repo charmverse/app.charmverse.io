@@ -153,7 +153,9 @@ function LayoutOptions(props: LayoutOptionsProps) {
         </Grid>
       )}
       <Stack pr={1} pl={2} my={1} alignItems='center' flexDirection='row' justifyContent='space-between'>
-        <Typography variant='subtitle2'>Open pages in</Typography>
+        <Typography variant='subtitle2' component='div'>
+          Open pages in
+        </Typography>
         <SelectMenu
           buttonSize='small'
           selectedValue={activeView.fields.openPageIn ?? 'center_peek'}

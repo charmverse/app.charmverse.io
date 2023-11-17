@@ -74,7 +74,7 @@ export function ProposalsPage({ title }: { title: string }) {
     if (!pageId) return;
     const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
     const page = pages[pageId];
-    if (openPageIn === 'center_peek') {
+    if (openPageIn === 'center_peek' || page?.type.includes('template')) {
       updateURLQuery({ id: pageId });
     } else if (openPageIn === 'full_page' && page) {
       navigateToSpacePath(`/${page.path}`);
