@@ -103,7 +103,7 @@ type Props = {
   pagePermissions?: PagePermissionFlags;
   undoEditorChanges?: VoidFunction;
   onDelete?: VoidFunction;
-  isInsideDialog: boolean;
+  isInsideDialog?: boolean;
 };
 
 export function DocumentPageActionList({
