@@ -212,7 +212,7 @@ export function RubricEvaluationForm({
           Viewing a draft
         </Alert>
       )}
-      <Box p={3}>
+      <Box p={2}>
         {fields.map((field, index) => (
           <CriteriaInput
             key={field.id}

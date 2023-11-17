@@ -26,10 +26,11 @@ const DesktopContainer = styled.div`
   max-width: 100%;
   top: 56px; // height of MUI Toolbar
   z-index: var(--z-index-drawer);
-  height: calc(100% - 80px);
+  height: calc(100% - 56px);
   overflow: auto;
   padding: ${({ theme }) => theme.spacing(0, 1)};
   background: ${({ theme }) => theme.palette.background.default};
+  border-left: 1px solid var(--input-border);
 `;
 
 export const SIDEBAR_VIEWS = {
@@ -139,7 +140,6 @@ function PageSidebarComponent(props: SidebarProps) {
           <SidebarViewIcon view='suggestions' size='medium' activeView={sidebarView} onClick={openSidebar} />
         </Box>
       }
-      PaperProps={{ sx: { background: theme.palette.background.light } }}
       contentSx={{ pr: 0, pb: 0, pl: 1 }}
     >
       <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
