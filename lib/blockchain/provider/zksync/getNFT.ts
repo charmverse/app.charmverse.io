@@ -44,6 +44,3 @@ export function mapNFTData(
     walletId
   };
 }
-getNFT({ chainId: 324, tokenId: '0xd909923f63516220afad2922850c757db4e47ee6a83031e39f8495a5715c522c' })
-  .then(console.log)
-  .catch(console.error);

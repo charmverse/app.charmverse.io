@@ -5,17 +5,13 @@ import { GET } from 'adapters/http';
 
 import { supportedNetworks, type SupportedChainId } from './config';
 // --------------------------------------------------
-
-// Ref: https://docs.zora.co/docs/zora-api/zdk
-// NFT example: https://docs.zora.co/docs/guides/zdk-intro-guide
+// https://docs.zksync.io/apiv02-docs/
 export const ZK_ERA_API_ENDPOINT = 'https://api.zksync.io/api/v0.2';
 const ZK_ERA_TEST_API_ENDPOINT = 'https://goerli-api.zksync.io/api/v0.2';
 
 // 30 requests/minute with no api key
 export const rateLimiter = RateLimit(0.5);
 
-// See source docs
-// https://docs.zksync.io/apiv02-docs/
 class ZkSyncApiClient {
   baseUrl: string;
 

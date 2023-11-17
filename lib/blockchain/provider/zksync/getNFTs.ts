@@ -18,6 +18,3 @@ export async function getNFTs({ wallets }: { wallets: Pick<UserWallet, 'address'
     )
     .flat();
 }
-getNFTs({ wallets: [{ address: '0xdead169385a0d558f1009e73e8b81e9337a6cd85', id: '1' }] }).then((data) =>
-  console.log(JSON.stringify(data, null, 2))
-);
