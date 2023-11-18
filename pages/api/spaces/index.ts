@@ -1,3 +1,4 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { Space } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,6 +11,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
+import { checkUserBanStatus } from 'lib/users/checkUserBanStatus';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -28,7 +30,10 @@ async function getSpaces(req: NextApiRequest, res: NextApiResponse<Space[]>) {
 async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
   const userId = req.session.user.id;
   const data = req.body as CreateSpaceProps;
-
+  const isBanned = await checkUserBanStatus(userId);
+  if (isBanned) {
+    throw new UnauthorisedActionError('This account has been blocked');
+  }
   const space = await createWorkspace({
     spaceData: data.spaceData,
     spaceTemplate: data.spaceTemplate,

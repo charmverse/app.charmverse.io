@@ -11,7 +11,7 @@ export async function checkUserSpaceBanStatus({
   discordId?: string;
   emails?: string[];
   userId?: string;
-  spaceIds: string[];
+  spaceIds?: string[];
 }) {
   if (!userId && !discordId && (!walletAddresses || walletAddresses.length === 0) && (!emails || emails.length === 0)) {
     return false;
