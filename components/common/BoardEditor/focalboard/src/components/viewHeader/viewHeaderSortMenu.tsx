@@ -6,8 +6,8 @@ import React, { useCallback } from 'react';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 
 type Props = {

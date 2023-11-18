@@ -41,8 +41,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../constants';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';

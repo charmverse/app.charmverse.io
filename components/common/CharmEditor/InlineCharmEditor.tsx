@@ -224,6 +224,7 @@ export default function CharmEditor({
         height: '100%'
       }}
       inline
+      linksPluginKey={linksPluginKey}
       readOnly={readOnly}
       noPadding={noPadding}
       pmViewOpts={{

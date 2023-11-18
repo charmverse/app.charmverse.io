@@ -57,7 +57,14 @@ class CardFilter {
     const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
-    const valueArray = (Array.isArray(value) ? value : [value]).map((v) => v.toString());
+    const valueArray = (Array.isArray(value) ? value : [value]).map((v: string | number | Record<'id', string>) => {
+      // In some cases we get an object with an id as value
+      if (typeof v === 'object' && 'id' in v) {
+        return v.id as string;
+      }
+
+      return v.toString();
+    });
 
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;

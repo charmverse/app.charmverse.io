@@ -1,6 +1,6 @@
 import type { IntlShape } from 'react-intl';
 
-import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
+import { Constants } from 'lib/focalboard/constants';
 
 import type { Board, DataSourceType, IPropertyTemplate } from './board';
 import type { BoardView } from './boardView';

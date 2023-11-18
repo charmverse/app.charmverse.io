@@ -3,8 +3,8 @@ import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import { getBoardColorFromColor } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import { getBoardColorFromColor } from 'lib/focalboard/constants';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
 

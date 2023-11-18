@@ -15,34 +15,7 @@ import type {
   ProposalNotification
 } from 'lib/notifications/interfaces';
 
-function getUrlSearchParamsFromNotificationType(notification: Notification): string | ReactNode {
-  const urlSearchParams = new URLSearchParams();
-  switch (notification.type) {
-    case 'comment.created':
-    case 'comment.replied':
-    case 'comment.mention.created': {
-      urlSearchParams.set('commentId', notification.commentId);
-      break;
-    }
-    case 'inline_comment.created':
-    case 'inline_comment.replied':
-    case 'inline_comment.mention.created': {
-      urlSearchParams.set('inlineCommentId', notification.inlineCommentId);
-      break;
-    }
-    case 'application_comment.created':
-    case 'application_comment.replied':
-    case 'application_comment.mention.created': {
-      urlSearchParams.set('commentId', notification.applicationCommentId);
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-  const query = urlSearchParams.toString();
-  return query ? `?${query}` : '';
-}
+import { getNotificationUrl } from './getNotificationUrl';
 
 function getCommentTypeNotificationContent({
   notificationType,
@@ -256,12 +229,13 @@ export function getNotificationMetadata(
   content: ReactNode;
   pageTitle: string;
 } {
+  const href = getNotificationUrl(notification);
   try {
     switch (notification.group) {
       case 'bounty': {
         return {
           content: getBountyContent(notification as BountyNotification, actorUsername),
-          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          href,
           pageTitle: notification.pageTitle
         };
       }
@@ -269,7 +243,7 @@ export function getNotificationMetadata(
       case 'card': {
         return {
           content: getCardContent(notification as CardNotification, actorUsername),
-          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          href,
           pageTitle: notification.pageTitle
         };
       }
@@ -280,10 +254,10 @@ export function getNotificationMetadata(
             ? `/forum/post/${notification.pagePath}`
             : notification.pageType === 'bounty' && notification.applicationId
             ? `/rewards/applications/${notification.applicationId}`
-            : notification.pagePath;
+            : `/${notification.pagePath}`;
         return {
           content: getDocumentContent(notification as DocumentNotification, actorUsername),
-          href: `${basePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          href,
           pageTitle: notification.pageTitle
         };
       }
@@ -291,7 +265,7 @@ export function getNotificationMetadata(
       case 'post': {
         return {
           content: getPostContent(notification as PostNotification, actorUsername),
-          href: `/forum/post/${notification.postPath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          href,
           pageTitle: notification.postTitle
         };
       }
@@ -299,7 +273,7 @@ export function getNotificationMetadata(
       case 'proposal': {
         return {
           content: getProposalContent(notification as ProposalNotification, actorUsername),
-          href: `/${notification.pagePath}${getUrlSearchParamsFromNotificationType(notification)}`,
+          href,
           pageTitle: notification.pageTitle
         };
       }
@@ -307,9 +281,7 @@ export function getNotificationMetadata(
       case 'vote': {
         return {
           content: `Polling started for "${notification.title}"`,
-          href: `/${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
-            notification.voteId
-          }`,
+          href,
           pageTitle: notification.pageTitle
         };
       }

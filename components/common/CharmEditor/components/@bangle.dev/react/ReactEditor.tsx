@@ -298,11 +298,14 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         }
         return acc;
       }, {});
-      editor.view.dispatch(
-        editor.view.state.tr.setMeta(linksPluginKey, {
-          pages: pageMap
-        })
-      );
+
+      if (!editor.view.isDestroyed) {
+        editor.view.dispatch(
+          editor.view.state.tr.setMeta(linksPluginKey, {
+            pages: pageMap
+          })
+        );
+      }
     }
   }, [!!editor?.view, isLoadingRef.current, loadingPages]);
 

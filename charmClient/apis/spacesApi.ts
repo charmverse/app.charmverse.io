@@ -8,6 +8,7 @@ import type { CustomDomainVerification, SpaceWithGates } from 'lib/spaces/interf
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { UpdateCustomDomainResponse } from 'lib/spaces/updateSpaceCustomDomain';
+import type { ZippedDataRequest } from 'pages/api/spaces/[id]/export-data';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
@@ -95,5 +96,9 @@ export class SpacesApi {
 
   getCollablandCode(spaceId: string) {
     return http.GET<{ code: string }>(`/api/spaces/${spaceId}/collabland/code`);
+  }
+
+  exportSpaceData({ spaceId, data }: { spaceId: string; data: ZippedDataRequest }) {
+    return http.POST(`/api/spaces/${spaceId}/export-data`, data);
   }
 }

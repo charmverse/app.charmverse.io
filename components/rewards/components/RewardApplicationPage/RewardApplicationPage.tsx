@@ -126,9 +126,16 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
           <Box display='flex' flexDirection='column'>
             <StyledContainer top={0}>
               <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
-              <Button onClick={goToReward} color='secondary' variant='text' startIcon={<ArrowBack fontSize='small' />}>
-                <span>Back to {query.id ? 'reward' : 'rewards'}</span>
-              </Button>
+              {!!query.id && (
+                <Button
+                  onClick={goToReward}
+                  color='secondary'
+                  variant='text'
+                  startIcon={<ArrowBack fontSize='small' />}
+                >
+                  <span>Back to reward</span>
+                </Button>
+              )}
 
               <div className='focalboard-body'>
                 <RewardProperties

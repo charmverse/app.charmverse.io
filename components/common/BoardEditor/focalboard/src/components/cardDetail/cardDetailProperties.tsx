@@ -12,9 +12,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import { isTruthy } from 'lib/utilities/types';
 
-import { Constants } from '../../constants';
 import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
