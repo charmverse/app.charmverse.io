@@ -1,8 +1,8 @@
-import { LIT_CHAINS } from '@lit-protocol/constants';
 import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
 import { getChainById } from 'connectors/chains';
 
 import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import { LIT_CHAINS } from 'lib/tokenGates/utils';
 import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
 
 import { getNFT } from './getNFTs';
@@ -33,7 +33,7 @@ export async function updateTokenGateDetails(tokenGates: TokenGateWithRoles[] | 
             });
 
             if (nft) {
-              const nftName = hasTokenId ? nft.title || nft.contractName : nft.contractName;
+              const nftName = nft.title || nft.contractName;
               return {
                 ...condition,
                 name: nftName,

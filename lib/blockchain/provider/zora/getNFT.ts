@@ -26,7 +26,7 @@ export async function getNFT({
   const response = await provider.token({
     token: {
       address,
-      tokenId
+      tokenId: String(tokenId)
     },
     network: {
       network: ZDKNetwork.Zora,
