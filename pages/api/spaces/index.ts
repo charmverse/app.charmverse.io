@@ -11,7 +11,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
-import { checkUserBanStatus } from 'lib/users/checkUserBanStatus';
+import { checkUserBlacklistStatus } from 'lib/users/checkUserBlacklistStatus';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -30,8 +30,8 @@ async function getSpaces(req: NextApiRequest, res: NextApiResponse<Space[]>) {
 async function createSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
   const userId = req.session.user.id;
   const data = req.body as CreateSpaceProps;
-  const isBanned = await checkUserBanStatus(userId);
-  if (isBanned) {
+  const isBlacklisted = await checkUserBlacklistStatus(userId);
+  if (isBlacklisted) {
     throw new UnauthorisedActionError('This account has been blocked');
   }
   const space = await createWorkspace({

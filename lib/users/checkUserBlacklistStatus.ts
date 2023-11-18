@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export async function checkUserBanStatus(userId: string) {
+export async function checkUserBlacklistStatus(userId: string) {
   const userWalletAddresses: string[] = [];
   const userEmails: string[] = [];
   let userDiscordId: string | null = null;
