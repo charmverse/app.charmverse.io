@@ -32,14 +32,14 @@ async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse
 
   const userId = req.session.user?.id;
 
-  const pagePermissions = await prisma.pagePermission.findMany({
+  const pagePermissions = await prisma.pagePermission.count({
     where: {
       pageId,
       public: true
     }
   });
 
-  const isPublic = pagePermissions.length !== 0;
+  const isPublic = pagePermissions !== 0;
 
   const permissions = await req.basePermissionsClient.pages.computePagePermissions({
     resourceId: pageId,
