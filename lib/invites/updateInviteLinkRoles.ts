@@ -2,6 +2,8 @@ import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@c
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 
+import { ActionNotPermittedError } from 'lib/middleware';
+
 import type { InviteLinkWithRoles } from './getSpaceInviteLinks';
 
 export type InviteLinkRolesUpdate = {
@@ -27,6 +29,15 @@ export async function updateInviteLinkRoles({
 
   if (!inviteLink) {
     throw new DataNotFoundError(`Invite link with id ${inviteLinkId} not found`);
+  }
+
+  const hasExpired =
+    inviteLink.maxAgeMinutes > 0
+      ? new Date(inviteLink.createdAt).getTime() + inviteLink.maxAgeMinutes * 60 * 1000 < Date.now()
+      : false;
+
+  if (hasExpired) {
+    throw new ActionNotPermittedError(`Invite link has expired`);
   }
 
   const updatedInviteLink = await prisma.$transaction(async (tx) => {

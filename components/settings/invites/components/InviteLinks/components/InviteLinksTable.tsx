@@ -65,73 +65,82 @@ export function InvitesTable() {
               </TableCell>
             </TableRow>
           )}
-          {privateInvites?.map((invite) => (
-            <TableRow key={invite.id}>
-              <TableCell sx={{ padding: '20px 16px' }}>
-                <Box display='flex' justifyContent='flex-start' gap={1}>
-                  Private Link
-                </Box>
-              </TableCell>
-              <TableCell>
-                <Typography>
-                  {invite.useCount}
-                  {invite.maxUses > 0 ? ` / ${invite.maxUses}` : ''}
-                </Typography>
-              </TableCell>
-              <TableCell width={150}>{getExpires(invite)}</TableCell>
-              <TableCell width={150}>
-                <TokenGateRolesSelect
-                  isAdmin={isAdmin}
-                  selectedRoleIds={invite.roleIds}
-                  onChange={(roleIds) => {
-                    updateInviteLinkRoles({ inviteLinkId: invite.id, roleIds });
-                  }}
-                  onDelete={(roleId) => {
-                    updateInviteLinkRoles({
-                      inviteLinkId: invite.id,
-                      roleIds: invite.roleIds.filter((role) => role !== roleId)
-                    });
-                  }}
-                />
-              </TableCell>
-              <TableCell width={90}>
-                <Tooltip
-                  arrow
-                  placement='top'
-                  title={copied[invite.id] ? 'Copied!' : 'Click to copy link'}
-                  disableInteractive
-                >
-                  <Box component='span'>
-                    <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
-                      <Chip
-                        sx={{ width: 90 }}
+          {privateInvites?.map((invite) => {
+            const hasExpired =
+              invite.maxAgeMinutes > 0
+                ? new Date(invite.createdAt).getTime() + invite.maxAgeMinutes * 60 * 1000 < Date.now()
+                : false;
+
+            return (
+              <TableRow key={invite.id}>
+                <TableCell sx={{ padding: '20px 16px' }}>
+                  <Box display='flex' justifyContent='flex-start' gap={1}>
+                    Private Link
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Typography>
+                    {invite.useCount}
+                    {invite.maxUses > 0 ? ` / ${invite.maxUses}` : ''}
+                  </Typography>
+                </TableCell>
+                <TableCell width={150}>{getExpires(invite)}</TableCell>
+                <TableCell width={150}>
+                  <TokenGateRolesSelect
+                    disabled={hasExpired}
+                    isAdmin={isAdmin}
+                    selectedRoleIds={invite.roleIds}
+                    onChange={(roleIds) => {
+                      updateInviteLinkRoles({ inviteLinkId: invite.id, roleIds });
+                    }}
+                    onDelete={(roleId) => {
+                      updateInviteLinkRoles({
+                        inviteLinkId: invite.id,
+                        roleIds: invite.roleIds.filter((role) => role !== roleId)
+                      });
+                    }}
+                  />
+                </TableCell>
+                <TableCell width={90}>
+                  <Tooltip
+                    arrow
+                    placement='top'
+                    title={copied[invite.id] ? 'Copied!' : 'Click to copy link'}
+                    disableInteractive
+                  >
+                    <Box component='span'>
+                      <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
+                        <Chip
+                          disabled={hasExpired}
+                          sx={{ width: 90 }}
+                          clickable
+                          color='secondary'
+                          size='small'
+                          variant='outlined'
+                          label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
+                        />
+                      </CopyToClipboard>
+                    </Box>
+                  </Tooltip>
+                </TableCell>
+                <TableCell width={30}>
+                  {isAdmin && (
+                    <Tooltip arrow placement='top' title='Delete'>
+                      <ButtonChip
+                        className='row-actions'
+                        icon={<CloseIcon />}
                         clickable
                         color='secondary'
                         size='small'
                         variant='outlined'
-                        label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
+                        onClick={() => triggerInviteDeletion(invite)}
                       />
-                    </CopyToClipboard>
-                  </Box>
-                </Tooltip>
-              </TableCell>
-              <TableCell width={30}>
-                {isAdmin && (
-                  <Tooltip arrow placement='top' title='Delete'>
-                    <ButtonChip
-                      className='row-actions'
-                      icon={<CloseIcon />}
-                      clickable
-                      color='secondary'
-                      size='small'
-                      variant='outlined'
-                      onClick={() => triggerInviteDeletion(invite)}
-                    />
-                  </Tooltip>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
+                    </Tooltip>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
       {inviteToDelete && (
