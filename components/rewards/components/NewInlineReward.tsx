@@ -31,7 +31,7 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
 
   return (
     <Stack gap={1}>
-      <RewardPropertiesForm onChange={setRewardValues} values={rewardValues} />
+      <RewardPropertiesForm onChange={setRewardValues} values={rewardValues} expandedByDefault isNewReward />
       <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} gap={1}>
         <Button onClick={() => setCreatingInlineReward(false)} variant='outlined' color='secondary'>
           Cancel

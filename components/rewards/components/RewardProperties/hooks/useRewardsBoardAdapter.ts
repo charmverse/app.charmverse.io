@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -15,6 +16,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
+import type { PagesMap } from 'lib/pages';
 import {
   ASSIGNEES_BLOCK_ID,
   CREATED_AT_ID,
@@ -38,7 +40,10 @@ export function useRewardsBoardAdapter() {
   const { rewards } = useRewards();
   const { pages } = usePages();
   const { rewardPropertiesBlock, rewardBlocks } = useRewardBlocks();
-  const rewardPage = pages[boardReward?.id || ''];
+  const { getRewardPage } = useRewardPage();
+
+  const rewardPage = getRewardPage(boardReward?.id);
+  Object.values(pages).find((p) => p?.bountyId === boardReward?.id);
 
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
@@ -67,7 +72,7 @@ export function useRewardsBoardAdapter() {
     let cards =
       rewards
         ?.map((p) => {
-          const page = pages[p?.id];
+          const page = getRewardPage(p.id);
 
           return mapRewardToCardPage({ reward: p, rewardPage: page, spaceId: space?.id, members: membersRecord });
         })
@@ -88,7 +93,7 @@ export function useRewardsBoardAdapter() {
     const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
 
     return sortedCardPages;
-  }, [activeView, board, membersRecord, pages, rewards, space?.id]);
+  }, [activeView, board, getRewardPage, membersRecord, rewards, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: rewardPropertiesBlock,

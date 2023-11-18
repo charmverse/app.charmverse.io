@@ -24,8 +24,6 @@ import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useBounties } from 'hooks/useBounties';
-import { useBountyPermissions } from 'hooks/useBountyPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useVotes } from 'hooks/useVotes';

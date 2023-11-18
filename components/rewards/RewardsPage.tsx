@@ -21,6 +21,7 @@ import {
 } from 'components/common/PageLayout/components/DatabasePageContent';
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -44,6 +45,7 @@ export function RewardsPage({ title }: { title: string }) {
   const loadingData = !rewards;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
+  const { getRewardPage } = useRewardPage();
 
   const isAdmin = useIsAdmin();
 
@@ -65,9 +67,11 @@ export function RewardsPage({ title }: { title: string }) {
 
   useRewardsBoardMutator();
 
-  function openPage(pageId: string | null) {
-    if (!pageId) return;
-    updateURLQuery({ id: pageId });
+  function openPage(pageOrRewardId: string | null) {
+    if (!pageOrRewardId) return;
+
+    const pageId = getRewardPage(pageOrRewardId)?.id;
+    updateURLQuery({ id: pageId || pageOrRewardId });
   }
 
   const onDelete = useCallback(async (rewardId: string) => {

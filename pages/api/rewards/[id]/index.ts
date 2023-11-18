@@ -57,13 +57,24 @@ async function getRewardController(req: NextApiRequest, res: NextApiResponse<Rew
 
 async function updateReward(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
   const { id } = req.query as { id: string };
-
   const updateContent = (req.body ?? {}) as UpdateableRewardFields;
-
   const userId = req.session.user.id;
 
+  const reward = await getRewardOrThrow({ rewardId: id as string });
+
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: reward.id
+    },
+    select: {
+      id: true
+    }
+  });
+
+  const pageId = rewardPage.id;
+
   const rewardPagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
-    resourceId: id,
+    resourceId: pageId,
     userId
   });
 
@@ -71,7 +82,7 @@ async function updateReward(req: NextApiRequest, res: NextApiResponse<RewardWith
     throw new UnauthorisedActionError('You do not have permissions to edit this reward.');
   }
   await updateRewardSettings({
-    rewardId: id,
+    rewardId: reward.id,
     updateContent
   });
 
