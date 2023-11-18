@@ -67,11 +67,11 @@ export function RewardsPage({ title }: { title: string }) {
 
   useRewardsBoardMutator();
 
-  function openPage(pageOrRewardId: string | null) {
-    if (!pageOrRewardId) return;
+  function openPage(rewardId: string | null) {
+    if (!rewardId) return;
 
-    const pageId = getRewardPage(pageOrRewardId)?.id;
-    updateURLQuery({ id: pageId || pageOrRewardId });
+    const pageId = getRewardPage(rewardId)?.id || rewardId;
+    updateURLQuery({ id: pageId });
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
