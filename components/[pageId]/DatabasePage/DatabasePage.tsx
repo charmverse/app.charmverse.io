@@ -2,7 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
@@ -120,32 +120,36 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     }
   });
 
-  const showCard = async (cardId: string | null) => {
-    if (cardId === null) {
-      setShownCardId(null);
-      return;
-    }
-
-    const cardPage = cardId && pages ? pages[cardId] ?? (await refreshPage(cardId)) : null;
-
-    if (activeView.fields.openPageIn === 'center_peek' || cardPage?.type.includes('template')) {
-      updateURLQuery({ viewId: router.query.viewId as string, cardId });
-      setShownCardId(cardId);
-    } else if (activeView.fields.openPageIn === 'full_page' && cardPage) {
-      navigateToSpacePath(`/${cardPage.path}`);
-    }
-  };
-
-  const showView = (viewId: string) => {
-    const { cardId, ...rest } = router.query;
-    router.replace({
-      pathname: router.pathname,
-      query: {
-        ...rest,
-        viewId: viewId || ''
+  const showCard = useCallback(
+    async (cardId: string | null, isTemplate?: boolean) => {
+      if (cardId === null) {
+        setShownCardId(null);
+        return;
       }
-    });
-  };
+
+      if (activeView.fields.openPageIn === 'center_peek' || isTemplate) {
+        updateURLQuery({ viewId: router.query.viewId as string, cardId });
+        setShownCardId(cardId);
+      } else if (activeView.fields.openPageIn === 'full_page') {
+        navigateToSpacePath(`/${cardId}`);
+      }
+    },
+    [router.query, activeView, pages]
+  );
+
+  const showView = useCallback(
+    (viewId: string) => {
+      const { cardId, ...rest } = router.query;
+      router.replace({
+        pathname: router.pathname,
+        query: {
+          ...rest,
+          viewId: viewId || ''
+        }
+      });
+    },
+    [router.query]
+  );
 
   if (board) {
     return (

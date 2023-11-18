@@ -22,7 +22,7 @@ type Props = {
   readOnly: boolean;
   cardIdToFocusOnRender: string;
   showCard: (cardId: string, parentId?: string) => void;
-  addCard: (groupByOptionId?: string) => Promise<void>;
+  addCard: (groupByOptionId?: string) => Promise<void> | void;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
   onDeleteCard?: (cardId: string) => Promise<void>;

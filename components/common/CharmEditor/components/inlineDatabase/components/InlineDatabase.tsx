@@ -14,7 +14,6 @@ import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
@@ -95,7 +94,6 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const dispatch = useAppDispatch();
   const { navigateToSpacePath } = useCharmRouter();
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
-  const { pages, refreshPage } = usePages();
   useEffect(() => {
     if (!currentViewId && views.length > 0) {
       setCurrentViewId(views[0].id);
@@ -124,18 +122,16 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
     }, 500);
   }, [updatePage]);
 
-  const showCard = async (cardId: string | null) => {
+  const showCard = async (cardId: string | null, isTemplate?: boolean) => {
     if (cardId === null) {
       setShownCardId(null);
       return;
     }
 
-    const cardPage = cardId && pages ? pages[cardId] ?? (await refreshPage(cardId)) : null;
-
-    if (currentView.fields.openPageIn === 'center_peek' || cardPage?.type.includes('template')) {
+    if (currentView.fields.openPageIn === 'center_peek' || isTemplate) {
       setShownCardId(cardId);
-    } else if (currentView.fields.openPageIn === 'full_page' && cardPage) {
-      navigateToSpacePath(`/${cardPage.path}`);
+    } else if (currentView.fields.openPageIn === 'full_page') {
+      navigateToSpacePath(`/${cardId}`);
     }
   };
 

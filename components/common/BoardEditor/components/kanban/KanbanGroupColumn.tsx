@@ -17,7 +17,7 @@ type Props = {
   readOnly: boolean;
   visiblePropertyTemplates: IPropertyTemplate[];
   selectedCardIds: string[];
-  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void> | void;
   onDropToColumn: (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDropToCard: (srcCard: Card, dstCard: Card) => Promise<void>;
