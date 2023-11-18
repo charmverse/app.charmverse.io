@@ -84,6 +84,7 @@ type ProposalPropertiesProps = {
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   readOnlyCustomProperties?: string[];
   openEvaluation?: () => void;
+  canSeeEvaluation?: boolean;
 };
 
 export function ProposalPropertiesBase({
@@ -110,6 +111,7 @@ export function ProposalPropertiesBase({
   updateProposalStatus,
   isPublishingToLens,
   openEvaluation,
+  canSeeEvaluation,
   readOnlyCustomProperties
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
@@ -137,7 +139,6 @@ export function ProposalPropertiesBase({
   const previousStatus = statuses[currentStatusIndex - 1];
   const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
   const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
-  const showEvaluationButton = proposalStatus === 'evaluation_active' || proposalStatus === 'evaluation_closed';
 
   async function handleProposalStatusUpdate(newStatus: ProposalStatus) {
     switch (newStatus) {
@@ -519,7 +520,7 @@ export function ProposalPropertiesBase({
           }}
         />
 
-        {showEvaluationButton && (
+        {canSeeEvaluation && (
           <Box display='flex' justifyContent='center' py={2}>
             <Button onClick={openEvaluation}>Review this proposal</Button>
           </Box>

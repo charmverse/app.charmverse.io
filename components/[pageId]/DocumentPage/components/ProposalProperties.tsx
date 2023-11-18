@@ -171,6 +171,7 @@ export function ProposalProperties({
   return (
     <>
       <ProposalPropertiesBase
+        canSeeEvaluation={canSeeEvaluation}
         proposalLensLink={proposal?.lensPostLink ?? undefined}
         archived={!!proposal?.archived}
         isFromTemplate={!!proposal?.page?.sourceTemplateId}
