@@ -59,13 +59,12 @@ export function ConnectCollabland() {
               onClose={disconnectCollablandModalState.close}
               open={disconnectCollablandModalState.isOpen}
               buttonText='Disconnect'
-              primaryButtonColor='primary'
               question={
                 <List dense sx={{ mt: -1, mx: 2, listStyleType: 'disc', listStylePosition: 'outside' }}>
                   {[
                     'You will visit CollabLand Command Center',
                     'Click Uninstall on the CharmVerse plugin you have installed',
-                    'CollabLand roles will be deleted and no longer synced'
+                    'CollabLand roles will no longer be synced'
                   ].map((step) => (
                     <ListItem key={step} sx={{ px: 0, display: 'list-item' }}>
                       <Typography variant='body2'>{step}</Typography>
