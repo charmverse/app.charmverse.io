@@ -343,13 +343,12 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') &&
-                pagePermissions.comment && (
-                  <Box mt='-100px'>
-                    {/* add negative margin to offset height of .charm-empty-footer */}
-                    <PageComments page={page} permissions={pagePermissions} />
-                  </Box>
-                )}
+              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
+                <Box mt='-100px'>
+                  {/* add negative margin to offset height of .charm-empty-footer */}
+                  <PageComments page={page} permissions={pagePermissions} />
+                </Box>
+              )}
             </Container>
           </div>
         </ScrollContainer>
