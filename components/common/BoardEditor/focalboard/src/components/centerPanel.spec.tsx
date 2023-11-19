@@ -29,7 +29,6 @@ jest.mock('next/router', () => ({
 }));
 
 const mockedUtils = jest.mocked(Utils, { shallow: true });
-const mockedMutator = jest.mocked(Mutator, { shallow: true });
 mockedUtils.createGuid.mockReturnValue('test-id');
 describe('components/centerPanel', () => {
   const board = TestBlockFactory.createBoard();
@@ -168,7 +167,7 @@ describe('components/centerPanel', () => {
       const kanbanCardElement = kanbanCardElements[0];
       userEvent.click(kanbanCardElement);
       expect(container).toMatchSnapshot();
-      expect(mockedShowCard).toBeCalledWith(card1.id);
+      expect(mockedShowCard).toBeCalledWith(card1.id, undefined);
     });
   });
 });

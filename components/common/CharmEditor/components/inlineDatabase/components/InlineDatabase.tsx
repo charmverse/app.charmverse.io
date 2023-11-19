@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/fo
 import { makeSelectSortedViews, makeSelectView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -91,9 +92,8 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const views = useAppSelector((state) => selectSortedViews(state, pageId));
   const router = useRouter();
   const dispatch = useAppDispatch();
-
+  const { navigateToSpacePath } = useCharmRouter();
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
-
   useEffect(() => {
     if (!currentViewId && views.length > 0) {
       setCurrentViewId(views[0].id);
@@ -121,6 +121,19 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
       await updatePage({ id: pageId, ...updates });
     }, 500);
   }, [updatePage]);
+
+  const showCard = async (cardId: string | null, isTemplate?: boolean) => {
+    if (cardId === null) {
+      setShownCardId(null);
+      return;
+    }
+
+    if (currentView.fields.openPageIn === 'center_peek' || isTemplate) {
+      setShownCardId(cardId);
+    } else if (currentView.fields.openPageIn === 'full_page') {
+      navigateToSpacePath(`/${cardId}`);
+    }
+  };
 
   function stopPropagation(e: KeyboardEvent | MouseEvent | ClipboardEvent) {
     e.stopPropagation();
@@ -159,7 +172,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
           board={board}
           embeddedBoardPath={boardPage.path}
           setPage={debouncedPageUpdate}
-          showCard={setShownCardId}
+          showCard={showCard}
           activeView={currentView}
           views={views}
           page={boardPage}

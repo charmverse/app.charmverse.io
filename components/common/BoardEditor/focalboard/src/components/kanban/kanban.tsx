@@ -67,7 +67,7 @@ type Props = {
   intl: IntlShape;
   readOnly: boolean;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void> | void;
   showCard: (cardId: string | null) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;

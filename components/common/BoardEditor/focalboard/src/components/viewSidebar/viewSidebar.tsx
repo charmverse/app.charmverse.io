@@ -29,6 +29,7 @@ interface Props {
   hideLayoutOptions?: boolean;
   hideSourceOptions?: boolean;
   hideGroupOptions?: boolean;
+  hideLayoutSelectOptions?: boolean;
   hidePropertiesRow?: boolean;
   withProposalCategories?: boolean;
 }
@@ -65,7 +66,11 @@ function ViewSidebar(props: Props) {
               {sidebarView === 'layout' && (
                 <>
                   <DatabaseSidebarHeader goBack={goToSidebarHome} title='Layout' onClose={props.closeSidebar} />
-                  <ViewLayoutOptions board={props.board} view={props.view} />
+                  <ViewLayoutOptions
+                    hideLayoutSelectOptions={props.hideLayoutSelectOptions}
+                    board={props.board}
+                    view={props.view}
+                  />
                 </>
               )}
               {sidebarView === 'card-properties' && (
