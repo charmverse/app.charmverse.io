@@ -1,8 +1,10 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
+import { getRewardOrThrow } from 'lib/rewards/getReward';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -19,10 +21,25 @@ handler
   .get(isRewardEditable);
 
 async function isRewardEditable(req: NextApiRequest, res: NextApiResponse<{ editable: boolean }>) {
-  const { id: bountyId } = req.query;
+  const { id } = req.query;
+
+  const reward = await getRewardOrThrow({ rewardId: id as string });
+
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: reward.id
+    },
+    select: {
+      id: true,
+      title: true,
+      path: true
+    }
+  });
+
+  const pageId = rewardPage.id;
 
   const result = await req.premiumPermissionsClient.pages.isBountyPageEditableByApplicants({
-    resourceId: bountyId as string
+    resourceId: pageId
   });
 
   res.status(200).send(result);

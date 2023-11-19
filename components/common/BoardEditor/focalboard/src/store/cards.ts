@@ -8,7 +8,7 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import type { Member } from 'lib/members/interfaces';
-import type { PagesMap } from 'lib/pages';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
 import { Utils } from '../utils';
 
@@ -238,6 +238,12 @@ export function sortCards(
           } else {
             result = titleOrCreatedOrder(a.page, b.page);
           }
+        } else if (template.id === PROPOSAL_REVIEWERS_BLOCK_ID) {
+          const value1 = (Array.isArray(aValue) ? aValue[0] : aValue) as unknown as Record<string, any>;
+          const value2 = (Array.isArray(bValue) ? bValue[0] : bValue) as unknown as Record<string, any>;
+          aValue = typeof value1 === 'object' && 'id' in value1 ? members[value1.id]?.username || '' : '';
+          bValue = typeof value2 === 'object' && 'id' in value2 ? members[value2.id]?.username || '' : '';
+          result = aValue.localeCompare(bValue);
         } else {
           // Text-based sort
 

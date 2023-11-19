@@ -26,7 +26,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
@@ -37,7 +36,6 @@ export function ProposalsPage({ title }: { title: string }) {
   const { isFreeSpace } = useIsFreeSpace();
   const { proposals } = useProposals();
   const [newProposal, setNewProposal] = useState<Partial<ProposalPageAndPropertiesInput> | null>(null);
-  const { pages } = usePages();
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
@@ -72,11 +70,10 @@ export function ProposalsPage({ title }: { title: string }) {
   function openPage(pageId: string | null) {
     if (!pageId) return;
     const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
-    const page = pages[pageId];
-    if (openPageIn === 'center_peek' || page?.type.includes('template')) {
+    if (openPageIn === 'center_peek') {
       updateURLQuery({ id: pageId });
-    } else if (openPageIn === 'full_page' && page) {
-      navigateToSpacePath(`/${page.path}`);
+    } else if (openPageIn === 'full_page') {
+      navigateToSpacePath(`/${pageId}`);
     }
   }
 

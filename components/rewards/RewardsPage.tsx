@@ -18,6 +18,7 @@ import {
 } from 'components/common/PageLayout/components/DatabasePageContent';
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -35,14 +36,13 @@ export function RewardsPage({ title }: { title: string }) {
 
   const { space: currentSpace } = useCurrentSpace();
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
-  const { pages } = usePages();
-
   const { isFreeSpace } = useIsFreeSpace();
   const { rewards } = useRewards();
 
   const loadingData = !rewards;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
+  const { getRewardPage } = useRewardPage();
 
   const isAdmin = useIsAdmin();
 
@@ -66,14 +66,15 @@ export function RewardsPage({ title }: { title: string }) {
 
   const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
 
-  function openPage(pageId: string | null) {
-    if (!pageId) return;
-    const page = pages[pageId];
+  function openPage(rewardId: string | null) {
+    if (!rewardId) return;
+
+    const pageId = getRewardPage(rewardId)?.id || rewardId;
 
     if (openPageIn === 'center_peek') {
       updateURLQuery({ id: pageId });
-    } else if (openPageIn === 'full_page' && page) {
-      navigateToSpacePath(`/${page.path}`);
+    } else if (openPageIn === 'full_page') {
+      navigateToSpacePath(`/${pageId}`);
     }
   }
 
@@ -85,14 +86,10 @@ export function RewardsPage({ title }: { title: string }) {
     if (id && (!rewardId || id === rewardId)) {
       openPage(id);
     } else if (id) {
-      const page = rewardId ? pages[rewardId] : null;
-
       if (openPageIn === 'center_peek') {
         updateURLQuery({ applicationId: id });
-      } else if (openPageIn === 'full_page' && page) {
-        navigateToSpacePath(`/${page.path}`, {
-          applicationId: id
-        });
+      } else if (openPageIn === 'full_page') {
+        navigateToSpacePath(`/rewards/applications/${id}`);
       }
     }
   };
