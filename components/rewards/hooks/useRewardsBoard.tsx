@@ -5,8 +5,9 @@ import { createContext, useContext, useMemo } from 'react';
 import type { BoardReward } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { RewardCard, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 
 type RewardsBoardContextType = {
@@ -20,6 +21,10 @@ type RewardsBoardContextType = {
   rewardPage: PageMeta | undefined;
   boardReward: BoardReward | null;
   setBoardReward: (boardReward: BoardReward | null) => void;
+  localFilters: FilterGroup | null;
+  localSort: ISortOption[] | null;
+  setLocalFilters: (filters: FilterGroup | null) => void;
+  setLocalSort: (sort: ISortOption[] | null) => void;
 };
 
 export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
@@ -32,38 +37,17 @@ export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextTyp
   views: [],
   rewardPage: undefined,
   boardReward: null,
-  setBoardReward: () => {}
+  setBoardReward: () => {},
+  localFilters: null,
+  localSort: null,
+  setLocalFilters: () => {},
+  setLocalSort: () => {}
 });
 
 export function RewardsBoardProvider({ children }: { children: ReactNode }) {
-  const {
-    board,
-    boardCustomProperties,
-    card,
-    cards,
-    activeView,
-    views,
-    rewardPage,
-    setBoardReward,
-    boardReward,
-    cardPages
-  } = useRewardsBoardAdapter();
+  const boardContext = useRewardsBoardAdapter();
 
-  const value = useMemo(
-    () => ({
-      board,
-      boardCustomProperties,
-      card,
-      cards,
-      activeView,
-      views,
-      rewardPage,
-      setBoardReward,
-      boardReward,
-      cardPages
-    }),
-    [board, boardCustomProperties, card, cards, activeView, views, rewardPage, setBoardReward, boardReward, cardPages]
-  );
+  const value = useMemo(() => boardContext, [boardContext]);
 
   return <RewardsBoardContext.Provider value={value}>{children}</RewardsBoardContext.Provider>;
 }

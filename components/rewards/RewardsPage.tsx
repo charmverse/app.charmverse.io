@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
+import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
@@ -27,7 +28,9 @@ import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePages } from 'hooks/usePages';
+import type { ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 
 import { useRewards } from './hooks/useRewards';
 
@@ -46,7 +49,17 @@ export function RewardsPage({ title }: { title: string }) {
 
   const isAdmin = useIsAdmin();
 
-  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
+  const {
+    board: activeBoard,
+    views,
+    cardPages,
+    activeView,
+    cards,
+    localFilters,
+    localSort,
+    setLocalFilters,
+    setLocalSort
+  } = useRewardsBoard();
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
@@ -149,6 +162,14 @@ export function RewardsPage({ title }: { title: string }) {
               )}
             </Stack>
             <Divider />
+
+            <ViewSettingsRow
+              localFilters={localFilters}
+              activeView={activeView}
+              localSort={localSort}
+              setLocalSort={setLocalSort}
+              setLocalFilters={setLocalFilters}
+            />
           </>
         )}
       </DatabaseStickyHeader>

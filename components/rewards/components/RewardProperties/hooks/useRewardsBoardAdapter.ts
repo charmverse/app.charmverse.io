@@ -7,6 +7,7 @@ import { getDefaultBoard, getDefaultTableView } from 'components/rewards/compone
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
@@ -43,8 +44,10 @@ export function useRewardsBoardAdapter() {
   const { getRewardPage } = useRewardPage();
 
   const rewardPage = getRewardPage(boardReward?.id);
-  Object.values(pages).find((p) => p?.bountyId === boardReward?.id);
-
+  // TODO - use different types of views (board, calendar)
+  const { localFilters, setLocalFilters, localSort, setLocalSort } = useLocalDbViewSettings(
+    `rewards-${DEFAULT_VIEW_BLOCK_ID}`
+  );
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
     storedBoard: rewardPropertiesBlock
@@ -52,6 +55,7 @@ export function useRewardsBoardAdapter() {
 
   const activeView = useMemo(() => {
     // use saved default block or build on the fly
+    // TODO: use different types of views
     const viewBlock = rewardBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
@@ -65,8 +69,17 @@ export function useRewardsBoardAdapter() {
       boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
     }
 
+    // override filter and sort with local settings
+    if (localSort) {
+      boardView.fields.sortOptions = localSort;
+    }
+
+    if (localFilters) {
+      boardView.fields.filter = localFilters;
+    }
+
     return boardView;
-  }, [rewardPropertiesBlock, rewardBlocks]);
+  }, [rewardBlocks, localSort, localFilters, rewardPropertiesBlock]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -123,7 +136,11 @@ export function useRewardsBoardAdapter() {
     views,
     rewardPage,
     boardReward,
-    setBoardReward
+    setBoardReward,
+    localFilters,
+    localSort,
+    setLocalFilters,
+    setLocalSort
   };
 }
 
