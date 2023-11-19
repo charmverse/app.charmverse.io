@@ -8,6 +8,7 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import type { Member } from 'lib/members/interfaces';
+import type { PagesMap } from 'lib/pages';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
 import { Utils } from '../utils';
@@ -326,14 +327,23 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-type getViewCardsProps = { viewId: string; boardId: string };
+type getViewCardsProps = { viewId: string; boardId: string; pages: PagesMap };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    getCards,
-    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
-    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
-    (cards, board, view) => {
+    (state: RootState, props: getViewCardsProps) => {
+      const cards = getCards(state);
+      const board = state.boards.boards[props.boardId];
+      const view = state.views.views[props.viewId];
+
+      return {
+        cards,
+        board,
+        view,
+        pages: props.pages
+      };
+    },
+    ({ cards, board, view, pages }) => {
       if (!view || !board || !cards) {
         return [];
       }
@@ -344,7 +354,7 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
         : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
 
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result);
+        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result, pages);
       }
       return result;
     }

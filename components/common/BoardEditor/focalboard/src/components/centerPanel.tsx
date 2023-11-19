@@ -122,13 +122,15 @@ function CenterPanel(props: Props) {
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
 
-  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
+  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, [pages]);
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || ''
+      viewId: activeView?.id || '',
+      pages
     })
   );
+
   const isActiveView = !!(activeView && activeBoard);
 
   useEffect(() => {

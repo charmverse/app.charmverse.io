@@ -26,7 +26,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
 import { useRewards } from './hooks/useRewards';
@@ -50,7 +49,6 @@ export function RewardsPage({ title }: { title: string }) {
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
-  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -129,7 +127,7 @@ export function RewardsPage({ title }: { title: string }) {
         {!!rewards?.length && (
           <>
             <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
               <ViewSortControl
                 activeBoard={activeBoard}

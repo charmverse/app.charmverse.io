@@ -84,7 +84,8 @@ export function useRewardsBoardAdapter() {
       const filteredCardsIds = CardFilter.applyFilterGroup(
         activeView.fields.filter,
         board.fields.cardProperties,
-        cardsRaw
+        cardsRaw,
+        pages
       ).map((c) => c.id);
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
