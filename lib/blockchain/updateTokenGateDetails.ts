@@ -23,7 +23,7 @@ export async function updateTokenGateDetails(tokenGates: TokenGateWithRoles[] | 
 
           if (isNft) {
             const hasTokenId = !!condition.parameters[0] && Number(condition.parameters[0]) >= 0;
-            const tokenId = hasTokenId ? condition.parameters[0] : 1;
+            const tokenId = hasTokenId ? String(condition.parameters[0]) : '1';
             const chainDetails = getChainById(LIT_CHAINS[condition.chain].chainId);
 
             const nft = await getNFT({
