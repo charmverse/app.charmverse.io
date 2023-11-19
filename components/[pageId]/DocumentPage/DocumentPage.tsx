@@ -115,7 +115,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   }, [printRef, _printRef]);
 
   const card = useAppSelector((state) => {
-    if (page?.type !== 'card') {
+    if (page?.type !== 'card' && page?.type !== 'card_template') {
       return null;
     }
     return state.cards.cards[page.id] ?? state.cards.templates[page.id];
