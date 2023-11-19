@@ -44,10 +44,7 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const { subscribe } = useWebSocketClient();
 
   // filter out deleted and templates
-  const rewards = useMemo(
-    () => (data ? data.filter((reward) => !pages[reward.id]?.deletedAt && pages[reward.id]?.type === 'bounty') : []),
-    [pages, data]
-  );
+  const rewards = useMemo(() => (data ? data.filter((reward) => !pages[reward.id]?.deletedAt) : []), [pages, data]);
 
   const updateReward = useCallback(
     async (rewardUpdate: RewardUpdate) => {
