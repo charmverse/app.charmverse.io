@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
@@ -9,7 +9,6 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
@@ -17,7 +16,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
-import type { PagesMap } from 'lib/pages';
 import {
   ASSIGNEES_BLOCK_ID,
   CREATED_AT_ID,
@@ -39,15 +37,13 @@ export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { rewards } = useRewards();
-  const { pages } = usePages();
   const { rewardPropertiesBlock, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
 
   const rewardPage = getRewardPage(boardReward?.id);
   // TODO - use different types of views (board, calendar)
-  const { localFilters, setLocalFilters, localSort, setLocalSort } = useLocalDbViewSettings(
-    `rewards-${DEFAULT_VIEW_BLOCK_ID}`
-  );
+  const localViewSettings = useLocalDbViewSettings(`rewards-${DEFAULT_VIEW_BLOCK_ID}`);
+
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
     storedBoard: rewardPropertiesBlock
@@ -69,17 +65,24 @@ export function useRewardsBoardAdapter() {
       boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
     }
 
-    // override filter and sort with local settings
+    if (!localViewSettings) {
+      throw new Error('localViewSettings provider not found');
+    }
+
+    const { localSort, localFilters, setGlobalFilters, setGlobalSort } = localViewSettings;
+    setGlobalSort(boardView.fields.sortOptions);
+    setGlobalFilters(boardView.fields.filter);
+
     if (localSort) {
-      boardView.fields.sortOptions = localSort;
+      boardView.fields = { ...boardView.fields, sortOptions: localSort };
     }
 
     if (localFilters) {
-      boardView.fields.filter = localFilters;
+      boardView.fields = { ...boardView.fields, filter: localFilters };
     }
 
     return boardView;
-  }, [rewardBlocks, localSort, localFilters, rewardPropertiesBlock]);
+  }, [localViewSettings, rewardBlocks, rewardPropertiesBlock]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -95,7 +98,7 @@ export function useRewardsBoardAdapter() {
     if (activeView?.fields.filter) {
       const cardsRaw = cards.map((cp) => cp.card);
       const filteredCardsIds = CardFilter.applyFilterGroup(
-        activeView.fields.filter,
+        activeView?.fields.filter,
         board.fields.cardProperties,
         cardsRaw
       ).map((c) => c.id);
@@ -136,11 +139,7 @@ export function useRewardsBoardAdapter() {
     views,
     rewardPage,
     boardReward,
-    setBoardReward,
-    localFilters,
-    localSort,
-    setLocalFilters,
-    setLocalSort
+    setBoardReward
   };
 }
 

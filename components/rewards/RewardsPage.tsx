@@ -163,13 +163,7 @@ export function RewardsPage({ title }: { title: string }) {
             </Stack>
             <Divider />
 
-            <ViewSettingsRow
-              localFilters={localFilters}
-              activeView={activeView}
-              localSort={localSort}
-              setLocalSort={setLocalSort}
-              setLocalFilters={setLocalFilters}
-            />
+            <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
           </>
         )}
       </DatabaseStickyHeader>

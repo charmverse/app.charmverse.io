@@ -3,6 +3,7 @@ import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import { Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import React, { useCallback } from 'react';
 
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -19,6 +20,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
   const sortDisplayOptions = properties?.map((o) => ({ id: o.id, name: o.name }));
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
+  const localViewSettings = useLocalDbViewSettings();
 
   const sortChanged = useCallback(
     (propertyId: string) => {
@@ -33,9 +35,16 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
       } else {
         newSortOptions = [{ propertyId, reversed: false }];
       }
+
+      // update sort locally if local settings context exist
+      if (localViewSettings) {
+        localViewSettings.setLocalSort(newSortOptions);
+        return;
+      }
+
       mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, newSortOptions);
     },
-    [activeView.id, activeView.fields.sortOptions]
+    [activeView.fields.sortOptions, activeView.id, localViewSettings]
   );
 
   const onManualSort = useCallback(() => {

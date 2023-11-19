@@ -8,12 +8,13 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { v4 } from 'uuid';
 
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { createFilterClause } from 'lib/focalboard/filterClause';
-import type { FilterGroupOperation } from 'lib/focalboard/filterGroup';
+import type { FilterGroup, FilterGroupOperation } from 'lib/focalboard/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
 import mutator from '../../mutator';
@@ -33,6 +34,17 @@ const StyledFilterComponent = styled(Box)`
 
 const FilterComponent = React.memo((props: Props) => {
   const { activeView, properties } = props;
+  const localViewSettings = useLocalDbViewSettings();
+
+  const changeViewFilter = (filterGroup: FilterGroup) => {
+    // update filters locally if local settings context exist
+    if (localViewSettings) {
+      localViewSettings.setLocalFilters(filterGroup);
+      return;
+    }
+
+    mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+  };
 
   const conditionClicked = (condition: FilterCondition, filter: FilterClause): void => {
     const filterGroup = createFilterGroup(activeView.fields.filter);
@@ -42,7 +54,8 @@ const FilterComponent = React.memo((props: Props) => {
 
     if (filterClause && filterClause.condition !== condition) {
       filterClause.condition = condition;
-      mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+
+      changeViewFilter(filterGroup);
     }
   };
 
@@ -57,11 +70,11 @@ const FilterComponent = React.memo((props: Props) => {
     });
 
     filterGroup.filters.push(filter);
-    mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+    changeViewFilter(filterGroup);
   };
 
   const deleteFilters = () => {
-    mutator.changeViewFilter(activeView.id, activeView.fields.filter, { filters: [], operation: 'and' });
+    changeViewFilter({ filters: [], operation: 'and' });
   };
 
   const filters: FilterClause[] =
@@ -70,7 +83,7 @@ const FilterComponent = React.memo((props: Props) => {
   function changeFilterGroupOperation(operation: FilterGroupOperation) {
     const filterGroup = createFilterGroup(activeView.fields.filter);
     filterGroup.operation = operation;
-    mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+    changeViewFilter(filterGroup);
   }
 
   return (

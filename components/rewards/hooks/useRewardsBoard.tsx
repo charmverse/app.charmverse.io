@@ -21,10 +21,6 @@ type RewardsBoardContextType = {
   rewardPage: PageMeta | undefined;
   boardReward: BoardReward | null;
   setBoardReward: (boardReward: BoardReward | null) => void;
-  localFilters: FilterGroup | null;
-  localSort: ISortOption[] | null;
-  setLocalFilters: (filters: FilterGroup | null) => void;
-  setLocalSort: (sort: ISortOption[] | null) => void;
 };
 
 export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
@@ -37,11 +33,7 @@ export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextTyp
   views: [],
   rewardPage: undefined,
   boardReward: null,
-  setBoardReward: () => {},
-  localFilters: null,
-  localSort: null,
-  setLocalFilters: () => {},
-  setLocalSort: () => {}
+  setBoardReward: () => {}
 });
 
 export function RewardsBoardProvider({ children }: { children: ReactNode }) {
