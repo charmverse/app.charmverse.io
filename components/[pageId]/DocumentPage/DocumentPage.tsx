@@ -44,7 +44,6 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
-import { useLastSidebarView } from './hooks/useLastSidebarView';
 import { usePageSidebar } from './hooks/usePageSidebar';
 
 // const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
@@ -94,7 +93,13 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
 
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath } = useCharmRouter();
-  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
+  const {
+    activeView: sidebarView,
+    persistedActiveView,
+    persistActiveView,
+    setActiveView,
+    closeSidebar
+  } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -201,8 +206,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     }
   }, [page.id, threadsPageId]);
 
-  const [defaultSidebarView, saveSidebarView] = useLastSidebarView();
-
   const threadIds = useMemo(
     () =>
       typeof page.type === 'string'
@@ -243,17 +246,17 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   useEffect(() => {
-    const defaultView = defaultSidebarView?.[page.id];
+    const defaultView = persistedActiveView?.[page.id];
     if (defaultView) {
       setActiveView(defaultView);
     }
-  }, [!!defaultSidebarView, page.id]);
+  }, [!!persistedActiveView, page.id]);
 
   const openEvaluation = useCallback(() => {
     if (enableSidebar) {
       setActiveView('proposal_evaluation');
     } else {
-      saveSidebarView({
+      persistActiveView({
         [page.id]: 'proposal_evaluation'
       });
       // go to full page view
