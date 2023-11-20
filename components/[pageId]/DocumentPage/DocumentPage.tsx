@@ -90,11 +90,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
-  // TODO: [bounties-cleanup]
-  // const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
-  //   bountyId: page.bountyId
-  // });
-  // const { draftBounty } = useBounties();
 
   const { creatingInlineReward } = useRewards();
 

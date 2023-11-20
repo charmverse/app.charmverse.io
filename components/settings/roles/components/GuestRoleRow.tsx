@@ -27,7 +27,7 @@ export function GuestRoleRow({ readOnly }: { readOnly: boolean }) {
           <>
             Guest permissions can not be changed
             <br />
-            Guests only have access to Pages, Bounties, Proposals and Forum Posts they have been shared on
+            Guests only have access to Pages, Rewards, Proposals and Forum Posts they have been shared on
           </>
         }
         readOnlyMembers={readOnly}

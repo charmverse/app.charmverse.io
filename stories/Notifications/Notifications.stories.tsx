@@ -163,7 +163,7 @@ const groups = [
     notifications: polls
   },
   {
-    title: 'Bounties',
+    title: 'Rewards',
     notifications: bounties
   },
   {
