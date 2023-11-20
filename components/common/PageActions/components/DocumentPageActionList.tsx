@@ -103,16 +103,24 @@ type Props = {
   pagePermissions?: PagePermissionFlags;
   undoEditorChanges?: VoidFunction;
   onDelete?: VoidFunction;
+  isInsideDialog?: boolean;
 };
 
-export function DocumentPageActionList({ page, onComplete, onDelete, pagePermissions, undoEditorChanges }: Props) {
+export function DocumentPageActionList({
+  isInsideDialog,
+  page,
+  onComplete,
+  onDelete,
+  pagePermissions,
+  undoEditorChanges
+}: Props) {
   const pageId = page.id;
   const { navigateToSpacePath } = useCharmRouter();
   const { updatePage, deletePage } = usePages();
   const { rewards, mutateRewards: refreshRewards } = useRewards();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
-  const { setActiveView, isInsideDialog } = usePageSidebar();
+  const { setActiveView } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
   const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();

@@ -121,7 +121,7 @@
     "@lit-protocol/constants": "^2.2.61",
     "@lit-protocol/lit-node-client": "^2.2.61",
     "@metamask/onboarding": "^1.0.1",
-    "@mui/icons-material": "^5.11.0",
+    "@mui/icons-material": "^5.14.18",
     "@mui/lab": "^5.0.0-alpha.118",
     "@mui/material": "^5.11.7",
     "@mui/x-date-pickers": "^5.0.16",

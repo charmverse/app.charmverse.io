@@ -1,4 +1,4 @@
-import type { EditorState, EditorView } from '@bangle.dev/pm';
+import type { EditorView } from '@bangle.dev/pm';
 import { Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
@@ -9,24 +9,20 @@ import type { CryptoCurrency, FiatCurrency } from 'connectors/chains';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
+import type { EditorState } from 'prosemirror-state';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
-import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageSidebarContext } from 'hooks/usePageSidebar';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getThreadsKey, useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import { isTruthy } from 'lib/utilities/types';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
@@ -55,7 +51,6 @@ import { PollNodeView } from './components/poll/PollComponent';
 import Quote from './components/quote/components/Quote';
 import ResizableImage from './components/ResizableImage';
 import RowActionsMenu from './components/rowActions/RowActionsMenu';
-import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
 import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
 import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
@@ -168,7 +163,7 @@ const defaultContent: PageContent = {
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
-interface CharmEditorProps {
+type CharmEditorProps = {
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -177,7 +172,8 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  PageSidebar?: IPageSidebarContext['activeView'];
+  sidebarView?: IPageSidebarContext['activeView'];
+  setSidebarView?: IPageSidebarContext['setActiveView'];
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
@@ -198,7 +194,9 @@ interface CharmEditorProps {
   disableMention?: boolean;
   allowClickingFooter?: boolean;
   disableVideo?: boolean;
-}
+  setEditorState?: (state: EditorState) => void; // this is used to pass the state to the suggestions sidebar
+  threadIds?: string[];
+};
 
 function CharmEditor({
   colorMode,
@@ -216,6 +214,7 @@ function CharmEditor({
   postId,
   containerWidth,
   pageType,
+  setEditorState,
   snapshotProposalId,
   pagePermissions,
   placeholderText,
@@ -226,15 +225,16 @@ function CharmEditor({
   onConnectionEvent,
   disableMention = false,
   allowClickingFooter,
-  disableVideo = false
+  disableVideo = false,
+  sidebarView,
+  setSidebarView,
+  threadIds
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
   const { space: currentSpace } = useCurrentSpace();
-  const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
-  const { threads } = useThreads();
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
@@ -291,31 +291,21 @@ function CharmEditor({
 
   const editorRef = useRef<HTMLDivElement>(null);
 
-  const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
-
   function onSelectionSet(state: EditorState) {
     // update state that triggers updates in the sidebar
-    setSuggestionState(state);
+    setEditorState?.(state);
     // expand the sidebar if the user is selecting a suggestion
-    setActiveView((sidebarState) => {
-      if (sidebarState) {
+    setSidebarView?.((currentView) => {
+      if (currentView) {
         const selected = getSelectedChanges(state);
         const hasSelection = Object.values(selected).some((value) => value);
         if (hasSelection) {
           return 'suggestions';
         }
       }
-      return sidebarState;
+      return currentView;
     });
   }
-
-  const threadIds =
-    typeof pageType === 'string'
-      ? Object.values(threads)
-          .filter((thread) => !thread?.resolved)
-          .filter(isTruthy)
-          .map((thread) => thread.id)
-      : undefined;
 
   function getPlugins() {
     return charmEditorPlugins({
@@ -551,26 +541,14 @@ function CharmEditor({
       {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
-          {(enableComments || enableSuggestingMode) && (
-            <SidebarDrawer
-              id='page-action-sidebar'
-              title={sidebarView ? SIDEBAR_VIEWS[sidebarView].title : ''}
-              open={!!sidebarView}
-            >
-              {sidebarView === 'suggestions' && currentSpace && pageId && (
-                <SuggestionsSidebar
-                  pageId={pageId}
-                  spaceId={currentSpace.id}
-                  readOnly={!pagePermissions?.edit_content}
-                  state={suggestionState}
-                />
-              )}
-              {sidebarView === 'comments' && <CommentsSidebar threads={threads} permissions={pagePermissions} />}
-            </SidebarDrawer>
-          )}
-          <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
+          <InlineCommentThread
+            isCommentSidebarOpen={sidebarView === 'comments'}
+            permissions={pagePermissions}
+            pluginKey={inlineCommentPluginKey}
+          />
           {currentSpace && pageId && (
             <SuggestionsPopup
+              isSuggestionSidebarOpen={sidebarView === 'suggestions'}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}
