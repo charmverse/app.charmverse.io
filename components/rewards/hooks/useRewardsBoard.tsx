@@ -39,9 +39,7 @@ export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextTyp
 export function RewardsBoardProvider({ children }: { children: ReactNode }) {
   const boardContext = useRewardsBoardAdapter();
 
-  const value = useMemo(() => boardContext, [boardContext]);
-
-  return <RewardsBoardContext.Provider value={value}>{children}</RewardsBoardContext.Provider>;
+  return <RewardsBoardContext.Provider value={boardContext}>{children}</RewardsBoardContext.Provider>;
 }
 
 export const useRewardsBoard = () => useContext(RewardsBoardContext);

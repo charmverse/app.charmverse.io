@@ -83,7 +83,7 @@ export function useLocalDbViewSettings(viewId?: string): DbViewLocalOptions | nu
   const ctx = useContext(DbViewSettingsContext);
 
   useEffect(() => {
-    if (viewId) {
+    if (viewId && ctx.setViewId) {
       ctx.setViewId(viewId);
     }
   }, [ctx, viewId]);

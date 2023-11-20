@@ -27,10 +27,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
-import type { ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
 
 import { useRewards } from './hooks/useRewards';
 

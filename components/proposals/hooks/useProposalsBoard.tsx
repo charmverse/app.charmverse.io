@@ -36,47 +36,9 @@ export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContex
 });
 
 export function ProposalsBoardProvider({ children }: { children: ReactNode }) {
-  const {
-    board,
-    boardCustomProperties,
-    card,
-    cards,
-    activeView,
-    views,
-    proposalPage,
-    setBoardProposal,
-    boardProposal,
-    cardPages
-  } = useProposalsBoardAdapter();
+  const boardContext = useProposalsBoardAdapter();
 
-  const value = useMemo(
-    () => ({
-      board,
-      boardCustomProperties,
-      card,
-      cards,
-      activeView,
-      views,
-      proposalPage,
-      setBoardProposal,
-      boardProposal,
-      cardPages
-    }),
-    [
-      board,
-      boardCustomProperties,
-      card,
-      cards,
-      activeView,
-      views,
-      proposalPage,
-      setBoardProposal,
-      boardProposal,
-      cardPages
-    ]
-  );
-
-  return <ProposalsBoardContext.Provider value={value}>{children}</ProposalsBoardContext.Provider>;
+  return <ProposalsBoardContext.Provider value={boardContext}>{children}</ProposalsBoardContext.Provider>;
 }
 
 export const useProposalsBoard = () => useContext(ProposalsBoardContext);
