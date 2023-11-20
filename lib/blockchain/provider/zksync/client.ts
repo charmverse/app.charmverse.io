@@ -113,7 +113,7 @@ class ZkSyncApiClient {
   getNFTCollectionMetaData(nftContract: string, identifier: string | number): Promise<any> {
     return GET(
       `${this.reservoirBaseUrl}/tokens/v6`,
-      { tokenSetId: `${nftContract}:${identifier}` },
+      { collection: nftContract },
       {
         headers: {
           'x-api-key': this.reservoirApiKey
@@ -145,7 +145,9 @@ export function getClient({ chainId }: { chainId: SupportedChainId }) {
   return chainId === 324 ? zkMainnetClient : zkTestnetClient;
 }
 
-zkMainnetClient.getNFTInfo(2048134).then(console.log);
+zkMainnetClient.getNFTCollectionMetaData('0xba547b64281a198f222cadccb6e19d5432615323', 5).then(console.log);
+
+// zkMainnetClient.getNFTInfo(2561682).then(console.log);
 // zkMainnetClient
 //   .getNFTMetaData('0x8d04a8c79ceb0889bdd12acdf3fa9d207ed3ff63', 1691)
 //   .then(async (val) => {
