@@ -238,7 +238,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
 
     if (!isLoadingThreads) {
       if (highlightedCommentId || (isLargeScreen && unresolvedThreads.length)) {
-        // commentSidebarOpened.current = true;
         return setActiveView('comments');
       }
     }
