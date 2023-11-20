@@ -247,10 +247,10 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
 
   useEffect(() => {
     const defaultView = persistedActiveView?.[page.id];
-    if (defaultView) {
+    if (enableSidebar && defaultView) {
       setActiveView(defaultView);
     }
-  }, [!!persistedActiveView, page.id]);
+  }, [!!persistedActiveView, enableSidebar, page.id]);
 
   const openEvaluation = useCallback(() => {
     if (enableSidebar) {

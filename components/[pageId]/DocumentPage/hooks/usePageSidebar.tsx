@@ -1,5 +1,5 @@
-import type { ReactNode, Dispatch, PropsWithChildren, SetStateAction } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import type { ReactNode, Dispatch, SetStateAction } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 import { useCurrentPage } from 'hooks/useCurrentPage';
 
@@ -29,10 +29,6 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();
   const [persistedActiveView, persistActiveView] = useLastSidebarView();
 
-  function closeSidebar() {
-    setActiveView(null);
-  }
-
   function _setActiveView(view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) {
     if (currentPageId && typeof view === 'string') {
       persistActiveView({
@@ -40,6 +36,10 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
       });
     }
     return setActiveView(view);
+  }
+
+  function closeSidebar() {
+    _setActiveView(null);
   }
 
   const value = useMemo<IPageSidebarContext>(
