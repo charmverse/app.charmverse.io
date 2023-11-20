@@ -26,6 +26,7 @@ import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/
 import React, { useMemo, useRef, useState } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
@@ -114,9 +115,8 @@ function TableHeader(props: Props): JSX.Element {
     }
   };
 
-  const { sortOptions: globalSortOptions, localSortOptions } = activeView.fields;
-  const sortOptions = localSortOptions && localSortOptions?.length > 0 ? localSortOptions : globalSortOptions;
   const localViewSettings = useLocalDbViewSettings();
+  const sortOptions = useViewSortOptions(activeView);
 
   const changeViewSortOptions = (newSortOptions: ISortOption[]) => {
     // update sort locally if local settings context exist

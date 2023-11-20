@@ -4,6 +4,7 @@ import { Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import React, { useCallback } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -22,8 +23,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
   const localViewSettings = useLocalDbViewSettings();
 
-  const { sortOptions: globalSortOptions, localSortOptions } = activeView.fields;
-  const sortOptions = localSortOptions && localSortOptions?.length > 0 ? localSortOptions : globalSortOptions;
+  const sortOptions = useViewSortOptions(activeView);
 
   const changeViewSortOptions = (newSortOptions: ISortOption[]) => {
     // update sort locally if local settings context exist

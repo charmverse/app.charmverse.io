@@ -270,16 +270,11 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
 
   const updatedBlocks = await prisma.$transaction(
     blocks.map((block) => {
-      const fields = block.fields as any;
-      // make sure to not save local settings
-      delete fields.localSortOptions;
-      delete fields.localFilter;
-
       return prisma.block.update({
         where: { id: block.id },
         data: {
           ...block,
-          fields,
+          fields: block.fields as any,
           updatedAt: new Date(),
           updatedBy: req.session.user.id
         }

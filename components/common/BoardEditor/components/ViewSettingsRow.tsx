@@ -2,7 +2,7 @@ import { Stack, Tooltip, Typography } from '@mui/material';
 
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { Button } from 'components/common/Button';
-import { useLocalDbViewSettings, type DbViewLocalOptions } from 'hooks/useLocalDbViewSettings';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { BoardView } from 'lib/focalboard/boardView';
 
 type Props = {
@@ -17,7 +17,7 @@ export function ViewSettingsRow({ activeView, canSaveGlobally }: Props) {
     return null;
   }
 
-  const { resetLocalSettings, localFilters, localSort, hasLocalFiltersEnabled, hasLocalSortEnabled } =
+  const { resetLocalSettings, localFilters, localSort, hasLocalFiltersEnabled, hasLocalSortEnabled, setLocalSort } =
     localViewSettings;
 
   const hasLocalFilters = hasLocalFiltersEnabled(activeView.fields.filter);
@@ -31,6 +31,10 @@ export function ViewSettingsRow({ activeView, canSaveGlobally }: Props) {
 
     if (localSort) {
       mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, localSort);
+      // reset after saving
+      if (!localSort.length) {
+        setLocalSort(null);
+      }
     }
 
     if (localFilters) {

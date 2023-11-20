@@ -65,21 +65,8 @@ export function useRewardsBoardAdapter() {
       boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
     }
 
-    if (!localViewSettings) {
-      throw new Error('localViewSettings provider not found');
-    }
-
-    const { localSort, localFilters } = localViewSettings;
-    if (localSort) {
-      boardView.fields = { ...boardView.fields, localSortOptions: localSort };
-    }
-
-    if (localFilters) {
-      boardView.fields = { ...boardView.fields, localFilter: localFilters };
-    }
-
     return boardView;
-  }, [localViewSettings, rewardBlocks, rewardPropertiesBlock]);
+  }, [rewardBlocks, rewardPropertiesBlock]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -102,10 +89,16 @@ export function useRewardsBoardAdapter() {
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
 
-    const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
+    if (!localViewSettings) {
+      throw new Error('localViewSettings provider not found');
+    }
+
+    const sortedCardPages = activeView
+      ? sortCards(cards, board, activeView, membersRecord, localViewSettings.localSort)
+      : [];
 
     return sortedCardPages;
-  }, [activeView, board, getRewardPage, membersRecord, rewards, space?.id]);
+  }, [activeView, board, getRewardPage, localViewSettings, membersRecord, rewards, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: rewardPropertiesBlock,

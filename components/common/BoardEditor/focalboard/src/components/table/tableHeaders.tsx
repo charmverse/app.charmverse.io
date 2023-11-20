@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -42,9 +43,7 @@ function TableHeaders(props: Props): JSX.Element {
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
-  const { sortOptions: globalSortOptions, localSortOptions } = activeView.fields;
-  const sortOptions = localSortOptions && localSortOptions?.length > 0 ? localSortOptions : globalSortOptions;
-
+  const sortOptions = useViewSortOptions(activeView);
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
