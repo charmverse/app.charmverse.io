@@ -175,7 +175,8 @@ export function sortCards(
   if (!activeView) {
     return cardPages;
   }
-  const { sortOptions } = activeView.fields;
+  const { sortOptions: globalSortOptions, localSortOptions } = activeView.fields;
+  const sortOptions = localSortOptions && localSortOptions?.length > 0 ? localSortOptions : globalSortOptions;
 
   if (sortOptions?.length < 1) {
     return cardPages.sort((a, b) => manualOrder(activeView, a, b));

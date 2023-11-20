@@ -42,6 +42,9 @@ function TableHeaders(props: Props): JSX.Element {
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
+  const { sortOptions: globalSortOptions, localSortOptions } = activeView.fields;
+  const sortOptions = localSortOptions && localSortOptions?.length > 0 ? localSortOptions : globalSortOptions;
+
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
@@ -152,7 +155,7 @@ function TableHeaders(props: Props): JSX.Element {
     );
   };
 
-  const titleSortOption = activeView.fields.sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
+  const titleSortOption = sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
   let titleSorted: 'up' | 'down' | 'none' = 'none';
   if (titleSortOption) {
     titleSorted = titleSortOption.reversed ? 'down' : 'up';
@@ -182,7 +185,7 @@ function TableHeaders(props: Props): JSX.Element {
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
       {visiblePropertyTemplates.map((template) => {
         let sorted: 'up' | 'down' | 'none' = 'none';
-        const sortOption = activeView.fields.sortOptions.find((o: ISortOption) => o.propertyId === template.id);
+        const sortOption = sortOptions.find((o: ISortOption) => o.propertyId === template.id);
         if (sortOption) {
           sorted = sortOption.reversed ? 'down' : 'up';
         }

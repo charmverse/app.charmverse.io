@@ -22,29 +22,32 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
   const localViewSettings = useLocalDbViewSettings();
 
+  const { sortOptions: globalSortOptions, localSortOptions } = activeView.fields;
+  const sortOptions = localSortOptions && localSortOptions?.length > 0 ? localSortOptions : globalSortOptions;
+
+  const changeViewSortOptions = (newSortOptions: ISortOption[]) => {
+    // update sort locally if local settings context exist
+    if (localViewSettings) {
+      localViewSettings.setLocalSort(newSortOptions);
+      return;
+    }
+
+    mutator.changeViewSortOptions(activeView.id, sortOptions, newSortOptions);
+  };
+
   const sortChanged = useCallback(
     (propertyId: string) => {
       let newSortOptions: ISortOption[] = [];
-      if (
-        activeView.fields.sortOptions &&
-        activeView.fields.sortOptions[0] &&
-        activeView.fields.sortOptions[0].propertyId === propertyId
-      ) {
+      if (sortOptions && sortOptions[0] && sortOptions[0].propertyId === propertyId) {
         // Already sorting by name, so reverse it
-        newSortOptions = [{ propertyId, reversed: !activeView.fields.sortOptions[0].reversed }];
+        newSortOptions = [{ propertyId, reversed: !sortOptions[0].reversed }];
       } else {
         newSortOptions = [{ propertyId, reversed: false }];
       }
 
-      // update sort locally if local settings context exist
-      if (localViewSettings) {
-        localViewSettings.setLocalSort(newSortOptions);
-        return;
-      }
-
-      mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, newSortOptions);
+      changeViewSortOptions(newSortOptions);
     },
-    [activeView.fields.sortOptions, activeView.id, localViewSettings]
+    [sortOptions, activeView.id, localViewSettings]
   );
 
   const onManualSort = useCallback(() => {
@@ -57,12 +60,12 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   }, [activeView, orderedCards]);
 
   const onRevertSort = useCallback(() => {
-    mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
-  }, [activeView.id, activeView.fields.sortOptions]);
+    changeViewSortOptions([]);
+  }, [activeView.id, sortOptions]);
 
   return (
     <>
-      {activeView.fields.sortOptions?.length > 0 && (
+      {sortOptions?.length > 0 && (
         <>
           <MenuItem id='manual' onClick={onManualSort}>
             Manual
@@ -76,8 +79,8 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
 
       {sortDisplayOptions?.map((option) => {
         let rightIcon: JSX.Element | undefined;
-        if (activeView.fields.sortOptions?.length > 0) {
-          const sortOption = activeView.fields.sortOptions[0];
+        if (sortOptions?.length > 0) {
+          const sortOption = sortOptions[0];
           if (sortOption.propertyId === option.id) {
             rightIcon = sortOption.reversed ? (
               <ArrowDownwardOutlinedIcon fontSize='small' />

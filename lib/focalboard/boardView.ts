@@ -37,6 +37,9 @@ export type BoardViewFields = {
   linkedSourceId?: string;
   columnWrappedIds?: string[];
   openPageIn?: 'full_page' | 'center_peek';
+  // fields used locally without saving
+  localFilter?: FilterGroup;
+  localSortOptions?: ISortOption[];
 };
 
 export type BoardView = Block & {

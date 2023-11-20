@@ -49,17 +49,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const isAdmin = useIsAdmin();
 
-  const {
-    board: activeBoard,
-    views,
-    cardPages,
-    activeView,
-    cards,
-    localFilters,
-    localSort,
-    setLocalFilters,
-    setLocalSort
-  } = useRewardsBoard();
+  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });

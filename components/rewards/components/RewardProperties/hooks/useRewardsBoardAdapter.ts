@@ -69,16 +69,13 @@ export function useRewardsBoardAdapter() {
       throw new Error('localViewSettings provider not found');
     }
 
-    const { localSort, localFilters, setGlobalFilters, setGlobalSort } = localViewSettings;
-    setGlobalSort(boardView.fields.sortOptions);
-    setGlobalFilters(boardView.fields.filter);
-
+    const { localSort, localFilters } = localViewSettings;
     if (localSort) {
-      boardView.fields = { ...boardView.fields, sortOptions: localSort };
+      boardView.fields = { ...boardView.fields, localSortOptions: localSort };
     }
 
     if (localFilters) {
-      boardView.fields = { ...boardView.fields, filter: localFilters };
+      boardView.fields = { ...boardView.fields, localFilter: localFilters };
     }
 
     return boardView;
@@ -94,14 +91,13 @@ export function useRewardsBoardAdapter() {
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
+    const filter = activeView?.fields.localFilter || activeView?.fields.filter;
     // filter cards by active view filter
     if (activeView?.fields.filter) {
       const cardsRaw = cards.map((cp) => cp.card);
-      const filteredCardsIds = CardFilter.applyFilterGroup(
-        activeView?.fields.filter,
-        board.fields.cardProperties,
-        cardsRaw
-      ).map((c) => c.id);
+      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cardsRaw).map(
+        (c) => c.id
+      );
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }

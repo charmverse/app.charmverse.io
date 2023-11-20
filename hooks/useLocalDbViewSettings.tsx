@@ -14,13 +14,8 @@ export type DbViewLocalOptions = {
   setViewId: (viewId: string | null) => void;
   viewId: string | null;
   resetLocalSettings: () => void;
-
-  globalSort: ISortOption[] | null;
-  setGlobalSort: (sort: ISortOption[] | null) => void;
-  globalFilters: FilterGroup | null;
-  setGlobalFilters: (filters: FilterGroup | null) => void;
-  hasLocalFiltersEnabled: boolean;
-  hasLocalSortEnabled: boolean;
+  hasLocalFiltersEnabled: (globalFilters: FilterGroup) => boolean;
+  hasLocalSortEnabled: (globalSort: ISortOption[]) => boolean;
 };
 
 export const DbViewSettingsContext = createContext<Readonly<DbViewLocalOptions>>({} as DbViewLocalOptions);
@@ -35,13 +30,6 @@ export function DbViewSettingsProvider({ children }: { children: ReactNode }) {
     viewId ? `db-view-sort-${viewId}` : null,
     null
   );
-  const [globalFilters, setGlobalFilters] = useState<FilterGroup | null>(null);
-  const [globalSort, setGlobalSort] = useState<ISortOption[] | null>(null);
-
-  useEffect(() => {
-    setGlobalFilters(null);
-    setGlobalSort(null);
-  }, [viewId]);
 
   const resetLocalSettings = useCallback(() => {
     if (!viewId) return;
@@ -50,13 +38,19 @@ export function DbViewSettingsProvider({ children }: { children: ReactNode }) {
     setLocalSort(null);
   }, [setLocalFilters, setLocalSort, viewId]);
 
-  const hasLocalFiltersEnabled = useMemo(() => {
-    return !!localFilters && localFilters.filters.length > 0 && !isEqual(localFilters, globalFilters);
-  }, [globalFilters, localFilters]);
+  const hasLocalFiltersEnabled = useCallback(
+    (globalFilters: FilterGroup) => {
+      return !!localFilters && !isEqual(localFilters, globalFilters);
+    },
+    [localFilters]
+  );
 
-  const hasLocalSortEnabled = useMemo(() => {
-    return !!localSort && localSort.length > 0 && !isEqual(localSort, globalSort);
-  }, [globalSort, localSort]);
+  const hasLocalSortEnabled = useCallback(
+    (globalSort: ISortOption[]) => {
+      return !!localSort && !isEqual(localSort, globalSort);
+    },
+    [localSort]
+  );
 
   const value = useMemo(
     () => ({
@@ -67,10 +61,6 @@ export function DbViewSettingsProvider({ children }: { children: ReactNode }) {
       setLocalSort,
       viewId,
       resetLocalSettings,
-      globalFilters,
-      setGlobalFilters,
-      globalSort,
-      setGlobalSort,
       hasLocalFiltersEnabled,
       hasLocalSortEnabled
     }),
@@ -81,8 +71,6 @@ export function DbViewSettingsProvider({ children }: { children: ReactNode }) {
       setLocalSort,
       viewId,
       resetLocalSettings,
-      globalFilters,
-      globalSort,
       hasLocalFiltersEnabled,
       hasLocalSortEnabled
     ]
