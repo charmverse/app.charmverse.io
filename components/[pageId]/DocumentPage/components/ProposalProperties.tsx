@@ -163,7 +163,7 @@ export function ProposalProperties({
 
   // open the rubric sidebar by default
   useEffect(() => {
-    if (enableSidebar && isReviewer && proposal?.evaluationType === 'rubric') {
+    if (enableSidebar) {
       openEvaluation?.();
     }
   }, [canSeeEvaluation]);
