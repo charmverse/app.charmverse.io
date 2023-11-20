@@ -74,7 +74,13 @@ export const customRenderWithContext = (
               }}
             >
               <PageSidebarContext.Provider
-                value={{ activeView: null, setActiveView: () => {}, closeSidebar: () => {} }}
+                value={{
+                  activeView: null,
+                  setActiveView: () => {},
+                  persistedActiveView: null,
+                  persistActiveView: () => {},
+                  closeSidebar: () => {}
+                }}
               >
                 {ui}
               </PageSidebarContext.Provider>
