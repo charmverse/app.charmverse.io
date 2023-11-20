@@ -24,7 +24,7 @@ async function exportImport({
 
   const result = await importWorkspacePages({
     targetSpaceIdOrDomain,
-    exportData: data
+    exportData: data,
   });
 
   console.log('Success ! Imported ', result.pages);
@@ -32,14 +32,15 @@ async function exportImport({
   return true;
 }
 
-exportImport({
-  sourceSpaceIdOrDomain: 'game7',
-  targetSpaceIdOrDomain: 'ethdenver-draft'
-}).then(() => {
-  console.log('Job done');
-});
+// exportImport({
+//   sourceSpaceIdOrDomain: 'imperial-floor-ostrich',
+//   targetSpaceIdOrDomain: 'deafening-apricot-crane'
+// }).then(() => {
 
-// importWorkspacePages({
-//   exportName: 'cvt-nft-community-template',
-//   targetSpaceIdOrDomain: 'forthepeopledao'
-// }).then(() => console.log('Complete'));
+//   console.log('Job done');
+// });
+
+importWorkspacePages({
+  exportName: 'cvt-nft-community-template',
+  targetSpaceIdOrDomain: 'forthepeopledao'
+}).then(() => console.log('Complete'));
