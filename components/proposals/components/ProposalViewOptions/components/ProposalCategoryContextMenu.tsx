@@ -1,29 +1,19 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
-import CheckIcon from '@mui/icons-material/Check';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import {
-  Box,
-  Divider,
-  IconButton,
-  ListItemIcon,
-  MenuItem,
-  MenuList,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Divider, IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { ColorSelectMenu } from 'components/common/form/ColorSelectMenu';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { brandColorNames } from 'theme/colors';
+import type { BrandColor } from 'theme/colors';
 
 import { useProposalCategories } from '../../../hooks/useProposalCategories';
 
@@ -35,7 +25,7 @@ type Props = {
 
 export function ProposalCategoryContextMenu({ category }: Props) {
   const [tempName, setTempName] = useState(category.title || '');
-  const [categoryColor, setCategoryColor] = useState(category.color);
+  const [categoryColor, setCategoryColor] = useState<BrandColor>(category.color as BrandColor);
   const { space } = useCurrentSpace();
   const { mutateCategory, deleteCategory } = useProposalCategories();
   const { showMessage } = useSnackbar();
@@ -44,7 +34,7 @@ export function ProposalCategoryContextMenu({ category }: Props) {
 
   useEffect(() => {
     setTempName(category.title || '');
-    setCategoryColor(category.color);
+    setCategoryColor(category.color as BrandColor);
   }, [category.title, category.color]);
 
   useEffect(() => {
@@ -118,33 +108,7 @@ export function ProposalCategoryContextMenu({ category }: Props) {
           </Typography>
         </MenuItem>
         <Divider />
-        <FieldLabel variant='subtitle2' p={1} pb={0}>
-          Color
-        </FieldLabel>
-        {brandColorNames.map((color) => (
-          <MenuItem
-            key={color}
-            sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setCategoryColor(color);
-            }}
-          >
-            <Stack flexDirection='row' gap={1} alignContent='center'>
-              <Box
-                sx={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: '20%',
-                  backgroundColor: (theme) => theme.palette[color].main
-                }}
-              />
-              <Typography variant='subtitle1'>{color}</Typography>
-            </Stack>
-
-            {color === categoryColor && <CheckIcon fontSize='small' />}
-          </MenuItem>
-        ))}
+        <ColorSelectMenu onChange={setCategoryColor} selectedColor={categoryColor} />
       </MenuList>
     ),
     [category, tempName, categoryColor, permissions.delete]

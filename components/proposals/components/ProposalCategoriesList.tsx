@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
-import CheckIcon from '@mui/icons-material/Check';
-import { Box, Menu, MenuItem, MenuList, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Box, Menu, MenuItem, MenuList, Stack, TextField } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { ColorSelectMenu } from 'components/common/form/ColorSelectMenu';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import { ProposalCategoryChip } from 'components/proposals/components/ProposalChip';
@@ -14,7 +14,6 @@ import { useProposalCategories } from 'components/proposals/hooks/useProposalCat
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { BrandColor } from 'theme/colors';
-import { brandColorNames } from 'theme/colors';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 const ColorBox = styled(Box)`
@@ -120,31 +119,14 @@ export function ProposalCategoriesList() {
                 sx: { width: 300 }
               }}
             >
-              {brandColorNames.map((color) => (
-                <MenuItem
-                  key={color}
-                  sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCategoryColor(color);
-                    popupState.close();
-                  }}
-                >
-                  <Stack flexDirection='row' gap={1} alignContent='center'>
-                    <Box
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: '20%',
-                        backgroundColor: (theme) => theme.palette[color].main
-                      }}
-                    />
-                    <Typography variant='subtitle1'>{color}</Typography>
-                  </Stack>
-
-                  {color === categoryColor && <CheckIcon fontSize='small' />}
-                </MenuItem>
-              ))}
+              <ColorSelectMenu
+                onChange={(color) => {
+                  setCategoryColor(color);
+                  popupState.close();
+                }}
+                hideLabel
+                selectedColor={categoryColor}
+              />
             </Menu>
           </Stack>
         </Stack>
