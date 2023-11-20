@@ -26,7 +26,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
 import { useRewards } from './hooks/useRewards';
@@ -127,14 +126,18 @@ export function RewardsPage({ title }: { title: string }) {
           </Box>
         </DatabaseTitle>
         <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-          <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+          {rewards?.length ? (
+            <>
+              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
-          <ViewSortControl
-            activeBoard={activeBoard}
-            activeView={activeView}
-            cards={cards as Card[]}
-            viewSortPopup={viewSortPopup}
-          />
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards as Card[]}
+                viewSortPopup={viewSortPopup}
+              />
+            </>
+          ) : null}
 
           {isAdmin && (
             <ViewHeaderActionsMenu

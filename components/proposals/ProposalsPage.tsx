@@ -133,14 +133,18 @@ export function ProposalsPage({ title }: { title: string }) {
           </Box>
         </DatabaseTitle>
         <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-          <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+          {proposals?.length ? (
+            <>
+              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
-          <ViewSortControl
-            activeBoard={activeBoard}
-            activeView={activeView}
-            cards={cards}
-            viewSortPopup={viewSortPopup}
-          />
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                viewSortPopup={viewSortPopup}
+              />
+            </>
+          ) : null}
 
           <ViewHeaderActionsMenu
             onClick={(e) => {
