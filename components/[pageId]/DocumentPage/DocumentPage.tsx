@@ -10,7 +10,6 @@ import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -28,7 +27,6 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useLgScreen } from 'hooks/useMediaScreens';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -45,7 +43,9 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
+import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { useLastSidebarView } from './hooks/useLastSidebarView';
+import { usePageSidebar } from './hooks/usePageSidebar';
 
 // const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
@@ -241,12 +241,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
       }
     }
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
-
-  useEffect(() => {
-    saveSidebarView({
-      [page.id]: sidebarView
-    });
-  }, [saveSidebarView, sidebarView]);
 
   useEffect(() => {
     const defaultView = defaultSidebarView?.[page.id];

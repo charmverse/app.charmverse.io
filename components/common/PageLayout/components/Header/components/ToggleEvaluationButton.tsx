@@ -2,8 +2,8 @@ import { IconButton, Tooltip } from '@mui/material';
 
 import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { useLastSidebarView } from 'components/[pageId]/DocumentPage/hooks/useLastSidebarView';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 
 export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDialog?: boolean; pageId?: string }) {
   const { activeView, setActiveView } = usePageSidebar();
