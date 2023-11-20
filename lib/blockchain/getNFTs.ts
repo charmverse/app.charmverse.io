@@ -99,7 +99,7 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
       return [] as NFTData[];
     })
   ]);
-  const nfts = [...alchemyNFTs, ...ankrNFTs, ...zoraNFTs];
+  const nfts = [...alchemyNFTs, ...ankrNFTs, ...zoraNFTs, ...zksyncNFTs];
   const sortedNfts = orderBy(nfts, ['timeLastUpdated', 'title'], ['desc', 'asc']);
   return sortedNfts;
 }
@@ -118,7 +118,7 @@ export async function getNFT({ address, tokenId, chainId = 1 }: NFTRequest) {
   } else if (supportedNetworksByZora.includes(chainId as SupportedChainIdByZora)) {
     return getNFTFromZora({ address, tokenId, chainId: chainId as SupportedChainIdByZora });
   } else if (supportedZkSyncNetwork.includes(chainId as SupportedChainIdByZkSync)) {
-    return getNftFromZKSync({ chainId: chainId as SupportedChainIdByZkSync, tokenId: tokenId as any });
+    return getNftFromZKSync({ chainId: chainId as SupportedChainIdByZkSync, tokenId: tokenId as any, address });
   }
   log.warn('NFT requested from unsupported chainId', { chainId });
   return null;

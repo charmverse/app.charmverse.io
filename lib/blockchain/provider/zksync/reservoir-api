@@ -1,0 +1,61 @@
+{
+  "type": "ask",
+  "fromAddress": "0x68665fbc70cf165e34e0df0e3c4548d56a230ef6",
+  "toAddress": null,
+  "price": {
+    "currency": {
+      "contract": "0x0000000000000000000000000000000000000000",
+      "name": "Ether",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "amount": {
+      "raw": "443800000000000000",
+      "decimal": 0.4438,
+      "usd": 892.53804,
+      "native": 0.4438
+    }
+  },
+  "amount": 1,
+  "timestamp": 1700399993,
+  "createdAt": "2023-11-19T13:19:54.624Z",
+  "contract": "0x8d04a8c79ceb0889bdd12acdf3fa9d207ed3ff63",
+  "token": {
+    "tokenId": "1691",
+    "isSpam": false,
+    "tokenName": "#1691 - Embryo Hand",
+    "tokenImage": "https://i.seadn.io/gcs/files/6a2e339cfc8575d3dc2b0c130747f094.png?w=500&auto=format"
+  },
+  "collection": {
+    "collectionId": "0x8d04a8c79ceb0889bdd12acdf3fa9d207ed3ff63",
+    "isSpam": false,
+    "collectionName": "Blitmap",
+    "collectionImage": "https://i.seadn.io/gae/N61iOqLx-qWAjIqVet9L0Fx-tWrgr_Jn6hdlyke23nnRdkRqDeE8Htz_BVjlOJ7KxEfB3KyujldKWnQg0bDao-Y1zyEJnogKtvaf?w=500&auto=format"
+  },
+  "order": {
+    "id": "0x41e550e6756d3658267450e5200361a933451224f090d5ce77bae010b020ed11",
+    "side": "ask",
+    "source": {
+      "domain": "blur.io",
+      "name": "Blur",
+      "icon": "https://blur.io/favicons/180.png"
+    },
+    "criteria": {
+      "kind": "token",
+      "data": {
+        "collection": {
+          "id": "0x8d04a8c79ceb0889bdd12acdf3fa9d207ed3ff63",
+          "name": "Blitmap",
+          "image": "https://i.seadn.io/gae/N61iOqLx-qWAjIqVet9L0Fx-tWrgr_Jn6hdlyke23nnRdkRqDeE8Htz_BVjlOJ7KxEfB3KyujldKWnQg0bDao-Y1zyEJnogKtvaf?w=500&auto=format",
+          "isSpam": false
+        },
+        "token": {
+          "tokenId": "1691",
+          "name": null,
+          "image": null,
+          "isSpam": false
+        }
+      }
+    }
+  }
+}
