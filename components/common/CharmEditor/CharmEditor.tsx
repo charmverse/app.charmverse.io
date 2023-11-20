@@ -11,7 +11,7 @@ import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
@@ -25,8 +25,11 @@ import { getThreadsKey, useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
+import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
+
+import { STATIC_PAGES, type FeatureJson } from '../PageLayout/components/Sidebar/utils/staticPages';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
@@ -235,6 +238,13 @@ function CharmEditor({
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
   const { threads } = useThreads();
+
+  const spaceFeatures = (currentSpace?.features as FeatureJson[]) ?? [];
+
+  const extendedFeatures = STATIC_PAGES.map(({ feature, ...restFeat }) => ({
+    id: feature,
+    title: spaceFeatures.find((_feature) => _feature.id === feature)?.title ?? restFeat.title
+  }));
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
@@ -487,10 +497,10 @@ function CharmEditor({
             return !disableMention && <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return <NestedPage currentPageId={pageId} {...props} />;
+            return <NestedPage features={extendedFeatures} currentPageId={pageId} {...props} />;
           }
           case 'linkedPage': {
-            return <NestedPage isLinkedPage currentPageId={pageId} {...props} />;
+            return <NestedPage features={extendedFeatures} isLinkedPage currentPageId={pageId} {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
@@ -538,7 +548,7 @@ function CharmEditor({
         pageId={pageId}
       />
       {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
-      <LinkedPagesList pluginKey={linkedPagePluginKey} />
+      <LinkedPagesList features={extendedFeatures} pluginKey={linkedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette

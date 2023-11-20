@@ -7,7 +7,7 @@ import type { NodeViewProps } from 'components/common/CharmEditor/components/@ba
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import type { StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import type { FeatureJson, StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
@@ -60,8 +60,9 @@ export default function NestedPage({
   isLinkedPage,
   node,
   currentPageId,
-  getPos
-}: NodeViewProps & { isLinkedPage?: boolean; currentPageId?: string }) {
+  getPos,
+  features = []
+}: NodeViewProps & { isLinkedPage?: boolean; currentPageId?: string; features?: Pick<FeatureJson, 'id' | 'title'>[] }) {
   const { space } = useCurrentSpace();
   const view = useEditorViewContext();
   const { pages, loadingPages } = usePages();
@@ -72,9 +73,13 @@ export default function NestedPage({
   const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
   let pageTitle = '';
   if (documentPage || staticPage) {
-    pageTitle = (documentPage || staticPage)?.title || 'Untitled';
+    pageTitle =
+      (staticPage
+        ? features.find((feat) => feat.id === staticPage.feature)?.title ?? staticPage.title
+        : documentPage?.title) || 'Untitled';
   } else if (forumCategoryPage) {
-    pageTitle = `Forum > ${forumCategoryPage?.name || 'Untitled'}`;
+    const forumFeatureTitle = features.find((feat) => feat.id === 'forum')?.title ?? 'Forum';
+    pageTitle = `${forumFeatureTitle} > ${forumCategoryPage?.name || 'Untitled'}`;
   } else if (!loadingPages) {
     pageTitle = 'No access';
   }
