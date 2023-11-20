@@ -19,13 +19,6 @@ export function updateBlock({
     throw new InvalidInputError('Missing required fields');
   }
 
-  const fields = data.fields as any;
-  // make sure to not save local settings
-  if (fields) {
-    delete fields.localSortOption;
-    delete fields.localFilter;
-  }
-
   if (data.type === 'board' || data.type === 'view') {
     return tx.rewardBlock.upsert({
       where: {
@@ -39,7 +32,7 @@ export function updateBlock({
         ...data,
         spaceId,
         rootId: spaceId,
-        fields: (fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
+        fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
         updatedBy: userId
       },
       create: {
