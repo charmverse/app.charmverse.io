@@ -33,6 +33,13 @@ export async function createBlock({
     }
   }
 
+  const fields = data.fields as any;
+  // make sure to not save local settings
+  if (fields) {
+    delete fields.localSortOption;
+    delete fields.localFilter;
+  }
+
   return tx.rewardBlock.create({
     data: {
       ...data,
@@ -44,7 +51,7 @@ export async function createBlock({
       rootId: data.rootId || data.spaceId || spaceId,
       schema: data.schema || 1,
       title: data.title || '',
-      fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue
+      fields: (fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue
     }
   });
 }

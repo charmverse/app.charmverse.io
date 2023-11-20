@@ -46,6 +46,10 @@ export function useRewardsBoardMutator() {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
 
+    // delete local fields before saving
+    delete fbBlockInput.fields.localSortOptions;
+    delete fbBlockInput.fields.localFilter;
+
     if (fbBlockInput.fields.cardProperties) {
       fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
         (p: IPropertyTemplate) => !p.id.startsWith('__')
