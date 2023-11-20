@@ -1,6 +1,6 @@
+import { PageSidebarProvider } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { CharmEditorProvider } from 'hooks/useCharmEditor';
 import { CurrentPageProvider } from 'hooks/useCurrentPage';
-import { PageSidebarProvider } from 'hooks/usePageSidebar';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { VotesProvider } from 'hooks/useVotes';
 

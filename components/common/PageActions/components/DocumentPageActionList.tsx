@@ -11,16 +11,15 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageUpdates, PageWithContent } from 'lib/pages';
 import { fontClassName } from 'theme/fonts';

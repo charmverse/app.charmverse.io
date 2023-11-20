@@ -15,9 +15,9 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
+import type { IPageSidebarContext } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { IPageSidebarContext } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';

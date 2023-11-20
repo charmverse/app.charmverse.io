@@ -1,14 +1,12 @@
 import { IconButton, Tooltip } from '@mui/material';
 
 import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
-import { useLastSidebarView } from 'components/[pageId]/DocumentPage/hooks/useLastSidebarView';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 
 export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDialog?: boolean; pageId?: string }) {
-  const { activeView, setActiveView } = usePageSidebar();
+  const { activeView, setActiveView, persistActiveView } = usePageSidebar();
   const { navigateToSpacePath } = useCharmRouter();
-  const [, saveSidebarView] = useLastSidebarView();
 
   const isActive = activeView === 'proposal_evaluation';
 
@@ -21,7 +19,7 @@ export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDia
       setActiveView('proposal_evaluation');
     } else if (pageId) {
       // set default sidebar and open full page
-      saveSidebarView({
+      persistActiveView({
         [pageId]: 'proposal_evaluation'
       });
       navigateToSpacePath(`/${pageId}`);
