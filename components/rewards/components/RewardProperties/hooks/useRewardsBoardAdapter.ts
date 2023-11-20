@@ -69,6 +69,10 @@ export function useRewardsBoardAdapter() {
   }, [rewardBlocks, rewardPropertiesBlock]);
 
   const cardPages: CardPage[] = useMemo(() => {
+    if (!localViewSettings) {
+      throw new Error('localViewSettings provider not found');
+    }
+
     let cards =
       rewards
         ?.map((p) => {
@@ -78,7 +82,7 @@ export function useRewardsBoardAdapter() {
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
-    const filter = activeView?.fields.localFilter || activeView?.fields.filter;
+    const filter = localViewSettings.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
     if (activeView?.fields.filter) {
       const cardsRaw = cards.map((cp) => cp.card);
@@ -88,11 +92,6 @@ export function useRewardsBoardAdapter() {
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
-
-    if (!localViewSettings) {
-      throw new Error('localViewSettings provider not found');
-    }
-
     const sortedCardPages = activeView
       ? sortCards(cards, board, activeView, membersRecord, localViewSettings.localSort)
       : [];

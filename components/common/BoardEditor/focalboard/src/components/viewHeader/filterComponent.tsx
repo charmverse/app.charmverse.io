@@ -9,6 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import { v4 } from 'uuid';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewFilter } from 'hooks/useViewFilter';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
@@ -35,7 +36,7 @@ const StyledFilterComponent = styled(Box)`
 const FilterComponent = React.memo((props: Props) => {
   const { activeView, properties } = props;
   const localViewSettings = useLocalDbViewSettings();
-  const currentFilter = activeView.fields.localFilter || activeView.fields.filter;
+  const currentFilter = useViewFilter(activeView);
 
   const changeViewFilter = (filterGroup: FilterGroup) => {
     // update filters locally if local settings context exist
