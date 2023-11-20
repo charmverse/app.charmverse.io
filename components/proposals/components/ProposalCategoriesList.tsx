@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
@@ -29,7 +28,6 @@ export function ProposalCategoriesList() {
   const { categories } = useProposalCategories();
   const [categoryColor, setCategoryColor] = useState<BrandColor>(getRandomThemeColor());
   const addCategoryPopupState = usePopupState({ variant: 'popover', popupId: 'add-category' });
-  const theme = useTheme();
   const popupState = usePopupState({ variant: 'popover', popupId: `change-category-color` });
 
   const isAdmin = useIsAdmin();
@@ -112,7 +110,7 @@ export function ProposalCategoriesList() {
             <FieldLabel variant='subtitle2'>Color</FieldLabel>
             <ColorBox
               sx={{
-                backgroundColor: theme.palette[categoryColor].main
+                backgroundColor: (theme) => theme.palette[categoryColor].main
               }}
               {...bindTrigger(popupState)}
             />
@@ -133,12 +131,12 @@ export function ProposalCategoriesList() {
                   }}
                 >
                   <Stack flexDirection='row' gap={1} alignContent='center'>
-                    <div
-                      style={{
+                    <Box
+                      sx={{
                         width: 20,
                         height: 20,
                         borderRadius: '20%',
-                        backgroundColor: theme.palette[color].main
+                        backgroundColor: (theme) => theme.palette[color].main
                       }}
                     />
                     <Typography variant='subtitle1'>{color}</Typography>
