@@ -74,6 +74,8 @@ const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
   'proposalEvaluationTotal'
 ];
 
+const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
+
 function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
@@ -119,7 +121,6 @@ function PropertyValueElement(props: Props) {
   const router = useRouter();
   const domain = router.query.domain as string;
 
-  const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
 
   useEffect(() => {
@@ -306,6 +307,10 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = (
       <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
     );
+  } else if (propertyTemplate.type === 'token_amount') {
+    propertyValueElement = <div className={clsx('octo-propertyvalue', { readonly: true })}>{displayValue}</div>;
+  } else if (propertyTemplate.type === 'token_chain') {
+    propertyValueElement = <div className={clsx('octo-propertyvalue', { readonly: true })}>{displayValue}</div>;
   }
 
   const commonProps = {

@@ -6,7 +6,7 @@ import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
 import mutator from '../../mutator';
-import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
+import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 interface LayoutOptionsProps {
   properties: readonly IPropertyTemplate[];

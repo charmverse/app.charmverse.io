@@ -43,8 +43,8 @@ import {
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
+import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 import Label from '../../widgets/label';
-import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
 import HorizontalGrip from './horizontalGrip';
 

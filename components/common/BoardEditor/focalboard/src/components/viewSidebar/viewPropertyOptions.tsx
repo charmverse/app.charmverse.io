@@ -11,7 +11,7 @@ import { Constants } from 'lib/focalboard/constants';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
-import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
+import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 interface LayoutOptionsProps {
   properties: readonly IPropertyTemplate[];

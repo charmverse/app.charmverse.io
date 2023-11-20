@@ -36,8 +36,7 @@ import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatu
 import { focalboardColorsMap } from 'theme/colors';
 
 import mutator from '../../mutator';
-
-import { iconForPropertyType } from './viewHeaderPropertiesMenu';
+import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 type Props = {
   properties: IPropertyTemplate[];
