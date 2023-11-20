@@ -9,6 +9,7 @@ import { getDefaultBoard, getDefaultTableView } from 'components/proposals/compo
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
@@ -39,6 +40,8 @@ export function useProposalsBoardAdapter() {
   const { pages } = usePages();
   const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
+  // TODO - use different types of views (board, calendar)
+  const localViewSettings = useLocalDbViewSettings(`proposals-${DEFAULT_VIEW_BLOCK_ID}`);
 
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
@@ -65,6 +68,10 @@ export function useProposalsBoardAdapter() {
   }, [categories, proposalPropertiesBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
+    if (!localViewSettings) {
+      throw new Error('localViewSettings provider not found');
+    }
+
     let cards =
       proposals
         ?.map((p) => {
@@ -74,19 +81,20 @@ export function useProposalsBoardAdapter() {
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
+    const filter = localViewSettings.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
-    if (activeView?.fields.filter) {
+    if (filter) {
       const cardsRaw = cards.map((cp) => cp.card);
-      const filteredCardsIds = CardFilter.applyFilterGroup(
-        activeView.fields.filter,
-        board.fields.cardProperties,
-        cardsRaw
-      ).map((c) => c.id);
+      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cardsRaw).map(
+        (c) => c.id
+      );
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
 
-    const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
+    const sortedCardPages = activeView
+      ? sortCards(cards, board, activeView, membersRecord, localViewSettings.localSort)
+      : [];
 
     return sortedCardPages;
   }, [activeView, board, membersRecord, pages, proposals, space?.id]);

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
+import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
@@ -153,6 +154,8 @@ export function ProposalsPage({ title }: { title: string }) {
               />
             </Stack>
             <Divider />
+
+            <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
           </>
         )}
       </DatabaseStickyHeader>
