@@ -347,14 +347,9 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
       if (!view || !board || !cards) {
         return [];
       }
-      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
-      const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
-      const cardProperties: IPropertyTemplate[] = hasTitleProperty
-        ? board.fields.cardProperties
-        : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
-
+      const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result, pages);
+        return CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result, pages);
       }
       return result;
     }

@@ -26,7 +26,12 @@ class CardFilter {
     cards: Card[],
     pages?: PagesMap
   ): Card[] {
-    return cards.filter((card) => this.isFilterGroupMet(filterGroup, templates, card, pages));
+    const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
+    const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
+      ? templates
+      : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+
+    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card, pages));
   }
 
   static isFilterGroupMet(
@@ -72,14 +77,7 @@ class CardFilter {
     card: Card,
     pages?: PagesMap
   ): boolean {
-    // Proposals and rewards templates doesn't contain the title property
-    const filterProperty =
-      templates.find((o) => o.id === filter.propertyId) ?? filter.propertyId === Constants.titleColumnId
-        ? ({
-            id: Constants.titleColumnId,
-            type: 'text'
-          } as IPropertyTemplate)
-        : null;
+    const filterProperty = templates.find((o) => o.id === filter.propertyId);
     const value =
       filterProperty?.id === Constants.titleColumnId
         ? pages?.[card.id]?.title ?? ''
