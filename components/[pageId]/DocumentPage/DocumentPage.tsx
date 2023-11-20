@@ -167,7 +167,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
-  const showPageActionSidebar = sidebarView !== null && (sidebarView !== 'comments' || enableComments);
+  const showPageActionSidebar =
+    !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
@@ -239,8 +240,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
       if (highlightedCommentId || (isLargeScreen && unresolvedThreads.length)) {
         // commentSidebarOpened.current = true;
         return setActiveView('comments');
-      } else {
-        closeSidebar();
       }
     }
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
