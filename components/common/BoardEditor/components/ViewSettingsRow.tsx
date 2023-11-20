@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack, Tooltip, Typography } from '@mui/material';
 
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { Button } from 'components/common/Button';
@@ -20,7 +20,7 @@ export function ViewSettingsRow({ activeView, canSaveGlobally }: Props) {
   const { resetLocalSettings, localFilters, localSort, hasLocalFiltersEnabled, hasLocalSortEnabled } =
     localViewSettings;
 
-  const hasLocalFilters = hasLocalFiltersEnabled(activeView.fields.filters);
+  const hasLocalFilters = hasLocalFiltersEnabled(activeView.fields.filter);
   const hasLocalSort = hasLocalSortEnabled(activeView.fields.sortOptions);
   const hasLocalSettingsEnabled = hasLocalFilters || hasLocalSort;
 
@@ -57,12 +57,11 @@ export function ViewSettingsRow({ activeView, canSaveGlobally }: Props) {
 
   return (
     <Stack flex={1} direction='row' justifyContent='flex-end' mx={2} gap={1}>
-      <Typography>
-        {hasLocalFilters && 'local filters on'} {hasLocalSort && 'local sort on'}
-      </Typography>
-      <Button onClick={resetLocalSettings} variant='text' color='secondary' size='small'>
-        {canSaveGlobally ? 'Reset' : `Reset default ${getSettingsLabel()}`}
-      </Button>
+      <Tooltip title={`Reset local ${getSettingsLabel()} to global default`}>
+        <Button onClick={resetLocalSettings} variant='text' color='secondary' size='small'>
+          {canSaveGlobally ? 'Reset' : `Reset default ${getSettingsLabel()}`}
+        </Button>
+      </Tooltip>
       {canSaveGlobally && (
         <Button onClick={saveSettingsGlobally} variant='outlined' color='warning' size='small'>
           {`Save ${getSettingsLabel()} for everyone`}

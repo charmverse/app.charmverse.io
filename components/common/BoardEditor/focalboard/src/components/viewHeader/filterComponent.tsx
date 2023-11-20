@@ -35,6 +35,7 @@ const StyledFilterComponent = styled(Box)`
 const FilterComponent = React.memo((props: Props) => {
   const { activeView, properties } = props;
   const localViewSettings = useLocalDbViewSettings();
+  const currentFilter = activeView.fields.localFilter || activeView.fields.filter;
 
   const changeViewFilter = (filterGroup: FilterGroup) => {
     // update filters locally if local settings context exist
@@ -43,11 +44,11 @@ const FilterComponent = React.memo((props: Props) => {
       return;
     }
 
-    mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+    mutator.changeViewFilter(activeView.id, currentFilter, filterGroup);
   };
 
   const conditionClicked = (condition: FilterCondition, filter: FilterClause): void => {
-    const filterGroup = createFilterGroup(activeView.fields.filter);
+    const filterGroup = createFilterGroup(currentFilter);
     const filterClause = filterGroup.filters.find(
       (_filter) => (_filter as FilterClause).filterId === filter.filterId
     ) as FilterClause;
@@ -60,7 +61,7 @@ const FilterComponent = React.memo((props: Props) => {
   };
 
   const addFilterClicked = () => {
-    const filterGroup = createFilterGroup(activeView.fields.filter);
+    const filterGroup = createFilterGroup(currentFilter);
 
     const filter = createFilterClause({
       condition: 'contains',
@@ -78,10 +79,10 @@ const FilterComponent = React.memo((props: Props) => {
   };
 
   const filters: FilterClause[] =
-    (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
+    (currentFilter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
 
   function changeFilterGroupOperation(operation: FilterGroupOperation) {
-    const filterGroup = createFilterGroup(activeView.fields.filter);
+    const filterGroup = createFilterGroup(currentFilter);
     filterGroup.operation = operation;
     changeViewFilter(filterGroup);
   }
@@ -101,7 +102,7 @@ const FilterComponent = React.memo((props: Props) => {
                 {filterIndex === 1 ? (
                   <Select<FilterGroupOperation>
                     size='small'
-                    value={activeView.fields.filter.operation}
+                    value={currentFilter.operation}
                     onChange={(e) => changeFilterGroupOperation(e.target.value as FilterGroupOperation)}
                     renderValue={(selected) => <Typography fontSize='small'>{capitalize(selected)}</Typography>}
                   >
@@ -115,15 +116,16 @@ const FilterComponent = React.memo((props: Props) => {
                   </Select>
                 ) : (
                   <Typography fontSize='small'>
-                    {filterIndex === 0 ? 'Where' : capitalize(activeView.fields.filter.operation)}
+                    {filterIndex === 0 ? 'Where' : capitalize(currentFilter.operation)}
                   </Typography>
                 )}
               </Stack>
               <FilterEntry
+                changeViewFilter={changeViewFilter}
                 properties={properties}
-                view={activeView}
                 conditionClicked={conditionClicked}
                 filter={filter}
+                currentFilter={currentFilter}
               />
             </Stack>
           ))}

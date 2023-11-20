@@ -14,7 +14,8 @@ type Props = {
 };
 
 export function ViewFilterControl({ activeBoard, activeView, viewFilterPopup }: Props) {
-  const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
+  const filter = activeView?.fields.localFilter || activeView?.fields.filter;
+  const hasFilter = filter && filter.filters?.length > 0;
 
   return (
     <>
