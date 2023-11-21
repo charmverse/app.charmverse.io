@@ -32,5 +32,9 @@ async function migrate({ offset = 0 }: { offset?: number } = {}) {
     return migrate({ offset: offset + perBatch });
   }
 }
-
-migrate().then(() => console.log('done'));
+(async () => {
+  const pageCount = await prisma.page.count({});
+  console.log('migrating', pageCount, 'pages');
+  await migrate();
+  console.log('done');
+})();
