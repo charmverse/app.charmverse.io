@@ -27,7 +27,7 @@ export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDia
   }
 
   return (
-    <Tooltip arrow title={isActive ? 'Close evaluation' : 'Open evaluation'}>
+    <Tooltip arrow title={isActive ? 'Close review' : 'Open review'}>
       <IconButton onClick={openEvaluation} sx={{ backgroundColor: isActive ? 'var(--input-bg)' : '' }}>
         {SIDEBAR_VIEWS.proposal_evaluation.icon}
       </IconButton>

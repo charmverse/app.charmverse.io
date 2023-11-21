@@ -70,7 +70,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
     }
     const tabs = [
       [
-        'Evaluate',
+        'Your evaluation',
         <RubricEvaluationForm
           key='evaluate'
           proposalId={proposalId!}
