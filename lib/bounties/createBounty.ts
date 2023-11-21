@@ -35,7 +35,7 @@ export async function createBounty({
 
   if (statusIsInvalid) {
     throw new InvalidInputError(
-      `Bounties can only be created with one of these statuses: ${validCreationStatuses.join(', ')}`
+      `Rewards can only be created with one of these statuses: ${validCreationStatuses.join(', ')}`
     );
   }
 

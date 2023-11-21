@@ -15,7 +15,7 @@ type ConfigurableGroups = Extract<NotificationGroup, 'rewards' | 'proposals' | '
 
 const notifications: Record<ConfigurableGroups, { title: string; types: NotificationType[][] }> = {
   rewards: {
-    title: 'Bounties',
+    title: 'Rewards',
     types: [
       [
         { label: 'Bounty suggested (Admins only)' },

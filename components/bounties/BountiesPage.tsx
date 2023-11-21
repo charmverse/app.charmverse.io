@@ -167,16 +167,16 @@ export function BountiesPage({ publicMode = false, bounties, title }: Props) {
         </div>
         {bounties.length === 0 ? (
           <EmptyStateVideo
-            description='Getting started with bounties'
-            videoTitle='Bounties | Getting started with CharmVerse'
+            description='Getting started with rewards'
+            videoTitle='Rewards | Getting started with CharmVerse'
             videoUrl='https://tiny.charmverse.io/bounties'
           />
         ) : currentView.type === 'open' && bounties.filter((bounty) => bounty.status === 'open').length === 0 ? (
           <Card variant='outlined' sx={{ margin: '0 auto', my: 2, width: 'fit-content' }}>
             <Box p={3} textAlign='center'>
               <Typography color='secondary'>
-                There are no open bounties, click <Link href={`/${space?.domain}/bounties?view=all`}>here</Link> to see
-                all of your existing bounties
+                There are no open rewards, click <Link href={`/${space?.domain}/bounties?view=all`}>here</Link> to see
+                all of your existing rewards
               </Typography>
             </Box>
           </Card>

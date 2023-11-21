@@ -52,7 +52,7 @@ export function BlocksExplanation() {
           Every piece of content in CharmVerse is a block:
           <ul>
             <li>Paragraphs, images, videos, and embeds are all individual blocks</li>
-            <li>Forum posts, comments, proposals, and bounties may be comprised of multiple blocks.</li>
+            <li>Forum posts, comments, proposals, and rewards may be comprised of multiple blocks.</li>
             <li>Each row or card in a database is a block and may contain multiple blocks in the body.</li>
             <li>Each cell of a table may contain more than one block.</li>
           </ul>

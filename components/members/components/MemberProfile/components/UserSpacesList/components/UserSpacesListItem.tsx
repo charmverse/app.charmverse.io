@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import EditIcon from '@mui/icons-material/Edit';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ForumIcon from '@mui/icons-material/Forum';
@@ -53,7 +52,7 @@ const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...p
 const TASK_TABS = [
   { icon: <HowToVoteIcon />, label: 'Votes', type: 'vote' },
   { icon: <TaskOutlinedIcon />, label: 'Proposals', type: 'proposal' },
-  { icon: <BountyIcon />, label: 'Bounties', type: 'bounty' }
+  { icon: <BountyIcon />, label: 'Rewards', type: 'bounty' }
 ] as const;
 
 type UserSpacesListItemProps = {
@@ -127,7 +126,7 @@ export function UserSpacesListItem({
             )}
             <CountIcon icon={<HowToVoteIcon />} label='Votes' count={space.votes.length} />
             <CountIcon icon={<ForumIcon />} label='Proposals' count={space.proposals.length} />
-            <CountIcon icon={<BountyIcon />} label='Bounties' count={space.bounties.length} />
+            <CountIcon icon={<BountyIcon />} label='Rewards' count={space.bounties.length} />
           </Box>
           <Box display='flex' alignItems='center' gap={0.5}>
             {showVisibilityIcon && (
