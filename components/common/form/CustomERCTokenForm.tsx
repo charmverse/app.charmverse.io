@@ -62,7 +62,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
     resolver: yupResolver(schema)
   });
 
-  const [, , refreshPaymentMethods] = usePaymentMethods();
+  const [, refreshPaymentMethods] = usePaymentMethods();
   const { space } = useCurrentSpace();
 
   const [allowManualInput, setAllowManualInput] = useState(false);

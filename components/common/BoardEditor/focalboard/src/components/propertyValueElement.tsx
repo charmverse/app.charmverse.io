@@ -185,6 +185,7 @@ function PropertyValueElement(props: Props) {
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
     return (
       <UserAndRoleSelect
+        displayType={displayType}
         data-test='selected-reviewers'
         readOnly={readOnly}
         onChange={() => null}
@@ -313,12 +314,16 @@ function PropertyValueElement(props: Props) {
       <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
     );
   } else if (propertyTemplate.type === 'tokenAmount') {
-    propertyValueElement = <TokenAmount amount={displayValue as number} />;
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    propertyValueElement = (
+      <TokenAmount amount={displayValue as string} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+    );
   } else if (propertyTemplate.type === 'tokenChain') {
     // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string | undefined;
-    const chainId = card.fields.properties[REWARD_CHAIN] as number | undefined;
-    propertyValueElement = <TokenChain symbolOrAddress={symbolOrAddress} chainId={chainId} />;
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
   }
 
   const commonProps = {
