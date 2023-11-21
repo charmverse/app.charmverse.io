@@ -5,6 +5,7 @@ import { useCallback, memo, useEffect, useMemo } from 'react';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
@@ -21,18 +22,20 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 
 const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
 
-function LinkedPagesList({
-  features = [],
-  pluginKey
-}: {
-  features?: Pick<FeatureJson, 'id' | 'title'>[];
-  pluginKey: PluginKey<NestedPagePluginState>;
-}) {
+function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
+  const { space } = useCurrentSpace();
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey) as NestedPagePluginState;
   const { triggerText, counter, show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
+
+  const spaceFeatures = (space?.features as FeatureJson[]) ?? [];
+
+  const features = STATIC_PAGES.map(({ feature, ...restFeat }) => ({
+    id: feature,
+    title: spaceFeatures.find((_feature) => _feature.id === feature)?.title ?? restFeat.title
+  }));
 
   function onClose() {
     hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);

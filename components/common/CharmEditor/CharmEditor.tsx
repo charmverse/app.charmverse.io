@@ -21,15 +21,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPageSidebarContext } from 'hooks/usePageSidebar';
 import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getThreadsKey, useThreads } from 'hooks/useThreads';
+import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
-
-import { STATIC_PAGES, type FeatureJson } from '../PageLayout/components/Sidebar/utils/staticPages';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
@@ -64,16 +61,16 @@ import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { VideoNodeView } from './components/video/VideoNodeView';
 import {
-  suggestionsPluginKey,
-  inlinePalettePluginKey,
+  actionsPluginKey,
+  charmEditorPlugins,
+  emojiPluginKey,
   floatingMenuPluginKey,
+  inlineCommentPluginKey,
+  inlinePalettePluginKey,
   linkedPagePluginKey,
   linksPluginKey,
   mentionPluginKey,
-  emojiPluginKey,
-  actionsPluginKey,
-  inlineCommentPluginKey,
-  charmEditorPlugins
+  suggestionsPluginKey
 } from './plugins';
 import { specRegistry } from './specRegistry';
 
@@ -238,13 +235,6 @@ function CharmEditor({
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
   const { threads } = useThreads();
-
-  const spaceFeatures = (currentSpace?.features as FeatureJson[]) ?? [];
-
-  const extendedFeatures = STATIC_PAGES.map(({ feature, ...restFeat }) => ({
-    id: feature,
-    title: spaceFeatures.find((_feature) => _feature.id === feature)?.title ?? restFeat.title
-  }));
 
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
@@ -497,10 +487,10 @@ function CharmEditor({
             return !disableMention && <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return <NestedPage features={extendedFeatures} currentPageId={pageId} {...props} />;
+            return <NestedPage currentPageId={pageId} {...props} />;
           }
           case 'linkedPage': {
-            return <NestedPage features={extendedFeatures} isLinkedPage currentPageId={pageId} {...props} />;
+            return <NestedPage isLinkedPage currentPageId={pageId} {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
@@ -548,7 +538,7 @@ function CharmEditor({
         pageId={pageId}
       />
       {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
-      <LinkedPagesList features={extendedFeatures} pluginKey={linkedPagePluginKey} />
+      <LinkedPagesList pluginKey={linkedPagePluginKey} />
       <EmojiSuggest pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette

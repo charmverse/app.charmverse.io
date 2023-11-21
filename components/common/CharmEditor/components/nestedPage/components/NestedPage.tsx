@@ -60,13 +60,20 @@ export default function NestedPage({
   isLinkedPage,
   node,
   currentPageId,
-  getPos,
-  features = []
-}: NodeViewProps & { isLinkedPage?: boolean; currentPageId?: string; features?: Pick<FeatureJson, 'id' | 'title'>[] }) {
+  getPos
+}: NodeViewProps & { isLinkedPage?: boolean; currentPageId?: string }) {
   const { space } = useCurrentSpace();
   const view = useEditorViewContext();
   const { pages, loadingPages } = usePages();
   const { categories } = useForumCategories();
+
+  const spaceFeatures = (space?.features as FeatureJson[]) ?? [];
+
+  const features = STATIC_PAGES.map(({ feature, ...restFeat }) => ({
+    id: feature,
+    title: spaceFeatures.find((_feature) => _feature.id === feature)?.title ?? restFeat.title
+  }));
+
   const documentPage = pages[node.attrs.id];
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
@@ -83,6 +90,7 @@ export default function NestedPage({
   } else if (!loadingPages) {
     pageTitle = 'No access';
   }
+
   const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
   const pagePath = documentPage ? `${space?.domain}/${documentPage.path}` : '';
   const staticPath = staticPage ? `${space?.domain}/${staticPage.path}` : '';
