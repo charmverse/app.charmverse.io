@@ -270,7 +270,7 @@ ol li {
   pointer-events: none;
 }
 
-.bangle-editor-core:not(.readonly) .ProseMirror-selectednode {
+.ProseMirror-selectednode {
   background-color: var(--charmeditor-active);
   transition: background-color 150ms ease-in-out;
 }
