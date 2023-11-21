@@ -36,12 +36,12 @@ const DesktopContainer = styled.div`
 export const SIDEBAR_VIEWS = {
   proposal_evaluation: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'View proposal evaluation',
-    title: 'Evaluation rubric'
+    tooltip: 'View evaluation',
+    title: 'Evaluation'
   },
   comments: {
     icon: <MessageOutlined fontSize='small' />,
-    tooltip: 'View all omments',
+    tooltip: 'View all comments',
     title: 'Comments'
   },
   suggestions: {

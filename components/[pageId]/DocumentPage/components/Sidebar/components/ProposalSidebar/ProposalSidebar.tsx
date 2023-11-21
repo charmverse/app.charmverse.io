@@ -70,7 +70,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
     }
     const tabs = [
       [
-        'Evaluate',
+        'Your evaluation',
         <RubricEvaluationForm
           key='evaluate'
           proposalId={proposalId!}
@@ -106,7 +106,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
         <>
           <Alert severity='info'>
             {canAnswerRubric
-              ? 'Your evaluation is only viewable by the Reviewers assigned to this Proposal'
+              ? 'Evaluation results are only visible to Reviewers'
               : 'Only Reviewers can submit an evaluation'}
           </Alert>
           <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />

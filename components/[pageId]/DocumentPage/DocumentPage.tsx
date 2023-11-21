@@ -402,6 +402,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
                       proposalPage={page}
+                      isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
                       openEvaluation={openEvaluation}
                     />
                   )}
