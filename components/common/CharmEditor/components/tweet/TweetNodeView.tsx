@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import { Box } from '@mui/material';
 import Script from 'next/script';
 import { useRef } from 'react';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import { randomIntFromInterval } from 'lib/utilities/random';
 
@@ -81,7 +81,7 @@ export function TweetNodeView({ deleteNode, readOnly, node, selected, updateAttr
       return (
         <MediaSelectionPopup
           node={node}
-          icon={<TwitterIcon fontSize='small' />}
+          icon={<FaXTwitter fontSize='small' />}
           isSelected={selected}
           buttonText='Embed a Tweet'
           onDelete={deleteNode}

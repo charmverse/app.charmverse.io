@@ -332,6 +332,7 @@ class CharmClient {
       const fbBlockInput = Object.assign(currentFBBlock, updates, {
         fields: { ...(currentFBBlock.fields as object), ...updatedFields }
       });
+
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });

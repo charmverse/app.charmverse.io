@@ -3,7 +3,9 @@ import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
@@ -21,11 +23,19 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
 
 function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
+  const { space } = useCurrentSpace();
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey) as NestedPagePluginState;
   const { triggerText, counter, show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
+
+  const spaceFeatures = (space?.features as FeatureJson[]) ?? [];
+
+  const features = STATIC_PAGES.map(({ feature, ...restFeat }) => ({
+    id: feature,
+    title: spaceFeatures.find((_feature) => _feature.id === feature)?.title ?? restFeat.title
+  }));
 
   function onClose() {
     hideSuggestionsTooltip(pluginKey)(view.state, view.dispatch, view);
@@ -39,24 +49,29 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
     [pages]
   );
 
+  const forumTitle = features.find((feat) => feat.id === 'forum')?.title ?? 'Forum';
+
   const allPages: PageListItem[] = useMemo(() => {
     const categoryPages: PageListItem[] = (categories || []).map((page) => ({
       id: page.id,
       path: page.path || '',
       hasContent: true,
-      title: `Forum > ${page.name}`,
+      title: `${forumTitle} > ${page.name}`,
       type: 'forum_category',
       icon: null
     }));
 
-    const staticPages: PageListItem[] = STATIC_PAGES.map((page) => ({
-      id: page.path,
-      path: page.path,
-      hasContent: true,
-      title: page.title,
-      type: page.path,
-      icon: null
-    }));
+    const staticPages: PageListItem[] = STATIC_PAGES.map((page) => {
+      const feature = features.find((feat) => feat.id === page.feature);
+      return {
+        id: page.path,
+        path: page.path,
+        hasContent: true,
+        title: feature?.title ?? page.title,
+        type: page.path,
+        icon: null
+      };
+    });
     return [...userPages, ...categoryPages, ...staticPages];
   }, [categories, userPages]);
 

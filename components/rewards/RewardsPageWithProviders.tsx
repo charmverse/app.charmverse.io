@@ -4,6 +4,7 @@ import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoard';
 import { RewardsPage } from 'components/rewards/RewardsPage';
 import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { setTitle } from 'hooks/usePageTitle';
 import { RewardBlocksProvider } from 'hooks/useRewardBlocks';
 
@@ -15,13 +16,15 @@ export function RewardsPageWithProviders() {
   return (
     <PageDialogProvider>
       <RewardsProvider>
-        <RewardBlocksProvider>
-          <RewardsBoardProvider>
-            <RewardsPage title={rewardsTitle} />
+        <DbViewSettingsProvider>
+          <RewardBlocksProvider>
+            <RewardsBoardProvider>
+              <RewardsPage title={rewardsTitle} />
 
-            <PageDialogGlobal />
-          </RewardsBoardProvider>
-        </RewardBlocksProvider>
+              <PageDialogGlobal />
+            </RewardsBoardProvider>
+          </RewardBlocksProvider>
+        </DbViewSettingsProvider>
       </RewardsProvider>
     </PageDialogProvider>
   );

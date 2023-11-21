@@ -191,11 +191,23 @@ function MemberDirectoryTableRow({
             case 'text':
             case 'phone':
             case 'email':
-            case 'url':
             case 'number': {
               return (
                 <TableCell key={property.id}>
                   <Typography variant='body2'>{(memberProperty.value as string) ?? '-'}</Typography>
+                </TableCell>
+              );
+            }
+            case 'url': {
+              return (
+                <TableCell key={property.id}>
+                  {memberProperty.value ? (
+                    <Link external target='_blank' color='inherit' href={memberProperty.value as string}>
+                      {memberProperty.value as string}
+                    </Link>
+                  ) : (
+                    <Typography variant='body2'>-</Typography>
+                  )}
                 </TableCell>
               );
             }

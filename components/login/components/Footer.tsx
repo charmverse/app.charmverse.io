@@ -1,13 +1,13 @@
 import styled from '@emotion/styled';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import { charmverseDiscordInvite } from 'config/constants';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
@@ -81,7 +81,7 @@ export default function Footer() {
                   <LinkedInIcon />
                 </StyledIconButton>
                 <StyledIconButton href='https://twitter.com/charmverse' target='_blank'>
-                  <TwitterIcon />
+                  <FaXTwitter />
                 </StyledIconButton>
                 <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>
                   <FacebookIcon />

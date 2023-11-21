@@ -1,18 +1,19 @@
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
-import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
+import { Divider, IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { ColorSelectMenu } from 'components/common/form/ColorSelectMenu';
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { BrandColor } from 'theme/colors';
 
 import { useProposalCategories } from '../../../hooks/useProposalCategories';
 
@@ -24,6 +25,7 @@ type Props = {
 
 export function ProposalCategoryContextMenu({ category }: Props) {
   const [tempName, setTempName] = useState(category.title || '');
+  const [categoryColor, setCategoryColor] = useState<BrandColor>(category.color as BrandColor);
   const { space } = useCurrentSpace();
   const { mutateCategory, deleteCategory } = useProposalCategories();
   const { showMessage } = useSnackbar();
@@ -32,7 +34,16 @@ export function ProposalCategoryContextMenu({ category }: Props) {
 
   useEffect(() => {
     setTempName(category.title || '');
-  }, [category.title]);
+    setCategoryColor(category.color as BrandColor);
+  }, [category.title, category.color]);
+
+  useEffect(() => {
+    if (category.color !== categoryColor && space) {
+      charmClient.proposals
+        .updateProposalCategory(space.id, { ...category, color: categoryColor })
+        .then(mutateCategory);
+    }
+  }, [category, categoryColor, space]);
 
   function onSave() {
     if (tempName !== category.title && space) {
@@ -75,13 +86,7 @@ export function ProposalCategoryContextMenu({ category }: Props) {
         {!!onDelete && (
           <Tooltip title={!permissions.delete ? 'You do not have permissions to delete this category' : ''}>
             <div>
-              <MenuItem
-                disabled={!permissions.delete}
-                onClick={onDelete}
-                sx={{
-                  py: 1
-                }}
-              >
+              <MenuItem disabled={!permissions.delete} onClick={onDelete}>
                 <ListItemIcon>
                   <DeleteOutlinedIcon fontSize='small' />
                 </ListItemIcon>
@@ -94,9 +99,6 @@ export function ProposalCategoryContextMenu({ category }: Props) {
         <MenuItem
           data-test={`open-category-permissions-dialog-${category.id}`}
           onClick={() => setPermissionsDialogIsOpen(true)}
-          sx={{
-            py: 1
-          }}
         >
           <ListItemIcon>
             <LockIcon />
@@ -105,9 +107,15 @@ export function ProposalCategoryContextMenu({ category }: Props) {
             Permissions <UpgradeChip upgradeContext='proposal_permissions' />
           </Typography>
         </MenuItem>
+        {permissions.edit && (
+          <>
+            <Divider />
+            <ColorSelectMenu onChange={setCategoryColor} selectedColor={categoryColor} />
+          </>
+        )}
       </MenuList>
     ),
-    [category, tempName]
+    [category, tempName, categoryColor, permissions.delete]
   );
 
   return (

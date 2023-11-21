@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 
 type Props = {
-  proposalIdOrPath: string | null;
+  proposalIdOrPath?: string | null;
   spaceDomain?: string;
   isNewProposal?: boolean;
 };

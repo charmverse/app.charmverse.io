@@ -13,7 +13,7 @@ class MyDocument extends Document {
           <link rel='icon' href='/favicon.png' />
           <meta
             name='description'
-            content='web3 operations platform handling docs, tasks, bounties, proposals, and votes.'
+            content='web3 operations platform handling docs, tasks, rewards, proposals, and votes.'
           />
           <script src='/__ENV.js' />
         </Head>

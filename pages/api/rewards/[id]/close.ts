@@ -28,7 +28,7 @@ async function closeRewardController(req: NextApiRequest, res: NextApiResponse<R
   const userId = req.session.user.id;
 
   const permissions = await computeBountyPermissions({
-    resourceId: page.id,
+    resourceId: rewardId,
     userId
   });
 

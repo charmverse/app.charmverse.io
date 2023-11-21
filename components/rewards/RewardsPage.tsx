@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
+import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
@@ -125,31 +126,31 @@ export function RewardsPage({ title }: { title: string }) {
             </Box>
           </Box>
         </DatabaseTitle>
-        <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-          {rewards?.length ? (
-            <>
-              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+        <>
+          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
+            <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
-              <ViewSortControl
-                activeBoard={activeBoard}
-                activeView={activeView}
-                cards={cards as Card[]}
-                viewSortPopup={viewSortPopup}
-              />
-            </>
-          ) : null}
-
-          {isAdmin && (
-            <ViewHeaderActionsMenu
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setShowSidebar(!showSidebar);
-              }}
+            <ViewSortControl
+              activeBoard={activeBoard}
+              activeView={activeView}
+              cards={cards as Card[]}
+              viewSortPopup={viewSortPopup}
             />
-          )}
-        </Stack>
-        <Divider />
+
+            {isAdmin && (
+              <ViewHeaderActionsMenu
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowSidebar(!showSidebar);
+                }}
+              />
+            )}
+          </Stack>
+          <Divider />
+
+          <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
+        </>
       </DatabaseStickyHeader>
 
       {loadingData ? (
