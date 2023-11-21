@@ -73,6 +73,10 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
         page: {
           id: {
             in: accessiblePageIds
+          },
+          // bounty templates have separate endpoint
+          type: {
+            notIn: ['bounty_template']
           }
         }
       },

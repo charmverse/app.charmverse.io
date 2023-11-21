@@ -31,7 +31,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
   hideGroup: (groupByOptionId: string) => void;
-  addCard: (groupByOptionId?: string) => Promise<void>;
+  addCard: (groupByOptionId?: string) => Promise<void> | void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
   disableAddingCards?: boolean;

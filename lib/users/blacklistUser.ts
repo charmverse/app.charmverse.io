@@ -1,8 +1,7 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function blacklistUser(userId: string) {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId
     },
@@ -13,10 +12,6 @@ export async function blacklistUser(userId: string) {
       googleAccounts: true
     }
   });
-
-  if (!user) {
-    throw new DataNotFoundError('User not found');
-  }
 
   await prisma.blacklistedUser.create({
     data: {

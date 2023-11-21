@@ -1,5 +1,4 @@
 import { isEmptyDocument } from '@bangle.dev/utils';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { SelectProps } from '@mui/material';
@@ -8,15 +7,15 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
+import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import type { CommentThreadsMap } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -49,13 +48,13 @@ const EmptyThreadContainerBox = styled(Box)`
 `;
 
 function CommentsSidebarComponent({
-  inline,
-  permissions,
-  threads
+  canCreateComments,
+  threads,
+  openSidebar
 }: {
   threads: CommentThreadsMap;
-  inline?: boolean;
-  permissions?: PagePermissionFlags;
+  canCreateComments: boolean;
+  openSidebar: (view: PageSidebarView) => void;
 }) {
   const router = useRouter();
   const { user } = useUser();
@@ -68,16 +67,13 @@ function CommentsSidebarComponent({
     setThreadFilter(event.target.value as any);
   };
   const lastHighlightedCommentId = React.useRef<string | null>(null);
-
-  const { setActiveView } = usePageSidebar();
-
-  let threadList: ThreadWithCommentsAndAuthors[] = [];
+  let threadList: ThreadWithComments[] = [];
   if (threadFilter === 'resolved') {
     threadList = resolvedThreads;
   } else if (threadFilter === 'open') {
     threadList = unResolvedThreads;
   } else if (threadFilter === 'all') {
-    threadList = allThreads as ThreadWithCommentsAndAuthors[];
+    threadList = allThreads as ThreadWithComments[];
   } else if (threadFilter === 'you') {
     // Filter the threads where there is at-least a single comment by the current user
     threadList = unResolvedThreads.filter((unResolvedThread) =>
@@ -112,7 +108,7 @@ function CommentsSidebarComponent({
     const highlightedCommentId = router.query.inlineCommentId;
 
     if (typeof highlightedCommentId === 'string' && highlightedCommentId !== lastHighlightedCommentId.current) {
-      setActiveView('comments');
+      openSidebar('comments');
       const isHighlightedResolved = resolvedThreads.some((thread) =>
         thread.comments.some((comment) => comment.id === highlightedCommentId)
       );
@@ -174,9 +170,8 @@ function CommentsSidebarComponent({
             (resolvedThread) =>
               resolvedThread && (
                 <PageThread
-                  permissions={permissions}
+                  canCreateComments={canCreateComments}
                   showFindButton
-                  inline={inline}
                   key={resolvedThread.id}
                   threadId={resolvedThread?.id}
                 />

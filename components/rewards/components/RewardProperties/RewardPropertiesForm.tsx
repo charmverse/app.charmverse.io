@@ -121,9 +121,6 @@ export function RewardPropertiesForm({
     <Box
       className='CardDetail content'
       sx={{
-        '& .MuiInputBase-input': {
-          background: 'none'
-        },
         '.octo-propertyname .Button': {
           paddingLeft: '0 !important'
         },

@@ -1,6 +1,6 @@
 import { rafCommandExec } from '@bangle.dev/utils';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
-import TwitterIcon from '@mui/icons-material/Twitter';
+import { FaXTwitter } from 'react-icons/fa6';
 import { RiNftLine } from 'react-icons/ri';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
@@ -117,7 +117,7 @@ export function items(): PaletteItemTypeNoGroup[] {
       uid: 'tweet',
       title: 'Tweet',
       keywords: ['twitter', 'elon'],
-      icon: <TwitterIcon sx={{ fontSize: iconSize }} />,
+      icon: <FaXTwitter style={{ fontSize: iconSize }} />,
       description: 'Embed a Tweet',
       editorExecuteCommand: ({ palettePluginKey }) => {
         return (state, dispatch, view) => {

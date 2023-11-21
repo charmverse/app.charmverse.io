@@ -1,5 +1,5 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Box, Collapse, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Collapse, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 

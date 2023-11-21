@@ -26,7 +26,7 @@ export default function Footer({ showSnooze = true }: { showSnooze?: boolean }) 
         </Column>
         <Column width={30}>
           <SocialIcon href='https://twitter.com/charmverse'>
-            <Img width={21} height={21} src={`${baseUrl}/images/logos/twitter_greyscale.png`} />
+            <Img width={21} height={21} src={`${baseUrl}/images/logos/x_greyscale.png`} />
           </SocialIcon>
         </Column>
         <Column width={30}>

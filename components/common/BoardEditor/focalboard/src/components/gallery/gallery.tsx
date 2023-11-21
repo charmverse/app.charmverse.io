@@ -16,7 +16,7 @@ type Props = {
   cards: Card[];
   activeView: BoardView;
   readOnly: boolean;
-  addCard: (show: boolean) => Promise<void>;
+  addCard: (show: boolean) => Promise<void> | void;
   selectedCardIds: string[];
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   disableAddingCards?: boolean;

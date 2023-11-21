@@ -4,22 +4,19 @@ import type { PageType, ProposalEvaluationType, ProposalRubricCriteria, Proposal
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
-import { Alert, Box, Card, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { Box, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
-import LoadingComponent, { LoadingIcon } from 'components/common/LoadingComponent';
+import { LoadingIcon } from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import type { TabConfig } from 'components/common/MultiTabs';
-import MultiTabs from 'components/common/MultiTabs';
-import { RubricResults } from 'components/proposals/components/ProposalProperties/components/RubricResults';
 import { CustomPropertiesAdapter } from 'components/proposals/components/ProposalProperties/CustomPropertiesAdapter';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -36,7 +33,6 @@ import {
 } from 'lib/proposal/proposalStatusTransition';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
@@ -47,7 +43,6 @@ import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteria
 import { ProposalStepper } from './components/ProposalStepper/ProposalStepper';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
-import { RubricEvaluationForm } from './components/RubricEvaluationForm';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;
@@ -67,14 +62,11 @@ type ProposalPropertiesProps = {
   isPublishingToLens?: boolean;
   proposalLensLink?: string;
   archived?: boolean;
-  canAnswerRubric?: boolean;
-  canViewRubricAnswers?: boolean;
   readOnlyCategory?: boolean;
   isAdmin?: boolean;
   isFromTemplate?: boolean;
   isTemplateRequired?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
-  onSaveRubricCriteriaAnswers?: () => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -85,27 +77,23 @@ type ProposalPropertiesProps = {
   readOnlyProposalEvaluationType?: boolean;
   readOnlyRubricCriteria?: boolean;
   rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
-  draftRubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   isTemplate: boolean;
   snapshotProposalId?: string | null;
-  userId?: string;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
-  title: string;
   readOnlyCustomProperties?: string[];
+  openEvaluation?: () => void;
+  canSeeEvaluation?: boolean;
 };
 
 export function ProposalPropertiesBase({
   proposalLensLink,
   archived,
-  canAnswerRubric,
-  canViewRubricAnswers,
   isAdmin = false,
   isFromTemplate,
   isTemplateRequired,
   onChangeRubricCriteria,
-  onSaveRubricCriteriaAnswers,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -117,19 +105,16 @@ export function ProposalPropertiesBase({
   readOnlyReviewers,
   readOnlyRubricCriteria,
   rubricAnswers = [],
-  draftRubricAnswers = [],
-  rubricCriteria,
   setProposalFormInputs,
   isTemplate,
   snapshotProposalId,
-  userId,
   updateProposalStatus,
-  title,
   isPublishingToLens,
+  openEvaluation,
+  canSeeEvaluation,
   readOnlyCustomProperties
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
-  const [rubricView, setRubricView] = useState<number>(0);
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const { pages } = usePages();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
@@ -176,9 +161,6 @@ export function ProposalPropertiesBase({
     }
   }
 
-  const { data: reviewerUserIds, mutate: refreshReviewerIds } = useGetAllReviewerUserIds(
-    !!pageId && proposalFormInputs.evaluationType === 'rubric' ? pageId : undefined
-  );
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -186,14 +168,6 @@ export function ProposalPropertiesBase({
   const isNewProposal = !pageId;
   const showStatusStepper = !isTemplate;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
-  const myRubricAnswers = useMemo(
-    () => rubricAnswers.filter((answer) => answer.userId === userId),
-    [userId, rubricAnswers]
-  );
-  const myDraftRubricAnswers = useMemo(
-    () => draftRubricAnswers.filter((answer) => answer.userId === userId),
-    [userId, draftRubricAnswers]
-  );
   const templateOptions = proposalTemplates
     .filter((_proposal) => {
       if (!proposalCategoryId) {
@@ -255,14 +229,6 @@ export function ProposalPropertiesBase({
     setIsVoteModalOpen(true);
   }
 
-  async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
-    await onSaveRubricCriteriaAnswers?.();
-    if (!isDraft) {
-      // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
-      setRubricView(1);
-    }
-  }
-
   useEffect(() => {
     if (!prevStatusRef.current && proposalStatus === 'draft') {
       setDetailsExpanded(true);
@@ -278,49 +244,10 @@ export function ProposalPropertiesBase({
     lensProposalPropertyState = lensProfile && account ? 'show_toggle' : 'hide';
   }
 
-  const evaluationTabs = useMemo<TabConfig[]>(() => {
-    if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
-      return [];
-    }
-    const tabs = [
-      canAnswerRubric &&
-        ([
-          'Evaluate',
-          <LoadingComponent key='evaluate' isLoading={!rubricCriteria}>
-            <RubricEvaluationForm
-              proposalId={proposalId!}
-              answers={myRubricAnswers}
-              draftAnswers={myDraftRubricAnswers}
-              criteriaList={rubricCriteria!}
-              onSubmit={onSubmitEvaluation}
-            />
-          </LoadingComponent>,
-          { sx: { p: 0 } } // disable default padding of tab panel
-        ] as TabConfig),
-      canViewRubricAnswers &&
-        ([
-          'Results',
-          <LoadingComponent key='results' isLoading={!rubricCriteria}>
-            <RubricResults
-              answers={rubricAnswers}
-              criteriaList={rubricCriteria || []}
-              reviewerUserIds={reviewerUserIds ?? []}
-              title={title}
-            />
-          </LoadingComponent>,
-          { sx: { p: 0 } }
-        ] as TabConfig)
-    ].filter(isTruthy);
-    return tabs;
-  }, [canAnswerRubric, canViewRubricAnswers, rubricAnswers, myRubricAnswers, reviewerUserIds, rubricCriteria]);
-
   return (
     <Box
       className='CardDetail content'
       sx={{
-        '& .MuiInputBase-input': {
-          background: 'none'
-        },
         '.octo-propertyname .Button': {
           paddingLeft: 0
         }
@@ -461,7 +388,6 @@ export function ProposalPropertiesBase({
                   await setProposalFormInputs({
                     reviewers: options.map((option) => ({ group: option.group, id: option.id }))
                   });
-                  refreshReviewerIds();
                 }}
               />
             </Box>
@@ -594,11 +520,10 @@ export function ProposalPropertiesBase({
           }}
         />
 
-        {evaluationTabs.length > 0 && (
-          <Card variant='outlined' sx={{ my: 2 }}>
-            <Alert severity='info'>Your evaluation is only viewable by the Reviewers assigned to this Proposal</Alert>
-            <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
-          </Card>
+        {canSeeEvaluation && (
+          <Box display='flex' justifyContent='center' py={2}>
+            <Button onClick={openEvaluation}>Review this proposal</Button>
+          </Box>
         )}
 
         <ConfirmDeleteModal

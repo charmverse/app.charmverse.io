@@ -47,7 +47,6 @@ export function FullPageEditor() {
         placeholderText='Custom placeholder... start typing / to see commands'
         readOnly={false}
         autoFocus={true}
-        PageSidebar={null}
         pageId='123'
         disablePageSpecificFeatures={false}
         enableSuggestingMode={false}
