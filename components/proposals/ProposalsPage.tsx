@@ -133,31 +133,29 @@ export function ProposalsPage({ title }: { title: string }) {
             </Box>
           </Box>
         </DatabaseTitle>
-        {!!proposals?.length && (
-          <>
-            <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+        <>
+          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
+            <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
-              <ViewSortControl
-                activeBoard={activeBoard}
-                activeView={activeView}
-                cards={cards}
-                viewSortPopup={viewSortPopup}
-              />
+            <ViewSortControl
+              activeBoard={activeBoard}
+              activeView={activeView}
+              cards={cards}
+              viewSortPopup={viewSortPopup}
+            />
 
-              <ViewHeaderActionsMenu
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowSidebar(!showSidebar);
-                }}
-              />
-            </Stack>
-            <Divider />
+            <ViewHeaderActionsMenu
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowSidebar(!showSidebar);
+              }}
+            />
+          </Stack>
+          <Divider />
 
-            <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
-          </>
-        )}
+          <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
+        </>
       </DatabaseStickyHeader>
 
       {loadingData ? (
@@ -165,62 +163,57 @@ export function ProposalsPage({ title }: { title: string }) {
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (
-        <>
-          {proposals?.length === 0 && (
-            <Grid item xs={12} position='relative'>
-              <Box sx={{ mt: 5 }}>
+        <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
+          <Stack>
+            {proposals?.length > 0 ? (
+              <Box width='100%'>
+                <Table
+                  board={activeBoard}
+                  activeView={activeView}
+                  cardPages={cardPages}
+                  groupByProperty={groupByProperty}
+                  views={views}
+                  visibleGroups={[]}
+                  selectedCardIds={[]}
+                  readOnly={!isAdmin}
+                  disableAddingCards
+                  showCard={openPage}
+                  readOnlyTitle
+                  cardIdToFocusOnRender=''
+                  addCard={async () => {}}
+                  onCardClicked={() => {}}
+                  onDeleteCard={onDelete}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
                   description='Getting started with proposals'
                   videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               </Box>
-            </Grid>
-          )}
-          {proposals?.length > 0 && (
-            <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
-              <Stack>
-                <Box width='100%'>
-                  <Table
-                    board={activeBoard}
-                    activeView={activeView}
-                    cardPages={cardPages}
-                    groupByProperty={groupByProperty}
-                    views={views}
-                    visibleGroups={[]}
-                    selectedCardIds={[]}
-                    readOnly={!isAdmin}
-                    disableAddingCards
-                    showCard={openPage}
-                    readOnlyTitle
-                    cardIdToFocusOnRender=''
-                    addCard={async () => {}}
-                    onCardClicked={() => {}}
-                    onDeleteCard={onDelete}
-                  />
-                </Box>
+            )}
 
-                <ViewSidebar
-                  views={views}
-                  board={activeBoard}
-                  rootBoard={activeBoard}
-                  view={activeView}
-                  isOpen={!!showSidebar}
-                  closeSidebar={() => setShowSidebar(false)}
-                  hideLayoutSelectOptions
-                  hideSourceOptions
-                  hideGroupOptions
-                  hidePropertiesRow={!isAdmin}
-                  groupByProperty={groupByProperty}
-                  page={undefined}
-                  pageId={undefined}
-                  showView={() => {}}
-                  withProposalCategories
-                />
-              </Stack>
-            </Box>
-          )}
-        </>
+            <ViewSidebar
+              views={views}
+              board={activeBoard}
+              rootBoard={activeBoard}
+              view={activeView}
+              isOpen={!!showSidebar}
+              closeSidebar={() => setShowSidebar(false)}
+              hideLayoutSelectOptions
+              hideSourceOptions
+              hideGroupOptions
+              hidePropertiesRow={!isAdmin}
+              groupByProperty={groupByProperty}
+              page={undefined}
+              pageId={undefined}
+              showView={() => {}}
+              withProposalCategories
+            />
+          </Stack>
+        </Box>
       )}
       {(props.pageId || newProposal) && (
         <ProposalDialog pageId={props.pageId} newProposal={newProposal} closeDialog={closeDialog} />
