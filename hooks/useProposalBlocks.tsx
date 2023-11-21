@@ -7,15 +7,16 @@ import { useCreateProposalBlocks, useGetProposalBlocks, useUpdateProposalBlocks 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type {
   ProposalBlockInput,
   ProposalBlockWithTypedFields,
-  ProposalPropertiesBlock
+  ProposalBoardBlock
 } from 'lib/proposal/blocks/interfaces';
 
 export type ProposalBlocksContextType = {
   proposalBlocks: ProposalBlockWithTypedFields[] | undefined;
-  proposalPropertiesBlock: ProposalPropertiesBlock | undefined;
+  proposalBoardBlock: ProposalBoardBlock | undefined;
   isLoading: boolean;
   createProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
   updateProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
@@ -28,7 +29,7 @@ export type ProposalBlocksContextType = {
 
 export const ProposalBlocksContext = createContext<Readonly<ProposalBlocksContextType>>({
   proposalBlocks: undefined,
-  proposalPropertiesBlock: undefined,
+  proposalBoardBlock: undefined,
   isLoading: false,
   createProperty: async () => {},
   updateProperty: async () => {},
@@ -82,8 +83,8 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
     [mutate]
   );
 
-  const proposalPropertiesBlock = useMemo(
-    () => proposalBlocks?.find((b): b is ProposalPropertiesBlock => b.type === 'board'),
+  const proposalBoardBlock = useMemo(
+    () => proposalBlocks?.find((b): b is ProposalBoardBlock => b.id === DEFAULT_BOARD_BLOCK_ID),
     [proposalBlocks]
   );
 
@@ -94,9 +95,9 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        if (proposalPropertiesBlock) {
-          const updatedProperties = [...proposalPropertiesBlock.fields.cardProperties, propertyTemplate];
-          const updatedBlock = { ...proposalPropertiesBlock, fields: { cardProperties: updatedProperties } };
+        if (proposalBoardBlock) {
+          const updatedProperties = [...proposalBoardBlock.fields.cardProperties, propertyTemplate];
+          const updatedBlock = { ...proposalBoardBlock, fields: { cardProperties: updatedProperties } };
           const res = await updateProposalBlocks([updatedBlock]);
 
           if (!res) {
@@ -107,7 +108,12 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
 
           return res[0].id;
         } else {
-          const propertiesBlock = { fields: { cardProperties: [propertyTemplate] }, type: 'board', spaceId: space.id };
+          const propertiesBlock = {
+            id: DEFAULT_BOARD_BLOCK_ID,
+            fields: { cardProperties: [propertyTemplate] },
+            type: 'board',
+            spaceId: space.id
+          };
           const res = await createProposalBlocks([propertiesBlock as ProposalBlockInput]);
 
           if (!res) {
@@ -128,19 +134,19 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to create property: ${e.message}`, 'error');
       }
     },
-    [createProposalBlocks, mutate, proposalPropertiesBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
+    [createProposalBlocks, mutate, proposalBoardBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const updateProperty = useCallback(
     async (propertyTemplate: IPropertyTemplate) => {
-      if (!space || !proposalPropertiesBlock) {
+      if (!space || !proposalBoardBlock) {
         return;
       }
 
-      const updatedProperties = proposalPropertiesBlock.fields.cardProperties.map((p) =>
+      const updatedProperties = proposalBoardBlock.fields.cardProperties.map((p) =>
         p.id === propertyTemplate.id ? propertyTemplate : p
       );
-      const updatedBlock = { ...proposalPropertiesBlock, fields: { cardProperties: updatedProperties } };
+      const updatedBlock = { ...proposalBoardBlock, fields: { cardProperties: updatedProperties } };
 
       try {
         const res = await updateProposalBlocks([updatedBlock]);
@@ -155,19 +161,17 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to update property: ${e.message}`, 'error');
       }
     },
-    [proposalPropertiesBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
+    [proposalBoardBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const deleteProperty = useCallback(
     async (propertyTemplateId: string) => {
-      if (!space || !proposalPropertiesBlock) {
+      if (!space || !proposalBoardBlock) {
         return;
       }
 
-      const updatedProperties = proposalPropertiesBlock.fields.cardProperties.filter(
-        (p) => p.id !== propertyTemplateId
-      );
-      const updatedBlock = { ...proposalPropertiesBlock, fields: { cardProperties: updatedProperties } };
+      const updatedProperties = proposalBoardBlock.fields.cardProperties.filter((p) => p.id !== propertyTemplateId);
+      const updatedBlock = { ...proposalBoardBlock, fields: { cardProperties: updatedProperties } };
       try {
         const res = await updateProposalBlocks([updatedBlock]);
 
@@ -180,7 +184,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to delete property: ${e.message}`, 'error');
       }
     },
-    [proposalPropertiesBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
+    [proposalBoardBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
   );
 
   const updateBlocks = useCallback(
@@ -240,7 +244,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       proposalBlocks,
-      proposalPropertiesBlock,
+      proposalBoardBlock,
       isLoading,
       createProperty,
       updateProperty,
@@ -252,7 +256,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
     }),
     [
       proposalBlocks,
-      proposalPropertiesBlock,
+      proposalBoardBlock,
       isLoading,
       createProperty,
       updateProperty,

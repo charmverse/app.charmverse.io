@@ -3,6 +3,8 @@ import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-cl
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { createBoard } from 'lib/focalboard/board';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type { ProposalBlockInput } from 'lib/proposal/blocks/interfaces';
 import { updateBlock } from 'lib/proposal/blocks/updateBlock';
 
@@ -23,13 +25,15 @@ export async function createBlock({
     throw new InvalidInputError('Missing required fields');
   }
 
-  // there should be only 1 block with properties for space
-  if (type === 'board') {
-    // there should be only 1 block with properties for space
-    const currentPropertiesBlock = await tx.proposalBlock.findFirst({ where: { spaceId, type } });
+  const id = type === 'board' ? DEFAULT_BOARD_BLOCK_ID : data.id || v4();
 
-    if (currentPropertiesBlock) {
-      return updateBlock({ data: { ...data, id: currentPropertiesBlock.id }, userId, spaceId, tx });
+  // there should be only 1 block with properties for space
+  if (id.startsWith('__')) {
+    // there should be only 1 block each space with particular internal id
+    const existingBlock = await tx.proposalBlock.findFirst({ where: { spaceId, id } });
+
+    if (existingBlock) {
+      return updateBlock({ data: { ...data, id }, userId, spaceId, tx });
     }
   }
 
@@ -37,14 +41,16 @@ export async function createBlock({
     data: {
       ...data,
       spaceId,
-      id: data.id || v4(),
+      id,
       createdBy: userId,
       updatedBy: userId,
       parentId: data.parentId || '',
       rootId: data.rootId || data.spaceId || spaceId,
       schema: data.schema || 1,
       title: data.title || '',
-      fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue
+      fields: createBoard({ block: { fields: { ...data.fields, viewIds: [] } } }).fields as unknown as
+        | Prisma.JsonNullValueInput
+        | Prisma.InputJsonValue
     }
   });
 }

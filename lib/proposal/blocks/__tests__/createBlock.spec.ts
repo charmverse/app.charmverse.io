@@ -2,12 +2,13 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { createBlock } from 'lib/proposal/blocks/createBlock';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('proposal blocks - createBlock', () => {
-  it('Should create properties block', async () => {
+  it('Should create properties block and set its id to __defaultBoard', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const propertiesData = {
@@ -42,6 +43,7 @@ describe('proposal blocks - createBlock', () => {
     });
 
     expect(block).toMatchObject(propertiesData);
+    expect(block.id).toBe('__defaultBoard');
 
     const blocks = await getBlocks({
       spaceId: space.id
@@ -50,11 +52,12 @@ describe('proposal blocks - createBlock', () => {
     expect(blocks).toMatchObject([propertiesData]);
   });
 
-  it('Should update properties block if it already exists', async () => {
+  it('Should update board block if it already exists', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const propertiesData = {
       spaceId: space.id,
+      id: '__defaultBoard',
       title: 'Properties',
       type: 'board',
       fields: {
@@ -81,6 +84,7 @@ describe('proposal blocks - createBlock', () => {
     const propertiesData2 = {
       spaceId: space.id,
       title: 'Properties 2',
+      id: '__defaultBoard',
       type: 'board',
       fields: {
         cardProperties: [
@@ -101,6 +105,51 @@ describe('proposal blocks - createBlock', () => {
           }
         ]
       }
+    };
+
+    const properties = await createBlock({
+      userId: user.id,
+      data: propertiesData,
+      spaceId: space.id
+    });
+
+    const properties2 = await createBlock({
+      userId: user.id,
+      data: propertiesData2,
+      spaceId: space.id
+    });
+
+    expect(properties2.id).toEqual(properties.id);
+    expect(properties2.fields).toMatchObject(propertiesData2.fields);
+
+    const blocks = await getBlocks({
+      spaceId: space.id
+    });
+
+    expect(blocks.length).toBe(1);
+  });
+
+  it('Should update view block if it already exists', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    const propertiesData = {
+      spaceId: space.id,
+      id: '__defaultView',
+      title: 'Properties',
+      type: 'view',
+      fields: {
+        sortOrder: [{ propertyId: '__title', reversed: true }]
+      } as unknown as BoardViewFields
+    };
+
+    const propertiesData2 = {
+      spaceId: space.id,
+      title: 'Properties 2',
+      id: '__defaultView',
+      type: 'view',
+      fields: {
+        sortOrder: [{ propertyId: '__title', reversed: false }]
+      } as unknown as BoardViewFields
     };
 
     const properties = await createBlock({
