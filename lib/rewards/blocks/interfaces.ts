@@ -1,5 +1,7 @@
 import type { RewardBlock } from '@charmverse/core/prisma-client';
 
+import type { BoardFields } from 'lib/focalboard/board';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
@@ -39,7 +41,7 @@ export type RewardBlockInput = {
   spaceId?: string;
   title?: string;
   schema?: number;
-  fields?: RewardPropertiesBlockFields | RewardPropertyValues;
+  fields?: RewardPropertiesBlockFields | RewardPropertyValues | BoardFields | BoardViewFields;
   parentId?: string;
   rootId?: string;
 };

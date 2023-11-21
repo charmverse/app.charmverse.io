@@ -28,12 +28,12 @@ export async function createBlock({
   const id = type === 'board' ? DEFAULT_BOARD_BLOCK_ID : data.id || v4();
 
   // there should be only 1 block with properties for space
-  if (type === 'board') {
-    // there should be only 1 block with properties for space
-    const currentPropertiesBlock = await tx.rewardBlock.findFirst({ where: { spaceId, type } });
+  if (id.startsWith('__')) {
+    // there should be only 1 block each space with particular internal id
+    const existingBlock = await tx.rewardBlock.findFirst({ where: { spaceId, id } });
 
-    if (currentPropertiesBlock) {
-      return updateBlock({ data: { ...data, id: currentPropertiesBlock.id }, userId, spaceId, tx });
+    if (existingBlock) {
+      return updateBlock({ data: { ...data, id }, userId, spaceId, tx });
     }
   }
 

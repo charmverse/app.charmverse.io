@@ -37,7 +37,7 @@ export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { rewards } = useRewards();
-  const { rewardPropertiesBlock, rewardBlocks } = useRewardBlocks();
+  const { rewardBoardBlock, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
 
   const rewardPage = getRewardPage(boardReward?.id);
@@ -46,7 +46,7 @@ export function useRewardsBoardAdapter() {
 
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
-    storedBoard: rewardPropertiesBlock
+    storedBoard: rewardBoardBlock
   });
 
   const activeView = useMemo(() => {
@@ -55,7 +55,7 @@ export function useRewardsBoardAdapter() {
     const viewBlock = rewardBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ storedBoard: rewardPropertiesBlock });
+      return getDefaultTableView({ storedBoard: rewardBoardBlock });
     }
 
     const boardView = blockToFBBlock(viewBlock) as BoardView;
@@ -66,7 +66,7 @@ export function useRewardsBoardAdapter() {
     }
 
     return boardView;
-  }, [rewardBlocks, rewardPropertiesBlock]);
+  }, [rewardBlocks, rewardBoardBlock]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -96,7 +96,7 @@ export function useRewardsBoardAdapter() {
   }, [activeView, board, getRewardPage, localViewSettings, membersRecord, rewards, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
-    storedBoard: rewardPropertiesBlock,
+    storedBoard: rewardBoardBlock,
     customOnly: true
   });
 
