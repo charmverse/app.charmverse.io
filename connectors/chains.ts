@@ -20,6 +20,7 @@ import {
   polygonMumbai,
   sepolia,
   zkSync,
+  zkSyncTestnet,
   zora
 } from 'viem/chains';
 
@@ -338,6 +339,16 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://explorer.zksync.io'],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: 'zksync'
+  },
+  ZKSYNC_DEV: {
+    ...EVM_DEFAULT,
+    chainId: zkSyncTestnet.id,
+    viem: zkSyncTestnet,
+    chainName: 'zkSync Era Testnet',
+    rpcUrls: ['https://testnet.era.zksync.dev'],
+    blockExplorerUrls: ['https://goerli.explorer.zksync.io'],
+    iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
+    shortName: 'zksync-goerli'
   },
   MANTLE: {
     chainId: mantle.id,
