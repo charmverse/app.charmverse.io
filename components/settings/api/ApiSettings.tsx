@@ -226,7 +226,7 @@ export function ApiSettings({ space }: { space: Space }) {
                       disabled={!isAdmin}
                     />
                   }
-                  label='Bounty'
+                  label='Reward'
                 />
                 <FormControlLabel
                   control={

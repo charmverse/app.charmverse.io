@@ -18,7 +18,7 @@ const notifications: Record<ConfigurableGroups, { title: string; types: Notifica
     title: 'Rewards',
     types: [
       [
-        { label: 'Bounty suggested (Admins only)' },
+        { label: 'Reward suggested (Admins only)' },
         { label: 'Application submitted (Reviewers only)' },
         { label: 'Application accepted (Applicants only)' },
         { label: 'Application rejected (Applicants only)' }
