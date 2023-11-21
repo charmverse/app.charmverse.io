@@ -79,9 +79,7 @@ export async function getNFTs({ wallets }: { wallets: UserWallet[] }) {
           .map((chainId) =>
             wallets.map(({ id, address }) =>
               getNFTsFromAnkr({ address, chainId, walletId: id }).catch((error) => {
-                if (!isTestEnv) {
-                  log.error('Error requesting nfts from Ankr', { address, chainId, error });
-                }
+                log.error('Error requesting nfts from Ankr', { address, chainId, error });
                 return [] as NFTData[];
               })
             )
