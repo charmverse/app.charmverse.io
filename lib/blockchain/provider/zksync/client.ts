@@ -59,10 +59,12 @@ class ZkSyncApiClient {
 
   async getNFTInfo({
     contractAddress,
-    tokenId
+    tokenId,
+    walletId = null
   }: {
     contractAddress: string;
     tokenId: number | string;
+    walletId?: string | null;
   }): Promise<NFTData> {
     const result = await this.getNftContract(contractAddress).tokenURI(tokenId);
 
@@ -70,14 +72,18 @@ class ZkSyncApiClient {
 
     const data = await GET<IpfsNft>(resultSource);
 
-    return mapNFTData({
-      ...data,
-      contractAddress,
-      tokenId
-    });
+    return mapNFTData(
+      {
+        ...data,
+        contractAddress,
+        tokenId
+      },
+      walletId,
+      this.chainId
+    );
   }
 
-  async getUserNfts({ walletAddress }: { walletAddress: string }): Promise<NFTData[]> {
+  async getUserNfts({ walletAddress, walletId }: { walletAddress: string; walletId?: string }): Promise<NFTData[]> {
     return GET<BlockExplorerNftTransactionResponse>(`${this.blockExplorerUrl}/api`, {
       module: 'account',
       action: 'tokennfttx',
@@ -104,10 +110,7 @@ class ZkSyncApiClient {
 
       const userNfts = await Promise.all(
         Object.values(ownedNfts).map((nft) =>
-          this.getNFTInfo({ contractAddress: nft.contractAddress, tokenId: nft.tokenID }).then((nftData) => ({
-            ...nftData,
-            walletId: walletAddress
-          }))
+          this.getNFTInfo({ contractAddress: nft.contractAddress, tokenId: nft.tokenID, walletId })
         )
       );
 

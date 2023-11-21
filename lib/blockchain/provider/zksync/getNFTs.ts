@@ -10,8 +10,10 @@ export async function getNFTs({ wallets }: { wallets: Pick<UserWallet, 'address'
 
   const nftData = (
     await Promise.all(
-      wallets.map(({ address }) =>
-        Promise.all([mainnetClient, testnetClient].map((client) => client.getUserNfts({ walletAddress: address })))
+      wallets.map(({ address, id }) =>
+        Promise.all(
+          [mainnetClient, testnetClient].map((client) => client.getUserNfts({ walletAddress: address, walletId: id }))
+        )
       )
     )
   ).flat(2);

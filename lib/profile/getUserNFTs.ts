@@ -20,13 +20,11 @@ export const getUserNFTs = async (userId: string) => {
   const hiddenNftIds = profileItems.filter((p) => p.isHidden).map((p) => p.id.replace(`${userId}:`, ''));
   const pinnedNftIds = profileItems.filter((p) => p.isPinned).map((p) => p.id.replace(`${userId}:`, ''));
 
-  // const wallets = await prisma.userWallet.findMany({
-  //   where: {
-  //     userId
-  //   }
-  // });
-
-  const wallets = [{ address: '0x22217e974bc0b875830e4a4e48cab88f46f1dbf7', id: '1', userId: '', ensname: null }];
+  const wallets = await prisma.userWallet.findMany({
+    where: {
+      userId
+    }
+  });
 
   const nfts = await getNFTs({
     wallets
