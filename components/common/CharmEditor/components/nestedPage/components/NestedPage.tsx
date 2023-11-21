@@ -7,7 +7,7 @@ import type { NodeViewProps } from 'components/common/CharmEditor/components/@ba
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import type { StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import type { FeatureJson, StaticPage } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
@@ -66,18 +66,31 @@ export default function NestedPage({
   const view = useEditorViewContext();
   const { pages, loadingPages } = usePages();
   const { categories } = useForumCategories();
+
+  const spaceFeatures = (space?.features as FeatureJson[]) ?? [];
+
+  const features = STATIC_PAGES.map(({ feature, ...restFeat }) => ({
+    id: feature,
+    title: spaceFeatures.find((_feature) => _feature.id === feature)?.title ?? restFeat.title
+  }));
+
   const documentPage = pages[node.attrs.id];
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
   const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
   let pageTitle = '';
   if (documentPage || staticPage) {
-    pageTitle = (documentPage || staticPage)?.title || 'Untitled';
+    pageTitle =
+      (staticPage
+        ? features.find((feat) => feat.id === staticPage.feature)?.title ?? staticPage.title
+        : documentPage?.title) || 'Untitled';
   } else if (forumCategoryPage) {
-    pageTitle = `Forum > ${forumCategoryPage?.name || 'Untitled'}`;
+    const forumFeatureTitle = features.find((feat) => feat.id === 'forum')?.title ?? 'Forum';
+    pageTitle = `${forumFeatureTitle} > ${forumCategoryPage?.name || 'Untitled'}`;
   } else if (!loadingPages) {
     pageTitle = 'No access';
   }
+
   const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
   const pagePath = documentPage ? `${space?.domain}/${documentPage.path}` : '';
   const staticPath = staticPage ? `${space?.domain}/${staticPage.path}` : '';

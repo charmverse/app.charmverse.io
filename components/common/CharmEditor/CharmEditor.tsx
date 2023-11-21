@@ -56,16 +56,16 @@ import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { VideoNodeView } from './components/video/VideoNodeView';
 import {
-  suggestionsPluginKey,
-  inlinePalettePluginKey,
+  actionsPluginKey,
+  charmEditorPlugins,
+  emojiPluginKey,
   floatingMenuPluginKey,
+  inlineCommentPluginKey,
+  inlinePalettePluginKey,
   linkedPagePluginKey,
   linksPluginKey,
   mentionPluginKey,
-  emojiPluginKey,
-  actionsPluginKey,
-  inlineCommentPluginKey,
-  charmEditorPlugins
+  suggestionsPluginKey
 } from './plugins';
 import { specRegistry } from './specRegistry';
 
