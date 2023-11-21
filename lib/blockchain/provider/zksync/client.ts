@@ -15,7 +15,7 @@ const ZK_MAINNET_BLOCK_EXPLORER = 'https://block-explorer-api.mainnet.zksync.io'
 const ZK_TESTNET_BLOCK_EXPLORER = 'https://block-explorer-api.testnets.zksync.dev';
 
 // https://docs.zksync.io/apiv02-docs/
-export const ZK_RPC_ENDPOINT = 'https://mainnet.era.zksync.io';
+const ZK_RPC_ENDPOINT = 'https://mainnet.era.zksync.io';
 const ZK_RPC_TEST_ENDPOINT = 'https://testnet.era.zksync.dev';
 
 type IpfsNft = {
@@ -118,8 +118,8 @@ class ZkSyncApiClient {
     });
   }
 }
-export const zkMainnetClient = new ZkSyncApiClient({ chainId: 324 });
-export const zkTestnetClient = new ZkSyncApiClient({ chainId: 280 });
+const zkMainnetClient = new ZkSyncApiClient({ chainId: 324 });
+const zkTestnetClient = new ZkSyncApiClient({ chainId: 280 });
 
 export function getClient({ chainId }: { chainId: SupportedChainId }) {
   if (!supportedNetworks.includes(chainId)) {
@@ -129,7 +129,7 @@ export function getClient({ chainId }: { chainId: SupportedChainId }) {
   return chainId === 324 ? zkMainnetClient : zkTestnetClient;
 }
 
-export function mapNFTData(
+function mapNFTData(
   token: IpfsNft & { contractAddress: string; tokenId: number | string },
   walletId: string | null = null,
   chainId: SupportedChainId = 324
