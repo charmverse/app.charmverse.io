@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import * as http from 'adapters/http';
-import { useCreateRewardBlocks, useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
+import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -43,7 +43,6 @@ export const RewardBlocksContext = createContext<Readonly<RewardBlocksContextTyp
 export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
   const { data: rewardBlocks, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id });
-  const { trigger: createRewardBlocks } = useCreateRewardBlocks(space?.id || '');
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
 
@@ -114,7 +113,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
             type: 'board',
             spaceId: space.id
           };
-          const res = await createRewardBlocks([propertiesBlock as RewardBlockInput]);
+          const res = await updateRewardBlocks([propertiesBlock as RewardBlockInput]);
 
           if (!res) {
             return;
@@ -134,7 +133,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to create property: ${e.message}`, 'error');
       }
     },
-    [createRewardBlocks, mutate, rewardBoardBlock, showMessage, space, updateBlockCache, updateRewardBlocks]
+    [mutate, rewardBoardBlock, showMessage, space, updateBlockCache, updateRewardBlocks]
   );
 
   const updateProperty = useCallback(
@@ -226,7 +225,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
 
       try {
         const newBlock = { ...blockInput, spaceId: space.id, id: blockInput.id || v4() };
-        const res = await createRewardBlocks([newBlock]);
+        const res = await updateRewardBlocks([newBlock]);
 
         if (!res) {
           return;
@@ -238,7 +237,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to update block: ${e.message}`, 'error');
       }
     },
-    [createRewardBlocks, showMessage, space, updateBlockCache]
+    [updateRewardBlocks, showMessage, space, updateBlockCache]
   );
 
   const value = useMemo(

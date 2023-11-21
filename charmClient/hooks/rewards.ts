@@ -74,12 +74,10 @@ export function useGetRewardTemplatesBySpace(spaceId?: string | null) {
   return useGET<RewardTemplate[]>(spaceId ? `/api/spaces/${spaceId}/reward-templates` : null);
 }
 
-export function useCreateRewardBlocks(spaceId: string) {
-  return usePOST<RewardBlockInput[], RewardBlockWithTypedFields[]>(`/api/spaces/${spaceId}/rewards/blocks`);
-}
-
 export function useUpdateRewardBlocks(spaceId: string) {
-  return usePUT<RewardBlockUpdateInput[], RewardBlockWithTypedFields[]>(`/api/spaces/${spaceId}/rewards/blocks`);
+  return usePUT<(RewardBlockUpdateInput | RewardBlockInput)[], RewardBlockWithTypedFields[]>(
+    `/api/spaces/${spaceId}/rewards/blocks`
+  );
 }
 
 export function useDeleteRewardBlocks(spaceId: string) {

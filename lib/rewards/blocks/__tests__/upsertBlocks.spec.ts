@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
-import { createBlock } from 'lib/rewards/blocks/createBlock';
 import { getBlocks } from 'lib/rewards/blocks/getBlocks';
-import { updateBlocks } from 'lib/rewards/blocks/updateBlocks';
+import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
+import { upsertBlocks } from 'lib/rewards/blocks/upsertBlocks';
 import { createReward } from 'lib/rewards/createReward';
 
 describe('reward blocks - updateBlocks', () => {
@@ -45,7 +45,7 @@ describe('reward blocks - updateBlocks', () => {
       }
     };
 
-    const block = await createBlock({
+    const block = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
@@ -95,7 +95,7 @@ describe('reward blocks - updateBlocks', () => {
       }
     };
 
-    const updatedBlock = await updateBlocks({
+    const updatedBlock = await upsertBlocks({
       blocksData: [propertiesUpdateData, proposalPropertiesUpdateData],
       userId: user.id,
       spaceId: space.id
