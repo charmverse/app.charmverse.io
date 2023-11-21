@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
+import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
@@ -26,7 +27,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
 import { useRewards } from './hooks/useRewards';
@@ -149,6 +149,8 @@ export function RewardsPage({ title }: { title: string }) {
               )}
             </Stack>
             <Divider />
+
+            <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
           </>
         )}
       </DatabaseStickyHeader>
