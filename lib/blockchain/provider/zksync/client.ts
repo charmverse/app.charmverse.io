@@ -1,7 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
+import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
+import { zkSync, zkSyncTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
 
 import { GET } from 'adapters/http';
@@ -10,14 +12,8 @@ import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import { supportedNetworks, type SupportedChainId } from './config';
 
-// https://docs.reservoir.tools/reference/gettokensv6
 const ZK_MAINNET_BLOCK_EXPLORER = 'https://block-explorer-api.mainnet.zksync.io';
 const ZK_TESTNET_BLOCK_EXPLORER = 'https://block-explorer-api.testnets.zksync.dev';
-
-// https://docs.zksync.io/apiv02-docs/
-const ZK_RPC_ENDPOINT = 'https://mainnet.era.zksync.io';
-const ZK_RPC_TEST_ENDPOINT = 'https://testnet.era.zksync.dev';
-
 type IpfsNft = {
   name: string;
   description: string;
@@ -47,10 +43,12 @@ class ZkSyncApiClient {
     if (!supportedNetworks.includes(chainId)) {
       throw new Error(`Unsupported chain id: ${chainId}`);
     }
-    this.rpcUrl = chainId === 324 ? ZK_RPC_ENDPOINT : ZK_RPC_TEST_ENDPOINT;
+    this.rpcUrl = (
+      chainId === zkSync.id ? getChainById(zkSync.id)?.rpcUrls[0] : getChainById(zkSyncTestnet.id)?.rpcUrls[0]
+    ) as string;
     this.chainId = chainId;
     this.provider = new Provider(this.rpcUrl, chainId);
-    this.blockExplorerUrl = chainId === 324 ? ZK_MAINNET_BLOCK_EXPLORER : ZK_TESTNET_BLOCK_EXPLORER;
+    this.blockExplorerUrl = chainId === zkSync.id ? ZK_MAINNET_BLOCK_EXPLORER : ZK_TESTNET_BLOCK_EXPLORER;
   }
 
   getNftContract(contractAddress: string) {
@@ -118,21 +116,21 @@ class ZkSyncApiClient {
     });
   }
 }
-const zkMainnetClient = new ZkSyncApiClient({ chainId: 324 });
-const zkTestnetClient = new ZkSyncApiClient({ chainId: 280 });
+const zkMainnetClient = new ZkSyncApiClient({ chainId: zkSync.id });
+const zkTestnetClient = new ZkSyncApiClient({ chainId: zkSyncTestnet.id });
 
 export function getClient({ chainId }: { chainId: SupportedChainId }) {
   if (!supportedNetworks.includes(chainId)) {
     throw new Error(`Unsupported chain id: ${chainId}`);
   }
 
-  return chainId === 324 ? zkMainnetClient : zkTestnetClient;
+  return chainId === zkSync.id ? zkMainnetClient : zkTestnetClient;
 }
 
 function mapNFTData(
   token: IpfsNft & { contractAddress: string; tokenId: number | string },
   walletId: string | null = null,
-  chainId: SupportedChainId = 324
+  chainId: SupportedChainId = zkSync.id
 ): NFTData {
   const tokenUriDNSVersion = token.image?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '';
   return {
