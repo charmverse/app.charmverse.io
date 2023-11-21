@@ -159,7 +159,7 @@ export function RewardsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {rewards?.length > 0 ? (
+            {rewards && rewards?.length > 0 ? (
               <Box width='100%'>
                 <Table
                   board={activeBoard}
