@@ -85,7 +85,6 @@ export function InlineCommentSubMenu({
       });
       // just refetch threads for now to make sure member is attached properly - optimize later by not needing to append members to output of useThreads
       refetchThreads();
-      // setThreads((_threads) => ({ ..._threads, [threadWithComment.id]: threadWithComment }));
       if (threadWithComment) {
         updateThreadPluginState({
           remove: false,

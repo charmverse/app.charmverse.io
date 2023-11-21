@@ -34,10 +34,6 @@ export interface ThreadWithComments extends Thread {
   comments: Comment[];
 }
 
-export interface ThreadWithCommentsAndAuthors extends Thread {
-  comments: Comment[];
-}
-
 export interface MultipleThreadsInput {
   threadIds: string[];
   pageId: string;

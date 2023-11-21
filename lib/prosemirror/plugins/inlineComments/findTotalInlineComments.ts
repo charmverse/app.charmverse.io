@@ -1,12 +1,12 @@
 import type { MarkType, Node, Schema } from '@bangle.dev/pm';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
 
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 export function findTotalInlineComments(
   schema: Schema,
   node: Node,
-  threads: Record<string, ThreadWithCommentsAndAuthors | undefined>,
+  threads: Record<string, ThreadWithComments | undefined>,
   keepResolved?: boolean
 ) {
   keepResolved = keepResolved ?? false;

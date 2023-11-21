@@ -20,19 +20,19 @@ function getUrlSearchParamsFromNotificationType(
     case 'comment.created':
     case 'comment.replied':
     case 'comment.mention.created': {
-      urlSearchParams.set('commentId', notification.commentId!);
+      addSearchParam('commentId', notification.commentId);
       break;
     }
     case 'inline_comment.created':
     case 'inline_comment.replied':
     case 'inline_comment.mention.created': {
-      urlSearchParams.set('inlineCommentId', notification.inlineCommentId!);
+      addSearchParam('inlineCommentId', notification.inlineCommentId);
       break;
     }
     case 'application_comment.created':
     case 'application_comment.replied':
     case 'application_comment.mention.created': {
-      urlSearchParams.set('commentId', notification.applicationCommentId!);
+      addSearchParam('commentId', notification.applicationCommentId);
       break;
     }
     default: {
@@ -41,7 +41,13 @@ function getUrlSearchParamsFromNotificationType(
   }
 
   if (notification.type.includes('mention')) {
-    urlSearchParams.set('mentionId', notification.mentionId!);
+    addSearchParam('mentionId', notification.mentionId);
+  }
+
+  function addSearchParam(param: string, value?: string | null) {
+    if (value) {
+      urlSearchParams.set(param, value);
+    }
   }
 
   const query = urlSearchParams.toString();

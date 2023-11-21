@@ -149,6 +149,7 @@ export function MemberPropertySidebarDetails({
               width: 'fit-content'
             }}
             onClick={savePermissions}
+            disabled={!selectedRoleIds.length}
           >
             Add selected roles
           </Button>

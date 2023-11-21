@@ -1,6 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export async function getPageThreads({ pageId, userId }: { pageId: string; userId: string }) {
+import type { ThreadWithComments } from 'lib/threads/interfaces';
+
+export async function getPageThreads({
+  pageId,
+  userId
+}: {
+  pageId: string;
+  userId: string;
+}): Promise<ThreadWithComments[]> {
   const page = await prisma.page.findUniqueOrThrow({
     where: {
       id: pageId
