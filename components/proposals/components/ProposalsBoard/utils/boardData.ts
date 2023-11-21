@@ -18,7 +18,7 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
-import type { ProposalPropertiesBlock } from 'lib/proposal/blocks/interfaces';
+import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
 import {
   PROPOSAL_STATUS_LABELS_WITH_ARCHIVED,
   type ProposalStatusWithArchived
@@ -32,18 +32,20 @@ export function getDefaultBoard({
   categories = [],
   customOnly = false
 }: {
-  storedBoard: ProposalPropertiesBlock | undefined;
+  storedBoard: ProposalBoardBlock | undefined;
   categories: ProposalCategory[] | undefined;
   customOnly?: boolean;
 }) {
   const block: Partial<Block> = storedBoard
     ? blockToFBBlock(storedBoard)
-    : {
-        id: DEFAULT_BOARD_BLOCK_ID,
-        fields: {
-          cardProperties: []
+    : createBoard({
+        block: {
+          id: DEFAULT_BOARD_BLOCK_ID,
+          fields: {
+            cardProperties: []
+          }
         }
-      };
+      });
 
   const cardProperties = [...getDefaultProperties({ categories }), ...(block.fields?.cardProperties || [])];
 
@@ -103,7 +105,7 @@ export function getDefaultTableView({
   storedBoard,
   categories = []
 }: {
-  storedBoard: ProposalPropertiesBlock | undefined;
+  storedBoard: ProposalBoardBlock | undefined;
   categories: ProposalCategory[] | undefined;
 }) {
   const view = createTableView({

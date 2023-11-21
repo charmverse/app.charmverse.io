@@ -2,6 +2,9 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
+import { createBoard } from 'lib/focalboard/board';
+import { createBoardView } from 'lib/focalboard/boardView';
 import type { ProposalBlockUpdateInput } from 'lib/proposal/blocks/interfaces';
 
 export function updateBlock({
@@ -20,6 +23,13 @@ export function updateBlock({
   }
 
   if (data.type === 'board' || data.type === 'view') {
+    let upsertFields = data.fields;
+
+    if (data.type === 'board') {
+      // add default bord fields, TODO: insert all default view ids (__defaultView, __defaultBoardView, __defaultCalendarView)
+      upsertFields = createBoard({ block: { fields: { ...data.fields, viewIds: [] } } }).fields;
+    }
+
     return tx.proposalBlock.upsert({
       where: {
         id_spaceId: {
@@ -32,7 +42,7 @@ export function updateBlock({
         ...data,
         spaceId,
         rootId: spaceId,
-        fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
+        fields: upsertFields as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
         updatedBy: userId
       },
       create: {
