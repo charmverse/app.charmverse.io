@@ -23,6 +23,12 @@ import {
 } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesBlock } from 'lib/rewards/blocks/interfaces';
 
+export const tokenChainOptions: IPropertyTemplate['options'] = RPCList.map((rpc) => ({
+  id: rpc.chainId.toString(),
+  value: rpc.chainName,
+  color: ''
+}));
+
 export function getDefaultBoard({
   storedBoard,
   customOnly = false
@@ -139,7 +145,7 @@ const rewardDbProperties = {
   rewardChain: (): IPropertyTemplate => ({
     id: REWARD_CHAIN,
     name: 'Token chain',
-    options: RPCList.map((rpc) => ({ id: rpc.chainId.toString(), value: rpc.chainName, color: '' })),
+    options: [], // use an external list that can be maintained separately
     type: 'tokenChain'
   }),
   rewardCustomValue: (): IPropertyTemplate => ({
