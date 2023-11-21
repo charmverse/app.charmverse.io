@@ -107,8 +107,12 @@ export function ProposalCategoryContextMenu({ category }: Props) {
             Permissions <UpgradeChip upgradeContext='proposal_permissions' />
           </Typography>
         </MenuItem>
-        <Divider />
-        <ColorSelectMenu onChange={setCategoryColor} selectedColor={categoryColor} />
+        {permissions.edit && (
+          <>
+            <Divider />
+            <ColorSelectMenu onChange={setCategoryColor} selectedColor={categoryColor} />
+          </>
+        )}
       </MenuList>
     ),
     [category, tempName, categoryColor, permissions.delete]
