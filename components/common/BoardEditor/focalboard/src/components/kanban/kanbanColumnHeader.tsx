@@ -32,7 +32,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   intl: IntlShape;
   readOnly: boolean;
-  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void> | void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void;
   calculationMenuOpen: boolean;

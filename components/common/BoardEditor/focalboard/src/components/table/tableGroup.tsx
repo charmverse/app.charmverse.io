@@ -19,7 +19,7 @@ type Props = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
   hideGroup: (groupByOptionId: string) => void;
-  addCard: (groupByOptionId?: string) => Promise<void>;
+  addCard: (groupByOptionId?: string) => Promise<void> | void;
   showCard: (cardId: string) => void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;

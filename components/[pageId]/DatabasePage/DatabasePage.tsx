@@ -20,9 +20,10 @@ import {
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 /**
  *
@@ -46,10 +47,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const activeView = boardViews.find((view) => view.id === currentViewId) ?? boardViews[0];
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
-
+  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-
+  const { pages, refreshPage } = usePages();
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -120,11 +121,20 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   });
 
   const showCard = useCallback(
-    (cardId: string | null = null) => {
-      setUrlWithoutRerender(router.pathname, { viewId: router.query.viewId as string, cardId });
-      setShownCardId(cardId);
+    async (cardId: string | null, isTemplate?: boolean) => {
+      if (cardId === null) {
+        setShownCardId(null);
+        return;
+      }
+
+      if (activeView.fields.openPageIn === 'center_peek' || isTemplate) {
+        updateURLQuery({ viewId: router.query.viewId as string, cardId });
+        setShownCardId(cardId);
+      } else if (activeView.fields.openPageIn === 'full_page') {
+        navigateToSpacePath(`/${cardId}`);
+      }
     },
-    [router.query]
+    [router.query, activeView, pages]
   );
 
   const showView = useCallback(

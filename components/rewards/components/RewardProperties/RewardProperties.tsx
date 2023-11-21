@@ -37,12 +37,11 @@ export function RewardProperties(props: {
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
     initialReward
   );
-
   useEffect(() => {
-    if (!currentReward && initialReward) {
+    if (initialReward) {
       setCurrentReward(initialReward);
     }
-  }, [currentReward, initialReward]);
+  }, [initialReward]);
 
   const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();

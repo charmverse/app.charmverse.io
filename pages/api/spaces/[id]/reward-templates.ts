@@ -14,12 +14,12 @@ async function getRewardTemplatesController(req: NextApiRequest, res: NextApiRes
   const userId = req.session.user?.id;
   const spaceId = req.query.id as string;
 
-  const proposals = await getRewardTemplates({
+  const templates = await getRewardTemplates({
     spaceId,
     userId
   });
 
-  return res.status(200).json(proposals);
+  return res.status(200).json(templates);
 }
 
 export default withSessionRoute(handler);
