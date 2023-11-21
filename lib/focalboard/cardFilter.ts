@@ -125,19 +125,19 @@ class CardFilter {
         const sourceValue = valueArray[0]?.toLowerCase() ?? '';
         switch (condition) {
           case 'equal': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) === Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) === Number(filterValue);
           }
           case 'greater_than': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) > Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) > Number(filterValue);
           }
           case 'less_than': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) < Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) < Number(filterValue);
           }
           case 'less_than_equal': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) <= Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) <= Number(filterValue);
           }
           case 'greater_than_equal': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) >= Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) >= Number(filterValue);
           }
           case 'is_empty': {
             return sourceValue === '';

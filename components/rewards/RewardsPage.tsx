@@ -26,7 +26,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
 import { useRewards } from './hooks/useRewards';
@@ -37,9 +36,8 @@ export function RewardsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { isFreeSpace } = useIsFreeSpace();
-  const { rewards } = useRewards();
+  const { rewards, isLoading: loadingData } = useRewards();
 
-  const loadingData = !rewards;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
   const { getRewardPage } = useRewardPage();
