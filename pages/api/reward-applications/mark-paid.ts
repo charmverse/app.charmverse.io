@@ -33,19 +33,7 @@ async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiR
     }
   });
 
-  const rewardPage = await prisma.page.findUniqueOrThrow({
-    where: {
-      bountyId: submission.bounty.id
-    },
-    select: {
-      id: true
-    }
-  });
-
-  const permissions = await computeBountyPermissions({
-    resourceId: rewardPage.id,
-    userId
-  });
+  const permissions = await computeBountyPermissions({ resourceId: submission.bounty.id, userId });
 
   if (!permissions.review) {
     throw new UnauthorisedActionError('You cannot review submissions for this bounty');

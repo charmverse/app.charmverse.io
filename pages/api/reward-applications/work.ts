@@ -29,17 +29,8 @@ async function workOnRewardController(req: NextApiRequest, res: NextApiResponse<
   const applicationId = req.query.applicationId ?? req.body.applicationId;
   const userId = req.session.user.id;
 
-  const rewardPage = await prisma.page.findUniqueOrThrow({
-    where: {
-      bountyId: req.body.rewardId || req.query.bountyId
-    },
-    select: {
-      id: true
-    }
-  });
-
   // Check user's permission before applying to a reward.
-  const rewardPermissions = await computeBountyPermissions({ resourceId: rewardPage.id, userId });
+  const rewardPermissions = await computeBountyPermissions({ resourceId: req.body.rewardId, userId });
 
   if (!rewardPermissions.work) {
     throw new UnauthorisedActionError('You do not have permissions to work on this reward.');
