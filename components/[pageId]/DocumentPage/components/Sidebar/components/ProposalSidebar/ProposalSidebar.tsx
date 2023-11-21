@@ -106,7 +106,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
         <>
           <Alert severity='info'>
             {canAnswerRubric
-              ? 'Evaluation results are only visible to other Reviewers'
+              ? 'Evaluation results are only visible to Reviewers'
               : 'Only Reviewers can submit an evaluation'}
           </Alert>
           <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
