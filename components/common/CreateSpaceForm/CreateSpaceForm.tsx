@@ -54,7 +54,6 @@ type SpaceFormStep = 'select_template' | 'create_space' | 'join_space';
 export function CreateSpaceForm({ className, defaultValues, onCancel, submitText }: Props) {
   const { createNewSpace, isCreatingSpace } = useSpaces();
   const { showMessage } = useSnackbar();
-  const [isBanned, setIsBanned] = useState(false);
   const [newSpace, setNewSpace] = useState<Space | null>(null);
 
   const [step, setStep] = useState<SpaceFormStep>('select_template');
@@ -170,13 +169,9 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     }
   }, []);
 
-  useEffect(() => {
-    if (typeof saveError === 'string' && saveError.includes('blocked')) {
-      setIsBanned(true);
-    } else if (saveError instanceof Error && saveError.message.includes('blocked')) {
-      setIsBanned(true);
-    }
-  }, [saveError]);
+  const isBanned =
+    (typeof saveError === 'string' && saveError.includes('blocked')) ||
+    (saveError instanceof Error && saveError.message.includes('blocked'));
 
   function randomizeName() {
     const name = randomName();

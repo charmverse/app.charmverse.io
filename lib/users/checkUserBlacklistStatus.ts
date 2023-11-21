@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 export async function checkUserBlacklistStatus(userId: string) {
   const userWalletAddresses: string[] = [];
   const userEmails: string[] = [];
-  let userDiscordId: string | null = null;
+  const userDiscordIds: string[] = [];
 
   const user = await prisma.user.findUnique({
     where: {
@@ -23,7 +23,9 @@ export async function checkUserBlacklistStatus(userId: string) {
       ...[...user.verifiedEmails.map(({ email }) => email), ...user.googleAccounts.map(({ email }) => email)]
     );
 
-    userDiscordId = user.discordUser?.discordId ?? null;
+    if (user.discordUser) {
+      userDiscordIds.push(user.discordUser.discordId);
+    }
   }
 
   const blacklistedUserByIdentity = await prisma.blacklistedUser.findFirst({
@@ -38,7 +40,9 @@ export async function checkUserBlacklistStatus(userId: string) {
           }
         },
         {
-          discordId: userDiscordId
+          discordId: {
+            in: userDiscordIds
+          }
         },
         {
           emails: {
