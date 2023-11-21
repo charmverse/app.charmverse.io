@@ -2,13 +2,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
 
-const perBatch = 1000;
+const cutoff = new Date('2023-11-01');
+const perBatch = 2;
 
 async function migrate({ offset = 0 }: { offset?: number } = {}) {
   const pages = await prisma.page.findMany({
     where: {
       createdAt: {
-        lt: new Date('2023-11-01')
+        lt: cutoff
       }
     },
     include: {
@@ -28,12 +29,18 @@ async function migrate({ offset = 0 }: { offset?: number } = {}) {
   );
 
   if (pages.length > 0) {
-    console.log('checked', offset + perBatch, 'pages. last id: ' + pages[pages.length - 1].id);
+    console.log('checking', offset + perBatch, 'pages. last id: ' + pages[pages.length - 1]?.id);
     return migrate({ offset: offset + perBatch });
   }
 }
 (async () => {
-  const pageCount = await prisma.page.count({});
+  const pageCount = await prisma.page.count({
+    where: {
+      createdAt: {
+        lt: cutoff
+      }
+    }
+  });
   console.log('migrating', pageCount, 'pages');
   await migrate();
   console.log('done');
