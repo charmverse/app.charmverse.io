@@ -3,9 +3,9 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
-import { createBlock } from 'lib/proposal/blocks/createBlock';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
-import { updateBlocks } from 'lib/proposal/blocks/updateBlocks';
+import { upsertBlock } from 'lib/proposal/blocks/upsertBlock';
+import { upsertBlocks } from 'lib/proposal/blocks/upsertBlocks';
 
 describe('proposal blocks - updateBlocks', () => {
   it('Should update properties block and proposal fields without internal properites', async () => {
@@ -48,7 +48,7 @@ describe('proposal blocks - updateBlocks', () => {
       }
     };
 
-    const block = await createBlock({
+    const block = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
@@ -93,7 +93,7 @@ describe('proposal blocks - updateBlocks', () => {
       }
     };
 
-    const updatedBlock = await updateBlocks({
+    const updatedBlock = await upsertBlocks({
       blocksData: [propertiesUpdateData, proposalPropertiesUpdateData],
       userId: user.id,
       spaceId: space.id

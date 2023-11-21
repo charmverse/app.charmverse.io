@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import * as http from 'adapters/http';
-import { useCreateProposalBlocks, useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
+import { useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -43,7 +43,6 @@ export const ProposalBlocksContext = createContext<Readonly<ProposalBlocksContex
 export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
   const { data: proposalBlocks, isLoading, mutate } = useGetProposalBlocks(space?.id);
-  const { trigger: createProposalBlocks } = useCreateProposalBlocks(space?.id || '');
   const { trigger: updateProposalBlocks } = useUpdateProposalBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
 
@@ -114,7 +113,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
             type: 'board',
             spaceId: space.id
           };
-          const res = await createProposalBlocks([propertiesBlock as ProposalBlockInput]);
+          const res = await updateProposalBlocks([propertiesBlock as ProposalBlockInput]);
 
           if (!res) {
             return;
@@ -134,7 +133,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to create property: ${e.message}`, 'error');
       }
     },
-    [createProposalBlocks, mutate, proposalBoardBlock, showMessage, space, updateBlockCache, updateProposalBlocks]
+    [updateProposalBlocks, mutate, proposalBoardBlock, showMessage, space, updateBlockCache]
   );
 
   const updateProperty = useCallback(
@@ -226,7 +225,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
 
       try {
         const newBlock = { ...blockInput, spaceId: space.id, id: blockInput.id || v4() };
-        const res = await createProposalBlocks([newBlock]);
+        const res = await updateProposalBlocks([newBlock]);
 
         if (!res) {
           return;
@@ -238,7 +237,7 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         showMessage(`Failed to update block: ${e.message}`, 'error');
       }
     },
-    [createProposalBlocks, showMessage, space, updateBlockCache]
+    [updateProposalBlocks, showMessage, space, updateBlockCache]
   );
 
   const value = useMemo(

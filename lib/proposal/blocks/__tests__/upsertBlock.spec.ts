@@ -1,12 +1,11 @@
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
-import { createBlock } from 'lib/proposal/blocks/createBlock';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
-import { updateBlock } from 'lib/proposal/blocks/updateBlock';
+import { upsertBlock } from 'lib/proposal/blocks/upsertBlock';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-describe('proposal blocks - updateBlock', () => {
+describe('proposal blocks - upsertBlock', () => {
   it('Should update properties block', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
@@ -35,7 +34,7 @@ describe('proposal blocks - updateBlock', () => {
       }
     };
 
-    const block = await createBlock({
+    const block = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
@@ -61,7 +60,7 @@ describe('proposal blocks - updateBlock', () => {
       }
     };
 
-    const updatedBlock = await updateBlock({ data: propertiesUpdateData, userId: user.id, spaceId: space.id });
+    const updatedBlock = await upsertBlock({ data: propertiesUpdateData, userId: user.id, spaceId: space.id });
 
     expect(updatedBlock).toMatchObject(propertiesUpdateData);
 
@@ -125,13 +124,13 @@ describe('proposal blocks - updateBlock', () => {
       }
     };
 
-    const properties = await createBlock({
+    const properties = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
     });
 
-    const properties2 = await createBlock({
+    const properties2 = await upsertBlock({
       userId: user.id,
       data: propertiesData2,
       spaceId: space.id
