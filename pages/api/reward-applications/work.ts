@@ -31,7 +31,7 @@ async function workOnRewardController(req: NextApiRequest, res: NextApiResponse<
 
   const rewardPage = await prisma.page.findUniqueOrThrow({
     where: {
-      bountyId: req.body.bountyId
+      bountyId: req.body.rewardId || req.query.bountyId
     },
     select: {
       id: true
