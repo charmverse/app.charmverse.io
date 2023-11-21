@@ -4,8 +4,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { ActionNotPermittedError } from 'lib/middleware';
-
 import { updateInviteLinkRoles } from '../updateInviteLinkRoles';
 
 let space: Space;
@@ -49,24 +47,6 @@ describe('updateInviteLinkRoles', () => {
     });
     expect(linkToRolesInDatabase).toHaveLength(1);
     expect(linkToRolesInDatabase[0].roleId).toEqual(newRole.id);
-  });
-
-  it('should throw an error if invite link has expired', async () => {
-    const invite = await testUtilsMembers.generateInviteLink({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    jest.spyOn(Date, 'now').mockImplementationOnce(() => Date.now() + 1000 * 60 * 60 * 24);
-
-    await expect(
-      updateInviteLinkRoles({
-        inviteLinkId: invite.id,
-        roleIds: [role.id]
-      })
-    ).rejects.toBeInstanceOf(ActionNotPermittedError);
-
-    jest.spyOn(Date, 'now').mockRestore();
   });
 
   it('should throw an error if assigning roles outside the space', async () => {

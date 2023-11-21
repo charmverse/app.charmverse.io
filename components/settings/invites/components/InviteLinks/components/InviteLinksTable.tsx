@@ -15,9 +15,11 @@ import Countdown from 'react-countdown';
 import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
+import { validateInviteLink } from 'lib/invites/validateInviteLink';
 
 import { ConfirmInviteLinkDeletion } from './ConfirmInviteLinkDeletion';
 
@@ -25,7 +27,7 @@ export function InvitesTable() {
   const isAdmin = useIsAdmin();
   const { updateInviteLinkRoles, deleteInviteLink, privateInvites } = useSpaceInvitesList();
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
-
+  const { space } = useCurrentSpace();
   const [inviteToDelete, setInviteToDelete] = useState<InviteLinkWithRoles | null>(null);
 
   function onCopy(id: string) {
@@ -66,10 +68,14 @@ export function InvitesTable() {
             </TableRow>
           )}
           {privateInvites?.map((invite) => {
-            const hasExpired =
-              invite.maxAgeMinutes > 0
-                ? new Date(invite.createdAt).getTime() + invite.maxAgeMinutes * 60 * 1000 < Date.now()
-                : false;
+            const isValid = space
+              ? validateInviteLink({
+                  invite: {
+                    ...invite,
+                    space
+                  }
+                })
+              : { valid: false };
 
             return (
               <TableRow key={invite.id}>
@@ -86,32 +92,42 @@ export function InvitesTable() {
                 </TableCell>
                 <TableCell width={150}>{getExpires(invite)}</TableCell>
                 <TableCell width={150}>
-                  <TokenGateRolesSelect
-                    disabled={hasExpired}
-                    isAdmin={isAdmin}
-                    selectedRoleIds={invite.roleIds}
-                    onChange={(roleIds) => {
-                      updateInviteLinkRoles({ inviteLinkId: invite.id, roleIds });
-                    }}
-                    onDelete={(roleId) => {
-                      updateInviteLinkRoles({
-                        inviteLinkId: invite.id,
-                        roleIds: invite.roleIds.filter((role) => role !== roleId)
-                      });
-                    }}
-                  />
+                  <Tooltip arrow placement='top' title={!isValid.valid ? isValid.message ?? 'Invite invalid' : ''}>
+                    <div>
+                      <TokenGateRolesSelect
+                        disabled={!isValid.valid}
+                        isAdmin={isAdmin}
+                        selectedRoleIds={invite.roleIds}
+                        onChange={(roleIds) => {
+                          updateInviteLinkRoles({ inviteLinkId: invite.id, roleIds });
+                        }}
+                        onDelete={(roleId) => {
+                          updateInviteLinkRoles({
+                            inviteLinkId: invite.id,
+                            roleIds: invite.roleIds.filter((role) => role !== roleId)
+                          });
+                        }}
+                      />
+                    </div>
+                  </Tooltip>
                 </TableCell>
                 <TableCell width={90}>
                   <Tooltip
                     arrow
                     placement='top'
-                    title={copied[invite.id] ? 'Copied!' : 'Click to copy link'}
+                    title={
+                      !isValid.valid
+                        ? isValid.message ?? 'Invite invalid'
+                        : copied[invite.id]
+                        ? 'Copied!'
+                        : 'Click to copy link'
+                    }
                     disableInteractive
                   >
                     <Box component='span'>
                       <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
                         <Chip
-                          disabled={hasExpired}
+                          disabled={!isValid.valid}
                           sx={{ width: 90 }}
                           clickable
                           color='secondary'
