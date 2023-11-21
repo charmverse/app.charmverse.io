@@ -15,9 +15,12 @@ async function migrateAllProposalDatabases() {
       fields.columnWidths['__rewardChain'] = 150;
       fields.visiblePropertyIds.push('__rewardAmount');
       fields.visiblePropertyIds.push('__rewardChain');
-      await prisma.block.update({
+      await prisma.rewardBlock.update({
         where: {
-          id: view.id
+          id_spaceId: {
+            id: view.id,
+            spaceId: view.spaceId
+          }
         },
         data: {
           fields
