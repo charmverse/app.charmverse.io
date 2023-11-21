@@ -40,8 +40,17 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
     throw new DataNotFoundError(`Application with id ${applicationId} not found`);
   }
 
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: application.bountyId
+    },
+    select: {
+      id: true
+    }
+  });
+
   const permissions = await computeBountyPermissions({
-    resourceId: application.bountyId,
+    resourceId: rewardPage.id,
     userId
   });
 

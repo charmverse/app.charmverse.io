@@ -29,8 +29,17 @@ async function workOnRewardController(req: NextApiRequest, res: NextApiResponse<
   const applicationId = req.query.applicationId ?? req.body.applicationId;
   const userId = req.session.user.id;
 
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: req.body.bountyId
+    },
+    select: {
+      id: true
+    }
+  });
+
   // Check user's permission before applying to a reward.
-  const rewardPermissions = await computeBountyPermissions({ resourceId: req.body.rewardId, userId });
+  const rewardPermissions = await computeBountyPermissions({ resourceId: rewardPage.id, userId });
 
   if (!rewardPermissions.work) {
     throw new UnauthorisedActionError('You do not have permissions to work on this reward.');
@@ -53,12 +62,21 @@ async function getApplicationController(req: NextApiRequest, res: NextApiRespons
     }
   });
 
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: application.bountyId
+    },
+    select: {
+      id: true
+    }
+  });
+
   const pagePermissions = await getPermissionsClient({
     resourceId: application.bountyId,
     resourceIdType: 'bounty'
   }).then(({ client }) =>
     client.pages.computePagePermissions({
-      resourceId: application.bountyId,
+      resourceId: rewardPage.id,
       userId: req.session.user?.id
     })
   );

@@ -32,8 +32,18 @@ async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiR
       bounty: true
     }
   });
+
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: submission.bounty.id
+    },
+    select: {
+      id: true
+    }
+  });
+
   const permissions = await computeBountyPermissions({
-    resourceId: submission.bounty.id,
+    resourceId: rewardPage.id,
     userId
   });
 
