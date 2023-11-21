@@ -1,4 +1,3 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';

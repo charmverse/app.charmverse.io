@@ -10,7 +10,6 @@ import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -28,7 +27,6 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useLgScreen } from 'hooks/useMediaScreens';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -45,7 +43,8 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
-import { useLastSidebarView } from './hooks/useLastSidebarView';
+import { PageSidebar } from './components/Sidebar/PageSidebar';
+import { usePageSidebar } from './hooks/usePageSidebar';
 
 // const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
@@ -94,7 +93,13 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
 
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath } = useCharmRouter();
-  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
+  const {
+    activeView: sidebarView,
+    persistedActiveView,
+    persistActiveView,
+    setActiveView,
+    closeSidebar
+  } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -162,7 +167,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
-  const showPageActionSidebar = sidebarView !== null && (sidebarView !== 'comments' || enableComments);
+  const showPageActionSidebar =
+    !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
@@ -201,8 +207,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     }
   }, [page.id, threadsPageId]);
 
-  const [defaultSidebarView, saveSidebarView] = useLastSidebarView();
-
   const threadIds = useMemo(
     () =>
       typeof page.type === 'string'
@@ -219,7 +223,11 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     if (!enableSidebar) {
       return;
     }
-    const highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
+    let highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
+    // hack to handle improperly-created URLs from notifications
+    if (highlightedCommentId === 'undefined') {
+      highlightedCommentId = null;
+    }
     const unresolvedThreads = Object.values(threads)
       .filter((thread) => !thread?.resolved)
       .filter(isTruthy);
@@ -234,32 +242,23 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
 
     if (!isLoadingThreads) {
       if (highlightedCommentId || (isLargeScreen && unresolvedThreads.length)) {
-        // commentSidebarOpened.current = true;
         return setActiveView('comments');
-      } else {
-        closeSidebar();
       }
     }
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   useEffect(() => {
-    saveSidebarView({
-      [page.id]: sidebarView
-    });
-  }, [saveSidebarView, sidebarView]);
-
-  useEffect(() => {
-    const defaultView = defaultSidebarView?.[page.id];
-    if (defaultView) {
+    const defaultView = persistedActiveView?.[page.id];
+    if (enableSidebar && defaultView) {
       setActiveView(defaultView);
     }
-  }, [!!defaultSidebarView, page.id]);
+  }, [!!persistedActiveView, enableSidebar, page.id]);
 
   const openEvaluation = useCallback(() => {
     if (enableSidebar) {
       setActiveView('proposal_evaluation');
     } else {
-      saveSidebarView({
+      persistActiveView({
         [page.id]: 'proposal_evaluation'
       });
       // go to full page view
@@ -403,6 +402,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
                       proposalPage={page}
+                      isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
                       openEvaluation={openEvaluation}
                     />
                   )}
@@ -436,13 +436,12 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') &&
-                pagePermissions.comment && (
-                  <Box mt='-100px'>
-                    {/* add negative margin to offset height of .charm-empty-footer */}
-                    <PageComments page={page} canCreateComments={pagePermissions.comment} />
-                  </Box>
-                )}
+              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
+                <Box mt='-100px'>
+                  {/* add negative margin to offset height of .charm-empty-footer */}
+                  <PageComments page={page} canCreateComments={pagePermissions.comment} />
+                </Box>
+              )}
             </Container>
           </div>
         </ScrollContainer>

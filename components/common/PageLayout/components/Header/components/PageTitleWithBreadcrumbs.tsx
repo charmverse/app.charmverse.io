@@ -195,7 +195,7 @@ function PublicBountyPageTitle() {
       {space && (
         <>
           <BreadCrumb>{`${space.name}`}</BreadCrumb>
-          Bounties
+          Rewards
         </>
       )}
     </PageTitle>
@@ -222,12 +222,6 @@ export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?
         applicationId={router.query.applicationId as string}
       />
     );
-
-    // TODO: [bounties-cleanup]
-    // } else if (pageType === 'bounty' || router.route.startsWith('/[domain]/bounties/')) {
-    //   const baseTitle = mappedFeatures.bounties.title;
-    //   return <BountyPageTitle baseTitle={baseTitle} basePath={`/${router.query.domain}`} />;
-    // Switch over when we use rewards
   } else if (pageType === 'proposal' || pageType === 'proposal_template') {
     const baseTitle = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} baseTitle={baseTitle} />;

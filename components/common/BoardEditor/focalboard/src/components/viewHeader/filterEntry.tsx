@@ -31,19 +31,20 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 import { PROPOSAL_REVIEWERS_BLOCK_ID, AUTHORS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
-import mutator from '../../mutator';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 type Props = {
   properties: IPropertyTemplate[];
-  view: BoardView;
   conditionClicked: (condition: FilterCondition, filter: FilterClause) => void;
   filter: FilterClause;
+  changeViewFilter: (filterGroup: FilterGroup) => void;
+  currentFilter: FilterGroup;
 };
 
 function formatCondition(condition: string) {
@@ -75,11 +76,13 @@ const EllipsisText = styled(Typography)`
 function FilterPropertyValue({
   properties,
   filter: initialFilter,
-  view
+  changeViewFilter,
+  currentFilter
 }: {
-  view: BoardView;
   filter: FilterClause;
   properties: IPropertyTemplate[];
+  changeViewFilter: (filterGroup: FilterGroup) => void;
+  currentFilter: FilterGroup;
 }) {
   const [filter, setFilter] = useState(initialFilter);
 
@@ -101,15 +104,15 @@ function FilterPropertyValue({
   }, [initialFilter]);
 
   const updatePropertyValueDebounced = useMemo(() => {
-    return debounce((_view: BoardView, _filter: FilterClause) => {
-      const filterIndex = view.fields.filter.filters.findIndex(
+    return debounce((_currentFilter: FilterGroup, _filter: FilterClause) => {
+      const filterIndex = currentFilter.filters.findIndex(
         (__filter) => (__filter as FilterClause).filterId === filter.filterId
       );
       if (filterIndex > -1) {
-        const filters = [..._view.fields.filter.filters];
+        const filters = [..._currentFilter.filters];
         filters[filterIndex] = _filter;
-        mutator.changeViewFilter(_view.id, _view.fields.filter, {
-          operation: _view.fields.filter.operation,
+        changeViewFilter({
+          operation: _currentFilter.operation,
           filters
         });
       }
@@ -123,7 +126,7 @@ function FilterPropertyValue({
       values: [value]
     };
     setFilter(newFilterValue);
-    updatePropertyValueDebounced(view, newFilterValue);
+    updatePropertyValueDebounced(currentFilter, newFilterValue);
   };
 
   const updateBooleanValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +136,7 @@ function FilterPropertyValue({
       values: [value ? 'true' : '']
     };
     setFilter(newFilterValue);
-    updatePropertyValueDebounced(view, newFilterValue);
+    updatePropertyValueDebounced(currentFilter, newFilterValue);
   };
 
   const updateMultiSelectValue = (e: SelectChangeEvent<string[]>) => {
@@ -143,7 +146,7 @@ function FilterPropertyValue({
       values
     };
     setFilter(newFilterValue);
-    updatePropertyValueDebounced(view, newFilterValue);
+    updatePropertyValueDebounced(currentFilter, newFilterValue);
   };
 
   const updateSelectValue = (value: string) => {
@@ -153,7 +156,7 @@ function FilterPropertyValue({
       values: currentValue === value ? [] : [value]
     };
     setFilter(newFilterValue);
-    updatePropertyValueDebounced(view, newFilterValue);
+    updatePropertyValueDebounced(currentFilter, newFilterValue);
   };
 
   const updateDateValue = (date: DateTime | null) => {
@@ -162,7 +165,7 @@ function FilterPropertyValue({
       values: date ? [date.toJSDate().getTime().toString()] : []
     };
     setFilter(newFilterValue);
-    updatePropertyValueDebounced(view, newFilterValue);
+    updatePropertyValueDebounced(currentFilter, newFilterValue);
   };
 
   const propertyDataType = propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
@@ -378,7 +381,7 @@ function FilterPropertyValue({
 
 function FilterEntry(props: Props) {
   const deleteFilterClausePopupState = usePopupState({ variant: 'popover' });
-  const { properties: viewProperties, view, filter } = props;
+  const { properties: viewProperties, filter, changeViewFilter, currentFilter } = props;
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
   const properties: IPropertyTemplate[] = containsTitleProperty
     ? viewProperties
@@ -395,11 +398,11 @@ function FilterEntry(props: Props) {
   const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
 
   function deleteFilterClause() {
-    const filterGroup = createFilterGroup(view.fields.filter);
+    const filterGroup = createFilterGroup(currentFilter);
     filterGroup.filters = filterGroup.filters.filter(
       (_filter) => (_filter as FilterClause).filterId !== filter.filterId
     );
-    mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
+    changeViewFilter(filterGroup);
   }
 
   if (!template) {
@@ -437,7 +440,7 @@ function FilterEntry(props: Props) {
                     id={property.id}
                     selected={property.id === filter.propertyId}
                     onClick={() => {
-                      const filterGroup = createFilterGroup(view.fields.filter);
+                      const filterGroup = createFilterGroup(currentFilter);
                       const filterClause = filterGroup.filters.find(
                         (_filter) => (_filter as FilterClause).filterId === filter.filterId
                       ) as FilterClause;
@@ -446,7 +449,7 @@ function FilterEntry(props: Props) {
                           filterClause.propertyId = property.id;
                           filterClause.values = [];
                           filterClause.condition = propertyConfigs[property.type].conditions[0];
-                          mutator.changeViewFilter(view.id, view.fields.filter, filterGroup);
+                          changeViewFilter(filterGroup);
                         }
                       }
                     }}
@@ -491,7 +494,12 @@ function FilterEntry(props: Props) {
             </>
           )}
         </PopupState>
-        <FilterPropertyValue filter={filter} properties={properties} view={view} />
+        <FilterPropertyValue
+          filter={filter}
+          properties={properties}
+          changeViewFilter={changeViewFilter}
+          currentFilter={currentFilter}
+        />
       </Stack>
       <MoreHorizIcon
         sx={{

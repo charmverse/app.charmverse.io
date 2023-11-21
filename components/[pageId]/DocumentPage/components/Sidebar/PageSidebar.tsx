@@ -8,9 +8,9 @@ import { memo } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { PageSidebarView } from 'hooks/usePageSidebar';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -36,12 +36,12 @@ const DesktopContainer = styled.div`
 export const SIDEBAR_VIEWS = {
   proposal_evaluation: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'View proposal evaluation',
-    title: 'Evaluation rubric'
+    tooltip: 'View evaluation',
+    title: 'Evaluation'
   },
   comments: {
     icon: <MessageOutlined fontSize='small' />,
-    tooltip: 'View all omments',
+    tooltip: 'View all comments',
     title: 'Comments'
   },
   suggestions: {

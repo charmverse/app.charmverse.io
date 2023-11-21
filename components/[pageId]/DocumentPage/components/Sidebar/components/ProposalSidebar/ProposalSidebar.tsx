@@ -70,25 +70,22 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
     }
     const tabs = [
       [
-        'Evaluate',
-        <LoadingComponent key='evaluate' isLoading={!rubricCriteria}>
-          <RubricEvaluationForm
-            proposalId={proposalId!}
-            answers={myRubricAnswers}
-            draftAnswers={myDraftRubricAnswers}
-            criteriaList={rubricCriteria!}
-            onSubmit={onSubmitEvaluation}
-            disabled={!canAnswerRubric}
-          />
-        </LoadingComponent>,
+        'Your evaluation',
+        <RubricEvaluationForm
+          key='evaluate'
+          proposalId={proposalId!}
+          answers={myRubricAnswers}
+          draftAnswers={myDraftRubricAnswers}
+          criteriaList={rubricCriteria!}
+          onSubmit={onSubmitEvaluation}
+          disabled={!canAnswerRubric}
+        />,
         { sx: { p: 0 } } // disable default padding of tab panel
       ] as TabConfig,
       canViewRubricAnswers &&
         ([
           'Results',
-          <LoadingComponent key='results' isLoading={!rubricCriteria}>
-            <RubricResults answers={proposal?.rubricAnswers ?? []} criteriaList={rubricCriteria || []} />
-          </LoadingComponent>,
+          <RubricResults key='results' answers={proposal?.rubricAnswers ?? []} criteriaList={rubricCriteria || []} />,
           { sx: { p: 0 } }
         ] as TabConfig)
     ].filter(isTruthy);
@@ -109,13 +106,14 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
         <>
           <Alert severity='info'>
             {canAnswerRubric
-              ? 'Your evaluation is only viewable by the Reviewers assigned to this Proposal'
+              ? 'Evaluation results are only visible to Reviewers'
               : 'Only Reviewers can submit an evaluation'}
           </Alert>
           <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
         </>
       )}
-      {evaluationTabs.length === 0 && (
+      {evaluationTabs.length === 0 && !proposal && <LoadingComponent isLoading={true} />}
+      {evaluationTabs.length === 0 && proposal && (
         <NoCommentsMessage
           icon={
             <SvgIcon

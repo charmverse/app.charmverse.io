@@ -9,6 +9,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
 
+import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -84,6 +85,7 @@ type ProposalPropertiesProps = {
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   readOnlyCustomProperties?: string[];
   openEvaluation?: () => void;
+  isEvaluationSidebarOpen?: boolean;
   canSeeEvaluation?: boolean;
 };
 
@@ -111,6 +113,7 @@ export function ProposalPropertiesBase({
   updateProposalStatus,
   isPublishingToLens,
   openEvaluation,
+  isEvaluationSidebarOpen,
   canSeeEvaluation,
   readOnlyCustomProperties
 }: ProposalPropertiesProps) {
@@ -522,7 +525,13 @@ export function ProposalPropertiesBase({
 
         {canSeeEvaluation && (
           <Box display='flex' justifyContent='center' py={2}>
-            <Button onClick={openEvaluation}>Review this proposal</Button>
+            <Button
+              disabled={isEvaluationSidebarOpen}
+              startIcon={SIDEBAR_VIEWS.proposal_evaluation.icon}
+              onClick={openEvaluation}
+            >
+              Open evaluation
+            </Button>
           </Box>
         )}
 

@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import ViewHeaderSortMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderSortMenu';
 import { Button } from 'components/common/Button';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -16,10 +17,12 @@ type Props = {
 };
 
 export function ViewSortControl({ viewSortPopup, activeView, activeBoard, cards }: Props) {
+  const sortOptions = useViewSortOptions(activeView);
+
   return (
     <>
       <Button
-        color={activeView.fields.sortOptions?.length > 0 ? 'primary' : 'secondary'}
+        color={sortOptions?.length > 0 ? 'primary' : 'secondary'}
         variant='text'
         size='small'
         sx={{ minWidth: 0 }}

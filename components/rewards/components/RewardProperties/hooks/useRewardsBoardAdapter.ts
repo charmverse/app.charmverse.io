@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
@@ -7,8 +7,8 @@ import { getDefaultBoard, getDefaultTableView } from 'components/rewards/compone
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
@@ -41,12 +41,12 @@ export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { rewards } = useRewards();
-  const { pages } = usePages();
   const { rewardPropertiesBlock, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
 
   const rewardPage = getRewardPage(boardReward?.id);
-  Object.values(pages).find((p) => p?.bountyId === boardReward?.id);
+  // TODO - use different types of views (board, calendar)
+  const localViewSettings = useLocalDbViewSettings(`rewards-${DEFAULT_VIEW_BLOCK_ID}`);
 
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
@@ -55,6 +55,7 @@ export function useRewardsBoardAdapter() {
 
   const activeView = useMemo(() => {
     // use saved default block or build on the fly
+    // TODO: use different types of views
     const viewBlock = rewardBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
@@ -69,7 +70,7 @@ export function useRewardsBoardAdapter() {
     }
 
     return boardView;
-  }, [rewardPropertiesBlock, rewardBlocks]);
+  }, [rewardBlocks, rewardPropertiesBlock]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -81,22 +82,22 @@ export function useRewardsBoardAdapter() {
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
+    const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
     if (activeView?.fields.filter) {
       const cardsRaw = cards.map((cp) => cp.card);
-      const filteredCardsIds = CardFilter.applyFilterGroup(
-        activeView.fields.filter,
-        board.fields.cardProperties,
-        cardsRaw
-      ).map((c) => c.id);
+      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cardsRaw).map(
+        (c) => c.id
+      );
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
-
-    const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
+    const sortedCardPages = activeView
+      ? sortCards(cards, board, activeView, membersRecord, localViewSettings?.localSort)
+      : [];
 
     return sortedCardPages;
-  }, [activeView, board, getRewardPage, membersRecord, rewards, space?.id]);
+  }, [activeView, board, getRewardPage, localViewSettings, membersRecord, rewards, space?.id]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: rewardPropertiesBlock,

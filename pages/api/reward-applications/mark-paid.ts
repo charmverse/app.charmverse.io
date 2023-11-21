@@ -32,10 +32,8 @@ async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiR
       bounty: true
     }
   });
-  const permissions = await computeBountyPermissions({
-    resourceId: submission.bounty.id,
-    userId
-  });
+
+  const permissions = await computeBountyPermissions({ resourceId: submission.bounty.id, userId });
 
   if (!permissions.review) {
     throw new UnauthorisedActionError('You cannot review submissions for this bounty');

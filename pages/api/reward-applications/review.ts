@@ -40,10 +40,7 @@ async function reviewUserApplication(req: NextApiRequest, res: NextApiResponse<A
     throw new DataNotFoundError(`Application with id ${applicationId} not found`);
   }
 
-  const permissions = await computeBountyPermissions({
-    resourceId: application.bountyId,
-    userId
-  });
+  const permissions = await computeBountyPermissions({ resourceId: application.bountyId, userId });
 
   if (!permissions.approve_applications) {
     throw new UnauthorisedActionError('You do not have the permission to approve applications for this bounty');

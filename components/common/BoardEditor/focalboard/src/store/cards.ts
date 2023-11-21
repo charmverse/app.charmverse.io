@@ -4,7 +4,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
@@ -171,12 +171,16 @@ export function sortCards(
   cardPages: CardPage[],
   board: Board,
   activeView: BoardView,
-  members: Record<string, Member>
+  members: Record<string, Member>,
+  localSort?: ISortOption[] | null
 ): CardPage[] {
   if (!activeView) {
     return cardPages;
   }
-  const { sortOptions } = activeView.fields;
+
+  const { sortOptions: globalSortOptions } = activeView.fields;
+  const sortOptions = localSort || globalSortOptions;
+
   if (sortOptions?.length < 1) {
     return cardPages.sort((a, b) => manualOrder(activeView, a, b));
   }

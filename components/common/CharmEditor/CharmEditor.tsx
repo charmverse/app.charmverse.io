@@ -15,9 +15,9 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
+import type { IPageSidebarContext } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { IPageSidebarContext } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -56,16 +56,16 @@ import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { VideoNodeView } from './components/video/VideoNodeView';
 import {
-  suggestionsPluginKey,
-  inlinePalettePluginKey,
+  actionsPluginKey,
+  charmEditorPlugins,
+  emojiPluginKey,
   floatingMenuPluginKey,
+  inlineCommentPluginKey,
+  inlinePalettePluginKey,
   linkedPagePluginKey,
   linksPluginKey,
   mentionPluginKey,
-  emojiPluginKey,
-  actionsPluginKey,
-  inlineCommentPluginKey,
-  charmEditorPlugins
+  suggestionsPluginKey
 } from './plugins';
 import { specRegistry } from './specRegistry';
 

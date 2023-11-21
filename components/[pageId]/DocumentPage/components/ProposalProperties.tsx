@@ -35,6 +35,7 @@ interface ProposalPropertiesProps {
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
   openEvaluation?: () => void;
+  isEvaluationSidebarOpen?: boolean;
   proposalPage: PageWithContent;
 }
 
@@ -46,6 +47,7 @@ export function ProposalProperties({
   proposalId,
   snapshotProposalId,
   readOnly,
+  isEvaluationSidebarOpen,
   openEvaluation,
   proposalPage
 }: ProposalPropertiesProps) {
@@ -200,6 +202,7 @@ export function ProposalProperties({
         setProposalFormInputs={onChangeProperties}
         isPublishingToLens={isPublishingToLens}
         readOnlyCustomProperties={readOnlyCustomProperties}
+        isEvaluationSidebarOpen={isEvaluationSidebarOpen}
         openEvaluation={openEvaluation}
       />
       {isPublishingToLens && (
