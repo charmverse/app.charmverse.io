@@ -5,11 +5,11 @@ import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useRef, useState } from 'react';
+import type { EditorState } from 'prosemirror-state';
+import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { PageComments } from 'components/[pageId]/Comments/PageComments';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -25,13 +25,17 @@ import { useProposalPermissions } from 'components/proposals/hooks/useProposalPe
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
-import { usePageSidebar } from 'hooks/usePageSidebar';
+import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useLgScreen } from 'hooks/useMediaScreens';
+import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
+import { PageComments } from './components/CommentsFooter/PageComments';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
@@ -39,6 +43,8 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
+import { PageSidebar } from './components/Sidebar/PageSidebar';
+import { usePageSidebar } from './hooks/usePageSidebar';
 
 // const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
@@ -79,29 +85,33 @@ export interface DocumentPageProps {
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   close?: VoidFunction;
+  enableSidebar?: boolean;
 }
 
-function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: DocumentPageProps) {
+function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, enableSidebar }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
-  const { activeView: sidebarView } = usePageSidebar();
+  const isLargeScreen = useLgScreen();
+  const { navigateToSpacePath } = useCharmRouter();
+  const {
+    activeView: sidebarView,
+    persistedActiveView,
+    persistActiveView,
+    setActiveView,
+    closeSidebar
+  } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
-  // TODO: [bounties-cleanup]
-  // const { permissions: bountyPermissions, refresh: refreshBountyPermissions } = useBountyPermissions({
-  //   bountyId: page.bountyId
-  // });
-  // const { draftBounty } = useBounties();
-
+  const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId as string });
+  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
   // keep a ref in sync for printing
@@ -144,20 +154,11 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
     return [];
   });
 
-  useEffect(() => {
-    if (page?.type === 'card') {
-      if (!card) {
-        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
-        blocksDispatch(blockLoad({ blockId: page.id }));
-        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
-      }
-    }
-  }, [page.id]);
-
-  const activeView = boardViews[0];
+  const activeBoardView = boardViews[0];
 
   const pageTop = getPageTop(page);
 
+  const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
@@ -166,7 +167,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
-  const showPageActionSidebar = sidebarView !== null && (sidebarView !== 'comments' || enableComments);
+  const showPageActionSidebar =
+    !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
 
@@ -185,10 +187,84 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
       setConnectionError(null);
     }
   }
-  // reset error whenever page id changes
+
+  useEffect(() => {
+    if (page?.type === 'card') {
+      if (!card) {
+        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+        blocksDispatch(blockLoad({ blockId: page.id }));
+        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+      }
+    }
+  }, [page.id]);
+
+  // reset error and sidebar state whenever page id changes
   useEffect(() => {
     setConnectionError(null);
-  }, [page.id]);
+    // check page id has changed, otherwwise this runs on every refresh in dev
+    if (threadsPageId !== page.id) {
+      closeSidebar();
+    }
+  }, [page.id, threadsPageId]);
+
+  const threadIds = useMemo(
+    () =>
+      typeof page.type === 'string'
+        ? Object.values(threads)
+            .filter((thread) => !thread?.resolved)
+            .filter(isTruthy)
+            .map((thread) => thread.id)
+        : undefined,
+    [threads, page.type]
+  );
+
+  // show page sidebar by default if there are comments or votes
+  useEffect(() => {
+    if (!enableSidebar) {
+      return;
+    }
+    let highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
+    // hack to handle improperly-created URLs from notifications
+    if (highlightedCommentId === 'undefined') {
+      highlightedCommentId = null;
+    }
+    const unresolvedThreads = Object.values(threads)
+      .filter((thread) => !thread?.resolved)
+      .filter(isTruthy);
+    if (sidebarView && !highlightedCommentId) {
+      // dont redirect if sidebar is already open
+      return;
+    }
+    if (page.id !== threadsPageId) {
+      // threads result is from a different page, maybe during navigation
+      return;
+    }
+
+    if (!isLoadingThreads) {
+      if (highlightedCommentId || (isLargeScreen && unresolvedThreads.length)) {
+        return setActiveView('comments');
+      }
+    }
+  }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
+
+  useEffect(() => {
+    const defaultView = persistedActiveView?.[page.id];
+    if (enableSidebar && defaultView) {
+      setActiveView(defaultView);
+    }
+  }, [!!persistedActiveView, enableSidebar, page.id]);
+
+  const openEvaluation = useCallback(() => {
+    if (enableSidebar) {
+      setActiveView('proposal_evaluation');
+    } else {
+      persistActiveView({
+        [page.id]: 'proposal_evaluation'
+      });
+      // go to full page view
+      navigateToSpacePath(`/${page.path}`);
+    }
+  }, [enableSidebar, setActiveView]);
 
   return (
     <>
@@ -246,7 +322,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 content={page.content as PageContent}
                 readOnly={readOnly || !!page.syncWithPageId}
                 autoFocus={false}
-                PageSidebar={sidebarView}
+                sidebarView={sidebarView}
+                setSidebarView={setActiveView}
                 pageId={page.id}
                 disablePageSpecificFeatures={isSharedPage}
                 enableSuggestingMode={enableSuggestingMode}
@@ -256,6 +333,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onConnectionEvent={onConnectionEvent}
+                setEditorState={setEditorState}
                 snapshotProposalId={page.snapshotProposalId}
                 onParticipantUpdate={onParticipantUpdate}
                 style={{
@@ -263,6 +341,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                 }}
                 disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
                 allowClickingFooter={true}
+                threadIds={threadIds}
               >
                 {/* temporary? disable editing of page title when in suggestion mode */}
                 <PageHeader
@@ -304,7 +383,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                         board={board}
                         card={card}
                         cards={cards}
-                        activeView={activeView}
+                        activeView={activeBoardView}
                         views={boardViews}
                         readOnly={readOnly}
                         pageUpdatedAt={page.updatedAt.toString()}
@@ -315,14 +394,15 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                   )}
                   {proposalId && (
                     <ProposalProperties
+                      enableSidebar={enableSidebar}
                       pageId={page.id}
                       proposalId={proposalId}
                       pagePermissions={pagePermissions}
                       snapshotProposalId={page.snapshotProposalId}
                       refreshPagePermissions={refreshPage}
                       readOnly={readonlyProposalProperties}
-                      title={page.title}
                       proposalPage={page}
+                      openEvaluation={openEvaluation}
                     />
                   )}
                   {reward && (
@@ -338,16 +418,29 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close }: 
                     />
                   )}
                   {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
+                  {(enableComments || enableSuggestingMode) && (
+                    <PageSidebar
+                      id='page-action-sidebar'
+                      pageId={page.id}
+                      spaceId={page.spaceId}
+                      proposalId={proposalId}
+                      pagePermissions={pagePermissions}
+                      editorState={editorState}
+                      sidebarView={sidebarView}
+                      closeSidebar={closeSidebar}
+                      openSidebar={setActiveView}
+                      threads={threads}
+                    />
+                  )}
                 </CardPropertiesWrapper>
               </CharmEditor>
 
-              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') &&
-                pagePermissions.comment && (
-                  <Box mt='-100px'>
-                    {/* add negative margin to offset height of .charm-empty-footer */}
-                    <PageComments page={page} permissions={pagePermissions} />
-                  </Box>
-                )}
+              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
+                <Box mt='-100px'>
+                  {/* add negative margin to offset height of .charm-empty-footer */}
+                  <PageComments page={page} canCreateComments={pagePermissions.comment} />
+                </Box>
+              )}
             </Container>
           </div>
         </ScrollContainer>

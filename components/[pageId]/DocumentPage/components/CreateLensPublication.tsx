@@ -4,7 +4,7 @@ import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
 import { useEffect } from 'react';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
-import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
+import { usePageComments } from 'components/[pageId]/DocumentPage/components/CommentsFooter/usePageComments';
 import { useHandleLensError } from 'components/settings/account/hooks/useLensProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';

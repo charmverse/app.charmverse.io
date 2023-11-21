@@ -16,7 +16,7 @@ export const schema = yup.object({
     .notRequired()
     .ensure()
     .trim()
-    .matches(/^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i, 'Invalid Twitter link'),
+    .matches(/^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i, 'Invalid X link'),
   githubURL: yup
     .string()
     .notRequired()
@@ -91,7 +91,7 @@ export function SocialInputs(props: SocialInputsProps) {
   return (
     <>
       <Grid item>
-        <FieldLabel>Twitter</FieldLabel>
+        <FieldLabel>X</FieldLabel>
         <TextField
           {...register('twitterURL')}
           fullWidth

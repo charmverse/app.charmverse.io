@@ -25,7 +25,7 @@ import { AppBar } from './components/AppBar';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, HeaderSpacer } from './components/Header/Header';
 import PageContainer from './components/PageContainer';
-import { Sidebar } from './components/Sidebar/Sidebar';
+import { NavigationSidebar } from './components/Sidebar/NavigationSidebar';
 
 const MAX_SIDEBAR_WIDTH = 500;
 const MIN_SIDEBAR_WIDTH = 200;
@@ -156,7 +156,7 @@ function PageLayout({ children }: PageLayoutProps) {
       !user ? (
         <div></div>
       ) : (
-        <Sidebar closeSidebar={handleDrawerClose} navAction={isMobile ? handleDrawerClose : undefined} />
+        <NavigationSidebar closeSidebar={handleDrawerClose} navAction={isMobile ? handleDrawerClose : undefined} />
       ),
     [handleDrawerClose, !!user, isMobile]
   );
