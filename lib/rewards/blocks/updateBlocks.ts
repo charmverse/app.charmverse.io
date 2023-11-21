@@ -29,7 +29,7 @@ export async function updateBlocks({
         rewardId: reward.id,
         updateContent: {
           fields: {
-            ...reward.fields,
+            ...(reward.fields as RewardPropertyValues),
             properties: filterInternalProperties<Prisma.JsonValue>((reward.fields as RewardPropertyValues).properties)
           }
         }
