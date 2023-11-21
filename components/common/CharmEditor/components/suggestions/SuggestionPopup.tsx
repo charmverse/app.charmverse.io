@@ -1,10 +1,8 @@
 import { Box, ClickAwayListener, Grow } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
-import React from 'react';
 import { createPortal } from 'react-dom';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useUser } from 'hooks/useUser';
 
 import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
@@ -18,19 +16,20 @@ export function SuggestionsPopup({
   pluginKey,
   readOnly,
   pageId,
-  spaceId
+  spaceId,
+  isSuggestionSidebarOpen
 }: {
   pluginKey: PluginKey<SuggestionPluginState>;
   readOnly: boolean;
   pageId: string;
   spaceId: string;
+  isSuggestionSidebarOpen: boolean;
 }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, rowPos } = usePluginState(pluginKey) as SuggestionPluginState;
-  const { activeView } = usePageSidebar();
   const { user } = useUser();
 
-  const popupIsVisible = activeView !== 'suggestions' && isVisible;
+  const popupIsVisible = !isSuggestionSidebarOpen && isVisible;
 
   if (popupIsVisible) {
     const rows = getEventsFromDoc({ state: view.state });

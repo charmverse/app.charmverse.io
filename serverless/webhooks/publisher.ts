@@ -17,21 +17,18 @@ export async function publishToWebhook({ webhookURL, signingSecret, ...webhookDa
 
     const signedJWT = await signJwt('webhook', webhookData, secret);
 
-    // Call their endpoint with the event's data
-    const response = await fetch(webhookURL, {
-      method: 'POST',
-      body: JSON.stringify(webhookData),
-      headers: {
-        Signature: signedJWT
-      }
-    });
-
-    log.debug('Webhook call response', { ...response, spaceId: webhookData.spaceId });
-
-    // If not 200 back, we throw an error
-    if (response.status !== 200) {
-      // Throw the error so we can log it for debugging
-      throw new Error(`Expect error 200 back. Received: ${response.status}`);
+    try {
+      // Call their endpoint with the event's data
+      const response = await fetch(webhookURL, {
+        method: 'POST',
+        body: JSON.stringify(webhookData),
+        headers: {
+          Signature: signedJWT
+        }
+      });
+      log.debug('Webhook call response', { ...response, spaceId: webhookData.spaceId });
+    } catch (_) {
+      log.error('Webhook call failed', { spaceId: webhookData.spaceId });
     }
   }
 }

@@ -3,7 +3,7 @@ import type { Comment } from '@charmverse/core/prisma';
 import * as http from 'adapters/http';
 import type { CommentCreate } from 'lib/comments/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { MultipleThreadsInput, ThreadWithComments, ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { MultipleThreadsInput, ThreadWithComments } from 'lib/threads/interfaces';
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';
 
 export class CommentsApi {
@@ -19,7 +19,7 @@ export class CommentsApi {
     return http.DELETE(`/api/comments/${commentId}`);
   }
 
-  getThreads(pageId: string): Promise<ThreadWithComments[] | ThreadWithCommentsAndAuthors[]> {
+  getThreads(pageId: string): Promise<ThreadWithComments[]> {
     return http.GET(`/api/pages/${pageId}/threads`);
   }
 

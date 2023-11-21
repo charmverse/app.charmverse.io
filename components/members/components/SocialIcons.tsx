@@ -1,9 +1,9 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import type { StackProps } from '@mui/material';
 import { Link, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import { DiscordSocialIcon } from './DiscordSocialIcon';
 
@@ -40,7 +40,7 @@ export function SocialIcons({
       {showDiscord && social?.discordUsername && <DiscordSocialIcon username={social.discordUsername} />}
       {showTwitter && social.twitterURL && (
         <Link href={social.twitterURL} target='_blank' display='flex'>
-          <TwitterIcon style={{ color: '#00ACEE', height: iconHeight }} />
+          <FaXTwitter style={{ color: '#888', height: iconHeight }} />
         </Link>
       )}
       {showLinkedIn && social?.linkedinURL && (
