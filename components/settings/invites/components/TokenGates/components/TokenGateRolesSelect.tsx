@@ -19,6 +19,7 @@ interface Props {
   selectedRoleIds: string[];
   onDelete: (roleId: string) => void;
   isAdmin: boolean;
+  disabled?: boolean;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -37,7 +38,7 @@ const StyledFormControl = styled(FormControl)`
   }
 `;
 
-export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChange, isAdmin }: Props) {
+export default function TokenGateRolesSelect({ disabled, onDelete, selectedRoleIds, onChange, isAdmin }: Props) {
   const { roles } = useRoles();
 
   const { isFreeSpace } = useIsFreeSpace();
@@ -93,7 +94,7 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
           multiple
           onChange={selectOption}
           displayEmpty={true}
-          disabled={!canEditRoles || roles?.length === 0}
+          disabled={!canEditRoles || roles?.length === 0 || disabled}
           sx={{ '& .MuiInputBase-input': { pb: 0 } }}
           renderValue={(roleIds) =>
             roleIds.length === 0 ? (
@@ -113,7 +114,7 @@ export default function TokenGateRolesSelect({ onDelete, selectedRoleIds, onChan
                       onMouseDown={(event) => {
                         event.stopPropagation();
                       }}
-                      disabled={!canEditRoles}
+                      disabled={!canEditRoles || disabled}
                       onDelete={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
