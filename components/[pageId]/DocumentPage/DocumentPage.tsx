@@ -223,7 +223,11 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
     if (!enableSidebar) {
       return;
     }
-    const highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
+    let highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
+    // hack to handle improperly-created URLs from notifications
+    if (highlightedCommentId === 'undefined') {
+      highlightedCommentId = null;
+    }
     const unresolvedThreads = Object.values(threads)
       .filter((thread) => !thread?.resolved)
       .filter(isTruthy);
