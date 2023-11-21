@@ -27,6 +27,9 @@ import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { PROPOSAL_REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import {
+  REWARD_CHAIN,
+  REWARD_TOKEN,
+  REWARD_CUSTOM_VALUE,
   ASSIGNEES_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
@@ -48,6 +51,8 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
+import { TokenAmount } from './properties/tokenAmount/tokenAmount';
+import { TokenChain } from './properties/tokenChain/tokenChain';
 
 type Props = {
   board: Board;
@@ -307,10 +312,13 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = (
       <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
     );
-  } else if (propertyTemplate.type === 'token_amount') {
-    propertyValueElement = <div className={clsx('octo-propertyvalue', { readonly: true })}>{displayValue}</div>;
-  } else if (propertyTemplate.type === 'token_chain') {
-    propertyValueElement = <div className={clsx('octo-propertyvalue', { readonly: true })}>{displayValue}</div>;
+  } else if (propertyTemplate.type === 'tokenAmount') {
+    propertyValueElement = <TokenAmount amount={displayValue as number} />;
+  } else if (propertyTemplate.type === 'tokenChain') {
+    // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string | undefined;
+    const chainId = card.fields.properties[REWARD_CHAIN] as number | undefined;
+    propertyValueElement = <TokenChain symbolOrAddress={symbolOrAddress} chainId={chainId} />;
   }
 
   const commonProps = {

@@ -1,4 +1,5 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
+import { RPCList } from 'connectors/chains';
 
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
@@ -17,7 +18,8 @@ import {
   CREATED_AT_ID,
   REWARD_AMOUNT,
   REWARD_CHAIN,
-  REWARD_CUSTOM_VALUE
+  REWARD_CUSTOM_VALUE,
+  REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesBlock } from 'lib/rewards/blocks/interfaces';
 
@@ -63,7 +65,10 @@ export function getDefaultTableView({ storedBoard }: { storedBoard: RewardProper
     [ASSIGNEES_BLOCK_ID]: 200,
     [REWARD_REVIEWERS_BLOCK_ID]: 150,
     [REWARDS_AVAILABLE_BLOCK_ID]: 150,
-    [REWARD_STATUS_BLOCK_ID]: 150
+    [REWARD_STATUS_BLOCK_ID]: 150,
+    [REWARD_AMOUNT]: 150,
+    [REWARD_CHAIN]: 150,
+    [REWARD_CUSTOM_VALUE]: 150
   };
 
   // Wrap title comumn by default
@@ -127,19 +132,25 @@ const rewardDbProperties = {
   }),
   rewardAmount: (): IPropertyTemplate => ({
     id: REWARD_AMOUNT,
-    name: 'Amount',
+    name: 'Token amount',
     options: [],
-    type: 'token_amount'
+    type: 'tokenAmount'
   }),
   rewardChain: (): IPropertyTemplate => ({
     id: REWARD_CHAIN,
-    name: 'Chain',
-    options: [],
-    type: 'token_chain'
+    name: 'Token chain',
+    options: RPCList.map((rpc) => ({ id: rpc.chainId.toString(), value: rpc.chainName, color: '' })),
+    type: 'tokenChain'
   }),
   rewardCustomValue: (): IPropertyTemplate => ({
     id: REWARD_CUSTOM_VALUE,
     name: 'Custom reward',
+    options: [],
+    type: 'text'
+  }),
+  rewardToken: (): IPropertyTemplate => ({
+    id: REWARD_TOKEN,
+    name: 'Reward token',
     options: [],
     type: 'text'
   })
@@ -153,8 +164,8 @@ function getDefaultProperties(): IPropertyTemplate[] {
     rewardDbProperties.rewardReviewers(),
     rewardDbProperties.rewardAvailableCount(),
     rewardDbProperties.rewardStatus(),
-    rewardDbProperties.rewardChain(),
     rewardDbProperties.rewardAmount(),
+    rewardDbProperties.rewardChain(),
     rewardDbProperties.rewardCustomValue()
   ];
 }

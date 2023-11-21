@@ -1,4 +1,5 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import { getChainById } from 'connectors/chains';
 import { DateUtils } from 'react-day-picker';
 
 import type { Block } from 'lib/focalboard/block';
@@ -10,6 +11,7 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { getTokenInfo } from 'lib/tokens/tokenData';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -91,6 +93,11 @@ class OctoUtils {
       }
       case 'updatedTime': {
         displayValue = formatDateTime(new Date(block.updatedAt));
+        break;
+      }
+      case 'tokenChain': {
+        const chain = typeof propertyValue === 'number' ? getChainById(propertyValue) : null;
+        displayValue = chain ? chain.chainName : '';
         break;
       }
       case 'date': {

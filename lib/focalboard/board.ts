@@ -36,8 +36,8 @@ export type PropertyType =
   | 'createdBy'
   | 'updatedTime'
   | 'updatedBy'
-  | 'token_amount'
-  | 'token_chain'
+  | 'tokenAmount'
+  | 'tokenChain'
   | DatabaseProposalPropertyType;
 
 export const propertyTypesList: PropertyType[] = [

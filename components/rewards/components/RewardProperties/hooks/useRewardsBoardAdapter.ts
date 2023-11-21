@@ -16,7 +16,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import type { Member } from 'lib/members/interfaces';
-import type { PagesMap } from 'lib/pages';
 import {
   ASSIGNEES_BLOCK_ID,
   CREATED_AT_ID,
@@ -28,7 +27,8 @@ import {
   REWARD_STATUS_BLOCK_ID,
   REWARD_AMOUNT,
   REWARD_CHAIN,
-  REWARD_CUSTOM_VALUE
+  REWARD_CUSTOM_VALUE,
+  REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
@@ -166,8 +166,9 @@ function mapRewardToCardPage({
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
     [ASSIGNEES_BLOCK_ID]: (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || [],
     [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
-    [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId) || '',
-    [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || ''
+    [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
+    [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
+    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || ''
   };
 
   const card: Card<RewardPropertyValue> = {
