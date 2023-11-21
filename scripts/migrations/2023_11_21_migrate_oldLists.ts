@@ -21,9 +21,11 @@ async function migrate({ offset = 0 }: { offset?: number } = {}) {
     take: perBatch
   });
 
-  for (const page of pages) {
-    await convertAndSavePage(page);
-  }
+  await Promise.all(
+    pages.map(async (page) => {
+      await convertAndSavePage(page);
+    })
+  );
 
   if (pages.length > 0) {
     console.log('checked', offset + perBatch, 'pages. last id: ' + pages[pages.length - 1].id);
