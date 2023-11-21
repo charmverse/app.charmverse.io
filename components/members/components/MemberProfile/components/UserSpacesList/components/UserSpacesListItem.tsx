@@ -162,7 +162,9 @@ export function UserSpacesListItem({
 
       <Collapse in={!isCollapsed}>
         <Box className='hidden-on-visible'>
-          <MemberProperties properties={properties} />
+          <Box my={1}>
+            <MemberProperties properties={properties} />
+          </Box>
           {showTabs && (
             <>
               <Tabs
