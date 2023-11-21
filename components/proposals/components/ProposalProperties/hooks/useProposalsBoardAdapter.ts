@@ -68,10 +68,6 @@ export function useProposalsBoardAdapter() {
   }, [categories, proposalPropertiesBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
-    if (!localViewSettings) {
-      throw new Error('localViewSettings provider not found');
-    }
-
     let cards =
       proposals
         ?.map((p) => {
@@ -81,7 +77,7 @@ export function useProposalsBoardAdapter() {
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
-    const filter = localViewSettings.localFilters || activeView?.fields.filter;
+    const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
     if (filter) {
       const cardsRaw = cards.map((cp) => cp.card);
@@ -93,11 +89,20 @@ export function useProposalsBoardAdapter() {
     }
 
     const sortedCardPages = activeView
-      ? sortCards(cards, board, activeView, membersRecord, localViewSettings.localSort)
+      ? sortCards(cards, board, activeView, membersRecord, localViewSettings?.localSort)
       : [];
 
     return sortedCardPages;
-  }, [activeView, board, membersRecord, pages, proposals, space?.id]);
+  }, [
+    activeView,
+    board,
+    localViewSettings?.localFilters,
+    localViewSettings?.localSort,
+    membersRecord,
+    pages,
+    proposals,
+    space?.id
+  ]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: proposalPropertiesBlock,
