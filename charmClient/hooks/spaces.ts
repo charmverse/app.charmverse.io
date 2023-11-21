@@ -1,3 +1,5 @@
+import type { PaymentMethod } from '@charmverse/core/prisma';
+
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import { useGETImmutable } from './helpers';
@@ -5,6 +7,12 @@ import { useGETImmutable } from './helpers';
 export function useSearchByDomain(domain?: string) {
   return useGETImmutable<SpaceWithGates>(domain ? `/api/spaces/search-domain` : null, {
     search: stripUrlParts(domain || '')
+  });
+}
+
+export function useGetPaymentMethods(spaceId?: string) {
+  return useGETImmutable<PaymentMethod[]>(spaceId ? `/api/payment-methods` : null, {
+    spaceId
   });
 }
 

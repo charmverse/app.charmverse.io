@@ -24,7 +24,11 @@ import {
   REWARDER_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  REWARD_AMOUNT,
+  REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE,
+  REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
@@ -161,7 +165,11 @@ function mapRewardToCardPage({
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
-    [ASSIGNEES_BLOCK_ID]: (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || []
+    [ASSIGNEES_BLOCK_ID]: (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || [],
+    [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
+    [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
+    [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
+    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || ''
   };
 
   const card: Card<RewardPropertyValue> = {
