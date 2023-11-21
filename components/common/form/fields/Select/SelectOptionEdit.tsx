@@ -1,15 +1,15 @@
 import { useTheme } from '@emotion/react';
-import CheckIcon from '@mui/icons-material/Check';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Divider, ListItemIcon, MenuList, Stack, TextField, Typography, IconButton, MenuItem } from '@mui/material';
+import { Divider, IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import PopperPopup from 'components/common/PopperPopup';
 import type { BrandColor } from 'theme/colors';
-import { brandColorNames } from 'theme/colors';
+
+import { ColorSelectMenu } from '../../ColorSelectMenu';
 
 type Props = {
   option: SelectOptionType;
@@ -71,33 +71,7 @@ export function SelectOptionEdit({ option, onChange, onDelete, onToggleOptionEdi
             </MenuItem>
           )}
           <Divider />
-          <Stack p={1} pb={0}>
-            <FieldLabel variant='subtitle2'>Color</FieldLabel>
-          </Stack>
-          {brandColorNames.map((color) => (
-            <MenuItem
-              key={color}
-              sx={{ textTransform: 'capitalize', display: 'flex', gap: 1, justifyContent: 'space-between' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onColorChange(color);
-              }}
-            >
-              <Stack flexDirection='row' gap={1} alignContent='center'>
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: '20%',
-                    backgroundColor: theme.palette[color].main
-                  }}
-                />
-                <Typography variant='subtitle1'>{color}</Typography>
-              </Stack>
-
-              {color === option.color && <CheckIcon fontSize='small' />}
-            </MenuItem>
-          ))}
+          <ColorSelectMenu onChange={onColorChange} selectedColor={option.color as BrandColor} />
         </MenuList>
       </Stack>
     ),
