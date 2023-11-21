@@ -38,12 +38,14 @@ export function ForumFilterListLink({ label, value, isSelected, href }: ForumSor
   const { permissions } = usePostCategoryPermissions(category?.id as string);
   function deleteCategory() {
     if (value) {
-      deleteForumCategory({ id: value }).catch((err) => {
-        showMessage(err?.message || 'An error occurred while deleting the category');
-      });
+      deleteForumCategory({ id: value })
+        .then(() => {
+          showMessage('Category deleted');
+        })
+        .catch((err) => {
+          showMessage(err?.message || 'An error occurred while deleting the category');
+        });
     }
-
-    showMessage('Category deleted');
   }
 
   return (

@@ -163,7 +163,6 @@ export function CryptoPrice({
         enableDragAndDrop(view, getPos());
       }}
       component='div'
-      raised={true}
       // disable propagation for bangle.dev
       onMouseUp={(e) => e.stopPropagation()}
       sx={{ display: 'inline-block', minWidth: '250px' }}

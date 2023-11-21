@@ -1,4 +1,3 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Comment } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Check } from '@mui/icons-material';
@@ -38,7 +37,7 @@ import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import InlineCharmEditor from '../../InlineCharmEditor';
 import { scrollToThread } from '../inlineComment/inlineComment.utils';
@@ -121,13 +120,21 @@ function AddCommentCharmEditor({
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkIsContentEmpty(commentContent);
   const { addComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
+  const thread = threads[threadId];
   const touched = useRef(false);
 
   usePreventReload(touched.current);
 
   return (
-    <Box display='flex' px={1} pb={1} sx={sx} flexDirection='column' gap={1} mt={thread.comments.length !== 0 ? 1 : 0}>
+    <Box
+      display='flex'
+      px={1}
+      pb={1}
+      sx={sx}
+      flexDirection='column'
+      gap={1}
+      mt={thread && thread.comments.length !== 0 ? 1 : 0}
+    >
       <InlineCharmEditor
         style={{
           backgroundColor: 'var(--input-bg)',
@@ -180,8 +187,8 @@ function EditCommentCharmEditor({
   const [commentContent, setCommentContent] = useState<PageContent | null>(null);
   const isEmpty = checkIsContentEmpty(commentContent);
   const { editComment, threads } = useThreads();
-  const thread = threads[threadId] as ThreadWithCommentsAndAuthors;
-  const comment = thread.comments.find((_comment) => _comment.id === commentId);
+  const thread = threads[threadId];
+  const comment = thread?.comments.find((_comment) => _comment.id === commentId);
 
   if (!comment) {
     return null;
@@ -239,7 +246,7 @@ interface PageThreadProps {
   threadId: string;
   inline?: boolean;
   showFindButton?: boolean;
-  permissions?: PagePermissionFlags;
+  canCreateComments?: boolean;
 }
 
 export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
@@ -281,7 +288,7 @@ export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; up
 );
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
-  ({ showFindButton = false, threadId, inline = false, permissions }, ref) => {
+  ({ showFindButton = false, threadId, inline = false, canCreateComments }, ref) => {
     showFindButton = showFindButton ?? !inline;
     const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
     const { user } = useUser();
@@ -293,7 +300,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const { updateThreadPluginState } = useInlineComment();
 
     const view = useEditorViewContext();
-    const thread = threadId ? (threads[threadId] as ThreadWithCommentsAndAuthors) : null;
+    const thread = threadId ? threads[threadId] : null;
     const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const [counter, setCounter] = useState(0);
 
@@ -414,7 +421,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                          disabled={isMutating || !permissions?.comment}
+                          disabled={isMutating || !canCreateComments}
                           onClick={toggleResolved}
                         />
                       )}
@@ -507,7 +514,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {permissions?.comment && (
+        {canCreateComments && (
           <AddCommentCharmEditor
             readOnly={Boolean(editedCommentId)}
             key={counter}

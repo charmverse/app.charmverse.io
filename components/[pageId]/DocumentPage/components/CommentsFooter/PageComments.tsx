@@ -1,11 +1,10 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
-import { usePageComments } from 'components/[pageId]/Comments/usePageComments';
+import { usePageComments } from 'components/[pageId]/DocumentPage/components/CommentsFooter/usePageComments';
 import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
@@ -19,14 +18,14 @@ import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-import { CreateLensPublication } from '../DocumentPage/components/CreateLensPublication';
+import { CreateLensPublication } from '../CreateLensPublication';
 
 type Props = {
   page: PageWithContent;
-  permissions: PagePermissionFlags;
+  canCreateComments: boolean;
 };
 
-export function PageComments({ page, permissions }: Props) {
+export function PageComments({ page, canCreateComments }: Props) {
   const { user } = useUser();
   const { lensProfile, setupLensProfile } = useLensProfile();
   const router = useRouter();
@@ -49,9 +48,9 @@ export function PageComments({ page, permissions }: Props) {
   const [createdComment, setCreatedComment] = useState<PageCommentWithVote | null>(null);
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
   const commentPermissions: CommentPermissions = {
-    add_comment: permissions.comment ?? false,
-    upvote: permissions.comment ?? false,
-    downvote: permissions.comment ?? false,
+    add_comment: canCreateComments ?? false,
+    upvote: canCreateComments ?? false,
+    downvote: canCreateComments ?? false,
     delete_comments: isAdmin
   };
 
@@ -101,7 +100,7 @@ export function PageComments({ page, permissions }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {permissions.comment && (
+      {canCreateComments && (
         <CommentForm
           isPublishingCommentsToLens={isPublishingToLens && !!createdComment?.parentId}
           publishToLens={publishCommentsToLens}
@@ -148,7 +147,7 @@ export function PageComments({ page, permissions }: Props) {
                 No Comments Yet
               </Typography>
 
-              {permissions.comment && <Typography color='secondary'>Be the first to share what you think!</Typography>}
+              {canCreateComments && <Typography color='secondary'>Be the first to share what you think!</Typography>}
             </Stack>
           )}
         </>

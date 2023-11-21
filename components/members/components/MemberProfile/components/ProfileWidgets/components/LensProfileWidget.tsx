@@ -1,8 +1,8 @@
 import type { Profile } from '@lens-protocol/react-web';
 import LanguageIcon from '@mui/icons-material/Language';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import { Divider, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import Avatar from 'components/common/Avatar';
 
@@ -11,7 +11,7 @@ import { ProfileWidget } from './ProfileWidget';
 function LensProfileAttributes({ href, icon, label }: { href: string; icon: ReactNode; label: string }) {
   return (
     <Link href={href} target='_blank' display='flex'>
-      <Stack direction='row' spacing={0.5}>
+      <Stack direction='row' spacing={1}>
         {icon}
         <Typography
           color='initial'
@@ -88,7 +88,7 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: Profile }) {
                 href={attribute.value}
                 key={attribute.key}
                 icon={<LanguageIcon fontSize='small' />}
-                label={`Website: ${attribute.value}`}
+                label={attribute.value}
               />
             );
           } else if (attribute.key === 'twitter') {
@@ -96,8 +96,8 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: Profile }) {
               <LensProfileAttributes
                 key={attribute.key}
                 href={`https://twitter.com/${attribute.value}`}
-                icon={<TwitterIcon style={{ color: '#00ACEE', height: 20 }} />}
-                label={`Twitter: ${attribute.value}`}
+                icon={<FaXTwitter style={{ color: '#888', height: 20, width: 18 }} />}
+                label={attribute.value}
               />
             );
           }

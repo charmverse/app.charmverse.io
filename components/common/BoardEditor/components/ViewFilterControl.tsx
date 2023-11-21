@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import FilterComponent from 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterComponent';
 import { Button } from 'components/common/Button';
+import { useViewFilter } from 'hooks/useViewFilter';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
@@ -13,7 +14,8 @@ type Props = {
 };
 
 export function ViewFilterControl({ activeBoard, activeView }: Props) {
-  const hasFilter = activeView?.fields.filter && activeView?.fields.filter.filters?.length > 0;
+  const filter = useViewFilter(activeView);
+  const hasFilter = filter && filter.filters?.length > 0;
   const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
 
   return (

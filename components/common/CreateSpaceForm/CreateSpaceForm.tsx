@@ -54,7 +54,6 @@ type SpaceFormStep = 'select_template' | 'create_space' | 'join_space';
 export function CreateSpaceForm({ className, defaultValues, onCancel, submitText }: Props) {
   const { createNewSpace, isCreatingSpace } = useSpaces();
   const { showMessage } = useSnackbar();
-
   const [newSpace, setNewSpace] = useState<Space | null>(null);
 
   const [step, setStep] = useState<SpaceFormStep>('select_template');
@@ -170,6 +169,10 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     }
   }, []);
 
+  const isBanned =
+    (typeof saveError === 'string' && saveError.includes('blocked')) ||
+    (saveError instanceof Error && saveError.message.includes('blocked'));
+
   function randomizeName() {
     const name = randomName();
     setValue('name', name);
@@ -262,7 +265,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
               {watchSpaceTemplate !== 'importMarkdown' && (
                 <Button
                   size='large'
-                  disabled={!watchName || !!newSpace}
+                  disabled={!watchName || !!newSpace || isBanned}
                   type='submit'
                   data-test='create-workspace'
                   loading={isCreatingSpace}

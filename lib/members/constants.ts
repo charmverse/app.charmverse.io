@@ -37,7 +37,7 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true
   },
   twitter: {
-    label: 'Twitter',
+    label: 'X',
     default: true,
     readonly: true
   },
