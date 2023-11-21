@@ -1,28 +1,26 @@
-import { zkMainnetClient, zkTestnetClient } from './client';
+import { lowerCaseEqual } from 'lib/utilities/strings';
+
+import { getClient } from './client';
+import type { SupportedChainId } from './config';
 
 /**
  * @tokenId - An integer representing the ZKSync token id
  */
 export async function verifyNFTOwner({
   ownerAddresses,
-  tokenId
+  tokenId,
+  chainId,
+  contractAddress
 }: {
+  contractAddress: string;
   ownerAddresses: string[];
   tokenId: number | string;
+  chainId: SupportedChainId;
 }): Promise<boolean> {
-  for (const wallet of ownerAddresses) {
-    const mainnetState = await zkMainnetClient.getAccountState(wallet);
+  const client = getClient({ chainId });
 
-    if (mainnetState.committed.nfts[Number(tokenId)]) {
-      return true;
-    }
+  const contract = client.getNftContract(contractAddress);
 
-    const testnetState = await zkTestnetClient.getAccountState(wallet);
-
-    if (testnetState.committed.nfts[Number(tokenId)]) {
-      return true;
-    }
-  }
-
-  return false;
+  const owner = await contract.functions.ownerOf(tokenId).then((data) => data.owner);
+  return ownerAddresses.some((a) => lowerCaseEqual(a, owner));
 }

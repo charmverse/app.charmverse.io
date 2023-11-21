@@ -257,7 +257,7 @@
     "viem": "^1.18.3",
     "wagmi": "^1.4.5",
     "yup": "^0.32.11",
-    "zksync": "^0.13.1"
+    "zksync-web3": "^0.16.0"
   },
   "devDependencies": {
     "@depay/web3-mock": "^13.18.1",

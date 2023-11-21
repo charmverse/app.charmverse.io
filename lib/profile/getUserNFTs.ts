@@ -32,8 +32,6 @@ export const getUserNFTs = async (userId: string) => {
     wallets
   });
 
-  console.log({ nfts });
-
   return nfts.map((nft) => ({
     ...nft,
     isHidden: hiddenNftIds.includes(nft.id),

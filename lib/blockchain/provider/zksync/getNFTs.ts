@@ -1,31 +1,19 @@
 import type { UserWallet } from '@charmverse/core/prisma';
 
-import { fetchFileByHash } from 'lib/ipfs/fetchFileByHash';
-
 import type { NFTData } from '../../getNFTs';
 
 import { getClient } from './client';
-import { getNFT, mapNFTData } from './getNFT';
 
 export async function getNFTs({ wallets }: { wallets: Pick<UserWallet, 'address' | 'id'>[] }): Promise<NFTData[]> {
-  const mainnetClient = await getClient({ chainId: 324 });
+  const mainnetClient = getClient({ chainId: 324 });
+  const testnetClient = getClient({ chainId: 280 });
 
-  const walletStates = await Promise.all(wallets.map((w) => mainnetClient.getAccountState(w.address)));
-
-  console.log('States', JSON.stringify(walletStates, null, 2));
-
-  const allNfts = (
+  const nftData = (
     await Promise.all(
-      walletStates
-        .map((state) =>
-          Object.values(state.committed?.nfts ?? []).map((nft) =>
-            getNFT({ address: nft.address, tokenId: String(nft.serialId), chainId: 324 })
-          )
-        )
-        .flat()
+      wallets.map(({ address }) =>
+        Promise.all([mainnetClient, testnetClient].map((client) => client.getUserNfts({ walletAddress: address })))
+      )
     )
-  ).filter((value) => !!value) as NFTData[];
-
-  return allNfts;
+  ).flat(2);
+  return nftData;
 }
-getNFTs({ wallets: [{ address: '0xf729372576390685b1ed63802ab74e85c4aa0caa', id: '1' }] }).then(console.log);
