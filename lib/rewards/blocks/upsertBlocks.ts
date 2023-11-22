@@ -8,10 +8,10 @@ import type {
   RewardBlockWithTypedFields,
   RewardPropertyValues
 } from 'lib/rewards/blocks/interfaces';
-import { updateBlock } from 'lib/rewards/blocks/updateBlock';
+import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
 import { updateRewardSettings } from 'lib/rewards/updateRewardSettings';
 
-export async function updateBlocks({
+export async function upsertBlocks({
   blocksData,
   userId,
   spaceId
@@ -29,7 +29,7 @@ export async function updateBlocks({
         rewardId: reward.id,
         updateContent: {
           fields: {
-            ...reward.fields,
+            ...(reward.fields as RewardPropertyValues),
             properties: filterInternalProperties<Prisma.JsonValue>((reward.fields as RewardPropertyValues).properties)
           }
         }
@@ -42,7 +42,7 @@ export async function updateBlocks({
     throw error;
   }
 
-  return prisma.$transaction(blocks.map((data) => updateBlock({ data, userId, spaceId }))) as Promise<
+  return prisma.$transaction(blocks.map((data) => upsertBlock({ data, userId, spaceId }))) as Promise<
     RewardBlockWithTypedFields[]
   >;
 }

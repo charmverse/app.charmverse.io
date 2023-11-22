@@ -88,12 +88,10 @@ export function useUpdateProposalLensProperties({ proposalId }: { proposalId: st
   );
 }
 
-export function useCreateProposalBlocks(spaceId: string) {
-  return usePOST<ProposalBlockInput[], ProposalBlockWithTypedFields[]>(`/api/spaces/${spaceId}/proposals/blocks`);
-}
-
 export function useUpdateProposalBlocks(spaceId: string) {
-  return usePUT<ProposalBlockUpdateInput[], ProposalBlockWithTypedFields[]>(`/api/spaces/${spaceId}/proposals/blocks`);
+  return usePUT<(ProposalBlockUpdateInput | ProposalBlockInput)[], ProposalBlockWithTypedFields[]>(
+    `/api/spaces/${spaceId}/proposals/blocks`
+  );
 }
 
 export function useDeleteProposalBlocks(spaceId: string) {

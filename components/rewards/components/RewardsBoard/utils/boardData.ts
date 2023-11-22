@@ -38,12 +38,14 @@ export function getDefaultBoard({
 }) {
   const block: Partial<Block> = storedBoard
     ? blockToFBBlock(storedBoard)
-    : {
-        id: DEFAULT_BOARD_BLOCK_ID,
-        fields: {
-          cardProperties: []
+    : createBoard({
+        block: {
+          id: DEFAULT_BOARD_BLOCK_ID,
+          fields: {
+            cardProperties: []
+          }
         }
-      };
+      });
 
   const cardProperties = [...getDefaultProperties(), ...(block.fields?.cardProperties || [])];
 

@@ -38,14 +38,14 @@ export function useProposalsBoardAdapter() {
   const { proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
-  const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
+  const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
   // TODO - use different types of views (board, calendar)
   const localViewSettings = useLocalDbViewSettings(`proposals-${DEFAULT_VIEW_BLOCK_ID}`);
 
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
-    storedBoard: proposalPropertiesBlock,
+    storedBoard: proposalBoardBlock,
     categories
   });
 
@@ -54,7 +54,7 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ storedBoard: proposalPropertiesBlock, categories });
+      return getDefaultTableView({ storedBoard: proposalBoardBlock, categories });
     }
 
     const boardView = blockToFBBlock(viewBlock) as BoardView;
@@ -65,7 +65,7 @@ export function useProposalsBoardAdapter() {
     }
 
     return boardView;
-  }, [categories, proposalPropertiesBlock, proposalBlocks]);
+  }, [categories, proposalBoardBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -105,7 +105,7 @@ export function useProposalsBoardAdapter() {
   ]);
 
   const boardCustomProperties: Board = getDefaultBoard({
-    storedBoard: proposalPropertiesBlock,
+    storedBoard: proposalBoardBlock,
     customOnly: true,
     categories: []
   });

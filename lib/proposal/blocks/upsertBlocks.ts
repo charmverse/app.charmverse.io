@@ -8,10 +8,10 @@ import type {
   ProposalPropertiesField,
   ProposalPropertyValues
 } from 'lib/proposal/blocks/interfaces';
-import { updateBlock } from 'lib/proposal/blocks/updateBlock';
+import { upsertBlock } from 'lib/proposal/blocks/upsertBlock';
 import { updateProposal } from 'lib/proposal/updateProposal';
 
-export async function updateBlocks({
+export async function upsertBlocks({
   blocksData,
   userId,
   spaceId
@@ -42,7 +42,7 @@ export async function updateBlocks({
     throw error;
   }
 
-  return prisma.$transaction(blocks.map((data) => updateBlock({ data, userId, spaceId }))) as Promise<
+  return prisma.$transaction(blocks.map((data) => upsertBlock({ data, userId, spaceId }))) as Promise<
     ProposalBlockWithTypedFields[]
   >;
 }

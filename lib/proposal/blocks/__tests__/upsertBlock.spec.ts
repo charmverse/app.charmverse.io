@@ -1,13 +1,12 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
-import { createBlock } from 'lib/proposal/blocks/createBlock';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
+import { upsertBlock } from 'lib/proposal/blocks/upsertBlock';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
-describe('proposal blocks - createBlock', () => {
-  it('Should create properties block', async () => {
+describe('proposal blocks - upsertBlock', () => {
+  it('Should update properties block', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const propertiesData = {
@@ -35,19 +34,41 @@ describe('proposal blocks - createBlock', () => {
       }
     };
 
-    const block = await createBlock({
+    const block = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
     });
 
-    expect(block).toMatchObject(propertiesData);
+    const propertiesUpdateData = {
+      id: block.id,
+      spaceId: space.id,
+      title: 'Update',
+      type: 'board',
+      fields: {
+        cardProperties: [
+          {
+            id: v4(),
+            name: 'tagz',
+            type: 'select' as PropertyType,
+            options: [
+              { id: v4(), color: 'red', value: 'apple' },
+              { id: v4(), color: 'blue', value: 'orange' }
+            ]
+          }
+        ]
+      }
+    };
+
+    const updatedBlock = await upsertBlock({ data: propertiesUpdateData, userId: user.id, spaceId: space.id });
+
+    expect(updatedBlock).toMatchObject(propertiesUpdateData);
 
     const blocks = await getBlocks({
       spaceId: space.id
     });
 
-    expect(blocks).toMatchObject([propertiesData]);
+    expect(blocks).toMatchObject([propertiesUpdateData]);
   });
 
   it('Should update properties block if it already exists', async () => {
@@ -103,13 +124,13 @@ describe('proposal blocks - createBlock', () => {
       }
     };
 
-    const properties = await createBlock({
+    const properties = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
     });
 
-    const properties2 = await createBlock({
+    const properties2 = await upsertBlock({
       userId: user.id,
       data: propertiesData2,
       spaceId: space.id
@@ -123,40 +144,5 @@ describe('proposal blocks - createBlock', () => {
     });
 
     expect(blocks.length).toBe(1);
-  });
-
-  it('Should throw error input data is missing required fields', async () => {
-    const propertiesData = {
-      spaceId: '123',
-      title: 'Properties',
-      type: 'board',
-      fields: {
-        properties: [
-          {
-            id: v4(),
-            name: 'title',
-            type: 'string' as PropertyType,
-            options: []
-          },
-          {
-            id: v4(),
-            name: 'tag',
-            type: 'select' as PropertyType,
-            options: [
-              { id: v4(), color: 'red', value: 'apple' },
-              { id: v4(), color: 'blue', value: 'orange' }
-            ]
-          }
-        ]
-      }
-    };
-
-    await expect(
-      createBlock({ data: { ...propertiesData, type: '' } as any, userId: '123', spaceId: '123' })
-    ).rejects.toBeInstanceOf(InvalidInputError);
-
-    await expect(
-      createBlock({ data: { ...propertiesData, fields: null } as any, userId: '123', spaceId: '123' })
-    ).rejects.toBeInstanceOf(InvalidInputError);
   });
 });

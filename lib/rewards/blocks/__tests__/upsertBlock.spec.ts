@@ -1,13 +1,13 @@
 import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/focalboard/board';
-import { createBlock } from 'lib/rewards/blocks/createBlock';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { getBlocks } from 'lib/rewards/blocks/getBlocks';
-import { updateBlock } from 'lib/rewards/blocks/updateBlock';
+import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('reward blocks - updateBlock', () => {
-  it('Should update properties block', async () => {
+  it('Should create board block', async () => {
     const { user, space } = await generateUserAndSpaceWithApiToken();
 
     const propertiesData = {
@@ -35,7 +35,51 @@ describe('reward blocks - updateBlock', () => {
       }
     };
 
-    const block = await createBlock({
+    const block = await upsertBlock({
+      userId: user.id,
+      data: propertiesData,
+      spaceId: space.id
+    });
+
+    expect(block).toMatchObject(propertiesData);
+    expect(block.id).toBe('__defaultBoard');
+
+    const blocks = await getBlocks({
+      spaceId: space.id
+    });
+
+    expect(blocks).toMatchObject([propertiesData]);
+  });
+
+  it('Should update board block', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    const propertiesData = {
+      spaceId: space.id,
+      title: 'Properties',
+      type: 'board',
+      fields: {
+        cardProperties: [
+          {
+            id: v4(),
+            name: 'title',
+            type: 'string' as PropertyType,
+            options: []
+          },
+          {
+            id: v4(),
+            name: 'tag',
+            type: 'select' as PropertyType,
+            options: [
+              { id: v4(), color: 'red', value: 'apple' },
+              { id: v4(), color: 'blue', value: 'orange' }
+            ]
+          }
+        ]
+      }
+    };
+
+    const block = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
@@ -61,7 +105,7 @@ describe('reward blocks - updateBlock', () => {
       }
     };
 
-    const updatedBlock = await updateBlock({ data: propertiesUpdateData, userId: user.id, spaceId: space.id });
+    const updatedBlock = await upsertBlock({ data: propertiesUpdateData, userId: user.id, spaceId: space.id });
 
     expect(updatedBlock).toMatchObject(propertiesUpdateData);
 
@@ -125,13 +169,58 @@ describe('reward blocks - updateBlock', () => {
       }
     };
 
-    const properties = await createBlock({
+    const properties = await upsertBlock({
       userId: user.id,
       data: propertiesData,
       spaceId: space.id
     });
 
-    const properties2 = await createBlock({
+    const properties2 = await upsertBlock({
+      userId: user.id,
+      data: propertiesData2,
+      spaceId: space.id
+    });
+
+    expect(properties2.id).toEqual(properties.id);
+    expect(properties2.fields).toMatchObject(propertiesData2.fields);
+
+    const blocks = await getBlocks({
+      spaceId: space.id
+    });
+
+    expect(blocks.length).toBe(1);
+  });
+
+  it('Should update view block if it already exists', async () => {
+    const { user, space } = await generateUserAndSpaceWithApiToken();
+
+    const propertiesData = {
+      spaceId: space.id,
+      id: '__defaultView',
+      title: 'Properties',
+      type: 'view',
+      fields: {
+        sortOrder: [{ propertyId: '__title', reversed: true }]
+      } as unknown as BoardViewFields
+    };
+
+    const propertiesData2 = {
+      spaceId: space.id,
+      title: 'Properties 2',
+      id: '__defaultView',
+      type: 'view',
+      fields: {
+        sortOrder: [{ propertyId: '__title', reversed: false }]
+      } as unknown as BoardViewFields
+    };
+
+    const properties = await upsertBlock({
+      userId: user.id,
+      data: propertiesData,
+      spaceId: space.id
+    });
+
+    const properties2 = await upsertBlock({
       userId: user.id,
       data: propertiesData2,
       spaceId: space.id

@@ -1,21 +1,24 @@
 import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import type { ProposalBlock } from '@charmverse/core/prisma-client';
 
+import type { BoardFields } from 'lib/focalboard/board';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
+
 export type ProposalPropertyOption = { id: string; color: string; value: string };
 
 export type ProposalPropertyField = { id: string; name: string; type: string; options: ProposalPropertyOption[] };
 
-export type ProposalPropertiesBlockFields = {
+export type ProposalBoardBlockFields = {
   cardProperties: ProposalPropertyField[];
 };
 // Properties block with typed fields
-export type ProposalPropertiesBlock = ProposalBlock & {
-  fields: ProposalPropertiesBlockFields;
+export type ProposalBoardBlock = ProposalBlock & {
+  fields: ProposalBoardBlockFields;
   type: 'board';
 };
 
 // TODO: Add other block types i.e. view.
-export type ProposalBlockWithTypedFields = ProposalPropertiesBlock;
+export type ProposalBlockWithTypedFields = ProposalBoardBlock;
 
 export type ProposalPropertyValue = string | string[] | number | TargetPermissionGroup<'user' | 'role'>[];
 
@@ -33,7 +36,7 @@ export type ProposalBlockInput = {
   spaceId?: string;
   title?: string;
   schema?: number;
-  fields?: ProposalPropertiesBlockFields | ProposalPropertyValues;
+  fields?: ProposalBoardBlockFields | ProposalPropertyValues | BoardFields | BoardViewFields;
   parentId?: string;
   rootId?: string;
 };
