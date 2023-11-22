@@ -1,0 +1,154 @@
+import type {
+  AuthSig,
+  JsonSigningResourceId,
+  JsonStoreSigningRequest,
+  UnifiedAccessControlConditions
+} from '@lit-protocol/types';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
+import { mutate } from 'swr';
+import { v4 as uuid } from 'uuid';
+
+import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
+import { useCreateLitToken, useCreateTokenGate } from 'charmClient/hooks/tokengates';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useWeb3Account } from 'hooks/useWeb3Account';
+
+import { createAuthSigs, getAllChains } from '../utils/helpers';
+
+export type DisplayedPage = 'tokens' | 'collectables' | 'advanced' | 'home' | 'review';
+export type Flow = 'singleCondition' | 'multipleConditions';
+
+export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions'> & {
+  authSigTypes: string[];
+  chains: string[];
+  permanent: true;
+};
+
+type IContext = {
+  handleUnifiedAccessControlConditions: (conditions: UnifiedAccessControlConditions) => void;
+  createUnifiedAccessControlConditions: () => Promise<void>;
+  unifiedAccessControlConditions: UnifiedAccessControlConditions;
+  flow: Flow;
+  setFlow: (flow: Flow) => void;
+  resetModal: () => void;
+  displayedPage: DisplayedPage;
+  setDisplayedPage: (page: DisplayedPage) => void;
+  loadingToken: boolean;
+  error?: string;
+};
+
+export const TokenGateModalContext = createContext<Readonly<IContext>>({
+  handleUnifiedAccessControlConditions: () => undefined,
+  createUnifiedAccessControlConditions: async () => undefined,
+  unifiedAccessControlConditions: [],
+  flow: 'singleCondition',
+  setFlow: () => undefined,
+  resetModal: () => undefined,
+  displayedPage: 'home',
+  setDisplayedPage: () => undefined,
+  loadingToken: false,
+  error: undefined
+});
+
+export function TokenGateModalProvider({ children }: { children: ReactNode }) {
+  const [displayedPage, setDisplayedPage] = useState<DisplayedPage>('home');
+  const [unifiedAccessControlConditions, setUnifiedAccessControlConditions] = useState<UnifiedAccessControlConditions>(
+    []
+  );
+  const litClient = useLitProtocol();
+  const { error: tokenError, isMutating: tokenLoading, trigger: triggerToken } = useCreateTokenGate();
+  const { error: litError, isMutating: litLoading, trigger: triggerLitToken } = useCreateLitToken(litClient);
+  const [flow, setFlow] = useState<Flow>('singleCondition');
+  const { walletAuthSignature, requestSignature } = useWeb3Account();
+  const { space } = useCurrentSpace();
+  const spaceId = space?.id || '';
+
+  const handleUnifiedAccessControlConditions = (conditions: UnifiedAccessControlConditions) => {
+    setUnifiedAccessControlConditions((prevState) => [...prevState, ...conditions]);
+  };
+
+  const clearAllAccessControlConditions = () => {
+    setUnifiedAccessControlConditions([]);
+  };
+
+  const resetModal = () => {
+    setFlow('singleCondition');
+    setDisplayedPage('home');
+    clearAllAccessControlConditions();
+  };
+
+  const createUnifiedAccessControlConditions = async () => {
+    const authSigTypes = createAuthSigs(unifiedAccessControlConditions);
+    const chains = getAllChains(unifiedAccessControlConditions);
+
+    const conditions: ConditionsModalResult = {
+      unifiedAccessControlConditions,
+      permanent: true,
+      chains,
+      authSigTypes
+    };
+
+    const tokenGateId = uuid();
+    const resourceId: JsonSigningResourceId = {
+      baseUrl: 'https://app.charmverse.io',
+      path: `${Math.random()}`,
+      orgId: spaceId,
+      role: 'member',
+      extraData: JSON.stringify({
+        tokenGateId
+      })
+    };
+
+    const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
+
+    const litSuccess = await triggerLitToken({
+      unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
+      chain: authSigTypes[0], // etherum or solana
+      authSig,
+      resourceId
+    });
+
+    if (litSuccess) {
+      await triggerToken({
+        conditions,
+        resourceId,
+        spaceId,
+        id: tokenGateId
+      });
+
+      mutate(`tokenGates/${spaceId}`);
+    }
+
+    resetModal();
+  };
+
+  const value = useMemo(
+    () => ({
+      handleUnifiedAccessControlConditions,
+      createUnifiedAccessControlConditions,
+      resetModal,
+      setDisplayedPage,
+      setFlow,
+      unifiedAccessControlConditions,
+      displayedPage,
+      flow,
+      loadingToken: tokenLoading || litLoading,
+      error: tokenError?.message || litError?.message
+    }),
+    [
+      flow,
+      unifiedAccessControlConditions,
+      displayedPage,
+      tokenLoading,
+      litLoading,
+      tokenError?.message,
+      litError?.message,
+      resetModal
+    ]
+  );
+
+  return <TokenGateModalContext.Provider value={value}>{children}</TokenGateModalContext.Provider>;
+}
+
+export const useTokenGateModal = () => useContext(TokenGateModalContext);

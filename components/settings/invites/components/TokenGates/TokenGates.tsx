@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma';
 import type { JsonSigningResourceId } from '@lit-protocol/types';
 import { debounce } from 'lodash';
 import type { PopupState } from 'material-ui-popup-state/hooks';
@@ -13,6 +14,9 @@ import { LitShareModal } from 'components/common/LitProtocolModal';
 import type { ConditionsModalResult } from 'components/common/LitProtocolModal/shareModal/ShareModal';
 import Modal, { ErrorModal } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
+import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
+import { isProdEnv } from 'config/constants';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 
@@ -21,13 +25,13 @@ import TokenGatesTable from './components/TokenGatesTable';
 interface TokenGatesProps {
   popupState: PopupState;
   isAdmin: boolean;
-  spaceId: string;
+  space: Space;
 }
 
-export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
+export function TokenGates({ isAdmin, space, popupState }: TokenGatesProps) {
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const [removedTokenGateId, setRemovedTokenGate] = useState<string | null>(null);
-
+  const spaceId = space.id;
   const litClient = useLitProtocol();
   const { walletAuthSignature, requestSignature, chainId } = useWeb3Account();
   const errorPopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-error' });
@@ -103,8 +107,14 @@ export function TokenGates({ isAdmin, spaceId, popupState }: TokenGatesProps) {
           mutate();
         }}
       />
-      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} noPadding size='large'>
-        <LitShareModal onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any} />
+      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} size='large'>
+        <TokenGateModalProvider>
+          {isProdEnv && !space.name.startsWith('cvt-') ? (
+            <LitShareModal onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any} />
+          ) : (
+            <TokenGateModal />
+          )}
+        </TokenGateModalProvider>
       </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
       {removedTokenGateId && (

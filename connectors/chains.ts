@@ -454,3 +454,13 @@ export function getChainExplorerLink(
   log.warn('Mising chain explorer link for network', { chainId, endpoint });
   return '';
 }
+
+export type IChainDetailsWithLit = IChainDetails & { litNetwork: NonNullable<IChainDetails['litNetwork']> };
+
+export const litChainList: IChainDetailsWithLit[] = RPCList.filter(
+  (chain): chain is IChainDetailsWithLit => !!chain.litNetwork
+);
+
+export const getChainDetailsFromLitNetwork = (network?: string) => {
+  return litChainList.find((chain) => chain.litNetwork === network);
+};
