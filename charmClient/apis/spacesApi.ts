@@ -86,6 +86,10 @@ export class SpacesApi {
     return http.GET<BlockCountInfo>(`/api/spaces/${spaceId}/block-count`);
   }
 
+  getAdditionalBlockQuota({ spaceId }: { spaceId: string }) {
+    return http.GET<number>(`/api/spaces/${spaceId}/additional-block-quota`);
+  }
+
   updateCustomDomain({ spaceId, customDomain }: { spaceId: string; customDomain: string | null }) {
     return http.PUT<UpdateCustomDomainResponse>(`/api/spaces/${spaceId}/custom-domain`, { customDomain });
   }
