@@ -383,10 +383,6 @@ class CharmClient {
     return http.POST('/api/payment-methods', paymentMethod);
   }
 
-  listPaymentMethods(spaceId: string): Promise<PaymentMethod[]> {
-    return http.GET('/api/payment-methods', { spaceId });
-  }
-
   deletePaymentMethod(paymentMethodId: string) {
     return http.DELETE(`/api/payment-methods/${paymentMethodId}`);
   }

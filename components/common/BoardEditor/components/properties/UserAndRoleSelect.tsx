@@ -1,7 +1,6 @@
 import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import type { SxProps } from '@mui/material';
 import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -78,6 +77,7 @@ function SelectedOptions({
         width={wrapColumn ? '100%' : 'min-content'}
         flexDirection='row'
         gap={1}
+        rowGap={0.5}
         flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
       >
         {value.map((option) => {
@@ -134,7 +134,7 @@ function SelectedOptions({
 
 type Props = {
   emptyPlaceholderContent?: string;
-  displayType?: 'details';
+  displayType?: PropertyValueDisplayType;
   onChange: (value: GroupedOptionPopulated[]) => void;
   proposalCategoryId?: string | null;
   readOnly?: boolean;

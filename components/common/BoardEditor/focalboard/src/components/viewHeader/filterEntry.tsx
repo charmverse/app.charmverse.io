@@ -17,6 +17,7 @@ import {
   Typography
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
+import { RPCList, getChainById } from 'connectors/chains';
 import { debounce } from 'lodash';
 import type { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
@@ -36,7 +37,7 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID, AUTHORS_BLOCK_ID } from 'lib/proposal/bloc
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
-import { iconForPropertyType } from './viewHeaderPropertiesMenu';
+import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 type Props = {
   properties: IPropertyTemplate[];
@@ -95,6 +96,7 @@ function FilterPropertyValue({
     filter.propertyId === PROPOSAL_REVIEWERS_BLOCK_ID ||
     filter.propertyId === AUTHORS_BLOCK_ID;
   const isPropertyTypeMultiSelect = propertyRecord[filter.propertyId].type === 'multiSelect';
+  const isPropertyTypeTokenChain = propertyRecord[filter.propertyId].type === 'tokenChain';
   const property = propertyRecord[filter.propertyId];
 
   useEffect(() => {
@@ -264,6 +266,38 @@ function FilterPropertyValue({
             return (
               <MenuItem value={member.id} key={member.id}>
                 <UserDisplay user={member} />
+              </MenuItem>
+            );
+          })}
+        </Select>
+      );
+    } else if (isPropertyTypeTokenChain) {
+      return (
+        <Select<string[]>
+          size='small'
+          multiple
+          displayEmpty
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(chainIds) => {
+            return chainIds.length === 0 ? (
+              <Typography color='secondary' fontSize='small'>
+                Select a blockchain
+              </Typography>
+            ) : (
+              <SelectMenuItemsContainer>
+                {chainIds.map((chainId) => {
+                  const chain = getChainById(parseInt(chainId, 10));
+                  return <Chip key={chainId} size='small' label={chain?.chainName} />;
+                })}
+              </SelectMenuItemsContainer>
+            );
+          }}
+        >
+          {RPCList.map((chain) => {
+            return (
+              <MenuItem value={chain.chainId.toString()} key={chain.chainId}>
+                <Chip size='small' label={chain.chainName} />
               </MenuItem>
             );
           })}

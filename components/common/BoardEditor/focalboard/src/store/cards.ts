@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
+import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -216,7 +217,7 @@ export function sortCards(
         }
 
         let result = 0;
-        if (template.type === 'number' || template.type === 'date') {
+        if (template.type === 'number' || template.type === 'date' || template.type === 'tokenAmount') {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
             return -1;
@@ -268,6 +269,11 @@ export function sortCards(
           if (template.type === 'select' || template.type === 'multiSelect') {
             aValue = template.options.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
             bValue = template.options.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
+          }
+
+          if (template.type === 'tokenChain') {
+            aValue = tokenChainOptions.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
+            bValue = tokenChainOptions.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
           }
 
           if (result === 0) {

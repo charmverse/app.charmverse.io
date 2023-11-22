@@ -1,41 +1,22 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
-import charmClient from 'charmClient';
+import { useGetPaymentMethods } from 'charmClient/hooks/spaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
-type IContext = [
-  paymentMethods: PaymentMethod[],
-  setPaymentMethods: Dispatch<SetStateAction<PaymentMethod[]>>,
-  refreshPaymentMethods: () => void
-];
+type IContext = [paymentMethods: PaymentMethod[], refreshPaymentMethods: () => void];
 
-export const PaymentMethodsContext = createContext<Readonly<IContext>>([[], () => undefined, () => {}]);
+export const PaymentMethodsContext = createContext<Readonly<IContext>>([[], () => {}]);
 
 export function PaymentMethodsProvider({ children }: { children: ReactNode }) {
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const { space } = useCurrentSpace();
-
-  useEffect(() => {
-    refreshPaymentMethods();
-  }, [space]);
-
-  function refreshPaymentMethods() {
-    if (space) {
-      charmClient
-        .listPaymentMethods(space.id)
-        .then((_paymentMethods) => {
-          setPaymentMethods(_paymentMethods);
-        })
-        .catch(() => {});
-    }
-  }
+  const { data: paymentMethods, mutate: mutatePaymentMethods } = useGetPaymentMethods(space?.id);
 
   const value = useMemo(() => {
-    return [paymentMethods, setPaymentMethods, refreshPaymentMethods] as const;
-  }, [paymentMethods, space]);
+    return [paymentMethods || [], mutatePaymentMethods] as const;
+  }, [paymentMethods, mutatePaymentMethods]);
 
   return <PaymentMethodsContext.Provider value={value}>{children}</PaymentMethodsContext.Provider>;
 }
