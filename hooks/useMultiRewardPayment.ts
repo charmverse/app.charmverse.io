@@ -29,7 +29,7 @@ export interface TransactionWithMetadata
   title: string;
 }
 
-export function useMultiBountyPayment({
+export function useMultiRewardPayment({
   rewards,
   postPaymentSuccess
 }: {
