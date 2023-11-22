@@ -1,4 +1,12 @@
-import type { MemberProperty, MemberPropertyPermission, Role, Space, User } from '@charmverse/core/prisma-client';
+import type {
+  MemberProperty,
+  MemberPropertyPermission,
+  ProposalBlock,
+  RewardBlock,
+  Role,
+  Space,
+  User
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers } from '@charmverse/core/test';
 
@@ -12,6 +20,12 @@ describe('exportSpaceSettings', () => {
   let space: Space;
   let role: Role;
   let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
+
+  let customProposalBlockBoard: ProposalBlock;
+  let customProposalBlockView: ProposalBlock;
+
+  let customRewardBlockBoard: RewardBlock;
+  let customRewardBlockView: RewardBlock;
 
   beforeAll(async () => {
     ({ user, space } = await generateUserAndSpace({ isAdmin: true }));
@@ -104,6 +118,137 @@ describe('exportSpaceSettings', () => {
         permissions: true
       }
     });
+
+    [customProposalBlockBoard, customProposalBlockView, customRewardBlockBoard, customRewardBlockView] =
+      await Promise.all([
+        prisma.proposalBlock.create({
+          data: {
+            id: '__defaultBoard',
+            title: '',
+            parentId: '',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'board',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              icon: '',
+              viewIds: [],
+              isTemplate: false,
+              description: '',
+              headerImage: null,
+              cardProperties: [
+                { id: 'c9db9654-65db-4a34-98d5-faf13cb571dd', name: 'Person', type: 'person', options: [] }
+              ],
+              showDescription: false,
+              columnCalculations: []
+            }
+          }
+        }),
+        prisma.proposalBlock.create({
+          data: {
+            id: '__defaultView',
+            title: '',
+            parentId: '__defaultBoard',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'view',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              filter: { filters: [], operation: 'and' },
+              viewType: 'table',
+              cardOrder: [],
+              openPageIn: 'center_peek',
+              sortOptions: [{ reversed: false, propertyId: '__title' }],
+              columnWidths: { __title: 400, __status: 150, __authors: 150, __category: 200, __reviewers: 150 },
+              hiddenOptionIds: [],
+              columnWrappedIds: [],
+              visibleOptionIds: [],
+              defaultTemplateId: '',
+              collapsedOptionIds: [],
+              columnCalculations: {},
+              kanbanCalculations: {},
+              visiblePropertyIds: ['__category', '__status', '__evaluationType', '__authors', '__reviewers']
+            }
+          }
+        }),
+        prisma.rewardBlock.create({
+          data: {
+            id: '__defaultBoard',
+            title: '',
+            parentId: '',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'board',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              icon: '',
+              viewIds: [],
+              isTemplate: false,
+              description: '',
+              headerImage: null,
+              cardProperties: [
+                { id: '5234ba6a-c6ac-4202-ba81-f14fb2e4cbe8', name: 'Person', type: 'person', options: [] }
+              ],
+              showDescription: false,
+              columnCalculations: []
+            }
+          }
+        }),
+        prisma.rewardBlock.create({
+          data: {
+            id: '__defaultView',
+            title: '',
+            parentId: '__defaultBoard',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'view',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              filter: { filters: [], operation: 'and' },
+              viewType: 'table',
+              cardOrder: [],
+              openPageIn: 'center_peek',
+              sortOptions: [{ reversed: false, propertyId: '__title' }],
+              columnWidths: {
+                __limit: 150,
+                __title: 400,
+                __available: 150,
+                __reviewers: 150,
+                __applicants: 200,
+                __rewardChain: 150,
+                __rewardAmount: 150,
+                __rewardStatus: 150,
+                __rewardCustomValue: 150
+              },
+              hiddenOptionIds: [],
+              columnWrappedIds: ['__title'],
+              visibleOptionIds: [],
+              defaultTemplateId: '',
+              collapsedOptionIds: [],
+              columnCalculations: {},
+              kanbanCalculations: {},
+              visiblePropertyIds: [
+                '__limit',
+                '__applicants',
+                '__reviewers',
+                '__available',
+                '__rewardStatus',
+                '__rewardAmount',
+                '__rewardChain',
+                '__rewardCustomValue'
+              ]
+            }
+          }
+        })
+      ]);
   });
 
   it('should export space settings correctly', async () => {
@@ -111,6 +256,8 @@ describe('exportSpaceSettings', () => {
 
     expect(exportedSettings).toMatchObject<{ space: SpaceSettingsExport }>({
       space: {
+        proposalBlocks: expect.arrayContaining<ProposalBlock>([customProposalBlockBoard, customProposalBlockView]),
+        rewardBlocks: expect.arrayContaining<RewardBlock>([customRewardBlockBoard, customRewardBlockView]),
         notificationToggles: space.notificationToggles,
         features: space.features,
         memberProfiles: space.memberProfiles,

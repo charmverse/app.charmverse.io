@@ -7,8 +7,11 @@ import type {
   Space
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
+import type { Board, BoardFields } from 'lib/focalboard/board';
+import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
@@ -58,6 +61,19 @@ export async function importSpaceSettings({
       .filter((perm) => !!perm.roleId);
   });
 
+  const [existingProposalBlocks, existingRewardBlocks] = await Promise.all([
+    prisma.proposalBlock.findMany({
+      where: {
+        spaceId: targetSpace.id
+      }
+    }),
+    prisma.rewardBlock.findMany({
+      where: {
+        spaceId: targetSpace.id
+      }
+    })
+  ]);
+
   await prisma.$transaction([
     prisma.space.update({
       where: {
@@ -75,35 +91,122 @@ export async function importSpaceSettings({
     prisma.memberPropertyPermission.createMany({
       data: permissionsToCreate
     }),
-    ...rewardBlocks.map((b) =>
-      prisma.rewardBlock.upsert({
+    ...rewardBlocks.map((b) => {
+      const matchingBlock = existingRewardBlocks.find((existingBlock) => existingBlock.id === b.id);
+
+      const fields =
+        b.type === 'board'
+          ? ({
+              ...(matchingBlock?.fields as any),
+              ...(b.fields as any),
+              cardProperties: mergeArrayWithoutDuplicates(
+                [
+                  ...((b.fields as any as BoardFields)?.cardProperties ?? []),
+                  ...((matchingBlock?.fields as any as BoardFields)?.cardProperties ?? [])
+                ],
+                'id'
+              ),
+              viewIds: arrayUtils.uniqueValues([
+                ...((b.fields as any as BoardFields).viewIds ?? []),
+                ...((matchingBlock?.fields as any as BoardFields)?.viewIds ?? [])
+              ])
+            } as BoardFields)
+          : b.type === 'view'
+          ? ({
+              ...(matchingBlock?.fields as any),
+              ...(b.fields as any),
+              sortOptions: mergeArrayWithoutDuplicates(
+                [
+                  ...((matchingBlock?.fields as any as BoardViewFields)?.sortOptions ?? []),
+                  ...((b.fields as any as BoardViewFields)?.sortOptions ?? [])
+                ],
+                'propertyId'
+              ),
+              columnWidths: {
+                ...(matchingBlock?.fields as any as BoardViewFields)?.columnWidths,
+                ...(b?.fields as any as BoardViewFields)?.columnWidths
+              },
+              visiblePropertyIds: arrayUtils.uniqueValues([
+                ...((b.fields as any as BoardViewFields).visiblePropertyIds ?? []),
+                ...((matchingBlock?.fields as any as BoardViewFields)?.visiblePropertyIds ?? [])
+              ])
+            } as BoardViewFields)
+          : {};
+
+      return prisma.rewardBlock.upsert({
         where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },
         create: {
           ...(b as any),
-          id: uuid(),
+          id: stringUtils.isUUID(b.id) ? uuid() : b.id,
           createdAt: new Date(),
           updatedAt: new Date(),
           rootId: targetSpace.id,
           spaceId: targetSpace.id,
-          createdBy: targetSpace.createdBy
+          createdBy: targetSpace.createdBy,
+          updatedBy: targetSpace.createdBy,
+          fields
         },
-        update: { fields: b.fields as Prisma.InputJsonValue, updatedAt: new Date() }
-      })
-    ),
-    ...proposalBlocks.map((b) =>
-      prisma.proposalBlock.upsert({
+        update: { fields, updatedAt: new Date() }
+      });
+    }),
+    ...proposalBlocks.map((b) => {
+      const matchingBlock = existingProposalBlocks.find((existingBlock) => existingBlock.id === b.id);
+
+      const fields =
+        b.type === 'board'
+          ? ({
+              ...(matchingBlock?.fields as any),
+              ...(b.fields as any),
+              cardProperties: mergeArrayWithoutDuplicates(
+                [
+                  ...((b.fields as any as BoardFields)?.cardProperties ?? []),
+                  ...((matchingBlock?.fields as any as BoardFields)?.cardProperties ?? [])
+                ],
+                'id'
+              ),
+              viewIds: arrayUtils.uniqueValues([
+                ...((b.fields as any as BoardFields).viewIds ?? []),
+                ...((matchingBlock?.fields as any as BoardFields)?.viewIds ?? [])
+              ])
+            } as BoardFields)
+          : b.type === 'view'
+          ? ({
+              ...(matchingBlock?.fields as any),
+              ...(b.fields as any),
+              sortOptions: mergeArrayWithoutDuplicates(
+                [
+                  ...((matchingBlock?.fields as any as BoardViewFields)?.sortOptions ?? []),
+                  ...((b.fields as any as BoardViewFields)?.sortOptions ?? [])
+                ],
+                'propertyId'
+              ),
+              columnWidths: {
+                ...(matchingBlock?.fields as any as BoardViewFields)?.columnWidths,
+                ...(b?.fields as any as BoardViewFields)?.columnWidths
+              },
+              visiblePropertyIds: arrayUtils.uniqueValues([
+                ...((b.fields as any as BoardViewFields).visiblePropertyIds ?? []),
+                ...((matchingBlock?.fields as any as BoardViewFields)?.visiblePropertyIds ?? [])
+              ])
+            } as BoardViewFields)
+          : {};
+
+      return prisma.proposalBlock.upsert({
         where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },
         create: {
           ...(b as any),
-          id: uuid(),
+          id: stringUtils.isUUID(b.id) ? uuid() : b.id,
           createdAt: new Date(),
           updatedAt: new Date(),
+          rootId: targetSpace.id,
           spaceId: targetSpace.id,
-          createdBy: targetSpace.createdBy
+          createdBy: targetSpace.createdBy,
+          updatedBy: targetSpace.createdBy,
+          fields
         },
-        update: { fields: b.fields as Prisma.InputJsonValue, updatedAt: new Date() }
-      })
-    )
+        update: { fields, updatedAt: new Date() }
+      });
+    })
   ]);
 
   return prisma.space.findUniqueOrThrow({
@@ -115,7 +218,22 @@ export async function importSpaceSettings({
         include: {
           permissions: true
         }
-      }
+      },
+      proposalBlocks: true,
+      rewardBlocks: true
     }
   });
+}
+
+function mergeArrayWithoutDuplicates<T>(arr: T[], key: keyof T): T[] {
+  const result: T[] = [];
+
+  arr.forEach((item) => {
+    const existingItem = result.find((r) => r[key] === item[key]);
+    if (!existingItem) {
+      result.push({ ...item });
+    }
+  });
+
+  return result;
 }
