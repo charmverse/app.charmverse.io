@@ -29,17 +29,9 @@ const pagesSlice = createSlice({
         }
       }
     },
-    updatePage: (state, { payload }: PayloadAction<Partial<PageMeta>>) => {
-      if (payload.id) {
-        const page = state.pages[payload.id];
-        if (page) {
-          state.pages[payload.id] = { ...page, ...payload };
-        }
-      }
-    },
-    deletePages: (state, action: PayloadAction<Pick<PageMeta, 'id'>[]>) => {
-      action.payload.forEach((deletedPage) => {
-        delete state.pages[deletedPage.id];
+    deletePages: (state, action: PayloadAction<string[]>) => {
+      action.payload.forEach((deletedPageId) => {
+        delete state.pages[deletedPageId];
       });
     }
   },
@@ -51,5 +43,5 @@ const pagesSlice = createSlice({
   }
 });
 
-export const { updatePage, updatePages, addPage, deletePages } = pagesSlice.actions;
+export const { updatePages, addPage, deletePages } = pagesSlice.actions;
 export const { reducer } = pagesSlice;

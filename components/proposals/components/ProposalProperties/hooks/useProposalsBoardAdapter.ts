@@ -18,6 +18,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
   CATEGORY_BLOCK_ID,
@@ -151,6 +152,7 @@ function mapProposalToCardPage({
 
   proposalFields.properties = {
     ...proposalFields.properties,
+    [Constants.titleColumnId]: proposalPage?.title || '',
     // add default field values on the fly
     [CREATED_AT_ID]:
       proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt

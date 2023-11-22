@@ -9,12 +9,12 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import type { Member } from 'lib/members/interfaces';
-import type { PagesMap } from 'lib/pages';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad, pagesLoad } from './databaseBlocksLoad';
+import { addPage, deletePages, updatePages } from './pages';
 
 import type { RootState } from './index';
 
@@ -106,6 +106,41 @@ const cardsSlice = createSlice({
         const cardPage = action.payload[card.id];
         if (cardPage) {
           card.fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
+        }
+      }
+    });
+
+    builder.addCase(addPage, (state, action) => {
+      const card = state.cards[action.payload.id];
+      if (card) {
+        card.fields.properties[Constants.titleColumnId] = action.payload.title ?? '';
+      }
+    });
+
+    builder.addCase(updatePages, (state, action) => {
+      for (const page of action.payload) {
+        if (page.deletedAt) {
+          delete state.cardPages[page.id];
+        } else {
+          state.cardPages[page.id] = { title: page.title };
+        }
+      }
+      for (const card of Object.values(state.cards)) {
+        const cardPage = action.payload.find((p) => p.id === card.id);
+        if (cardPage) {
+          card.fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
+        }
+      }
+    });
+
+    builder.addCase(deletePages, (state, action) => {
+      action.payload.forEach((deletedPageId) => {
+        delete state.cardPages[deletedPageId];
+      });
+      for (const card of Object.values(state.cards)) {
+        const cardPage = action.payload.find((pid) => pid === card.id);
+        if (cardPage) {
+          card.fields.properties[Constants.titleColumnId] = '';
         }
       }
     });
