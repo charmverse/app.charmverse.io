@@ -337,7 +337,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                 snapshotProposalId={page.snapshotProposalId}
                 onParticipantUpdate={onParticipantUpdate}
                 style={{
-                  minHeight: proposalId ? '100px' : 'unset'
+                  // 5 lines
+                  minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
                 }}
                 disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
                 allowClickingFooter={true}
