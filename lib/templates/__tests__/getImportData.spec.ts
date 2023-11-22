@@ -21,6 +21,15 @@ describe('getImportData', () => {
     ({ space } = await testUtilsUser.generateUserAndSpace());
 
     validExportData = {
+      posts: [],
+      space: {
+        features: [],
+        memberProfiles: [],
+        memberProperties: [],
+        notificationToggles: [],
+        proposalBlocks: [],
+        rewardBlocks: []
+      },
       pages: [],
       roles: [],
       postCategories: [],
