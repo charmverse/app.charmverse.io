@@ -8,8 +8,11 @@ import type {
 import type {
   MemberProperty,
   MemberPropertyPermission,
+  Post,
   PostCategory,
+  ProposalBlock,
   ProposalCategory,
+  RewardBlock,
   Role,
   Space,
   User
@@ -44,12 +47,19 @@ describe('exportSpaceData', () => {
   let proposalCategory3WithRolePermissions: ProposalCategory;
   let postCategoryWithPermissions: PostCategory;
 
+  let posts: Post[];
+
   let proposalInCategory1: ExportedPage;
 
   let proposalInCategory2: ExportedPage;
   let proposalInCategory3: ExportedPage;
 
   let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
+  let customProposalBlockBoard: ProposalBlock;
+  let customProposalBlockView: ProposalBlock;
+
+  let customRewardBlockBoard: RewardBlock;
+  let customRewardBlockView: RewardBlock;
 
   beforeAll(async () => {
     ({ space, user } = await testUtilsUser.generateUserAndSpace());
@@ -131,6 +141,13 @@ describe('exportSpaceData', () => {
         ]
       })
     ]);
+
+    posts = await testUtilsForum.generateForumPosts({
+      count: 3,
+      createdBy: space.createdBy,
+      spaceId: space.id,
+      categoryId: postCategoryWithPermissions.id
+    });
 
     proposalCategoryPermissions = await prisma.proposalCategoryPermission
       .findMany({
@@ -303,6 +320,137 @@ describe('exportSpaceData', () => {
         permissions: true
       }
     });
+
+    [customProposalBlockBoard, customProposalBlockView, customRewardBlockBoard, customRewardBlockView] =
+      await Promise.all([
+        prisma.proposalBlock.create({
+          data: {
+            id: '__defaultBoard',
+            title: '',
+            parentId: '',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'board',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              icon: '',
+              viewIds: [],
+              isTemplate: false,
+              description: '',
+              headerImage: null,
+              cardProperties: [
+                { id: 'c9db9654-65db-4a34-98d5-faf13cb571dd', name: 'Person', type: 'person', options: [] }
+              ],
+              showDescription: false,
+              columnCalculations: []
+            }
+          }
+        }),
+        prisma.proposalBlock.create({
+          data: {
+            id: '__defaultView',
+            title: '',
+            parentId: '__defaultBoard',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'view',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              filter: { filters: [], operation: 'and' },
+              viewType: 'table',
+              cardOrder: [],
+              openPageIn: 'center_peek',
+              sortOptions: [{ reversed: false, propertyId: '__title' }],
+              columnWidths: { __title: 400, __status: 150, __authors: 150, __category: 200, __reviewers: 150 },
+              hiddenOptionIds: [],
+              columnWrappedIds: [],
+              visibleOptionIds: [],
+              defaultTemplateId: '',
+              collapsedOptionIds: [],
+              columnCalculations: {},
+              kanbanCalculations: {},
+              visiblePropertyIds: ['__category', '__status', '__evaluationType', '__authors', '__reviewers']
+            }
+          }
+        }),
+        prisma.rewardBlock.create({
+          data: {
+            id: '__defaultBoard',
+            title: '',
+            parentId: '',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'board',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              icon: '',
+              viewIds: [],
+              isTemplate: false,
+              description: '',
+              headerImage: null,
+              cardProperties: [
+                { id: '5234ba6a-c6ac-4202-ba81-f14fb2e4cbe8', name: 'Person', type: 'person', options: [] }
+              ],
+              showDescription: false,
+              columnCalculations: []
+            }
+          }
+        }),
+        prisma.rewardBlock.create({
+          data: {
+            id: '__defaultView',
+            title: '',
+            parentId: '__defaultBoard',
+            rootId: space.id,
+            spaceId: space.id,
+            type: 'view',
+            schema: 1,
+            createdBy: space.createdBy,
+            updatedBy: space.createdBy,
+            fields: {
+              filter: { filters: [], operation: 'and' },
+              viewType: 'table',
+              cardOrder: [],
+              openPageIn: 'center_peek',
+              sortOptions: [{ reversed: false, propertyId: '__title' }],
+              columnWidths: {
+                __limit: 150,
+                __title: 400,
+                __available: 150,
+                __reviewers: 150,
+                __applicants: 200,
+                __rewardChain: 150,
+                __rewardAmount: 150,
+                __rewardStatus: 150,
+                __rewardCustomValue: 150
+              },
+              hiddenOptionIds: [],
+              columnWrappedIds: ['__title'],
+              visibleOptionIds: [],
+              defaultTemplateId: '',
+              collapsedOptionIds: [],
+              columnCalculations: {},
+              kanbanCalculations: {},
+              visiblePropertyIds: [
+                '__limit',
+                '__applicants',
+                '__reviewers',
+                '__available',
+                '__rewardStatus',
+                '__rewardAmount',
+                '__rewardChain',
+                '__rewardCustomValue'
+              ]
+            }
+          }
+        })
+      ]);
   });
 
   it('should export space data successfully by space ID', async () => {
@@ -316,6 +464,8 @@ describe('exportSpaceData', () => {
 
     expect(exportedData).toMatchObject<SpaceDataExport>({
       space: {
+        proposalBlocks: expect.arrayContaining([customProposalBlockBoard, customProposalBlockView]),
+        rewardBlocks: expect.arrayContaining([customRewardBlockBoard, customRewardBlockView]),
         features: space.features,
         memberProfiles: space.memberProfiles,
         memberProperties: [memberProperty],
@@ -333,7 +483,8 @@ describe('exportSpaceData', () => {
         proposalCategory2WithSpacePermissions,
         proposalCategory3WithRolePermissions
       ]),
-      postCategories: expect.arrayContaining([postCategoryWithPermissions])
+      postCategories: expect.arrayContaining([postCategoryWithPermissions]),
+      posts: expect.arrayContaining(posts)
     });
   });
 
@@ -344,6 +495,8 @@ describe('exportSpaceData', () => {
 
     expect(exportedData).toMatchObject<SpaceDataExport>({
       space: {
+        proposalBlocks: expect.arrayContaining([customProposalBlockBoard, customProposalBlockView]),
+        rewardBlocks: expect.arrayContaining([customRewardBlockBoard, customRewardBlockView]),
         features: space.features,
         memberProfiles: space.memberProfiles,
         memberProperties: [memberProperty],
@@ -361,7 +514,8 @@ describe('exportSpaceData', () => {
         proposalCategory2WithSpacePermissions,
         proposalCategory3WithRolePermissions
       ]),
-      postCategories: expect.arrayContaining([postCategoryWithPermissions])
+      postCategories: expect.arrayContaining([postCategoryWithPermissions]),
+      posts: expect.arrayContaining(posts)
     });
   });
 
@@ -377,6 +531,30 @@ describe('exportSpaceData', () => {
 
     expect(fileContent).toMatchObject<SpaceDataExport>({
       space: {
+        proposalBlocks: expect.arrayContaining([
+          {
+            ...customProposalBlockBoard,
+            createdAt: customProposalBlockBoard.createdAt.toISOString(),
+            updatedAt: customProposalBlockBoard.updatedAt.toISOString()
+          },
+          {
+            ...customProposalBlockView,
+            createdAt: customProposalBlockView.createdAt.toISOString(),
+            updatedAt: customProposalBlockView.updatedAt.toISOString()
+          }
+        ]),
+        rewardBlocks: expect.arrayContaining([
+          {
+            ...customRewardBlockBoard,
+            createdAt: customRewardBlockBoard.createdAt.toISOString(),
+            updatedAt: customRewardBlockBoard.updatedAt.toISOString()
+          },
+          {
+            ...customRewardBlockView,
+            createdAt: customRewardBlockView.createdAt.toISOString(),
+            updatedAt: customRewardBlockView.updatedAt.toISOString()
+          }
+        ]),
         features: space.features,
         memberProfiles: space.memberProfiles,
         memberProperties: [
@@ -409,7 +587,10 @@ describe('exportSpaceData', () => {
         proposalCategory2WithSpacePermissions,
         proposalCategory3WithRolePermissions
       ]),
-      postCategories: expect.arrayContaining([postCategoryWithPermissions])
+      postCategories: expect.arrayContaining([postCategoryWithPermissions]),
+      posts: expect.arrayContaining(
+        posts.map((p) => ({ ...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString() }))
+      )
     });
   });
 
