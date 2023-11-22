@@ -16,7 +16,9 @@ import type {
   Post,
   PostCategory,
   Proposal,
+  ProposalBlock,
   ProposalCategory,
+  RewardBlock,
   Role,
   Space,
   User
@@ -71,6 +73,12 @@ describe('importSpaceData', () => {
   let postCategoryPermissions: AssignedPostCategoryPermission[];
 
   let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
+
+  let customProposalBlockBoard: ProposalBlock;
+  let customProposalBlockView: ProposalBlock;
+
+  let customRewardBlockBoard: RewardBlock;
+  let customRewardBlockView: RewardBlock;
 
   const fileExportName = 'jest-test-import-space-data-import.json';
 
@@ -320,6 +328,137 @@ describe('importSpaceData', () => {
       categoryId: firstSourcePostCategory.id
     });
 
+    [customProposalBlockBoard, customProposalBlockView, customRewardBlockBoard, customRewardBlockView] =
+      await Promise.all([
+        prisma.proposalBlock.create({
+          data: {
+            id: '__defaultBoard',
+            title: '',
+            parentId: '',
+            rootId: sourceSpace.id,
+            spaceId: sourceSpace.id,
+            type: 'board',
+            schema: 1,
+            createdBy: sourceSpace.createdBy,
+            updatedBy: sourceSpace.createdBy,
+            fields: {
+              icon: '',
+              viewIds: [],
+              isTemplate: false,
+              description: '',
+              headerImage: null,
+              cardProperties: [
+                { id: 'c9db9654-65db-4a34-98d5-faf13cb571dd', name: 'Person', type: 'person', options: [] }
+              ],
+              showDescription: false,
+              columnCalculations: []
+            }
+          }
+        }),
+        prisma.proposalBlock.create({
+          data: {
+            id: '__defaultView',
+            title: '',
+            parentId: '__defaultBoard',
+            rootId: sourceSpace.id,
+            spaceId: sourceSpace.id,
+            type: 'view',
+            schema: 1,
+            createdBy: sourceSpace.createdBy,
+            updatedBy: sourceSpace.createdBy,
+            fields: {
+              filter: { filters: [], operation: 'and' },
+              viewType: 'table',
+              cardOrder: [],
+              openPageIn: 'center_peek',
+              sortOptions: [{ reversed: false, propertyId: '__title' }],
+              columnWidths: { __title: 400, __status: 150, __authors: 150, __category: 200, __reviewers: 150 },
+              hiddenOptionIds: [],
+              columnWrappedIds: [],
+              visibleOptionIds: [],
+              defaultTemplateId: '',
+              collapsedOptionIds: [],
+              columnCalculations: {},
+              kanbanCalculations: {},
+              visiblePropertyIds: ['__category', '__status', '__evaluationType', '__authors', '__reviewers']
+            }
+          }
+        }),
+        prisma.rewardBlock.create({
+          data: {
+            id: '__defaultBoard',
+            title: '',
+            parentId: '',
+            rootId: sourceSpace.id,
+            spaceId: sourceSpace.id,
+            type: 'board',
+            schema: 1,
+            createdBy: sourceSpace.createdBy,
+            updatedBy: sourceSpace.createdBy,
+            fields: {
+              icon: '',
+              viewIds: [],
+              isTemplate: false,
+              description: '',
+              headerImage: null,
+              cardProperties: [
+                { id: '5234ba6a-c6ac-4202-ba81-f14fb2e4cbe8', name: 'Person', type: 'person', options: [] }
+              ],
+              showDescription: false,
+              columnCalculations: []
+            }
+          }
+        }),
+        prisma.rewardBlock.create({
+          data: {
+            id: '__defaultView',
+            title: '',
+            parentId: '__defaultBoard',
+            rootId: sourceSpace.id,
+            spaceId: sourceSpace.id,
+            type: 'view',
+            schema: 1,
+            createdBy: sourceSpace.createdBy,
+            updatedBy: sourceSpace.createdBy,
+            fields: {
+              filter: { filters: [], operation: 'and' },
+              viewType: 'table',
+              cardOrder: [],
+              openPageIn: 'center_peek',
+              sortOptions: [{ reversed: false, propertyId: '__title' }],
+              columnWidths: {
+                __limit: 150,
+                __title: 400,
+                __available: 150,
+                __reviewers: 150,
+                __applicants: 200,
+                __rewardChain: 150,
+                __rewardAmount: 150,
+                __rewardStatus: 150,
+                __rewardCustomValue: 150
+              },
+              hiddenOptionIds: [],
+              columnWrappedIds: ['__title'],
+              visibleOptionIds: [],
+              defaultTemplateId: '',
+              collapsedOptionIds: [],
+              columnCalculations: {},
+              kanbanCalculations: {},
+              visiblePropertyIds: [
+                '__limit',
+                '__applicants',
+                '__reviewers',
+                '__available',
+                '__rewardStatus',
+                '__rewardAmount',
+                '__rewardChain',
+                '__rewardCustomValue'
+              ]
+            }
+          }
+        })
+      ]);
+
     exportedData = await exportSpaceData({ spaceIdOrDomain: sourceSpace.id, filename: fileExportName });
   });
 
@@ -358,6 +497,46 @@ describe('importSpaceData', () => {
         }))
       ),
       space: {
+        proposalBlocks: expect.arrayContaining<ProposalBlock>([
+          {
+            ...customProposalBlockBoard,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          },
+          {
+            ...customProposalBlockView,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          }
+        ]),
+        rewardBlocks: expect.arrayContaining<RewardBlock>([
+          {
+            ...customRewardBlockBoard,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          },
+          {
+            ...customRewardBlockView,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          }
+        ]),
         notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
         memberProfiles: sourceSpace.memberProfiles,
@@ -515,6 +694,46 @@ describe('importSpaceData', () => {
         }))
       ),
       space: {
+        proposalBlocks: expect.arrayContaining<ProposalBlock>([
+          {
+            ...customProposalBlockBoard,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          },
+          {
+            ...customProposalBlockView,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          }
+        ]),
+        rewardBlocks: expect.arrayContaining<RewardBlock>([
+          {
+            ...customRewardBlockBoard,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          },
+          {
+            ...customRewardBlockView,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          }
+        ]),
         notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
         memberProfiles: sourceSpace.memberProfiles,

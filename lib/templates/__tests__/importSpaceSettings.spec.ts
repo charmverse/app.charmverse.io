@@ -299,7 +299,26 @@ describe('importSpaceSettings', () => {
             updatedAt: expect.any(Date)
           }
         ]),
-        rewardBlocks: expect.arrayContaining<RewardBlock>([]),
+        rewardBlocks: expect.arrayContaining<RewardBlock>([
+          {
+            ...customRewardBlockBoard,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          },
+          {
+            ...customRewardBlockView,
+            rootId: targetSpace.id,
+            spaceId: targetSpace.id,
+            createdBy: targetSpace.createdBy,
+            updatedBy: targetSpace.createdBy,
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date)
+          }
+        ]),
         notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
         memberProfiles: sourceSpace.memberProfiles,
