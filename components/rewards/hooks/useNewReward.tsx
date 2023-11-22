@@ -3,7 +3,6 @@ import { useCallback, useState } from 'react';
 
 import { useCreateReward } from 'charmClient/hooks/rewards';
 import { EMPTY_PAGE_VALUES } from 'components/common/PageDialog/hooks/useNewPage';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { RewardPageProps } from 'lib/rewards/createReward';
@@ -16,7 +15,6 @@ export function useNewReward() {
   const [contentUpdated, setContentUpdated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFields>(emptyState());
-  const { mutateRewards } = useRewards();
   const { trigger: createRewardTrigger } = useCreateReward();
 
   const setRewardValues = useCallback((partialFormInputs: Partial<UpdateableRewardFields>) => {
@@ -57,13 +55,6 @@ export function useNewReward() {
             throw err;
           })
           .then((reward) => {
-            mutateRewards(
-              (data) => {
-                if (!reward) return data;
-                return [...(data || []), reward];
-              },
-              { revalidate: false }
-            );
             setContentUpdated(false);
             return reward;
           })
@@ -74,7 +65,7 @@ export function useNewReward() {
         return createdReward;
       }
     },
-    [createRewardTrigger, rewardValues, mutateRewards, currentSpace, showMessage]
+    [createRewardTrigger, rewardValues, currentSpace, showMessage]
   );
 
   return {

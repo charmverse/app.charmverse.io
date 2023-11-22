@@ -292,7 +292,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             {targetGroup !== 'space' && (
               <PermissionToggle
                 data-test='space-operation-deleteAnyBounty'
-                label='Delete any bounty'
+                label='Delete any reward'
                 defaultChecked={!isFreeSpace && !!assignedPermissions?.deleteAnyBounty}
                 disabled={disableModifications}
                 onChange={(ev) => {
