@@ -304,7 +304,7 @@ export function RewardPropertiesForm({
 
             {rewardType === 'Custom' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
+                <PropertyLabel readOnly highlighted required={isNewReward}>
                   Custom Reward
                 </PropertyLabel>
 
