@@ -4,6 +4,8 @@ import type {
   MemberPropertyPermission,
   MemberPropertyPermissionLevel,
   Prisma,
+  ProposalBlock,
+  RewardBlock,
   Space
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -18,7 +20,11 @@ import { getImportData } from './getImportData';
 import { importRoles } from './importRoles';
 import type { ImportParams } from './interfaces';
 
-type SpaceImportResult = Space & { memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[] };
+type SpaceImportResult = Space & {
+  memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
+  proposalBlocks: ProposalBlock[];
+  rewardBlocks: RewardBlock[];
+};
 
 export async function importSpaceSettings({
   targetSpaceIdOrDomain,

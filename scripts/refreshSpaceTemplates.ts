@@ -16,4 +16,4 @@ async function refreshSpaceTemplates(selectedTemplates?: Array<(typeof staticSpa
   }
 }
 
-// refreshSpaceTemplates(['templateNounishDAO']).then(() => console.log('Done'))
+// refreshSpaceTemplates().then(() => console.log('Done'))

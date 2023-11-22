@@ -49,7 +49,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -109,7 +110,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -169,7 +171,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -229,7 +232,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -391,7 +395,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -441,7 +446,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -491,7 +497,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -541,7 +548,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -609,7 +617,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -659,7 +668,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -753,303 +763,6 @@
           "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
           "title": "Treasury",
           "color": "gray"
-        }
-      }
-    },
-    {
-      "id": "0cbc1684-e8f8-4e68-af2b-f746007c3dd4",
-      "deletedAt": null,
-      "createdAt": "2023-05-23T19:51:48.336Z",
-      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "updatedAt": "2023-05-24T13:36:52.843Z",
-      "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "deletedBy": null,
-      "title": "CharmVerse",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "blockquote",
-            "attrs": {
-              "emoji": "🔎",
-              "track": []
-            },
-            "content": [
-              {
-                "type": "paragraph",
-                "attrs": {
-                  "track": []
-                },
-                "content": [
-                  {
-                    "text": "Project name",
-                    "type": "text",
-                    "marks": [
-                      {
-                        "type": "bold"
-                      }
-                    ]
-                  },
-                  {
-                    "text": ":",
-                    "type": "text"
-                  },
-                  {
-                    "type": "hardBreak"
-                  },
-                  {
-                    "text": "CharmVerse",
-                    "type": "text"
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "attrs": {
-                  "track": []
-                },
-                "content": [
-                  {
-                    "text": "Author name",
-                    "type": "text",
-                    "marks": [
-                      {
-                        "type": "bold"
-                      }
-                    ]
-                  },
-                  {
-                    "text": ":",
-                    "type": "text",
-                    "marks": [
-                      {
-                        "type": "bold"
-                      },
-                      {
-                        "type": "insertion",
-                        "attrs": {
-                          "date": "2023-05-24T13:30:00.000Z",
-                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                          "approved": true,
-                          "username": "Drea | CharmVerse"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "hardBreak"
-                  },
-                  {
-                    "text": "Alex Poon",
-                    "type": "text"
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "attrs": {
-                  "track": []
-                },
-                "content": [
-                  {
-                    "text": "L2 recipient address",
-                    "type": "text",
-                    "marks": [
-                      {
-                        "type": "bold"
-                      }
-                    ]
-                  },
-                  {
-                    "text": ":",
-                    "type": "text"
-                  },
-                  {
-                    "type": "hardBreak"
-                  },
-                  {
-                    "text": "0xD358",
-                    "type": "text"
-                  },
-                  {
-                    "text": "...",
-                    "type": "text",
-                    "marks": [
-                      {
-                        "type": "insertion",
-                        "attrs": {
-                          "date": "2023-05-24T13:30:00.000Z",
-                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                          "approved": true,
-                          "username": "Drea | CharmVerse"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "text": "b2c9",
-                    "type": "text"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "id": null,
-              "level": 2,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Project Details",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "The solution for token communities to build relationships, work together and vote. Manage members, coordinate tasks, facilitate structured discussions & decisions, and hold each other accountable.",
-                "type": "text"
-              }
-            ]
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "id": null,
-              "level": 2,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "What are you going to build?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "bulletList",
-            "attrs": {
-              "tight": false
-            },
-            "content": [
-              {
-                "type": "listItem",
-                "attrs": {
-                  "track": [],
-                  "todoChecked": null
-                },
-                "content": [
-                  {
-                    "type": "paragraph",
-                    "attrs": {
-                      "track": []
-                    },
-                    "content": [
-                      {
-                        "text": "Grant submission, voting and post-grant tracking",
-                        "type": "text",
-                        "marks": [
-                          {
-                            "type": "insertion",
-                            "attrs": {
-                              "date": "2023-05-24T13:30:00.000Z",
-                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                              "approved": true,
-                              "username": "Drea | CharmVerse"
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          }
-        ]
-      },
-      "contentText": "Project name:CharmVerseAuthor name:Alex PoonL2 recipient address:0xD358...b2c9Project DetailsThe solution for token communities to build relationships, work together and vote. Manage members, coordinate tasks, facilitate structured discussions & decisions, and hold each other accountable.What are you going to build?Grant submission, voting and post-grant tracking",
-      "galleryImage": null,
-      "hasContent": true,
-      "headerImage": null,
-      "icon": null,
-      "path": "page-025638706470463735",
-      "isTemplate": false,
-      "parentId": null,
-      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-      "additionalPaths": [],
-      "type": "proposal",
-      "boardId": null,
-      "autoGenerated": false,
-      "index": -1,
-      "cardId": null,
-      "proposalId": "0cbc1684-e8f8-4e68-af2b-f746007c3dd4",
-      "snapshotProposalId": null,
-      "fullWidth": false,
-      "fontFamily": "default",
-      "fontSizeSmall": false,
-      "version": 39,
-      "bountyId": null,
-      "syncWithPageId": null,
-      "convertedProposalId": null,
-      "sourceTemplateId": null,
-      "permissions": [],
-      "children": [],
-      "proposal": {
-        "id": "0cbc1684-e8f8-4e68-af2b-f746007c3dd4",
-        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-        "status": "reviewed",
-        "archived": false,
-        "reviewedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "reviewedAt": "2023-05-24T14:50:33.023Z",
-        "categoryId": "76feebf0-5e28-4b07-af82-163eb353ce2b",
-        "snapshotProposalExpiry": null,
-        "publishToLens": null,
-        "lensPostLink": null,
-        "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "76feebf0-5e28-4b07-af82-163eb353ce2b",
-          "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-          "title": "Cycle 8 Grants",
-          "color": "red"
         }
       }
     },
@@ -1189,7 +902,8 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -1300,7 +1014,8 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -1361,7 +1076,8 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -1522,7 +1238,8 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -1583,7 +1300,8 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -1666,7 +1384,8 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -1780,495 +1499,6 @@
       }
     },
     {
-      "id": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
-      "deletedAt": null,
-      "createdAt": "2023-05-15T14:58:57.709Z",
-      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "updatedAt": "2023-05-15T14:58:57.709Z",
-      "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "deletedBy": null,
-      "title": "Grants",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Grants usually fund one-off initiatives perceived as creating value for the community. Examples include product/protocol modules, code reviews, relevant research, bd/growth initiatives, and ecosystem support initiatives. When the grant amount or delivery duration is significant, proposals can include milestones and quantitative metrics on what constitutes successful delivery. When the initiative benefits multiple communities, disclosing other funding applications can serve as a positive social signal.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "turquoise",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "level": 1,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "SUMMARY",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T21:00:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "A 1-paragraph summary of the Grants proposal. It should ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:00:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "describe the fund usage and include ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "a high-level budget.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:00:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:00:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "level": 1,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "MOTIVATION",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Provide context of the proposal. Describe the current challenges, history, and stakeholders involved.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:20:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:20:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "level": 1,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "RATIONALE",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Provide context for Why and Why Now?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:20:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "level": 1,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "IMPLEMENTATION",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Provide high-level execution steps",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:20:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "level": 1,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "TIMELINE",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Provide a high-level schedule of implementation. If complexity demands it, provide detailed schedule and execution plans.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "heading",
-            "attrs": {
-              "level": 1,
-              "track": []
-            },
-            "content": [
-              {
-                "text": "COST",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Provide the cost of the grants and frequency of deployment",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "italic"
-                  },
-                  {
-                    "type": "insertion",
-                    "attrs": {
-                      "date": "2023-01-23T17:10:00.000Z",
-                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-                      "approved": true,
-                      "username": "alexpoon.eth"
-                    }
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "default",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "contentText": "Grants usually fund one-off initiatives perceived as creating value for the community. Examples include product/protocol modules, code reviews, relevant research, bd/growth initiatives, and ecosystem support initiatives. When the grant amount or delivery duration is significant, proposals can include milestones and quantitative metrics on what constitutes successful delivery. When the initiative benefits multiple communities, disclosing other funding applications can serve as a positive social signal.SUMMARYA 1-paragraph summary of the Grants proposal. It should describe the fund usage and include a high-level budget. MOTIVATIONProvide context of the proposal. Describe the current challenges, history, and stakeholders involved. RATIONALEProvide context for Why and Why Now?IMPLEMENTATIONProvide high-level execution stepsTIMELINEProvide a high-level schedule of implementation. If complexity demands it, provide detailed schedule and execution plans.COSTProvide the cost of the grants and frequency of deployment",
-      "galleryImage": "",
-      "hasContent": true,
-      "headerImage": null,
-      "icon": null,
-      "path": "page-10303017323071773",
-      "isTemplate": false,
-      "parentId": null,
-      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-      "additionalPaths": [],
-      "type": "proposal_template",
-      "boardId": null,
-      "autoGenerated": true,
-      "index": 36,
-      "cardId": null,
-      "proposalId": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
-      "snapshotProposalId": null,
-      "fullWidth": false,
-      "fontFamily": "default",
-      "fontSizeSmall": false,
-      "version": 1,
-      "bountyId": null,
-      "syncWithPageId": null,
-      "convertedProposalId": null,
-      "sourceTemplateId": null,
-      "permissions": [
-        {
-          "pageId": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
-          "userId": null,
-          "id": "9a8278ad-f53f-43c1-b405-333860b76405",
-          "permissionLevel": "full_access",
-          "permissions": [],
-          "roleId": null,
-          "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-          "inheritedFromPermission": null,
-          "public": null,
-          "allowDiscovery": false,
-          "sourcePermission": null
-        }
-      ],
-      "children": [],
-      "proposal": {
-        "id": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
-        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-        "status": "draft",
-        "archived": false,
-        "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "a1e3fa83-b7f2-44fd-8c22-7fa303fe1c66",
-        "snapshotProposalExpiry": null,
-        "publishToLens": null,
-        "lensPostLink": null,
-        "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "a1e3fa83-b7f2-44fd-8c22-7fa303fe1c66",
-          "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-          "title": "Treasury",
-          "color": "gray"
-        }
-      }
-    },
-    {
       "id": "16bed8d6-836b-4000-b48b-f1d8e9c3abdb",
       "deletedAt": null,
       "createdAt": "2023-05-15T14:58:57.709Z",
@@ -2316,6 +1546,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 1,
               "track": []
             },
@@ -2402,6 +1633,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 1,
               "track": []
             },
@@ -2488,6 +1720,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 1,
               "track": []
             },
@@ -2574,6 +1807,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 1,
               "track": []
             },
@@ -2624,6 +1858,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 1,
               "track": []
             },
@@ -2692,6 +1927,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 1,
               "track": []
             },
@@ -2778,6 +2014,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 1,
               "track": []
             },
@@ -2802,42 +2039,24 @@
           {
             "type": "table",
             "attrs": {
-              "sort": {
-                "col": null,
-                "dir": null
-              },
-              "track": [],
-              "labels": [],
-              "filters": [],
-              "headers": true
+              "track": []
             },
             "content": [
               {
                 "type": "table_row",
                 "attrs": {
-                  "track": [],
-                  "hidden": false
+                  "track": []
                 },
                 "content": [
                   {
                     "type": "table_cell",
                     "attrs": {
-                      "id": "_xij6qik8v",
-                      "type": "text",
                       "track": [],
-                      "header": true,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [228],
-                      "background": "transparent",
-                      "typesValues": {
-                        "date": -1,
-                        "text": "",
-                        "labels": [],
-                        "number": "",
-                        "checkbox": false,
-                        "currency": ""
-                      }
+                      "colwidth": [
+                        228
+                      ]
                     },
                     "content": [
                       {
@@ -2868,22 +2087,12 @@
                   {
                     "type": "table_cell",
                     "attrs": {
-                      "id": "_zzgc2mb4s",
-                      "type": "text",
                       "track": [],
-                      "header": true,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [208],
-                      "background": "transparent",
-                      "typesValues": {
-                        "date": -1,
-                        "text": "",
-                        "labels": [],
-                        "number": "",
-                        "checkbox": false,
-                        "currency": ""
-                      }
+                      "colwidth": [
+                        208
+                      ]
                     },
                     "content": [
                       {
@@ -2914,22 +2123,10 @@
                   {
                     "type": "table_cell",
                     "attrs": {
-                      "id": "_g7z3u78xi",
-                      "type": "text",
                       "track": [],
-                      "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": null,
-                      "background": "transparent",
-                      "typesValues": {
-                        "date": -1,
-                        "text": "",
-                        "labels": [],
-                        "number": "",
-                        "checkbox": false,
-                        "currency": ""
-                      }
+                      "colwidth": null
                     },
                     "content": [
                       {
@@ -2962,29 +2159,18 @@
               {
                 "type": "table_row",
                 "attrs": {
-                  "track": [],
-                  "hidden": false
+                  "track": []
                 },
                 "content": [
                   {
                     "type": "table_cell",
                     "attrs": {
-                      "id": "_0f0aa431v",
-                      "type": "text",
                       "track": [],
-                      "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [228],
-                      "background": "transparent",
-                      "typesValues": {
-                        "date": -1,
-                        "text": "",
-                        "labels": [],
-                        "number": "",
-                        "checkbox": false,
-                        "currency": ""
-                      }
+                      "colwidth": [
+                        228
+                      ]
                     },
                     "content": [
                       {
@@ -2998,22 +2184,12 @@
                   {
                     "type": "table_cell",
                     "attrs": {
-                      "id": "_0f0aa431v",
-                      "type": "text",
                       "track": [],
-                      "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [208],
-                      "background": "transparent",
-                      "typesValues": {
-                        "date": -1,
-                        "text": "",
-                        "labels": [],
-                        "number": "",
-                        "checkbox": false,
-                        "currency": ""
-                      }
+                      "colwidth": [
+                        208
+                      ]
                     },
                     "content": [
                       {
@@ -3027,22 +2203,10 @@
                   {
                     "type": "table_cell",
                     "attrs": {
-                      "id": "_9rebyfc2n",
-                      "type": "text",
                       "track": [],
-                      "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": null,
-                      "background": "transparent",
-                      "typesValues": {
-                        "date": -1,
-                        "text": "",
-                        "labels": [],
-                        "number": "",
-                        "checkbox": false,
-                        "currency": ""
-                      }
+                      "colwidth": null
                     },
                     "content": [
                       {
@@ -3060,6 +2224,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 2,
               "track": []
             },
@@ -3182,6 +2347,7 @@
           {
             "type": "heading",
             "attrs": {
+              "id": null,
               "level": 2,
               "track": []
             },
@@ -3230,13 +2396,14 @@
             ]
           },
           {
-            "type": "bulletList",
+            "type": "bullet_list",
             "attrs": {
-              "tight": false
+              "indent": 0,
+              "listStyleType": null
             },
             "content": [
               {
-                "type": "listItem",
+                "type": "list_item",
                 "attrs": {
                   "track": [],
                   "todoChecked": null
@@ -3315,13 +2482,14 @@
             ]
           },
           {
-            "type": "bulletList",
+            "type": "bullet_list",
             "attrs": {
-              "tight": false
+              "indent": 0,
+              "listStyleType": null
             },
             "content": [
               {
-                "type": "listItem",
+                "type": "list_item",
                 "attrs": {
                   "track": [],
                   "todoChecked": null
@@ -3365,7 +2533,7 @@
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
-      "version": 1,
+      "version": 2,
       "bountyId": null,
       "syncWithPageId": null,
       "convertedProposalId": null,
@@ -3388,6 +2556,501 @@
       "children": [],
       "proposal": {
         "id": "16bed8d6-836b-4000-b48b-f1d8e9c3abdb",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "status": "draft",
+        "archived": false,
+        "reviewedBy": null,
+        "reviewedAt": null,
+        "categoryId": "a1e3fa83-b7f2-44fd-8c22-7fa303fe1c66",
+        "snapshotProposalExpiry": null,
+        "publishToLens": null,
+        "lensPostLink": null,
+        "evaluationType": "vote",
+        "fields": null,
+        "category": {
+          "id": "a1e3fa83-b7f2-44fd-8c22-7fa303fe1c66",
+          "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+          "title": "Treasury",
+          "color": "gray"
+        }
+      }
+    },
+    {
+      "id": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
+      "deletedAt": null,
+      "createdAt": "2023-05-15T14:58:57.709Z",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "updatedAt": "2023-05-15T14:58:57.709Z",
+      "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
+      "title": "Grants",
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Grants usually fund one-off initiatives perceived as creating value for the community. Examples include product/protocol modules, code reviews, relevant research, bd/growth initiatives, and ecosystem support initiatives. When the grant amount or delivery duration is significant, proposals can include milestones and quantitative metrics on what constitutes successful delivery. When the initiative benefits multiple communities, disclosing other funding applications can serve as a positive social signal.",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  },
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": "turquoise",
+                      "bgColor": ""
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 1,
+              "track": [],
+              "collapseContent": null
+            },
+            "content": [
+              {
+                "text": "SUMMARY",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T21:00:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "A 1-paragraph summary of the Grants proposal. It should ",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:00:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": "describe the fund usage and include ",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": "a high-level budget.",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:00:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:00:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 1,
+              "track": [],
+              "collapseContent": null
+            },
+            "content": [
+              {
+                "text": "MOTIVATION",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "bold"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Provide context of the proposal. Describe the current challenges, history, and stakeholders involved.",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:20:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " ",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:20:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 1,
+              "track": [],
+              "collapseContent": null
+            },
+            "content": [
+              {
+                "text": "RATIONALE",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "bold"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Provide context for Why and Why Now?",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:20:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 1,
+              "track": [],
+              "collapseContent": null
+            },
+            "content": [
+              {
+                "text": "IMPLEMENTATION",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Provide high-level execution steps",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:20:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 1,
+              "track": [],
+              "collapseContent": null
+            },
+            "content": [
+              {
+                "text": "TIMELINE",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Provide a high-level schedule of implementation. If complexity demands it, provide detailed schedule and execution plans.",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "level": 1,
+              "track": [],
+              "collapseContent": null
+            },
+            "content": [
+              {
+                "text": "COST",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Provide the cost of the grants and frequency of deployment",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-01-23T17:10:00.000Z",
+                      "user": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
+                      "approved": true,
+                      "username": "alexpoon.eth"
+                    }
+                  },
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": "default",
+                      "bgColor": ""
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "contentText": "Grants usually fund one-off initiatives perceived as creating value for the community. Examples include product/protocol modules, code reviews, relevant research, bd/growth initiatives, and ecosystem support initiatives. When the grant amount or delivery duration is significant, proposals can include milestones and quantitative metrics on what constitutes successful delivery. When the initiative benefits multiple communities, disclosing other funding applications can serve as a positive social signal.SUMMARYA 1-paragraph summary of the Grants proposal. It should describe the fund usage and include a high-level budget. MOTIVATIONProvide context of the proposal. Describe the current challenges, history, and stakeholders involved. RATIONALEProvide context for Why and Why Now?IMPLEMENTATIONProvide high-level execution stepsTIMELINEProvide a high-level schedule of implementation. If complexity demands it, provide detailed schedule and execution plans.COSTProvide the cost of the grants and frequency of deployment",
+      "galleryImage": "",
+      "hasContent": true,
+      "headerImage": null,
+      "icon": null,
+      "path": "page-10303017323071773",
+      "isTemplate": false,
+      "parentId": null,
+      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+      "additionalPaths": [],
+      "type": "proposal_template",
+      "boardId": null,
+      "autoGenerated": true,
+      "index": 36,
+      "cardId": null,
+      "proposalId": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
+      "snapshotProposalId": null,
+      "fullWidth": false,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
+      "version": 1,
+      "bountyId": null,
+      "syncWithPageId": null,
+      "convertedProposalId": null,
+      "sourceTemplateId": null,
+      "permissions": [
+        {
+          "pageId": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
+          "userId": null,
+          "id": "9a8278ad-f53f-43c1-b405-333860b76405",
+          "permissionLevel": "full_access",
+          "permissions": [],
+          "roleId": null,
+          "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+          "inheritedFromPermission": null,
+          "public": null,
+          "allowDiscovery": false,
+          "sourcePermission": null
+        }
+      ],
+      "children": [],
+      "proposal": {
+        "id": "2a9a7f38-21df-4f2a-8623-2d513c5b07ab",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
         "status": "draft",
@@ -3457,7 +3120,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -3507,7 +3171,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -3557,7 +3222,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -3607,7 +3273,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -3675,7 +3342,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -3725,7 +3393,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -3885,7 +3554,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -3945,7 +3615,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4005,7 +3676,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4065,7 +3737,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4291,7 +3964,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4401,7 +4075,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4461,7 +4136,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4621,7 +4297,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4681,7 +4358,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -4763,7 +4441,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5039,7 +4718,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5099,7 +4779,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5159,7 +4840,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5219,7 +4901,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5279,7 +4962,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5339,7 +5023,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5399,7 +5084,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -5459,7 +5145,8 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -6078,7 +5765,8 @@
             "attrs": {
               "id": null,
               "level": 2,
-              "track": []
+              "track": [],
+              "collapseContent": null
             },
             "content": [
               {
@@ -6709,7 +6397,8 @@
                 "attrs": {
                   "id": null,
                   "level": 1,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -7023,7 +6712,8 @@
                 "attrs": {
                   "id": null,
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -7175,7 +6865,8 @@
                 "attrs": {
                   "id": null,
                   "level": 1,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -7472,7 +7163,8 @@
                 "attrs": {
                   "id": null,
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -7706,7 +7398,8 @@
                 "attrs": {
                   "id": null,
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -8586,7 +8279,8 @@
                 "attrs": {
                   "id": null,
                   "level": 3,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -9103,7 +8797,8 @@
                 "attrs": {
                   "id": null,
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -9379,7 +9074,8 @@
                 "attrs": {
                   "id": "heading-1",
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -9777,7 +9473,8 @@
                 "attrs": {
                   "id": "heading-2",
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -9832,7 +9529,8 @@
                 "attrs": {
                   "id": "heading-3",
                   "level": 3,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -10103,7 +9801,8 @@
                 "attrs": {
                   "id": "heading-4",
                   "level": 3,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -10475,7 +10174,8 @@
                 "attrs": {
                   "id": "heading-5",
                   "level": 3,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -10860,7 +10560,8 @@
                 "attrs": {
                   "id": "heading-6",
                   "level": 3,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -11275,7 +10976,8 @@
                 "attrs": {
                   "id": "heading-7",
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -11385,7 +11087,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -11413,7 +11117,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -11441,7 +11147,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -11469,7 +11177,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -11497,7 +11207,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -11525,7 +11237,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -11553,7 +11267,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -11589,7 +11305,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -11617,7 +11335,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -11640,7 +11360,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -11657,7 +11379,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -11674,7 +11398,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -11691,7 +11417,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -11708,7 +11436,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -11733,7 +11463,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -11761,7 +11493,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -11822,7 +11556,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -11839,7 +11575,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -11856,7 +11594,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -11873,7 +11613,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -11890,7 +11632,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -11915,7 +11659,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -11943,7 +11689,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -11966,7 +11714,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -11983,7 +11733,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -12000,7 +11752,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12017,7 +11771,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12034,7 +11790,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -12059,7 +11817,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -12087,7 +11847,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -12110,7 +11872,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -12127,7 +11891,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -12144,7 +11910,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12161,7 +11929,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12178,7 +11948,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -12203,7 +11975,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -12231,7 +12005,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -12254,7 +12030,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -12271,7 +12049,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -12288,7 +12068,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12305,7 +12087,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12322,7 +12106,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -12347,7 +12133,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -12375,7 +12163,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -12398,7 +12188,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -12415,7 +12207,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -12432,7 +12226,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12449,7 +12245,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12466,7 +12264,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -12491,7 +12291,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -12519,7 +12321,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -12580,7 +12384,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -12597,7 +12403,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -12614,7 +12422,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12631,7 +12441,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12648,7 +12460,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -12673,7 +12487,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -12701,7 +12517,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -12743,7 +12561,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -12760,7 +12580,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -12777,7 +12599,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12794,7 +12618,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12811,7 +12637,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -12836,7 +12664,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [235]
+                          "colwidth": [
+                            235
+                          ]
                         },
                         "content": [
                           {
@@ -12864,7 +12694,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [464]
+                          "colwidth": [
+                            464
+                          ]
                         },
                         "content": [
                           {
@@ -12881,7 +12713,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [47]
+                          "colwidth": [
+                            47
+                          ]
                         },
                         "content": [
                           {
@@ -12898,7 +12732,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [42]
+                          "colwidth": [
+                            42
+                          ]
                         },
                         "content": [
                           {
@@ -12915,7 +12751,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12932,7 +12770,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [41]
+                          "colwidth": [
+                            41
+                          ]
                         },
                         "content": [
                           {
@@ -12949,7 +12789,9 @@
                           "track": [],
                           "colspan": 1,
                           "rowspan": 1,
-                          "colwidth": [49]
+                          "colwidth": [
+                            49
+                          ]
                         },
                         "content": [
                           {
@@ -12969,7 +12811,8 @@
                 "attrs": {
                   "id": "heading-8",
                   "level": 2,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -13039,7 +12882,8 @@
                     "attrs": {
                       "id": "heading-9",
                       "level": 3,
-                      "track": []
+                      "track": [],
+                      "collapseContent": null
                     },
                     "content": [
                       {
@@ -13600,7 +13444,8 @@
                     "attrs": {
                       "id": "heading-10",
                       "level": 3,
-                      "track": []
+                      "track": [],
+                      "collapseContent": null
                     },
                     "content": [
                       {
@@ -14207,7 +14052,8 @@
                     "attrs": {
                       "id": "heading-11",
                       "level": 3,
-                      "track": []
+                      "track": [],
+                      "collapseContent": null
                     },
                     "content": [
                       {
@@ -14362,7 +14208,8 @@
                     "attrs": {
                       "id": "heading-12",
                       "level": 3,
-                      "track": []
+                      "track": [],
+                      "collapseContent": null
                     },
                     "content": [
                       {
@@ -15168,7 +15015,8 @@
                     "attrs": {
                       "id": "heading-13",
                       "level": 3,
-                      "track": []
+                      "track": [],
+                      "collapseContent": null
                     },
                     "content": [
                       {
@@ -15761,7 +15609,8 @@
                 "attrs": {
                   "id": null,
                   "level": 1,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -16456,7 +16305,8 @@
                 "attrs": {
                   "id": null,
                   "level": 1,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -16714,7 +16564,8 @@
                 "attrs": {
                   "id": null,
                   "level": 1,
-                  "track": []
+                  "track": [],
+                  "collapseContent": null
                 },
                 "content": [
                   {
@@ -19351,6 +19202,304 @@
           "children": []
         }
       ]
+    },
+    {
+      "id": "0cbc1684-e8f8-4e68-af2b-f746007c3dd4",
+      "deletedAt": null,
+      "createdAt": "2023-05-23T19:51:48.336Z",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "updatedAt": "2023-05-24T13:36:52.843Z",
+      "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
+      "title": "CharmVerse",
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "blockquote",
+            "attrs": {
+              "emoji": "🔎",
+              "track": []
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "track": []
+                },
+                "content": [
+                  {
+                    "text": "Project name",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ]
+                  },
+                  {
+                    "text": ":",
+                    "type": "text"
+                  },
+                  {
+                    "type": "hardBreak"
+                  },
+                  {
+                    "text": "CharmVerse",
+                    "type": "text"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "track": []
+                },
+                "content": [
+                  {
+                    "text": "Author name",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ]
+                  },
+                  {
+                    "text": ":",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      },
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-05-24T13:30:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "hardBreak"
+                  },
+                  {
+                    "text": "Alex Poon",
+                    "type": "text"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "track": []
+                },
+                "content": [
+                  {
+                    "text": "L2 recipient address",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ]
+                  },
+                  {
+                    "text": ":",
+                    "type": "text"
+                  },
+                  {
+                    "type": "hardBreak"
+                  },
+                  {
+                    "text": "0xD358",
+                    "type": "text"
+                  },
+                  {
+                    "text": "...",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-05-24T13:30:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "b2c9",
+                    "type": "text"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "id": null,
+              "level": 2,
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Project Details",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "The solution for token communities to build relationships, work together and vote. Manage members, coordinate tasks, facilitate structured discussions & decisions, and hold each other accountable.",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "id": null,
+              "level": 2,
+              "track": []
+            },
+            "content": [
+              {
+                "text": "What are you going to build?",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "bullet_list",
+            "attrs": {
+              "indent": 0,
+              "listStyleType": null
+            },
+            "content": [
+              {
+                "type": "list_item",
+                "attrs": {
+                  "track": [],
+                  "todoChecked": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Grant submission, voting and post-grant tracking",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-05-24T13:30:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          }
+        ]
+      },
+      "contentText": "Project name:CharmVerseAuthor name:Alex PoonL2 recipient address:0xD358...b2c9Project DetailsThe solution for token communities to build relationships, work together and vote. Manage members, coordinate tasks, facilitate structured discussions & decisions, and hold each other accountable.What are you going to build?Grant submission, voting and post-grant tracking",
+      "galleryImage": null,
+      "hasContent": true,
+      "headerImage": null,
+      "icon": null,
+      "path": "page-025638706470463735",
+      "isTemplate": false,
+      "parentId": null,
+      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+      "additionalPaths": [],
+      "type": "proposal",
+      "boardId": null,
+      "autoGenerated": false,
+      "index": -1,
+      "cardId": null,
+      "proposalId": "0cbc1684-e8f8-4e68-af2b-f746007c3dd4",
+      "snapshotProposalId": null,
+      "fullWidth": false,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
+      "version": 40,
+      "bountyId": null,
+      "syncWithPageId": null,
+      "convertedProposalId": null,
+      "sourceTemplateId": null,
+      "permissions": [],
+      "children": [],
+      "proposal": {
+        "id": "0cbc1684-e8f8-4e68-af2b-f746007c3dd4",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "status": "reviewed",
+        "archived": false,
+        "reviewedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "reviewedAt": "2023-05-24T14:50:33.023Z",
+        "categoryId": "76feebf0-5e28-4b07-af82-163eb353ce2b",
+        "snapshotProposalExpiry": null,
+        "publishToLens": null,
+        "lensPostLink": null,
+        "evaluationType": "vote",
+        "fields": null,
+        "category": {
+          "id": "76feebf0-5e28-4b07-af82-163eb353ce2b",
+          "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+          "title": "Cycle 8 Grants",
+          "color": "red"
+        }
+      }
     }
   ],
   "roles": [
@@ -19408,6 +19557,42 @@
   "permissions": {
     "proposalCategoryPermissions": [
       {
+        "id": "eca18de4-7472-4cb1-bb8e-ad0fad775154",
+        "permissionLevel": "full_access",
+        "proposalCategoryId": "27f5e426-59c9-4de3-8e9d-3cc2fbaa7b7b",
+        "assignee": {
+          "group": "space",
+          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
+        }
+      },
+      {
+        "id": "ce36a0ea-3e9b-4b1b-9c1f-f9e7e9218cc5",
+        "permissionLevel": "full_access",
+        "proposalCategoryId": "f01c5349-2df5-494a-a412-aa62602041a2",
+        "assignee": {
+          "group": "space",
+          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
+        }
+      },
+      {
+        "id": "0f35de70-d87d-45a2-bcdf-2c748259ae8b",
+        "permissionLevel": "full_access",
+        "proposalCategoryId": "d92d217a-20be-4753-99b7-b68e37c57fcf",
+        "assignee": {
+          "group": "space",
+          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
+        }
+      },
+      {
+        "id": "45a86077-ad37-437d-ae68-73b8a9acaeae",
+        "permissionLevel": "full_access",
+        "proposalCategoryId": "1b962593-669e-4e7e-a2b6-1a16aefd436d",
+        "assignee": {
+          "group": "space",
+          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
+        }
+      },
+      {
         "id": "9966251e-ae09-408a-b372-af287a913013",
         "permissionLevel": "full_access",
         "proposalCategoryId": "31fe9327-bfa3-4962-aea4-ea171fa2dc65",
@@ -19426,27 +19611,18 @@
         }
       },
       {
-        "id": "6f418f78-d17b-4717-8a7c-6aa007fa3ee4",
-        "permissionLevel": "view_comment",
-        "proposalCategoryId": "76feebf0-5e28-4b07-af82-163eb353ce2b",
-        "assignee": {
-          "group": "role",
-          "id": "5e2328b8-bb22-4b1c-8565-448418009c4c"
-        }
-      },
-      {
-        "id": "0f35de70-d87d-45a2-bcdf-2c748259ae8b",
+        "id": "7d9eb82d-40fb-47ae-9266-1672c29c6718",
         "permissionLevel": "full_access",
-        "proposalCategoryId": "d92d217a-20be-4753-99b7-b68e37c57fcf",
+        "proposalCategoryId": "4cf7654d-3df7-4915-8755-e3028bbf4211",
         "assignee": {
           "group": "space",
           "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
         }
       },
       {
-        "id": "ce36a0ea-3e9b-4b1b-9c1f-f9e7e9218cc5",
+        "id": "80ac7a97-f673-447e-b16f-0da85a9a3cfc",
         "permissionLevel": "full_access",
-        "proposalCategoryId": "f01c5349-2df5-494a-a412-aa62602041a2",
+        "proposalCategoryId": "99054d92-aabe-4bd9-97eb-ea9ba7223ab1",
         "assignee": {
           "group": "space",
           "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
@@ -19462,12 +19638,12 @@
         }
       },
       {
-        "id": "45a86077-ad37-437d-ae68-73b8a9acaeae",
+        "id": "9654dbf3-50f2-483a-9d3e-5fb479934278",
         "permissionLevel": "full_access",
-        "proposalCategoryId": "1b962593-669e-4e7e-a2b6-1a16aefd436d",
+        "proposalCategoryId": "76feebf0-5e28-4b07-af82-163eb353ce2b",
         "assignee": {
-          "group": "space",
-          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
+          "group": "role",
+          "id": "bbb4f1ee-6d09-4e7b-97e6-9f31334a8299"
         }
       },
       {
@@ -19480,56 +19656,20 @@
         }
       },
       {
-        "id": "9654dbf3-50f2-483a-9d3e-5fb479934278",
-        "permissionLevel": "full_access",
+        "id": "6f418f78-d17b-4717-8a7c-6aa007fa3ee4",
+        "permissionLevel": "view_comment",
         "proposalCategoryId": "76feebf0-5e28-4b07-af82-163eb353ce2b",
         "assignee": {
           "group": "role",
-          "id": "bbb4f1ee-6d09-4e7b-97e6-9f31334a8299"
-        }
-      },
-      {
-        "id": "80ac7a97-f673-447e-b16f-0da85a9a3cfc",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "99054d92-aabe-4bd9-97eb-ea9ba7223ab1",
-        "assignee": {
-          "group": "space",
-          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
-        }
-      },
-      {
-        "id": "eca18de4-7472-4cb1-bb8e-ad0fad775154",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "27f5e426-59c9-4de3-8e9d-3cc2fbaa7b7b",
-        "assignee": {
-          "group": "space",
-          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
-        }
-      },
-      {
-        "id": "7d9eb82d-40fb-47ae-9266-1672c29c6718",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "4cf7654d-3df7-4915-8755-e3028bbf4211",
-        "assignee": {
-          "group": "space",
-          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
+          "id": "5e2328b8-bb22-4b1c-8565-448418009c4c"
         }
       }
     ],
     "postCategoryPermissions": [
       {
-        "id": "972e233e-679d-4a7e-92e6-e52245c7c75e",
+        "id": "61b0a694-ffd7-49f5-9095-30f55ede96b2",
         "permissionLevel": "full_access",
-        "postCategoryId": "1afd792b-d5d3-45d0-9b36-0606dd9dce2f",
-        "assignee": {
-          "group": "space",
-          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
-        }
-      },
-      {
-        "id": "1abff5b0-1538-40aa-87d9-af60f1859c9c",
-        "permissionLevel": "full_access",
-        "postCategoryId": "89a7ada8-1ba6-450f-bb7f-37eb67e6b59c",
+        "postCategoryId": "b76fa50d-e0d3-4ab1-8062-3ef899a00c66",
         "assignee": {
           "group": "space",
           "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
@@ -19554,9 +19694,9 @@
         }
       },
       {
-        "id": "61b0a694-ffd7-49f5-9095-30f55ede96b2",
+        "id": "1abff5b0-1538-40aa-87d9-af60f1859c9c",
         "permissionLevel": "full_access",
-        "postCategoryId": "b76fa50d-e0d3-4ab1-8062-3ef899a00c66",
+        "postCategoryId": "89a7ada8-1ba6-450f-bb7f-37eb67e6b59c",
         "assignee": {
           "group": "space",
           "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
@@ -19566,6 +19706,15 @@
         "id": "52c7ce4a-a858-4080-abe1-93f6f002c849",
         "permissionLevel": "full_access",
         "postCategoryId": "5ca03df0-d0c0-451e-9602-d0d3f19f1bbd",
+        "assignee": {
+          "group": "space",
+          "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
+        }
+      },
+      {
+        "id": "972e233e-679d-4a7e-92e6-e52245c7c75e",
+        "permissionLevel": "full_access",
+        "postCategoryId": "1afd792b-d5d3-45d0-9b36-0606dd9dce2f",
         "assignee": {
           "group": "space",
           "id": "9e215a8f-d4b6-4097-af71-e1d148995d23"
@@ -19690,5 +19839,263 @@
       "path": "questions_support",
       "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23"
     }
-  ]
+  ],
+  "posts": [
+    {
+      "createdAt": "2023-06-21T20:23:35.967Z",
+      "updatedAt": "2023-06-21T20:23:35.967Z",
+      "deletedAt": null,
+      "id": "ee61da0c-ae16-4337-aa01-653d57f4914f",
+      "title": "First post!",
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "Hello everybody!",
+                "type": "text"
+              }
+            ]
+          }
+        ]
+      },
+      "contentText": "Hello everybody!",
+      "path": "first_post_z45i45pb",
+      "categoryId": "b76fa50d-e0d3-4ab1-8062-3ef899a00c66",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+      "pinned": false,
+      "locked": false,
+      "proposalId": null,
+      "isDraft": false
+    }
+  ],
+  "space": {
+    "features": [
+      {
+        "id": "member_directory",
+        "isHidden": false
+      },
+      {
+        "id": "proposals",
+        "isHidden": false
+      },
+      {
+        "id": "bounties",
+        "isHidden": false
+      },
+      {
+        "id": "forum",
+        "isHidden": false
+      }
+    ],
+    "memberProfiles": [
+      {
+        "id": "charmverse",
+        "isHidden": false
+      },
+      {
+        "id": "collection",
+        "isHidden": false
+      },
+      {
+        "id": "ens",
+        "isHidden": false
+      },
+      {
+        "id": "lens",
+        "isHidden": false
+      },
+      {
+        "id": "summon",
+        "isHidden": false
+      }
+    ],
+    "notificationToggles": {},
+    "memberProperties": [
+      {
+        "id": "e4ca50fa-cbce-4cb0-89e5-c3c91759af02",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Avatar",
+        "type": "profile_pic",
+        "options": null,
+        "index": 0,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "24a78832-a785-4dc6-984c-17ad313d4f87",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Name",
+        "type": "name",
+        "options": null,
+        "index": 1,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "1c9138f2-0f88-4079-9249-f5fe266191b1",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Roles",
+        "type": "role",
+        "options": null,
+        "index": 2,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "5e511051-69d8-40a2-8c72-37fb96d5781f",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Bio",
+        "type": "bio",
+        "options": null,
+        "index": 3,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "bab09257-d978-4d3f-bb7b-39b12f6e251f",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Discord",
+        "type": "discord",
+        "options": null,
+        "index": 4,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "069d440d-eb2d-4cf1-9ead-70ace90576b5",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Twitter",
+        "type": "twitter",
+        "options": null,
+        "index": 5,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "c14e619d-ff23-44a4-938e-2bebd02d7346",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "LinkedIn",
+        "type": "linked_in",
+        "options": null,
+        "index": 6,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "8b9f80fc-feb7-47a1-85a2-5e3e27bdef24",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "GitHub",
+        "type": "github",
+        "options": null,
+        "index": 7,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "e6eb0184-6594-43e5-ae65-5e8d58ffaeec",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Timezone",
+        "type": "timezone",
+        "options": null,
+        "index": 8,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "permissions": []
+      },
+      {
+        "id": "b713e517-e2d6-4365-991d-e1319a8f40fa",
+        "createdAt": "2023-05-16T19:07:57.975Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-05-16T19:07:57.975Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
+        "name": "Join date",
+        "type": "join_date",
+        "options": null,
+        "index": 9,
+        "enabledViews": [],
+        "permissions": []
+      }
+    ],
+    "rewardBlocks": [],
+    "proposalBlocks": []
+  }
 }
