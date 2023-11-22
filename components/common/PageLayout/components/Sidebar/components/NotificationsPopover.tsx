@@ -31,7 +31,6 @@ import type { Member } from 'lib/members/interfaces';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
-import type { LoggedInUser } from 'models';
 
 import { sidebarItemStyles } from './SidebarButton';
 
@@ -126,8 +125,9 @@ export function NotificationsPopover({
   isLoading: boolean;
 }) {
   const { user } = useUser();
-  const { members } = useMembers();
-  const currentMember = members.find((member) => member.id === user?.id);
+
+  const { membersRecord } = useMembers();
+  const currentMember = user?.id ? membersRecord[user.id] : undefined;
   const theme = useTheme();
   const [inboxState, setInboxState] = useState<'unread' | 'unarchived'>('unarchived');
   const [activeTab, setActiveState] = useState<'Inbox' | 'Archived'>('Inbox');
@@ -163,8 +163,6 @@ export function NotificationsPopover({
         readUnArchivedNotifications: _readUnArchivedNotifications
       };
     }, [notifications]);
-
-  const { membersRecord } = useMembers();
 
   const markNotifications = async (payload: MarkNotifications) => {
     await charmClient.notifications.markNotifications(payload);

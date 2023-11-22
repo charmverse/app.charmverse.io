@@ -2,14 +2,15 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
+import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
 import type { Member } from 'lib/members/interfaces';
-import type { PagesMap } from 'lib/pages';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
-import { Constants } from '../constants';
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
@@ -170,12 +171,15 @@ export function sortCards(
   cardPages: CardPage[],
   board: Board,
   activeView: BoardView,
-  members: Record<string, Member>
+  members: Record<string, Member>,
+  localSort?: ISortOption[] | null
 ): CardPage[] {
   if (!activeView) {
     return cardPages;
   }
-  const { sortOptions } = activeView.fields;
+
+  const { sortOptions: globalSortOptions } = activeView.fields;
+  const sortOptions = localSort || globalSortOptions;
 
   if (sortOptions?.length < 1) {
     return cardPages.sort((a, b) => manualOrder(activeView, a, b));
@@ -212,7 +216,7 @@ export function sortCards(
         }
 
         let result = 0;
-        if (template.type === 'number' || template.type === 'date') {
+        if (template.type === 'number' || template.type === 'date' || template.type === 'tokenAmount') {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
             return -1;
@@ -238,6 +242,12 @@ export function sortCards(
           } else {
             result = titleOrCreatedOrder(a.page, b.page);
           }
+        } else if (template.id === PROPOSAL_REVIEWERS_BLOCK_ID) {
+          const value1 = (Array.isArray(aValue) ? aValue[0] : aValue) as unknown as Record<string, any>;
+          const value2 = (Array.isArray(bValue) ? bValue[0] : bValue) as unknown as Record<string, any>;
+          aValue = typeof value1 === 'object' && 'id' in value1 ? members[value1.id]?.username || '' : '';
+          bValue = typeof value2 === 'object' && 'id' in value2 ? members[value2.id]?.username || '' : '';
+          result = aValue.localeCompare(bValue);
         } else {
           // Text-based sort
 
@@ -258,6 +268,11 @@ export function sortCards(
           if (template.type === 'select' || template.type === 'multiSelect') {
             aValue = template.options.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
             bValue = template.options.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
+          }
+
+          if (template.type === 'tokenChain') {
+            aValue = tokenChainOptions.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
+            bValue = tokenChainOptions.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
           }
 
           if (result === 0) {

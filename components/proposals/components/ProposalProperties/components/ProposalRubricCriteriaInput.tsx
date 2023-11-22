@@ -278,6 +278,7 @@ export function IntegerInput({
   readOnly,
   readOnlyMessage,
   inputProps,
+  disabled,
   maxWidth,
   sx
 }: {
@@ -286,6 +287,7 @@ export function IntegerInput({
   readOnly?: boolean;
   readOnlyMessage?: string;
   inputProps?: any;
+  disabled?: boolean;
   maxWidth?: number;
   sx?: any;
 }) {
@@ -293,7 +295,7 @@ export function IntegerInput({
     <TextInput
       displayType='details'
       fullWidth={!maxWidth}
-      inputProps={{ type: 'number', ...inputProps }}
+      inputProps={{ disabled, type: 'number', ...inputProps }}
       onChange={(newValue) => onChange(getNumberFromString(newValue))}
       readOnly={readOnly}
       readOnlyMessage={readOnlyMessage}

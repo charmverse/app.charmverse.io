@@ -13,9 +13,9 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
 import Editable from '../../widgets/editable';
@@ -32,7 +32,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   intl: IntlShape;
   readOnly: boolean;
-  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void> | void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void;
   calculationMenuOpen: boolean;

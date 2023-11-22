@@ -4,8 +4,7 @@ import { useIntl } from 'react-intl';
 import type { PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList, propertyTypesList } from 'lib/focalboard/board';
 
-import { iconForPropertyType } from '../components/viewHeader/viewHeaderPropertiesMenu';
-
+import { iconForPropertyType } from './iconForPropertyType';
 import { typeDisplayName } from './typeDisplayName';
 
 export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyType) => void; isMobile?: boolean }) {

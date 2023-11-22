@@ -3,11 +3,13 @@ import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import { Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import React, { useCallback } from 'react';
 
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 
 type Props = {
@@ -19,23 +21,33 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
   const sortDisplayOptions = properties?.map((o) => ({ id: o.id, name: o.name }));
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
+  const localViewSettings = useLocalDbViewSettings();
+
+  const sortOptions = useViewSortOptions(activeView);
+
+  const changeViewSortOptions = (newSortOptions: ISortOption[]) => {
+    // update sort locally if local settings context exist
+    if (localViewSettings) {
+      localViewSettings.setLocalSort(newSortOptions);
+      return;
+    }
+
+    mutator.changeViewSortOptions(activeView.id, sortOptions, newSortOptions);
+  };
 
   const sortChanged = useCallback(
     (propertyId: string) => {
       let newSortOptions: ISortOption[] = [];
-      if (
-        activeView.fields.sortOptions &&
-        activeView.fields.sortOptions[0] &&
-        activeView.fields.sortOptions[0].propertyId === propertyId
-      ) {
+      if (sortOptions && sortOptions[0] && sortOptions[0].propertyId === propertyId) {
         // Already sorting by name, so reverse it
-        newSortOptions = [{ propertyId, reversed: !activeView.fields.sortOptions[0].reversed }];
+        newSortOptions = [{ propertyId, reversed: !sortOptions[0].reversed }];
       } else {
         newSortOptions = [{ propertyId, reversed: false }];
       }
-      mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, newSortOptions);
+
+      changeViewSortOptions(newSortOptions);
     },
-    [activeView.id, activeView.fields.sortOptions]
+    [sortOptions, activeView.id, localViewSettings]
   );
 
   const onManualSort = useCallback(() => {
@@ -48,12 +60,12 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   }, [activeView, orderedCards]);
 
   const onRevertSort = useCallback(() => {
-    mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
-  }, [activeView.id, activeView.fields.sortOptions]);
+    changeViewSortOptions([]);
+  }, [activeView.id, sortOptions]);
 
   return (
     <>
-      {activeView.fields.sortOptions?.length > 0 && (
+      {sortOptions?.length > 0 && (
         <>
           <MenuItem id='manual' onClick={onManualSort}>
             Manual
@@ -67,8 +79,8 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
 
       {sortDisplayOptions?.map((option) => {
         let rightIcon: JSX.Element | undefined;
-        if (activeView.fields.sortOptions?.length > 0) {
-          const sortOption = activeView.fields.sortOptions[0];
+        if (sortOptions?.length > 0) {
+          const sortOption = sortOptions[0];
           if (sortOption.propertyId === option.id) {
             rightIcon = sortOption.reversed ? (
               <ArrowDownwardOutlinedIcon fontSize='small' />

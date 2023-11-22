@@ -332,6 +332,7 @@ class CharmClient {
       const fbBlockInput = Object.assign(currentFBBlock, updates, {
         fields: { ...(currentFBBlock.fields as object), ...updatedFields }
       });
+
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
@@ -380,10 +381,6 @@ class CharmClient {
 
   createPaymentMethod(paymentMethod: Partial<PaymentMethod>): Promise<PaymentMethod> {
     return http.POST('/api/payment-methods', paymentMethod);
-  }
-
-  listPaymentMethods(spaceId: string): Promise<PaymentMethod[]> {
-    return http.GET('/api/payment-methods', { spaceId });
   }
 
   deletePaymentMethod(paymentMethodId: string) {

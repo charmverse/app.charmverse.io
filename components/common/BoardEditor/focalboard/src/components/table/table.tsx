@@ -8,8 +8,8 @@ import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { CardPage, Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';
@@ -31,7 +31,7 @@ type Props = {
   readOnly: boolean;
   cardIdToFocusOnRender: string;
   showCard: (cardId: string | null, parentId?: string) => void;
-  addCard: (groupByOptionId?: string) => Promise<void>;
+  addCard: (groupByOptionId?: string) => Promise<void> | void;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;

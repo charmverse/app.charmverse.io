@@ -25,10 +25,13 @@ import {
 import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useMemo, useRef, useState } from 'react';
 
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
   CATEGORY_BLOCK_ID,
@@ -39,12 +42,11 @@ import {
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 
-import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
+import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 import Label from '../../widgets/label';
-import { iconForPropertyType } from '../viewHeader/viewHeaderPropertiesMenu';
 
 import HorizontalGrip from './horizontalGrip';
 
@@ -80,6 +82,7 @@ function TableHeader(props: Props): JSX.Element {
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
+
   const disableRename = proposalPropertyTypesList.includes(type as any) || DEFAULT_BLOCK_IDS.includes(templateId);
 
   const [tempName, setTempName] = useState(props.name || '');
@@ -112,6 +115,18 @@ function TableHeader(props: Props): JSX.Element {
     }
   };
 
+  const localViewSettings = useLocalDbViewSettings();
+  const sortOptions = useViewSortOptions(activeView);
+
+  const changeViewSortOptions = (newSortOptions: ISortOption[]) => {
+    // update sort locally if local settings context exist
+    if (localViewSettings) {
+      localViewSettings.setLocalSort(newSortOptions);
+      return;
+    }
+
+    mutator.changeViewSortOptions(activeView.id, sortOptions, newSortOptions);
+  };
   async function renameColumn() {
     if (tempName !== template.name) {
       mutator.changePropertyTypeAndName(board, cards, template, type, tempName, views);
@@ -137,9 +152,7 @@ function TableHeader(props: Props): JSX.Element {
   }
 
   function reverseSort(e: React.MouseEvent<HTMLButtonElement>) {
-    mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
-      { propertyId: templateId, reversed: props.sorted === 'up' }
-    ]);
+    changeViewSortOptions([{ propertyId: templateId, reversed: props.sorted === 'up' }]);
     e.stopPropagation();
   }
 
@@ -177,9 +190,7 @@ function TableHeader(props: Props): JSX.Element {
         </Stack>
         <MenuItem
           onClick={() => {
-            mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
-              { propertyId: templateId, reversed: false }
-            ]);
+            changeViewSortOptions([{ propertyId: templateId, reversed: false }]);
           }}
         >
           <ListItemIcon>
@@ -189,9 +200,7 @@ function TableHeader(props: Props): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, [
-              { propertyId: templateId, reversed: true }
-            ]);
+            changeViewSortOptions([{ propertyId: templateId, reversed: true }]);
           }}
         >
           <ListItemIcon>

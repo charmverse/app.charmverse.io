@@ -1,27 +1,12 @@
 import { log } from '@charmverse/core/log';
-import { ALL_LIT_CHAINS, LIT_CHAINS } from '@lit-protocol/constants';
 import type { HumanizedAccsProps } from '@lit-protocol/types';
 import type { TypographyProps } from '@mui/material/Typography';
 import { formatEther, isAddress } from 'viem';
-import { base } from 'viem/chains';
 
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
-// Add missing info for Base
-LIT_CHAINS.base = {
-  contractAddress: null,
-  chainId: base.id,
-  name: base.name,
-  symbol: 'ETH',
-  decimals: 18,
-  rpcUrls: base.rpcUrls.default.http.slice(),
-  blockExplorerUrls: [base.blockExplorers.default.url],
-  type: null,
-  vmType: 'EVM'
-};
-
-ALL_LIT_CHAINS.base = LIT_CHAINS.base;
+import { ALL_LIT_CHAINS } from './utils';
 
 const humanizeComparator = (comparator: string) => {
   const list: Record<string, string> = {

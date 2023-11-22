@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Constants } from '../constants';
+import { Constants } from 'lib/focalboard/constants';
 
 type Props = {
   color?: string;

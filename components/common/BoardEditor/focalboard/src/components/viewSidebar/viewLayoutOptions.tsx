@@ -1,13 +1,14 @@
-import { Box, Card, Grid, Typography } from '@mui/material';
+import { Box, Card, Grid, Stack, Typography } from '@mui/material';
 import { useCallback } from 'react';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
+import SelectMenu from 'components/common/Menu';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';
@@ -22,12 +23,14 @@ interface LayoutOptionsProps {
   board?: Board;
   view: BoardView;
   intl: IntlShape;
+  hideLayoutSelectOptions?: boolean;
 }
 
 function LayoutOptions(props: LayoutOptionsProps) {
   const dispatch = useAppDispatch();
 
   const intl = props.intl;
+  const hideLayoutSelectOptions = props.hideLayoutSelectOptions ?? false;
   const activeView = props.view;
 
   const boardText = intl.formatMessage({
@@ -42,6 +45,16 @@ function LayoutOptions(props: LayoutOptionsProps) {
     id: 'View.Gallery',
     defaultMessage: 'Gallery'
   });
+
+  const handleViewOpenPage = useCallback(
+    async (openPageIn: 'full_page' | 'center_peek') => {
+      const newView = createBoardView(activeView);
+      newView.fields.openPageIn = openPageIn;
+      dispatch(updateView(newView));
+      await mutator.updateBlock(newView, activeView, 'change view open page');
+    },
+    [activeView]
+  );
 
   const handleAddViewBoard = useCallback(async () => {
     const newView = createBoardView(activeView);
@@ -119,24 +132,50 @@ function LayoutOptions(props: LayoutOptionsProps) {
 
   return (
     <Box onClick={(e) => e.stopPropagation()}>
-      <Grid container spacing={1} px={1}>
-        <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
-          <BoardIcon />
-          {boardText}
-        </LayoutOption>
-        <LayoutOption active={activeView.fields.viewType === 'table'} onClick={handleAddViewTable}>
-          <TableIcon />
-          {tableText}
-        </LayoutOption>
-        <LayoutOption active={activeView.fields.viewType === 'gallery'} onClick={handleAddViewGallery}>
-          <GalleryIcon />
-          {galleryText}
-        </LayoutOption>
-        <LayoutOption active={activeView.fields.viewType === 'calendar'} onClick={handleAddViewCalendar}>
-          <CalendarIcon />
-          Calendar
-        </LayoutOption>
-      </Grid>
+      {!hideLayoutSelectOptions && (
+        <Grid container spacing={1} px={1}>
+          <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
+            <BoardIcon />
+            {boardText}
+          </LayoutOption>
+          <LayoutOption active={activeView.fields.viewType === 'table'} onClick={handleAddViewTable}>
+            <TableIcon />
+            {tableText}
+          </LayoutOption>
+          <LayoutOption active={activeView.fields.viewType === 'gallery'} onClick={handleAddViewGallery}>
+            <GalleryIcon />
+            {galleryText}
+          </LayoutOption>
+          <LayoutOption active={activeView.fields.viewType === 'calendar'} onClick={handleAddViewCalendar}>
+            <CalendarIcon />
+            Calendar
+          </LayoutOption>
+        </Grid>
+      )}
+      <Stack pr={1} pl={2} my={1} alignItems='center' flexDirection='row' justifyContent='space-between'>
+        <Typography variant='subtitle2' component='div'>
+          Open pages in
+        </Typography>
+        <SelectMenu
+          buttonSize='small'
+          selectedValue={activeView.fields.openPageIn ?? 'center_peek'}
+          options={[
+            {
+              primary: 'Center peek',
+              secondary: 'Open pages in a focused, centered modal.',
+              value: 'center_peek'
+            },
+            {
+              primary: 'Full page',
+              secondary: 'Open pages in full page.',
+              value: 'full_page'
+            }
+          ]}
+          valueUpdated={(openPageIn) => {
+            handleViewOpenPage(openPageIn as 'center_peek' | 'full_page');
+          }}
+        />
+      </Stack>
     </Box>
   );
 }

@@ -9,20 +9,17 @@ export type IBaseCurrentDomainContext = {
   isSpaceLoading: boolean;
   spaceFromPath?: SpaceWithGates | null;
   customDomain?: string | null;
-  isCustomDomain: boolean;
 };
 
 export const BaseCurrentDomainContext = createContext<Readonly<IBaseCurrentDomainContext>>({
   isSpaceLoading: true,
   spaceFromPath: undefined,
-  customDomain: undefined,
-  isCustomDomain: false
+  customDomain: undefined
 });
 
 export function BaseCurrentDomainProvider({ children }: { children: ReactNode }) {
   const [customDomain, setCustomDomain] = useState<string | null>();
   const { data: spaceFromPath, isLoading: isSpaceLoading } = useSearchByDomain(customDomain || '');
-  const isCustomDomain = Boolean(customDomain && spaceFromPath?.name && spaceFromPath.isCustomDomainVerified);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -36,10 +33,9 @@ export function BaseCurrentDomainProvider({ children }: { children: ReactNode })
     return {
       customDomain,
       isSpaceLoading: isSpaceLoading || customDomain === undefined,
-      spaceFromPath,
-      isCustomDomain
+      spaceFromPath
     };
-  }, [customDomain, isSpaceLoading, spaceFromPath, isCustomDomain]);
+  }, [customDomain, isSpaceLoading, spaceFromPath]);
 
   return <BaseCurrentDomainContext.Provider value={value}>{children}</BaseCurrentDomainContext.Provider>;
 }

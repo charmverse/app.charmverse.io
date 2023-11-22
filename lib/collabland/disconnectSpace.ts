@@ -42,26 +42,16 @@ export async function disconnectSpace({
     };
   }
 
-  await prisma.$transaction([
-    prisma.space.updateMany({
-      where: {
-        id: {
-          in: spaceIds
-        }
-      },
-      data: {
-        discordServerId: null
+  await prisma.space.updateMany({
+    where: {
+      id: {
+        in: spaceIds
       }
-    }),
-    prisma.role.deleteMany({
-      where: {
-        source: 'collabland',
-        spaceId: {
-          in: spaceIds
-        }
-      }
-    })
-  ]);
+    },
+    data: {
+      discordServerId: null
+    }
+  });
 
   return {
     spaceIds

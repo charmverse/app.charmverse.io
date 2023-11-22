@@ -11,9 +11,9 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import { isTruthy } from 'lib/utilities/types';
 
-import { Constants } from '../../constants';
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
 import { IDType, Utils } from '../../utils';
@@ -67,7 +67,7 @@ type Props = {
   intl: IntlShape;
   readOnly: boolean;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void> | void;
   showCard: (cardId: string | null) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;

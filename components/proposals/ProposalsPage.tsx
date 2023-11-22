@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
+import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
@@ -20,6 +22,7 @@ import { NewProposalButton } from 'components/proposals/components/NewProposalBu
 import { ProposalDialog } from 'components/proposals/components/ProposalDialog/ProposalDialog';
 import { useProposalsBoardMutator } from 'components/proposals/components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -27,21 +30,17 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
-import { ProposalsViewOptions } from './components/ProposalViewOptions/ProposalsViewOptions';
-import { useProposalCategories } from './hooks/useProposalCategories';
 import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage({ title }: { title: string }) {
-  const { categories = [] } = useProposalCategories();
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { statusFilter, setStatusFilter, categoryIdFilter, setCategoryIdFilter, proposals } = useProposals();
+  const { proposals } = useProposals();
   const [newProposal, setNewProposal] = useState<Partial<ProposalPageAndPropertiesInput> | null>(null);
-
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
-
+  const { navigateToSpacePath, updateURLQuery } = useCharmRouter();
   const isAdmin = useIsAdmin();
 
   const { props, showProposal, hideProposal } = useProposalDialog();
@@ -49,6 +48,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
+  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -70,14 +70,16 @@ export function ProposalsPage({ title }: { title: string }) {
 
   function openPage(pageId: string | null) {
     if (!pageId) return;
-
-    const { pathname } = router;
-    router.push({ pathname, query: { domain: router.query.domain, id: pageId } }, undefined, { shallow: true });
+    const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
+    if (openPageIn === 'center_peek') {
+      updateURLQuery({ id: pageId });
+    } else if (openPageIn === 'full_page') {
+      navigateToSpacePath(`/${pageId}`);
+    }
   }
 
   function closeDialog() {
-    const { pathname } = router;
-    router.push({ pathname, query: { domain: router.query.domain } }, undefined, { shallow: true });
+    updateURLQuery({ id: null });
     setNewProposal(null);
   }
 
@@ -131,39 +133,29 @@ export function ProposalsPage({ title }: { title: string }) {
             </Box>
           </Box>
         </DatabaseTitle>
-        {!!proposals?.length && (
-          <>
-            <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-              <ProposalsViewOptions
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                categoryIdFilter={categoryIdFilter}
-                setCategoryIdFilter={setCategoryIdFilter}
-                categories={categories}
-                // Playwright-specific
-                testKey='desktop'
-              />
+        <>
+          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
+            <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
 
-              <ViewSortControl
-                activeBoard={activeBoard}
-                activeView={activeView}
-                cards={cards}
-                viewSortPopup={viewSortPopup}
-              />
+            <ViewSortControl
+              activeBoard={activeBoard}
+              activeView={activeView}
+              cards={cards}
+              viewSortPopup={viewSortPopup}
+            />
 
-              {isAdmin && (
-                <ViewHeaderActionsMenu
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowSidebar(!showSidebar);
-                  }}
-                />
-              )}
-            </Stack>
-            <Divider />
-          </>
-        )}
+            <ViewHeaderActionsMenu
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowSidebar(!showSidebar);
+              }}
+            />
+          </Stack>
+          <Divider />
+
+          <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
+        </>
       </DatabaseStickyHeader>
 
       {loadingData ? (
@@ -171,62 +163,57 @@ export function ProposalsPage({ title }: { title: string }) {
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (
-        <>
-          {proposals?.length === 0 && (
-            <Grid item xs={12} position='relative'>
-              <Box sx={{ mt: 5 }}>
+        <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
+          <Stack>
+            {proposals?.length > 0 ? (
+              <Box width='100%'>
+                <Table
+                  board={activeBoard}
+                  activeView={activeView}
+                  cardPages={cardPages}
+                  groupByProperty={groupByProperty}
+                  views={views}
+                  visibleGroups={[]}
+                  selectedCardIds={[]}
+                  readOnly={!isAdmin}
+                  disableAddingCards
+                  showCard={openPage}
+                  readOnlyTitle
+                  cardIdToFocusOnRender=''
+                  addCard={async () => {}}
+                  onCardClicked={() => {}}
+                  onDeleteCard={onDelete}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
                   description='Getting started with proposals'
                   videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />
               </Box>
-            </Grid>
-          )}
-          {proposals?.length > 0 && (
-            <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
-              <Stack>
-                <Box width='100%'>
-                  <Table
-                    board={activeBoard}
-                    activeView={activeView}
-                    cardPages={cardPages}
-                    groupByProperty={groupByProperty}
-                    views={views}
-                    visibleGroups={[]}
-                    selectedCardIds={[]}
-                    readOnly={!isAdmin}
-                    disableAddingCards={true}
-                    showCard={openPage}
-                    readOnlyTitle={true}
-                    cardIdToFocusOnRender=''
-                    addCard={async () => {}}
-                    onCardClicked={() => {}}
-                    onDeleteCard={onDelete}
-                  />
-                </Box>
+            )}
 
-                {isAdmin && (
-                  <ViewSidebar
-                    views={views}
-                    board={activeBoard}
-                    rootBoard={activeBoard}
-                    view={activeView}
-                    isOpen={!!showSidebar}
-                    closeSidebar={() => setShowSidebar(false)}
-                    hideLayoutOptions={true}
-                    hideSourceOptions={true}
-                    hideGroupOptions={true}
-                    groupByProperty={groupByProperty}
-                    page={undefined}
-                    pageId={undefined}
-                    showView={() => {}}
-                  />
-                )}
-              </Stack>
-            </Box>
-          )}
-        </>
+            <ViewSidebar
+              views={views}
+              board={activeBoard}
+              rootBoard={activeBoard}
+              view={activeView}
+              isOpen={!!showSidebar}
+              closeSidebar={() => setShowSidebar(false)}
+              hideLayoutSelectOptions
+              hideSourceOptions
+              hideGroupOptions
+              hidePropertiesRow={!isAdmin}
+              groupByProperty={groupByProperty}
+              page={undefined}
+              pageId={undefined}
+              showView={() => {}}
+              withProposalCategories
+            />
+          </Stack>
+        </Box>
       )}
       {(props.pageId || newProposal) && (
         <ProposalDialog pageId={props.pageId} newProposal={newProposal} closeDialog={closeDialog} />

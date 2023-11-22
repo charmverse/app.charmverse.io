@@ -36,6 +36,7 @@ export type BoardViewFields = {
   // This field is only used for linked views
   linkedSourceId?: string;
   columnWrappedIds?: string[];
+  openPageIn?: 'full_page' | 'center_peek';
 };
 
 export type BoardView = Block & {
@@ -61,7 +62,8 @@ function createBoardView(block?: Block): BoardView {
     linkedSourceId: block?.fields.linkedSourceId,
     sourceData: block?.fields.sourceData,
     sourceType: block?.fields.sourceType,
-    columnWrappedIds: block?.fields.columnWrappedIds?.slice() || []
+    columnWrappedIds: block?.fields.columnWrappedIds?.slice() || [],
+    openPageIn: block?.fields.openPageIn || 'center_peek'
   };
 
   return {

@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { blacklistUser } from 'lib/users/blacklistUser';
 
 /**
  * Use this script to retrieve and blacklist a space
  */
 
-const spaceDomain = 'life';
+const spaceDomain = 'possible-peach-barracuda';
 
 async function search(domain: string) {
   const space = await prisma.space.findUniqueOrThrow({
@@ -61,11 +62,25 @@ async function deleteSpace(domain: string) {
   const result = await prisma.space.delete({
     where: {
       domain
+    },
+    select: {
+      spaceRoles: {
+        where: {
+          isAdmin: true
+        },
+        select: {
+          userId: true
+        }
+      }
     }
   });
+  const adminUserIds = result.spaceRoles.map((sr) => sr.userId);
+  for (const adminUserId of adminUserIds) {
+    await blacklistUser(adminUserId);
+  }
   console.log('Deleted space', result);
 }
 
-search(spaceDomain).then(() => process.exit());
+// search(spaceDomain).then(() => process.exit());
 
-//deleteSpace(spaceDomain).then(() => process.exit());
+deleteSpace(spaceDomain).then(() => process.exit());

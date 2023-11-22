@@ -165,6 +165,14 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   proposalEvaluationType: {
     datatype: 'select',
     conditions: SelectDataTypeConditions
+  },
+  tokenAmount: {
+    datatype: 'number',
+    conditions: NumberDataTypeConditions
+  },
+  tokenChain: {
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
   }
 };
 

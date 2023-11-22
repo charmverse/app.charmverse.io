@@ -41,8 +41,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
 
-import { Constants } from '../constants';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -72,7 +72,7 @@ type Props = WrappedComponentProps &
     pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
     updateView: (view: BoardView) => void;
-    showCard: (cardId: string | null) => void;
+    showCard: (cardId: string | null, isTemplate?: boolean) => void;
     showView: (viewId: string) => void;
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
@@ -226,12 +226,12 @@ function CenterPanel(props: Props) {
     }
   }
 
-  const showCard = React.useCallback(
-    (cardId: string | null) => {
+  const showCard = useCallback(
+    (cardId: string | null, isTemplate?: boolean) => {
       if (state.selectedCardIds.length > 0) {
         setState({ ...state, selectedCardIds: [] });
       }
-      props.showCard(cardId);
+      props.showCard(cardId, isTemplate);
     },
     [props.showCard, state.selectedCardIds]
   );
@@ -240,13 +240,19 @@ function CenterPanel(props: Props) {
   const _updateView = props.updateView;
 
   const addCard = useCallback(
-    async (
-      groupByOptionId?: string,
+    async ({
+      groupByOptionId,
       show = false,
-      properties: Record<string, string> = {},
+      properties = {},
       insertLast = true,
       isTemplate = false
-    ) => {
+    }: {
+      groupByOptionId?: string;
+      show?: boolean;
+      properties?: Record<string, string>;
+      insertLast?: boolean;
+      isTemplate?: boolean;
+    }) => {
       if (!activeBoard) {
         throw new Error('No active board');
       }
@@ -292,7 +298,7 @@ function CenterPanel(props: Props) {
             }
 
             if (isTemplate) {
-              showCard(block.id);
+              showCard(block.id, true);
             } else if (show) {
               __addCard(createCard(block));
               _updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
@@ -362,7 +368,47 @@ function CenterPanel(props: Props) {
 
   const calendarAddCard = useCallback(
     (properties: Record<string, string>) => {
-      addCard('', true, properties);
+      addCard({
+        groupByOptionId: '',
+        show: true,
+        properties
+      });
+    },
+    [addCard]
+  );
+
+  const viewHeaderAddCard = useCallback(() => {
+    addCard({
+      groupByOptionId: '',
+      show: true
+    });
+  }, [addCard]);
+
+  const viewHeaderAddCardTemplate = useCallback(() => {
+    addCard({
+      groupByOptionId: '',
+      show: true,
+      isTemplate: true,
+      insertLast: false,
+      properties: {}
+    });
+  }, [addCard]);
+
+  const kanbanAddCard = useCallback(
+    (groupByOptionId?: string) => {
+      addCard({
+        groupByOptionId
+      });
+    },
+    [addCard]
+  );
+
+  const galleryAddCard = useCallback(
+    (show: boolean) => {
+      addCard({
+        groupByOptionId: '',
+        show
+      });
     },
     [addCard]
   );
@@ -536,10 +582,10 @@ function CenterPanel(props: Props) {
               cards={cards}
               views={views}
               dateDisplayProperty={dateDisplayProperty}
-              addCard={() => addCard('', true)}
+              addCard={viewHeaderAddCard}
               showCard={showCard}
               // addCardFromTemplate={addCardFromTemplate}
-              addCardTemplate={() => addCard('', true, {}, false, true)}
+              addCardTemplate={viewHeaderAddCardTemplate}
               editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
@@ -609,7 +655,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     onCardClicked={cardClicked}
-                    addCard={addCard}
+                    addCard={kanbanAddCard}
                     showCard={showCard}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
@@ -626,8 +672,8 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-                    showCard={showCard}
-                    addCard={addCard}
+                    showCard={(cardId) => showCard(cardId)}
+                    addCard={kanbanAddCard}
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
@@ -653,7 +699,7 @@ function CenterPanel(props: Props) {
                     readOnly={props.readOnly}
                     onCardClicked={cardClicked}
                     selectedCardIds={state.selectedCardIds}
-                    addCard={(show) => addCard('', show)}
+                    addCard={galleryAddCard}
                     disableAddingCards={disableAddingNewCards}
                   />
                 )}

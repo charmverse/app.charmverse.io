@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
-import type { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Constants } from 'lib/focalboard/constants';
 import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTransition';
 
 export const proposalDbProperties: {

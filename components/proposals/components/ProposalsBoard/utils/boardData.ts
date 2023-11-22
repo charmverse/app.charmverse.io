@@ -1,10 +1,11 @@
 import type { ProposalCategory } from '@charmverse/core/prisma';
 
-import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { mapMUIColorToProperty } from 'components/common/BoardEditor/utils/mapMUIColorToProperty';
 import { evaluationTypeOptions } from 'components/proposals/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
+import { Constants } from 'lib/focalboard/constants';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {
@@ -17,36 +18,34 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
-import type { ProposalPropertiesBlock } from 'lib/proposal/blocks/interfaces';
+import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
+import {
+  PROPOSAL_STATUS_LABELS_WITH_ARCHIVED,
+  type ProposalStatusWithArchived
+} from 'lib/proposal/proposalStatusTransition';
+import type { SupportedColor } from 'theme/colors';
 
-const proposalStatuses = [
-  'draft',
-  'discussion',
-  'review',
-  'reviewed',
-  'vote_active',
-  'vote_closed',
-  'evaluation_active',
-  'evaluation_closed'
-] as const;
+const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS_WITH_ARCHIVED) as ProposalStatusWithArchived[];
 
 export function getDefaultBoard({
   storedBoard,
   categories = [],
   customOnly = false
 }: {
-  storedBoard: ProposalPropertiesBlock | undefined;
+  storedBoard: ProposalBoardBlock | undefined;
   categories: ProposalCategory[] | undefined;
   customOnly?: boolean;
 }) {
   const block: Partial<Block> = storedBoard
     ? blockToFBBlock(storedBoard)
-    : {
-        id: DEFAULT_BOARD_BLOCK_ID,
-        fields: {
-          cardProperties: []
+    : createBoard({
+        block: {
+          id: DEFAULT_BOARD_BLOCK_ID,
+          fields: {
+            cardProperties: []
+          }
         }
-      };
+      });
 
   const cardProperties = [...getDefaultProperties({ categories }), ...(block.fields?.cardProperties || [])];
 
@@ -76,13 +75,17 @@ function getDefaultProperties({ categories }: { categories: ProposalCategory[] |
 function getDefaultCategoryProperty(categories: ProposalCategory[] = []) {
   return {
     ...proposalDbProperties.proposalCategory(CATEGORY_BLOCK_ID, 'Category'),
-    options: categories.map((c) => ({ id: c.id, value: c.title, color: c.color }))
+    options: categories.map((c) => ({
+      id: c.id,
+      value: c.title,
+      color: mapMUIColorToProperty(c.color as SupportedColor)
+    }))
   };
 }
 
 export function getDefaultStatusProperty() {
   return {
-    ...proposalDbProperties.proposalCategory(STATUS_BLOCK_ID, 'Status'),
+    ...proposalDbProperties.proposalStatus(STATUS_BLOCK_ID, 'Status'),
     options: proposalStatuses.map((s) => ({
       id: s,
       value: s,
@@ -93,7 +96,7 @@ export function getDefaultStatusProperty() {
 
 function getDefaultEvaluationTypeProperty() {
   return {
-    ...proposalDbProperties.proposalCategory(EVALUATION_TYPE_BLOCK_ID, 'Type'),
+    ...proposalDbProperties.proposalEvaluationType(EVALUATION_TYPE_BLOCK_ID, 'Type'),
     options: evaluationTypeOptions
   };
 }
@@ -102,7 +105,7 @@ export function getDefaultTableView({
   storedBoard,
   categories = []
 }: {
-  storedBoard: ProposalPropertiesBlock | undefined;
+  storedBoard: ProposalBoardBlock | undefined;
   categories: ProposalCategory[] | undefined;
 }) {
   const view = createTableView({

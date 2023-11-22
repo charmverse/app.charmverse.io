@@ -53,12 +53,21 @@ async function getApplicationController(req: NextApiRequest, res: NextApiRespons
     }
   });
 
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: application.bountyId
+    },
+    select: {
+      id: true
+    }
+  });
+
   const pagePermissions = await getPermissionsClient({
     resourceId: application.bountyId,
     resourceIdType: 'bounty'
   }).then(({ client }) =>
     client.pages.computePagePermissions({
-      resourceId: application.bountyId,
+      resourceId: rewardPage.id,
       userId: req.session.user?.id
     })
   );

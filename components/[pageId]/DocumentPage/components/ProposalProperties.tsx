@@ -1,7 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { debounce } from 'lodash';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import {
@@ -28,23 +28,27 @@ import { CreateLensPublication } from './CreateLensPublication';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
+  enableSidebar?: boolean;
   pageId: string;
   proposalId: string;
   snapshotProposalId: string | null;
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
-  title?: string;
+  openEvaluation?: () => void;
+  isEvaluationSidebarOpen?: boolean;
   proposalPage: PageWithContent;
 }
 
 export function ProposalProperties({
+  enableSidebar,
   pagePermissions,
   refreshPagePermissions = () => null,
   pageId,
   proposalId,
   snapshotProposalId,
   readOnly,
-  title,
+  isEvaluationSidebarOpen,
+  openEvaluation,
   proposalPage
 }: ProposalPropertiesProps) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
@@ -69,9 +73,7 @@ export function ProposalProperties({
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
-  const canAnswerRubric = proposalPermissions?.evaluate;
   const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
-  const canViewRubricAnswers = isAdmin || isReviewer;
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
   const isTemplate = proposalPage.type === 'proposal_template';
   const sourceTemplate = isFromTemplateSource
@@ -129,16 +131,10 @@ export function ProposalProperties({
     }
   }
 
-  function onSaveRubricCriteriaAnswers() {
-    return refreshProposal();
-  }
-
   async function onChangeRubricCriteria(rubricCriteria: ProposalPropertiesInput['rubricCriteria']) {
     // @ts-ignore TODO: unify types for rubricCriteria
     await upsertRubricCriteria({ rubricCriteria });
-    if (proposal?.status === 'evaluation_active') {
-      refreshProposal();
-    }
+    refreshProposal();
   }
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
@@ -164,9 +160,20 @@ export function ProposalProperties({
   // rubric criteria can always be updated by reviewers and admins
   const readOnlyRubricCriteria = (readOnlyProperties || isFromTemplateSource) && !(isAdmin || isReviewer);
 
+  const canSeeEvaluation =
+    (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
+
+  // open the rubric sidebar by default
+  useEffect(() => {
+    if (enableSidebar) {
+      openEvaluation?.();
+    }
+  }, [canSeeEvaluation]);
+
   return (
     <>
       <ProposalPropertiesBase
+        canSeeEvaluation={canSeeEvaluation}
         proposalLensLink={proposal?.lensPostLink ?? undefined}
         archived={!!proposal?.archived}
         isFromTemplate={!!proposal?.page?.sourceTemplateId}
@@ -187,20 +194,16 @@ export function ProposalProperties({
         readOnlyReviewers={readOnlyReviewers}
         rubricAnswers={proposal?.rubricAnswers}
         isTemplate={isTemplate}
-        draftRubricAnswers={proposal?.draftRubricAnswers}
         rubricCriteria={proposal?.rubricCriteria}
-        userId={user?.id}
         snapshotProposalId={snapshotProposalId}
         updateProposalStatus={updateProposalStatus}
-        onSaveRubricCriteriaAnswers={onSaveRubricCriteriaAnswers}
         onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
         proposalFormInputs={proposalFormInputs}
         setProposalFormInputs={onChangeProperties}
-        canAnswerRubric={canAnswerRubric}
-        canViewRubricAnswers={canViewRubricAnswers}
-        title={title || ''}
         isPublishingToLens={isPublishingToLens}
         readOnlyCustomProperties={readOnlyCustomProperties}
+        isEvaluationSidebarOpen={isEvaluationSidebarOpen}
+        openEvaluation={openEvaluation}
       />
       {isPublishingToLens && (
         <CreateLensPublication

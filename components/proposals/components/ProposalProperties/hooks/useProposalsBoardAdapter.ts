@@ -9,6 +9,7 @@ import { getDefaultBoard, getDefaultTableView } from 'components/proposals/compo
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
@@ -16,6 +17,7 @@ import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { CardFilter } from 'lib/focalboard/cardFilter';
 import {
   AUTHORS_BLOCK_ID,
   CATEGORY_BLOCK_ID,
@@ -33,15 +35,17 @@ export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { filteredProposals: proposals } = useProposals();
+  const { proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
-  const { proposalPropertiesBlock, proposalBlocks } = useProposalBlocks();
+  const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
+  // TODO - use different types of views (board, calendar)
+  const localViewSettings = useLocalDbViewSettings(`proposals-${DEFAULT_VIEW_BLOCK_ID}`);
 
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
-    storedBoard: proposalPropertiesBlock,
+    storedBoard: proposalBoardBlock,
     categories
   });
 
@@ -50,7 +54,7 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ storedBoard: proposalPropertiesBlock, categories });
+      return getDefaultTableView({ storedBoard: proposalBoardBlock, categories });
     }
 
     const boardView = blockToFBBlock(viewBlock) as BoardView;
@@ -61,10 +65,10 @@ export function useProposalsBoardAdapter() {
     }
 
     return boardView;
-  }, [categories, proposalPropertiesBlock, proposalBlocks]);
+  }, [categories, proposalBoardBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
-    const cards =
+    let cards =
       proposals
         ?.map((p) => {
           const page = pages[p?.id];
@@ -73,13 +77,35 @@ export function useProposalsBoardAdapter() {
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
-    const sortedCardPages = activeView ? sortCards(cards, board, activeView, membersRecord) : [];
+    const filter = localViewSettings?.localFilters || activeView?.fields.filter;
+    // filter cards by active view filter
+    if (filter) {
+      const cardsRaw = cards.map((cp) => cp.card);
+      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cardsRaw).map(
+        (c) => c.id
+      );
+
+      cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
+    }
+
+    const sortedCardPages = activeView
+      ? sortCards(cards, board, activeView, membersRecord, localViewSettings?.localSort)
+      : [];
 
     return sortedCardPages;
-  }, [activeView, board, membersRecord, pages, proposals, space?.id]);
+  }, [
+    activeView,
+    board,
+    localViewSettings?.localFilters,
+    localViewSettings?.localSort,
+    membersRecord,
+    pages,
+    proposals,
+    space?.id
+  ]);
 
   const boardCustomProperties: Board = getDefaultBoard({
-    storedBoard: proposalPropertiesBlock,
+    storedBoard: proposalBoardBlock,
     customOnly: true,
     categories: []
   });

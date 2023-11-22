@@ -63,7 +63,7 @@ export function RoleForm({ role, submitted }: Props) {
           <TextField
             {...register('name')}
             autoFocus
-            placeholder='Bounty manager'
+            placeholder='Reward manager'
             variant='outlined'
             type='text'
             fullWidth

@@ -18,15 +18,6 @@
     outline: 0;
   }
 
-  input,
-  textarea {
-    background: rgb(var(--center-channel-bg-rgb));
-    color: rgb(var(--center-channel-color-rgb));
-    font-family: inherit;
-
-    user-select: text;
-  }
-
   hr {
     width: 100%;
     height: 1px;

@@ -27,6 +27,9 @@ import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { PROPOSAL_REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import {
+  REWARD_CHAIN,
+  REWARD_TOKEN,
+  REWARD_CUSTOM_VALUE,
   ASSIGNEES_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
@@ -48,6 +51,8 @@ import DateRange from './properties/dateRange/dateRange';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
+import { TokenAmount } from './properties/tokenAmount/tokenAmount';
+import { TokenChain } from './properties/tokenChain/tokenChain';
 
 type Props = {
   board: Board;
@@ -73,6 +78,8 @@ const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
   'proposalEvaluatedBy',
   'proposalEvaluationTotal'
 ];
+
+const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
 
 function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
@@ -119,7 +126,6 @@ function PropertyValueElement(props: Props) {
   const router = useRouter();
   const domain = router.query.domain as string;
 
-  const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
 
   useEffect(() => {
@@ -179,6 +185,7 @@ function PropertyValueElement(props: Props) {
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
     return (
       <UserAndRoleSelect
+        displayType={displayType}
         data-test='selected-reviewers'
         readOnly={readOnly}
         onChange={() => null}
@@ -215,6 +222,9 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
+    // do not show value in reward row
+  } else if (propertyTemplate.id === ASSIGNEES_BLOCK_ID && Array.isArray(propertyValue)) {
+    propertyValueElement = null;
   } else if (
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||
@@ -303,6 +313,17 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = (
       <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
     );
+  } else if (propertyTemplate.type === 'tokenAmount') {
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    propertyValueElement = (
+      <TokenAmount amount={displayValue as string} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+    );
+  } else if (propertyTemplate.type === 'tokenChain') {
+    // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
   }
 
   const commonProps = {
