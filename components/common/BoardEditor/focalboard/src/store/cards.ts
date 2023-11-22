@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
@@ -14,7 +14,7 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
 import { Utils } from '../utils';
 
-import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
+import { blockLoad, initialDatabaseLoad, pagesLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
@@ -22,6 +22,7 @@ type CardsState = {
   current: string;
   cards: { [key: string]: Card };
   templates: { [key: string]: Card };
+  cardPages: Record<string, Pick<PageMeta, 'title'>>;
 };
 
 const cardsSlice = createSlice({
@@ -29,7 +30,8 @@ const cardsSlice = createSlice({
   initialState: {
     current: '',
     cards: {},
-    templates: {}
+    templates: {},
+    cardPages: {}
   } as CardsState,
   reducers: {
     setCurrent: (state, action: PayloadAction<string>) => {
@@ -71,23 +73,40 @@ const cardsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
-      state.cards = state.cards ?? {};
-      state.templates = state.templates ?? {};
-      for (const block of action.payload) {
-        if (block.type === 'card' && block.fields.isTemplate) {
-          state.templates[block.id] = block as Card;
-        } else if (block.type === 'card' && !block.fields.isTemplate) {
-          state.cards[block.id] = block as Card;
-        }
-      }
-    });
-
     builder.addCase(blockLoad.fulfilled, (state, action) => {
       state.cards = state.cards ?? {};
       const block = action.payload;
       if (block.type === 'card') {
         state.cards[block.id] = block as Card;
+      }
+    });
+
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
+      const cardPages = state.cardPages;
+      for (const block of action.payload) {
+        if (block.type === 'card' && block.fields.isTemplate) {
+          state.templates[block.id] = block as Card;
+        } else if (block.type === 'card' && !block.fields.isTemplate) {
+          state.cards[block.id] = block as Card;
+          if (cardPages) {
+            state.cards[block.id].fields.properties[Constants.titleColumnId] = cardPages[block.id]?.title ?? '';
+          }
+        }
+      }
+    });
+
+    builder.addCase(pagesLoad.fulfilled, (state, action) => {
+      state.cards = state.cards ?? {};
+      Object.values(action.payload).forEach((page) => {
+        if (page) {
+          state.cardPages[page.id] = { title: page.title };
+        }
+      });
+      for (const card of Object.values(state.cards)) {
+        const cardPage = action.payload[card.id];
+        if (cardPage) {
+          card.fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
+        }
       }
     });
   }
@@ -336,7 +355,7 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-type getViewCardsProps = { viewId: string; boardId: string; pages: PagesMap };
+type getViewCardsProps = { viewId: string; boardId: string };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
@@ -344,21 +363,19 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
       const cards = getCards(state);
       const board = state.boards.boards[props.boardId];
       const view = state.views.views[props.viewId];
-
       return {
         cards,
         board,
-        view,
-        pages: props.pages
+        view
       };
     },
-    ({ cards, board, view, pages }) => {
+    ({ cards, board, view }) => {
       if (!view || !board || !cards) {
         return [];
       }
       const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        return CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result, pages);
+        return CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result);
       }
       return result;
     }

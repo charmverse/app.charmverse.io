@@ -1,5 +1,5 @@
-import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import type { PageMeta } from '@charmverse/core/pages';
+import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { useMemo, useState } from 'react';
 

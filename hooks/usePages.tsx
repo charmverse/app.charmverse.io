@@ -7,6 +7,8 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { pagesLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { Block } from 'lib/focalboard/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
@@ -51,8 +53,14 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
+  const blocksDispatch = useAppDispatch();
   const { sendMessage, subscribe } = useWebSocketClient();
-  const { data, mutate: mutatePagesList } = useSWR(
+  const pagesDispatched = useRef(false);
+  const {
+    data,
+    mutate: mutatePagesList,
+    isLoading
+  } = useSWR(
     () => getPagesListCacheKey(currentSpace?.id),
     async () => {
       if (!currentSpace) {
@@ -87,6 +95,13 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     return updatedData;
   };
+
+  useEffect(() => {
+    if (data && !isLoading && !pagesDispatched.current) {
+      blocksDispatch(pagesLoad({ pagesMap: data }));
+      pagesDispatched.current = true;
+    }
+  }, [data, isLoading]);
 
   async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
     const page = pages[pageId];

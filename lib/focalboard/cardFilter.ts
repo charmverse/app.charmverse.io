@@ -15,31 +15,19 @@ import type {
 } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
-import type { PagesMap } from 'lib/pages';
 
 import { Constants } from './constants';
 
 class CardFilter {
-  static applyFilterGroup(
-    filterGroup: FilterGroup,
-    templates: readonly IPropertyTemplate[],
-    cards: Card[],
-    pages?: PagesMap
-  ): Card[] {
+  static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
     const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
     const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
       ? templates
       : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
-
-    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card, pages));
+    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card));
   }
 
-  static isFilterGroupMet(
-    filterGroup: FilterGroup,
-    templates: readonly IPropertyTemplate[],
-    card: Card,
-    pages?: PagesMap
-  ): boolean {
+  static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const { filters } = filterGroup;
     if (filterGroup.filters.length < 1) {
       return true; // No filters = always met
@@ -48,10 +36,10 @@ class CardFilter {
     if (filterGroup.operation === 'or') {
       for (const filter of filters) {
         if (isAFilterGroupInstance(filter)) {
-          if (this.isFilterGroupMet(filter, templates, card, pages)) {
+          if (this.isFilterGroupMet(filter, templates, card)) {
             return true;
           }
-        } else if (this.isClauseMet(filter, templates, card, pages)) {
+        } else if (this.isClauseMet(filter, templates, card)) {
           return true;
         }
       }
@@ -61,27 +49,19 @@ class CardFilter {
 
     for (const filter of filters) {
       if (isAFilterGroupInstance(filter)) {
-        if (!this.isFilterGroupMet(filter, templates, card, pages)) {
+        if (!this.isFilterGroupMet(filter, templates, card)) {
           return false;
         }
-      } else if (!this.isClauseMet(filter, templates, card, pages)) {
+      } else if (!this.isClauseMet(filter, templates, card)) {
         return false;
       }
     }
     return true;
   }
 
-  static isClauseMet(
-    filter: FilterClause,
-    templates: readonly IPropertyTemplate[],
-    card: Card,
-    pages?: PagesMap
-  ): boolean {
+  static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
-    const value =
-      filterProperty?.id === Constants.titleColumnId
-        ? pages?.[card.id]?.title ?? ''
-        : card.fields.properties[filter.propertyId] ?? [];
+    const value = card.fields.properties[filter.propertyId] ?? [];
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
     const valueArray = (Array.isArray(value) ? value : [value]).map((v: string | number | Record<'id', string>) => {
       // In some cases we get an object with an id as value
