@@ -45,9 +45,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   );
 
-  const { blockCount: blockCountData } = useBlockCount();
-
-  const blockCount = blockCountData?.count || 0;
+  const { count: blockCount, data: blockCountData } = useBlockCount();
 
   const minimumBlockQuota = blockCount > 10000 ? Math.ceil(blockCount / 10000) * 10 : 10;
 

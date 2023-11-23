@@ -9,15 +9,12 @@ import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
 
-import { useAdditionalBlockQuota } from './useAdditionalBlockQuota';
-
 export function useSpaceSubscription() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setSpace } = useSpaces();
   const { user } = useUser();
-  const { blockCount } = useBlockCount();
-  const { additionalBlockQuota } = useAdditionalBlockQuota();
+  const { count, additionalQuota } = useBlockCount();
 
   const {
     data: spaceSubscription,
@@ -34,9 +31,8 @@ export function useSpaceSubscription() {
     [spaceSubscription?.status]
   );
 
-  const spaceBlockQuota =
-    defaultFreeBlockQuota * 1000 + (spaceSubscription?.blockQuota || 0) * 1000 + additionalBlockQuota;
-  const hasPassedBlockQuota = (blockCount?.count || 0) > spaceBlockQuota;
+  const spaceBlockQuota = defaultFreeBlockQuota * 1000 + (spaceSubscription?.blockQuota || 0) * 1000 + additionalQuota;
+  const hasPassedBlockQuota = (count || 0) > spaceBlockQuota;
 
   useEffect(() => {
     const unsubscribeFromSpaceSubscriptionUpdates = subscribe('space_subscription', (payload) => {
@@ -61,7 +57,7 @@ export function useSpaceSubscription() {
     refetchSpaceSubscription,
     hasPassedBlockQuota,
     spaceBlockQuota,
-    spaceBlockCount: blockCount?.count,
+    spaceBlockCount: count,
     paidTier: currentSpace?.paidTier
   };
 }
