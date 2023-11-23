@@ -154,9 +154,7 @@ export function RewardSubmissionInput({
                 fullWidth
                 error={!!errors.rewardInfo}
                 helperText={errors.rewardInfo?.message}
-                disabled={
-                  !currentUserIsAuthor || readOnly || submission?.status === 'complete' || submission?.status === 'paid'
-                }
+                disabled={!currentUserIsAuthor || submission?.status !== 'inProgress'}
               />
             </Grid>
           )}
