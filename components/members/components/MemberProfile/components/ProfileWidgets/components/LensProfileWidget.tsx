@@ -41,9 +41,10 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
             size='large'
             name={lensProfile.handle?.fullHandle ?? lensProfile.metadata?.displayName ?? lensProfile.id}
             avatar={
-              lensProfile.metadata?.picture?.__typename === 'ImageSet'
-                ? lensProfile.metadata?.picture?.raw.uri
-                : lensProfile.metadata?.picture?.image?.raw?.uri
+              (lensProfile.metadata?.picture?.__typename === 'ImageSet'
+                ? lensProfile.metadata?.picture?.optimized?.uri || lensProfile.metadata?.picture?.raw.uri
+                : lensProfile.metadata?.picture?.image?.optimized?.uri ||
+                  lensProfile.metadata?.picture?.image?.raw?.uri) || 'https://www.lensfrens.xyz/assets/defaultPfp.png'
             }
             variant='circular'
           />
@@ -79,31 +80,34 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
             Followers: {lensProfile.stats?.followers ?? 0} | Following: {lensProfile.stats?.following ?? 0}
           </Typography>
         </Stack>
-        <Divider />
-        <Typography variant='subtitle1'>{lensProfile.metadata?.bio}</Typography>
-
-        {(lensProfile.metadata?.attributes ?? []).map((attribute) => {
-          if (attribute.key === 'website') {
-            return (
-              <LensProfileAttributes
-                href={attribute.value}
-                key={attribute.key}
-                icon={<LanguageIcon fontSize='small' />}
-                label={attribute.value}
-              />
-            );
-          } else if (attribute.key === 'twitter') {
-            return (
-              <LensProfileAttributes
-                key={attribute.key}
-                href={`https://twitter.com/${attribute.value}`}
-                icon={<FaXTwitter style={{ color: '#888', height: 20, width: 18 }} />}
-                label={attribute.value}
-              />
-            );
-          }
-          return null;
-        })}
+        {lensProfile.metadata?.bio || (lensProfile.metadata?.attributes ?? []).length ? (
+          <>
+            <Divider />
+            <Typography variant='subtitle1'>{lensProfile.metadata?.bio}</Typography>
+            {(lensProfile.metadata?.attributes ?? []).map((attribute) => {
+              if (attribute.key === 'website') {
+                return (
+                  <LensProfileAttributes
+                    href={attribute.value}
+                    key={attribute.key}
+                    icon={<LanguageIcon fontSize='small' />}
+                    label={attribute.value}
+                  />
+                );
+              } else if (attribute.key === 'twitter') {
+                return (
+                  <LensProfileAttributes
+                    key={attribute.key}
+                    href={`https://twitter.com/${attribute.value}`}
+                    icon={<FaXTwitter style={{ color: '#888', height: 20, width: 18 }} />}
+                    label={attribute.value}
+                  />
+                );
+              }
+              return null;
+            })}
+          </>
+        ) : null}
       </Stack>
     </ProfileWidget>
   );
