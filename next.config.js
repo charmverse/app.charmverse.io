@@ -56,11 +56,6 @@ const config = {
         permanent: true
       },
       {
-        source: '/:domain/bounties',
-        destination: '/:domain/rewards',
-        permanent: true
-      },
-      {
         source: '/nexus',
         destination: '/',
         permanent: true
@@ -102,7 +97,7 @@ const config = {
       {
         source: '/:domain/bounties',
         destination: '/:domain/rewards',
-        permanent: false // change this to true once we confirm success :)
+        permanent: true // change this to true once we confirm success :)
       }
     ];
   },
