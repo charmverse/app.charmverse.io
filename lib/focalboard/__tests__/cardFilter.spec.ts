@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/dist/cjs/pages';
 import { v4 } from 'uuid';
 
 import { TestBlockFactory } from 'components/common/BoardEditor/focalboard/src/test/testBlockFactory';
@@ -26,6 +25,8 @@ describe('src/cardFilter', () => {
     values: ['Status'],
     filterId: v4()
   });
+
+  card1.fields.properties[Constants.titleColumnId] = 'Page Title';
 
   describe('verify isClauseMet method', () => {
     test('should be true with is_not_empty clause', () => {
@@ -62,12 +63,7 @@ describe('src/cardFilter', () => {
       const result = CardFilter.isClauseMet(
         filterClauseIncludes,
         [{ id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }],
-        card1,
-        {
-          [card1.id]: {
-            title: 'Page Title'
-          } as PageMeta
-        }
+        card1
       );
       expect(result).toBeTruthy();
     });
