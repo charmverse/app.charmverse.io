@@ -10,9 +10,16 @@ export async function getSpaceAdditionalBlockCount({ spaceId }: { spaceId: strin
     },
     where: {
       spaceId,
-      expiresAt: {
-        gt: new Date()
-      }
+      OR: [
+        {
+          expiresAt: null
+        },
+        {
+          expiresAt: {
+            gt: new Date()
+          }
+        }
+      ]
     }
   });
 
