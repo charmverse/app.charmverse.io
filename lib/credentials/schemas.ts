@@ -15,16 +15,16 @@ export type ProposalCredential = {
 type TypedSchemaItem<T> = SchemaItem & { name: keyof T };
 
 export const proposalCredentialSchemaDefinition =
-  'string name, string description, string organization, string url, string status';
+  'string name,string organization,string description,string url,string status';
 
 export function encodeProposalCredential({ description, name, organization, status, url }: ProposalCredential) {
   const encoder = new SchemaEncoder(proposalCredentialSchemaDefinition);
   const encodedData = encoder.encodeData([
     { name: 'name', value: name, type: 'string' },
-    { name: 'description', value: description, type: 'string' },
     { name: 'organization', value: organization, type: 'string' },
-    { name: 'status', value: status, type: 'string' },
-    { name: 'url', value: url, type: 'string' }
+    { name: 'description', value: description, type: 'string' },
+    { name: 'url', value: url, type: 'string' },
+    { name: 'status', value: status, type: 'string' }
   ] as TypedSchemaItem<ProposalCredential>[]);
 
   return encodedData;

@@ -9,7 +9,7 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+// import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
@@ -27,7 +27,7 @@ type Props = {
 
 export function PageComments({ page, canCreateComments }: Props) {
   const { user } = useUser();
-  const { lensProfile, setupLensProfile } = useLensProfile();
+  const { lensProfile, setupLensProfile } = {} as any;
   const router = useRouter();
   const {
     nonNestedComments,

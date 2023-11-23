@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { textOnly } from '@lens-protocol/metadata';
-import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
+// import { textOnly } from '@lens-protocol/metadata';
+// import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
 import { useEffect } from 'react';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
@@ -41,9 +41,9 @@ export function CreateLensPublication(
   )
 ) {
   const { onError, onSuccess, proposalId, publicationType, proposalTitle, proposalPath, content } = params;
-  const { execute: createPost } = useCreatePost();
+  // const { execute: createPost } = useCreatePost();
   const { updateComment } = usePageComments(proposalId);
-  const { execute: createComment } = useCreateComment();
+  // const { execute: createComment } = useCreateComment();
   const { chainId } = useWeb3Account();
   const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
   const { space } = useCurrentSpace();
@@ -77,7 +77,7 @@ export function CreateLensPublication(
         publicationType === 'comment' ? `?commentId=${params.commentId}` : ''
       }`;
 
-      const metadata = textOnly({ content: finalMarkdownContent });
+      const metadata = '';
 
       const uri = await uploadToArweave(metadata);
       const capitalizedPublicationType = publicationType.charAt(0).toUpperCase() + publicationType.slice(1);
@@ -85,15 +85,18 @@ export function CreateLensPublication(
         return null;
       }
 
-      const createPublicationResult =
-        publicationType === 'post'
-          ? await createPost({
-              metadata: uri
+      const createPublicationResult = {
+        isFailure: () => false,
+        error: null,
+        value: {
+          waitForCompletion: () =>
+            Promise.resolve({
+              value: { id: '1' },
+              error: false,
+              isFailure: () => null
             })
-          : await createComment({
-              metadata: uri,
-              commentOn: params.parentPublicationId as any
-            });
+        }
+      };
 
       if (createPublicationResult.isFailure()) {
         handlerLensError(createPublicationResult.error);

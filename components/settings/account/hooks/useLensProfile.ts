@@ -1,14 +1,14 @@
 import { log } from '@charmverse/core/log';
-import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
-import type {
-  BroadcastingError,
-  PendingSigningRequestError,
-  ProfileId,
-  TransactionError,
-  UserRejectedError,
-  WalletConnectionError
-} from '@lens-protocol/react-web';
-import { SessionType, useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
+// import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
+// import type {
+//   BroadcastingError,
+//   PendingSigningRequestError,
+//   ProfileId,
+//   TransactionError,
+//   UserRejectedError,
+//   WalletConnectionError
+// } from '@lens-protocol/react-web';
+// import { SessionType, useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -18,14 +18,14 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 export function useHandleLensError() {
   const { showMessage } = useSnackbar();
   const handlerLensError = (
-    error:
-      | BroadcastingError
-      | PendingSigningRequestError
-      | UserRejectedError
-      | WalletConnectionError
-      | TransactionError
-      | CredentialsExpiredError
-      | NotAuthenticatedError
+    error: any
+    // | BroadcastingError
+    // | PendingSigningRequestError
+    // | UserRejectedError
+    // | WalletConnectionError
+    // | TransactionError
+    // | CredentialsExpiredError
+    // | NotAuthenticatedError
   ) => {
     let errorMessage = '';
     switch (error.name) {
@@ -82,52 +82,52 @@ export function useHandleLensError() {
 
 export function useLensProfile() {
   const { account } = useWeb3Account();
-  const { data: sessionData } = useSession();
-  const authenticated = sessionData?.authenticated ?? false;
-  const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
-  const { handlerLensError } = useHandleLensError();
+  // const { data: sessionData } = useSession();
+  // const authenticated = sessionData?.authenticated ?? false;
+  // const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
+  // const { handlerLensError } = useHandleLensError();
 
-  const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
-    where: {
-      ownedBy: account ? [account] : null
-    }
-  });
+  // const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
+  //   where: {
+  //     ownedBy: account ? [account] : null
+  //   }
+  // });
 
-  const { execute } = useLogin();
+  // const { execute } = useLogin();
   const { showMessage } = useSnackbar();
 
-  const lensProfile = sessionProfile ?? profilesData?.[0] ?? null;
+  // const lensProfile = sessionProfile ?? profilesData?.[0] ?? null;
 
   const { user } = useUser();
   const { space } = useCurrentSpace();
 
-  const setupLensProfile = async () => {
-    if (!user || !account || !lensProfile) {
-      return false;
-    }
+  // const setupLensProfile = async () => {
+  //   if (!user || !account || !lensProfile) {
+  //     return false;
+  //   }
 
-    if (authenticated) {
-      return true;
-    }
+  //   if (authenticated) {
+  //     return true;
+  //   }
 
-    const result = await execute({
-      address: account,
-      profileId: lensProfile.id as ProfileId
-    });
+  //   const result = await execute({
+  //     address: account,
+  //     profileId: lensProfile.id as ProfileId
+  //   });
 
-    if (result.isFailure()) {
-      handlerLensError(result.error);
-      return false;
-    }
+  //   if (result.isFailure()) {
+  //     // handlerLensError(result.error);
+  //     return false;
+  //   }
 
-    return true;
-  };
+  //   return true;
+  // };
 
   return {
-    isAuthenticated: authenticated,
-    lensProfile: !isCyberConnect(space?.domain) && lensProfile,
-    setupLensProfile,
-    isLoadingProfiles
+    isAuthenticated: false,
+    lensProfile: null,
+    setupLensProfile: () => null,
+    isLoadingProfiles: false
   };
 }
 

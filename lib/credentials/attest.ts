@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { SignedOffchainAttestation } from '@ethereum-attestation-service/eas-sdk';
 import type { SignerOrProvider } from '@ethereum-attestation-service/eas-sdk/dist/transaction';
 import { getChainById } from 'connectors/chains';
-import * as ethers from 'ethers-v6';
+import { JsonRpcProvider, Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
 import { isValidChainAddress } from 'lib/tokens/validation';
@@ -64,9 +64,9 @@ export type CharmVerseCredentialInput = {
 };
 
 export function signCharmverseCredential({ chainId, credential, recipient }: CharmVerseCredentialInput) {
-  const provider = new ethers.JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
+  const provider = new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
 
-  const wallet = new ethers.Wallet(credentialsWalletPrivateKey, provider);
+  const wallet = new Wallet(credentialsWalletPrivateKey, provider);
 
   return attestOffchain({
     attester: wallet.address,
