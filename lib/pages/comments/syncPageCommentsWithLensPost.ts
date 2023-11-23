@@ -63,9 +63,10 @@ export async function syncPageCommentsWithLensPost({
             path: `${lensUserHandle}-${pathSuffix}`,
             isBot: true,
             avatar:
-              lensProfile.metadata?.picture?.__typename === 'ImageSet'
-                ? lensProfile.metadata?.picture?.raw.uri
-                : lensProfile.metadata?.picture?.image?.raw?.uri,
+              (lensProfile.metadata?.picture?.__typename === 'ImageSet'
+                ? lensProfile.metadata?.picture?.optimized?.uri || lensProfile.metadata?.picture?.raw.uri
+                : lensProfile.metadata?.picture?.image?.optimized?.uri ||
+                  lensProfile.metadata?.picture?.image?.raw?.uri) || 'https://www.lensfrens.xyz/assets/defaultPfp.png',
             spaceRoles: {
               create: {
                 spaceId
