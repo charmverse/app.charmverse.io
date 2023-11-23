@@ -32,7 +32,7 @@ export type PublicRewardToggle = {
 
 async function setPublicBountyBoardController(req: NextApiRequest, res: NextApiResponse<Space>) {
   const { id: spaceId } = req.query;
-  const { publicRewardBoard, publicBountyBoard } = req.body as PublicRewardToggle & { publicBountyBoard: boolean };
+  const { publicRewardBoard } = req.body as PublicRewardToggle;
 
   // If this endpoint is being called, a manual update is happening. So we should update the space configuration mode to "custom"
   await prisma.space.update({
@@ -45,7 +45,7 @@ async function setPublicBountyBoardController(req: NextApiRequest, res: NextApiR
   });
 
   const updatedSpace = await req.premiumPermissionsClient.spaces.togglePublicBounties({
-    publicBountyBoard: publicBountyBoard ?? publicRewardBoard,
+    publicBountyBoard: publicRewardBoard,
     spaceId: spaceId as string
   });
 

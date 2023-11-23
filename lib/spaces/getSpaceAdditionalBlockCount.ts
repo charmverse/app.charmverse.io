@@ -10,7 +10,7 @@ export async function getSpaceAdditionalBlockCount({ spaceId }: { spaceId: strin
     },
     where: {
       spaceId,
-      expiration: {
+      expiresAt: {
         gt: new Date()
       }
     }

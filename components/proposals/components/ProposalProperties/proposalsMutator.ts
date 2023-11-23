@@ -6,7 +6,7 @@ import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { ProposalPropertiesBlockFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
+import type { ProposalBoardBlockFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 
 export interface BlockChange {
   block: Block;
@@ -69,16 +69,16 @@ export class ProposalsMutator extends Mutator {
   }
 
   async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]): Promise<void> {
-    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
-    const oldFields = proposalPropertiesBlock?.fields || {};
+    const proposalBoardBlock = this.blocksContext.proposalBoardBlock;
+    const oldFields = proposalBoardBlock?.fields || {};
 
-    if (!proposalPropertiesBlock) {
+    if (!proposalBoardBlock) {
       return;
     }
 
     await this.blocksContext.updateBlock({
-      ...proposalPropertiesBlock,
-      fields: { ...oldFields, cardProperties } as ProposalPropertiesBlockFields
+      ...proposalBoardBlock,
+      fields: { ...oldFields, cardProperties } as ProposalBoardBlockFields
     });
   }
 
@@ -114,13 +114,13 @@ export class ProposalsMutator extends Mutator {
   }
 
   async changePropertyOption(board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
-    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
+    const proposalBoardBlock = this.blocksContext.proposalBoardBlock;
 
-    const updatedProperties = proposalPropertiesBlock?.fields?.cardProperties
-      ? [...proposalPropertiesBlock.fields.cardProperties]
+    const updatedProperties = proposalBoardBlock?.fields?.cardProperties
+      ? [...proposalBoardBlock.fields.cardProperties]
       : [];
 
-    if (!proposalPropertiesBlock) {
+    if (!proposalBoardBlock) {
       return;
     }
 
@@ -137,11 +137,11 @@ export class ProposalsMutator extends Mutator {
       };
     });
 
-    const oldFields = proposalPropertiesBlock?.fields || {};
+    const oldFields = proposalBoardBlock?.fields || {};
 
     await this.blocksContext.updateBlock({
-      ...proposalPropertiesBlock,
-      fields: { ...oldFields, cardProperties: properties } as ProposalPropertiesBlockFields
+      ...proposalBoardBlock,
+      fields: { ...oldFields, cardProperties: properties } as ProposalBoardBlockFields
     });
   }
 
@@ -151,13 +151,13 @@ export class ProposalsMutator extends Mutator {
     option: IPropertyOption,
     description = 'add option'
   ) {
-    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
+    const proposalBoardBlock = this.blocksContext.proposalBoardBlock;
 
-    const updatedProperties = proposalPropertiesBlock?.fields?.cardProperties
-      ? [...proposalPropertiesBlock.fields.cardProperties]
+    const updatedProperties = proposalBoardBlock?.fields?.cardProperties
+      ? [...proposalBoardBlock.fields.cardProperties]
       : [];
 
-    if (!proposalPropertiesBlock) {
+    if (!proposalBoardBlock) {
       return;
     }
 
@@ -166,23 +166,23 @@ export class ProposalsMutator extends Mutator {
     if (udpatedTemplate) {
       udpatedTemplate.options = udpatedTemplate.options ? [...udpatedTemplate.options, option] : [option];
 
-      const oldFields = proposalPropertiesBlock?.fields || {};
+      const oldFields = proposalBoardBlock?.fields || {};
 
       await this.blocksContext.updateBlock({
-        ...proposalPropertiesBlock,
-        fields: { ...oldFields, cardProperties: updatedProperties } as ProposalPropertiesBlockFields
+        ...proposalBoardBlock,
+        fields: { ...oldFields, cardProperties: updatedProperties } as ProposalBoardBlockFields
       });
     }
   }
 
   async deletePropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption) {
-    const proposalPropertiesBlock = this.blocksContext.proposalPropertiesBlock;
+    const proposalBoardBlock = this.blocksContext.proposalBoardBlock;
 
-    const updatedProperties = proposalPropertiesBlock?.fields?.cardProperties
-      ? [...proposalPropertiesBlock.fields.cardProperties]
+    const updatedProperties = proposalBoardBlock?.fields?.cardProperties
+      ? [...proposalBoardBlock.fields.cardProperties]
       : [];
 
-    if (!proposalPropertiesBlock) {
+    if (!proposalBoardBlock) {
       return;
     }
 
@@ -191,11 +191,11 @@ export class ProposalsMutator extends Mutator {
     if (udpatedTemplate) {
       udpatedTemplate.options = udpatedTemplate.options?.filter((o) => o.id !== option.id) || [];
 
-      const oldFields = proposalPropertiesBlock?.fields || {};
+      const oldFields = proposalBoardBlock?.fields || {};
 
       await this.blocksContext.updateBlock({
-        ...proposalPropertiesBlock,
-        fields: { ...oldFields, cardProperties: updatedProperties } as ProposalPropertiesBlockFields
+        ...proposalBoardBlock,
+        fields: { ...oldFields, cardProperties: updatedProperties } as ProposalBoardBlockFields
       });
     }
   }

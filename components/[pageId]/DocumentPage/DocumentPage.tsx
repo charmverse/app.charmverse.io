@@ -46,7 +46,6 @@ import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { usePageSidebar } from './hooks/usePageSidebar';
 
-// const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
@@ -337,7 +336,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                 snapshotProposalId={page.snapshotProposalId}
                 onParticipantUpdate={onParticipantUpdate}
                 style={{
-                  minHeight: proposalId ? '100px' : 'unset'
+                  // 5 lines
+                  minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
                 }}
                 disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
                 allowClickingFooter={true}

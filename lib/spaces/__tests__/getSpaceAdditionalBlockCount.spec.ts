@@ -11,7 +11,7 @@ describe('getSpaceAdditionalBlockCount', () => {
       data: {
         blockCount: 10,
         // expiration is 1 day before
-        expiration: new Date(Date.now() - 1000 * 60 * 60 * 24),
+        expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
         spaceId: space.id
       }
     });
@@ -20,7 +20,14 @@ describe('getSpaceAdditionalBlockCount', () => {
       data: {
         blockCount: 20,
         // expiration is 1 day after
-        expiration: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        spaceId: space.id
+      }
+    });
+
+    await prisma.additionalBlockQuota.create({
+      data: {
+        blockCount: 30,
         spaceId: space.id
       }
     });
@@ -29,7 +36,7 @@ describe('getSpaceAdditionalBlockCount', () => {
       spaceId: space.id
     });
 
-    expect(additionalBlockCount).toEqual(20);
+    expect(additionalBlockCount).toEqual(50);
   });
 
   it('should return 0 for a space without any additional block counts', async () => {
