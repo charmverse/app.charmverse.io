@@ -103,7 +103,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://sepolia.etherscan.io/'],
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     testnet: true,
-    shortName: 'sep'
+    shortName: 'sep',
+    litNetwork: 'sepolia'
   },
   OPTIMISM: {
     ...EVM_DEFAULT,

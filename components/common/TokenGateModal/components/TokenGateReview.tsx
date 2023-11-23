@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Card, CardContent, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
 import { useReviewTokenGate } from 'charmClient/hooks/tokengates';
@@ -37,11 +37,15 @@ export function TokenGateReview() {
 
   return (
     <Box display='flex' flexDirection='column' gap={3}>
-      <Typography>Review your conditions and confirm at bottom</Typography>
+      <Typography>Review your conditions and confirm</Typography>
       {!data || isMutating ? (
         <LoadingComponent isLoading={isMutating} />
       ) : (
-        <ConditionsGroup conditions={conditionsData} />
+        <Card variant='outlined' color='default'>
+          <CardContent>
+            <ConditionsGroup conditions={conditionsData} />
+          </CardContent>
+        </Card>
       )}
       <TokenGateFooter onSubmit={onSubmit} onCancel={resetModal} isValid={!loadingToken} />
     </Box>
