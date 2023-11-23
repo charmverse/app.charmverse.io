@@ -88,7 +88,7 @@ export function useLensProfile() {
   const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
   const { handlerLensError } = useHandleLensError();
   const wallet = user?.wallets[0]?.address;
-  const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
+  const { data: profilesData } = useProfiles({
     where: {
       ownedBy: wallet ? [wallet] : account ? [account] : null
     }
@@ -125,8 +125,7 @@ export function useLensProfile() {
   return {
     isAuthenticated: authenticated,
     lensProfile: !isCyberConnect(space?.domain) && lensProfile,
-    setupLensProfile,
-    isLoadingProfiles
+    setupLensProfile
   };
 }
 
