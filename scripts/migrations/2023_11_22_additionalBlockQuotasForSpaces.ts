@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { DateTime } from 'luxon';
 
 async function additionalBlockQuotasForSpaces(data: {
   winner: boolean
@@ -7,8 +8,8 @@ async function additionalBlockQuotasForSpaces(data: {
   await prisma.additionalBlockQuota.createMany({
     data: data.map(({spaceId, winner}) => ({
       spaceId,
-      blockCount: winner ? 100000 : 20000,
-      expiration: new Date('2024-11-22T00:00:00.000Z'),
+      blockCount: winner ? 100 : 20,
+      expiresAt: DateTime.local().plus({ years: 1 }).endOf('day').toJSDate()
     }))
   })
 }
