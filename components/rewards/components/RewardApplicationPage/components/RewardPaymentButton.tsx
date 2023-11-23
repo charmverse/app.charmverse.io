@@ -16,7 +16,7 @@ import charmClient from 'charmClient';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
-import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
+import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -50,7 +50,7 @@ function SafeMenuItem({
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
 }) {
-  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ rewards: [reward] });
+  const { onPaymentSuccess, getTransactions } = useMultiRewardPayment({ rewards: [reward] });
 
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,

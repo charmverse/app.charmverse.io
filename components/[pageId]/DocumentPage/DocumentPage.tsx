@@ -46,7 +46,6 @@ import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { usePageSidebar } from './hooks/usePageSidebar';
 
-// const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
