@@ -10,7 +10,10 @@ const tokenIds = tokenCheck.map((t) => t.id);
 
 const schema = yup.object({
   chain: yup.string().required('Chain is required'),
-  check: yup.string().oneOf(tokenIds).required('Token selection is required'),
+  check: yup
+    .string()
+    .oneOf(tokenIds)
+    .test('empty-check', 'Token selection is required', (option) => !!option),
   contract: yup.string().when('check', {
     is: (val: 'token' | 'customToken') => val === 'customToken',
     then: () =>
@@ -30,7 +33,7 @@ export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = {
   chain: '',
-  check: 'token',
+  check: undefined,
   contract: '',
   quantity: ''
 };

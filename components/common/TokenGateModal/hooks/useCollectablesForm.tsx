@@ -17,8 +17,8 @@ type NftCheck = (typeof nftCheckIds)[number];
 const schema = yup.object({
   collectableOption: yup
     .string()
-    .required()
-    .oneOf([...collectableOptionIds, ''] as const, 'Invalid collectable option'),
+    .oneOf(collectableOptionIds, 'Invalid collectable option')
+    .test('empty-collectable-option-check', 'Selection is required', (option) => !!option),
   chain: yup.string().when('collectableOption', {
     is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155',
     then: () => yup.string().required('Chain is required'),
@@ -87,10 +87,10 @@ const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = {
-  collectableOption: '',
+  collectableOption: undefined,
   chain: '',
   contract: '',
-  check: 'individual',
+  check: undefined,
   quantity: '',
   tokenId: '',
   poapType: undefined,
