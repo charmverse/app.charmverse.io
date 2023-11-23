@@ -1,15 +1,6 @@
-import {
-  FormControlLabel,
-  FormHelperText,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select
-} from '@mui/material';
+import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import { getChainDetailsFromLitNetwork, litChainList } from 'connectors/chains';
-import { Controller, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
@@ -58,17 +49,18 @@ export function TokengateNft() {
       />
       {collectableOption === 'ERC721' && (
         <FieldWrapper label='Select how would you like to customize the nft token gate'>
-          <Controller
-            control={control}
-            name='check'
-            render={({ field: { onChange, value } }) => (
-              <RadioGroup aria-labelledby='radio-buttons-for-nfts' onChange={onChange} value={value}>
-                {nftCheck.map((c) => (
-                  <FormControlLabel key={c.id} value={c.id} control={<Radio />} label={c.name} />
-                ))}
-              </RadioGroup>
-            )}
-          />
+          <Select<string>
+            displayEmpty
+            fullWidth
+            renderValue={(selected) => nftCheck.find((c) => c.id === selected)?.name || selected || 'Select...'}
+            {...register('check')}
+          >
+            {nftCheck.map((type) => (
+              <MenuItem key={type.id} value={type.id}>
+                {type.name}
+              </MenuItem>
+            ))}
+          </Select>
         </FieldWrapper>
       )}
       {((collectableOption === 'ERC721' && check === 'individual') || collectableOption === 'ERC1155') && (

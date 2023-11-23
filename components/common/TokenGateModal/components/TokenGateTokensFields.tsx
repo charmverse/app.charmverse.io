@@ -1,13 +1,4 @@
-import {
-  FormControlLabel,
-  FormHelperText,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select
-} from '@mui/material';
+import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import { getChainDetailsFromLitNetwork, litChainList } from 'connectors/chains';
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -49,18 +40,19 @@ export function TokenGateTokenFields() {
         </Select>
         {errors.chain?.message && <FormHelperText>{errors.chain?.message}</FormHelperText>}
       </FieldWrapper>
-      <FieldWrapper label='Which group should be able to access this asset?'>
-        <Controller
-          control={control}
-          name='check'
-          render={({ field: { onChange, value } }) => (
-            <RadioGroup aria-labelledby='radio-buttons-for-tokens' onChange={onChange} value={value}>
-              {tokenCheck.map((c) => (
-                <FormControlLabel key={c.id} value={c.id} control={<Radio />} label={c.name} />
-              ))}
-            </RadioGroup>
-          )}
-        />
+      <FieldWrapper label='Which group should be able to access this asset'>
+        <Select<string>
+          displayEmpty
+          fullWidth
+          renderValue={(selected) => tokenCheck.find((c) => c.id === selected)?.name || selected || 'Select...'}
+          {...register('check')}
+        >
+          {tokenCheck.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name}
+            </MenuItem>
+          ))}
+        </Select>
       </FieldWrapper>
       {check === 'customToken' && (
         <TextInputField
