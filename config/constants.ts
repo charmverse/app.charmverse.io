@@ -42,3 +42,5 @@ export const permissionsApiAuthKey = process.env.PERMISSIONS_API_AUTH_KEY ?? 'ke
 export const webhookEndpoint = 'api/v1/webhooks/addToDatabase';
 
 export const appSubdomain = 'app';
+
+export const credentialsWalletPrivateKey = process.env.CREDENTIAL_WALLET_KEY as string;

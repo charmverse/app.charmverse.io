@@ -170,6 +170,7 @@
     "diff": "^5.1.0",
     "emoji-mart": "^3.0.1",
     "ethers": "^5.5.4",
+    "ethers-v6": "npm:ethers@^6.8.1",
     "firebase": "^10.2.0",
     "firebase-admin": "^11.10.1",
     "form-data": "^4.0.0",

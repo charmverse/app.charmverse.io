@@ -1,7 +1,10 @@
-import { InvalidInputError } from '@charmverse/core/dist/cjs/errors';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { SignedOffchainAttestation } from '@ethereum-attestation-service/eas-sdk';
-import type { Signer } from 'ethers';
+import type { SignerOrProvider } from '@ethereum-attestation-service/eas-sdk/dist/transaction';
+import { getChainById } from 'connectors/chains';
+import * as ethers from 'ethers-v6';
 
+import { credentialsWalletPrivateKey } from 'config/constants';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import type { EasSchemaChain } from './connectors';
@@ -10,9 +13,8 @@ import { encodeAttestion, type CredentialData, type CredentialType } from './sch
 
 type AttestationInput<T extends CredentialType = CredentialType> = {
   recipient: string;
-  type: T;
   credential: CredentialData<T>;
-  signer: Signer;
+  signer: SignerOrProvider;
   attester: string;
   chainId: EasSchemaChain;
 };
@@ -34,10 +36,8 @@ export async function attestOffchain({
 
   const eas = getEasConnector(chainId);
 
-  eas.connect(signer as any);
-
+  eas.connect(signer);
   const offchain = await eas.getOffchain();
-
   const signedOffchainAttestation = await offchain.signOffchainAttestation(
     {
       recipient: recipient.toLowerCase(),
@@ -55,4 +55,24 @@ export async function attestOffchain({
     signer as any
   );
   return signedOffchainAttestation;
+}
+
+export type CharmVerseCredentialInput = {
+  chainId: EasSchemaChain;
+  credential: CredentialData;
+  recipient: string;
+};
+
+export function signCharmverseCredential({ chainId, credential, recipient }: CharmVerseCredentialInput) {
+  const provider = new ethers.JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
+
+  const wallet = new ethers.Wallet(credentialsWalletPrivateKey, provider);
+
+  return attestOffchain({
+    attester: wallet.address,
+    recipient,
+    chainId,
+    signer: wallet,
+    credential
+  });
 }

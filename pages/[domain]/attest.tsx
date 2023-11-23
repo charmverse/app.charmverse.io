@@ -3,6 +3,7 @@ import InputLabel from '@mui/material/InputLabel';
 
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { Typography } from 'components/common/Typography';
+import { ProposalCredentialForm } from 'components/credentials/ProposalCredentialForm';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 
 // Root attestation schema
@@ -14,8 +15,7 @@ export default function AttestPage() {
     <div>
       <Typography variant='h2'>Create an attestation</Typography>
 
-      <InputLabel>Attest</InputLabel>
-      <Input type='text' />
+      <ProposalCredentialForm />
     </div>
   );
 }
