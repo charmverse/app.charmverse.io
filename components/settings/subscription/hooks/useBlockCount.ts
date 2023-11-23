@@ -8,17 +8,13 @@ export function useBlockCount() {
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser(); // a user session is required to get a result
 
-  const {
-    data: blockCount,
-    isLoading,
-    mutate: refetchBlockCount
-  } = useSWR(currentSpace && user ? `/spaces/${currentSpace.id}/block-count` : null, () =>
+  const { data } = useSWR(currentSpace && user ? `/spaces/${currentSpace.id}/block-count` : null, () =>
     charmClient.spaces.getBlockCount({ spaceId: currentSpace!.id })
   );
 
   return {
-    blockCount,
-    isLoading,
-    refetchBlockCount
+    data,
+    count: data?.count ?? 0,
+    additionalQuota: data?.additionalQuota ?? 0
   };
 }

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PublicBountyToggle } from '@charmverse/core/permissions';
-import type { Space, User } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { LoggedInUser } from 'models';
+import { type PublicRewardToggle } from 'pages/api/spaces/[id]/set-public-bounty-board';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -29,8 +29,8 @@ beforeAll(async () => {
 
 describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty board public or private', () => {
   it('should update a space`s public bounty board status, set its mode to "custom" and return the space, responding with 200', async () => {
-    const update: Pick<PublicBountyToggle, 'publicBountyBoard'> = {
-      publicBountyBoard: true
+    const update: PublicRewardToggle = {
+      publicRewardBoard: true
     };
 
     let updatedSpace = (
@@ -48,7 +48,7 @@ describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty 
     expect(updatedSpace.permissionConfigurationMode).toBe('custom');
 
     // Make a second request to ensure the value is actually being changed
-    update.publicBountyBoard = false;
+    update.publicRewardBoard = false;
 
     updatedSpace = (
       await request(baseUrl)

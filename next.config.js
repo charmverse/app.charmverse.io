@@ -55,16 +55,6 @@ const config = {
         destination: '/:domain',
         permanent: true
       },
-      // {
-      //   source: '/:domain/bounties',
-      //   destination: '/:domain/rewards',
-      //   permanent: true
-      // },
-      // {
-      //   source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
-      //   destination: '/:domain/bounties?bountyId=:id',
-      //   permanent: false
-      // },
       {
         source: '/nexus',
         destination: '/',
@@ -107,7 +97,7 @@ const config = {
       {
         source: '/:domain/bounties',
         destination: '/:domain/rewards',
-        permanent: false // change this to true once we confirm success :)
+        permanent: true // change this to true once we confirm success :)
       }
     ];
   },
