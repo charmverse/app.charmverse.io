@@ -1,3 +1,4 @@
+import type { ProfileFragment } from '@lens-protocol/client';
 import type { Profile } from '@lens-protocol/react-web';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Divider, Link, Stack, Typography } from '@mui/material';
@@ -27,7 +28,7 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
   );
 }
 
-export function LensProfileWidget({ lensProfile }: { lensProfile: Profile }) {
+export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
   return (
     <ProfileWidget
       link={`https://www.lensfrens.xyz/${lensProfile.handle?.localName}`}
