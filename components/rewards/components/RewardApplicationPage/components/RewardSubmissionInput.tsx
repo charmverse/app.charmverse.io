@@ -24,11 +24,9 @@ const schema = (customReward?: boolean) => {
   return yup.object({
     submission: yup.string().required(),
     submissionNodes: yup.mixed().required(),
-    walletAddress: (customReward ? yup.string() : yup.string().required()).test(
-      'verifyContractFormat',
-      'Invalid wallet address',
-      (value) => (customReward ? true : isValidChainAddress(value))
-    ),
+    walletAddress: customReward
+      ? yup.string()
+      : yup.string().required().test('verifyContractFormat', 'Invalid wallet address', isValidChainAddress),
     rewardInfo: yup.string()
   });
 };
