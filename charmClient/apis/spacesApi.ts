@@ -3,7 +3,6 @@ import type { Space, Prisma } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
-import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
 import type { CustomDomainVerification, SpaceWithGates } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
@@ -83,7 +82,10 @@ export class SpacesApi {
   }
 
   getBlockCount({ spaceId }: { spaceId: string }) {
-    return http.GET<BlockCountInfo>(`/api/spaces/${spaceId}/block-count`);
+    return http.GET<{
+      count: number;
+      additionalQuota: number;
+    }>(`/api/spaces/${spaceId}/block-count`);
   }
 
   updateCustomDomain({ spaceId, customDomain }: { spaceId: string; customDomain: string | null }) {

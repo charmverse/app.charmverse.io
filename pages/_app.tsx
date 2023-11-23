@@ -30,7 +30,6 @@ import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
-import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
@@ -244,23 +243,21 @@ function DataProviders({ children }: { children: ReactNode }) {
                       <IsSpaceMemberProvider>
                         <WebSocketClientProvider>
                           <MembersProvider>
-                            <BountiesProvider>
-                              <RewardsProvider>
-                                <PaymentMethodsProvider>
-                                  <FocalBoardProvider>
-                                    <PagesProvider>
-                                      <MemberPropertiesProvider>
-                                        <LensProvider config={lensConfig}>
-                                          <UserProfileProvider>
-                                            <PageTitleProvider>{children}</PageTitleProvider>
-                                          </UserProfileProvider>
-                                        </LensProvider>
-                                      </MemberPropertiesProvider>
-                                    </PagesProvider>
-                                  </FocalBoardProvider>
-                                </PaymentMethodsProvider>
-                              </RewardsProvider>
-                            </BountiesProvider>
+                            <RewardsProvider>
+                              <PaymentMethodsProvider>
+                                <FocalBoardProvider>
+                                  <PagesProvider>
+                                    <MemberPropertiesProvider>
+                                      <LensProvider config={lensConfig}>
+                                        <UserProfileProvider>
+                                          <PageTitleProvider>{children}</PageTitleProvider>
+                                        </UserProfileProvider>
+                                      </LensProvider>
+                                    </MemberPropertiesProvider>
+                                  </PagesProvider>
+                                </FocalBoardProvider>
+                              </PaymentMethodsProvider>
+                            </RewardsProvider>
                           </MembersProvider>
                         </WebSocketClientProvider>
                       </IsSpaceMemberProvider>

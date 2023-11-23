@@ -1,3 +1,5 @@
+import type { ProfileFragment } from '@lens-protocol/client';
+
 import * as http from 'adapters/http';
 import type { EnsProfile } from 'lib/profile/getEnsProfile';
 import type { SummonUserProfile } from 'lib/summon/interfaces';
@@ -9,5 +11,9 @@ export class PublicProfileApi {
 
   getSummonProfile(userId: string) {
     return http.GET<SummonUserProfile | null>(`/api/public/profile/${userId}/summon`);
+  }
+
+  getLensProfile(userId: string) {
+    return http.GET<ProfileFragment>(`/api/public/profile/${userId}/lens`);
   }
 }
