@@ -1,20 +1,19 @@
-import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
-import { getChainDetailsFromLitNetwork, litChainList } from 'connectors/chains';
+import { MenuItem, Select } from '@mui/material';
 import { useFormContext } from 'react-hook-form';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import TokenLogo from 'components/common/TokenLogo';
 
 import type { FormValues } from '../hooks/useCollectablesForm';
 import { nftCheck } from '../utils/utils';
+
+import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 
 export function TokengateNft() {
   const {
     register,
     watch,
-    control,
     formState: { errors }
   } = useFormContext<FormValues>();
   const check = watch('check');
@@ -22,25 +21,11 @@ export function TokengateNft() {
 
   return (
     <>
-      <FieldWrapper label='Blockchain'>
-        <Select<FormValues['chain']>
-          fullWidth
-          displayEmpty
-          error={!!errors.chain?.message}
-          renderValue={(selected) => getChainDetailsFromLitNetwork(selected)?.chainName || selected || 'Select a Chain'}
-          {...register('chain')}
-        >
-          {litChainList.map((_chain) => (
-            <MenuItem key={_chain.chainName} value={_chain.litNetwork}>
-              <ListItemIcon>
-                <TokenLogo height={20} src={_chain.iconUrl} />
-              </ListItemIcon>
-              <ListItemText>{_chain.chainName}</ListItemText>
-            </MenuItem>
-          ))}
-        </Select>
-        {errors.chain?.message && <FormHelperText>{errors.chain?.message}</FormHelperText>}
-      </FieldWrapper>
+      <TokenGateBlockchainSelect
+        error={!!errors.chain?.message}
+        helperMessage={errors.chain?.message}
+        {...register('chain')}
+      />
       <TextInputField
         label='Contract Address'
         error={errors.contract?.message}
@@ -49,7 +34,7 @@ export function TokengateNft() {
       />
       {collectableOption === 'ERC721' && (
         <FieldWrapper label='Select how would you like to customize the nft token gate'>
-          <Select<string>
+          <Select<FormValues['check']>
             displayEmpty
             fullWidth
             renderValue={(selected) => nftCheck.find((c) => c.id === selected)?.name || selected || 'Select...'}

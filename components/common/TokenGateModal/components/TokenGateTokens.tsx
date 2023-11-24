@@ -31,10 +31,8 @@ export function TokenGateTokens() {
 
   return (
     <FormProvider {...methods}>
-      <Box display='flex' gap={2} flexDirection='column'>
-        <TokenGateTokenFields />
-        <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
-      </Box>
+      <TokenGateTokenFields />
+      <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </FormProvider>
   );
 }

@@ -16,7 +16,7 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 
 import { createAuthSigs, getAllChains } from '../utils/helpers';
 
-export type DisplayedPage = 'tokens' | 'collectables' | 'advanced' | 'home' | 'review';
+export type DisplayedPage = 'tokens' | 'collectables' | 'advanced' | 'home' | 'review' | 'wallet' | 'dao';
 export type Flow = 'singleCondition' | 'multipleConditions';
 
 export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions'> & {

@@ -36,7 +36,7 @@ export function TokenGateReview() {
   };
 
   return (
-    <Box display='flex' flexDirection='column' gap={3}>
+    <>
       <Typography>Review your conditions and confirm</Typography>
       {!data || isMutating ? (
         <LoadingComponent isLoading={isMutating} />
@@ -48,6 +48,6 @@ export function TokenGateReview() {
         </Card>
       )}
       <TokenGateFooter onSubmit={onSubmit} onCancel={resetModal} isValid={!loadingToken} />
-    </Box>
+    </>
   );
 }

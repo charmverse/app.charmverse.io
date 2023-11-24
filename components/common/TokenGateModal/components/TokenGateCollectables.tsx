@@ -33,24 +33,22 @@ export function TokenGateCollectables() {
 
   return (
     <FormProvider {...methods}>
-      <Box display='flex' gap={2} flexDirection='column'>
-        <Box>
-          <Select<string>
-            displayEmpty
-            fullWidth
-            renderValue={(selected) => selected || 'Select a Digital Collectible'}
-            {...register('collectableOption')}
-          >
-            {collectableOptions.map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-        <TokenGateCollectableFields />
-        <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
+      <Box>
+        <Select<string>
+          displayEmpty
+          fullWidth
+          renderValue={(selected) => selected || 'Select a Digital Collectible'}
+          {...register('collectableOption')}
+        >
+          {collectableOptions.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name}
+            </MenuItem>
+          ))}
+        </Select>
       </Box>
+      <TokenGateCollectableFields />
+      <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </FormProvider>
   );
 }

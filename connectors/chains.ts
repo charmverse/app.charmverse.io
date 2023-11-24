@@ -458,10 +458,23 @@ export function getChainExplorerLink(
 
 export type IChainDetailsWithLit = IChainDetails & { litNetwork: NonNullable<IChainDetails['litNetwork']> };
 
-export const litChainList: IChainDetailsWithLit[] = RPCList.filter(
+export const litChains: IChainDetailsWithLit[] = RPCList.filter(
   (chain): chain is IChainDetailsWithLit => !!chain.litNetwork
+).sort((a, b) => {
+  // Createa function that will return mainnets first, then testnets
+  const isMainnet = (chain: IChainDetailsWithLit) => !chain.testnet;
+  if (isMainnet(a) && !isMainnet(b)) {
+    return -1;
+  } else if (!isMainnet(a) && isMainnet(b)) {
+    return 1;
+  }
+  return 0;
+});
+
+export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
+  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
 );
 
 export const getChainDetailsFromLitNetwork = (network?: string) => {
-  return litChainList.find((chain) => chain.litNetwork === network);
+  return litChains.find((chain) => chain.litNetwork === network);
 };

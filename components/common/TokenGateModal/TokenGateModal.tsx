@@ -7,12 +7,12 @@ import { useTokenGateModal } from './hooks/useTokenGateModalContext';
 import { getTitle } from './utils/helpers';
 
 function TokenGateModal() {
-  const { displayedPage, flow } = useTokenGateModal();
+  const { displayedPage } = useTokenGateModal();
 
   return (
-    <Box>
+    <Box display='flex' gap={2} flexDirection='column'>
       <DialogTitle>{getTitle(displayedPage)}</DialogTitle>
-      {flow === 'singleCondition' && <SingleConditionSelect />}
+      <SingleConditionSelect />
     </Box>
   );
 }

@@ -1,9 +1,10 @@
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import { Box, SvgIcon, Typography } from '@mui/material';
 import type { ElementType } from 'react';
 
 import { Button } from 'components/common/Button';
 import GrantorIcon from 'public/images/template_icons/grantor_icon.svg';
-import LightBulbIcon from 'public/images/template_icons/light_bulb_icon_bnw.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
 
 import { useTokenGateModal, type DisplayedPage } from '../hooks/useTokenGateModalContext';
@@ -26,9 +27,14 @@ const requirementButton: ButtonProps[] = [
     icon: GrantorIcon
   },
   {
-    name: 'advanced',
-    title: 'Advanced',
-    icon: LightBulbIcon
+    name: 'wallet',
+    title: 'Wallet',
+    icon: AccountBalanceWalletIcon
+  },
+  {
+    name: 'dao',
+    title: 'MolochDAOv2.1',
+    icon: WaterDropIcon
   }
 ];
 
@@ -36,7 +42,7 @@ export function TokenGateHome() {
   const { setDisplayedPage } = useTokenGateModal();
 
   return (
-    <Box display='flex' flexDirection='column' gap={3}>
+    <>
       <Typography variant='h5'>Select Requirements</Typography>
       {requirementButton.map((btn) => (
         <Box key={btn.name}>
@@ -53,6 +59,6 @@ export function TokenGateHome() {
           </Button>
         </Box>
       ))}
-    </Box>
+    </>
   );
 }
