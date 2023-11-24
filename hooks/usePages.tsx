@@ -7,9 +7,8 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { pagesLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
+import { deleteCardPages, updateCardPages } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { addPage, deletePages, updatePages } from 'components/common/BoardEditor/focalboard/src/store/pages';
 import type { Block } from 'lib/focalboard/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
@@ -100,7 +99,13 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (data && !isLoading && !pagesDispatched.current) {
-      blocksDispatch(pagesLoad({ pagesMap: data }));
+      blocksDispatch(
+        updateCardPages(
+          Object.values(data)
+            .filter(isTruthy)
+            .map((page) => ({ id: page.id, title: page.title }))
+        )
+      );
       pagesDispatched.current = true;
     }
   }, [data, isLoading]);
@@ -237,7 +242,11 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           }, {});
 
           blocksDispatch(
-            updatePages(Object.values(value).filter((page) => page.spaceId === currentSpaceId.current) as PageMeta[])
+            updateCardPages(
+              Object.values(pagesToUpdate)
+                .filter(isTruthy)
+                .map((page) => ({ id: page.id, title: page.title }))
+            )
           );
 
           return {
@@ -258,7 +267,14 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       const newPages = value.reduce<PagesMap>((pageMap, page) => {
         if (page.spaceId === currentSpaceId.current) {
           pageMap[page.id] = page;
-          blocksDispatch(addPage(page));
+          blocksDispatch(
+            updateCardPages([
+              {
+                id: page.id,
+                title: page.title
+              }
+            ])
+          );
         }
         return pageMap;
       }, {});
@@ -290,7 +306,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
           if (existingPages) {
             blocksDispatch(
-              deletePages(
+              deleteCardPages(
                 Object.values(existingPages)
                   .filter(isTruthy)
                   .map((page) => page.id)

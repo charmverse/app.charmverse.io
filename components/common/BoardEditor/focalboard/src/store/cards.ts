@@ -13,8 +13,7 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
 import { Utils } from '../utils';
 
-import { blockLoad, initialDatabaseLoad, pagesLoad } from './databaseBlocksLoad';
-import { addPage, deletePages, updatePages } from './pages';
+import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
 
@@ -39,9 +38,29 @@ const cardsSlice = createSlice({
     },
     addCard: (state, action: PayloadAction<Card>) => {
       state.cards[action.payload.id] = action.payload;
+      const cardPage = state.cardPages[action.payload.id];
+      if (cardPage) {
+        state.cards[action.payload.id].fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
+      }
     },
     addTemplate: (state, action: PayloadAction<Card>) => {
       state.templates[action.payload.id] = action.payload;
+    },
+    updateCardPages: (state, action: PayloadAction<Pick<PageMeta, 'id' | 'title'>[]>) => {
+      for (const cardPage of action.payload) {
+        state.cardPages[cardPage.id] = { title: cardPage.title };
+      }
+      for (const card of Object.values(state.cards)) {
+        const cardPage = state.cardPages[card.id];
+        if (cardPage) {
+          card.fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
+        }
+      }
+    },
+    deleteCardPages: (state, action: PayloadAction<string[]>) => {
+      action.payload.forEach((deletedPageId) => {
+        delete state.cardPages[deletedPageId];
+      });
     },
     updateCards: (state, action: PayloadAction<Card[]>) => {
       for (const card of action.payload) {
@@ -94,60 +113,19 @@ const cardsSlice = createSlice({
         }
       }
     });
-
-    builder.addCase(pagesLoad.fulfilled, (state, action) => {
-      state.cards = state.cards ?? {};
-      Object.values(action.payload).forEach((page) => {
-        if (page) {
-          state.cardPages[page.id] = { title: page.title };
-        }
-      });
-      for (const card of Object.values(state.cards)) {
-        const cardPage = action.payload[card.id];
-        if (cardPage) {
-          card.fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
-        }
-      }
-    });
-
-    builder.addCase(addPage, (state, action) => {
-      const card = state.cards[action.payload.id];
-      if (card) {
-        card.fields.properties[Constants.titleColumnId] = action.payload.title ?? '';
-      }
-    });
-
-    builder.addCase(updatePages, (state, action) => {
-      for (const page of action.payload) {
-        if (page.deletedAt) {
-          delete state.cardPages[page.id];
-        } else {
-          state.cardPages[page.id] = { title: page.title };
-        }
-      }
-      for (const card of Object.values(state.cards)) {
-        const cardPage = action.payload.find((p) => p.id === card.id);
-        if (cardPage) {
-          card.fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
-        }
-      }
-    });
-
-    builder.addCase(deletePages, (state, action) => {
-      action.payload.forEach((deletedPageId) => {
-        delete state.cardPages[deletedPageId];
-      });
-      for (const card of Object.values(state.cards)) {
-        const cardPage = action.payload.find((pid) => pid === card.id);
-        if (cardPage) {
-          card.fields.properties[Constants.titleColumnId] = '';
-        }
-      }
-    });
   }
 });
 
-export const { updateCards, updateCard, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
+export const {
+  updateCardPages,
+  deleteCardPages,
+  updateCards,
+  updateCard,
+  addCard,
+  addTemplate,
+  setCurrent,
+  deleteCards
+} = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;

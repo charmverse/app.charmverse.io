@@ -7,7 +7,6 @@ import { reducer as globalErrorReducer } from './globalError';
 import { reducer as globalTemplatesReducer } from './globalTemplates';
 import { reducer as languageReducer } from './language';
 import { reducer as loadingStateReducer } from './loadingState';
-import { reducer as pagesReducer } from './pages';
 import { reducer as searchTextReducer } from './searchText';
 import { reducer as viewsReducer } from './views';
 
@@ -21,8 +20,7 @@ const store = configureStore({
     searchText: searchTextReducer,
     globalError: globalErrorReducer,
     clientConfig: clientConfigReducer,
-    loadingState: loadingStateReducer,
-    pages: pagesReducer
+    loadingState: loadingStateReducer
   }
 });
 
