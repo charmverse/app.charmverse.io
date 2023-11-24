@@ -1,4 +1,7 @@
+import type { SignedOffchainAttestation } from '@ethereum-attestation-service/eas-sdk';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Stack from '@mui/material/Stack';
@@ -10,12 +13,16 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import type { SignedCredential } from 'lib/credentials/attest';
 import type { CredentialData, ProposalCredential } from 'lib/credentials/schemas';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+
+import { ProposalCredentialCard } from './ProposalCredentialCard';
 
 const schema = yup.object<Record<keyof ProposalCredential | 'recipient', yup.StringSchema>>({
   name: yup.string().required(),
@@ -35,8 +42,11 @@ export function ProposalCredentialForm() {
   const { account } = useWeb3Account();
   const { showMessage } = useSnackbar();
 
+  const [signedAttestation, setSignedAttestation] = useState<SignedCredential | null>(null);
+
   async function attest(values: FormValues) {
     setIsAttesting(true);
+    setSignedAttestation(null);
 
     try {
       const attestResponse = await charmClient.credentials.attest({
@@ -48,7 +58,9 @@ export function ProposalCredentialForm() {
         recipient: values.recipient as string
       });
 
-      showMessage(JSON.stringify(attestResponse), 'info');
+      setSignedAttestation(attestResponse);
+
+      showMessage('Attestation success!', 'success');
     } catch (err: any) {
       showMessage(err?.message);
     } finally {
@@ -81,67 +93,68 @@ export function ProposalCredentialForm() {
     setValue(event.target.name as keyof FormValues, value);
     return trigger();
   };
+
   return (
-    <form onSubmit={handleSubmit(attest)}>
-      <Stack gap={2}>
-        <Typography>
-          CharmVerse can use your email address to let you know when there is a conversation or activity you should be
-          part of.
-        </Typography>
-        <TextField
-          {...register('recipient')}
-          autoFocus
-          error={!!errors.name}
-          helperText={errors.name?.message}
-          onChange={onChange}
-        />
-        <TextField
-          {...register('name')}
-          autoFocus
-          error={!!errors.name}
-          helperText={errors.name?.message}
-          onChange={onChange}
-        />
-        <TextField
-          {...register('description')}
-          autoFocus
-          error={!!errors.description}
-          helperText={errors.description?.message}
-          onChange={onChange}
-        />
-        <TextField
-          {...register('organization')}
-          autoFocus
-          error={!!errors.name}
-          helperText={errors.name?.message}
-          onChange={onChange}
-        />
-        <TextField
-          {...register('url')}
-          autoFocus
-          error={!!errors.name}
-          helperText={errors.name?.message}
-          onChange={onChange}
-        />
-        <TextField
-          {...register('status')}
-          autoFocus
-          error={!!errors.name}
-          helperText={errors.name?.message}
-          placeholder='me@gmail.com'
-          onChange={onChange}
-        />
-        <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
-          <Button
-            loading={isAttesting}
-            data-test='member-email-next'
-            type='submit'
-            disabled={Object.keys(errors).length !== 0}
-          >
-            Attest
-          </Button>
+    <>
+      <form onSubmit={handleSubmit(attest)}>
+        <Stack gap={2}>
+          <Typography>Create a credential</Typography>
+          <TextField
+            {...register('recipient')}
+            autoFocus
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            onChange={onChange}
+          />
+          <TextField
+            {...register('name')}
+            autoFocus
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            onChange={onChange}
+          />
+          <TextField
+            {...register('description')}
+            autoFocus
+            error={!!errors.description}
+            helperText={errors.description?.message}
+            onChange={onChange}
+          />
+          <TextField
+            {...register('organization')}
+            autoFocus
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            onChange={onChange}
+          />
+          <TextField
+            {...register('url')}
+            autoFocus
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            onChange={onChange}
+          />
+          <TextField
+            {...register('status')}
+            autoFocus
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            placeholder='me@gmail.com'
+            onChange={onChange}
+          />
+          <Stack flexDirection='row' gap={1} justifyContent='flex-start'>
+            <Button loading={isAttesting} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
+              Attest
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-    </form>
+      </form>
+      <Divider />
+      {signedAttestation && (
+        <Box sx={{ maxWidth: '400px' }}>
+          <ProposalCredentialCard credential={signedAttestation} />
+        </Box>
+      )}
+    </>
   );
 }

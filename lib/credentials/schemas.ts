@@ -50,13 +50,24 @@ export const credentialLabels: Record<CredentialType, string> = {
 
 export const attestationSchemaIds: Record<CredentialType, { [key in EasSchemaChain]: string }> = {
   proposal: {
-    '10': '0x20770d8c0a19668aa843240ddf6d57025334b346171c28dfed1a7ddb16928b89'
+    10: '0x20770d8c0a19668aa843240ddf6d57025334b346171c28dfed1a7ddb16928b89'
   }
 };
+
 export type CredentialData<T extends CredentialType = CredentialType> = {
   type: T;
   data: T extends 'proposal' ? ProposalCredential : never;
 };
+
+export function getAttestationSchemaId({
+  chainId,
+  credentialType
+}: {
+  chainId: EasSchemaChain;
+  credentialType: CredentialType;
+}) {
+  return attestationSchemaIds[credentialType][chainId];
+}
 
 export function encodeAttestion<T extends CredentialType = CredentialType>({ type, data }: CredentialData<T>) {
   if (type === 'proposal') {
