@@ -10,7 +10,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { useUser } from 'hooks/useUser';
@@ -25,11 +24,9 @@ const schema = (customReward?: boolean) => {
   return yup.object({
     submission: yup.string().required(),
     submissionNodes: yup.mixed().required(),
-    walletAddress: (customReward ? yup.string() : yup.string().required()).test(
-      'verifyContractFormat',
-      'Invalid wallet address',
-      isValidChainAddress
-    ),
+    walletAddress: customReward
+      ? yup.string()
+      : yup.string().required().test('verifyContractFormat', 'Invalid wallet address', isValidChainAddress),
     rewardInfo: yup.string()
   });
 };
@@ -59,13 +56,11 @@ export function RewardSubmissionInput({
   readOnly = false,
   submission,
   onSubmit: onSubmitProp,
-  bountyId,
   hasCustomReward,
   currentUserIsAuthor,
   isSaving
 }: Props) {
   const { user } = useUser();
-
   const [isEditorTouched, setIsEditorTouched] = useState(false);
 
   const {
@@ -78,7 +73,7 @@ export function RewardSubmissionInput({
     defaultValues: {
       submission: submission?.submission as string,
       submissionNodes: submission?.submissionNodes as any as JSON,
-      walletAddress: submission ? submission?.walletAddress || '' : user?.wallets[0]?.address
+      walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address ?? ''
     },
     resolver: yupResolver(schema(hasCustomReward))
   });
@@ -159,7 +154,7 @@ export function RewardSubmissionInput({
                 fullWidth
                 error={!!errors.rewardInfo}
                 helperText={errors.rewardInfo?.message}
-                disabled={!currentUserIsAuthor}
+                disabled={!currentUserIsAuthor || submission?.status !== 'inProgress'}
               />
             </Grid>
           )}
