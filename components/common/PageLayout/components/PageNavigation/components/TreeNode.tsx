@@ -59,7 +59,7 @@ function DraggableTreeNode({
       handlerId: monitor.getHandlerId()
     })
   }));
-  const databasesDispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const loadedViews = useAppSelector(getLoadedBoardViews());
 
   const dndEnabled = (!!onDropAdjacent && !!onDropChild) || (isFavorites && !!onDropAdjacent);
@@ -163,7 +163,7 @@ function DraggableTreeNode({
 
   useEffect(() => {
     if (expanded && loadedViews && item.type.match(/board/) && !loadedViews[item.id]) {
-      databasesDispatch(databaseViewsLoad({ pageId: item.id }));
+      dispatch(databaseViewsLoad({ pageId: item.id }));
     }
   }, [expanded, loadedViews?.[item.id]]);
 

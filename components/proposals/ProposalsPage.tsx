@@ -48,7 +48,6 @@ export function ProposalsPage({ title }: { title: string }) {
   const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
-  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -135,7 +134,7 @@ export function ProposalsPage({ title }: { title: string }) {
         </DatabaseTitle>
         <>
           <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-            <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+            <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
             <ViewSortControl
               activeBoard={activeBoard}

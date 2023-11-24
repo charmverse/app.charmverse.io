@@ -15,6 +15,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
 import type { Member } from 'lib/members/interfaces';
 import {
   ASSIGNEES_BLOCK_ID,
@@ -148,6 +149,7 @@ function mapRewardToCardPage({
 
   rewardFields.properties = {
     ...rewardFields.properties,
+    [Constants.titleColumnId]: rewardPage?.title || '',
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]:
       reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0

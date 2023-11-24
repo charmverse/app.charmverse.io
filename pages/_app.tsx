@@ -182,34 +182,32 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
           <DataProviders>
             <SettingsDialogProvider>
               <LocalizationProvider>
-                <FocalBoardProvider>
-                  <NotionProvider>
-                    <IntlProvider>
-                      <PageHead {...pageProps} />
+                <NotionProvider>
+                  <IntlProvider>
+                    <PageHead {...pageProps} />
 
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          <Snackbar
-                            isOpen={isOldBuild}
-                            message='New CharmVerse platform update available. Please refresh.'
-                            actions={[
-                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                <RefreshIcon fontSize='small' />
-                              </IconButton>
-                            ]}
-                            origin={{ vertical: 'top', horizontal: 'center' }}
-                            severity='warning'
-                            handleClose={() => setIsOldBuild(false)}
-                          />
+                    <RouteGuard>
+                      <ErrorBoundary>
+                        <Snackbar
+                          isOpen={isOldBuild}
+                          message='New CharmVerse platform update available. Please refresh.'
+                          actions={[
+                            <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                              <RefreshIcon fontSize='small' />
+                            </IconButton>
+                          ]}
+                          origin={{ vertical: 'top', horizontal: 'center' }}
+                          severity='warning'
+                          handleClose={() => setIsOldBuild(false)}
+                        />
 
-                          {getLayout(<Component {...pageProps} />)}
+                        {getLayout(<Component {...pageProps} />)}
 
-                          <GlobalComponents />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </IntlProvider>
-                  </NotionProvider>
-                </FocalBoardProvider>
+                        <GlobalComponents />
+                      </ErrorBoundary>
+                    </RouteGuard>
+                  </IntlProvider>
+                </NotionProvider>
               </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
@@ -247,15 +245,17 @@ function DataProviders({ children }: { children: ReactNode }) {
                           <MembersProvider>
                             <RewardsProvider>
                               <PaymentMethodsProvider>
-                                <PagesProvider>
-                                  <MemberPropertiesProvider>
-                                    <LensProvider config={lensConfig}>
-                                      <UserProfileProvider>
-                                        <PageTitleProvider>{children}</PageTitleProvider>
-                                      </UserProfileProvider>
-                                    </LensProvider>
-                                  </MemberPropertiesProvider>
-                                </PagesProvider>
+                                <FocalBoardProvider>
+                                  <PagesProvider>
+                                    <MemberPropertiesProvider>
+                                      <LensProvider config={lensConfig}>
+                                        <UserProfileProvider>
+                                          <PageTitleProvider>{children}</PageTitleProvider>
+                                        </UserProfileProvider>
+                                      </LensProvider>
+                                    </MemberPropertiesProvider>
+                                  </PagesProvider>
+                                </FocalBoardProvider>
                               </PaymentMethodsProvider>
                             </RewardsProvider>
                           </MembersProvider>
