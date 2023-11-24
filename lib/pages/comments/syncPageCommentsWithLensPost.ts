@@ -1,82 +1,12 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
-import type { CommentFragment } from '@lens-protocol/client';
 
-import { lensClient } from 'lib/lens/lensClient';
+import { fetchLensPageComments } from 'lib/lens/fetchLensPostComments';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 
 import { listPageComments } from './listPageComments';
 
 const usernameSuffix = 'lens-imported';
 const pathSuffix = 'lens-bot';
-
-const MAX_COMMENT_DEPTH = 5;
-
-type CommentFragmentWithMeta = CommentFragment & { parentId: string; depth: number };
-
-async function fetchLensComments({
-  depth = 1,
-  parentId
-}: {
-  parentId: string;
-  depth: number;
-}): Promise<CommentFragmentWithMeta[]> {
-  if (depth === MAX_COMMENT_DEPTH) {
-    return [];
-  }
-
-  const comments: CommentFragmentWithMeta[] = [];
-  let publicationFetchAllResponse = await lensClient.publication.fetchAll({
-    where: {
-      commentOn: {
-        id: parentId
-      }
-    }
-  });
-
-  if (publicationFetchAllResponse.items.length === 0) {
-    return [];
-  }
-
-  comments.push(
-    ...(publicationFetchAllResponse.items.map((comment) => ({
-      ...comment,
-      depth,
-      parentId
-    })) as CommentFragmentWithMeta[])
-  );
-
-  while (publicationFetchAllResponse.pageInfo.next) {
-    publicationFetchAllResponse = await lensClient.publication.fetchAll({
-      cursor: publicationFetchAllResponse.pageInfo.next,
-      where: {
-        commentOn: {
-          id: parentId
-        }
-      }
-    });
-
-    comments.push(
-      ...(publicationFetchAllResponse.items.map((comment) => ({
-        ...comment,
-        depth,
-        parentId
-      })) as CommentFragmentWithMeta[])
-    );
-  }
-
-  const nestedCommentsPromises = comments.map(async (comment) => {
-    const nestedComments = await fetchLensComments({
-      depth: depth + 1,
-      parentId: comment.id
-    });
-    return [comment, ...nestedComments];
-  });
-
-  const nestedComments = await Promise.all(nestedCommentsPromises);
-
-  // Sort based on ascending order of depth
-  return nestedComments.flat().sort((a, b) => a.depth - b.depth);
-}
 
 export async function syncPageCommentsWithLensPost({
   userId,
@@ -98,7 +28,7 @@ export async function syncPageCommentsWithLensPost({
     currentCharmVerseComments.filter((comment) => comment.lensCommentLink).map((comment) => comment.lensCommentLink)
   );
 
-  const lensComments = await fetchLensComments({
+  const lensComments = await fetchLensPageComments({
     depth: 1,
     parentId: lensPostLink
   });
@@ -106,8 +36,10 @@ export async function syncPageCommentsWithLensPost({
   const lensCommentIdCharmverseCommentIdRecord: Record<string, string> = {};
 
   for (const lensComment of lensComments) {
+    const lensProfile = lensComment.by;
+
     if (!commentIdsPublishedToLens.has(lensComment.id)) {
-      const lensUserHandle = lensComment.by.handle?.fullHandle.toLowerCase();
+      const lensUserHandle = lensProfile.handle?.fullHandle.toLowerCase();
       let charmverseUserId: null | string = null;
       const charmVerseUser = await prisma.user.findFirst({
         where: {
@@ -124,19 +56,17 @@ export async function syncPageCommentsWithLensPost({
       });
 
       charmverseUserId = charmVerseUser?.id ?? null;
-
       if (!charmVerseUser) {
         const createdCharmVerseUser = await prisma.user.create({
           data: {
             username: `${lensUserHandle}-${usernameSuffix}`,
             path: `${lensUserHandle}-${pathSuffix}`,
             isBot: true,
-            // TODO: Uncomment when we have cover pictures
-            avatar: /* lensComment.by?..coverPicture?.__typename === 'MediaSet'
-                ? lensComment.profile.coverPicture.original.url
-                : lensComment.profile.coverPicture?.__typename === 'NftImage'
-                ? lensComment.profile.coverPicture.uri
-                :  */ null,
+            avatar:
+              (lensProfile.metadata?.picture?.__typename === 'ImageSet'
+                ? lensProfile.metadata?.picture?.optimized?.uri || lensProfile.metadata?.picture?.raw.uri
+                : lensProfile.metadata?.picture?.image?.optimized?.uri ||
+                  lensProfile.metadata?.picture?.image?.raw?.uri) || 'https://www.lensfrens.xyz/assets/defaultPfp.png',
             spaceRoles: {
               create: {
                 spaceId

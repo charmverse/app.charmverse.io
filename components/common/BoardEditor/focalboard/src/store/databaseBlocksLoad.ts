@@ -11,6 +11,7 @@ export const databaseViewsLoad = createAsyncThunk('databaseViewsLoad', async ({ 
   const blocks = charmClient.getViews({ pageId });
   return blocks;
 });
+
 export const blockLoad = createAsyncThunk('blockLoad', async ({ blockId }: { blockId: string }) => {
   const blocks = charmClient.getBlock({ blockId });
   return blocks;

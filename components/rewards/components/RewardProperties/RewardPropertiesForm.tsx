@@ -32,6 +32,7 @@ type Props = {
   pageId?: string;
   refreshPermissions?: VoidFunction;
   isNewReward?: boolean;
+  isTemplate?: boolean;
   expandedByDefault?: boolean;
 };
 
@@ -41,6 +42,7 @@ export function RewardPropertiesForm({
   readOnly,
   useDebouncedInputs,
   isNewReward,
+  isTemplate,
   pageId,
   refreshPermissions,
   expandedByDefault
@@ -145,7 +147,7 @@ export function RewardPropertiesForm({
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted required={isNewReward}>
+              <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                 Reviewer
               </PropertyLabel>
               <UserAndRoleSelect
@@ -291,7 +293,7 @@ export function RewardPropertiesForm({
 
             {rewardType === 'Token' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted required={isNewReward}>
+                <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                   Reward Token
                 </PropertyLabel>
                 <RewardTokenProperty
@@ -304,7 +306,7 @@ export function RewardPropertiesForm({
 
             {rewardType === 'Custom' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
+                <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                   Custom Reward
                 </PropertyLabel>
 

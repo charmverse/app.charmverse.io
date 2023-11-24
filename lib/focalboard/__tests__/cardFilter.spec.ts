@@ -7,6 +7,7 @@ import { createFilterClause } from 'lib/focalboard/filterClause';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 
 import { CardFilter } from '../cardFilter';
+import { Constants } from '../constants';
 
 jest.mock('components/common/BoardEditor/focalboard/src/utils');
 const mockedUtils = jest.mocked(Utils, { shallow: true });
@@ -24,6 +25,9 @@ describe('src/cardFilter', () => {
     values: ['Status'],
     filterId: v4()
   });
+
+  card1.fields.properties[Constants.titleColumnId] = 'Page Title';
+
   describe('verify isClauseMet method', () => {
     test('should be true with is_not_empty clause', () => {
       const filterClauseIsNotEmpty = createFilterClause({
@@ -32,7 +36,7 @@ describe('src/cardFilter', () => {
         values: ['Status'],
         filterId: v4()
       });
-      const result = CardFilter.isClauseMet(filterClauseIsNotEmpty, [], card1);
+      const result = CardFilter.isClauseMet(filterClauseIsNotEmpty, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
     test('should be false with is_empty clause', () => {
@@ -49,6 +53,21 @@ describe('src/cardFilter', () => {
       );
       expect(result).toBeFalsy();
     });
+    test('should be true with contains clause for title property', () => {
+      const filterClauseIncludes = createFilterClause({
+        propertyId: Constants.titleColumnId,
+        condition: 'contains',
+        values: ['Title'],
+        filterId: v4()
+      });
+      const result = CardFilter.isClauseMet(
+        filterClauseIncludes,
+        [{ id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }],
+        card1
+      );
+      expect(result).toBeTruthy();
+    });
+
     test('should be true with contains clause', () => {
       const filterClauseIncludes = createFilterClause({
         propertyId: 'propertyId',
@@ -56,7 +75,7 @@ describe('src/cardFilter', () => {
         values: ['Status'],
         filterId: v4()
       });
-      const result = CardFilter.isClauseMet(filterClauseIncludes, [], card1);
+      const result = CardFilter.isClauseMet(filterClauseIncludes, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
     test('should be true with contains and no values clauses', () => {
@@ -66,7 +85,7 @@ describe('src/cardFilter', () => {
         values: [],
         filterId: v4()
       });
-      const result = CardFilter.isClauseMet(filterClauseIncludes, [], card1);
+      const result = CardFilter.isClauseMet(filterClauseIncludes, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
     test('should be false with does not contain clause', () => {
@@ -90,7 +109,7 @@ describe('src/cardFilter', () => {
         values: [],
         filterId: v4()
       });
-      const result = CardFilter.isClauseMet(filterClauseNotIncludes, [], card1);
+      const result = CardFilter.isClauseMet(filterClauseNotIncludes, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
   });
@@ -100,7 +119,7 @@ describe('src/cardFilter', () => {
         operation: 'and',
         filters: []
       });
-      const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
+      const result = CardFilter.isFilterGroupMet(filterGroup, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
     test('should return true with or operation and 2 filterCause, one is false ', () => {
@@ -114,7 +133,7 @@ describe('src/cardFilter', () => {
         operation: 'and',
         filters: [filterClauseNotIncludes, filterClause]
       });
-      const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
+      const result = CardFilter.isFilterGroupMet(filterGroup, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
     test('should return true with or operation and 2 filterCause, 1 filtergroup in filtergroup, one filterClause is false ', () => {
@@ -133,7 +152,7 @@ describe('src/cardFilter', () => {
         filters: []
       });
       filterGroup.filters.push(filterGroupInFilterGroup);
-      const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
+      const result = CardFilter.isFilterGroupMet(filterGroup, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
     test('should return false with or operation and two filterCause, two are false ', () => {
@@ -189,7 +208,7 @@ describe('src/cardFilter', () => {
         operation: 'and',
         filters: [filterClauseIncludes, filterClause]
       });
-      const result = CardFilter.isFilterGroupMet(filterGroup, [], card1);
+      const result = CardFilter.isFilterGroupMet(filterGroup, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
   });
@@ -457,7 +476,7 @@ describe('src/cardFilter', () => {
         operation: 'and',
         filters: [filterClauseNotIncludes, filterClause]
       });
-      const result = CardFilter.applyFilterGroup(filterGroup, [], [card1]);
+      const result = CardFilter.applyFilterGroup(filterGroup, board.fields.cardProperties, [card1]);
       expect(result).toBeDefined();
       expect(result[0]).toEqual(card1);
     });

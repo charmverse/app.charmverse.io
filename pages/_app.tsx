@@ -30,7 +30,6 @@ import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
-import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
@@ -183,34 +182,32 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
           <DataProviders>
             <SettingsDialogProvider>
               <LocalizationProvider>
-                <FocalBoardProvider>
-                  <NotionProvider>
-                    <IntlProvider>
-                      <PageHead {...pageProps} />
+                <NotionProvider>
+                  <IntlProvider>
+                    <PageHead {...pageProps} />
 
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          <Snackbar
-                            isOpen={isOldBuild}
-                            message='New CharmVerse platform update available. Please refresh.'
-                            actions={[
-                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                <RefreshIcon fontSize='small' />
-                              </IconButton>
-                            ]}
-                            origin={{ vertical: 'top', horizontal: 'center' }}
-                            severity='warning'
-                            handleClose={() => setIsOldBuild(false)}
-                          />
+                    <RouteGuard>
+                      <ErrorBoundary>
+                        <Snackbar
+                          isOpen={isOldBuild}
+                          message='New CharmVerse platform update available. Please refresh.'
+                          actions={[
+                            <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                              <RefreshIcon fontSize='small' />
+                            </IconButton>
+                          ]}
+                          origin={{ vertical: 'top', horizontal: 'center' }}
+                          severity='warning'
+                          handleClose={() => setIsOldBuild(false)}
+                        />
 
-                          {getLayout(<Component {...pageProps} />)}
+                        {getLayout(<Component {...pageProps} />)}
 
-                          <GlobalComponents />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </IntlProvider>
-                  </NotionProvider>
-                </FocalBoardProvider>
+                        <GlobalComponents />
+                      </ErrorBoundary>
+                    </RouteGuard>
+                  </IntlProvider>
+                </NotionProvider>
               </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
@@ -246,9 +243,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                       <IsSpaceMemberProvider>
                         <WebSocketClientProvider>
                           <MembersProvider>
-                            <BountiesProvider>
-                              <RewardsProvider>
-                                <PaymentMethodsProvider>
+                            <RewardsProvider>
+                              <PaymentMethodsProvider>
+                                <FocalBoardProvider>
                                   <PagesProvider>
                                     <MemberPropertiesProvider>
                                       {/* <LensProvider config={lensConfig}> */}
@@ -258,9 +255,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                                       {/* </LensProvider> */}
                                     </MemberPropertiesProvider>
                                   </PagesProvider>
-                                </PaymentMethodsProvider>
-                              </RewardsProvider>
-                            </BountiesProvider>
+                                </FocalBoardProvider>
+                              </PaymentMethodsProvider>
+                            </RewardsProvider>
                           </MembersProvider>
                         </WebSocketClientProvider>
                       </IsSpaceMemberProvider>

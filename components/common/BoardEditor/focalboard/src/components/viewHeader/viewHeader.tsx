@@ -1,16 +1,13 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { Box, Popover, Tooltip } from '@mui/material';
-import { bindTrigger, bindPopover } from 'material-ui-popup-state';
+import { Box, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
-import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -23,7 +20,6 @@ import { useAppSelector } from '../../store/hooks';
 import IconButton from '../../widgets/buttons/iconButton';
 import AddViewMenu from '../addViewMenu';
 
-import FilterComponent from './filterComponent';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
@@ -56,7 +52,6 @@ function ViewHeader(props: Props) {
   const router = useRouter();
   const { pages, refreshPage } = usePages();
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
-  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   const views = props.views.filter((view) => !view.fields.inline);
@@ -141,7 +136,7 @@ function ViewHeader(props: Props) {
             )}
 
             {/* Filter */}
-            <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+            <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
             {/* Sort */}
             {withSortBy && (

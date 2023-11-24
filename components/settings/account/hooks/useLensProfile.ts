@@ -81,6 +81,7 @@ export function useHandleLensError() {
 }
 
 export function useLensProfile() {
+  const { user } = useUser();
   const { account } = useWeb3Account();
   // const { data: sessionData } = useSession();
   // const authenticated = sessionData?.authenticated ?? false;
@@ -98,7 +99,6 @@ export function useLensProfile() {
 
   // const lensProfile = sessionProfile ?? profilesData?.[0] ?? null;
 
-  const { user } = useUser();
   const { space } = useCurrentSpace();
 
   // const setupLensProfile = async () => {

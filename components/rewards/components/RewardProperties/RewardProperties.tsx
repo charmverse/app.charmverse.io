@@ -84,6 +84,7 @@ export function RewardProperties(props: {
         onChange={applyRewardUpdates}
         readOnly={readOnly}
         expandedByDefault={expandedRewardProperties}
+        isTemplate={isTemplate}
       />
 
       {!isTemplate && (

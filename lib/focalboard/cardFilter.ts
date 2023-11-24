@@ -16,9 +16,15 @@ import type {
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
+import { Constants } from './constants';
+
 class CardFilter {
   static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
-    return cards.filter((card) => this.isFilterGroupMet(filterGroup, templates, card));
+    const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
+    const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
+      ? templates
+      : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card));
   }
 
   static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
@@ -54,8 +60,8 @@ class CardFilter {
   }
 
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
-    const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
+    const value = card.fields.properties[filter.propertyId] ?? [];
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
     const valueArray = (Array.isArray(value) ? value : [value]).map((v: string | number | Record<'id', string>) => {
       // In some cases we get an object with an id as value

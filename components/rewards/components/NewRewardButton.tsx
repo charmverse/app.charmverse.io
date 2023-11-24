@@ -70,15 +70,19 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   }
   let disabledTooltip: string | undefined;
 
+  const isTemplate = newPageValues?.type === 'bounty_template';
   if (!newPageValues?.title) {
     disabledTooltip = 'Page title is required';
-  } else if (!rewardValues.reviewers?.length) {
-    disabledTooltip = 'Reviewer is required';
-  } else if (
-    !rewardValues.customReward &&
-    (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
-  ) {
-    disabledTooltip = 'Reward is required';
+  } else if (!isTemplate) {
+    // these values are not required for templates
+    if (!rewardValues.reviewers?.length) {
+      disabledTooltip = 'Reviewer is required';
+    } else if (
+      !rewardValues.customReward &&
+      (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
+    ) {
+      disabledTooltip = 'Reward is required';
+    }
   }
 
   return (
@@ -114,7 +118,13 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
         isSaving={isSavingReward}
       >
         <NewDocumentPage titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
-          <RewardPropertiesForm onChange={setRewardValues} values={rewardValues} isNewReward expandedByDefault />
+          <RewardPropertiesForm
+            onChange={setRewardValues}
+            values={rewardValues}
+            isNewReward
+            isTemplate={isTemplate}
+            expandedByDefault
+          />
         </NewDocumentPage>
       </NewPageDialog>
     </>

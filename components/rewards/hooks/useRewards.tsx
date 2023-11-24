@@ -6,7 +6,6 @@ import charmClient from 'charmClient';
 import { useGetRewards } from 'charmClient/hooks/rewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardUpdate } from 'lib/rewards/updateRewardSettings';
@@ -37,7 +36,6 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
 export function RewardsProvider({ children }: { children: ReactNode }) {
   const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
-  const { user } = useUser();
 
   const { data, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
   const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
