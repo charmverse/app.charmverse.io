@@ -20,7 +20,7 @@ type Props = {
   addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void> | void;
   onDropToColumn: (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-  onDropToCard: (srcCard: Card, dstCard: Card) => Promise<void>;
+  onDropToCard?: (srcCard: Card, dstCard: Card) => Promise<void>;
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
   disableAddingCards?: boolean;

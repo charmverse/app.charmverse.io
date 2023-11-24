@@ -217,8 +217,8 @@ export function RewardsPage({ title }: { title: string }) {
                     activeView={activeView}
                     cards={cards as Card[]}
                     groupByProperty={groupByProperty}
-                    visibleGroups={visibleGroups}
-                    hiddenGroups={hiddenGroups}
+                    visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
+                    hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     addCard={async () => {}}
@@ -226,6 +226,7 @@ export function RewardsPage({ title }: { title: string }) {
                     showCard={showRewardOrApplication}
                     disableAddingCards
                     readOnlyTitle
+                    disableDnd
                   />
                 )}
               </Box>

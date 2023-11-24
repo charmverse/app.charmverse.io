@@ -97,8 +97,7 @@ const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (type
   { id: 'open', value: 'Open', color: 'propColorTeal' },
   { id: 'inProgress', value: 'In Progress', color: 'propColorYellow' },
   { id: 'complete', value: 'Complete', color: 'propColorPink' },
-  { id: 'paid', value: 'Paid', color: 'propColorGray' },
-  { id: 'suggestion', value: 'Suggestion', color: 'propColorPurple' }
+  { id: 'paid', value: 'Paid', color: 'propColorGray' }
 ];
 
 const rewardDbProperties = {
