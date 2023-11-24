@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import LitTokenSelect from "../../../reusableComponents/litTokenSelect/LitTokenSelect";
 import LitInput from "../../../reusableComponents/litInput/LitInput";
-import { utils } from "ethers";
+import { isAddress } from "ethers";
 import { ShareModalContext } from "../../../shareModal/createShareContext";
 
 const EthereumSelectNFT = ({updateUnifiedAccessControlConditions, submitDisabled, chain, initialState = null}) => {
@@ -40,7 +40,7 @@ const EthereumSelectNFT = ({updateUnifiedAccessControlConditions, submitDisabled
     if (selectedToken?.['value'] === 'ethereum') {
       setContractAddress('');
     }
-    if (selectedToken?.['value'] && utils.isAddress(selectedToken?.['value'])) {
+    if (selectedToken?.['value'] && isAddress(selectedToken?.['value'])) {
       setContractAddress(selectedToken['value']);
     }
   }, [ selectedToken ]);
