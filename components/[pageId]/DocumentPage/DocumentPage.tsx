@@ -104,7 +104,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const blocksDispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
-  const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
 
   const pagePermissions = page.permissionFlags;
@@ -332,7 +331,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                 pageType={page.type}
                 pagePermissions={pagePermissions ?? undefined}
                 onConnectionEvent={onConnectionEvent}
-                setEditorState={setEditorState}
                 snapshotProposalId={page.snapshotProposalId}
                 onParticipantUpdate={onParticipantUpdate}
                 style={{
@@ -426,7 +424,6 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                       spaceId={page.spaceId}
                       proposalId={proposalId}
                       pagePermissions={pagePermissions}
-                      editorState={editorState}
                       sidebarView={sidebarView}
                       closeSidebar={closeSidebar}
                       openSidebar={setActiveView}

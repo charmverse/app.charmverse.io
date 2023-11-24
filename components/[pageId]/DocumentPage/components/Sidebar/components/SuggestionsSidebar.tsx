@@ -18,12 +18,10 @@ import { NoCommentsMessage } from './CommentsSidebar';
 
 export function SuggestionsSidebar({
   readOnly,
-  state,
   pageId,
   spaceId
 }: {
   readOnly: boolean;
-  state: EditorState | null;
   pageId: string;
   spaceId: string;
 }) {
@@ -39,18 +37,6 @@ export function SuggestionsSidebar({
       .flat();
     setSuggestions(marks);
   }, [view.state.doc]);
-
-  // listen to changes from selection (see CharmEditor)
-  useEffect(() => {
-    if (state) {
-      const marks = getEventsFromDoc({ state })
-        .map((r) => r.marks)
-        .flat();
-      setSuggestions(marks);
-    }
-  }, [state]);
-
-  // console.log('suggestions', suggestions);
 
   function clickAcceptAll() {
     acceptAll(view);

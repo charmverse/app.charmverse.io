@@ -1,13 +1,11 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
 import { Box, IconButton, Slide, SvgIcon, Tooltip, Typography } from '@mui/material';
-import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
-import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -57,7 +55,6 @@ type SidebarProps = {
   pageId: string;
   spaceId: string;
   threads: Record<string, ThreadWithComments | undefined>;
-  editorState: EditorState | null;
   pagePermissions: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
   openSidebar: (view: PageSidebarView) => void;
@@ -153,7 +150,6 @@ function SidebarContents({
   pageId,
   spaceId,
   pagePermissions,
-  editorState,
   threads,
   openSidebar,
   proposalId,
@@ -171,12 +167,7 @@ function SidebarContents({
         />
       )}
       {sidebarView === 'suggestions' && (
-        <SuggestionsSidebar
-          pageId={pageId}
-          spaceId={spaceId}
-          readOnly={!pagePermissions?.edit_content}
-          state={editorState}
-        />
+        <SuggestionsSidebar pageId={pageId} spaceId={spaceId} readOnly={!pagePermissions?.edit_content} />
       )}
       {sidebarView === 'comments' && (
         <CommentsSidebar openSidebar={openSidebar} threads={threads} canCreateComments={!!pagePermissions?.comment} />
