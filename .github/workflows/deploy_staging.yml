@@ -178,7 +178,7 @@ jobs:
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
-          npm install @datadog/datadog-ci
+          npm install @datadog/datadog-ci --force
           npx datadog-ci sourcemaps upload .next/static  \
             --service=webapp                             \
             --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
