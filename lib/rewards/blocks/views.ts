@@ -1,3 +1,4 @@
+import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 import {
@@ -60,7 +61,7 @@ export function generateDefaultTableView({ spaceId }: { spaceId: string }) {
   view.id = DEFAULT_TABLE_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
   view.rootId = spaceId;
-  view.fields.visiblePropertyIds = [Constants.titleColumnId];
+  view.fields.visiblePropertyIds = [Constants.titleColumnId, ...getDefaultRewardProperties().map((p) => p.id)];
   view.fields.cardOrder = [];
 
   view.fields.columnWidths = {

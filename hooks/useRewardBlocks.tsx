@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 
 import * as http from 'adapters/http';
 import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -43,7 +44,12 @@ export const RewardBlocksContext = createContext<Readonly<RewardBlocksContextTyp
 
 export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
-  const { data: rewardBlocks, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id });
+  const { rewards } = useRewards();
+  const {
+    data: rewardBlocks,
+    isLoading,
+    mutate
+  } = useGetRewardBlocks({ spaceId: rewards?.length ? space?.id : undefined });
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
 

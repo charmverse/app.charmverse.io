@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import { getDefaultBoard, getDefaultTableView } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import { getDefaultBoard, getDefaultView } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -55,7 +55,10 @@ export function useRewardsBoardAdapter() {
     storedBoard: rewardBoardBlock
   });
 
-  const views = useMemo(() => (rewardBlocks?.filter((b) => b.type === 'view') as BoardView[]) || [], [rewardBlocks]);
+  const views = useMemo(
+    () => board.fields.viewIds.map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView).filter(Boolean),
+    [board.fields.viewIds, rewardBlocks]
+  );
   const queryViewType = viewTypeToBlockId[query?.viewId?.toString() as IViewType];
   const activeViewId = board.fields.viewIds?.find((vid) => vid === queryViewType)
     ? queryViewType
@@ -67,7 +70,7 @@ export function useRewardsBoardAdapter() {
     const viewBlock = views?.find((v) => v.id === activeViewId);
 
     if (!viewBlock) {
-      return getDefaultTableView({ storedBoard: rewardBoardBlock });
+      return getDefaultView({ viewType: activeViewId, spaceId: space?.id || '' });
     }
 
     const boardView = blockToFBBlock(viewBlock as any) as BoardView;
@@ -78,7 +81,7 @@ export function useRewardsBoardAdapter() {
     }
 
     return boardView;
-  }, [activeViewId, views, rewardBoardBlock]);
+  }, [views, activeViewId, space?.id]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =

@@ -11,6 +11,7 @@ import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalbo
 import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import ViewTabs from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewTabs';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -31,6 +32,7 @@ import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 
 import { useRewards } from './hooks/useRewards';
 
@@ -110,6 +112,12 @@ export function RewardsPage({ title }: { title: string }) {
     }
   };
 
+  const showView = (boardViewId: string) => {
+    const viewId = Object.entries(viewTypeToBlockId).find(([, blockId]) => blockId === boardViewId)?.[0] ?? 'table';
+    if (viewId === activeView?.id) return;
+    updateURLQuery({ viewId });
+  };
+
   if (isLoadingAccess) {
     return null;
   }
@@ -143,25 +151,42 @@ export function RewardsPage({ title }: { title: string }) {
           </Box>
         </DatabaseTitle>
         <>
-          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-            <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
-
-            <ViewSortControl
-              activeBoard={activeBoard}
-              activeView={activeView}
-              cards={cards as Card[]}
-              viewSortPopup={viewSortPopup}
-            />
-
-            {isAdmin && (
-              <ViewHeaderActionsMenu
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowSidebar(!showSidebar);
-                }}
+          <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1}>
+            <Stack mb={0.5}>
+              <ViewTabs
+                onDeleteView={() => {}}
+                onClickNewView={() => {}}
+                board={activeBoard}
+                views={views}
+                readOnly
+                showView={showView}
+                activeView={activeView}
+                disableUpdatingUrl
+                maxTabsShown={3}
+                openViewOptions={() => {}}
               />
-            )}
+            </Stack>
+
+            <Stack direction='row' alignItems='center' mb={1}>
+              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards as Card[]}
+                viewSortPopup={viewSortPopup}
+              />
+
+              {isAdmin && (
+                <ViewHeaderActionsMenu
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSidebar(!showSidebar);
+                  }}
+                />
+              )}
+            </Stack>
           </Stack>
           <Divider />
 
