@@ -102,7 +102,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const blocksDispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
   const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
@@ -190,9 +190,9 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   useEffect(() => {
     if (page?.type === 'card') {
       if (!card) {
-        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
-        blocksDispatch(blockLoad({ blockId: page.id }));
-        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+        dispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+        dispatch(blockLoad({ blockId: page.id }));
+        dispatch(blockLoad({ blockId: page.parentId as string }));
       }
     }
   }, [page.id]);

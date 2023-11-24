@@ -59,7 +59,6 @@ export function RewardsPage({ title }: { title: string }) {
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
-  const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -168,7 +167,7 @@ export function RewardsPage({ title }: { title: string }) {
             </Stack>
 
             <Stack direction='row' alignItems='center' mb={1}>
-              <ViewFilterControl viewFilterPopup={viewFilterPopup} activeBoard={activeBoard} activeView={activeView} />
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
               <ViewSortControl
                 activeBoard={activeBoard}

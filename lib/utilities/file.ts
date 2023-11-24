@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 
-import type { Page } from '@charmverse/core/dist/cjs/prisma-client';
 import JSZip from 'jszip';
 
 // https://github.com/sindresorhus/callsites/blob/main/index.js
