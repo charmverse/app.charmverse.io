@@ -435,30 +435,6 @@ function CenterPanel(props: Props) {
 
     setState({ ...state, selectedCardIds: [] });
   }
-
-  function getVisibleAndHiddenGroups(
-    __cardPages: CardPage[],
-    visibleOptionIds: string[],
-    hiddenOptionIds: string[],
-    groupByProperty?: IPropertyTemplate
-  ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
-    let unassignedOptionIds: string[] = [];
-    if (groupByProperty) {
-      unassignedOptionIds = (groupByProperty.options ?? [])
-        .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
-        .map((o: IPropertyOption) => o.id);
-    }
-    const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds];
-
-    // If the empty group position is not explicitly specified, make it the first visible column
-    if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
-      allVisibleOptionIds.unshift('');
-    }
-
-    const _visibleGroups = groupCardsByOptions(__cardPages, allVisibleOptionIds, groupByProperty);
-    const _hiddenGroups = groupCardsByOptions(__cardPages, hiddenOptionIds, groupByProperty);
-    return { visible: _visibleGroups, hidden: _hiddenGroups };
-  }
   function addNewLinkedView() {
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
@@ -760,6 +736,30 @@ export function groupCardsByOptions(
     }
   }
   return groups;
+}
+
+export function getVisibleAndHiddenGroups(
+  __cardPages: CardPage[],
+  visibleOptionIds: string[],
+  hiddenOptionIds: string[],
+  groupByProperty?: IPropertyTemplate
+): { visible: BoardGroup[]; hidden: BoardGroup[] } {
+  let unassignedOptionIds: string[] = [];
+  if (groupByProperty) {
+    unassignedOptionIds = (groupByProperty.options ?? [])
+      .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
+      .map((o: IPropertyOption) => o.id);
+  }
+  const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds];
+
+  // If the empty group position is not explicitly specified, make it the first visible column
+  if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
+    allVisibleOptionIds.unshift('');
+  }
+
+  const _visibleGroups = groupCardsByOptions(__cardPages, allVisibleOptionIds, groupByProperty);
+  const _hiddenGroups = groupCardsByOptions(__cardPages, hiddenOptionIds, groupByProperty);
+  return { visible: _visibleGroups, hidden: _hiddenGroups };
 }
 
 const connector = connect(undefined, { addCard: _addCard, addTemplate, updateView });

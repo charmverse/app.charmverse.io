@@ -1,11 +1,14 @@
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
+import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
+import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
@@ -30,6 +33,11 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import type { Card, CardPage } from 'lib/focalboard/card';
 
 import { useRewards } from './hooks/useRewards';
+
+const CalendarFullView = dynamic(
+  () => import('../common/BoardEditor/focalboard/src/components/calendar/fullCalendar'),
+  { ssr: false }
+);
 
 export function RewardsPage({ title }: { title: string }) {
   useRewardsNavigation();
@@ -60,6 +68,15 @@ export function RewardsPage({ title }: { title: string }) {
 
     return _groupByProperty;
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
+
+  const { visible: visibleGroups, hidden: hiddenGroups } = activeView
+    ? getVisibleAndHiddenGroups(
+        cardPages as CardPage[],
+        activeView.fields.visibleOptionIds,
+        activeView.fields.hiddenOptionIds,
+        groupByProperty
+      )
+    : { visible: [], hidden: [] };
 
   useRewardsBoardMutator();
 
@@ -161,24 +178,56 @@ export function RewardsPage({ title }: { title: string }) {
           <Stack>
             {rewards && rewards?.length > 0 ? (
               <Box width='100%'>
-                <Table
-                  board={activeBoard}
-                  activeView={activeView}
-                  cardPages={cardPages as CardPage[]}
-                  groupByProperty={groupByProperty}
-                  views={views}
-                  visibleGroups={[]}
-                  selectedCardIds={[]}
-                  readOnly={!isAdmin}
-                  disableAddingCards
-                  showCard={showRewardOrApplication}
-                  readOnlyTitle
-                  cardIdToFocusOnRender=''
-                  addCard={async () => {}}
-                  onCardClicked={() => {}}
-                  onDeleteCard={onDelete}
-                  expandSubRowsOnLoad
-                />
+                {activeView.fields.viewType === 'table' && (
+                  <Table
+                    board={activeBoard}
+                    activeView={activeView}
+                    cardPages={cardPages as CardPage[]}
+                    groupByProperty={groupByProperty}
+                    views={views}
+                    visibleGroups={[]}
+                    selectedCardIds={[]}
+                    readOnly={!isAdmin}
+                    disableAddingCards
+                    showCard={showRewardOrApplication}
+                    readOnlyTitle
+                    cardIdToFocusOnRender=''
+                    addCard={async () => {}}
+                    onCardClicked={() => {}}
+                    onDeleteCard={onDelete}
+                    expandSubRowsOnLoad
+                  />
+                )}
+                {activeView.fields.viewType === 'calendar' && (
+                  <CalendarFullView
+                    board={activeBoard}
+                    cards={cards as Card[]}
+                    activeView={activeView}
+                    readOnly={!isAdmin}
+                    // dateDisplayProperty={dateDisplayProperty}
+                    showCard={showRewardOrApplication}
+                    addCard={async () => {}}
+                    disableAddingCards
+                  />
+                )}
+
+                {activeView.fields.viewType === 'board' && (
+                  <Kanban
+                    board={activeBoard}
+                    activeView={activeView}
+                    cards={cards as Card[]}
+                    groupByProperty={groupByProperty}
+                    visibleGroups={visibleGroups}
+                    hiddenGroups={hiddenGroups}
+                    selectedCardIds={[]}
+                    readOnly={!isAdmin}
+                    addCard={async () => {}}
+                    onCardClicked={(e, card) => showRewardOrApplication(card.id)}
+                    showCard={showRewardOrApplication}
+                    disableAddingCards
+                    readOnlyTitle
+                  />
+                )}
               </Box>
             ) : (
               <Box sx={{ mt: 3 }}>
