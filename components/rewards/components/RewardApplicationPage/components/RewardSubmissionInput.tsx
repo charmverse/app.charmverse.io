@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import type { WorkUpsertData } from 'lib/rewards/work';
@@ -106,7 +106,7 @@ export function RewardSubmissionInput({
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={2}>
           <Grid item>
-            <InlineCharmEditor
+            <CharmEditor
               content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={(content) => {
                 setValue('submission', content.rawText, {
@@ -121,11 +121,15 @@ export function RewardSubmissionInput({
                 backgroundColor: 'var(--input-bg)',
                 border: '1px solid var(--input-border)',
                 borderRadius: 3,
-                minHeight: 130
+                minHeight: 130,
+                left: 0
               }}
               readOnly={readOnly || submission?.status === 'complete' || submission?.status === 'paid'}
               placeholderText={currentUserIsAuthor ? 'Enter your submission here' : 'No submission yet'}
               key={`${readOnly}.${submission?.status}`}
+              disableRowHandles
+              isContentControlled
+              disableNestedPages
             />
           </Grid>
 
