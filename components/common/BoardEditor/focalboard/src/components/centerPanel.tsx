@@ -146,16 +146,7 @@ function CenterPanel(props: Props) {
       // TODO: dont recreate the card objects, this causes re-rendering on all cards when any card/page is updated
       // we need to figure another way to grab the page titles probably down-stream
       .map((card) => ({
-        card: {
-          ...card,
-          fields: {
-            ...card.fields,
-            properties: {
-              ...card.fields.properties,
-              [Constants.titleColumnId]: pages[card.id]?.title ?? ''
-            }
-          }
-        },
+        card,
         page: pages[card.id]!
       }))
       .filter(({ page }) => !!page && !page.deletedAt);

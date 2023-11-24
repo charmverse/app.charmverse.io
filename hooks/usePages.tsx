@@ -7,7 +7,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { deleteCardPages, updateCardPages } from 'components/common/BoardEditor/focalboard/src/store/cards';
+import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { Block } from 'lib/focalboard/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
@@ -54,7 +54,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
-  const blocksDispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const { sendMessage, subscribe } = useWebSocketClient();
   const pagesDispatched = useRef(false);
   const {
@@ -99,13 +99,13 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (data && !isLoading && !pagesDispatched.current) {
-      blocksDispatch(
-        updateCardPages(
-          Object.values(data)
-            .filter(isTruthy)
-            .map((page) => ({ id: page.id, title: page.title }))
-        )
-      );
+      const cardPages = Object.values(data)
+        .filter(isTruthy)
+        .filter((page) => page.type === 'card');
+
+      if (cardPages.length) {
+        dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
+      }
       pagesDispatched.current = true;
     }
   }, [data, isLoading]);
@@ -241,13 +241,13 @@ export function PagesProvider({ children }: { children: ReactNode }) {
             return pageMap;
           }, {});
 
-          blocksDispatch(
-            updateCardPages(
-              Object.values(pagesToUpdate)
-                .filter(isTruthy)
-                .map((page) => ({ id: page.id, title: page.title }))
-            )
-          );
+          const cardPages = Object.values(pagesToUpdate)
+            .filter(isTruthy)
+            .filter((page) => page.type === 'card');
+
+          if (cardPages.length) {
+            dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
+          }
 
           return {
             ..._existingPages,
@@ -267,14 +267,16 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       const newPages = value.reduce<PagesMap>((pageMap, page) => {
         if (page.spaceId === currentSpaceId.current) {
           pageMap[page.id] = page;
-          blocksDispatch(
-            updateCardPages([
-              {
-                id: page.id,
-                title: page.title
-              }
-            ])
-          );
+          if (page.type === 'card') {
+            dispatch(
+              updateCards([
+                {
+                  id: page.id,
+                  title: page.title
+                }
+              ])
+            );
+          }
         }
         return pageMap;
       }, {});
@@ -303,16 +305,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           value.forEach((deletedPage) => {
             delete newValue[deletedPage.id];
           });
-
-          if (existingPages) {
-            blocksDispatch(
-              deleteCardPages(
-                Object.values(existingPages)
-                  .filter(isTruthy)
-                  .map((page) => page.id)
-              )
-            );
-          }
 
           return newValue;
         },

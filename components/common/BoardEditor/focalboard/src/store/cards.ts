@@ -21,66 +21,51 @@ type CardsState = {
   current: string;
   cards: { [key: string]: Card };
   templates: { [key: string]: Card };
-  cardPages: Record<string, Pick<PageMeta, 'title'>>;
 };
+
+function updateCardTitleProperty({ card, cards }: { cards: CardsState['cards']; card: Card }) {
+  const cardTitle = card.title || cards[card.id]?.title;
+  const cardAfterUpdate = Object.assign(cards[card.id] || {}, card);
+  cardAfterUpdate.title = cardTitle;
+  cards[card.id] = cardAfterUpdate;
+  if (cardAfterUpdate.fields && cardAfterUpdate.fields.properties) {
+    cardAfterUpdate.fields.properties[Constants.titleColumnId] = cardAfterUpdate.title || '';
+  }
+}
 
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: {
     current: '',
     cards: {},
-    templates: {},
-    cardPages: {}
+    templates: {}
   } as CardsState,
   reducers: {
     setCurrent: (state, action: PayloadAction<string>) => {
       state.current = action.payload;
     },
     addCard: (state, action: PayloadAction<Card>) => {
-      state.cards[action.payload.id] = action.payload;
-      const cardPage = state.cardPages[action.payload.id];
-      if (cardPage) {
-        state.cards[action.payload.id].fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
-      }
+      updateCardTitleProperty({
+        card: action.payload,
+        cards: state.cards
+      });
     },
     addTemplate: (state, action: PayloadAction<Card>) => {
       state.templates[action.payload.id] = action.payload;
     },
-    updateCardPages: (state, action: PayloadAction<Pick<PageMeta, 'id' | 'title'>[]>) => {
-      for (const cardPage of action.payload) {
-        state.cardPages[cardPage.id] = { title: cardPage.title };
-      }
-      for (const card of Object.values(state.cards)) {
-        const cardPage = state.cardPages[card.id];
-        if (cardPage) {
-          card.fields.properties[Constants.titleColumnId] = cardPage.title ?? '';
-        }
-      }
-    },
-    deleteCardPages: (state, action: PayloadAction<string[]>) => {
-      action.payload.forEach((deletedPageId) => {
-        delete state.cardPages[deletedPageId];
-      });
-    },
-    updateCards: (state, action: PayloadAction<Card[]>) => {
+    updateCards: (state, action: PayloadAction<(Partial<Card> & { id: string })[]>) => {
       for (const card of action.payload) {
         if (card.deletedAt) {
           delete state.cards[card.id];
           delete state.templates[card.id];
-        } else if (card.fields.isTemplate) {
+        } else if (card.fields?.isTemplate) {
           const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
           state.templates[card.id] = cardAfterUpdate;
         } else {
-          const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
-          state.cards[card.id] = cardAfterUpdate;
-        }
-      }
-    },
-    updateCard: (state, { payload }: PayloadAction<Partial<Card>>) => {
-      if (payload.id) {
-        const card = state.cards[payload.id];
-        if (card) {
-          state.cards[payload.id] = { ...card, ...payload };
+          updateCardTitleProperty({
+            card: card as Card,
+            cards: state.cards
+          });
         }
       }
     },
@@ -96,36 +81,29 @@ const cardsSlice = createSlice({
       state.cards = state.cards ?? {};
       const block = action.payload;
       if (block.type === 'card') {
-        state.cards[block.id] = block as Card;
+        updateCardTitleProperty({
+          card: block as Card,
+          cards: state.cards
+        });
       }
     });
 
     builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
-      const cardPages = state.cardPages;
       for (const block of action.payload) {
         if (block.type === 'card' && block.fields.isTemplate) {
           state.templates[block.id] = block as Card;
         } else if (block.type === 'card' && !block.fields.isTemplate) {
-          state.cards[block.id] = block as Card;
-          if (cardPages) {
-            state.cards[block.id].fields.properties[Constants.titleColumnId] = cardPages[block.id]?.title ?? '';
-          }
+          updateCardTitleProperty({
+            card: block as Card,
+            cards: state.cards
+          });
         }
       }
     });
   }
 });
 
-export const {
-  updateCardPages,
-  deleteCardPages,
-  updateCards,
-  updateCard,
-  addCard,
-  addTemplate,
-  setCurrent,
-  deleteCards
-} = cardsSlice.actions;
+export const { updateCards, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
