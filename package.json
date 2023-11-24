@@ -373,6 +373,9 @@
     "typescript": "$typescript",
     "esbuild": "^0.19.5"
   },
+  "resolutions": {
+    "ethers": "6.8.1"
+  },
   "msw": {
     "workerDirectory": "public"
   }
