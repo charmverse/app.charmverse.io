@@ -171,7 +171,6 @@
     "emoji-mart": "^3.0.1",
     "ethers": "^6.8.1",
     "ethers-v5": "npm:ethers@^5.7.2",
-    "ethers-v6": "npm:ethers@^6.8.1",
     "firebase": "^10.2.0",
     "firebase-admin": "^11.10.1",
     "form-data": "^4.0.0",
