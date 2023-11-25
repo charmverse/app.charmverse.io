@@ -52,7 +52,7 @@ export type ContentToCompress = {
 export function zipContent({ csv = [], pages = [] }: ContentToCompress) {
   // Ensure no duplicates
   function getUniqueFilename(_filename: string, _existingFilenames: Set<string>, extension: 'md' | 'csv') {
-    // Replace any forward slashes and backslashes in the filename with an underscore
+    // Remove any forward slashes and backslashes in the filename so they don't show up as a subfolder in the end-users' device
     // eslint-disable-next-line no-useless-escape
     const sanitizedFilename = _filename.replace(/[\/\\]/g, '');
 
