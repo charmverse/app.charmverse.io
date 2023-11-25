@@ -24,7 +24,7 @@ export async function generateMarkdown({
 
   const state = new BangleEditorState({
     specRegistry,
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : emptyDocument,
+    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : undefined,
     editorProps: {
       attributes: {
         example: 'value'
