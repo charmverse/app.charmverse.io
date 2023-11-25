@@ -7,6 +7,7 @@ import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useENSName } from 'hooks/useENSName';
+import { useMembers } from 'hooks/useMembers';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 /**
@@ -90,6 +91,8 @@ interface UserDisplayProps extends StyleProps {
 
 function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayProps) {
   const { showUserId } = useMemberDialog();
+  const { membersRecord } = useMembers();
+  const member = user ? membersRecord[user.id] : null;
 
   if (!user) {
     // strip out invalid names
@@ -115,8 +118,8 @@ function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayPro
             }
           : undefined
       }
-      username={user.username}
-      avatar={user.avatar}
+      username={member?.username ?? user.username}
+      avatar={member?.avatar ?? user.avatar}
       isNft={isNft}
       {...props}
     />
