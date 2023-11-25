@@ -52,10 +52,14 @@ export type ContentToCompress = {
 export function zipContent({ csv = [], pages = [] }: ContentToCompress) {
   // Ensure no duplicates
   function getUniqueFilename(_filename: string, _existingFilenames: Set<string>, extension: 'md' | 'csv') {
+    // Replace any forward slashes and backslashes in the filename with an underscore
+    // eslint-disable-next-line no-useless-escape
+    const sanitizedFilename = _filename.replace(/[\/\\]/g, '');
+
     let count = 1;
-    let newFilename = _filename;
+    let newFilename = sanitizedFilename;
     while (_existingFilenames.has(newFilename)) {
-      newFilename = `${_filename} (${count})`;
+      newFilename = `${sanitizedFilename} (${count})`;
       count += 1;
     }
     _existingFilenames.add(newFilename);
