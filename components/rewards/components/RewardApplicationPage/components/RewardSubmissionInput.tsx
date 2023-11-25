@@ -1,3 +1,4 @@
+import { isEmptyDocument } from '@bangle.dev/utils';
 import type { Application } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormLabel } from '@mui/material';
@@ -14,6 +15,7 @@ import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
@@ -67,6 +69,7 @@ export function RewardSubmissionInput({
     register,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -77,6 +80,8 @@ export function RewardSubmissionInput({
     },
     resolver: yupResolver(schema(hasCustomReward))
   });
+
+  const formValues = getValues();
 
   const [formError, setFormError] = useState<SystemError | null>(null);
 
@@ -166,7 +171,11 @@ export function RewardSubmissionInput({
           {!readOnly && (
             <Grid item display='flex' gap={1} justifyContent='flex-end'>
               <Button
-                disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched}
+                disabled={
+                  (!isValid && submission?.status === 'inProgress') ||
+                  !isEditorTouched ||
+                  checkIsContentEmpty(formValues.submissionNodes)
+                }
                 type='submit'
                 loading={isSaving}
               >
