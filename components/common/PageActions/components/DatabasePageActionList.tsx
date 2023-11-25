@@ -98,7 +98,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   async function exportZippedDatabase() {
     setExportingDatabase(true);
     try {
-      const exportName = `${boardPage?.title ?? 'Untitled'} database export.zip`;
+      const exportName = `${boardPage?.title ?? 'Untitled'} database export`;
 
       const generatedZip = await charmClient.pages.exportZippedDatabasePage({
         databaseId: pageId

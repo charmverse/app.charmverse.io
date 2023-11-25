@@ -55,7 +55,8 @@ const createDocument = ({
     return schema.nodeFromJSON(content);
   }
 
-  if (typeof content === 'string') {
+  // Make sure document is present, otherwise it will throw an error
+  if (typeof content === 'string' && typeof window !== 'undefined') {
     const element = document.createElement('div');
     element.innerHTML = content.trim();
     return DOMParser.fromSchema(schema).parse(element, parseOptions);

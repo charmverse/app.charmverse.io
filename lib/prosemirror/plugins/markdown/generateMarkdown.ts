@@ -5,6 +5,7 @@ import { BangleEditorState } from 'components/common/CharmEditor/components/@ban
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { Member } from 'lib/members/interfaces';
+import { emptyDocument } from 'lib/prosemirror/constants';
 
 export type CharmMarkdownGeneratorOptions = {
   members?: Member[];
@@ -23,7 +24,7 @@ export async function generateMarkdown({
 
   const state = new BangleEditorState({
     specRegistry,
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : '',
+    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : emptyDocument,
     editorProps: {
       attributes: {
         example: 'value'
