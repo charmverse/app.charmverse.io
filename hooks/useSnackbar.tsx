@@ -64,12 +64,9 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       setAutoHideDuration,
       isOpen,
       handleClose,
-      showMessage: (msg: ReactNode, newSeverity?: AlertColor, anchorOrigin?: SnackbarOrigin) => {
+      showMessage: (msg: ReactNode, newSeverity?: AlertColor) => {
         newSeverity = newSeverity ?? 'info';
         setIsOpen(true);
-        if (anchorOrigin) {
-          setOrigin(anchorOrigin);
-        }
         setSeverity(newSeverity);
         setMessage(msg);
       },

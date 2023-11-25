@@ -55,33 +55,37 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
     severity: severityProp
   } = props;
 
+  const open = isOpenProp ?? isOpen;
+
   return (
     <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
-      <Snackbar
-        open={isOpenProp ?? isOpen}
-        autoHideDuration={autoHideDuration}
-        anchorOrigin={originProp ?? origin}
-        onClose={handleClose}
-        sx={{
-          '& .MuiAlert-action': {
-            alignItems: 'center',
-            gap: 1
-          }
-        }}
-      >
-        <Alert
-          action={[
-            ...(actionsProp || actions || []),
-            <IconButton key='clear' onClick={handleCloseProp ?? (handleClose as any)} color='inherit'>
-              <ClearIcon fontSize='small' />
-            </IconButton>
-          ]}
-          severity={severityProp ?? severity}
-          sx={{ width: '100%', alignItems: 'center' }}
+      {open && (
+        <Snackbar
+          open={open}
+          autoHideDuration={autoHideDuration}
+          anchorOrigin={originProp ?? origin}
+          onClose={handleClose}
+          sx={{
+            '& .MuiAlert-action': {
+              alignItems: 'center',
+              gap: 1
+            }
+          }}
         >
-          {messageProp ?? message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            action={[
+              ...(actionsProp || actions || []),
+              <IconButton key='clear' onClick={handleCloseProp ?? (handleClose as any)} color='inherit'>
+                <ClearIcon fontSize='small' />
+              </IconButton>
+            ]}
+            severity={severityProp ?? severity}
+            sx={{ width: '100%', alignItems: 'center' }}
+          >
+            {messageProp ?? message}
+          </Alert>
+        </Snackbar>
+      )}
     </Stack>
   );
 }
