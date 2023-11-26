@@ -34,7 +34,7 @@ export function RewardStatusBadge({
 }: IRewardBadgeProps) {
   const { space } = useCurrentSpace();
 
-  const rewardLink = `/${space?.domain}/bounties/${reward.id}`;
+  const rewardLink = `/${space?.domain}/rewards/${reward.id}`;
 
   if (layout === 'row') {
     return (
