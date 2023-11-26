@@ -41,6 +41,7 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
+import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -83,7 +84,10 @@ function TableHeader(props: Props): JSX.Element {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
 
-  const disableRename = proposalPropertyTypesList.includes(type as any) || DEFAULT_BLOCK_IDS.includes(templateId);
+  const disableRename =
+    proposalPropertyTypesList.includes(type as any) ||
+    DEFAULT_BLOCK_IDS.includes(templateId) ||
+    defaultRewardPropertyIds.includes(templateId);
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -253,7 +257,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
-            disabled={proposalPropertyTypesList.includes(type as any)}
+            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}
@@ -265,7 +269,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='delete'
-            disabled={proposalPropertyTypesList.includes(type as any)}
+            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
             onClick={() => {
               mutator.deleteProperty(board, views, cards, templateId);
             }}
