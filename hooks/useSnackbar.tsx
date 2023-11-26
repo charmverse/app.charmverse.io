@@ -7,7 +7,6 @@ type IContext = {
   actions?: ReactNode[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   message: ReactNode;
-  origin: SnackbarOrigin;
   setMessage: Dispatch<SetStateAction<ReactNode>>;
   severity: AlertColor;
   setSeverity: Dispatch<SetStateAction<AlertColor>>;
@@ -23,7 +22,6 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
   isOpen: false,
   actions: [],
   message: null,
-  origin: { vertical: 'bottom', horizontal: 'left' },
   setIsOpen: () => {},
   setMessage: () => {},
   setSeverity: () => {},
@@ -37,7 +35,6 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
 export function SnackbarProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const [actions, setActions] = useState<ReactNode[]>([]);
-  const [origin, setOrigin] = useState<SnackbarOrigin>({ vertical: 'bottom', horizontal: 'left' });
   const [severity, setSeverity] = useState<AlertColor>('info');
   const [message, setMessage] = useState<null | ReactNode>(null);
   const [autoHideDuration, setAutoHideDuration] = useState<null | number>(5000);
@@ -45,10 +42,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
   const resetState = () => {
     setIsOpen(false);
     setActions([]);
-    setOrigin({ vertical: 'bottom', horizontal: 'left' });
-    setMessage(null);
     setAutoHideDuration(5000);
-    setSeverity('info');
   };
 
   const handleClose: SnackbarProps['onClose'] = (_, reason) => {
@@ -72,14 +66,13 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       },
       actions,
       message,
-      origin,
       severity,
       setActions,
       setSeverity,
       setIsOpen,
       setMessage
     }),
-    [isOpen, message, origin, severity]
+    [isOpen, message, autoHideDuration, actions, severity]
   );
 
   return <SnackbarContext.Provider value={value}>{children}</SnackbarContext.Provider>;

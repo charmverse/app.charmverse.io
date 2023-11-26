@@ -31,7 +31,6 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
     severity,
     message,
     actions,
-    origin,
     handleClose,
     isOpen,
     autoHideDuration = props.autoHideDuration ?? 5000
@@ -51,20 +50,14 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
     handleClose: handleCloseProp,
     isOpen: isOpenProp,
     message: messageProp,
-    origin: originProp,
+    origin: originProp = { vertical: 'bottom', horizontal: 'left' },
     severity: severityProp
   } = props;
-
-  const open = isOpenProp ?? isOpen;
-
-  if (!open) {
-    return null;
-  }
 
   return (
     <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
       <Snackbar
-        open
+        open={isOpenProp ?? isOpen}
         autoHideDuration={autoHideDuration}
         anchorOrigin={originProp ?? origin}
         onClose={handleClose}
