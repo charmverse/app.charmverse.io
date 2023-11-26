@@ -60,9 +60,9 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       handleClose,
       showMessage: (msg: ReactNode, newSeverity?: AlertColor) => {
         newSeverity = newSeverity ?? 'info';
-        setIsOpen(true);
-        setSeverity(newSeverity);
         setMessage(msg);
+        setSeverity(newSeverity);
+        setIsOpen(true);
       },
       actions,
       message,
