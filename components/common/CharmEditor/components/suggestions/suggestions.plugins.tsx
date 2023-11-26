@@ -28,7 +28,7 @@ export function plugins({ onSelectionSet, key }: { onSelectionSet?: (state: Edit
         },
         apply(tr, prev, oldState, state) {
           // react to when something is clicked, or when a selection is set by the sidebar component
-          if (tr.selectionSet || oldState.selection.eq(state.selection)) {
+          if (tr.selectionSet || !oldState.selection.eq(state.selection)) {
             onSelectionSet?.(state);
           }
           return prev;
