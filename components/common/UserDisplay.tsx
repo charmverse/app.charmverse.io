@@ -80,21 +80,16 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user?: {
-    avatar?: string | null;
-    username: string;
-    path?: string | null;
-    id: string;
-  } | null;
+  userId?: string;
   showMiniProfile?: boolean;
 }
 
-function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayProps) {
+function UserDisplay({ showMiniProfile = false, userId, ...props }: UserDisplayProps) {
   const { showUserId } = useMemberDialog();
   const { membersRecord } = useMembers();
-  const member = user ? membersRecord[user.id] : null;
+  const member = userId ? membersRecord[userId] : null;
 
-  if (!user) {
+  if (!member) {
     // strip out invalid names
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { hideName, avatarSize, ...boxProps } = props;
@@ -105,21 +100,21 @@ function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayPro
     );
   }
 
-  const isNft = hasNftAvatar(user);
+  const isNft = hasNftAvatar(member);
 
   return (
     <BaseComponent
       onClick={
         showMiniProfile
           ? () => {
-              if (showMiniProfile) {
-                showUserId(user.id);
+              if (showMiniProfile && userId) {
+                showUserId(userId);
               }
             }
           : undefined
       }
-      username={member?.username ?? user.username}
-      avatar={member?.avatar ?? user.avatar}
+      username={member.username}
+      avatar={member.avatar}
       isNft={isNft}
       {...props}
     />

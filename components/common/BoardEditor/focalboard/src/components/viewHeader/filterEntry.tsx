@@ -255,7 +255,7 @@ function FilterPropertyValue({
                 {selectedMemberIds.map((selectedMemberId) => {
                   const member = members?.find((_member) => _member.id === selectedMemberId);
                   return member ? (
-                    <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} user={member} />
+                    <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} userId={member.id} />
                   ) : null;
                 })}
               </SelectMenuItemsContainer>
@@ -265,7 +265,7 @@ function FilterPropertyValue({
           {members.map((member) => {
             return (
               <MenuItem value={member.id} key={member.id}>
-                <UserDisplay user={member} />
+                <UserDisplay userId={member.id} />
               </MenuItem>
             );
           })}

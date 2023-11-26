@@ -211,5 +211,7 @@ function FormatChangeDisplay({ before, after }: { before: string[]; after: strin
 
 function SidebarUser({ user }: { user?: Member }) {
   if (!user) return null;
-  return <UserDisplay showMiniProfile component='div' user={user} avatarSize='small' fontSize={14} fontWeight={500} />;
+  return (
+    <UserDisplay showMiniProfile component='div' userId={user.id} avatarSize='small' fontSize={14} fontWeight={500} />
+  );
 }

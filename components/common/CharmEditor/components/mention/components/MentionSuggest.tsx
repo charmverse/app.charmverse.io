@@ -164,7 +164,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
                   data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
-                  <UserDisplay fontSize={14} user={member} avatarSize='small' />
+                  <UserDisplay fontSize={14} userId={member.id} avatarSize='small' />
                 </MenuItem>
               );
             })}

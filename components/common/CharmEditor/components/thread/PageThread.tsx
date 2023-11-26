@@ -402,7 +402,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     <UserDisplay
                       showMiniProfile
                       component='div'
-                      user={member}
+                      userId={member.id}
                       avatarSize='small'
                       sx={{
                         '& .MuiTypography-root': {
