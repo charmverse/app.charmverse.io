@@ -17,7 +17,8 @@ export type StaticPageType =
   | 'settings/space'
   | 'settings/roles-and-permissions'
   | 'settings/import'
-  | 'settings/invites'
+  | 'settings/import'
+  | 'settings/proposals'
   | 'billing/marketing'
   | 'billing/checkout'
   | 'billing/settings';

@@ -19,21 +19,20 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useFavoritePages } from 'hooks/useFavoritePages';
-import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 
+import { PageIcon } from '../../../PageIcon';
 import NewPageMenu from '../NewPageMenu';
-import { PageIcon } from '../PageIcon';
 import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
@@ -229,8 +228,7 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
     );
   }, [favoritePageIds, userSpacePermissions, isMobile, navAction, addPage, showMemberFeatures]);
 
-  const { features } = useFeaturesAndMembers();
-  const isCharmverse = useIsCharmverseSpace();
+  const { features } = useSpaceFeatures();
 
   return (
     <SidebarContainer>

@@ -11,7 +11,7 @@ import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board } from 'lib/focalboard/board';

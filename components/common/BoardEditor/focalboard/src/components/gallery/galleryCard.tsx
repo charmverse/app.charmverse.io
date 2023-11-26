@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
