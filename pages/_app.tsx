@@ -35,6 +35,7 @@ import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
@@ -184,28 +185,30 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
               <LocalizationProvider>
                 <NotionProvider>
                   <IntlProvider>
-                    <PageHead {...pageProps} />
+                    <DbViewSettingsProvider>
+                      <PageHead {...pageProps} />
 
-                    <RouteGuard>
-                      <ErrorBoundary>
-                        <Snackbar
-                          isOpen={isOldBuild}
-                          message='New CharmVerse platform update available. Please refresh.'
-                          actions={[
-                            <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                              <RefreshIcon fontSize='small' />
-                            </IconButton>
-                          ]}
-                          origin={{ vertical: 'top', horizontal: 'center' }}
-                          severity='warning'
-                          handleClose={() => setIsOldBuild(false)}
-                        />
+                      <RouteGuard>
+                        <ErrorBoundary>
+                          <Snackbar
+                            isOpen={isOldBuild}
+                            message='New CharmVerse platform update available. Please refresh.'
+                            actions={[
+                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                <RefreshIcon fontSize='small' />
+                              </IconButton>
+                            ]}
+                            origin={{ vertical: 'top', horizontal: 'center' }}
+                            severity='warning'
+                            handleClose={() => setIsOldBuild(false)}
+                          />
 
-                        {getLayout(<Component {...pageProps} />)}
+                          {getLayout(<Component {...pageProps} />)}
 
-                        <GlobalComponents />
-                      </ErrorBoundary>
-                    </RouteGuard>
+                          <GlobalComponents />
+                        </ErrorBoundary>
+                      </RouteGuard>
+                    </DbViewSettingsProvider>
                   </IntlProvider>
                 </NotionProvider>
               </LocalizationProvider>
