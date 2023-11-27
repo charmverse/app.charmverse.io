@@ -15,14 +15,14 @@ export type BountyPermissionAssignment = {
   assignee: TargetPermissionGroup;
 } & Resource;
 
-// Groups that can be assigned to various bounty actions
+// Groups that can be assigned to various reward actions
 export type BountyReviewer = Extract<AssignablePermissionGroupsWithPublic, 'role' | 'user'>;
 
 export type BountySubmitter = Extract<AssignablePermissionGroupsWithPublic, 'space' | 'role'>;
 
 export type BountyPermissionGroup = TargetPermissionGroup<BountyReviewer | BountySubmitter>;
 
-// The set of all permissions for an individual bounty
+// The set of all permissions for an individual reward
 export type BountyPermissions = {
   reviewer: TargetPermissionGroup<BountyReviewer>[];
   creator: TargetPermissionGroup[];

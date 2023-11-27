@@ -314,7 +314,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
               <CharmEditor
                 placeholderText={
                   page.type === 'bounty' || page.type === 'bounty_template'
-                    ? `Describe the bounty. Type '/' to see the list of available commands`
+                    ? `Describe the reward. Type '/' to see the list of available commands`
                     : undefined
                 }
                 key={editorKey}

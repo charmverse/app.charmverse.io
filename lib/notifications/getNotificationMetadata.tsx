@@ -174,10 +174,10 @@ function getBountyContent(n: BountyNotification, authorUsername?: string): strin
     case 'suggestion.created': {
       return username ? (
         <span>
-          <strong>{username}</strong> suggested a new bounty
+          <strong>{username}</strong> suggested a new reward
         </span>
       ) : (
-        `New bounty suggestion`
+        `New reward suggestion`
       );
     }
     default: {

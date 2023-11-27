@@ -58,7 +58,7 @@ export function RewardPropertiesHeader({
 
   return (
     <>
-      {/* Bounty price and status  */}
+      {/* Reward price and status  */}
       <Grid container mb={1}>
         <Grid item xs={6}>
           <ExpandableSectionTitle title='Reward details' isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
@@ -72,7 +72,7 @@ export function RewardPropertiesHeader({
               alignItems: 'center'
             }}
           >
-            {/* Provide the bounty menu options */}
+            {/* Provide the reward menu options */}
             <Box data-test='bounty-header-amount' display='flex'>
               <RewardStatusBadge reward={reward} truncate showEmptyStatus />
             </Box>
@@ -86,14 +86,14 @@ export function RewardPropertiesHeader({
           severity='info'
           sx={{ mb: 2 }}
           action={
-            <Tooltip title={"Update this bounty's page permissions to view-only (except for the bounty creator)."}>
+            <Tooltip title={"Update this reward's page permissions to view-only (except for the reward creator)."}>
               <Button size='small' variant='outlined' onClick={restrictPermissions} loading={updatingPermissions}>
                 Restrict editing
               </Button>
             </Tooltip>
           }
         >
-          The current permissions allow some applicants to edit the details of this bounty.
+          The current permissions allow some applicants to edit the details of this reward.
         </Alert>
       )}
     </>
