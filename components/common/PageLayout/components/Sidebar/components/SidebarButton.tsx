@@ -79,7 +79,7 @@ export function SidebarLink({
           {icon}
           {label}
         </Box>
-        {section && (premiumSettingSections as SpaceSettingsSection[]).includes(section) && (
+        {section && premiumSettingSections.includes(section as any) && (
           <span style={{ paddingLeft: 10 }}>
             <UpgradeChip
               upgradeContext={(premiumSectionToUpgradeContext as Record<SpaceSettingsSection, UpgradeContext>)[section]}

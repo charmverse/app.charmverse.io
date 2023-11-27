@@ -1,3 +1,4 @@
+import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FilledPageIcon from '@mui/icons-material/DescriptionOutlined';
@@ -11,9 +12,10 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box } from '@mui/material';
 import type { ComponentProps, ReactNode } from 'react';
 
-import type { PageListItem } from 'components/common/CharmEditor/components/PageList';
-import EmojiIcon from 'components/common/Emoji';
+import type { StaticPageType } from 'components/common/PageLayout/components/Sidebar/constants';
 import { greyColor2 } from 'theme/colors';
+
+import EmojiIcon from './Emoji';
 
 export const StyledDatabaseIcon = styled(DatabaseIcon)`
   color: ${greyColor2};
@@ -58,9 +60,11 @@ export function LinkedIcon({ children }: { children: ReactNode }) {
   );
 }
 
+export type PagePathType = Page['type'] | StaticPageType | 'forum_category';
+
 type PageIconProps = Omit<ComponentProps<typeof StyledPageIcon>, 'icon'> & {
   icon?: ReactNode | null | 'application';
-  pageType?: PageListItem['type'];
+  pageType?: PagePathType;
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;
 };
@@ -76,6 +80,7 @@ export function NoAccessPageIcon() {
     />
   );
 }
+
 export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
   let iconComponent: ReactNode = icon;
   if (!icon) {
@@ -122,3 +127,5 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
     <StyledPageIcon icon={iconComponent} {...props} />
   );
 }
+
+export { ProposalIcon };

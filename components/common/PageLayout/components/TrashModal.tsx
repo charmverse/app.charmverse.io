@@ -32,7 +32,7 @@ import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import { PageIcon } from './PageIcon';
+import { PageIcon } from '../../PageIcon';
 
 const PageArchivedDate = memo<{ date: Date; title: string }>(({ date, title }) => {
   return (

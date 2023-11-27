@@ -9,7 +9,7 @@ import { capitalize } from 'lodash';
 import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
 
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';

@@ -3,11 +3,11 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
+import { SPACE_SETTINGS_TABS } from 'components/settings/config';
 import type { ACCOUNT_TABS } from 'components/settings/config';
-import { SETTINGS_TABS } from 'components/settings/config';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
-export type SettingsPath = (typeof SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
+export type SettingsPath = (typeof SPACE_SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
 type IContext = {
   isOpen: boolean;
@@ -56,7 +56,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    if (router.query.settingTab && SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
+    if (router.query.settingTab && SPACE_SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
       openSettings(router.query.settingTab as SettingsPath);
       setUrlWithoutRerender(router.pathname, { settingTab: null });
     }
