@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import { ColorSelectMenu } from 'components/common/form/ColorSelectMenu';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Modal from 'components/common/Modal';
 import { ProposalCategoryChip } from 'components/proposals/components/ProposalChip';
 import { ProposalCategoryContextMenu } from 'components/proposals/components/ProposalViewOptions/components/ProposalCategoryContextMenu';
@@ -21,6 +22,10 @@ const ColorBox = styled(Box)`
   height: 40px;
   border-radius: 4px;
   cursor: pointer;
+`;
+
+const StyledMenuItem = styled(MenuItem)`
+  ${hoverIconsStyle({ marginForIcons: false })}
 `;
 
 export function ProposalCategoriesList() {
@@ -53,7 +58,7 @@ export function ProposalCategoriesList() {
     <>
       <MenuList>
         {categories.map((category) => (
-          <MenuItem
+          <StyledMenuItem
             data-test={`proposal-category-${category.id}`}
             key={category.id}
             value={category.id}
@@ -61,7 +66,7 @@ export function ProposalCategoriesList() {
           >
             <ProposalCategoryChip size='small' color={category.color} title={category.title} />
             <ProposalCategoryContextMenu category={category} key={category.id} />
-          </MenuItem>
+          </StyledMenuItem>
         ))}
 
         <Button
