@@ -1,7 +1,7 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ArrowBack } from '@mui/icons-material';
-import { Box, Grid, Divider, FormLabel, Stack } from '@mui/material';
+import { Box, Grid, Divider, FormLabel } from '@mui/material';
 import { useState } from 'react';
 
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
@@ -162,7 +162,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                             ? 'Applicant'
                             : 'Submitter'}
                         </FormLabel>
-                        <UserDisplay user={submitter} avatarSize='small' showMiniProfile />
+                        <UserDisplay userId={submitter?.id} avatarSize='small' showMiniProfile />
                       </Grid>
 
                       <RewardReviewerActions

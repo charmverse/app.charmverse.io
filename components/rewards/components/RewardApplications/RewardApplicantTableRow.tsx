@@ -21,7 +21,7 @@ export function RewardApplicantTableRow({ submission, onClickView }: Props) {
   return (
     <TableRow key={submission.id} hover sx={{ '.MuiTableCell-root': { borderBottom: 0 } }}>
       <TableCell size='small'>
-        {member ? <UserDisplay avatarSize='small' user={member} fontSize='small' showMiniProfile /> : 'Anonymous'}
+        {member ? <UserDisplay avatarSize='small' userId={member.id} fontSize='small' showMiniProfile /> : 'Anonymous'}
       </TableCell>
       <TableCell>
         <RewardApplicationStatusChip status={submission.status} />

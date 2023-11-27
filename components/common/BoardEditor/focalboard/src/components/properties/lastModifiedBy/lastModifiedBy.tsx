@@ -11,7 +11,7 @@ function LastModifiedBy(props: Props) {
 
   return member ? (
     <div style={{ width: 'fit-content' }} className='readonly octo-propertyvalue'>
-      <UserDisplay user={member} avatarSize='xSmall' fontSize='small' />
+      <UserDisplay userId={member.id} avatarSize='xSmall' fontSize='small' />
     </div>
   ) : null;
 }

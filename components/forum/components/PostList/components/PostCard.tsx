@@ -105,7 +105,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
           <Box display='flex' flexDirection='row' justifyContent='space-between' mt='16px'>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <UserDisplay
-                user={user}
+                userId={user?.id}
                 avatarSize='small'
                 fontSize='medium'
                 sx={{ '> p': { display: { xs: 'none', sm: 'block' } } }}

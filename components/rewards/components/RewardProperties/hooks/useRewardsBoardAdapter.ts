@@ -184,7 +184,8 @@ function mapRewardToCardPage({
   };
 
   const card: Card<RewardPropertyValue> = {
-    id: reward?.id || '',
+    // use page id as card id - kanban board is based on usePages
+    id: rewardPage?.id || '',
     spaceId: rewardSpaceId,
     parentId: '',
     schema: 1,

@@ -4,6 +4,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';
 
 import charmClient from 'charmClient';
+import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { Button } from 'components/common/Button';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
@@ -11,6 +12,7 @@ import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -25,10 +27,13 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { templates, isLoading } = useRewardTemplates();
+  const [currentSpacePermissions] = useCurrentSpacePermissions();
 
   function deleteTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
   }
+
+  const isDisabled = !currentSpacePermissions?.createBounty;
 
   function createTemplate() {
     openNewPage({
@@ -88,10 +93,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   return (
     <>
       <ButtonGroup variant='contained' ref={buttonRef}>
-        <Button data-test='create-suggest-bounty' onClick={createNewReward}>
+        <Button disabled={isDisabled} data-test='create-suggest-bounty' onClick={createNewReward}>
           Create
         </Button>
-        <Button data-test='reward-template-select' size='small' onClick={popupState.open}>
+        <Button disabled={isDisabled} data-test='reward-template-select' size='small' onClick={popupState.open}>
           <KeyboardArrowDown />
         </Button>
       </ButtonGroup>
