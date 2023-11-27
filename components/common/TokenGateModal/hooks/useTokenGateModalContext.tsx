@@ -13,11 +13,12 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useCreateLitToken, useCreateTokenGate } from 'charmClient/hooks/tokengates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import { isTruthy } from 'lib/utilities/types';
 
 import { createAuthSigs, getAllChains } from '../utils/helpers';
 
 export type DisplayedPage = 'tokens' | 'collectables' | 'advanced' | 'home' | 'review' | 'wallet' | 'dao';
-export type Flow = 'singleCondition' | 'multipleConditions';
+export type Flow = 'single' | 'multiple_all' | 'multiple_one';
 
 export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions'> & {
   authSigTypes: string[];
@@ -42,7 +43,7 @@ export const TokenGateModalContext = createContext<Readonly<IContext>>({
   handleUnifiedAccessControlConditions: () => undefined,
   createUnifiedAccessControlConditions: async () => undefined,
   unifiedAccessControlConditions: [],
-  flow: 'singleCondition',
+  flow: 'single',
   setFlow: () => undefined,
   resetModal: () => undefined,
   displayedPage: 'home',
@@ -59,13 +60,16 @@ export function TokenGateModalProvider({ children }: { children: ReactNode }) {
   const litClient = useLitProtocol();
   const { error: tokenError, isMutating: tokenLoading, trigger: triggerToken } = useCreateTokenGate();
   const { error: litError, isMutating: litLoading, trigger: triggerLitToken } = useCreateLitToken(litClient);
-  const [flow, setFlow] = useState<Flow>('singleCondition');
+  const [flow, setFlow] = useState<Flow>('single');
   const { walletAuthSignature, requestSignature } = useWeb3Account();
   const { space } = useCurrentSpace();
   const spaceId = space?.id || '';
 
   const handleUnifiedAccessControlConditions = (conditions: UnifiedAccessControlConditions) => {
-    setUnifiedAccessControlConditions((prevState) => [...prevState, ...conditions]);
+    const andOperator = { operator: 'and' };
+    const orOperator = { operator: 'or' };
+    const operator = flow === 'multiple_all' ? andOperator : flow === 'multiple_one' ? orOperator : undefined;
+    setUnifiedAccessControlConditions((prevState) => [...prevState, operator, ...conditions].filter(isTruthy));
   };
 
   const clearAllAccessControlConditions = () => {
@@ -73,7 +77,7 @@ export function TokenGateModalProvider({ children }: { children: ReactNode }) {
   };
 
   const resetModal = () => {
-    setFlow('singleCondition');
+    setFlow('single');
     setDisplayedPage('home');
     clearAllAccessControlConditions();
   };
@@ -144,7 +148,8 @@ export function TokenGateModalProvider({ children }: { children: ReactNode }) {
       litLoading,
       tokenError?.message,
       litError?.message,
-      resetModal
+      resetModal,
+      handleUnifiedAccessControlConditions
     ]
   );
 

@@ -18,7 +18,7 @@ type ButtonProps = {
 const requirementButton: ButtonProps[] = [
   {
     name: 'collectables',
-    title: 'Digital Collectibles (i.e. NFTs, POAPs, ETC)',
+    title: 'Digital Collectibles (i.e. NFTs, POAPs)',
     icon: NFTCommunityIcon
   },
   {
@@ -51,7 +51,7 @@ export function TokenGateHome() {
             fullWidth
             size='large'
             color='inherit'
-            sx={{ justifyContent: 'left', px: 3, py: 2 }}
+            sx={{ justifyContent: 'left', px: 3, py: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}
             startIcon={<SvgIcon component={btn.icon} inheritViewBox />}
             onClick={() => setDisplayedPage(btn.name)}
           >
