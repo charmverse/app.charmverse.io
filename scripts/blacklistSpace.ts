@@ -5,7 +5,7 @@ import { blacklistUser } from 'lib/users/blacklistUser';
  * Use this script to retrieve and blacklist a space
  */
 
-const spaceDomain = 'possible-peach-barracuda';
+const spaceDomain = 'dirty-brown-caterpillar';
 
 async function search(domain: string) {
   const space = await prisma.space.findUniqueOrThrow({
@@ -81,6 +81,6 @@ async function deleteSpace(domain: string) {
   console.log('Deleted space', result);
 }
 
-// search(spaceDomain).then(() => process.exit());
+search(spaceDomain).then(() => process.exit());
 
-deleteSpace(spaceDomain).then(() => process.exit());
+//deleteSpace(spaceDomain).then(() => process.exit());

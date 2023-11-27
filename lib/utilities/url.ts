@@ -32,5 +32,5 @@ export function addQueryToUrl({
 // example: https://s3.amazonaws.com/charm.public/user-content/... to https://charm.public.prd/user-content/...
 export function replaceS3Domain<T extends string | undefined | null>(url: T) {
   if (!url) return url;
-  return url.replace('charm.public/', 'charm.public.prd/');
+  return url.replace('https://s3.amazonaws.com/charm.public/', 'https://cdn.charmverse.io/');
 }
