@@ -11,7 +11,7 @@ export function checkPageContent(
   pageContent: any | null,
   meta: { spaceId?: string; blockId?: string; postId?: string; pageId?: string } = {}
 ): void {
-  if (pageContent) {
+  if (pageContent && pageContent.content) {
     const doc = getNodeFromJson(pageContent);
     if (doc) {
       doc.nodesBetween(0, doc.content.size, (node) => {
