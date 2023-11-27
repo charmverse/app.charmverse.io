@@ -22,19 +22,9 @@ export async function generateMarkdown({
 }): Promise<string> {
   const serializer = markdownSerializer(specRegistry);
 
-  const state = new BangleEditorState({
-    specRegistry,
-    initialValue: content ? Node.fromJSON(specRegistry.schema, content) : undefined,
-    editorProps: {
-      attributes: {
-        example: 'value'
-      }
-    }
-  });
-
   (serializer.options as any).charmOptions = generatorOptions;
 
-  let markdown = serializer.serialize(state.pmState.doc);
+  let markdown = content ? serializer.serialize(Node.fromJSON(specRegistry.schema, content)) : '';
 
   // Logic added here as the markdown serializer is synchronous
   markdown = await replaceNestedPages(markdown);
