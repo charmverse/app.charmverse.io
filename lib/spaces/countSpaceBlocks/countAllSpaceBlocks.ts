@@ -31,7 +31,7 @@ type SpaceBlockDetails = {
 
 export type OverallBlocksCount = GenericBlocksCount<SpaceBlockDetails>;
 
-// a function that queries the database for the number of blocks, proposals, pages, and bounties in a space
+// a function that queries the database for the number of blocks, proposals, pages, and rewards in a space
 export async function countSpaceBlocks({
   spaceId,
   batchSize = defaultBatchSize

@@ -98,7 +98,7 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
     userId
   });
   if (!userPermissions.createBounty) {
-    throw new UnauthorisedActionError('You do not have permissions to create a bounty.');
+    throw new UnauthorisedActionError('You do not have permissions to create a reward.');
   }
 
   const { reward: createdReward, createdPageId } = await createReward({

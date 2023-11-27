@@ -41,7 +41,7 @@ export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequ
     .then((bounties) =>
       bounties
         .map(({ page, ...reward }) => ({ reward, page: page! }))
-        // remove bounties that have no page (unexpected case)
+        // remove rewards that have no page (unexpected case)
         .filter((bounty) => bounty.page)
 
         // return reviewers in templates

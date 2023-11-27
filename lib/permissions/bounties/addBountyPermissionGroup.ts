@@ -31,11 +31,11 @@ export async function addBountyPermissionGroup({
   });
 
   if (!bounty) {
-    throw new DataNotFoundError(`Bounty with id ${resourceId} not found`);
+    throw new DataNotFoundError(`Reward with id ${resourceId} not found`);
   }
 
   if (assignee.group === 'public') {
-    throw new InsecureOperationError('No Bounty permissions can be assigned to the public.');
+    throw new InsecureOperationError('No reward permissions can be assigned to the public.');
   }
 
   // Validate assignees
@@ -49,7 +49,7 @@ export async function addBountyPermissionGroup({
 
   if (assignee.group === 'space' && bounty.spaceId !== assignee.id) {
     throw new InsecureOperationError(
-      'You cannot assign permissions to a different space than the one the bounty belongs to.'
+      'You cannot assign permissions to a different space than the one the reward belongs to.'
     );
   } else if (assignee.group === 'role') {
     const role = await prisma.role.findUnique({
