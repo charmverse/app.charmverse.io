@@ -2,7 +2,6 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import useSWR from 'swr';
 
@@ -23,25 +22,18 @@ interface Props {
   readOnly?: boolean;
   isExpanded: boolean;
   toggleExpanded: () => void;
-  refreshPermissions: () => void;
 }
 
-export function RewardPropertiesHeader({
-  readOnly = false,
-  reward,
-  isExpanded,
-  pageId,
-  toggleExpanded,
-  refreshPermissions
-}: Props) {
+export function RewardPropertiesHeader({ readOnly = false, reward, isExpanded, pageId, toggleExpanded }: Props) {
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
   const { isFreeSpace } = useIsFreeSpace();
 
-  const { data: editableCheck } = useSWR(!isFreeSpace && reward.id ? `bounty-editable-${reward.id}` : null, () =>
-    charmClient.rewards.isRewardEditable(reward.id)
+  const { data: editableCheck, mutate: refreshEditable } = useSWR(
+    !isFreeSpace && reward.id ? `bounty-editable-${reward.id}` : null,
+    () => charmClient.rewards.isRewardEditable(reward.id)
   );
   function restrictPermissions() {
     setUpdatingPermissions(true);
@@ -50,7 +42,7 @@ export function RewardPropertiesHeader({
         pageId
       })
       .then(() => {
-        refreshPermissions();
+        refreshEditable();
         showMessage('Page permissions updated. Only the bounty creator can edit this page.', 'success');
       })
       .finally(() => setUpdatingPermissions(false));
@@ -80,7 +72,7 @@ export function RewardPropertiesHeader({
         </Grid>
       </Grid>
 
-      {/* Warning for applicants */}
+      {/* Warning for reward creator */}
       {!!editableCheck?.editable && !isFreeSpace && !readOnly && (
         <Alert
           severity='info'
