@@ -1,4 +1,4 @@
-import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 import {
