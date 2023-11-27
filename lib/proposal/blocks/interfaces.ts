@@ -1,4 +1,4 @@
-import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
+import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { ProposalBlock } from '@charmverse/core/prisma-client';
 
 import type { BoardFields } from 'lib/focalboard/board';

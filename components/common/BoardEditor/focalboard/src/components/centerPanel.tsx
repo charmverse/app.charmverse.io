@@ -104,7 +104,6 @@ function CenterPanel(props: Props) {
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
-
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   let activeBoardId: string | undefined = board.id;
   if (activeView?.fields.linkedSourceId) {
@@ -121,7 +120,6 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
-
   const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
@@ -148,16 +146,7 @@ function CenterPanel(props: Props) {
       // TODO: dont recreate the card objects, this causes re-rendering on all cards when any card/page is updated
       // we need to figure another way to grab the page titles probably down-stream
       .map((card) => ({
-        card: {
-          ...card,
-          fields: {
-            ...card.fields,
-            properties: {
-              ...card.fields.properties,
-              [Constants.titleColumnId]: pages[card.id]?.title ?? ''
-            }
-          }
-        },
+        card,
         page: pages[card.id]!
       }))
       .filter(({ page }) => !!page && !page.deletedAt);

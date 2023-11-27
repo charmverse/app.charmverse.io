@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
@@ -23,6 +23,16 @@ type CardsState = {
   templates: { [key: string]: Card };
 };
 
+function updateCardTitleProperty({ card, cards }: { cards: CardsState['cards']; card: Card }) {
+  const cardTitle = card.title || cards[card.id]?.title;
+  const cardAfterUpdate = Object.assign(cards[card.id] || {}, card);
+  cardAfterUpdate.title = cardTitle;
+  cards[card.id] = cardAfterUpdate;
+  if (cardAfterUpdate.fields && cardAfterUpdate.fields.properties) {
+    cardAfterUpdate.fields.properties[Constants.titleColumnId] = cardAfterUpdate.title || '';
+  }
+}
+
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: {
@@ -35,30 +45,27 @@ const cardsSlice = createSlice({
       state.current = action.payload;
     },
     addCard: (state, action: PayloadAction<Card>) => {
-      state.cards[action.payload.id] = action.payload;
+      updateCardTitleProperty({
+        card: action.payload,
+        cards: state.cards
+      });
     },
     addTemplate: (state, action: PayloadAction<Card>) => {
       state.templates[action.payload.id] = action.payload;
     },
-    updateCards: (state, action: PayloadAction<Card[]>) => {
+    updateCards: (state, action: PayloadAction<(Partial<Card> & { id: string })[]>) => {
       for (const card of action.payload) {
         if (card.deletedAt) {
           delete state.cards[card.id];
           delete state.templates[card.id];
-        } else if (card.fields.isTemplate) {
+        } else if (card.fields?.isTemplate) {
           const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
           state.templates[card.id] = cardAfterUpdate;
         } else {
-          const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
-          state.cards[card.id] = cardAfterUpdate;
-        }
-      }
-    },
-    updateCard: (state, { payload }: PayloadAction<Partial<Card>>) => {
-      if (payload.id) {
-        const card = state.cards[payload.id];
-        if (card) {
-          state.cards[payload.id] = { ...card, ...payload };
+          updateCardTitleProperty({
+            card: card as Card,
+            cards: state.cards
+          });
         }
       }
     },
@@ -70,29 +77,33 @@ const cardsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
-      state.cards = state.cards ?? {};
-      state.templates = state.templates ?? {};
-      for (const block of action.payload) {
-        if (block.type === 'card' && block.fields.isTemplate) {
-          state.templates[block.id] = block as Card;
-        } else if (block.type === 'card' && !block.fields.isTemplate) {
-          state.cards[block.id] = block as Card;
-        }
-      }
-    });
-
     builder.addCase(blockLoad.fulfilled, (state, action) => {
       state.cards = state.cards ?? {};
       const block = action.payload;
       if (block.type === 'card') {
-        state.cards[block.id] = block as Card;
+        updateCardTitleProperty({
+          card: block as Card,
+          cards: state.cards
+        });
+      }
+    });
+
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
+      for (const block of action.payload) {
+        if (block.type === 'card' && block.fields.isTemplate) {
+          state.templates[block.id] = block as Card;
+        } else if (block.type === 'card' && !block.fields.isTemplate) {
+          updateCardTitleProperty({
+            card: block as Card,
+            cards: state.cards
+          });
+        }
       }
     });
   }
 });
 
-export const { updateCards, updateCard, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
+export const { updateCards, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
@@ -339,21 +350,23 @@ type getViewCardsProps = { viewId: string; boardId: string };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    getCards,
-    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
-    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
-    (cards, board, view) => {
+    (state: RootState, props: getViewCardsProps) => {
+      const cards = getCards(state);
+      const board = state.boards.boards[props.boardId];
+      const view = state.views.views[props.viewId];
+      return {
+        cards,
+        board,
+        view
+      };
+    },
+    ({ cards, board, view }) => {
       if (!view || !board || !cards) {
         return [];
       }
-      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
-      const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
-      const cardProperties: IPropertyTemplate[] = hasTitleProperty
-        ? board.fields.cardProperties
-        : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
-
+      const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result);
+        return CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result);
       }
       return result;
     }
