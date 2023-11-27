@@ -109,11 +109,7 @@ export function TokenGates({ isAdmin, space, popupState }: TokenGatesProps) {
       />
       <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} size='large'>
         <TokenGateModalProvider>
-          {isProdEnv && !space.name.startsWith('cvt-') ? (
-            <LitShareModal onUnifiedAccessControlConditionsSelected={throttledOnSubmit as any} />
-          ) : (
-            <TokenGateModal />
-          )}
+          <TokenGateModal />
         </TokenGateModalProvider>
       </Modal>
       <ErrorModal message={apiError} open={errorPopupState.isOpen} onClose={errorPopupState.close} />
