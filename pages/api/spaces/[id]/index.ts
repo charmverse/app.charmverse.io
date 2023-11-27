@@ -11,6 +11,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { updateSpace } from 'lib/spaces/updateSpace';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
 import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -31,6 +32,8 @@ async function getSpace(req: NextApiRequest, res: NextApiResponse<Space>) {
   if (!space) {
     throw new SpaceNotFoundError(spaceId);
   }
+
+  space.spaceImage = replaceS3Domain(space.spaceImage);
 
   res.status(200).json(space);
 }
