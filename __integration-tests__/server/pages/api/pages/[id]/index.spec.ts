@@ -9,28 +9,28 @@ import { getPage } from 'lib/pages/server';
 import { createProposal } from 'lib/proposal/createProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
-const updateContent = {
-  content: {
-    paragraph: 'This is a paragraph'
-  }
-};
-let adminUser: User;
-let normalMember: User;
-let space: Space;
-
-beforeAll(async () => {
-  const generated = await testUtilsUser.generateUserAndSpace({
-    isAdmin: true
-  });
-  adminUser = generated.user;
-  space = generated.space;
-  normalMember = await testUtilsUser.generateSpaceUser({
-    spaceId: space.id,
-    isAdmin: false
-  });
-});
-
 describe('PUT /api/pages/{id} - update page', () => {
+  const updateContent = {
+    content: {
+      paragraph: 'This is a paragraph'
+    }
+  };
+  let adminUser: User;
+  let normalMember: User;
+  let space: Space;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    adminUser = generated.user;
+    space = generated.space;
+    normalMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+  });
+
   it('should allow user with permissions to update the page content, title, header image, and icon', async () => {
     const page = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
@@ -149,6 +149,27 @@ describe('PUT /api/pages/{id} - update page', () => {
 });
 
 describe('GET /api/pages/{id} - get page', () => {
+  const updateContent = {
+    content: {
+      paragraph: 'This is a paragraph'
+    }
+  };
+  let adminUser: User;
+  let normalMember: User;
+  let space: Space;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    adminUser = generated.user;
+    space = generated.space;
+    normalMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+  });
+
   it('should return a page to a user with permission to access it and respond 200', async () => {
     const { createdAt, updatedAt, content, ...page } = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
@@ -204,5 +225,40 @@ describe('GET /api/pages/{id} - get page', () => {
     });
     const userCookie = await loginUser(normalMember.id);
     await request(baseUrl).get(`/api/pages/${page.id}`).set('Cookie', userCookie).expect(401);
+  });
+});
+describe('GET /api/pages/{id} - unsafe page', () => {
+  it('should throw an error when the page contains unsafe content', async () => {
+    const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+
+    const unsafePageContent = {
+      type: 'doc',
+      content: [
+        {
+          type: 'blockquote',
+          attrs: { emoji: '😃', track: [] },
+          content: [
+            {
+              type: 'heading',
+              attrs: { id: null, level: 2, track: [] },
+              content: [
+                {
+                  text: 'www.unsafe.ru',
+                  type: 'text'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    const { id: unsafePageId } = await testUtilsPages.generatePage({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      content: unsafePageContent
+    });
+    const userCookie = await loginUser(adminUser.id);
+    await request(baseUrl).get(`/api/pages/${unsafePageId}`).set('Cookie', userCookie).expect(401);
   });
 });

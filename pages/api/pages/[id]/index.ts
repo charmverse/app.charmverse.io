@@ -16,6 +16,7 @@ import { updatePage } from 'lib/pages/server/updatePage';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
+import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
@@ -51,6 +52,8 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   if (!page) {
     throw new NotFoundError();
   }
+
+  checkPageContent(page.content);
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
   const permissions = await getPermissionsClient({ resourceId: page.spaceId, resourceIdType: 'space' }).then(
