@@ -51,17 +51,8 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
 
   const forumTitle = features.find((feat) => feat.id === 'forum')?.title ?? 'Forum';
 
-  const allPages: PageListItem[] = useMemo(() => {
-    const categoryPages: PageListItem[] = (categories || []).map((page) => ({
-      id: page.id,
-      path: page.path || '',
-      hasContent: true,
-      title: `${forumTitle} > ${page.name}`,
-      type: 'forum_category',
-      icon: null
-    }));
-
-    const staticPages: PageListItem[] = STATIC_PAGES.map((page) => {
+  const staticPages: PageListItem[] = useMemo(() => {
+    return STATIC_PAGES.map((page) => {
       const feature = features.find((feat) => feat.id === page.feature);
       return {
         id: page.path,
@@ -72,15 +63,27 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
         icon: null
       };
     });
+  }, [features]);
+
+  const allPages: PageListItem[] = useMemo(() => {
+    const categoryPages: PageListItem[] = (categories || []).map((page) => ({
+      id: page.id,
+      path: page.path || '',
+      hasContent: true,
+      title: `${forumTitle} > ${page.name}`,
+      type: 'forum_category',
+      icon: null
+    }));
+
     return [...userPages, ...categoryPages, ...staticPages];
-  }, [categories, userPages]);
+  }, [categories, userPages, staticPages, forumTitle]);
 
   const filteredPages = useMemo(() => {
     if (triggerText) {
       return sortList({ triggerText, list: allPages, prop: 'title' });
     }
-    return userPages;
-  }, [triggerText, userPages]);
+    return [...userPages, ...staticPages];
+  }, [triggerText, userPages, allPages, staticPages]);
 
   const totalItems = filteredPages.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
