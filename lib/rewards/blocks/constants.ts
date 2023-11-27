@@ -13,3 +13,17 @@ export const REWARD_AMOUNT = '__rewardAmount';
 export const REWARD_TOKEN = '__rewardToken';
 export const REWARD_CHAIN = '__rewardChain';
 export const REWARD_CUSTOM_VALUE = '__rewardCustomValue';
+
+export const defaultRewardPropertyIds = [
+  REWARD_STATUS_BLOCK_ID,
+  ASSIGNEES_BLOCK_ID,
+  ASSIGNEE_BLOCK_ID,
+  REWARD_REVIEWERS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  DUE_DATE_ID,
+  CREATED_AT_ID,
+  REWARD_AMOUNT,
+  REWARD_TOKEN,
+  REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE
+];
