@@ -42,6 +42,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   accessiblePages.forEach((page) => {
     page.galleryImage = replaceS3Domain(page.galleryImage);
     page.headerImage = replaceS3Domain(page.headerImage);
+    page.icon = replaceS3Domain(page.icon);
   });
 
   const createdPages: PageMeta[] = [];

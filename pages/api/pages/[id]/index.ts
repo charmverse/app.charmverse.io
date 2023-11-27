@@ -80,6 +80,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
 
   result.galleryImage = replaceS3Domain(result.galleryImage);
   result.headerImage = replaceS3Domain(result.headerImage);
+  result.icon = replaceS3Domain(result.icon);
 
   return res.status(200).json(result);
 }
