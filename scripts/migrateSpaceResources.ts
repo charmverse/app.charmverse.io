@@ -1,4 +1,4 @@
-import { stringUtils } from '@charmverse/core/dist/cjs/utilities';
+import { stringUtils } from '@charmverse/core/utilities';
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client'
 
@@ -80,6 +80,24 @@ async function migrateSpaceResources({newOwner, previousOwner, spaceDomain}: {sp
         createdBy: newOwner
       }
     }),
+    prisma.block.updateMany({
+      where: {
+        spaceId: space.id,
+        createdBy: previousOwner
+      },
+      data: {
+        createdBy: newOwner,
+        updatedBy: newOwner
+      }
+    }),
+    prisma.proposalReviewer.deleteMany({
+      where: {
+        proposal: {
+          spaceId: space.id
+        },
+        userId: previousOwner
+      }
+    }),
     // Clean out permissions ---------
     prisma.pagePermission.deleteMany({
       where: {
@@ -99,3 +117,4 @@ async function migrateSpaceResources({newOwner, previousOwner, spaceDomain}: {sp
     })
   ])
 }
+
