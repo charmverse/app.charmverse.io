@@ -12,6 +12,7 @@ import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 import { enableDragAndDrop } from '../utils';
 
@@ -210,7 +211,12 @@ function ResizableImage({
         </Box>
       ) : readOnly ? (
         <StyledImageContainer size={node.attrs.size}>
-          <StyledImage draggable={false} src={node.attrs.src} alt={node.attrs.alt} width={node.attrs.size} />
+          <StyledImage
+            draggable={false}
+            src={replaceS3Domain(node.attrs.src)}
+            alt={node.attrs.alt}
+            width={node.attrs.size}
+          />
         </StyledImageContainer>
       ) : (
         <Resizable
@@ -226,7 +232,7 @@ function ResizableImage({
                 enableDragAndDrop(view, nodePos);
               }
             }}
-            src={node.attrs.src}
+            src={replaceS3Domain(node.attrs.src)}
             alt={node.attrs.alt}
           />
         </Resizable>

@@ -10,6 +10,7 @@ import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -36,6 +37,11 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     archived,
     limit,
     search
+  });
+
+  accessiblePages.forEach((page) => {
+    page.galleryImage = replaceS3Domain(page.galleryImage);
+    page.headerImage = replaceS3Domain(page.headerImage);
   });
 
   const createdPages: PageMeta[] = [];
