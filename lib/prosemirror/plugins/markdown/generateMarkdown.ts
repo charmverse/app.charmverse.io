@@ -1,11 +1,9 @@
 import { markdownSerializer } from '@bangle.dev/markdown';
 import { Node } from '@bangle.dev/pm';
 
-import { BangleEditorState } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor-state';
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { Member } from 'lib/members/interfaces';
-import { emptyDocument } from 'lib/prosemirror/constants';
 
 export type CharmMarkdownGeneratorOptions = {
   members?: Member[];
