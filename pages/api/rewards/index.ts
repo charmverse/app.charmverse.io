@@ -8,6 +8,7 @@ import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/met
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
 import { rewardWithUsersInclude } from 'lib/rewards/getReward';
@@ -138,6 +139,12 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
 
   logWorkspaceFirstBountyEvents(createdReward);
   logUserFirstBountyEvents(createdReward);
+
+  // Upsert reward board blocks when 1st bounty is created
+  const numberOfBounties = await prisma.bounty.count({ where: { spaceId } });
+  if (numberOfBounties === 1) {
+    await upsertDefaultRewardsBoard({ spaceId, userId });
+  }
 
   return res.status(201).json(createdReward);
 }

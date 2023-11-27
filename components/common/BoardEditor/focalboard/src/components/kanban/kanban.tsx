@@ -71,6 +71,7 @@ type Props = {
   showCard: (cardId: string | null) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
+  disableDnd?: boolean;
 };
 
 function Kanban(props: Props) {
@@ -302,6 +303,7 @@ function Kanban(props: Props) {
             onCalculationMenuClose={() => toggleOptions(group.option.id)}
             anchorEl={anchorEl}
             readOnlyTitle={props.readOnlyTitle}
+            disableAddingCards={props.disableAddingCards}
           />
         ))}
 
@@ -346,7 +348,7 @@ function Kanban(props: Props) {
               visiblePropertyTemplates={visiblePropertyTemplates}
               key={group.option.id || 'empty'}
               readOnly={props.readOnly}
-              onDropToCard={onDropToCard}
+              onDropToCard={props.disableDnd ? undefined : onDropToCard}
               isManualSort={isManualSort}
               selectedCardIds={props.selectedCardIds}
               addCard={props.addCard}

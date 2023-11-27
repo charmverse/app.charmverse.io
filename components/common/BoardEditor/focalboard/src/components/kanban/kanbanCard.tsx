@@ -29,7 +29,7 @@ type Props = {
   isSelected: boolean;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readOnly: boolean;
-  onDrop: (srcCard: Card, dstCard: Card) => void;
+  onDrop?: (srcCard: Card, dstCard: Card) => void;
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
@@ -49,9 +49,14 @@ const StyledBox = styled(Box)`
 `;
 
 const KanbanCard = React.memo((props: Props) => {
-  const { card, board } = props;
+  const { card, board, onDrop } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable(
+    'card',
+    card,
+    !props.readOnly && !isTouchScreen() && !!onDrop,
+    onDrop || (() => {})
+  );
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {

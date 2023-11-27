@@ -17,7 +17,7 @@ export type RewardPropertiesBlockFields = {
 // Properties block with typed fields
 export type RewardPropertiesBlock = RewardBlock & {
   fields: RewardPropertiesBlockFields;
-  type: 'board';
+  type: 'board' | 'view';
 };
 
 // TODO: Add other block types i.e. view.

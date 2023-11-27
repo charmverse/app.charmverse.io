@@ -4,9 +4,11 @@ import { v4 } from 'uuid';
 
 import * as http from 'adapters/http';
 import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardView } from 'lib/focalboard/boardView';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type {
   RewardBlockInput,
@@ -15,7 +17,7 @@ import type {
 } from 'lib/rewards/blocks/interfaces';
 
 export type RewardBlocksContextType = {
-  rewardBlocks: RewardBlockWithTypedFields[] | undefined;
+  rewardBlocks: (RewardBlockWithTypedFields | BoardView | Board)[] | undefined;
   rewardBoardBlock: RewardPropertiesBlock | undefined;
   isLoading: boolean;
   createProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
@@ -42,7 +44,12 @@ export const RewardBlocksContext = createContext<Readonly<RewardBlocksContextTyp
 
 export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
-  const { data: rewardBlocks, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id });
+  const { rewards } = useRewards();
+  const {
+    data: rewardBlocks,
+    isLoading,
+    mutate
+  } = useGetRewardBlocks({ spaceId: rewards?.length ? space?.id : undefined });
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
 

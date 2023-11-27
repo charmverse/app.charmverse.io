@@ -1,7 +1,9 @@
+import { hasAccessToSpace } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteBlocks } from 'lib/rewards/blocks/deleteBlocks';
 import { getBlocks } from 'lib/rewards/blocks/getBlocks';
 import type { RewardBlockUpdateInput, RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
@@ -11,7 +13,6 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getRewardBlocksHandler)
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .put(updateRewardBlocksHandler)
@@ -21,6 +22,27 @@ handler
 async function getRewardBlocksHandler(req: NextApiRequest, res: NextApiResponse<RewardBlockWithTypedFields[]>) {
   const spaceId = req.query.id as string;
   const blockId = req.query.blockId as string;
+
+  // Session may be undefined as non-logged in users can access this endpoint
+  const userId = req.session?.user?.id;
+
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId,
+    userId
+  });
+
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      publicBountyBoard: true
+    }
+  });
+
+  if (!spaceRole && !space.publicBountyBoard) {
+    throw new ActionNotPermittedError(`You cannot access the rewards list`);
+  }
 
   const rewardBlocks = await getBlocks({
     spaceId,
