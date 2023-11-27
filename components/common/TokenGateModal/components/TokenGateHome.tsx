@@ -1,5 +1,6 @@
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import type { SvgIconProps, SvgIconPropsColorOverrides } from '@mui/material';
 import { Box, SvgIcon, Typography } from '@mui/material';
 import type { ElementType } from 'react';
 
@@ -13,6 +14,7 @@ type ButtonProps = {
   name: DisplayedPage;
   title: string;
   icon: ElementType;
+  iconColor?: SvgIconProps['color'];
 };
 
 const requirementButton: ButtonProps[] = [
@@ -29,12 +31,14 @@ const requirementButton: ButtonProps[] = [
   {
     name: 'wallet',
     title: 'Wallet',
-    icon: AccountBalanceWalletIcon
+    icon: AccountBalanceWalletIcon,
+    iconColor: 'primary'
   },
   {
     name: 'dao',
     title: 'MolochDAOv2.1',
-    icon: WaterDropIcon
+    icon: WaterDropIcon,
+    iconColor: 'error'
   }
 ];
 
@@ -52,7 +56,7 @@ export function TokenGateHome() {
             size='large'
             color='inherit'
             sx={{ justifyContent: 'left', px: 3, py: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}
-            startIcon={<SvgIcon component={btn.icon} inheritViewBox />}
+            startIcon={<SvgIcon component={btn.icon} inheritViewBox color={btn.iconColor} />}
             onClick={() => setDisplayedPage(btn.name)}
           >
             {btn.title}
