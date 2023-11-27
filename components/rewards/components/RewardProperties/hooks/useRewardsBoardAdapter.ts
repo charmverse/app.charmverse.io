@@ -65,7 +65,7 @@ export function useRewardsBoardAdapter() {
     ? queryViewType
     : board.fields.viewIds?.[0] || DEFAULT_VIEW_BLOCK_ID;
 
-  const localViewSettings = useLocalDbViewSettings(`rewards-${activeViewId}`);
+  const localViewSettings = useLocalDbViewSettings(`rewards-${space?.id}-${activeViewId}`);
 
   const activeView = useMemo(() => {
     const viewBlock = views?.find((v) => v.id === activeViewId);
