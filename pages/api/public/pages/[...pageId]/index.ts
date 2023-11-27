@@ -12,6 +12,7 @@ import type { PublicPageResponse } from 'lib/pages/interfaces';
 import { getPermissionsClient } from 'lib/permissions/api';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
+import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
 
@@ -210,6 +211,8 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   } else if (computed.read !== true && page.type === 'bounty' && !space.publicBountyBoard) {
     throw new NotFoundError('Page not found');
   }
+
+  checkPageContent(page.content);
 
   const boardPages: Page[] = [];
   let boards: Board[] = [];

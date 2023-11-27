@@ -16,6 +16,7 @@ import { updatePage } from 'lib/pages/server/updatePage';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
+import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
