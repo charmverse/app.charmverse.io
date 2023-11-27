@@ -8,14 +8,16 @@ export function upsertBlock({
   data,
   userId,
   spaceId,
-  tx = prisma
+  tx = prisma,
+  createOnly = false
 }: {
   data: RewardBlockInput | RewardBlockUpdateInput;
   userId: string;
   spaceId: string;
   tx?: PrismaTransactionClient;
+  createOnly?: boolean;
 }) {
-  const input = getUpsertBlockInput({ data: data as unknown as Block, userId, spaceId });
+  const input = getUpsertBlockInput({ data: data as unknown as Block, userId, spaceId, createOnly });
 
   return tx.rewardBlock.upsert(input);
 }

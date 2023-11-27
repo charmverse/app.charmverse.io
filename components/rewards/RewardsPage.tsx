@@ -1,13 +1,17 @@
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
+import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
+import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import ViewTabs from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewTabs';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -28,8 +32,14 @@ import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 
 import { useRewards } from './hooks/useRewards';
+
+const CalendarFullView = dynamic(
+  () => import('../common/BoardEditor/focalboard/src/components/calendar/fullCalendar'),
+  { ssr: false }
+);
 
 export function RewardsPage({ title }: { title: string }) {
   useRewardsNavigation();
@@ -59,6 +69,15 @@ export function RewardsPage({ title }: { title: string }) {
 
     return _groupByProperty;
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
+
+  const { visible: visibleGroups, hidden: hiddenGroups } = activeView
+    ? getVisibleAndHiddenGroups(
+        cardPages as CardPage[],
+        activeView.fields.visibleOptionIds,
+        activeView.fields.hiddenOptionIds,
+        groupByProperty
+      )
+    : { visible: [], hidden: [] };
 
   useRewardsBoardMutator();
 
@@ -90,6 +109,12 @@ export function RewardsPage({ title }: { title: string }) {
         navigateToSpacePath(`/rewards/applications/${id}`);
       }
     }
+  };
+
+  const showView = (boardViewId: string) => {
+    const viewId = Object.entries(viewTypeToBlockId).find(([, blockId]) => blockId === boardViewId)?.[0] ?? 'table';
+    if (viewId === activeView?.id) return;
+    updateURLQuery({ viewId });
   };
 
   if (isLoadingAccess) {
@@ -125,25 +150,42 @@ export function RewardsPage({ title }: { title: string }) {
           </Box>
         </DatabaseTitle>
         <>
-          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-            <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-
-            <ViewSortControl
-              activeBoard={activeBoard}
-              activeView={activeView}
-              cards={cards as Card[]}
-              viewSortPopup={viewSortPopup}
-            />
-
-            {isAdmin && (
-              <ViewHeaderActionsMenu
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowSidebar(!showSidebar);
-                }}
+          <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1}>
+            <Stack mb={0.5}>
+              <ViewTabs
+                onDeleteView={() => {}}
+                onClickNewView={() => {}}
+                board={activeBoard}
+                views={views}
+                readOnly
+                showView={showView}
+                activeView={activeView}
+                disableUpdatingUrl
+                maxTabsShown={3}
+                openViewOptions={() => {}}
               />
-            )}
+            </Stack>
+
+            <Stack direction='row' alignItems='center' mb={1}>
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards as Card[]}
+                viewSortPopup={viewSortPopup}
+              />
+
+              {isAdmin && (
+                <ViewHeaderActionsMenu
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSidebar(!showSidebar);
+                  }}
+                />
+              )}
+            </Stack>
           </Stack>
           <Divider />
 
@@ -160,24 +202,57 @@ export function RewardsPage({ title }: { title: string }) {
           <Stack>
             {rewards && rewards?.length > 0 ? (
               <Box width='100%'>
-                <Table
-                  board={activeBoard}
-                  activeView={activeView}
-                  cardPages={cardPages as CardPage[]}
-                  groupByProperty={groupByProperty}
-                  views={views}
-                  visibleGroups={[]}
-                  selectedCardIds={[]}
-                  readOnly={!isAdmin}
-                  disableAddingCards
-                  showCard={showRewardOrApplication}
-                  readOnlyTitle
-                  cardIdToFocusOnRender=''
-                  addCard={async () => {}}
-                  onCardClicked={() => {}}
-                  onDeleteCard={onDelete}
-                  expandSubRowsOnLoad
-                />
+                {activeView.fields.viewType === 'table' && (
+                  <Table
+                    board={activeBoard}
+                    activeView={activeView}
+                    cardPages={cardPages as CardPage[]}
+                    groupByProperty={groupByProperty}
+                    views={views}
+                    visibleGroups={[]}
+                    selectedCardIds={[]}
+                    readOnly={!isAdmin}
+                    disableAddingCards
+                    showCard={showRewardOrApplication}
+                    readOnlyTitle
+                    cardIdToFocusOnRender=''
+                    addCard={async () => {}}
+                    onCardClicked={() => {}}
+                    onDeleteCard={onDelete}
+                    expandSubRowsOnLoad
+                  />
+                )}
+                {activeView.fields.viewType === 'calendar' && (
+                  <CalendarFullView
+                    board={activeBoard}
+                    cards={cards as Card[]}
+                    activeView={activeView}
+                    readOnly={!isAdmin}
+                    // dateDisplayProperty={dateDisplayProperty}
+                    showCard={showRewardOrApplication}
+                    addCard={async () => {}}
+                    disableAddingCards
+                  />
+                )}
+
+                {activeView.fields.viewType === 'board' && (
+                  <Kanban
+                    board={activeBoard}
+                    activeView={activeView}
+                    cards={cards as Card[]}
+                    groupByProperty={groupByProperty}
+                    visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
+                    hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
+                    selectedCardIds={[]}
+                    readOnly={!isAdmin}
+                    addCard={async () => {}}
+                    onCardClicked={(e, card) => showRewardOrApplication(card.id)}
+                    showCard={showRewardOrApplication}
+                    disableAddingCards
+                    readOnlyTitle
+                    disableDnd
+                  />
+                )}
               </Box>
             ) : (
               <Box sx={{ mt: 3 }}>

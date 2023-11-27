@@ -40,6 +40,7 @@ type Props = {
   onCalculationMenuClose: () => void;
   anchorEl: HTMLElement | null;
   readOnlyTitle?: boolean;
+  disableAddingCards?: boolean;
 };
 
 const defaultCalculation = 'count';
@@ -184,7 +185,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
                 name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                 onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
               />
-              {group.option.id && (
+              {group.option.id && !props.readOnlyTitle && (
                 <>
                   {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
                     <Menu.Text
@@ -208,7 +209,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
               )}
             </Menu>
           </MenuWrapper>
-          {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
+          {!props.disableAddingCards && !proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
             <IconButton
               icon={<AddIcon fontSize='small' />}
               onClick={() => {
