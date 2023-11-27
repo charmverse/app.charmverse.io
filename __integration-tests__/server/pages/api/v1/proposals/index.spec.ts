@@ -375,8 +375,7 @@ describe('GET /api/v1/proposals', () => {
             path: `proposal-${v4()}`,
             type: 'proposal',
             updatedBy: space2User.id,
-            contentText: proposalText,
-            content: {}
+            contentText: proposalText
           }
         }
       }

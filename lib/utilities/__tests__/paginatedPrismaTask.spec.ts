@@ -1,3 +1,4 @@
+import { Prisma } from '@charmverse/core/prisma';
 import type { Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
@@ -21,7 +22,7 @@ describe('paginatedPrismaTask', () => {
     const posts = await prisma.post.createMany({
       data: array.map((item) => ({
         categoryId: category.id,
-        content: {},
+        content: Prisma.JsonNull,
         contentText: '',
         createdBy: user.id,
         path: `post-${randomIntFromInterval(10000000, 90000000)}`,
@@ -67,7 +68,7 @@ describe('paginatedPrismaTask', () => {
     const posts = await prisma.post.createMany({
       data: array.map((item) => ({
         categoryId: category.id,
-        content: {},
+        content: Prisma.JsonNull,
         contentText: '',
         createdBy: user.id,
         path: `post-${randomIntFromInterval(1000000, 90000000)}`,

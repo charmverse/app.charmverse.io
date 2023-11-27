@@ -1148,7 +1148,7 @@ export async function generateForumComment({
     data: {
       createdAt: new Date(),
       createdBy,
-      content: {},
+      content: Prisma.JsonNull,
       contentText,
       updatedAt: new Date(),
       deletedAt: null,
