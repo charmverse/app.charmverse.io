@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 
 import { DialogTitle } from '../Modal';
 
-import { SingleConditionSelect } from './components/SingleConditionSelect';
+import { TokenGateContent } from './components/TokenGateContent';
 import { useTokenGateModal } from './hooks/useTokenGateModalContext';
 import { getTitle } from './utils/helpers';
 
@@ -12,7 +12,7 @@ function TokenGateModal() {
   return (
     <Box display='flex' gap={2} flexDirection='column'>
       <DialogTitle>{getTitle(displayedPage)}</DialogTitle>
-      <SingleConditionSelect />
+      <TokenGateContent />
     </Box>
   );
 }

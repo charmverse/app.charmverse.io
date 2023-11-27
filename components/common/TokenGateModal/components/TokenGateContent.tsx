@@ -7,7 +7,7 @@ import { TokenGateReview } from './TokenGateReview';
 import { TokenGateTokens } from './TokenGateTokens';
 import { TokenGateWallet } from './TokenGateWallet';
 
-export function SingleConditionSelect() {
+export function TokenGateContent() {
   const { displayedPage } = useTokenGateModal();
 
   if (displayedPage === 'home') {
