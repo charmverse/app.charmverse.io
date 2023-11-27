@@ -162,7 +162,7 @@ export default function SidebarSubmenu({
             columnGap: 1
           }}
         >
-          <UserDisplay user={user} hideName gridColumn='1' gridRow='1/3' />
+          <UserDisplay userId={user?.id} hideName gridColumn='1' gridRow='1/3' />
           <Typography variant='body2' noWrap>
             {user?.username}
           </Typography>

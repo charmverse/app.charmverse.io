@@ -339,7 +339,7 @@ export function PostPage({
             <Box minHeight={300} data-test='post-charmeditor'>
               <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
               {createdBy && (
-                <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+                <UserDisplay showMiniProfile userId={createdBy.id} avatarSize='small' fontSize='medium' mt={2} mb={3} />
               )}
               <Box my={2}>
                 <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />

@@ -96,7 +96,7 @@ export function CommentForm({
 
   return (
     <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start' data-test='comment-form' my={1}>
-      <UserDisplay user={user} hideName={true} />
+      <UserDisplay userId={user.id} hideName={true} />
       <Stack gap={1} width='100%'>
         {editor}
         <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>

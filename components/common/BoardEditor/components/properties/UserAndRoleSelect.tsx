@@ -92,7 +92,7 @@ function SelectedOptions({
             >
               {option.group === 'user' && (
                 <>
-                  <UserDisplay fontSize={14} avatarSize='xSmall' user={option} wrapName={wrapColumn} />
+                  <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
                   {!readOnly && (
                     <IconButton size='small' onClick={() => onRemove(option.id)}>
                       <CloseIcon
@@ -333,7 +333,7 @@ export function UserAndRoleSelect({
             <UserDisplay
               data-test={`select-option-${option.id}`}
               {...(_props as any)}
-              user={option}
+              userId={option.id}
               avatarSize='small'
             />
           );
