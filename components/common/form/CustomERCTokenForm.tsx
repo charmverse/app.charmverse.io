@@ -32,10 +32,10 @@ export const schema = yup.object({
   contractAddress: yup.string().test('verifyContractFormat', 'Invalid contract address', (value) => {
     return !value || isValidChainAddress(value);
   }),
-  tokenSymbol: yup.string().nullable(true),
-  tokenName: yup.string().nullable(true),
-  tokenLogo: yup.string().nullable(true),
-  tokenDecimals: yup.number().nullable(true)
+  tokenSymbol: yup.string().nullable(),
+  tokenName: yup.string().nullable(),
+  tokenLogo: yup.string().nullable(),
+  tokenDecimals: yup.number().nullable()
 });
 
 type FormValues = yup.InferType<typeof schema>;

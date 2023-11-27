@@ -56,9 +56,9 @@ export type FormValues = {
   notificationToggles: NotificationToggles;
 };
 
-const schema: yup.SchemaOf<FormValues> = yup.object({
+const schema: yup.Schema<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true),
+  spaceImage: yup.string().nullable(),
   notificationToggles: yup.object(),
   domain: yup
     .string()
