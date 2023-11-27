@@ -610,7 +610,7 @@
                             ]
                           },
                           {
-                            "text": "guilds, participate in events and bounties, become a member of the ",
+                            "text": "guilds, participate in events and rewards, become a member of the ",
                             "type": "text",
                             "marks": [
                               {
@@ -839,7 +839,7 @@
           }
         ]
       },
-      "contentText": "Welcome your members! Add your own images by clicking on the prompts below or typing /image. Delete example images by hovering over the image and clicking the trash can that appears in the upper right-hand corner. You may delete any block by clicking the  ⋮⋮ to the left on hover.Welcome to [Our Community's] Information Hub!This space encompasses a series of initiatives aimed at guiding [Our Community] towards a positive and impactful trajectory for the world.This space serves as the hub for all things related to [Our Community], including its archive, deliverables, documents, in-real-life operations, and more.A hub for accessing information and resources to join [Our Community's] guilds, participate in events and bounties, become a member of the DAO, join the community, or explore other opportunities to get involved.Help your members easily navigate your space. Add links to new pages below by typing /link to page. ",
+      "contentText": "Welcome your members! Add your own images by clicking on the prompts below or typing /image. Delete example images by hovering over the image and clicking the trash can that appears in the upper right-hand corner. You may delete any block by clicking the  ⋮⋮ to the left on hover.Welcome to [Our Community's] Information Hub!This space encompasses a series of initiatives aimed at guiding [Our Community] towards a positive and impactful trajectory for the world.This space serves as the hub for all things related to [Our Community], including its archive, deliverables, documents, in-real-life operations, and more.A hub for accessing information and resources to join [Our Community's] guilds, participate in events and rewards, become a member of the DAO, join the community, or explore other opportunities to get involved.Help your members easily navigate your space. Add links to new pages below by typing /link to page. ",
       "galleryImage": null,
       "hasContent": true,
       "headerImage": "https://s3.amazonaws.com/charm.public/user-content/b3f5d420-abe6-4c82-9d70-b5294cfcb890/0b7657f6-aa70-475a-9c67-6bc377b83e9b/Information-Hub.png",
@@ -1208,7 +1208,7 @@
                     ]
                   },
                   {
-                    "text": ", including joining its guilds, participating in events, contributing to bounties, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.",
+                    "text": ", including joining its guilds, participating in events, contributing to rewards, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.",
                     "type": "text",
                     "marks": [
                       {
@@ -2090,7 +2090,7 @@
               }
             ]
           },
-          "contentText": "Create an onboarding experience for your members. Customize the callouts below with your onboarding information.  Add a new callout by typing /callout.  You can also make use of 4 list types to better organize your info: /bullet, /ordered, /todo, or /toggleThe information hub serves as a guide for individuals interested in becoming part of [Our Community], including joining its guilds, participating in events, contributing to bounties, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.Types of Members: Ways to Join [Our Community]Voting Members = Holders of Voting SharesLiquidity Members = Holders of Loot [non-voting shares]DAO Team Members = Members who work for the DAO on a full-time basis [may hold non-voting shares or loot]Contributors = Members who work for the DAO on a project-by-project basis [may hold non-voting shares or loot]Stakeholders Onboarding FlowHow to use DAO DashboardHow to navigate DiscordHow to use DAO Member private discord channelsMonthly DAO Member Community CallOnboarding FunnelA web3 onboarding funnel is a series of steps or stages that help introduce people to the concept of web3 and decentralized finance. Such a funnel would provide people with the necessary knowledge and tools to navigate the world of web3 and decentralized finance safely and effectively while avoiding common pitfalls such as scams and misinformation.One potential approach to creating a web3 onboarding funnel might involve the following steps:Start by explaining the basics of web3 and decentralized finance, including key concepts such as blockchain technology, decentralization, and the use of smart contracts.Next, provide guidance on how to securely store and manage cryptocurrencies, emphasizing the importance of keeping one's private keys safe and never sharing them with others.Introduce people to the concept of decentralized autonomous organizations (DAOs), and explain how they can be used to govern and coordinate decentralized networks in a transparent and democratic manner.Provide resources and information on how to identify and avoid common scams and other forms of fraud in the web3 and decentralized finance space.Finally, direct people to resources and tools that can help them find and join regenerative DAOs that align with their values and goals.Overall, the key to creating an effective web3 onboarding funnel is to provide clear, concise, and accessible information that helps people understand the basics of web3 and decentralized finance, while also equipping them with the knowledge and tools they need to navigate this complex and rapidly evolving space safely and confidently.",
+          "contentText": "Create an onboarding experience for your members. Customize the callouts below with your onboarding information.  Add a new callout by typing /callout.  You can also make use of 4 list types to better organize your info: /bullet, /ordered, /todo, or /toggleThe information hub serves as a guide for individuals interested in becoming part of [Our Community], including joining its guilds, participating in events, contributing to rewards, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.Types of Members: Ways to Join [Our Community]Voting Members = Holders of Voting SharesLiquidity Members = Holders of Loot [non-voting shares]DAO Team Members = Members who work for the DAO on a full-time basis [may hold non-voting shares or loot]Contributors = Members who work for the DAO on a project-by-project basis [may hold non-voting shares or loot]Stakeholders Onboarding FlowHow to use DAO DashboardHow to navigate DiscordHow to use DAO Member private discord channelsMonthly DAO Member Community CallOnboarding FunnelA web3 onboarding funnel is a series of steps or stages that help introduce people to the concept of web3 and decentralized finance. Such a funnel would provide people with the necessary knowledge and tools to navigate the world of web3 and decentralized finance safely and effectively while avoiding common pitfalls such as scams and misinformation.One potential approach to creating a web3 onboarding funnel might involve the following steps:Start by explaining the basics of web3 and decentralized finance, including key concepts such as blockchain technology, decentralization, and the use of smart contracts.Next, provide guidance on how to securely store and manage cryptocurrencies, emphasizing the importance of keeping one's private keys safe and never sharing them with others.Introduce people to the concept of decentralized autonomous organizations (DAOs), and explain how they can be used to govern and coordinate decentralized networks in a transparent and democratic manner.Provide resources and information on how to identify and avoid common scams and other forms of fraud in the web3 and decentralized finance space.Finally, direct people to resources and tools that can help them find and join regenerative DAOs that align with their values and goals.Overall, the key to creating an effective web3 onboarding funnel is to provide clear, concise, and accessible information that helps people understand the basics of web3 and decentralized finance, while also equipping them with the knowledge and tools they need to navigate this complex and rapidly evolving space safely and confidently.",
           "galleryImage": null,
           "hasContent": true,
           "headerImage": "https://s3.amazonaws.com/charm.public/user-content/b3f5d420-abe6-4c82-9d70-b5294cfcb890/35c612e1-763e-4316-9f68-ad8cf0c31fe0/3.png",
@@ -2299,7 +2299,7 @@
                     ]
                   },
                   {
-                    "text": "DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create bounties, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.",
+                    "text": "DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create rewards, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.",
                     "type": "text",
                     "marks": [
                       {
@@ -2487,7 +2487,7 @@
                 },
                 "content": [
                   {
-                    "text": "Individuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the bounties section, information hub, and the ability to create proposals for DAO Members to review and consider.",
+                    "text": "Individuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the rewards section, information hub, and the ability to create proposals for DAO Members to review and consider.",
                     "type": "text",
                     "marks": [
                       {
@@ -2505,7 +2505,7 @@
               }
             ]
           },
-          "contentText": "What are the different ways to contribute to your community? Let your members know how they fit in.DAO MemberDAO Member is a person, organization, multi-signature entity, or any other entity that holds at least one full share of the DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create bounties, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.DAO TeamThe DAO Team has a simple yet crucial mandate, which is to uphold the DAO Constitution and act in a responsible and ethical manner in the execution of its duties within the DAO. Their specific roles, obligations, and responsibilities are clearly outlined in the DAO Constitution.Community MemberIndividuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the bounties section, information hub, and the ability to create proposals for DAO Members to review and consider.",
+          "contentText": "What are the different ways to contribute to your community? Let your members know how they fit in.DAO MemberDAO Member is a person, organization, multi-signature entity, or any other entity that holds at least one full share of the DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create rewards, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.DAO TeamThe DAO Team has a simple yet crucial mandate, which is to uphold the DAO Constitution and act in a responsible and ethical manner in the execution of its duties within the DAO. Their specific roles, obligations, and responsibilities are clearly outlined in the DAO Constitution.Community MemberIndividuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the rewards section, information hub, and the ability to create proposals for DAO Members to review and consider.",
           "galleryImage": null,
           "hasContent": true,
           "headerImage": null,
@@ -6269,7 +6269,9 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": ["028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"],
+                          "cardOrder": [
+                            "028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"
+                          ],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 128,
@@ -6550,7 +6552,9 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": ["a3cdb69f-ea43-4fc2-a557-76e79529a838"],
+                          "cardOrder": [
+                            "a3cdb69f-ea43-4fc2-a557-76e79529a838"
+                          ],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 172,
@@ -6842,7 +6846,9 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": ["028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"],
+                          "cardOrder": [
+                            "028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"
+                          ],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 128,
@@ -7123,7 +7129,9 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": ["a3cdb69f-ea43-4fc2-a557-76e79529a838"],
+                          "cardOrder": [
+                            "a3cdb69f-ea43-4fc2-a557-76e79529a838"
+                          ],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 172,
@@ -17619,7 +17627,9 @@
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd",
                         "6c00b28c-5239-482b-b44e-6f5b3a9d1298"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
                         "89f01ff1-29d9-4027-8daf-cff3e606c159"
@@ -28493,7 +28503,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["6c00b28c-5239-482b-b44e-6f5b3a9d1298"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "6c00b28c-5239-482b-b44e-6f5b3a9d1298"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -29978,7 +29990,9 @@
                         "eb8322fb-a751-46fd-9794-bea021a33f65",
                         "50f9ac76-6237-4ddb-8134-b673c712393e"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "be227d08-200f-49db-9b5b-d288f1391f8c": "https://kokonut.network/dao",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -30184,7 +30198,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["345ab4bb-8381-41eb-8da5-f028d9116458"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "345ab4bb-8381-41eb-8da5-f028d9116458"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "89f01ff1-29d9-4027-8daf-cff3e606c159",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433"
@@ -30819,7 +30835,9 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "651fb707-10e6-4b21-9851-30be77f64061",
                         "89f01ff1-29d9-4027-8daf-cff3e606c159"
@@ -31019,7 +31037,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "9948f88c-4963-4726-ace4-001853672a1f": "{\"from\":1666958400000}",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -31929,7 +31949,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "651fb707-10e6-4b21-9851-30be77f64061",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433"
@@ -33129,7 +33151,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["89f01ff1-29d9-4027-8daf-cff3e606c159"],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
+                        "89f01ff1-29d9-4027-8daf-cff3e606c159"
+                      ],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "72ca2319-e9e7-44c8-90d5-9cddea85adbe"
                     },
                     "headerImage": null,
@@ -33959,7 +33983,9 @@
                   "fields": {
                     "isTemplate": false,
                     "properties": {
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["2045d6c3-69fa-4397-92d1-1e1b0cefd36a"],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
+                        "2045d6c3-69fa-4397-92d1-1e1b0cefd36a"
+                      ],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                     },
                     "contentOrder": []
@@ -36044,7 +36070,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["345ab4bb-8381-41eb-8da5-f028d9116458"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "345ab4bb-8381-41eb-8da5-f028d9116458"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "89f01ff1-29d9-4027-8daf-cff3e606c159",
                         "557fad80-82bf-43eb-806a-2b8859b38e09"
@@ -37802,7 +37830,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "a7126c66-89d2-4f8f-a26b-28c83a7f48ae",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -37889,7 +37919,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433",
@@ -38435,7 +38467,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a"
@@ -38521,8 +38555,12 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -39948,8 +39986,12 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "be227d08-200f-49db-9b5b-d288f1391f8c": "https://www.kuoka.earth/project/kokonut+network/r/recDtigxQUce1Xo05",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -40064,7 +40106,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "18c4363d-8d22-40cb-8ee8-3c4054ebdab4",
                         "fb9dc5c3-13d5-47f1-b0bb-7773f5bc0cae"
@@ -40248,8 +40292,12 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["651fb707-10e6-4b21-9851-30be77f64061"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
+                      ],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
+                        "651fb707-10e6-4b21-9851-30be77f64061"
+                      ],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "72ca2319-e9e7-44c8-90d5-9cddea85adbe"
                     },
                     "headerImage": null,
@@ -40581,7 +40629,9 @@
                         "50f9ac76-6237-4ddb-8134-b673c712393e",
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -40917,7 +40967,9 @@
                         "50f9ac76-6237-4ddb-8134-b673c712393e",
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "9948f88c-4963-4726-ace4-001853672a1f": "{\"from\":1673870400000}",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -41428,7 +41480,9 @@
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd",
                         "a772c12c-fb39-48a4-b575-1aed2c496161"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -41955,7 +42009,9 @@
                   "filter": {
                     "filters": [
                       {
-                        "values": ["557fad80-82bf-43eb-806a-2b8859b38e09"],
+                        "values": [
+                          "557fad80-82bf-43eb-806a-2b8859b38e09"
+                        ],
                         "condition": "includes",
                         "propertyId": "d5e4afc6-8cff-4289-a725-70e724347c0f"
                       }
@@ -42041,7 +42097,9 @@
                     "__title": 280
                   },
                   "linkedSourceId": null,
-                  "hiddenOptionIds": [""],
+                  "hiddenOptionIds": [
+                    ""
+                  ],
                   "visibleOptionIds": [
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64",
                     "72ca2319-e9e7-44c8-90d5-9cddea85adbe",
@@ -42052,7 +42110,10 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": ["__title", "432d6b75-2446-49f0-acde-8b7129c695e3"]
+                  "visiblePropertyIds": [
+                    "__title",
+                    "432d6b75-2446-49f0-acde-8b7129c695e3"
+                  ]
                 }
               },
               {
@@ -42172,7 +42233,9 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": ["432d6b75-2446-49f0-acde-8b7129c695e3"]
+                  "visiblePropertyIds": [
+                    "432d6b75-2446-49f0-acde-8b7129c695e3"
+                  ]
                 }
               }
             ]

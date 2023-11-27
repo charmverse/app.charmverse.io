@@ -23,8 +23,17 @@ export async function getRewardEntity(id: string): Promise<RewardEntity> {
       id
     },
     include: {
-      page: true,
-      space: true
+      page: {
+        select: {
+          title: true,
+          path: true
+        }
+      },
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
   return {
@@ -34,7 +43,7 @@ export async function getRewardEntity(id: string): Promise<RewardEntity> {
     rewardToken: bounty.rewardToken,
     rewardChain: bounty.chainId,
     rewardAmount: bounty.rewardAmount,
-    url: `${baseUrl}/${bounty.space.domain}/bounties/${bounty.id}`,
+    url: `${baseUrl}/${bounty.space.domain}/${bounty.page?.path}`,
     customReward: bounty.customReward,
     author: await getUserEntity(bounty.createdBy)
   };
@@ -98,7 +107,12 @@ export async function getPostEntity(id: string): Promise<PostEntity> {
       id
     },
     include: {
-      category: true,
+      category: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
       space: {
         select: {
           domain: true
@@ -123,9 +137,23 @@ export async function getProposalEntity(id: string): Promise<ProposalEntity> {
       id
     },
     include: {
-      authors: true,
-      page: true,
-      space: true
+      authors: {
+        select: {
+          userId: true
+        }
+      },
+      page: {
+        select: {
+          title: true,
+          path: true,
+          createdAt: true
+        }
+      },
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
   const authors = await Promise.all(proposal.authors.map(({ userId }) => getUserEntity(userId)));
@@ -195,9 +223,21 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
       id
     },
     include: {
-      wallets: true,
-      googleAccounts: true,
-      discordUser: true
+      wallets: {
+        select: {
+          address: true
+        }
+      },
+      googleAccounts: {
+        select: {
+          email: true
+        }
+      },
+      discordUser: {
+        select: {
+          discordId: true
+        }
+      }
     }
   });
   return {

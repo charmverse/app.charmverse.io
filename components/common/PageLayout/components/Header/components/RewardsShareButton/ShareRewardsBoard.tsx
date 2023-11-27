@@ -46,7 +46,7 @@ interface Props {
   padding?: number;
 }
 
-export default function ShareBountyBoard({ padding = 1 }: Props) {
+export default function ShareRewardsBoard({ padding = 1 }: Props) {
   const [copied, setCopied] = useState<boolean>(false);
   const { setSpace } = useSpaces();
   const { space } = useCurrentSpace();
@@ -78,7 +78,7 @@ export default function ShareBountyBoard({ padding = 1 }: Props) {
     if (!space?.publicBountyBoard) {
       setShareLink(null);
     } else {
-      const shareLinkToSet = getAbsolutePath('/bounties', space?.domain);
+      const shareLinkToSet = getAbsolutePath('/rewards', space?.domain);
       setShareLink(shareLinkToSet);
     }
   }

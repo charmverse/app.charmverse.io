@@ -146,18 +146,6 @@ function ForumPostTitle({ basePath, pathName, baseTitle }: { basePath: string; p
   );
 }
 
-function BountyPageTitle({ basePath, baseTitle }: { basePath: string; baseTitle: string }) {
-  const [pageTitle] = usePageTitle();
-  return (
-    <PageTitle>
-      <BreadCrumb>
-        <Link href={`${basePath}/bounties`}>{baseTitle}</Link>
-      </BreadCrumb>
-      {pageTitle || 'Untitled'}
-    </PageTitle>
-  );
-}
-
 function RewardsPageTitle({
   basePath,
   baseTitle,

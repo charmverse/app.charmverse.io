@@ -3,9 +3,9 @@ import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 
 import { Button } from 'components/common/Button';
 
-import ShareBountyBoard from './ShareBountyBoard';
+import ShareRewardsBoard from './ShareRewardsBoard';
 
-export default function BountyShareButton({ headerHeight }: { headerHeight: number }) {
+export default function RewardsShareButton({ headerHeight }: { headerHeight: number }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
 
   return (
@@ -32,7 +32,7 @@ export default function BountyShareButton({ headerHeight }: { headerHeight: numb
           }
         }}
       >
-        <ShareBountyBoard />
+        <ShareRewardsBoard />
       </Popover>
     </>
   );
