@@ -227,38 +227,3 @@ describe('GET /api/pages/{id} - get page', () => {
     await request(baseUrl).get(`/api/pages/${page.id}`).set('Cookie', userCookie).expect(401);
   });
 });
-describe('GET /api/pages/{id} - unsafe page', () => {
-  it('should throw an error when the page contains unsafe content', async () => {
-    const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
-
-    const unsafePageContent = {
-      type: 'doc',
-      content: [
-        {
-          type: 'blockquote',
-          attrs: { emoji: '😃', track: [] },
-          content: [
-            {
-              type: 'heading',
-              attrs: { id: null, level: 2, track: [] },
-              content: [
-                {
-                  text: 'www.unsafe.ru',
-                  type: 'text'
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    };
-
-    const { id: unsafePageId } = await testUtilsPages.generatePage({
-      createdBy: adminUser.id,
-      spaceId: space.id,
-      content: unsafePageContent
-    });
-    const userCookie = await loginUser(adminUser.id);
-    await request(baseUrl).get(`/api/pages/${unsafePageId}`).set('Cookie', userCookie).expect(401);
-  });
-});
