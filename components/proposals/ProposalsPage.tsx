@@ -181,6 +181,7 @@ export function ProposalsPage({ title }: { title: string }) {
                   disableAddingCards
                   showCard={openPage}
                   readOnlyTitle
+                  readOnlyRows
                   cardIdToFocusOnRender=''
                   addCard={async () => {}}
                   onCardClicked={() => {}}
