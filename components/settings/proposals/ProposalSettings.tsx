@@ -47,12 +47,12 @@ export function ProposalSettings({ space }: { space: Space }) {
   function addNewWorkflow(workflow?: WorkflowTemplate) {
     const lowestIndex = workflows[0]?.index ?? 0;
     const newWorkflow: WorkflowTemplateItem = {
-      id: uuid(),
-      isNew: true,
       title: '',
       spaceId: space.id,
       evaluations: [],
       ...workflow,
+      isNew: true,
+      id: uuid(),
       index: lowestIndex - 1
     };
     setWorkflows((_workflows) => [newWorkflow, ..._workflows]);
