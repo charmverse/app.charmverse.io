@@ -6,7 +6,7 @@ import * as http from 'adapters/http';
 import { useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type {
   ProposalBlockInput,
@@ -96,7 +96,10 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       try {
         if (proposalBoardBlock) {
           const updatedProperties = [...proposalBoardBlock.fields.cardProperties, propertyTemplate];
-          const updatedBlock = { ...proposalBoardBlock, fields: { cardProperties: updatedProperties } };
+          const updatedBlock = {
+            ...proposalBoardBlock,
+            fields: { ...(proposalBoardBlock.fields as BoardFields), cardProperties: updatedProperties }
+          };
           const res = await updateProposalBlocks([updatedBlock]);
 
           if (!res) {
@@ -145,7 +148,10 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
       const updatedProperties = proposalBoardBlock.fields.cardProperties.map((p) =>
         p.id === propertyTemplate.id ? propertyTemplate : p
       );
-      const updatedBlock = { ...proposalBoardBlock, fields: { cardProperties: updatedProperties } };
+      const updatedBlock = {
+        ...proposalBoardBlock,
+        fields: { ...(proposalBoardBlock.fields as BoardFields), cardProperties: updatedProperties }
+      };
 
       try {
         const res = await updateProposalBlocks([updatedBlock]);

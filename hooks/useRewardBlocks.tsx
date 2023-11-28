@@ -7,7 +7,7 @@ import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rew
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type {
@@ -15,6 +15,7 @@ import type {
   RewardBlockWithTypedFields,
   RewardPropertiesBlock
 } from 'lib/rewards/blocks/interfaces';
+import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
 export type RewardBlocksContextType = {
   rewardBlocks: (RewardBlockWithTypedFields | BoardView | Board)[] | undefined;
@@ -89,10 +90,14 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
     [mutate]
   );
 
-  const rewardBoardBlock = useMemo(
-    () => rewardBlocks?.find((b): b is RewardPropertiesBlock => b.type === 'board'),
-    [rewardBlocks]
-  );
+  const rewardBoardBlock = useMemo(() => {
+    const block = rewardBlocks?.find((b): b is RewardPropertiesBlock => b.type === 'board');
+    if (block && !block.fields.cardProperties) {
+      block.fields.cardProperties = [];
+    }
+
+    return block;
+  }, [rewardBlocks]);
 
   const createProperty = useCallback(
     async (propertyTemplate: IPropertyTemplate) => {
@@ -102,8 +107,11 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
 
       try {
         if (rewardBoardBlock) {
-          const updatedProperties = [...rewardBoardBlock.fields.cardProperties, propertyTemplate];
-          const updatedBlock = { ...rewardBoardBlock, fields: { cardProperties: updatedProperties } };
+          const updatedProperties = [...(rewardBoardBlock.fields.cardProperties || []), propertyTemplate];
+          const updatedBlock = {
+            ...rewardBoardBlock,
+            fields: { ...(rewardBoardBlock.fields as BoardFields), cardProperties: updatedProperties }
+          };
           const res = await updateRewardBlocks([updatedBlock]);
 
           if (!res) {
@@ -116,7 +124,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
         } else {
           const propertiesBlock = {
             id: DEFAULT_BOARD_BLOCK_ID,
-            fields: { cardProperties: [propertyTemplate] },
+            fields: { cardProperties: [propertyTemplate], viewIds: defaultRewardViews },
             type: 'board',
             spaceId: space.id
           };
@@ -177,7 +185,10 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
       }
 
       const updatedProperties = rewardBoardBlock.fields.cardProperties.filter((p) => p.id !== propertyTemplateId);
-      const updatedBlock = { ...rewardBoardBlock, fields: { cardProperties: updatedProperties } };
+      const updatedBlock = {
+        ...rewardBoardBlock,
+        fields: { ...(rewardBoardBlock.fields as BoardFields), cardProperties: updatedProperties }
+      };
       try {
         const res = await updateRewardBlocks([updatedBlock]);
 
