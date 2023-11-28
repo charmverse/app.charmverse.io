@@ -8,7 +8,7 @@ import { getSpacesByName } from 'lib/spaces/getSpacesByName';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(requireKeys([{ key: 'search', valueType: 'truthy' }, 'query']), getSpaceInfoController);
+handler.get(requireKeys([{ key: 'search', valueType: 'truthy' }], 'query'), getSpaceInfoController);
 
 async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<Space[]>) {
   const { search } = req.query;
