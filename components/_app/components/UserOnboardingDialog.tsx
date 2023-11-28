@@ -13,8 +13,8 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
 import { ProfileWidgets } from 'components/members/components/MemberProfile/components/ProfileWidgets/ProfileWidgets';
-import { useMemberPropertyRequired } from 'components/members/hooks/useMemberPropertyRequired';
 import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
+import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
 import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
@@ -64,7 +64,9 @@ function UserOnboardingDialog({
   isOnboarding?: boolean;
 }) {
   const { showMessage } = useSnackbar();
-  const { control, errors, isValid, memberProperties, values } = useMemberPropertyRequired({ userId: currentUser.id });
+  const { control, errors, isValid, memberProperties, values, requiredProperties } = useRequiredMemberProperties({
+    userId: currentUser.id
+  });
   const { space: currentSpace } = useCurrentSpace();
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
@@ -72,6 +74,11 @@ function UserOnboardingDialog({
   const [userDetails, setUserDetails] = useState<EditableFields>({});
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
+  const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone');
+  const isBioRequired = requiredProperties.find((p) => p.type === 'bio');
+  const isInputValid =
+    requiredProperties.length === 0 ||
+    (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
 
   function onUserDetailsChange(fields: EditableFields) {
     setUserDetails((_form) => ({ ..._form, ...fields }));
@@ -141,7 +148,7 @@ function UserOnboardingDialog({
       fluidSize={currentStep === 'email_step'}
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
-      hideCloseButton={currentStep === 'email_step' || !isValid}
+      hideCloseButton={currentStep === 'email_step' || requiredProperties.length !== 0}
       footerActions={
         currentStep === 'profile_step' ? (
           <Box mr={4.5}>
@@ -149,8 +156,8 @@ function UserOnboardingDialog({
               disableElevation
               size='large'
               onClick={saveForm}
-              disabled={isFormClean || !isValid}
-              disabledTooltip=''
+              disabled={isFormClean || !isInputValid}
+              disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
             >
               Save
             </Button>

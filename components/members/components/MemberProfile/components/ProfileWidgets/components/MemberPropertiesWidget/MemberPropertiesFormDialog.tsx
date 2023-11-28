@@ -8,7 +8,7 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
-import { useMemberPropertyRequired } from 'components/members/hooks/useMemberPropertyRequired';
+import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
@@ -79,7 +79,7 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
 
-  const { control, errors, isValid, memberProperties, values } = useMemberPropertyRequired({ userId });
+  const { control, errors, isValid, memberProperties, values } = useRequiredMemberProperties({ userId });
 
   async function saveForm() {
     await updateSpaceValues(spaceId, memberDetails);

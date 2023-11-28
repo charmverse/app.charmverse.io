@@ -8,7 +8,7 @@ import type { MemberPropertyValueType } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
 
-export function useMemberPropertyRequired({ userId }: { userId: string }) {
+export function useRequiredMemberProperties({ userId }: { userId: string }) {
   const { memberPropertyValues = [] } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
 
@@ -26,7 +26,9 @@ export function useMemberPropertyRequired({ userId }: { userId: string }) {
       (p) =>
         p.required &&
         // Handled by oauth
-        !['linked_in', 'github', 'discord', 'twitter', 'role', 'profile_pic', 'join_date'].includes(p.type)
+        !['linked_in', 'github', 'discord', 'twitter', 'role', 'profile_pic', 'join_date', 'bio', 'timezone'].includes(
+          p.type
+        )
     ) ?? [];
 
   const {
@@ -69,6 +71,7 @@ export function useMemberPropertyRequired({ userId }: { userId: string }) {
     control,
     isValid,
     errors,
-    memberProperties
+    memberProperties,
+    requiredProperties
   };
 }
