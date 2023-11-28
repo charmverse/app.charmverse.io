@@ -108,7 +108,7 @@ export function TokenGates({ isAdmin, space, popupState }: TokenGatesProps) {
         }}
       />
       <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} size='large'>
-        <TokenGateModalProvider>
+        <TokenGateModalProvider onClose={closeTokenGateModal}>
           <TokenGateModal />
         </TokenGateModalProvider>
       </Modal>

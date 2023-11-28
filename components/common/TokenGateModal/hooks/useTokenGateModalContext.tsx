@@ -35,6 +35,7 @@ type IContext = {
   resetModal: () => void;
   displayedPage: DisplayedPage;
   setDisplayedPage: (page: DisplayedPage) => void;
+  onClose: () => void;
   loadingToken: boolean;
   error?: string;
 };
@@ -48,11 +49,12 @@ export const TokenGateModalContext = createContext<Readonly<IContext>>({
   resetModal: () => undefined,
   displayedPage: 'home',
   setDisplayedPage: () => undefined,
+  onClose: () => undefined,
   loadingToken: false,
   error: undefined
 });
 
-export function TokenGateModalProvider({ children }: { children: ReactNode }) {
+export function TokenGateModalProvider({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   const [displayedPage, setDisplayedPage] = useState<DisplayedPage>('home');
   const [unifiedAccessControlConditions, setUnifiedAccessControlConditions] = useState<UnifiedAccessControlConditions>(
     []
@@ -134,11 +136,12 @@ export function TokenGateModalProvider({ children }: { children: ReactNode }) {
       resetModal,
       setDisplayedPage,
       setFlow,
+      onClose,
       unifiedAccessControlConditions,
       displayedPage,
       flow,
       loadingToken: tokenLoading || litLoading,
-      error: tokenError?.message || litError?.message
+      error: tokenError?.message || typeof litError?.message === 'string' ? litError?.message : undefined
     }),
     [
       flow,
@@ -149,6 +152,7 @@ export function TokenGateModalProvider({ children }: { children: ReactNode }) {
       tokenError?.message,
       litError?.message,
       resetModal,
+      onClose,
       handleUnifiedAccessControlConditions
     ]
   );

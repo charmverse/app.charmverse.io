@@ -20,6 +20,6 @@ export const tokenCheck = [
 ] as const;
 
 export const nftCheck = [
-  { id: 'individual', name: 'An individual NFT' },
-  { id: 'group', name: 'A group of NFT holders' }
+  { id: 'group', name: 'Any NFT in this collection' },
+  { id: 'individual', name: 'A specific token id' }
 ] as const;

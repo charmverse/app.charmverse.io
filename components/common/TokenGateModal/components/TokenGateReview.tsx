@@ -5,6 +5,7 @@ import { useReviewTokenGate } from 'charmClient/hooks/tokenGates';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ConditionsGroup } from 'components/common/SpaceAccessGate/components/TokenGate/TokenGateConditions';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { humanizeConditionsData } from 'lib/tokenGates/humanizeConditions';
 
@@ -16,13 +17,15 @@ import { TokenGateFooter } from './TokenGateFooter';
 
 export function TokenGateReview() {
   const { account } = useWeb3Account();
+  const { showMessage } = useSnackbar();
   const {
     unifiedAccessControlConditions,
     resetModal,
     createUnifiedAccessControlConditions,
     loadingToken,
+    error,
     flow,
-    displayedPage,
+    onClose,
     setFlow,
     setDisplayedPage
   } = useTokenGateModal();
@@ -42,8 +45,16 @@ export function TokenGateReview() {
     }
   }, [trigger, unifiedAccessControlConditions]);
 
+  useEffect(() => {
+    if (error) {
+      showMessage('Something went wrong while creating the token gate.', 'error');
+    }
+  }, [error, showMessage]);
+
   const onSubmit = async () => {
     await createUnifiedAccessControlConditions();
+    showMessage('Token gate created successfully', 'success');
+    onClose();
   };
 
   const handleMultipleConditions = (_flow: Flow) => {
@@ -69,12 +80,7 @@ export function TokenGateReview() {
           Add a condition
         </Button>
       )}
-      <TokenGateFooter
-        onSubmit={onSubmit}
-        onCancel={resetModal}
-        isValid={!loadingToken}
-        displayedPage={displayedPage}
-      />
+      <TokenGateFooter onSubmit={onSubmit} onCancel={resetModal} isValid={!loadingToken} />
     </>
   );
 }
