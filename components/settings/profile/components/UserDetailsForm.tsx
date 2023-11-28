@@ -10,15 +10,13 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
+import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
 import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -148,20 +146,28 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
-  const { memberPropertyValues = [] } = useMemberPropertyValues(user.id);
-  const { space: currentSpace } = useCurrentSpace();
-  const memberProperties = memberPropertyValues
-    .filter((mpv) => mpv.spaceId === currentSpace?.id)
-    .map((mpv) => mpv.properties)
-    .flat();
-  const [form, setForm] = useState<EditableFields>({});
+  const { requiredProperties, memberProperties } = useRequiredMemberProperties({ userId: user.id });
+  const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone');
+  const isBioRequired = requiredProperties.find((p) => p.type === 'bio');
+  const { data: defaultUserDetails, isLoading } = useSWRImmutable(`/current-user-details`, () =>
+    charmClient.getUserDetails()
+  );
+
+  const [userDetails, setForm] = useState<EditableFields>({
+    description: '',
+    timezone: ''
+  });
+
+  useEffect(() => {
+    setForm({
+      description: defaultUserDetails?.description ?? '',
+      timezone: defaultUserDetails?.timezone ?? ''
+    });
+  }, [defaultUserDetails]);
+  const isInputValid = (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description);
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
-  const { trigger: updateUserDetails } = useSWRMutation(
-    '/api/profile/details',
-    (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
-  );
-  const isFormClean = Object.keys(form).length === 0;
+  const isFormClean = Object.keys(userDetails).length === 0;
 
   usePreventReload(!isFormClean);
 
@@ -170,7 +176,7 @@ export function UserDetailsFormWithSave({
   }
 
   async function saveForm() {
-    await updateUserDetails(form);
+    await charmClient.updateUserDetails(userDetails);
     await mutateMembers();
     setForm({});
     showMessage('Profile updated', 'success');
@@ -189,7 +195,13 @@ export function UserDetailsFormWithSave({
     <>
       <UserDetailsForm memberProperties={memberProperties} user={user} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
-        <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
+        <Button
+          disableElevation
+          size='large'
+          disabled={isLoading || isFormClean || !isInputValid}
+          disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
+          onClick={saveForm}
+        >
           Save
         </Button>
       </Box>

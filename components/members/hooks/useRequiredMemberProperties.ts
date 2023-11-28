@@ -21,15 +21,25 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     [memberPropertyValues, currentSpace?.id]
   );
 
-  const requiredProperties =
-    memberProperties.filter(
-      (p) =>
-        p.required &&
+  const requiredProperties = memberProperties.filter((p) => p.required) ?? [];
+
+  const editableRequiredProperties = requiredProperties.filter(
+    (p) =>
+      ![
         // Handled by oauth
-        !['linked_in', 'github', 'discord', 'twitter', 'role', 'profile_pic', 'join_date', 'bio', 'timezone'].includes(
-          p.type
-        )
-    ) ?? [];
+        'linked_in',
+        'github',
+        'discord',
+        'twitter',
+        'profile_pic',
+        // Handled by admin
+        'role',
+        'join_date',
+        // Handled separately from space member properties
+        'bio',
+        'timezone'
+      ].includes(p.type)
+  );
 
   const {
     control,
@@ -40,7 +50,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     mode: 'onChange',
     resolver: yupResolver(
       yup.object(
-        Object.values(requiredProperties).reduce((acc, prop) => {
+        Object.values(editableRequiredProperties).reduce((acc, prop) => {
           if (prop.type === 'multiselect') {
             acc[prop.memberPropertyId] = yup.array().of(yup.string()).required();
             return acc;
