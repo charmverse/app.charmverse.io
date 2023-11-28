@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { deleteUserS3Assets } from 'lib/aws/deleteUserS3Assets';
 import { blacklistUser } from 'lib/users/blacklistUser';
 
 /**
@@ -77,6 +78,7 @@ async function deleteSpace(domain: string) {
   const adminUserIds = result.spaceRoles.map((sr) => sr.userId);
   for (const adminUserId of adminUserIds) {
     await blacklistUser(adminUserId);
+    await deleteUserS3Assets({userId: adminUserId})
   }
   console.log('Deleted space', result);
 }
