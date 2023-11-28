@@ -14,6 +14,7 @@ export function createMemberProperty(
     updatedAt: createdAt,
     enabledViews: ['gallery', 'table', 'profile'],
     options: null,
+    required: false,
     ...memberProperty
   };
 }
