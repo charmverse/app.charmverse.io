@@ -1,7 +1,7 @@
 import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
 import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
-
+import { getDefaultWorkflows } from 'lib/spaces/getProposalWorkflowTemplates';
 import type { SpacePermissionFlags } from '../lib/permissions/spaces';
 
 import {
@@ -45,6 +45,9 @@ const spaceHandlers = {
   }),
   spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
     return res(ctx.json(spaces));
+  }),
+  proposalWorkflows: rest.get(`/api/spaces/:spaceId/proposals/workflows`, (req, res, ctx) => {
+    return res(ctx.json(getDefaultWorkflows(req.params.spaceId)));
   }),
   spaceBlockCount: rest.get(`/api/spaces/:spaceId/block-count`, (req, res, ctx) => {
     const result: BlockCountInfo = { count: 1000 };

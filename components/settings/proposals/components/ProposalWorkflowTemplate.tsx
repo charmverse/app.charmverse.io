@@ -77,10 +77,7 @@ export function ProposalWorkflowItem({
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Box display='flex' justifyContent='space-between' width='100%'>
-          <Box display='flex' gap={2} alignItems='center'>
-            <Typography>Workflow {workflow.index}</Typography>
-            {!isExpanded && <Chip variant='outlined' size='small' color='warning' label='unsaved changes' />}
-          </Box>
+          <Typography>{workflow.title || 'Untitled'}</Typography>
           <span onClick={(e) => e.stopPropagation()}>
             <Menu {...bindMenu(popupState)}>
               <MenuItem onClick={duplicateWorkflow}>
@@ -90,9 +87,12 @@ export function ProposalWorkflowItem({
                 <ListItemText>Delete</ListItemText>
               </MenuItem>
             </Menu>
-            <IconButton size='small' {...bindTrigger(popupState)}>
-              <MoreHoriz fontSize='small' />
-            </IconButton>
+            <Box display='flex' gap={2} alignItems='center'>
+              {!isExpanded && <Chip variant='outlined' size='small' color='warning' label='unsaved changes' />}
+              <IconButton size='small' {...bindTrigger(popupState)}>
+                <MoreHoriz fontSize='small' />
+              </IconButton>
+            </Box>
           </span>
         </Box>
       </AccordionSummary>

@@ -25,7 +25,7 @@ export function useGetSpaceProposalWorkflows(spaceId: MaybeString) {
 }
 
 export function useGetProposalWorkflowTemplates(spaceId: MaybeString) {
-  return useGETImmutable<WorkflowTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposals/workflow-templates` : null);
+  return useGETImmutable<WorkflowTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposals/workflows` : null);
 }
 
 function stripUrlParts(maybeUrl: string) {
