@@ -110,6 +110,8 @@ test.describe.serial('Edit database select properties', async () => {
     // Leave time for all creation processes to happen
     await page.waitForTimeout(500);
 
+    await databasePage.closeModal.click();
+
     const card = await prisma.page.findFirstOrThrow({ where: { parentId: databasePageId } });
 
     const { closedSelect, openSelect } = databasePage.getTablePropertySelectLocator({
