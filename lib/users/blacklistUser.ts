@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { deleteUserS3Assets } from 'lib/aws/deleteUserS3Assets';
+
 export async function blacklistUser(userId: string) {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
@@ -12,6 +14,8 @@ export async function blacklistUser(userId: string) {
       googleAccounts: true
     }
   });
+
+  await deleteUserS3Assets({ userId });
 
   await prisma.blacklistedUser.create({
     data: {
