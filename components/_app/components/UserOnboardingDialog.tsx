@@ -157,6 +157,7 @@ function UserOnboardingDialog({
             }}
             user={currentUser}
             onChange={onUserDetailsChange}
+            memberProperties={memberProperties ?? []}
           />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm

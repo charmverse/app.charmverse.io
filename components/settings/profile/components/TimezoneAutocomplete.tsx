@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { getTimezonesWithOffset, toHoursAndMinutes } from 'lib/utilities/dates';
 
 export interface Timezone {
@@ -15,11 +16,13 @@ const timezoneOptions = getTimezonesWithOffset();
 export function TimezoneAutocomplete({
   save,
   userTimezone,
-  readOnly
+  readOnly,
+  required
 }: {
   userTimezone?: string | null;
   save: (timezone?: string | null) => void;
   readOnly?: boolean;
+  required?: boolean;
 }) {
   const [tz, setTimezone] = useState<null | Timezone | undefined>(null);
   function setInitialTimezone() {
@@ -42,8 +45,7 @@ export function TimezoneAutocomplete({
   const currentTzOffset = toHoursAndMinutes(DateTime.local().offset);
 
   return (
-    <>
-      <FieldLabel>Timezone</FieldLabel>
+    <FieldWrapper label='Timezone' required={required}>
       <Autocomplete<Timezone>
         fullWidth
         disabled={readOnly}
@@ -73,6 +75,6 @@ export function TimezoneAutocomplete({
           />
         )}
       />
-    </>
+    </FieldWrapper>
   );
 }

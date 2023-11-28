@@ -15,12 +15,14 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
 import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Social } from 'lib/members/interfaces';
+import type { PropertyValueWithDetails, Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import type { LoggedInUser } from 'models';
@@ -40,6 +42,7 @@ export interface UserDetailsProps {
   user: LoggedInUser;
   sx?: SxProps<Theme>;
   onChange: (user: EditableFields) => void;
+  memberProperties: PropertyValueWithDetails[];
 }
 
 const StyledStack = styled(Stack)`
@@ -61,7 +64,7 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
+export function UserDetailsForm({ memberProperties, user, onChange, sx = {} }: UserDetailsProps) {
   const { data: userDetails, isLoading } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
   const identityTypes = useIdentityTypes();
@@ -84,6 +87,8 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
   };
 
   const disabled = isLoading;
+
+  const requiredProperties = memberProperties.filter((mp) => mp.required);
 
   return (
     <>
@@ -109,10 +114,20 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
           </EditIconContainer>
         </Grid>
         <Grid item>
-          <UserDescription currentDescription={userDetails?.description} save={setDescription} readOnly={disabled} />
+          <UserDescription
+            required={!!requiredProperties.find((prop) => prop.type === 'bio')}
+            currentDescription={userDetails?.description}
+            save={setDescription}
+            readOnly={disabled}
+          />
         </Grid>
         <Grid item>
-          <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={setTimezone} readOnly={disabled} />
+          <TimezoneAutocomplete
+            required={!!requiredProperties.find((prop) => prop.type === 'timezone')}
+            userTimezone={userDetails?.timezone}
+            save={setTimezone}
+            readOnly={disabled}
+          />
         </Grid>
         <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={disabled} />
       </Grid>
@@ -133,6 +148,12 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
+  const { memberPropertyValues = [] } = useMemberPropertyValues(user.id);
+  const { space: currentSpace } = useCurrentSpace();
+  const memberProperties = memberPropertyValues
+    .filter((mpv) => mpv.spaceId === currentSpace?.id)
+    .map((mpv) => mpv.properties)
+    .flat();
   const [form, setForm] = useState<EditableFields>({});
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
@@ -166,7 +187,7 @@ export function UserDetailsFormWithSave({
 
   return (
     <>
-      <UserDetailsForm user={user} onChange={onFormChange} />
+      <UserDetailsForm memberProperties={memberProperties} user={user} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
         <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
           Save
