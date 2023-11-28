@@ -57,10 +57,10 @@ export function getFilePath({ spaceId, url }: { spaceId: string; url: string }) 
   return `spaces/${spaceId}/${uuid()}/${generateFilename(url)}`;
 }
 
-export function getUserUploadsPrefix({ userId }: { userId: string }) {
+export function getUserS3FilePrefix({ userId }: { userId: string }) {
   return `user-content/${userId}`;
 }
 
 export function getUserS3FilePath({ userId, url }: { userId: string; url: string }) {
-  return `${getUserUploadsPrefix({ userId })}/${uuid()}/${generateFilename(url)}`;
+  return `${getUserS3FilePrefix({ userId })}/${uuid()}/${generateFilename(url)}`;
 }

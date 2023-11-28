@@ -7,13 +7,13 @@ import { awsS3Bucket } from 'config/constants';
 
 import { getS3ClientConfig } from './getS3ClientConfig';
 import { listS3BucketContents } from './listS3Assets';
-import { getUserUploadsPrefix } from './uploadToS3Server';
+import { getUserS3FilePrefix } from './uploadToS3Server';
 
 export async function deleteUserS3Assets({ userId }: { userId: string }): Promise<void> {
   if (!stringUtils.isUUID(userId)) {
     throw new InvalidInputError('User id must be valid');
   }
-  const folderPath = getUserUploadsPrefix({ userId });
+  const folderPath = getUserS3FilePrefix({ userId });
 
   // List all objects in the subfolder
   const listedObjects = await listS3BucketContents({ prefix: folderPath });
