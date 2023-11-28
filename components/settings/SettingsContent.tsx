@@ -92,7 +92,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   return (
-    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
+    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
         component='aside'
         width={{ xs: '100%', md: 300 }}
