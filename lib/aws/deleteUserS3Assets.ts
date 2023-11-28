@@ -1,4 +1,6 @@
 import { DeleteObjectsCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+import { InvalidInputError } from '@charmverse/core/errors';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { awsS3Bucket } from 'config/constants';
 
@@ -7,6 +9,9 @@ import { listS3BucketContents } from './listS3Assets';
 import { getUserUploadsPrefix } from './uploadToS3Server';
 
 export async function deleteUserS3Assets({ userId }: { userId: string }): Promise<void> {
+  if (!stringUtils.isUUID(userId)) {
+    throw new InvalidInputError('User id must be valid');
+  }
   const folderPath = getUserUploadsPrefix({ userId });
 
   // List all objects in the subfolder
