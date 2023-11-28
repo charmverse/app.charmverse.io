@@ -10,7 +10,7 @@ import { mutate } from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import { useCreateLitToken, useCreateTokenGate } from 'charmClient/hooks/tokenGatess';
+import { useCreateLitToken, useCreateTokenGate } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { isTruthy } from 'lib/utilities/types';
