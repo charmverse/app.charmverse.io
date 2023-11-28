@@ -11,6 +11,7 @@ import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalbo
 import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import ViewHeaderDisplayByMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderDisplayByMenu';
 import ViewTabs from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewTabs';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
@@ -33,6 +34,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
+import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
 
 import { useRewards } from './hooks/useRewards';
 
@@ -82,6 +84,16 @@ export function RewardsPage({ title }: { title: string }) {
   useRewardsBoardMutator();
 
   const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
+  const withDisplayBy = activeView?.fields.viewType === 'calendar';
+
+  const dateDisplayProperty = useMemo(
+    () =>
+      activeBoard?.fields.cardProperties.find((o) => {
+        // default calendar grouping to due date
+        return o.id === (activeView?.fields.dateDisplayPropertyId || DUE_DATE_ID);
+      }),
+    [activeBoard?.fields.cardProperties, activeView?.fields.dateDisplayPropertyId]
+  );
 
   function openPage(rewardId: string | null) {
     if (!rewardId) return;
@@ -166,7 +178,15 @@ export function RewardsPage({ title }: { title: string }) {
               />
             </Stack>
 
-            <Stack direction='row' alignItems='center' mb={1}>
+            <Stack direction='row' alignItems='center' mb={1} gap={0.5}>
+              {withDisplayBy && (
+                <ViewHeaderDisplayByMenu
+                  properties={activeBoard?.fields.cardProperties ?? []}
+                  activeView={activeView}
+                  dateDisplayPropertyName={dateDisplayProperty?.name || '-'}
+                />
+              )}
+
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
               <ViewSortControl
@@ -228,7 +248,7 @@ export function RewardsPage({ title }: { title: string }) {
                     cards={cards as Card[]}
                     activeView={activeView}
                     readOnly={!isAdmin}
-                    // dateDisplayProperty={dateDisplayProperty}
+                    dateDisplayProperty={dateDisplayProperty}
                     showCard={showRewardOrApplication}
                     addCard={async () => {}}
                     disableAddingCards
