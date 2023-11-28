@@ -8,6 +8,7 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { useMemberPropertyRequired } from 'components/members/hooks/useMemberPropertyRequired';
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
@@ -74,9 +75,11 @@ export function DialogContainer({
 }
 
 export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) {
-  const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
+  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
+
+  const { control, errors, isValid, memberProperties, values } = useMemberPropertyRequired({ userId });
 
   async function saveForm() {
     await updateSpaceValues(spaceId, memberDetails);
@@ -86,15 +89,6 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
     setMemberDetails(fields);
   }
-
-  const memberProperties = useMemo(
-    () =>
-      memberPropertyValues
-        ?.filter((mpv) => mpv.spaceId === spaceId)
-        .map((mpv) => mpv.properties)
-        .flat(),
-    [memberPropertyValues, spaceId]
-  );
 
   function onClickClose() {
     // refresh members only after all the editing is finished
@@ -106,6 +100,9 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
   return (
     <DialogContainer title='Edit profile' onClose={onClickClose}>
       <MemberPropertiesForm
+        values={values}
+        control={control}
+        errors={errors}
         properties={memberProperties}
         userId={userId}
         refreshPropertyValues={refreshPropertyValues}
@@ -115,7 +112,7 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
         <Button disableElevation color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
-        <Button disableElevation disabled={isFormClean} onClick={saveForm}>
+        <Button disableElevation disabled={isFormClean || !isValid} onClick={saveForm}>
           Save
         </Button>
       </Box>

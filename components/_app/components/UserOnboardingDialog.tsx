@@ -1,8 +1,11 @@
 import { log } from '@charmverse/core/log';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
+import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -10,6 +13,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
 import { ProfileWidgets } from 'components/members/components/MemberProfile/components/ProfileWidgets/ProfileWidgets';
+import { useMemberPropertyRequired } from 'components/members/hooks/useMemberPropertyRequired';
 import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
 import Legend from 'components/settings/Legend';
 import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
@@ -19,7 +23,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -60,8 +64,9 @@ function UserOnboardingDialog({
   isOnboarding?: boolean;
 }) {
   const { showMessage } = useSnackbar();
+  const { control, errors, isValid, memberProperties, values } = useMemberPropertyRequired({ userId: currentUser.id });
   const { space: currentSpace } = useCurrentSpace();
-  const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
+  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
 
   const [userDetails, setUserDetails] = useState<EditableFields>({});
@@ -107,15 +112,6 @@ function UserOnboardingDialog({
     setCurrentStep('profile_step');
   }
 
-  const memberProperties = useMemo(
-    () =>
-      memberPropertyValues
-        ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
-        .map((mpv) => mpv.properties)
-        .flat(),
-    [memberPropertyValues, currentSpace?.id]
-  );
-
   const handleClose = () => {
     if (!isFormClean) {
       confirmExitPopupState.open();
@@ -145,11 +141,17 @@ function UserOnboardingDialog({
       fluidSize={currentStep === 'email_step'}
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
-      hideCloseButton={currentStep === 'email_step'}
+      hideCloseButton={currentStep === 'email_step' || !isValid}
       footerActions={
         currentStep === 'profile_step' ? (
           <Box mr={4.5}>
-            <Button disableElevation size='large' onClick={saveForm} disabled={isFormClean} disabledTooltip=''>
+            <Button
+              disableElevation
+              size='large'
+              onClick={saveForm}
+              disabled={isFormClean || !isValid}
+              disabledTooltip=''
+            >
               Save
             </Button>
           </Box>
@@ -170,6 +172,9 @@ function UserOnboardingDialog({
           />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
+            values={values}
+            control={control}
+            errors={errors}
             properties={memberProperties}
             refreshPropertyValues={refreshPropertyValues}
             onChange={onMemberDetailsChange}

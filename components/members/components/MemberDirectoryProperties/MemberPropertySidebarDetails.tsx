@@ -63,7 +63,9 @@ export function MemberPropertySidebarDetails({
     <>
       <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
-          {!['role', 'join_date', 'profile_pic'].includes(property.type) ? (
+          {!['role', 'join_date', 'profile_pic', 'twitter', 'linked_in', 'github', 'discord'].includes(
+            property.type
+          ) ? (
             <Stack flexDirection='row' justifyContent='space-between' mr={2}>
               <Typography pl={4} variant='overline' alignItems='center' display='flex'>
                 Required

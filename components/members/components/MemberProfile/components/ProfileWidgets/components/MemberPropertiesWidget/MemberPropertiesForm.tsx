@@ -1,17 +1,11 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Divider, Stack } from '@mui/material';
-import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
 import { useMembers } from 'hooks/useMembers';
-import type {
-  MemberPropertyValueType,
-  PropertyValueWithDetails,
-  UpdateMemberPropertyValuePayload
-} from 'lib/members/interfaces';
+import type { PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberCollections } from '../../../../../../hooks/useMemberCollections';
 import { useMutateMemberPropertyValues } from '../../../../../../hooks/useMutateMemberPropertyValues';
@@ -24,6 +18,9 @@ type Props = {
   showCollectionOptions?: boolean;
   userId: string;
   refreshPropertyValues: VoidFunction;
+  values: FieldValues;
+  errors: FieldErrors<FieldValues>;
+  control: Control<FieldValues, any>;
 };
 
 export function MemberPropertiesForm({
@@ -31,52 +28,19 @@ export function MemberPropertiesForm({
   onChange,
   userId,
   refreshPropertyValues,
-  showCollectionOptions
+  showCollectionOptions,
+  values,
+  errors,
+  control
 }: Props) {
   const { membersRecord } = useMembers();
-  const requiredProperties =
-    properties?.filter(
-      (p) =>
-        p.required &&
-        // Rest of the properties are shown on separate component
-        ['text', 'text_multiline', 'number', 'email', 'phone', 'url', 'select', 'multiselect', 'name'].includes(p.type)
-    ) ?? [];
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
-  const {
-    control,
-    formState: { errors },
-    reset,
-    getValues
-  } = useForm({
-    mode: 'onChange',
-    resolver: yupResolver(
-      yup.object(
-        Object.values(requiredProperties).reduce((acc, prop) => {
-          acc[prop.memberPropertyId] = prop.type === 'number' ? yup.number().required() : yup.string().required();
-          return acc;
-        }, {} as Record<string, any>)
-      )
-    )
-  });
 
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
     memberId: userId
   });
-
-  useEffect(() => {
-    if (!properties) {
-      return;
-    }
-    const defaultValues = properties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-      acc[prop.memberPropertyId] = prop.value;
-      return acc;
-    }, {});
-
-    reset(defaultValues);
-  }, [properties, reset]);
-
   function handleOnChange(propertyId: string, option: any) {
-    const submitData = { ...getValues(), [propertyId]: option };
+    const submitData = { ...values, [propertyId]: option };
     const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
       memberPropertyId: key,
       value: submitData[key]
