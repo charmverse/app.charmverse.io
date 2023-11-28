@@ -1,5 +1,6 @@
 import { DeleteObjectsCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { awsS3Bucket } from 'config/constants';
@@ -33,6 +34,7 @@ export async function deleteUserS3Assets({ userId }: { userId: string }): Promis
 
   // Recursively delete if there are more objects to be deleted
   if (listedObjects.IsTruncated) {
+    log.info('Found additional objects to delete');
     return deleteUserS3Assets({ userId });
   }
 }
