@@ -6,6 +6,7 @@ import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceWithTokenGates } from 'lib/spaces/getSpaceWithTokenGates';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,6 +23,10 @@ async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<
   const updatedPublicSpace: SpaceWithGates | null = publicSpace
     ? { ...publicSpace, tokenGates: updatedTokenGates }
     : null;
+
+  if (updatedPublicSpace?.spaceImage) {
+    updatedPublicSpace.spaceImage = replaceS3Domain(updatedPublicSpace.spaceImage);
+  }
 
   return res.status(200).json(updatedPublicSpace);
 }

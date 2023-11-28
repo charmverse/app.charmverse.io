@@ -3,12 +3,12 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import type { PagePathType } from 'components/common/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import type { StaticPagesType } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 
 export type PageListItem = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
-  type: Page['type'] | StaticPagesType | 'forum_category';
+  type: PagePathType;
 };
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-export default function PagesList({
+export function PagesList({
   emptyText = 'No pages found',
   activeItemIndex = -1,
   activePageId,

@@ -30,9 +30,9 @@ import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { greyColor2 } from 'theme/colors';
 
+import { PageIcon } from '../../../../PageIcon';
 import AddNewCard from '../../AddNewCard';
 import NewPageMenu, { StyledIconButton } from '../../NewPageMenu';
-import { PageIcon } from '../../PageIcon';
 import PageTitle from '../../PageTitle';
 
 import TreeItemContent from './TreeItemContent';

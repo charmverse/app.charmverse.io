@@ -148,7 +148,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
       {/* @ts-ignore */}
       <form
         onSubmit={(event) => {
-          // stop propagation so it doesnt submit parent forms, like bounty editor
+          // stop propagation so it doesnt submit parent forms, like reward editor
           event.stopPropagation();
           event.preventDefault();
           handleSubmit(addPaymentMethod as any)(event);

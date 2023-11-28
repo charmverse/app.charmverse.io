@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
+import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 
 import { useMemberCollections } from '../../../../hooks/useMemberCollections';
 import { useMemberPropertyValues } from '../../../../hooks/useMemberPropertyValues';
@@ -22,7 +22,7 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
     isLoading: isLoadingMemberPropertiesValues,
     canEditSpaceProfile
   } = useMemberPropertyValues(userId);
-  const { memberProfiles } = useFeaturesAndMembers();
+  const { memberProfileTypes } = useMemberProfileTypes();
   const { data: lensProfile = null, isLoading: isLoadingLensProfile } = useSWR(`public/profile/${userId}/lens`, () =>
     charmClient.publicProfile.getLensProfile(userId)
   );
@@ -56,7 +56,7 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
 
   return (
     <Grid container spacing={4}>
-      {memberProfiles
+      {memberProfileTypes
         ?.filter(({ isHidden }) => !isHidden)
         .map(({ id }) => {
           switch (id) {

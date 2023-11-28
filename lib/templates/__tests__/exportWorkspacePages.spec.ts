@@ -152,7 +152,7 @@ describe('exportWorkspacePages', () => {
     expect(data.pages[0].id).toBe(returnedPage.id);
   });
 
-  it('should not ignore bounties', async () => {
+  it('should not ignore rewards', async () => {
     const { space: _space, user: _user } = await generateUserAndSpace();
 
     const bounty = await generateBounty({

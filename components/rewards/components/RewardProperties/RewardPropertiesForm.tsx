@@ -141,7 +141,6 @@ export function RewardPropertiesForm({
           isExpanded={isExpanded}
           toggleExpanded={() => setIsExpanded((v) => !v)}
           readOnly={readOnly || !pageId}
-          refreshPermissions={refreshPermissions || (() => {})}
         />
 
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>

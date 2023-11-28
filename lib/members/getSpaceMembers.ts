@@ -10,6 +10,7 @@ import { getSpaceMemberSearchParams } from 'lib/members/getSpaceMemberSearchPara
 import type { Member } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 export async function getSpaceMembers({
   requestingUserId,
@@ -88,7 +89,7 @@ export async function getSpaceMembers({
           deletedAt: userData.deletedAt || undefined,
           updatedAt: userData.updatedAt,
           profile: (userData.profile as Member['profile']) || undefined,
-          avatar: userData.avatar || undefined,
+          avatar: replaceS3Domain(userData.avatar || undefined),
           avatarTokenId: userData.avatarTokenId || undefined,
           username,
           path: userData.path,

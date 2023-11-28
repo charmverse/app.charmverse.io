@@ -3,8 +3,10 @@ import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/constants';
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
+import type { PageListItem } from 'components/common/PagesList';
+import { PagesList } from 'components/common/PagesList';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
@@ -16,8 +18,6 @@ import { isTruthy } from 'lib/utilities/types';
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
-import type { PageListItem } from '../../PageList';
-import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 
 const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];

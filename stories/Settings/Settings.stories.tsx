@@ -113,6 +113,10 @@ export function billing() {
   return <ShowSettingsProfile path='subscription' />;
 }
 
+export function proposals() {
+  return <ShowSettingsProfile path='proposals' />;
+}
+
 export default {
   title: 'Settings/Views',
   component: SettingsContent
