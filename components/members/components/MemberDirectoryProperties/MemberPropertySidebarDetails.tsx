@@ -1,8 +1,8 @@
-import type { MemberPropertyPermission } from '@charmverse/core/prisma';
+import type { MemberProperty, MemberPropertyPermission } from '@charmverse/core/prisma';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Checkbox, Collapse, IconButton, InputLabel, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -19,6 +19,11 @@ type Props = {
   readOnly: boolean;
   addPermissions: (propertyId: string, permissions: CreateMemberPropertyPermissionInput[]) => void;
   removePermission: (permission: MemberPropertyPermission) => void;
+  updateProperty: (
+    propertyData: Partial<MemberProperty> & {
+      id: string;
+    }
+  ) => Promise<void>;
 };
 
 export function MemberPropertySidebarDetails({
@@ -26,7 +31,8 @@ export function MemberPropertySidebarDetails({
   readOnly,
   addPermissions,
   removePermission,
-  property
+  property,
+  updateProperty
 }: Props) {
   const memberPropertySidebarItemPopupState = usePopupState({
     variant: 'popover',
@@ -57,8 +63,27 @@ export function MemberPropertySidebarDetails({
     <>
       <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
+          <Stack flexDirection='row' justifyContent='space-between' mr={2}>
+            <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+              Required
+            </Typography>
+            <Checkbox
+              size='small'
+              sx={{
+                p: 0
+              }}
+              checked={property.required}
+              disabled={readOnly}
+              onChange={(e) => {
+                updateProperty({
+                  id: property.id,
+                  required: e.target.checked
+                });
+              }}
+            />
+          </Stack>
           <Stack>
-            <Box pl={4}>
+            <Box pl={4} mr={2}>
               <MemberPropertyVisibility property={property} />
             </Box>
             {property?.permissions.length ? (

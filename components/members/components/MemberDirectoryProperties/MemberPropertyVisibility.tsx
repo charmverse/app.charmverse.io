@@ -73,7 +73,7 @@ export function MemberPropertyVisibility({ property }: { property: MemberPropert
   }
 
   return (
-    <Stack flexDirection='row' justifyContent='space-between' mr={2}>
+    <Stack flexDirection='row' justifyContent='space-between'>
       <Typography variant='overline' alignItems='center' display='flex'>
         Views
       </Typography>
