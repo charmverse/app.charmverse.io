@@ -18,7 +18,7 @@ export type CreateRoleInput = {
 };
 
 handler
-  .get(listSpaceRoles)
+  .get(requireKeys([{ key: 'spaceId', valueType: 'uuid' }]), listSpaceRoles)
   .use(requireUser)
   .use(
     requirePaidPermissionsSubscription({
@@ -28,7 +28,7 @@ handler
     })
   )
   .use(requireSpaceMembership({ adminOnly: true }))
-  .use(requireKeys<Role>(['spaceId', 'name'], 'body'))
+  .use(requireKeys<Role>([{ key: 'spaceId', valueType: 'uuid' }, 'name'], 'body'))
   .post(createRole);
 
 export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
