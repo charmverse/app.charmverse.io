@@ -63,25 +63,27 @@ export function MemberPropertySidebarDetails({
     <>
       <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
-          <Stack flexDirection='row' justifyContent='space-between' mr={2}>
-            <Typography pl={4} variant='overline' alignItems='center' display='flex'>
-              Required
-            </Typography>
-            <Checkbox
-              size='small'
-              sx={{
-                p: 0
-              }}
-              checked={property.required}
-              disabled={readOnly}
-              onChange={(e) => {
-                updateProperty({
-                  id: property.id,
-                  required: e.target.checked
-                });
-              }}
-            />
-          </Stack>
+          {!['role', 'join_date', 'profile_pic'].includes(property.type) ? (
+            <Stack flexDirection='row' justifyContent='space-between' mr={2}>
+              <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+                Required
+              </Typography>
+              <Checkbox
+                size='small'
+                sx={{
+                  p: 0
+                }}
+                checked={property.required}
+                disabled={readOnly}
+                onChange={(e) => {
+                  updateProperty({
+                    id: property.id,
+                    required: e.target.checked
+                  });
+                }}
+              />
+            </Stack>
+          ) : null}
           <Stack>
             <Box pl={4} mr={2}>
               <MemberPropertyVisibility property={property} />

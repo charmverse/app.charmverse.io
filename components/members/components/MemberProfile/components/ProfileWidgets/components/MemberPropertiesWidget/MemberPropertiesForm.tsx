@@ -1,11 +1,12 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Divider, Stack } from '@mui/material';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
 import { useMembers } from 'hooks/useMembers';
-import { useUser } from 'hooks/useUser';
 import type {
   MemberPropertyValueType,
   PropertyValueWithDetails,
@@ -33,14 +34,30 @@ export function MemberPropertiesForm({
   showCollectionOptions
 }: Props) {
   const { membersRecord } = useMembers();
+  const requiredProperties =
+    properties?.filter(
+      (p) =>
+        p.required &&
+        // Rest of the properties are shown on separate component
+        ['text', 'text_multiline', 'number', 'email', 'phone', 'url', 'select', 'multiselect', 'name'].includes(p.type)
+    ) ?? [];
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
   const {
     control,
     formState: { errors },
     reset,
-    getValues,
-    setError
-  } = useForm({ mode: 'onChange' });
+    getValues
+  } = useForm({
+    mode: 'onChange',
+    resolver: yupResolver(
+      yup.object(
+        Object.values(requiredProperties).reduce((acc, prop) => {
+          acc[prop.memberPropertyId] = prop.type === 'number' ? yup.number().required() : yup.string().required();
+          return acc;
+        }, {} as Record<string, any>)
+      )
+    )
+  });
 
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
     memberId: userId
@@ -56,20 +73,7 @@ export function MemberPropertiesForm({
     }, {});
 
     reset(defaultValues);
-  }, [!!properties]);
-
-  useEffect(() => {
-    const requiredProperties = properties?.filter((p) => p.required) ?? [];
-    const values = getValues();
-    requiredProperties.forEach((p) => {
-      if (!values[p.memberPropertyId]) {
-        setError(p.memberPropertyId, {
-          type: 'required',
-          message: 'This field is required'
-        });
-      }
-    });
-  }, [properties, setError, getValues]);
+  }, [properties, reset]);
 
   function handleOnChange(propertyId: string, option: any) {
     const submitData = { ...getValues(), [propertyId]: option };
