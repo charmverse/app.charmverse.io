@@ -386,7 +386,8 @@ function CenterPanel(props: Props) {
   const kanbanAddCard = useCallback(
     (groupByOptionId?: string) => {
       addCard({
-        groupByOptionId
+        groupByOptionId,
+        show: true
       });
     },
     [addCard]
