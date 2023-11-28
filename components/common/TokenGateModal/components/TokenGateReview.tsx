@@ -1,7 +1,7 @@
 import { Card, CardContent, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
-import { useReviewTokenGate } from 'charmClient/hooks/tokengates';
+import { useReviewTokenGate } from 'charmClient/hooks/tokenGatess';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ConditionsGroup } from 'components/common/SpaceAccessGate/components/TokenGate/TokenGateConditions';
