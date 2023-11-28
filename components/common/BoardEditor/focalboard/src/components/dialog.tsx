@@ -36,14 +36,9 @@ const FooterActionsContainer = styled(Box)`
   max-width: 100%;
   margin: 0 auto;
   position: relative;
-  padding: 0 40px 0 30px;
 
   ${({ theme }) => theme.breakpoints.up('lg')} {
     width: 860px;
-  }
-
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    padding: 0 80px;
   }
 `;
 

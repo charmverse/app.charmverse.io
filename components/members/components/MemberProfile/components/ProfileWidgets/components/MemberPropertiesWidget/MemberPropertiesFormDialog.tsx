@@ -1,8 +1,8 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, useMediaQuery } from '@mui/material';
-import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
@@ -42,19 +42,27 @@ export function DialogContainer({
   onClose,
   title,
   fluidSize,
-  hideCloseButton
+  hideCloseButton,
+  footerActions
 }: {
   onClose?: VoidFunction;
   title: string;
   children?: ReactNode;
   fluidSize?: boolean;
   hideCloseButton?: boolean;
+  footerActions?: React.ReactNode;
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <StyledDialog toolbar={<div />} fluidSize={fluidSize} hideCloseButton={hideCloseButton} onClose={onClose}>
+    <StyledDialog
+      toolbar={<div />}
+      fluidSize={fluidSize}
+      hideCloseButton={hideCloseButton}
+      onClose={onClose}
+      footerActions={footerActions}
+    >
       <ScrollableWindow>
         <ContentContainer fullWidth={fullWidth} top={20}>
           {title && <Legend wrap>{title}</Legend>}

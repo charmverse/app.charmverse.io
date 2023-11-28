@@ -146,6 +146,15 @@ function UserOnboardingDialog({
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
       hideCloseButton={currentStep === 'email_step'}
+      footerActions={
+        currentStep === 'profile_step' ? (
+          <Box mr={4.5}>
+            <Button disableElevation size='large' onClick={saveForm} disabled={isFormClean} disabledTooltip=''>
+              Save
+            </Button>
+          </Box>
+        ) : null
+      }
     >
       {currentStep === 'email_step' ? (
         <OnboardingEmailForm onClick={goNextStep} spaceId={currentSpace.id} />
@@ -169,11 +178,6 @@ function UserOnboardingDialog({
           />
           <Legend mt={4}>Profiles</Legend>
           <ProfileWidgets userId={currentUser.id} />
-          <Box display='flex' justifyContent='flex-end' mt={2}>
-            <Button disableElevation size='large' onClick={saveForm} disabled={isFormClean}>
-              Save
-            </Button>
-          </Box>
           <ConfirmDeleteModal
             onClose={confirmExitPopupState.close}
             title='Unsaved changes'
