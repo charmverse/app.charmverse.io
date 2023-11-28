@@ -1,16 +1,19 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import useSWRImmutable from 'swr/immutable';
 import * as yup from 'yup';
 
+import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { MemberPropertyValueType } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
-  const { memberPropertyValues = [] } = useMemberPropertyValues(userId);
+  const { memberPropertyValues = [], isLoading } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
+  const { data: userDetails } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
   const memberProperties = useMemo(
     () =>
@@ -21,7 +24,42 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     [memberPropertyValues, currentSpace?.id]
   );
 
-  const requiredProperties = memberProperties.filter((p) => p.required) ?? [];
+  const requiredProperties = useMemo(
+    () => memberProperties.filter((p) => p.required && !['role', 'join_date'].includes(p.type)) ?? [],
+    [memberProperties]
+  );
+
+  const requiredPropertiesWithoutValue = useMemo(() => {
+    let propertiesWithoutValue = requiredProperties
+      .filter(
+        (rp) =>
+          !memberProperties.find((mp) => mp.memberPropertyId === rp.memberPropertyId)?.value &&
+          !['bio', 'timezone'].includes(rp.type)
+      )
+      .map((p) => p.memberPropertyId);
+
+    const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone')?.required;
+    const isBioRequired = requiredProperties.find((p) => p.type === 'bio')?.required;
+
+    if (isTimezoneRequired && !userDetails?.timezone && !isLoading) {
+      propertiesWithoutValue = [...propertiesWithoutValue, 'timezone'];
+    }
+
+    if (isBioRequired && !userDetails?.description && !isLoading) {
+      propertiesWithoutValue = [...propertiesWithoutValue, 'bio'];
+    }
+    return propertiesWithoutValue;
+  }, [requiredProperties, memberProperties, userDetails, isLoading]);
+
+  return {
+    memberProperties,
+    requiredProperties,
+    requiredPropertiesWithoutValue
+  };
+}
+
+export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) {
+  const { memberProperties, requiredProperties } = useRequiredMemberProperties({ userId });
 
   const editableRequiredProperties = requiredProperties.filter(
     (p) =>
@@ -32,9 +70,6 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
         'discord',
         'twitter',
         'profile_pic',
-        // Handled by admin
-        'role',
-        'join_date',
         // Handled separately from space member properties
         'bio',
         'timezone'

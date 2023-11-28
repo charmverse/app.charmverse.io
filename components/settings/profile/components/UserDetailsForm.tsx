@@ -164,6 +164,7 @@ export function UserDetailsFormWithSave({
       timezone: defaultUserDetails?.timezone ?? ''
     });
   }, [defaultUserDetails]);
+
   const isInputValid = (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description);
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();

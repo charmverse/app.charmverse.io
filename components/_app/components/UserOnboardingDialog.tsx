@@ -1,11 +1,9 @@
 import { log } from '@charmverse/core/log';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
-import * as yup from 'yup';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -14,7 +12,10 @@ import { MemberPropertiesForm } from 'components/members/components/MemberProfil
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
 import { ProfileWidgets } from 'components/members/components/MemberProfile/components/ProfileWidgets/ProfileWidgets';
 import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
-import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
+import {
+  useRequiredMemberProperties,
+  useRequiredMemberPropertiesForm
+} from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
 import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
@@ -23,7 +24,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { MemberPropertyValueType, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -35,18 +36,38 @@ type Step = 'email_step' | 'profile_step';
 export function UserOnboardingDialogGlobal() {
   const { space } = useCurrentSpace();
   const { user } = useUser();
-  const { showOnboardingFlow, completeOnboarding } = useOnboarding({ user, spaceId: space?.id });
 
   // Wait for user to load before deciding what to show
-  if (!user) {
+  if (!user || !space) {
     return null;
   }
-  // Show member profile for onboarding
-  if (showOnboardingFlow) {
+
+  return <LoggedInUserOnboardingDialog user={user} spaceId={space.id} />;
+}
+
+function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user: LoggedInUser }) {
+  const { showOnboardingFlow, completeOnboarding } = useOnboarding({ user, spaceId });
+
+  useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
+  }, []);
+
+  const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
+    userId: user.id
+  });
+
+  if (showOnboardingFlow) {
     return (
       <div data-test='member-onboarding-form'>
         <UserOnboardingDialog key={user.id} isOnboarding currentUser={user} onClose={completeOnboarding} />
+      </div>
+    );
+  }
+
+  if (requiredPropertiesWithoutValue.length) {
+    return (
+      <div data-test='member-onboarding-form'>
+        <UserOnboardingDialog key={user.id} currentUser={user} onClose={completeOnboarding} />
       </div>
     );
   }
@@ -64,12 +85,13 @@ function UserOnboardingDialog({
   isOnboarding?: boolean;
 }) {
   const { showMessage } = useSnackbar();
-  const { control, errors, isValid, memberProperties, values, requiredProperties } = useRequiredMemberProperties({
+  const { control, errors, isValid, memberProperties, values, requiredProperties } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
   const { space: currentSpace } = useCurrentSpace();
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
+  const { data: userDetailsData } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
   const [userDetails, setUserDetails] = useState<EditableFields>({});
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
@@ -91,6 +113,13 @@ function UserOnboardingDialog({
   const isFormClean = Object.keys(userDetails).length === 0 && memberDetails.length === 0;
 
   usePreventReload(!isFormClean);
+
+  useEffect(() => {
+    setUserDetails({
+      description: userDetailsData?.description ?? '',
+      timezone: userDetailsData?.timezone ?? ''
+    });
+  }, [userDetailsData]);
 
   async function saveForm() {
     if (isFormClean) {
