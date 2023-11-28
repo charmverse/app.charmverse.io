@@ -38,22 +38,13 @@ export function MemberPropertiesForm({
     control,
     formState: { errors },
     reset,
-    getValues
+    getValues,
+    setError
   } = useForm({ mode: 'onChange' });
-  const { user } = useUser();
+
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
     memberId: userId
   });
-
-  function handleOnChange(propertyId: string, option: any) {
-    const submitData = { ...getValues(), [propertyId]: option };
-    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
-      memberPropertyId: key,
-      value: submitData[key]
-    }));
-
-    onChange(updateData);
-  }
 
   useEffect(() => {
     if (!properties) {
@@ -66,6 +57,29 @@ export function MemberPropertiesForm({
 
     reset(defaultValues);
   }, [!!properties]);
+
+  useEffect(() => {
+    const requiredProperties = properties?.filter((p) => p.required) ?? [];
+    const values = getValues();
+    requiredProperties.forEach((p) => {
+      if (!values[p.memberPropertyId]) {
+        setError(p.memberPropertyId, {
+          type: 'required',
+          message: 'This field is required'
+        });
+      }
+    });
+  }, [properties, setError, getValues]);
+
+  function handleOnChange(propertyId: string, option: any) {
+    const submitData = { ...getValues(), [propertyId]: option };
+    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
+      memberPropertyId: key,
+      value: submitData[key]
+    }));
+
+    onChange(updateData);
+  }
 
   function getPlaceholder(type: string) {
     if (type === 'name') {
@@ -94,6 +108,7 @@ export function MemberPropertiesForm({
                 onCreateOption={(option) => createOption(property, option)}
                 onUpdateOption={(option) => updateOption(property, option)}
                 onDeleteOption={(option) => deleteOption(property, option)}
+                required={property.required}
                 onChange={(e) => {
                   field.onChange(e);
                   handleOnChange(property.memberPropertyId, typeof e?.target?.value === 'string' ? e.target.value : e);

@@ -26,4 +26,5 @@ export type FieldProps = {
   inline?: boolean;
   error?: string;
   disabled?: boolean;
+  required?: boolean;
 } & SelectFieldProps;
