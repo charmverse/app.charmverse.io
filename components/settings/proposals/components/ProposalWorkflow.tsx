@@ -47,7 +47,7 @@ export function ProposalWorkflowItem({
   readOnly: boolean;
 }) {
   const [activeEvaluation, setActiveEvaluation] = useState<EvaluationTemplateItem | null>(null);
-  const [hasUnsavedChanges, setUnsavedChanges] = useState(false);
+  const [hasUnsavedChanges, setUnsavedChanges] = useState(!!workflow.isNew);
   const { showMessage } = useSnackbar();
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
 
