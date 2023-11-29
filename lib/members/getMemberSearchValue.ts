@@ -5,6 +5,7 @@ type UserData = User & {
   profile: UserDetails | null;
   telegramUser: TelegramUser | null;
   discordUser: DiscordUser | null;
+  name: string | null;
 };
 
 export function getMemberSearchValue(
@@ -23,7 +24,7 @@ export function getMemberSearchValue(
       ? telegramUser?.account?.username
       : '';
 
-  const userDetailsString = `${userData.username} ${userData.path}`;
+  const userDetailsString = `${userData.name} ${userData.username} ${userData.path}`;
 
   // all property values
   const propertyValuesString = memberPropertyValues

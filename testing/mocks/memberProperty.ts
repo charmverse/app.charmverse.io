@@ -24,7 +24,7 @@ export function createMemberPropertyValue(member: Member, memberPropertyType: Me
     case 'profile_pic':
       return member.avatar;
     case 'name':
-      return member.username;
+      return member.profile?.name ?? member.username;
     case 'role':
       return member.roles;
     case 'bio':

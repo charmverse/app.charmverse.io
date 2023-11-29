@@ -33,7 +33,7 @@ function MemberPropertyItemForm({ property, close }: { property: MemberProperty;
 
   useEffect(() => {
     setPropertyName(property.name);
-  }, []);
+  }, [property]);
 
   const isSelectPropertyType = isSelectType(property.type);
 
