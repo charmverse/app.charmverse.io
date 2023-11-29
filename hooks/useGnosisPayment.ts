@@ -7,7 +7,6 @@ import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
@@ -15,21 +14,24 @@ import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 
 import useGnosisSafes from './useGnosisSafes';
 
-export type MultiPaymentResult = {
+export type MetaTransactionDataWithApplicationId = MetaTransactionData & { applicationId: string };
+
+export type GnosisProposeTransactionResult = {
   safeAddress: string;
-  transactions: (MetaTransactionData & { applicationId: string })[];
+  transaction: MetaTransactionDataWithApplicationId;
   txHash: string;
 };
 
 export type GnosisPaymentProps = {
   chainId?: number;
-  onSuccess: (result: MultiPaymentResult) => void;
+  onSuccess: (result: GnosisProposeTransactionResult) => void;
   safeAddress: string;
-  transactions: (MetaTransactionData & { applicationId: string })[];
+  transaction: MetaTransactionDataWithApplicationId;
 };
 
-export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
+export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
+
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
@@ -55,12 +57,14 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
     const txNonce = nonce + pendingTx.results.length;
 
     const safeTransaction = await safe.createTransaction({
-      safeTransactionData: transactions.map((transaction) => ({
-        data: transaction.data,
-        to: transaction.to,
-        value: transaction.value,
-        operation: transaction.operation
-      })),
+      safeTransactionData: [
+        {
+          data: transaction.data,
+          to: transaction.to,
+          value: transaction.value,
+          operation: transaction.operation
+        }
+      ],
       options: {
         nonce: txNonce
       }
@@ -106,7 +110,7 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
         origin
       });
     }
-    onSuccess({ safeAddress, transactions, txHash });
+    onSuccess({ safeAddress, transaction, txHash });
   }
 
   async function makePaymentWithErrorParser() {

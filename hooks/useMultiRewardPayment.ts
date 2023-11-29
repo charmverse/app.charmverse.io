@@ -6,7 +6,6 @@ import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import { getAddress, parseUnits } from 'viem';
 
-import charmClient from 'charmClient';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -16,7 +15,6 @@ import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { eToNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { MultiPaymentResult } from './useGnosisPayment';
 import { usePages } from './usePages';
 
 const ERC20_ABI = ['function transfer(address to, uint256 value)'];
@@ -30,10 +28,8 @@ export interface TransactionWithMetadata
 }
 
 export function useMultiRewardPayment({
-  rewards,
-  postPaymentSuccess
+  rewards
 }: {
-  postPaymentSuccess?: () => void;
   rewards: Pick<RewardWithUsers, 'applications' | 'chainId' | 'id' | 'rewardAmount' | 'rewardToken'>[];
   selectedApplicationIds?: string[];
 }) {
@@ -140,28 +136,6 @@ export function useMultiRewardPayment({
     [rewards, gnosisSafes]
   );
 
-  async function onPaymentSuccess(result: MultiPaymentResult) {
-    const safeData = gnosisSafes?.find((safe) => safe.address === result.safeAddress);
-
-    if (safeData) {
-      setIsLoading(true);
-      await Promise.all(
-        result.transactions.map(async (transaction) => {
-          await charmClient.rewards.recordTransaction({
-            applicationId: transaction.applicationId,
-            transactionId: result.txHash,
-            safeTxHash: result.txHash,
-            chainId: safeData.chainId.toString()
-          });
-        })
-      );
-
-      refreshRewards();
-      setIsLoading(false);
-      postPaymentSuccess?.();
-    }
-  }
-
   const isDisabled = bountiesToPay.length === 0;
 
   return {
@@ -169,7 +143,6 @@ export function useMultiRewardPayment({
     isDisabled,
     getTransactions,
     prepareGnosisSafeRewardPayment,
-    onPaymentSuccess,
     gnosisSafes,
     gnosisSafeData,
     setGnosisSafeData

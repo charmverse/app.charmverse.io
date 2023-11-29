@@ -87,6 +87,7 @@ export function RewardReviewerActions({
           onSuccess={recordTransaction}
           onError={(message) => showMessage(message, 'warning')}
           submission={application}
+          refreshSubmission={refreshApplication}
         />
       )}
 

@@ -9,13 +9,14 @@ import type { AlertColor } from '@mui/material/Alert';
 import ERC20ABI from 'abis/ERC20.json';
 import { getChainById } from 'connectors/chains';
 import type { MouseEvent } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { parseEther, parseUnits } from 'viem';
+import { getAddress, parseEther, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
+import type { GnosisProposeTransactionResult } from 'hooks/useGnosisPayment';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
@@ -25,7 +26,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import { getSafesForAddress } from 'lib/gnosis';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { shortenHex } from 'lib/utilities/blockchain';
@@ -37,7 +38,8 @@ function SafeMenuItem({
   reward,
   submission,
   onClick,
-  onError = () => {}
+  onError = () => {},
+  refreshSubmission
 }: {
   safeInfo: UserGnosisSafe;
   label: string;
@@ -45,27 +47,38 @@ function SafeMenuItem({
   submission: Application;
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
+  refreshSubmission: () => void;
 }) {
-  const { onPaymentSuccess, prepareGnosisSafeRewardPayment } = useMultiRewardPayment({
+  const { prepareGnosisSafeRewardPayment } = useMultiRewardPayment({
     rewards: [reward]
   });
+  const { showMessage } = useSnackbar();
 
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions: [
-      prepareGnosisSafeRewardPayment({
-        amount: reward.rewardAmount as number,
-        applicationId: submission.id,
-        recipientAddress: submission.walletAddress as string,
-        recipientUserId: submission.createdBy,
-        token: reward.rewardToken as string,
-        txChainId: reward.chainId as number,
-        rewardId: reward.id
-      })
-    ]
+    transaction: prepareGnosisSafeRewardPayment({
+      amount: reward.rewardAmount as number,
+      applicationId: submission.id,
+      recipientAddress: submission.walletAddress as string,
+      recipientUserId: submission.createdBy,
+      token: reward.rewardToken as string,
+      txChainId: reward.chainId as number,
+      rewardId: reward.id
+    })
   });
+
+  async function onPaymentSuccess(result: GnosisProposeTransactionResult) {
+    await charmClient.rewards.recordTransaction({
+      applicationId: result.transaction.applicationId,
+      transactionId: result.txHash,
+      safeTxHash: result.txHash,
+      chainId: safeInfo.chainId.toString()
+    });
+
+    refreshSubmission();
+  }
 
   return (
     <MenuItem
@@ -74,6 +87,7 @@ function SafeMenuItem({
         onClick();
         try {
           await makePayment();
+          showMessage('Transaction added to your Safe', 'success');
         } catch (error) {
           const typedError = error as SystemError;
           onError(typedError.message, typedError.severity);
@@ -94,11 +108,13 @@ interface Props {
   onSuccess?: (txId: string, chainId: number) => void;
   onError?: (err: string, severity?: AlertColor) => void;
   reward: RewardWithUsers;
+  refreshSubmission: () => void;
 }
 
 export function RewardPaymentButton({
   receiver,
   reward,
+  refreshSubmission,
   submission,
   amount,
   chainIdToUse,
@@ -119,12 +135,20 @@ export function RewardPaymentButton({
   };
   const [sendingTx, setSendingTx] = useState(false);
 
-  const { data: safeInfos } = useSWR(
-    signer && account && chainIdToUse === chainId ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    () => getSafesForAddress({ signer: signer!, chainId: chainIdToUse, address: account! })
-  );
+  const safeApiClient = useMemo(() => {
+    return getSafeApiClient({ chainId: chainIdToUse });
+  }, [chainIdToUse]);
 
+  const { data: safeInfos } = useSWR(
+    account && chainIdToUse ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    () =>
+      safeApiClient
+        .getSafesByOwner(getAddress(account!))
+        .then(async (response) =>
+          Promise.all(response.safes.map((safeAddress) => safeApiClient.getSafeInfo(safeAddress)))
+        )
+  );
   useEffect(() => {
     // This allows auto-syncing of safes, so the user does not need to visit their account to setup their safes
     if (safeInfos && existingSafesData && user) {
@@ -138,7 +162,7 @@ export function RewardPaymentButton({
           safesToAdd.push({
             address: foundSafe.address,
             userId: user.id,
-            chainId: foundSafe.chainId,
+            chainId: chainIdToUse,
             isHidden: false,
             owners: foundSafe.owners,
             threshold: foundSafe.nonce
@@ -150,7 +174,7 @@ export function RewardPaymentButton({
         charmClient.gnosisSafe.setMyGnosisSafes([...safesToAdd, ...existingSafesData]).then(() => refreshSafes());
       }
     }
-  }, [safeInfos, existingSafesData, user]);
+  }, [safeInfos?.length, existingSafesData?.length, user, chainIdToUse]);
 
   const safeDataRecord =
     existingSafesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
@@ -295,6 +319,7 @@ export function RewardPaymentButton({
                 onError={onError}
                 safeInfo={safeInfo}
                 submission={submission}
+                refreshSubmission={refreshSubmission}
               />
             ))}
         </Menu>
