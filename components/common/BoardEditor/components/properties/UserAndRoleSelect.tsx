@@ -17,18 +17,20 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-export type GroupedRole = TargetPermissionGroup<'role'>;
-type GroupedMember = TargetPermissionGroup<'user'>;
-type GroupedOption = GroupedRole | GroupedMember;
-type GroupedRolePopulated = ListSpaceRolesResponse & GroupedRole;
-type GroupedMemberPopulated = Member & GroupedMember;
-type GroupedOptionPopulated = GroupedRolePopulated | GroupedMemberPopulated;
+export type RoleOption = TargetPermissionGroup<'role'>;
+type MemberOption = TargetPermissionGroup<'user'>;
+type SystemRoleOption<T extends string = string> = { group: 'system_role'; id: T };
+export type SelectOption = RoleOption | MemberOption | SystemRoleOption;
+type RoleOptionPopulated = ListSpaceRolesResponse & RoleOption;
+type MemberOptionPopulated = Member & MemberOption;
+export type SystemRoleOptionPopulated<T extends string = string> = SystemRoleOption<T> & { label: string };
+type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated | SystemRoleOptionPopulated;
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
 };
 
-const StyledAutocomplete = styled(Autocomplete<GroupedOptionPopulated, true, boolean>)`
+const StyledAutocomplete = styled(Autocomplete<SelectOptionPopulated, true, boolean>)`
   min-width: 150px;
 `;
 
@@ -67,7 +69,7 @@ function SelectedOptions({
   wrapColumn?: boolean;
   readOnly: boolean;
   readOnlyMessage?: string;
-  value: GroupedOptionPopulated[];
+  value: SelectOptionPopulated[];
   onRemove: (reviewerId: string) => void;
 }) {
   return (
@@ -124,6 +126,24 @@ function SelectedOptions({
                   }
                 />
               )}
+              {option.group === 'system_role' && (
+                <Chip
+                  sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
+                  label={option.label}
+                  key={option.id}
+                  variant='outlined'
+                  size='small'
+                  onDelete={readOnly ? undefined : () => onRemove(option.id)}
+                  deleteIcon={
+                    <CloseIcon
+                      sx={{
+                        fontSize: 14
+                      }}
+                      cursor='pointer'
+                    />
+                  }
+                />
+              )}
             </Stack>
           );
         })}
@@ -132,22 +152,23 @@ function SelectedOptions({
   );
 }
 
-type Props = {
+type Props<T> = {
   emptyPlaceholderContent?: string;
   displayType?: PropertyValueDisplayType;
-  onChange: (value: GroupedOptionPopulated[]) => void;
+  onChange: (value: SelectOptionPopulated[]) => void;
   proposalCategoryId?: string | null;
   readOnly?: boolean;
   readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
-  value: GroupedOption[];
+  systemRoles?: { group: 'system_role'; id: string; label: string }[];
+  value: T[];
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
 };
 
-export function UserAndRoleSelect({
+export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
   displayType = 'details',
   onChange,
   proposalCategoryId,
@@ -155,12 +176,13 @@ export function UserAndRoleSelect({
   readOnlyMessage,
   showEmptyPlaceholder = true,
   emptyPlaceholderContent = 'Empty',
+  systemRoles = [],
   variant = 'standard',
   value: inputValue,
   'data-test': dataTest,
   wrapColumn,
   type = 'roleAndUser'
-}: Props): JSX.Element | null {
+}: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
   const { members } = useMembers();
@@ -173,8 +195,8 @@ export function UserAndRoleSelect({
     ? (inputValue as { id: string; group: 'user' | 'role' }[]).filter((elem) => elem.group === 'user')
     : (inputValue as { id: string; group: 'user' | 'role' }[]);
 
-  const mappedMembers: GroupedMemberPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
-  const mappedRoles: GroupedRolePopulated[] =
+  const mappedMembers: MemberOptionPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
+  const mappedRoles: RoleOptionPopulated[] =
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
 
@@ -187,32 +209,34 @@ export function UserAndRoleSelect({
   }, [reviewerPool]);
 
   const filteredOptions = useMemo(() => {
-    let _filteredOptions: GroupedOptionPopulated[] = [];
+    let _filteredOptions: SelectOptionPopulated[] = [];
     if (proposalCategoryId && isFreeSpace) {
       _filteredOptions = reviewerPool
         ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id])
         : [];
+      _filteredOptions = [..._filteredOptions, ...systemRoles];
     } else if (proposalCategoryId && !isFreeSpace) {
       _filteredOptions = [
         // For proposals we only want current space members and roles that are allowed to review proposals
         ...(reviewerPool ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id]) : []),
+        ...systemRoles,
         ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
       ];
     } else if (isFreeSpace) {
       // In public space, don't include custom roles
-      _filteredOptions = type === 'role' ? [] : [...mappedMembers];
+      _filteredOptions = type === 'role' ? [] : [...mappedMembers, ...systemRoles];
     } else {
       // For bounties, allow any space member or role to be selected
       if (type === 'role') {
-        _filteredOptions = mappedRoles;
+        _filteredOptions = [...systemRoles, ...mappedRoles];
       }
 
       if (type === 'roleAndUser') {
-        _filteredOptions = [...mappedMembers, ...mappedRoles];
+        _filteredOptions = [...mappedMembers, ...systemRoles, ...mappedRoles];
       }
     }
     return _filteredOptions;
-  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
+  }, [reviewerPool, systemRoles, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
 
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
@@ -221,9 +245,9 @@ export function UserAndRoleSelect({
 
   const allOptions = useMemo(() => {
     if (isFreeSpace) {
-      return [...mappedMembers];
+      return [...mappedMembers, ...systemRoles];
     } else {
-      return [...mappedMembers, ...mappedRoles];
+      return [...mappedMembers, ...mappedRoles, ...systemRoles];
     }
   }, [filteredMembers, roles]);
 
@@ -235,7 +259,7 @@ export function UserAndRoleSelect({
     }
   }, [readOnly]);
 
-  function removeReviewer(idToRemove: string) {
+  function removeOption(idToRemove: string) {
     onChange(populatedValue.filter(({ id }) => id !== idToRemove));
   }
 
@@ -270,7 +294,7 @@ export function UserAndRoleSelect({
               wrapColumn={wrapColumn}
               readOnly
               value={populatedValue}
-              onRemove={removeReviewer}
+              onRemove={removeOption}
             />
           )}
         </Stack>
@@ -296,9 +320,15 @@ export function UserAndRoleSelect({
           if (option.group === 'user') {
             return option.username;
           }
-          return option.name;
+          if (option.group === 'role') {
+            return option.name;
+          }
+          return option.label;
         }}
-        groupBy={(option) => `${option.group[0].toUpperCase() + option.group.slice(1)}s`}
+        groupBy={(option) => {
+          const group = option.group === 'system_role' ? 'role' : option.group;
+          return `${group[0].toUpperCase() + group.slice(1)}s`;
+        }}
         isOptionEqualToValue={(option, val) => option.id === val.id}
         loading={!roles || filteredMembers.length === 0 || (!!proposalCategoryId && !reviewerPool)}
         multiple
@@ -329,6 +359,18 @@ export function UserAndRoleSelect({
               </li>
             );
           }
+          if (option.group === 'system_role') {
+            return (
+              <li data-test={`select-option-${option.id}`} {..._props}>
+                <Chip
+                  sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
+                  variant='outlined'
+                  label={option.label}
+                  size='small'
+                />
+              </li>
+            );
+          }
           return (
             <UserDisplay
               data-test={`select-option-${option.id}`}
@@ -343,7 +385,7 @@ export function UserAndRoleSelect({
             wrapColumn={wrapColumn}
             readOnly={!!readOnly}
             value={populatedValue}
-            onRemove={removeReviewer}
+            onRemove={removeOption}
           />
         )}
         value={populatedValue}

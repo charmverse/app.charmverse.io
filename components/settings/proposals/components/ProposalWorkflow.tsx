@@ -10,6 +10,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Stack,
   TextField,
   Typography
 } from '@mui/material';
@@ -22,6 +23,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
 
 import { EvaluationDialog } from './EvaluationDialog';
+import { EvaluationPermissions } from './EvaluationPermissions';
 import { EvaluationRow } from './EvaluationRow';
 
 export type WorkflowTemplateItem = WorkflowTemplate & { isNew?: boolean };
@@ -202,11 +204,14 @@ export function ProposalWorkflowItem({
                       <Typography variant='h6' gutterBottom>
                         {evaluation.title}
                       </Typography>
-                      <Typography variant='body2'>Who can:</Typography>
-                      <Typography>View</Typography>
-                      <Typography>Edit</Typography>
-                      <Typography>Comment</Typography>
-                      <Typography>Move</Typography>
+
+                      <Stack flex={1} className='CardDetail content'>
+                        <EvaluationPermissions
+                          evaluation={evaluation}
+                          onChange={updateEvaluationStep}
+                          readOnly={readOnly}
+                        />
+                      </Stack>
                     </Box>
                   </Card>
                 ))}

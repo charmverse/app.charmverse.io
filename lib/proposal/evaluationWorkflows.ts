@@ -2,15 +2,17 @@ import type { ProposalEvaluationType, ProposalWorkflowTemplate } from '@charmver
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-export const permissionLevels = ['view', 'comment', 'edit', 'move'];
+export const permissionLevels = ['view', 'comment', 'edit', 'move'] as const;
 export type PermissionLevel = (typeof permissionLevels)[number];
-export const resourceTypes = ['space', 'user', 'role'];
-export type ResourceType = (typeof permissionLevels)[number];
+export const resourceTypes = ['user', 'role', 'system_role'] as const;
+export type ResourceType = (typeof resourceTypes)[number];
+
+export type SystemRole = 'author' | 'reviewer' | 'space_member';
 
 export type SpaceEvaluationPermission = {
   level: PermissionLevel;
   resourceType: ResourceType;
-  id: string;
+  id: string | SystemRole;
 };
 
 export type EvaluationTemplate = {

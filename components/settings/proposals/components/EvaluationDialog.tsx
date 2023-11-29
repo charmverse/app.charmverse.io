@@ -1,5 +1,5 @@
-import { ProposalEvaluationType, Space } from '@charmverse/core/prisma';
-import { Box, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { ProposalEvaluationType } from '@charmverse/core/prisma';
+import { Box, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
@@ -10,6 +10,8 @@ import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { permissionLevels, resourceTypes } from 'lib/proposal/evaluationWorkflows';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
+
+import { EvaluationPermissions } from './EvaluationPermissions';
 
 export type WorkflowTemplateItem = WorkflowTemplate & { isNew?: boolean };
 
@@ -26,12 +28,19 @@ export const schema = yup.object({
     .of(
       yup.object({
         id: yup.string().required(),
-        level: yup.mixed().oneOf(permissionLevels).required(),
-        resourceType: yup.mixed().oneOf(resourceTypes).required()
+        level: yup
+          .mixed()
+          .oneOf([...permissionLevels])
+          .required(),
+        resourceType: yup
+          .mixed()
+          .oneOf([...resourceTypes])
+          .required()
       })
     )
     .required()
 });
+
 type FormValues = yup.InferType<typeof schema>;
 
 export function EvaluationDialog({
@@ -53,6 +62,10 @@ export function EvaluationDialog({
   } = useForm<FormValues>({});
 
   const dialogTitle = evaluation?.id ? 'Rename evaluation' : evaluation ? 'New evaluation step' : '';
+
+  function updatePermissions({ permissions }: EvaluationInput) {
+    setValue('permissions', permissions);
+  }
 
   useEffect(() => {
     reset({
@@ -117,21 +130,24 @@ export function EvaluationDialog({
           />
         </Box>
         {!evaluation?.id && (
-          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Type</PropertyLabel>
-            <Controller
-              name='type'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { onChange: _onChange, value } }) => (
-                <Select value={value} onChange={_onChange}>
-                  <MenuItem value='rubric'>Evaluation</MenuItem>
-                  <MenuItem value='vote'>Vote</MenuItem>
-                  <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
-                </Select>
-              )}
-            />
-          </Box>
+          <>
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly>Type</PropertyLabel>
+              <Controller
+                name='type'
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { onChange: _onChange, value } }) => (
+                  <Select value={value} onChange={_onChange}>
+                    <MenuItem value='rubric'>Evaluation</MenuItem>
+                    <MenuItem value='vote'>Vote</MenuItem>
+                    <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
+                  </Select>
+                )}
+              />
+            </Box>
+            {evaluation && <EvaluationPermissions evaluation={evaluation} onChange={updatePermissions} />}
+          </>
         )}
       </Stack>
     </Dialog>
