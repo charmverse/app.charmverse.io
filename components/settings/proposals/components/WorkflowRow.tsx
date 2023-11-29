@@ -11,7 +11,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Tooltip,
+  TextField,
   Typography
 } from '@mui/material';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
@@ -23,7 +23,7 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { WorkflowTemplate, EvaluationStep } from 'lib/spaces/getProposalWorkflowTemplates';
+import type { WorkflowTemplate, EvaluationStep } from 'lib/spaces/workflowTemplates';
 
 import { WorkflowEvaluationRow } from './WorkflowEvaluationRow';
 
@@ -86,24 +86,36 @@ export function ProposalWorkflowItem({
     onUpdate(workflow);
   }
 
-  function addEvaluation() {
+  function addEvaluation(evaluation?: EvaluationStep) {
+    const existingIndex = workflow.evaluations.findIndex((e) => e.id === evaluation?.id);
     const newEvaluation: EvaluationStep = {
-      id: uuid(),
       title: '',
       type: 'vote',
-      permissions: []
+      permissions: [],
+      ...evaluation,
+      id: uuid()
     };
-    workflow.evaluations.push(newEvaluation);
+    // insert the new evaluation after the existing one
+    if (existingIndex > -1) {
+      workflow.evaluations.splice(existingIndex + 1, 0, newEvaluation);
+    } else {
+      workflow.evaluations.push(newEvaluation);
+    }
+    onUpdate(workflow);
   }
 
   function deleteEvaluation(id: string) {
     workflow.evaluations = workflow.evaluations.filter((evaluation) => evaluation.id !== id);
-    onSave(workflow);
+    onDelete(workflow.id);
   }
 
   function saveEvaluation(evaluation: EvaluationStep) {
     workflow.evaluations = workflow.evaluations.map((e) => (e.id === evaluation.id ? evaluation : e));
     onSave(workflow);
+  }
+
+  function duplicateEvaluation(evaluation: EvaluationStep) {
+    addEvaluation(evaluation);
   }
 
   function updateEvaluation(evaluation: EvaluationStep) {
@@ -118,8 +130,20 @@ export function ProposalWorkflowItem({
       onChange={(e, expand) => toggleRow(expand ? workflow.id : false)}
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
-        <Box display='flex' justifyContent='space-between' width='100%'>
-          <Typography>{workflow.title || 'Untitled'}</Typography>
+        <Box display='flex' alignItems='center' justifyContent='space-between' width='100%' gap={2}>
+          {isExpanded && !readOnly ? (
+            <TextField
+              onClick={(e) => e.stopPropagation()}
+              placeholder='Title (required)'
+              // prevent the accordion summary styles from responding to 'focus' event
+              onFocus={(e) => e.stopPropagation()}
+              fullWidth
+              autoFocus
+              defaultValue={workflow.title}
+            />
+          ) : (
+            <Typography>{workflow.title || 'Untitled'}</Typography>
+          )}
           <span onClick={(e) => e.stopPropagation()}>
             <Menu {...bindMenu(popupState)}>
               <MenuItem onClick={duplicateWorkflow}>
@@ -144,12 +168,15 @@ export function ProposalWorkflowItem({
             key={evaluation.id}
             evaluation={evaluation}
             onDelete={deleteEvaluation}
+            onDuplicate={duplicateEvaluation}
             onSave={saveEvaluation}
             onChangeOrder={changeEvaluationsOrder}
             readOnly={readOnly}
           />
         ))}
-        <Button onClick={addEvaluation}>Add step</Button>
+        <Button variant='text' onClick={addEvaluation}>
+          + Add step
+        </Button>
       </AccordionDetails>
     </Accordion>
   );

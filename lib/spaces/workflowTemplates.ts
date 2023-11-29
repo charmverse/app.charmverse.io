@@ -85,3 +85,23 @@ export async function getWorkflowTemplates(spaceId: string) {
   });
   return dbWorkflows as WorkflowTemplate[];
 }
+
+export async function deleteWorkflowTemplate({ spaceId, workflowId }: { spaceId: string; workflowId: string }) {
+  return prisma.proposalWorkflowTemplate.delete({
+    where: {
+      id: workflowId,
+      spaceId
+    }
+  });
+}
+
+export async function updateWorkflowTemplate(workflow: WorkflowTemplate) {
+  return prisma.proposalWorkflowTemplate.upsert({
+    where: {
+      id: workflow.id,
+      spaceId: workflow.spaceId
+    },
+    create: workflow,
+    update: workflow
+  });
+}

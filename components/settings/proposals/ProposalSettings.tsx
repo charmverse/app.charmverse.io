@@ -3,7 +3,11 @@ import { Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
-import { useGetProposalWorkflowTemplates } from 'charmClient/hooks/spaces';
+import {
+  useGetProposalWorkflows,
+  useUpsertProposalWorkflow,
+  useDeleteProposalWorkflow
+} from 'charmClient/hooks/spaces';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -19,12 +23,15 @@ export function ProposalSettings({ space }: { space: Space }) {
   const { mappedFeatures } = useSpaceFeatures();
   const [expanded, setExpanded] = useState<string | false>(false);
   const [workflows, setWorkflows] = useState<WorkflowTemplateItem[]>([]);
-  const { data: currentWorkflowTemplates } = useGetProposalWorkflowTemplates(space.id);
+  const { data: currentWorkflowTemplates } = useGetProposalWorkflows(space.id);
+  const { trigger: upsertWorkflow } = useUpsertProposalWorkflow(space.id);
+  const { trigger: deleteWorkflow } = useDeleteProposalWorkflow(space.id);
 
   useTrackPageView({ type: 'settings/proposals' });
 
   function addNewWorkflow(workflow?: WorkflowTemplateItem) {
     const lowestIndex = workflows[0]?.index ?? 0;
+    const existingIndex = workflows.findIndex((e) => e.id === workflow?.id);
     const newWorkflow: WorkflowTemplateItem = {
       title: '',
       spaceId: space.id,
@@ -34,20 +41,28 @@ export function ProposalSettings({ space }: { space: Space }) {
       id: uuid(),
       index: lowestIndex - 1
     };
-    setWorkflows((_workflows) => [newWorkflow, ..._workflows]);
+    // insert the new evaluation after the existing one
+    if (existingIndex > -1) {
+      workflows.splice(existingIndex + 1, 0, newWorkflow);
+    } else {
+      workflows.unshift(newWorkflow);
+    }
+    setWorkflows([...workflows]);
     setExpanded(newWorkflow.id);
   }
 
-  function saveWorkflow(workflow: WorkflowTemplateItem) {
-    updateWorkflow(workflow);
-    triggerSave(workflow);
+  async function handleSaveWorkflow(workflow: WorkflowTemplateItem) {
+    await upsertWorkflow(workflow);
+    handleUpdateWorkflow(workflow);
   }
 
-  function updateWorkflow(workflow: WorkflowTemplateItem) {
+  // updates the state but does not save to the backend
+  async function handleUpdateWorkflow(workflow: WorkflowTemplateItem) {
     setWorkflows((_workflows) => _workflows.map((w) => (w.id === workflow.id ? workflow : w)));
   }
 
-  function deleteWorkflow(id: string) {
+  async function handleDeleteWorkflow(id: string) {
+    await deleteWorkflow({ workflowId: id });
     setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
   }
 
@@ -85,9 +100,9 @@ export function ProposalSettings({ space }: { space: Space }) {
           workflow={workflow}
           isExpanded={expanded === workflow.id}
           toggleRow={setExpanded}
-          onSave={saveWorkflow}
-          onUpdate={updateWorkflow}
-          onDelete={deleteWorkflow}
+          onSave={handleSaveWorkflow}
+          onUpdate={handleUpdateWorkflow}
+          onDelete={handleDeleteWorkflow}
           onDuplicate={duplicateWorkflow}
           readOnly={!isAdmin}
         />

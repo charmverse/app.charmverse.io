@@ -94,6 +94,7 @@
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
     "@date-io/luxon": "^2.13.1",
+    "@emotion/babel-preset-css-prop": "^11.11.0",
     "@emotion/cache": "^11.10.5",
     "@emotion/react": "^11.10.5",
     "@emotion/server": "^11.10.0",

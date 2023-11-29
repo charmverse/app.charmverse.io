@@ -49,6 +49,12 @@ const config: StorybookConfig = {
     // This modifies the existing image rule to exclude .svg files
     // since you want to handle those files with @svgr/webpack
     if (config.module?.rules) {
+      // add support for the "css"  prop
+      // const jsxRule = config.module.rules.find((rule) => rule?.['test']?.test('.jsx'));
+      // if (jsxRule) {
+      //   jsxRule.use[0].options.presets.push(require.resolve('@emotion/babel-preset-css-prop'));
+      // }
+
       const imageRule = config.module.rules.find((rule) => rule?.['test']?.test('.svg'));
       if (imageRule) {
         imageRule['exclude'] = /\.svg$/;
