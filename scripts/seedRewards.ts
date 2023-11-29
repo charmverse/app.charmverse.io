@@ -4,10 +4,11 @@ import { RewardCreationData, createReward } from "lib/rewards/createReward";
 import { RewardWithUsers } from "lib/rewards/interfaces";
 import { work } from "lib/rewards/work";
 import { isAddress } from "viem";
+import { sepolia } from "viem/chains";
 
 
 
-async function seedReward({spaceDomain, applicantAddresses, rewardData, createdBy, applicationsPerApplicant = 1}: {spaceDomain: string, applicantAddresses: string [], rewardData: Omit<RewardCreationData, 'spaceId' | 'createdBy'>, createdBy?: string, applicationsPerApplicant: number}): Promise<{reward: RewardWithUsers, page: Page}> {
+async function seedReward({spaceDomain, applicantAddresses, rewardData, createdBy, applicationsPerApplicant = 1}: {spaceDomain: string, applicantAddresses: string [], rewardData: Omit<RewardCreationData, 'spaceId' | 'userId'>, createdBy?: string, applicationsPerApplicant: number}): Promise<{reward: RewardWithUsers, page: Page}> {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       domain: spaceDomain
@@ -35,7 +36,7 @@ async function seedReward({spaceDomain, applicantAddresses, rewardData, createdB
         },
         wallets: {
           some: {
-            address
+            address: address.toLowerCase()
           }
         }
       }
@@ -63,6 +64,36 @@ async function seedReward({spaceDomain, applicantAddresses, rewardData, createdB
 }
 
 
+const spaceDomain = 'icy-crimson-barracuda'
+
 // seedReward({
+//   spaceDomain,
+//   applicationsPerApplicant: 5,
+//   rewardData: {
+//     pageProps: {
+//       title: 'Demo 2'
+//     },
+//     maxSubmissions: 100,
+//     chainId: sepolia.id,
+//     rewardToken: 'ETH',
+//     rewardAmount: 0.0001,
+//     allowMultipleApplications: true
+//   },
 //   applicantAddresses: []
+// }).then(data => {
+//   console.log(`Find reward at ${process.env.DOMAIN}/${spaceDomain}/${data.page.path}`)
 // })
+
+// Utility to update all applications in the page to complete so we can mark them as paid
+// prisma.application.updateMany({
+//   where: {
+//     bounty: {
+//       page: {
+//         path: 'page-7005800419474704'
+//       }
+//     }
+//   },
+//   data: {
+//     status: 'complete'
+//   }
+// }).then(console.log)
