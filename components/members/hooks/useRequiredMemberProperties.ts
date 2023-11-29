@@ -80,7 +80,8 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
         'profile_pic',
         // Handled separately from space member properties
         'bio',
-        'timezone'
+        'timezone',
+        'name'
       ].includes(p.type)
   );
 
