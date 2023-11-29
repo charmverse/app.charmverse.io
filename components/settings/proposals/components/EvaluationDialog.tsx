@@ -104,7 +104,9 @@ export function EvaluationDialog({
     >
       <Stack flex={1} className='CardDetail content'>
         <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel readOnly>Title</PropertyLabel>
+          <PropertyLabel required readOnly>
+            Title
+          </PropertyLabel>
           <Controller
             name='title'
             control={control}

@@ -1,3 +1,4 @@
+import { ProposalEvaluationType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { DragIndicator, MoreHoriz } from '@mui/icons-material';
 import { Box, Card, IconButton, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
@@ -9,6 +10,12 @@ import type { EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
 const DragIcon = styled(IconButton)`
   cursor: grab;
 `;
+
+const friendlyTypes = {
+  [ProposalEvaluationType.vote]: 'Vote',
+  [ProposalEvaluationType.rubric]: 'Rubric',
+  [ProposalEvaluationType.pass_fail]: 'Pass/Fail'
+};
 
 export function EvaluationRow({
   key,
@@ -49,7 +56,9 @@ export function EvaluationRow({
         <DragIcon size='small'>
           <DragIndicator color='secondary' fontSize='small' />
         </DragIcon>
-        <Typography sx={{ flexGrow: 1 }}>{evaluation.title}</Typography>
+        <Typography sx={{ flexGrow: 1 }}>
+          {evaluation.title} - <em>{friendlyTypes[evaluation.type]}</em>
+        </Typography>
         <Menu {...bindMenu(popupState)} onClick={popupState.close}>
           <MenuItem disabled={readOnly} onClick={renameEvaluation}>
             <ListItemText>Rename</ListItemText>

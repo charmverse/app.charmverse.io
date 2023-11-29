@@ -127,6 +127,13 @@ export function ProposalWorkflowItem({
     }
   }
 
+  let disabledTooltip: string | undefined;
+  if (!workflow.title) {
+    disabledTooltip = 'You must add a title';
+  } else if (workflow.evaluations.length === 0) {
+    disabledTooltip = 'You must add at least one step';
+  }
+
   return (
     <Accordion
       key={workflow.id}
@@ -192,7 +199,12 @@ export function ProposalWorkflowItem({
                   <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
                     + Add step
                   </Button>
-                  <Button disabled={readOnly} onClick={saveWorkflow} sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}>
+                  <Button
+                    disabled={readOnly || !!disabledTooltip}
+                    disabledTooltip={disabledTooltip}
+                    onClick={saveWorkflow}
+                    sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
+                  >
                     Save
                   </Button>
                 </Box>
