@@ -40,6 +40,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 
     const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone')?.required;
     const isBioRequired = requiredProperties.find((p) => p.type === 'bio')?.required;
+    const isNameRequired = requiredProperties.find((p) => p.type === 'name')?.required;
 
     if (isTimezoneRequired && !userDetails?.timezone && !isLoading) {
       propertiesWithoutValue = [...propertiesWithoutValue, 'timezone'];
@@ -48,18 +49,25 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     if (isBioRequired && !userDetails?.description && !isLoading) {
       propertiesWithoutValue = [...propertiesWithoutValue, 'bio'];
     }
+
+    if (isNameRequired && !userDetails?.name && !isLoading) {
+      propertiesWithoutValue = [...propertiesWithoutValue, 'name'];
+    }
+
     return propertiesWithoutValue;
   }, [requiredProperties, memberProperties, userDetails, isLoading]);
 
   return {
     memberProperties,
     requiredProperties,
-    requiredPropertiesWithoutValue
+    requiredPropertiesWithoutValue,
+    userDetails
   };
 }
 
 export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) {
-  const { memberProperties, requiredProperties } = useRequiredMemberProperties({ userId });
+  const { memberProperties, userDetails, requiredProperties, requiredPropertiesWithoutValue } =
+    useRequiredMemberProperties({ userId });
 
   const editableRequiredProperties = requiredProperties.filter(
     (p) =>
@@ -117,6 +125,8 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     isValid,
     errors,
     memberProperties,
-    requiredProperties
+    requiredProperties,
+    userDetails,
+    requiredPropertiesWithoutValue
   };
 }
