@@ -71,6 +71,7 @@ describe('POST /api/proposals - Create a proposal', () => {
           id: expect.any(String),
           proposalId: createdProposal?.proposal.id as string,
           userId: user.id,
+          evaluationId: null,
           roleId: null
         }
       ])
