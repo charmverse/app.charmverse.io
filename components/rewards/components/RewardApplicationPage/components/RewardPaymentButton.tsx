@@ -124,6 +124,7 @@ export function RewardPaymentButton({
   );
 
   useEffect(() => {
+    // This allows auto-syncing of safes, so the user does not need to visit their account to setup their safes
     if (safeInfos && existingSafesData && user) {
       const safesToAdd: Parameters<(typeof charmClient)['gnosisSafe']['setMyGnosisSafes']>[0] = [];
 
