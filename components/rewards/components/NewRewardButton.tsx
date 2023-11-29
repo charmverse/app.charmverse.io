@@ -87,6 +87,8 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
     ) {
       disabledTooltip = 'Reward is required';
+    } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
+      disabledTooltip = 'You need to assign at least one submitter';
     }
   }
 
