@@ -15,7 +15,6 @@ export function EvaluationRow({
   evaluation,
   onDelete,
   onDuplicate,
-  onSave,
   onRename,
   onChangeOrder,
   readOnly
@@ -24,7 +23,6 @@ export function EvaluationRow({
   evaluation: EvaluationTemplate;
   onDelete: (id: string) => void;
   onDuplicate: (evaluation: EvaluationTemplate) => void;
-  onSave: (evaluation: EvaluationTemplate) => void;
   onRename: (evaluation: EvaluationTemplate) => void;
   onChangeOrder: (selectedId: string, targetId: string) => void;
   readOnly: boolean;

@@ -1,32 +1,13 @@
 import { ProposalEvaluationType, Space } from '@charmverse/core/prisma';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { ExpandMore, MoreHoriz, TextFields } from '@mui/icons-material';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Chip,
-  IconButton,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import { Box, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
-import type { IPropertyOption } from 'lib/focalboard/board';
 import { permissionLevels, resourceTypes } from 'lib/proposal/evaluationWorkflows';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
 
@@ -35,19 +16,6 @@ export type WorkflowTemplateItem = WorkflowTemplate & { isNew?: boolean };
 const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluationType) as ProposalEvaluationType[];
 
 export type EvaluationInput = Omit<EvaluationTemplate, 'id'> & { id: string | null };
-
-export const evaluationTypeOptions: IPropertyOption<ProposalEvaluationType>[] = [
-  {
-    id: 'rubric',
-    value: 'Rubric',
-    color: 'grey'
-  },
-  {
-    id: 'vote',
-    value: 'Vote',
-    color: 'grey'
-  }
-];
 
 export const schema = yup.object({
   id: yup.string(),
@@ -155,7 +123,7 @@ export function EvaluationDialog({
               rules={{ required: true }}
               render={({ field: { onChange: _onChange, value } }) => (
                 <Select value={value} onChange={_onChange}>
-                  <MenuItem value='evaluation'>Evaluation</MenuItem>
+                  <MenuItem value='rubric'>Evaluation</MenuItem>
                   <MenuItem value='vote'>Vote</MenuItem>
                   <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
                 </Select>

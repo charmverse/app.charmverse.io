@@ -25,6 +25,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
 
@@ -33,17 +34,13 @@ import { EvaluationRow } from './EvaluationRow';
 
 export type WorkflowTemplateItem = WorkflowTemplate & { isNew?: boolean };
 
-export const schema = yup.object({});
-
-type FormValues = yup.InferType<typeof schema>;
-
 type EvaluationTemplateItem = Omit<EvaluationTemplate, 'id'> & { id: string | null };
 
 export function ProposalWorkflowItem({
   isExpanded,
   toggleRow,
   workflow,
-  onSave: onSaveWorkflow,
+  onSave,
   onUpdate,
   onDuplicate,
   onDelete,
@@ -59,30 +56,25 @@ export function ProposalWorkflowItem({
   readOnly: boolean;
 }) {
   const [activeEvaluation, setActiveEvaluation] = useState<EvaluationTemplateItem | null>(null);
+  const [hasUnsavedChanges, setUnsavedChanges] = useState(false);
+  const { showMessage } = useSnackbar();
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors, isDirty, isSubmitting }
-  } = useForm<FormValues>({
-    mode: 'onChange',
-    resolver: yupResolver(schema)
-  });
 
   function duplicateWorkflow() {
     onDuplicate(workflow);
-    popupState.close();
   }
 
   function deleteWorkflow() {
     onDelete(workflow.id);
-    popupState.close();
   }
 
-  async function changeEvaluationsOrder(selectedId: string, targetId: string) {
+  function updateWorkflowTitle(title: string) {
+    workflow.title = title;
+    onUpdate(workflow);
+    setUnsavedChanges(true);
+  }
+
+  async function changeEvaluationStepOrder(selectedId: string, targetId: string) {
     const newOrder = [...workflow.evaluations];
     const propIndex = newOrder.findIndex((val) => val.id === selectedId); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
@@ -91,12 +83,13 @@ export function ProposalWorkflowItem({
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
     workflow.evaluations = newOrder;
     onUpdate(workflow);
+    setUnsavedChanges(true);
   }
 
-  function addEvaluation(evaluation?: EvaluationTemplate) {
+  function addEvaluationStep(evaluation?: EvaluationTemplate) {
     const newEvaluation: EvaluationTemplateItem = {
       title: '',
-      type: 'evaluation',
+      type: 'rubric',
       permissions: [],
       ...evaluation,
       id: null
@@ -104,31 +97,43 @@ export function ProposalWorkflowItem({
     setActiveEvaluation(newEvaluation);
   }
 
-  function deleteEvaluation(id: string) {
+  function deleteEvaluationStep(id: string) {
     workflow.evaluations = workflow.evaluations.filter((evaluation) => evaluation.id !== id);
-    onDelete(workflow.id);
+    onUpdate(workflow);
+    setUnsavedChanges(true);
   }
 
-  function saveEvaluation(updates: EvaluationTemplate) {
+  // note: this only updates the workflow state, does not save to the db
+  function updateEvaluationStep(updates: EvaluationTemplate) {
     const index = workflow.evaluations.findIndex((e) => e.id === updates.id);
     if (index === -1) {
       workflow.evaluations.push(updates);
     } else {
       workflow.evaluations[index] = { ...workflow.evaluations[index], ...updates };
     }
-    onSaveWorkflow(workflow);
+    onUpdate(workflow);
+    setUnsavedChanges(true);
   }
 
-  function duplicateEvaluation(evaluation: EvaluationTemplate) {
-    addEvaluation(evaluation);
+  function duplicateEvaluationStep(evaluation: EvaluationTemplate) {
+    addEvaluationStep(evaluation);
   }
 
-  function closeEvaluation() {
+  function closeEvaluationStep() {
     setActiveEvaluation(null);
   }
 
-  function openEvaluation(evaluation: EvaluationTemplate) {
+  function openEvaluationStep(evaluation: EvaluationTemplate) {
     setActiveEvaluation(evaluation);
+  }
+
+  async function saveWorkflow() {
+    try {
+      await onSave(workflow);
+      setUnsavedChanges(false);
+    } catch (error) {
+      showMessage('Error saving workflow', 'error');
+    }
   }
 
   return (
@@ -148,13 +153,14 @@ export function ProposalWorkflowItem({
               fullWidth
               autoFocus={workflow.isNew}
               defaultValue={workflow.title}
+              onChange={(e) => updateWorkflowTitle(e.target.value)}
             />
           ) : (
             <Typography color={!workflow.title ? 'secondary' : 'inherit'}>{workflow.title || 'Untitled'}</Typography>
           )}
           {!readOnly && (
             <span onClick={(e) => e.stopPropagation()}>
-              <Menu {...bindMenu(popupState)}>
+              <Menu {...bindMenu(popupState)} onClick={popupState.close}>
                 <MenuItem onClick={duplicateWorkflow}>
                   <ListItemText>Duplicate</ListItemText>
                 </MenuItem>
@@ -163,7 +169,9 @@ export function ProposalWorkflowItem({
                 </MenuItem>
               </Menu>
               <Box display='flex' gap={2} alignItems='center'>
-                {!isExpanded && <Chip variant='outlined' size='small' color='warning' label='unsaved changes' />}
+                {!isExpanded && hasUnsavedChanges && (
+                  <Chip variant='outlined' size='small' color='warning' label='unsaved changes' />
+                )}
                 <IconButton size='small' {...bindTrigger(popupState)}>
                   <MoreHoriz fontSize='small' />
                 </IconButton>
@@ -177,19 +185,25 @@ export function ProposalWorkflowItem({
           <EvaluationRow
             key={evaluation.id}
             evaluation={evaluation}
-            onDelete={deleteEvaluation}
-            onDuplicate={duplicateEvaluation}
-            onRename={openEvaluation}
-            onSave={saveEvaluation}
-            onChangeOrder={changeEvaluationsOrder}
+            onDelete={deleteEvaluationStep}
+            onDuplicate={duplicateEvaluationStep}
+            onRename={openEvaluationStep}
+            onChangeOrder={changeEvaluationStepOrder}
             readOnly={readOnly}
           />
         ))}
-        <Button disabled={readOnly} variant='text' onClick={() => addEvaluation()}>
-          + Add step
-        </Button>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()}>
+            + Add step
+          </Button>
+          {hasUnsavedChanges && (
+            <Button disabled={readOnly} onClick={saveWorkflow}>
+              Save
+            </Button>
+          )}
+        </Box>
 
-        <EvaluationDialog evaluation={activeEvaluation} onClose={closeEvaluation} onSave={saveEvaluation} />
+        <EvaluationDialog evaluation={activeEvaluation} onClose={closeEvaluationStep} onSave={updateEvaluationStep} />
       </AccordionDetails>
     </Accordion>
   );

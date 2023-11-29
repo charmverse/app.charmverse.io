@@ -88,8 +88,8 @@ export function ProposalSettings({ space }: { space: Space }) {
         <Tooltip title={!isAdmin ? 'Only space admins can create workflows' : ''} arrow>
           {/* Tooltip on disabled button requires one block element below wrapper */}
           <span>
-            <Button id='add-invites-menu' onClick={() => addNewWorkflow()} disabled={!isAdmin}>
-              Add
+            <Button size='small' id='add-invites-menu' onClick={() => addNewWorkflow()} disabled={!isAdmin}>
+              New
             </Button>
           </span>
         </Tooltip>
