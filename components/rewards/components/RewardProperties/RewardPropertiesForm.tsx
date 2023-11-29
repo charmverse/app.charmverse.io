@@ -76,7 +76,8 @@ export function RewardPropertiesForm({
     applyUpdates({
       maxSubmissions: undefined,
       approveSubmitters: isAssignedReward ? false : rewardApplicationType === 'application_required',
-      assignedSubmitters: isAssignedReward ? [] : null
+      assignedSubmitters: isAssignedReward ? [] : null,
+      allowMultipleApplications: isAssignedReward ? false : undefined
     });
   }, [rewardApplicationType, isAssignedReward]);
 
