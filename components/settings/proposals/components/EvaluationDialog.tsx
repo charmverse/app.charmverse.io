@@ -8,6 +8,7 @@ import * as yup from 'yup';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { permissionLevels, resourceTypes } from 'lib/proposal/evaluationWorkflows';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
 
@@ -20,7 +21,7 @@ const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluation
 export type EvaluationInput = Omit<EvaluationTemplate, 'id'> & { id: string | null };
 
 export const schema = yup.object({
-  id: yup.string(),
+  id: yup.string().required(),
   title: yup.string().required(),
   type: yup.mixed().oneOf(evaluationTypes),
   permissions: yup
@@ -62,6 +63,8 @@ export function EvaluationDialog({
   } = useForm<FormValues>({});
 
   const dialogTitle = evaluation?.id ? 'Rename evaluation' : evaluation ? 'New evaluation step' : '';
+
+  const formValues = watch();
 
   function updatePermissions({ permissions }: EvaluationInput) {
     setValue('permissions', permissions);
@@ -115,38 +118,39 @@ export function EvaluationDialog({
         </Stack>
       }
     >
-      <Stack flex={1} className='CardDetail content'>
-        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-          <PropertyLabel required readOnly>
-            Title
-          </PropertyLabel>
+      <Stack gap={2} width='100%'>
+        <div>
+          <FieldLabel>Title</FieldLabel>
           <Controller
             name='title'
             control={control}
             rules={{ required: true }}
             render={({ field: { onChange: _onChange, value } }) => (
-              <TextField autoFocus={!evaluation?.id} onChange={_onChange} value={value} />
+              <TextField autoFocus={!evaluation?.id} onChange={_onChange} fullWidth value={value} />
             )}
           />
-        </Box>
+        </div>
         {!evaluation?.id && (
           <>
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly>Type</PropertyLabel>
+            <div>
+              <FieldLabel>Type</FieldLabel>
               <Controller
                 name='type'
                 control={control}
                 rules={{ required: true }}
                 render={({ field: { onChange: _onChange, value } }) => (
-                  <Select value={value} onChange={_onChange}>
+                  <Select value={value} onChange={_onChange} fullWidth>
                     <MenuItem value='rubric'>Evaluation</MenuItem>
                     <MenuItem value='vote'>Vote</MenuItem>
                     <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
                   </Select>
                 )}
               />
-            </Box>
-            {evaluation && <EvaluationPermissions evaluation={evaluation} onChange={updatePermissions} />}
+            </div>
+            <FieldLabel>Permissions</FieldLabel>
+            <Stack flex={1} className='CardDetail content'>
+              {evaluation && <EvaluationPermissions evaluation={formValues} onChange={updatePermissions} />}
+            </Stack>
           </>
         )}
       </Stack>

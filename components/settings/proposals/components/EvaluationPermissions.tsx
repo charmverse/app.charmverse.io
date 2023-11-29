@@ -54,10 +54,12 @@ export function EvaluationPermissions<T extends EvaluationInput | EvaluationTemp
       <Typography variant='body2'>Who can:</Typography>
 
       {permissionLevels.map((level) => (
-        <Box key={level} display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+        <Box key={level} className='octo-propertyrow'>
           <PropertyLabel readOnly>{capitalize(level)}</PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
+            wrapColumn
+            variant='outlined'
             value={valuesByLevel[level] || []}
             systemRoles={extraEvaluationRoles}
             onChange={async (options) => updatePermissionLevel(level, options)}
