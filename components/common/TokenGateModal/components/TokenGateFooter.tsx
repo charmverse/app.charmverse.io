@@ -5,12 +5,12 @@ import { Button } from 'components/common/Button';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 
 export function TokenGateFooter({
-  isValid,
+  isValid = false,
   onSubmit,
   onCancel
 }: {
-  isValid: boolean;
-  onSubmit: () => Promise<void> | void;
+  isValid?: boolean;
+  onSubmit?: () => Promise<void> | void;
   onCancel?: () => void;
 }) {
   const { displayedPage } = useTokenGateModal();
@@ -22,9 +22,11 @@ export function TokenGateFooter({
           Cancel
         </Button>
       )}
-      <Button onClick={onSubmit} disabled={!isValid}>
-        {displayedPage === 'review' ? 'Confirm' : 'Next'}
-      </Button>
+      {onSubmit && (
+        <Button onClick={onSubmit} disabled={!isValid}>
+          {displayedPage === 'review' ? 'Confirm' : 'Next'}
+        </Button>
+      )}
     </Box>
   );
 }

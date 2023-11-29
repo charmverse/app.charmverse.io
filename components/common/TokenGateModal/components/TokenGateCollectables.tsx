@@ -1,6 +1,10 @@
-import { Box, MenuItem, Select } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import { FormProvider } from 'react-hook-form';
 
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
+
+import type { FormValues } from '../hooks/useCollectablesForm';
 import { useCollectablesForm } from '../hooks/useCollectablesForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { getCollectablesUnifiedAccessControlConditions } from '../utils/getCollectablesUnifiedAccessControlConditions';
@@ -33,11 +37,11 @@ export function TokenGateCollectables() {
 
   return (
     <FormProvider {...methods}>
-      <Box>
-        <Select<string>
+      <FieldWrapper label='Select a Digital Collectible'>
+        <Select<FormValues['collectableOption']>
           displayEmpty
           fullWidth
-          renderValue={(selected) => selected || 'Select a Digital Collectible'}
+          renderValue={(selected) => selected || 'Standard'}
           {...register('collectableOption')}
         >
           {collectableOptions.map((type) => (
@@ -46,7 +50,7 @@ export function TokenGateCollectables() {
             </MenuItem>
           ))}
         </Select>
-      </Box>
+      </FieldWrapper>
       <TokenGateCollectableFields />
       <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </FormProvider>

@@ -1,14 +1,17 @@
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
-import type { SvgIconProps, SvgIconPropsColorOverrides } from '@mui/material';
-import { Box, SvgIcon, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import SvgIcon, { type SvgIconProps } from '@mui/material/SvgIcon';
 import type { ElementType } from 'react';
 
 import { Button } from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import GrantorIcon from 'public/images/template_icons/grantor_icon.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
 
 import { useTokenGateModal, type DisplayedPage } from '../hooks/useTokenGateModalContext';
+
+import { TokenGateFooter } from './TokenGateFooter';
 
 type ButtonProps = {
   name: DisplayedPage;
@@ -43,11 +46,14 @@ const requirementButton: ButtonProps[] = [
 ];
 
 export function TokenGateHome() {
-  const { setDisplayedPage } = useTokenGateModal();
+  const { setDisplayedPage, flow } = useTokenGateModal();
+
+  const goBack = () => setDisplayedPage('review');
+  const onCancel = flow === 'single' ? undefined : goBack;
 
   return (
     <>
-      <Typography variant='h5'>Select Requirements</Typography>
+      <FieldLabel>Select Requirements</FieldLabel>
       {requirementButton.map((btn) => (
         <Box key={btn.name}>
           <Button
@@ -63,6 +69,7 @@ export function TokenGateHome() {
           </Button>
         </Box>
       ))}
+      <TokenGateFooter onCancel={onCancel} />
     </>
   );
 }

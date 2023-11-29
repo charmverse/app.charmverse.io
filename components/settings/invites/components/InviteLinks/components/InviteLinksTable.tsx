@@ -80,9 +80,7 @@ export function InvitesTable() {
             return (
               <TableRow key={invite.id}>
                 <TableCell sx={{ padding: '20px 16px' }}>
-                  <Box display='flex' justifyContent='flex-start' gap={1}>
-                    Private Link
-                  </Box>
+                  <Typography variant='body2'>Private Link</Typography>
                 </TableCell>
                 <TableCell>
                   <Typography>

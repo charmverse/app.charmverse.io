@@ -1,5 +1,7 @@
 import Box from '@mui/material/Box';
 
+import Legend from 'components/settings/Legend';
+
 import { DialogTitle } from '../Modal';
 
 import { TokenGateContent } from './components/TokenGateContent';
@@ -11,7 +13,7 @@ function TokenGateModal() {
 
   return (
     <Box display='flex' gap={2} flexDirection='column'>
-      <DialogTitle>{getTitle(displayedPage)}</DialogTitle>
+      <Legend>{getTitle(displayedPage)}</Legend>
       <TokenGateContent />
     </Box>
   );

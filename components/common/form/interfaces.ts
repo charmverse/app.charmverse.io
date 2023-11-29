@@ -26,5 +26,5 @@ export type FieldProps = {
   inline?: boolean;
   error?: string;
   disabled?: boolean;
-  helperText?: string;
+  helperText?: ReactNode;
 } & SelectFieldProps;

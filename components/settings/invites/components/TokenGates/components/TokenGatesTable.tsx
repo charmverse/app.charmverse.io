@@ -191,10 +191,7 @@ export default function TokenGatesTable({ isAdmin, onDelete, tokenGates, refresh
             {sortedTokenGates.map((tokenGate, tokenGateIndex, tokenGateArray) => (
               <TableRow key={tokenGate.id} sx={{ '&:not(:last-child) td': { border: 0 }, marginBottom: 20 }}>
                 <TableCell>
-                  <Typography
-                    variant='caption'
-                    sx={{ my: 1, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}
-                  >
+                  <Typography variant='body2' my={1}>
                     {descriptions[tokenGateIndex]}
                   </Typography>
                 </TableCell>
