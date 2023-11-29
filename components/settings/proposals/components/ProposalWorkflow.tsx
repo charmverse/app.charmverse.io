@@ -4,6 +4,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Card,
   Chip,
   IconButton,
   ListItemText,
@@ -211,7 +212,36 @@ export function ProposalWorkflowItem({
               </>,
               { sx: { px: 0, pb: 0, pt: 2 } }
             ],
-            ['Permissions', <div key='permissions'>Permissions!</div>, { sx: { px: 0, pb: 0, pt: 2 } }]
+            [
+              'Permissions',
+              <>
+                {workflow.evaluations.map((evaluation) => (
+                  <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
+                    <Box px={2} py={1}>
+                      <Typography variant='h6' gutterBottom>
+                        {evaluation.title}
+                      </Typography>
+                      <Typography variant='body2'>Who can:</Typography>
+                      <Typography>View</Typography>
+                      <Typography>Edit</Typography>
+                      <Typography>Comment</Typography>
+                      <Typography>Move</Typography>
+                    </Box>
+                  </Card>
+                ))}
+                <Box display='flex' justifyContent='flex-end' alignItems='center'>
+                  <Button
+                    disabled={readOnly || !!disabledTooltip}
+                    disabledTooltip={disabledTooltip}
+                    onClick={saveWorkflow}
+                    sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
+                  >
+                    Save
+                  </Button>
+                </Box>
+              </>,
+              { sx: { px: 0, pb: 0, pt: 2 } }
+            ]
           ]}
         />
 
