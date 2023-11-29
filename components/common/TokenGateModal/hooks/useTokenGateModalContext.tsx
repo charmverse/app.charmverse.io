@@ -17,7 +17,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { createAuthSigs, getAllChains } from '../utils/helpers';
 
-export type DisplayedPage = 'tokens' | 'collectables' | 'advanced' | 'home' | 'review' | 'wallet' | 'dao';
+export type DisplayedPage = 'tokens' | 'collectables' | 'home' | 'review' | 'wallet' | 'dao';
 export type Flow = 'single' | 'multiple_all' | 'multiple_one';
 
 export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions'> & {

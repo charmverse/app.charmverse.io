@@ -19,7 +19,7 @@ export function TokenGateFooter({
     <Box mb={3} display='flex' justifyContent='flex-end'>
       {onCancel && (
         <Button sx={{ mr: 2 }} variant='outlined' onClick={onCancel}>
-          Cancel
+          {displayedPage === 'review' ? 'Cancel' : 'Back'}
         </Button>
       )}
       {onSubmit && (

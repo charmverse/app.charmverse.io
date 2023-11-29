@@ -35,8 +35,10 @@ export function getTitle(page: DisplayedPage) {
       return 'Tokens';
     case 'review':
       return 'Review Conditions';
-    case 'advanced':
-      return 'Advanced';
+    case 'wallet':
+      return 'Wallet Condition';
+    case 'dao':
+      return 'DAO Condition';
     default:
       return 'Select Condition';
   }
