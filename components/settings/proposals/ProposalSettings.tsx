@@ -11,8 +11,8 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import Legend from '../Legend';
 
-import type { WorkflowTemplateItem } from './components/ProposalWorkflowTemplate';
-import { ProposalWorkflowItem } from './components/ProposalWorkflowTemplate';
+import type { WorkflowTemplateItem } from './components/WorkflowRow';
+import { ProposalWorkflowItem } from './components/WorkflowRow';
 
 export function ProposalSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
@@ -38,7 +38,14 @@ export function ProposalSettings({ space }: { space: Space }) {
     setExpanded(newWorkflow.id);
   }
 
-  function saveWorkflow(workflow: WorkflowTemplateItem) {}
+  function saveWorkflow(workflow: WorkflowTemplateItem) {
+    updateWorkflow(workflow);
+    triggerSave(workflow);
+  }
+
+  function updateWorkflow(workflow: WorkflowTemplateItem) {
+    setWorkflows((_workflows) => _workflows.map((w) => (w.id === workflow.id ? workflow : w)));
+  }
 
   function deleteWorkflow(id: string) {
     setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
@@ -79,8 +86,10 @@ export function ProposalSettings({ space }: { space: Space }) {
           isExpanded={expanded === workflow.id}
           toggleRow={setExpanded}
           onSave={saveWorkflow}
+          onUpdate={updateWorkflow}
           onDelete={deleteWorkflow}
           onDuplicate={duplicateWorkflow}
+          readOnly={!isAdmin}
         />
       ))}
     </>

@@ -23,7 +23,9 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { WorkflowTemplate } from 'lib/spaces/getProposalWorkflowTemplates';
+import type { WorkflowTemplate, EvaluationStep } from 'lib/spaces/getProposalWorkflowTemplates';
+
+import { WorkflowEvaluationRow } from './WorkflowEvaluationRow';
 
 export type WorkflowTemplateItem = WorkflowTemplate & { isNew?: boolean };
 
@@ -36,15 +38,19 @@ export function ProposalWorkflowItem({
   toggleRow,
   workflow,
   onSave,
+  onUpdate,
   onDuplicate,
-  onDelete
+  onDelete,
+  readOnly
 }: {
   isExpanded: boolean;
   toggleRow: (id: string | false) => void;
   workflow: WorkflowTemplateItem;
+  onUpdate: (workflow: WorkflowTemplateItem) => void;
   onSave: (workflow: WorkflowTemplate) => void;
   onDelete: (id: string) => void;
   onDuplicate: (workflow: WorkflowTemplate) => void;
+  readOnly: boolean;
 }) {
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
 
@@ -67,6 +73,42 @@ export function ProposalWorkflowItem({
   function deleteWorkflow() {
     onDelete(workflow.id);
     popupState.close();
+  }
+
+  async function changeEvaluationsOrder(selectedId: string, targetId: string) {
+    const newOrder = [...workflow.evaluations];
+    const propIndex = newOrder.findIndex((val) => val.id === selectedId); // find the property that was dragged
+    const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
+    const droppedOnIndex = newOrder.findIndex((val) => val.id === targetId); // find the index of the space that was dropped on
+    const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
+    newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
+    workflow.evaluations = newOrder;
+    onUpdate(workflow);
+  }
+
+  function addEvaluation() {
+    const newEvaluation: EvaluationStep = {
+      id: uuid(),
+      title: '',
+      type: 'vote',
+      permissions: []
+    };
+    workflow.evaluations.push(newEvaluation);
+  }
+
+  function deleteEvaluation(id: string) {
+    workflow.evaluations = workflow.evaluations.filter((evaluation) => evaluation.id !== id);
+    onSave(workflow);
+  }
+
+  function saveEvaluation(evaluation: EvaluationStep) {
+    workflow.evaluations = workflow.evaluations.map((e) => (e.id === evaluation.id ? evaluation : e));
+    onSave(workflow);
+  }
+
+  function updateEvaluation(evaluation: EvaluationStep) {
+    workflow.evaluations = workflow.evaluations.map((e) => (e.id === evaluation.id ? evaluation : e));
+    onUpdate(workflow);
   }
 
   return (
@@ -96,7 +138,19 @@ export function ProposalWorkflowItem({
           </span>
         </Box>
       </AccordionSummary>
-      <AccordionDetails></AccordionDetails>
+      <AccordionDetails>
+        {workflow.evaluations.map((evaluation) => (
+          <WorkflowEvaluationRow
+            key={evaluation.id}
+            evaluation={evaluation}
+            onDelete={deleteEvaluation}
+            onSave={saveEvaluation}
+            onChangeOrder={changeEvaluationsOrder}
+            readOnly={readOnly}
+          />
+        ))}
+        <Button onClick={addEvaluation}>Add step</Button>
+      </AccordionDetails>
     </Accordion>
   );
 }

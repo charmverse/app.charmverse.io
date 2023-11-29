@@ -7,8 +7,8 @@ import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { getNumberFromString } from 'lib/utilities/numbers';
