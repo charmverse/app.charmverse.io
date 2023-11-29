@@ -8,7 +8,7 @@ import type { AlertColor } from '@mui/material/Alert';
 import ERC20ABI from 'abis/ERC20.json';
 import { getChainById } from 'connectors/chains';
 import type { MouseEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { parseEther, parseUnits } from 'viem';
 
@@ -19,6 +19,7 @@ import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment
 import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
@@ -26,6 +27,7 @@ import { getSafesForAddress } from 'lib/gnosis';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { shortenHex } from 'lib/utilities/blockchain';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 interface Props {
   receiver: string;
@@ -86,8 +88,9 @@ export function RewardPaymentButton({
   onSuccess = () => {},
   onError = () => {}
 }: Props) {
-  const { data: safesData } = useMultiWalletSigs();
+  const { data: existingSafesData, mutate: refreshSafes } = useMultiWalletSigs();
   const { account, chainId, signer } = useWeb3Account();
+  const { user } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -99,13 +102,39 @@ export function RewardPaymentButton({
   const [hasPendingTx, setHasPendingTx] = useState(false);
 
   const { data: safeInfos } = useSWR(
-    signer && account ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
+    signer && account && chainIdToUse === chainId ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () => getSafesForAddress({ signer: signer!, chainId: chainIdToUse, address: account! })
   );
 
+  useEffect(() => {
+    if (safeInfos && existingSafesData && user) {
+      const safesToAdd: Parameters<(typeof charmClient)['gnosisSafe']['setMyGnosisSafes']>[0] = [];
+
+      for (const foundSafe of safeInfos) {
+        if (
+          foundSafe.owners.some((owner) => lowerCaseEqual(owner, account as string)) &&
+          !existingSafesData.some((_existingSafe) => lowerCaseEqual(_existingSafe.address, foundSafe.address))
+        ) {
+          safesToAdd.push({
+            address: foundSafe.address,
+            userId: user.id,
+            chainId: foundSafe.chainId,
+            isHidden: false,
+            owners: foundSafe.owners,
+            threshold: foundSafe.nonce
+          });
+        }
+      }
+
+      if (safesToAdd.length) {
+        charmClient.gnosisSafe.setMyGnosisSafes([...safesToAdd, ...existingSafesData]).then(() => refreshSafes());
+      }
+    }
+  }, [safeInfos, existingSafesData, user]);
+
   const safeDataRecord =
-    safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+    existingSafesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
       if (!record[userGnosisSafe.address]) {
         record[userGnosisSafe.address] = userGnosisSafe;
       }
@@ -234,7 +263,7 @@ export function RewardPaymentButton({
           <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
             Gnosis wallets
           </MenuItem>
-          {safesData
+          {existingSafesData
             ?.filter((s) => !s.isHidden && chainIdToUse === s.chainId)
             .map((safeInfo) => (
               <SafeMenuItem
