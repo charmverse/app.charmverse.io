@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireSpaceMembership } from 'lib/middleware';
 import { defaultHandler } from 'lib/middleware/handler';
+import type { WorkflowTemplate } from 'lib/proposal/evaluationWorkflows';
+import { getWorkflowTemplates, updateWorkflowTemplate, deleteWorkflowTemplate } from 'lib/proposal/evaluationWorkflows';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { WorkflowTemplate } from 'lib/spaces/workflowTemplates';
-import { getWorkflowTemplates, updateWorkflowTemplate, deleteWorkflowTemplate } from 'lib/spaces/workflowTemplates';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 const handler = defaultHandler();

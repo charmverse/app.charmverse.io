@@ -15,8 +15,8 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import Legend from '../Legend';
 
-import type { WorkflowTemplateItem } from './components/WorkflowRow';
-import { ProposalWorkflowItem } from './components/WorkflowRow';
+import type { WorkflowTemplateItem } from './components/ProposalWorkflow';
+import { ProposalWorkflowItem } from './components/ProposalWorkflow';
 
 export function ProposalSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
