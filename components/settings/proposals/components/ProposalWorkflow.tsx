@@ -1,5 +1,3 @@
-import type { Space } from '@charmverse/core/prisma';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { ExpandMore, MoreHoriz } from '@mui/icons-material';
 import {
   Accordion,
@@ -11,22 +9,15 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Stack,
   TextField,
   Typography
 } from '@mui/material';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { v4 as uuid } from 'uuid';
-import * as yup from 'yup';
+import { useState } from 'react';
 
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
-import { Dialog } from 'components/common/Dialog/Dialog';
-import { useIsAdmin } from 'hooks/useIsAdmin';
+import MultiTabs from 'components/common/MultiTabs';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
 
 import { EvaluationDialog } from './EvaluationDialog';
@@ -181,26 +172,35 @@ export function ProposalWorkflowItem({
         </Box>
       </AccordionSummary>
       <AccordionDetails>
-        {workflow.evaluations.map((evaluation) => (
-          <EvaluationRow
-            key={evaluation.id}
-            evaluation={evaluation}
-            onDelete={deleteEvaluationStep}
-            onDuplicate={duplicateEvaluationStep}
-            onRename={openEvaluationStep}
-            onChangeOrder={changeEvaluationStepOrder}
-            readOnly={readOnly}
-          />
-        ))}
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()}>
-            + Add step
+        <MultiTabs
+          tabs={[
+            [
+              'Steps',
+              <>
+                {workflow.evaluations.map((evaluation) => (
+                  <EvaluationRow
+                    key={evaluation.id}
+                    evaluation={evaluation}
+                    onDelete={deleteEvaluationStep}
+                    onDuplicate={duplicateEvaluationStep}
+                    onRename={openEvaluationStep}
+                    onChangeOrder={changeEvaluationStepOrder}
+                    readOnly={readOnly}
+                  />
+                ))}
+                <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()}>
+                  + Add step
+                </Button>
+              </>,
+              { sx: { px: 0, pb: 0, pt: 2 } }
+            ],
+            ['Permissions', <div key='permissions'>Permissions!</div>, { sx: { px: 0, pb: 0, pt: 2 } }]
+          ]}
+        />
+        <Box position='relative' mt={-4} display='flex' justifyContent='flex-end'>
+          <Button disabled={readOnly} onClick={saveWorkflow} sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}>
+            Save
           </Button>
-          {hasUnsavedChanges && (
-            <Button disabled={readOnly} onClick={saveWorkflow}>
-              Save
-            </Button>
-          )}
         </Box>
 
         <EvaluationDialog evaluation={activeEvaluation} onClose={closeEvaluationStep} onSave={updateEvaluationStep} />

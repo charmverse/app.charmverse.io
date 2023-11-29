@@ -1,6 +1,6 @@
 import { ProposalEvaluationType, Space } from '@charmverse/core/prisma';
 import { Box, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
