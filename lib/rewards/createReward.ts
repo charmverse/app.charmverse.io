@@ -86,7 +86,7 @@ export async function createReward({
     rewardAmount,
     rewardToken,
     customReward,
-    allowMultipleApplications
+    allowMultipleApplications: isAssignedReward ? false : allowMultipleApplications
   };
 
   const rewardPermissions: Prisma.BountyPermissionCreateManyBountyInput[] = [];
