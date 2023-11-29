@@ -65,7 +65,7 @@ export function ProposalWorkflowItem({
     setUnsavedChanges(true);
   }
 
-  async function changeEvaluationStepOrder(selectedId: string, targetId: string) {
+  function changeEvaluationStepOrder(selectedId: string, targetId: string) {
     const newOrder = [...workflow.evaluations];
     const propIndex = newOrder.findIndex((val) => val.id === selectedId); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
@@ -188,20 +188,20 @@ export function ProposalWorkflowItem({
                     readOnly={readOnly}
                   />
                 ))}
-                <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()}>
-                  + Add step
-                </Button>
+                <Box display='flex' justifyContent='space-between' alignItems='center'>
+                  <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
+                    + Add step
+                  </Button>
+                  <Button disabled={readOnly} onClick={saveWorkflow} sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}>
+                    Save
+                  </Button>
+                </Box>
               </>,
               { sx: { px: 0, pb: 0, pt: 2 } }
             ],
             ['Permissions', <div key='permissions'>Permissions!</div>, { sx: { px: 0, pb: 0, pt: 2 } }]
           ]}
         />
-        <Box position='relative' mt={-4} display='flex' justifyContent='flex-end'>
-          <Button disabled={readOnly} onClick={saveWorkflow} sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}>
-            Save
-          </Button>
-        </Box>
 
         <EvaluationDialog evaluation={activeEvaluation} onClose={closeEvaluationStep} onSave={updateEvaluationStep} />
       </AccordionDetails>
