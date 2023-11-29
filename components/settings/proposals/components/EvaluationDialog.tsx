@@ -9,8 +9,8 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { permissionLevels, resourceTypes } from 'lib/proposal/evaluationWorkflows';
-import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
+import { permissionLevels, resourceTypes } from 'lib/proposal/workflows/config';
+import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/config';
 
 import { EvaluationPermissions } from './EvaluationPermissions';
 

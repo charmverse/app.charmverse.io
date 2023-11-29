@@ -66,6 +66,10 @@ export function ProposalSettings({ space }: { space: Space }) {
     setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
   }
 
+  function handleCancelNewWorkflow(id: string) {
+    setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
+  }
+
   function duplicateWorkflow(workflow: WorkflowTemplateItem) {
     addNewWorkflow(workflow);
   }
@@ -103,6 +107,7 @@ export function ProposalSettings({ space }: { space: Space }) {
           onSave={handleSaveWorkflow}
           onUpdate={handleUpdateWorkflow}
           onDelete={handleDeleteWorkflow}
+          onCancel={handleCancelNewWorkflow}
           onDuplicate={duplicateWorkflow}
           readOnly={!isAdmin}
         />

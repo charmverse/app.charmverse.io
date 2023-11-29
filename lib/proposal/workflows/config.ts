@@ -1,5 +1,4 @@
 import type { ProposalEvaluationType, ProposalWorkflowTemplate } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 export const permissionLevels = ['view', 'comment', 'edit', 'move'] as const;
@@ -82,33 +81,3 @@ export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spa
     spaceId
   }
 ];
-
-export async function getWorkflowTemplates(spaceId: string) {
-  return getDefaultWorkflows(spaceId);
-  const dbWorkflows = await prisma.proposalWorkflowTemplate.findMany({
-    where: {
-      spaceId
-    }
-  });
-  return dbWorkflows as WorkflowTemplate[];
-}
-
-export async function deleteWorkflowTemplate({ spaceId, workflowId }: { spaceId: string; workflowId: string }) {
-  return prisma.proposalWorkflowTemplate.delete({
-    where: {
-      id: workflowId,
-      spaceId
-    }
-  });
-}
-
-export async function updateWorkflowTemplate(workflow: WorkflowTemplate) {
-  return prisma.proposalWorkflowTemplate.upsert({
-    where: {
-      id: workflow.id,
-      spaceId: workflow.spaceId
-    },
-    create: workflow,
-    update: workflow
-  });
-}

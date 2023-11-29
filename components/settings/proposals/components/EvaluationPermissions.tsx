@@ -9,8 +9,8 @@ import type {
   SelectOption
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { permissionLevels } from 'lib/proposal/evaluationWorkflows';
-import type { EvaluationTemplate, PermissionLevel, SystemRole } from 'lib/proposal/evaluationWorkflows';
+import { permissionLevels } from 'lib/proposal/workflows/config';
+import type { EvaluationTemplate, PermissionLevel, SystemRole } from 'lib/proposal/workflows/config';
 
 import type { EvaluationInput } from './EvaluationDialog';
 

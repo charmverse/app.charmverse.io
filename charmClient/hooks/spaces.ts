@@ -1,6 +1,6 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
 
-import type { WorkflowTemplate } from 'lib/proposal/evaluationWorkflows';
+import type { WorkflowTemplate } from 'lib/proposal/workflows/config';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import type { MaybeString } from './helpers';

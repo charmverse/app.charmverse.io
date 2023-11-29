@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/evaluationWorkflows';
+import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/config';
 
 import { EvaluationDialog } from './EvaluationDialog';
 import { EvaluationPermissions } from './EvaluationPermissions';
@@ -38,6 +38,7 @@ export function ProposalWorkflowItem({
   onUpdate,
   onDuplicate,
   onDelete,
+  onCancel,
   readOnly
 }: {
   isExpanded: boolean;
@@ -46,6 +47,7 @@ export function ProposalWorkflowItem({
   onUpdate: (workflow: WorkflowTemplateItem) => void;
   onSave: (workflow: WorkflowTemplate) => void;
   onDelete: (id: string) => void;
+  onCancel: (id: string) => void;
   onDuplicate: (workflow: WorkflowTemplate) => void;
   readOnly: boolean;
 }) {
@@ -60,6 +62,10 @@ export function ProposalWorkflowItem({
 
   function deleteWorkflow() {
     onDelete(workflow.id);
+  }
+
+  function cancelNewWorkflow() {
+    onCancel(workflow.id);
   }
 
   function updateWorkflowTitle(title: string) {
@@ -215,22 +221,26 @@ export function ProposalWorkflowItem({
                     </Box>
                   </Card>
                 ))}
+
               <Box display='flex' justifyContent='space-between' alignItems='center'>
-                {value === 'Steps' ? (
-                  <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
-                    + Add step
-                  </Button>
-                ) : (
-                  <div />
-                )}
-                <Button
-                  disabled={readOnly || !!disabledTooltip}
-                  disabledTooltip={disabledTooltip}
-                  onClick={saveWorkflow}
-                  sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
-                >
-                  Save
+                <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
+                  + Add step
                 </Button>
+                <Stack flexDirection='row' gap={1}>
+                  {workflow.isNew && (
+                    <Button variant='outlined' color='secondary' onClick={cancelNewWorkflow}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    disabled={readOnly || !!disabledTooltip}
+                    disabledTooltip={disabledTooltip}
+                    onClick={saveWorkflow}
+                    sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
+                  >
+                    Save
+                  </Button>
+                </Stack>
               </Box>
             </Box>
           )}

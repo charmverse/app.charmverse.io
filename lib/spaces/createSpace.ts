@@ -16,6 +16,7 @@ import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMe
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { getDefaultWorkflows } from 'lib/proposal/workflows/config';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
@@ -121,9 +122,11 @@ export async function createWorkspace({
   const defaultProposalCategories = generateDefaultProposalCategoriesInput(space.id);
   const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
   const defaultPostCategories = generateDefaultPostCategories(space.id);
+  const defaultWorkflows = getDefaultWorkflows(space.id);
 
   await prisma.$transaction([
     prisma.proposalCategory.createMany({ data: defaultProposalCategories }),
+    prisma.proposalWorkflowTemplate.createMany({ data: defaultWorkflows }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
     prisma.postCategory.createMany({ data: defaultPostCategories }),
     prisma.postCategoryPermission.createMany({
