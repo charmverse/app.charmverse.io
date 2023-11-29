@@ -235,6 +235,7 @@ export function RewardsPage({ title }: { title: string }) {
                     disableAddingCards
                     showCard={showRewardOrApplication}
                     readOnlyTitle
+                    readOnlyRows
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
                     onCardClicked={() => {}}

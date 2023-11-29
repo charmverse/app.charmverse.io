@@ -123,6 +123,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const showCard = useCallback(
     async (cardId: string | null, isTemplate?: boolean) => {
       if (cardId === null) {
+        updateURLQuery({ cardId: null });
         setShownCardId(null);
         return;
       }

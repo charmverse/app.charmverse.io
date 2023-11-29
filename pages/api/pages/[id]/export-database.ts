@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import { loadAndGenerateCsv } from 'lib/focalboard/generateCsv';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ContentToCompress, MarkdownPageToCompress } from 'lib/utilities/file';

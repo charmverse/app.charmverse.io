@@ -24,6 +24,7 @@ export async function uploadToS3(file: File, config?: Config) {
       sessionToken: data.token.Credentials.SessionToken
     },
     region: data.region,
+
     requestHandler: trackProgress ? new XhrHttpHandler() : undefined
   });
 
@@ -49,6 +50,7 @@ export async function uploadToS3(file: File, config?: Config) {
   });
 
   await s3Upload.done();
+
   const location = `https://s3.amazonaws.com/${data.bucket}/${data.key}`;
 
   return {

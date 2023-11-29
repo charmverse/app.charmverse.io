@@ -6,16 +6,15 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { v4 as uuid } from 'uuid';
 
+import { awsS3Bucket } from 'config/constants';
 import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 
-const bucket = process.env.S3_UPLOAD_BUCKET;
-
-const client = new S3Client(getS3ClientConfig());
+const client = new S3Client([getS3ClientConfig()]);
 
 export async function uploadFileToS3(file: { pathInS3: string; content: Buffer; contentType?: string }) {
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
-    Bucket: bucket,
+    Bucket: awsS3Bucket,
     Key: file.pathInS3,
     Body: file.content,
     ContentType: file.contentType
@@ -28,7 +27,7 @@ export async function uploadFileToS3(file: { pathInS3: string; content: Buffer; 
 
   await s3Upload.done();
 
-  const fileUrl = `https://s3.amazonaws.com/${bucket}/${file.pathInS3}`;
+  const fileUrl = `https://s3.amazonaws.com/${awsS3Bucket}/${file.pathInS3}`;
   return { fileUrl };
 }
 
@@ -58,6 +57,10 @@ export function getFilePath({ spaceId, url }: { spaceId: string; url: string }) 
   return `spaces/${spaceId}/${uuid()}/${generateFilename(url)}`;
 }
 
+export function getUserS3FilePrefix({ userId }: { userId: string }) {
+  return `user-content/${userId}`;
+}
+
 export function getUserS3FilePath({ userId, url }: { userId: string; url: string }) {
-  return `user-content/${userId}/${uuid()}/${generateFilename(url)}`;
+  return `${getUserS3FilePrefix({ userId })}/${uuid()}/${generateFilename(url)}`;
 }
