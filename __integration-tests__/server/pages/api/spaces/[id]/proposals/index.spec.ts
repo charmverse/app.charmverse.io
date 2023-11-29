@@ -104,7 +104,8 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
               id: expect.any(String),
               proposalId: visibleCategoryFeedbackProposalReviewedByAdmin.id,
               roleId: null,
-              userId: adminUser.id
+              userId: adminUser.id,
+              evaluationId: null
             }
           ]
         })

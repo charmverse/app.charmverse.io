@@ -82,7 +82,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
             id: expect.any(String),
             proposalId: proposal?.id as string,
             userId: reviewerUser.id,
-            roleId: null
+            roleId: null,
+            evaluationId: null
           }
         ]
       })

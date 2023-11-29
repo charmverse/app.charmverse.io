@@ -108,7 +108,8 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
         id: expect.any(String),
         proposalId: page.proposalId as string,
         userId: adminUser.id,
-        roleId: null
+        roleId: null,
+        evaluationId: null
       }
     ]);
   });

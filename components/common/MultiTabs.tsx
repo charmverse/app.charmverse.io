@@ -34,10 +34,10 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export type TabConfig<T extends string> = [T, React.ReactNode, { sx?: SxProps }?];
+export type TabConfig = [string, React.ReactNode, { sx?: SxProps }?];
 
 type MultiTabsProps<T extends string> = {
-  tabs: TabConfig<T>[] | T[];
+  tabs: TabConfig[] | T[];
   disabled?: boolean;
   tabPanelSx?: SxProps;
   children?: (props: { index: number; value: T }) => React.ReactNode;
@@ -82,8 +82,9 @@ export default function MultiTabs<T extends string>(props: MultiTabsProps<T>) {
     }
   }, [activeTab]);
 
-  const tabsWithComponents = tabs.filter((element): element is TabConfig<T> => typeof element !== 'string');
-  const tabLabels: T[] = tabs.map((element) => (typeof element === 'string' ? element : element[0]));
+  const tabsWithComponents = tabs.filter((element): element is TabConfig => typeof element !== 'string');
+  // lie about the type for TabConfig to make TS happy. The type is only important when using the children prop, in which tabs is a list of strings
+  const tabLabels: T[] = tabs.map((element) => (typeof element === 'string' ? element : (element[0] as T)));
 
   return (
     <Box sx={{ width: '100%' }} {...boxProps}>
