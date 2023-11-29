@@ -1,6 +1,6 @@
 import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
 
-import type { FormValues } from '../components/TokenGateWallet';
+import type { FormValues } from '../hooks/useWalletForm';
 
 export function getWalletUnifiedAccessControlConditions(
   values: FormValues
