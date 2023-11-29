@@ -34,22 +34,35 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export type TabConfig = [string, React.ReactNode, { sx?: SxProps }?];
+export type TabConfig<T extends string> = [T, React.ReactNode, { sx?: SxProps }?];
 
-type MultiTabsProps = {
-  tabs: TabConfig[];
+type MultiTabsProps<T extends string> = {
+  tabs: TabConfig<T>[] | T[];
   disabled?: boolean;
   tabPanelSx?: SxProps;
+  children?: (props: { index: number; value: T }) => React.ReactNode;
   // allow for controlled tab
   activeTab?: number;
   setActiveTab?: (tabIndex: number) => void;
   endAdornmentComponent?: React.ReactNode;
-} & BoxProps;
+} & Omit<BoxProps, 'children'>;
 
-export default function MultiTabs(props: MultiTabsProps) {
-  const [value, setValue] = React.useState<any>(0);
+/**
+ * Note: try to use the 'children' prop when possible. It is less logic, easier to compose and customize. Example:
+ * <MultiTabs tabs=['tab1', 'tab2']>
+ *  {({ index, value }) => (
+ *   <Box p={3}>
+ *    {value === 'tab1' && <div>tab1 content</div>}
+ *    {value === 'tab2' && <div>tab2 content</div>}
+ *   </Box>
+ * )}
+ * </MultiTabs>
+ */
+export default function MultiTabs<T extends string>(props: MultiTabsProps<T>) {
+  const [value, setValue] = React.useState<number>(0);
   const {
     tabs,
+    children,
     disabled = false,
     tabPanelSx = {},
     activeTab,
@@ -57,16 +70,20 @@ export default function MultiTabs(props: MultiTabsProps) {
     setActiveTab,
     ...boxProps
   } = props;
-  const handleChange = (_: React.SyntheticEvent<Element, Event>, newValue: number) => {
+
+  function handleChange(_: React.SyntheticEvent<Element, Event>, newValue: number) {
     setValue(newValue);
     setActiveTab?.(newValue);
-  };
+  }
 
   useEffect(() => {
     if (typeof activeTab !== 'undefined') {
       setValue(activeTab);
     }
   }, [activeTab]);
+
+  const tabsWithComponents = tabs.filter((element): element is TabConfig<T> => typeof element !== 'string');
+  const tabLabels: T[] = tabs.map((element) => (typeof element === 'string' ? element : element[0]));
 
   return (
     <Box sx={{ width: '100%' }} {...boxProps}>
@@ -86,7 +103,7 @@ export default function MultiTabs(props: MultiTabsProps) {
           onChange={handleChange}
           aria-label='multi tabs'
         >
-          {tabs.map(([tabLabel]) => (
+          {tabLabels.map((tabLabel) => (
             <Tab
               disabled={disabled}
               sx={{
@@ -100,7 +117,7 @@ export default function MultiTabs(props: MultiTabsProps) {
         </Tabs>
         {endAdornmentComponent}
       </Box>
-      {tabs.map(([tabLabel, tabComponent, _props], tabIndex) => {
+      {tabsWithComponents.map(([tabLabel, tabComponent, _props], tabIndex) => {
         const sxProps = _props?.sx ?? ({} as SxProps);
         return (
           /* eslint-disable-next-line */
@@ -116,6 +133,7 @@ export default function MultiTabs(props: MultiTabsProps) {
           </TabPanel>
         );
       })}
+      {children && children({ index: value, value: tabLabels[value] })}
     </Box>
   );
 }

@@ -180,12 +180,11 @@ export function ProposalWorkflowItem({
         </Box>
       </AccordionSummary>
       <AccordionDetails>
-        <MultiTabs
-          tabs={[
-            [
-              'Steps',
-              <>
-                {workflow.evaluations.map((evaluation) => (
+        <MultiTabs tabs={['Steps', 'Permissions']}>
+          {({ value }) => (
+            <Box pt={2}>
+              {value === 'Steps' &&
+                workflow.evaluations.map((evaluation) => (
                   <EvaluationRow
                     key={evaluation.id}
                     evaluation={evaluation}
@@ -196,26 +195,8 @@ export function ProposalWorkflowItem({
                     readOnly={readOnly}
                   />
                 ))}
-                <Box display='flex' justifyContent='space-between' alignItems='center'>
-                  <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
-                    + Add step
-                  </Button>
-                  <Button
-                    disabled={readOnly || !!disabledTooltip}
-                    disabledTooltip={disabledTooltip}
-                    onClick={saveWorkflow}
-                    sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
-                  >
-                    Save
-                  </Button>
-                </Box>
-              </>,
-              { sx: { px: 0, pb: 0, pt: 2 } }
-            ],
-            [
-              'Permissions',
-              <>
-                {workflow.evaluations.map((evaluation) => (
+              {value === 'Permissions' &&
+                workflow.evaluations.map((evaluation) => (
                   <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
                     <Box px={2} py={1}>
                       <Typography variant='h6' gutterBottom>
@@ -229,21 +210,26 @@ export function ProposalWorkflowItem({
                     </Box>
                   </Card>
                 ))}
-                <Box display='flex' justifyContent='flex-end' alignItems='center'>
-                  <Button
-                    disabled={readOnly || !!disabledTooltip}
-                    disabledTooltip={disabledTooltip}
-                    onClick={saveWorkflow}
-                    sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
-                  >
-                    Save
+              <Box display='flex' justifyContent='space-between' alignItems='center'>
+                {value === 'Steps' ? (
+                  <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
+                    + Add step
                   </Button>
-                </Box>
-              </>,
-              { sx: { px: 0, pb: 0, pt: 2 } }
-            ]
-          ]}
-        />
+                ) : (
+                  <div />
+                )}
+                <Button
+                  disabled={readOnly || !!disabledTooltip}
+                  disabledTooltip={disabledTooltip}
+                  onClick={saveWorkflow}
+                  sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
+                >
+                  Save
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </MultiTabs>
 
         <EvaluationDialog evaluation={activeEvaluation} onClose={closeEvaluationStep} onSave={updateEvaluationStep} />
       </AccordionDetails>

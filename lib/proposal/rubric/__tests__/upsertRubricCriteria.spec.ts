@@ -39,7 +39,8 @@ describe('upsertRubricCriteria', () => {
         },
         proposalId: proposal.id,
         title: 'Score',
-        type: 'range'
+        type: 'range',
+        evaluationId: null
       }
     ]);
 
@@ -59,7 +60,8 @@ describe('upsertRubricCriteria', () => {
         },
         proposalId: proposal.id,
         title: 'Second score',
-        type: 'range'
+        type: 'range',
+        evaluationId: null
       }
     ]);
   });

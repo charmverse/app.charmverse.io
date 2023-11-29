@@ -69,7 +69,8 @@ describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criter
       ...answerContent.answers[0],
       userId: reviewer.id,
       proposalId: proposal.id,
-      comment: 'opinion'
+      comment: 'opinion',
+      evaluationId: null
     });
   });
 
