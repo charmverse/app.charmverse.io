@@ -19,6 +19,12 @@ import {
   REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 
+export const defaultRewardViews = [
+  DEFAULT_TABLE_VIEW_BLOCK_ID,
+  DEFAULT_BOARD_VIEW_BLOCK_ID,
+  DEFAULT_CALENDAR_VIEW_BLOCK_ID
+];
+
 export function generateDefaultCalendarView({
   spaceId,
   dateDisplayPropertyId = DUE_DATE_ID

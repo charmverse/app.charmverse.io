@@ -15,7 +15,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 
 const handler = defaultHandler();
 
-handler.use(requireKeys([{ key: 'wallet', truthy: true }], 'body')).post(requireSuperApiKey, createSpaceMember);
+handler.use(requireKeys([{ key: 'wallet', valueType: 'wallet' }], 'body')).post(requireSuperApiKey, createSpaceMember);
 
 /**
  * @swagger

@@ -17,10 +17,10 @@ handler
   .use(
     requireKeys(
       [
-        { key: 'address', truthy: true },
+        { key: 'address', valueType: 'wallet' },
         {
           key: 'choice',
-          truthy: true
+          valueType: 'truthy'
         }
       ],
       'body'

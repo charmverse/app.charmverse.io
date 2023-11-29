@@ -37,7 +37,10 @@ const ViewHeaderDisplayByMenu = React.memo((props: Props) => {
           defaultMessage='Display by: {property}'
           values={{
             property: (
-              <span style={{ color: 'rgb(var(--center-channel-color-rgb))' }} id='displayByLabel'>
+              <span
+                style={{ color: 'rgb(var(--center-channel-color-rgb))', marginLeft: '3px', marginTop: '1px' }}
+                id='displayByLabel'
+              >
                 {dateDisplayPropertyName || createdDateName}
               </span>
             )

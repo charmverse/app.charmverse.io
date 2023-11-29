@@ -11,7 +11,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 const handler = defaultHandler();
 
-handler.use(requireSuperApiKey, requireKeys([{ key: 'name', truthy: true }], 'body')).post(createSpace);
+handler.use(requireSuperApiKey, requireKeys([{ key: 'name', valueType: 'string' }], 'body')).post(createSpace);
 
 /**
  * @swagger
