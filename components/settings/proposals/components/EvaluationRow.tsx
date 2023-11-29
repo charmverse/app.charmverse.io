@@ -57,7 +57,7 @@ export function EvaluationRow({
           <DragIndicator color='secondary' fontSize='small' />
         </DragIcon>
         <Typography sx={{ flexGrow: 1 }}>
-          {evaluation.title} - <em>{friendlyTypes[evaluation.type]}</em>
+          {evaluation.title} <em>({friendlyTypes[evaluation.type]})</em>
         </Typography>
         <Menu {...bindMenu(popupState)} onClick={popupState.close}>
           <MenuItem disabled={readOnly} onClick={renameEvaluation}>
