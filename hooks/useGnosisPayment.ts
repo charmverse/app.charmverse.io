@@ -10,6 +10,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 
 import useGnosisSafes from './useGnosisSafes';
 
@@ -40,9 +41,18 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       await switchActiveNetwork(chainId);
     }
 
-    if (!safe || !account || !network?.gnosisUrl || !signer) {
+    if (!safe || !account || !network?.gnosisUrl || !signer || !chainId) {
       return;
     }
+
+    // Increment tx Nonce
+    const nonce = await safe.getNonce();
+
+    const client = getSafeApiClient({ chainId });
+
+    const pendingTx = await client.getPendingTransactions(safeAddress);
+
+    const txNonce = nonce + pendingTx.results.length;
 
     const safeTransaction = await safe.createTransaction({
       safeTransactionData: transactions.map((transaction) => ({
@@ -50,7 +60,10 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
         to: transaction.to,
         value: transaction.value,
         operation: transaction.operation
-      }))
+      })),
+      options: {
+        nonce: txNonce
+      }
     });
 
     const txHash = await safe.getTransactionHash(safeTransaction);
@@ -96,19 +109,21 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
     onSuccess({ safeAddress, transactions, txHash });
   }
 
-  async function makePaymentGraceful() {
+  async function makePaymentWithErrorParser() {
     try {
       await makePayment();
     } catch (error) {
       log.error(error);
+      // Use utilities for standard error message, but ensure downstream consumers don't think tx succeeded
       const { message, level } = getPaymentErrorMessage(error);
       showMessage(message, level);
+      throw new Error(message);
     }
   }
 
   return {
     safe,
-    makePayment: makePaymentGraceful
+    makePayment: makePaymentWithErrorParser
   };
 }
 

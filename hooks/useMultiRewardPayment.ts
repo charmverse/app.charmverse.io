@@ -90,10 +90,12 @@ export function useMultiRewardPayment({
         const paymentMethod = paymentMethods.find((method) => method.contractAddress === token);
         const erc20 = new Interface(ERC20_ABI);
         const parsedAmount = parseUnits(eToNumber(amount), paymentMethod!.tokenDecimals).toString();
-        data = erc20.encodeFunctionData('transfer', [recipientAddress, parsedAmount]);
+        data = erc20.encodeFunctionData('transfer', [getAddress(recipientAddress), parsedAmount]);
         // send the request to the token contract
         to = token;
         value = '0';
+      } else {
+        to = getAddress(recipientAddress);
       }
 
       const defaultTitle = 'Untitled';
@@ -105,7 +107,7 @@ export function useMultiRewardPayment({
         data,
         rewardToken: token,
         title: title ?? (rewardId ? pages[rewardId]?.title : defaultTitle) ?? defaultTitle,
-        to: recipientAddress,
+        to,
         userId: recipientUserId,
         value
       };

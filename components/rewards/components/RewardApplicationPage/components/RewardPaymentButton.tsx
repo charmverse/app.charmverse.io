@@ -29,17 +29,6 @@ import { isValidChainAddress } from 'lib/tokens/validation';
 import { shortenHex } from 'lib/utilities/blockchain';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
-interface Props {
-  receiver: string;
-  amount: string;
-  tokenSymbolOrAddress: string;
-  chainIdToUse: number;
-  submission: Application;
-  onSuccess?: (txId: string, chainId: number) => void;
-  onError?: (err: string, severity?: AlertColor) => void;
-  reward: RewardWithUsers;
-}
-
 function SafeMenuItem({
   label,
   safeInfo,
@@ -94,6 +83,17 @@ function SafeMenuItem({
   );
 }
 
+interface Props {
+  receiver: string;
+  amount: string;
+  tokenSymbolOrAddress: string;
+  chainIdToUse: number;
+  submission: Application;
+  onSuccess?: (txId: string, chainId: number) => void;
+  onError?: (err: string, severity?: AlertColor) => void;
+  reward: RewardWithUsers;
+}
+
 export function RewardPaymentButton({
   receiver,
   reward,
@@ -115,7 +115,7 @@ export function RewardPaymentButton({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const [hasPendingTx, setHasPendingTx] = useState(false);
+  const [sendingTx, setSendingTx] = useState(false);
 
   const { data: safeInfos } = useSWR(
     signer && account && chainIdToUse === chainId ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
@@ -173,7 +173,7 @@ export function RewardPaymentButton({
     }
 
     try {
-      setHasPendingTx(true);
+      setSendingTx(true);
 
       if (chainIdToUse !== chainId) {
         await switchActiveNetwork(chainIdToUse);
@@ -228,7 +228,7 @@ export function RewardPaymentButton({
       log.warn(`Error sending payment on blockchain: ${message}`, { amount, chainId, error });
       onError(message, level);
     } finally {
-      setHasPendingTx(false);
+      setSendingTx(false);
     }
   };
 
@@ -247,9 +247,9 @@ export function RewardPaymentButton({
   return (
     <>
       <Button
-        loading={hasPendingTx}
+        loading={sendingTx}
         color='primary'
-        endIcon={hasSafes && !hasPendingTx ? <KeyboardArrowDownIcon /> : null}
+        endIcon={hasSafes && !sendingTx ? <KeyboardArrowDownIcon /> : null}
         size='small'
         onClick={(e: MouseEvent<HTMLButtonElement>) => {
           if (!hasSafes) {
