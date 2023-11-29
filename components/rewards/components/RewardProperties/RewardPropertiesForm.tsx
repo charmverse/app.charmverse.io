@@ -41,7 +41,6 @@ type Props = {
 const getApplicationType = (values: UpdateableRewardFields) => {
   let applicationType: RewardApplicationType = values?.approveSubmitters ? 'application_required' : 'direct_submission';
 
-  // check if allowedSubmitters is set
   if (values?.assignedSubmitters?.length) {
     applicationType = 'assigned';
   }
