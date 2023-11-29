@@ -142,7 +142,7 @@ export function ProposalWorkflowItem({
               defaultValue={workflow.title}
             />
           ) : (
-            <Typography>{workflow.title || 'Untitled'}</Typography>
+            <Typography color={!workflow.title && 'secondary'}>{workflow.title || 'Untitled'}</Typography>
           )}
           <span onClick={(e) => e.stopPropagation()}>
             <Menu {...bindMenu(popupState)}>
