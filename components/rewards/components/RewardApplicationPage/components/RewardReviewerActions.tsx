@@ -86,6 +86,7 @@ export function RewardReviewerActions({
           tokenSymbolOrAddress={reward.rewardToken as string}
           onSuccess={recordTransaction}
           onError={(message) => showMessage(message, 'warning')}
+          submission={application}
         />
       )}
 

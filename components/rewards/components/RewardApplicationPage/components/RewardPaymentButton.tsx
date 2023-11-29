@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { UserGnosisSafe } from '@charmverse/core/prisma';
+import type { Application, UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Contract } from '@ethersproject/contracts';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -34,6 +34,7 @@ interface Props {
   amount: string;
   tokenSymbolOrAddress: string;
   chainIdToUse: number;
+  submission: Application;
   onSuccess?: (txId: string, chainId: number) => void;
   onError?: (err: string, severity?: AlertColor) => void;
   reward: RewardWithUsers;
@@ -43,22 +44,36 @@ function SafeMenuItem({
   label,
   safeInfo,
   reward,
+  submission,
   onClick,
   onError = () => {}
 }: {
   safeInfo: UserGnosisSafe;
   label: string;
   reward: RewardWithUsers;
+  submission: Application;
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
 }) {
-  const { onPaymentSuccess, getTransactions } = useMultiRewardPayment({ rewards: [reward] });
+  const { onPaymentSuccess, getTransactions, prepareGnosisSafeRewardPayment } = useMultiRewardPayment({
+    rewards: [reward]
+  });
 
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions: getTransactions(safeInfo.address)
+    transactions: [
+      prepareGnosisSafeRewardPayment({
+        amount: reward.rewardAmount as number,
+        applicationId: submission.id,
+        recipientAddress: submission.walletAddress as string,
+        recipientUserId: submission.createdBy,
+        token: reward.rewardToken as string,
+        txChainId: reward.chainId as number,
+        rewardId: reward.id
+      })
+    ]
   });
 
   return (
@@ -82,6 +97,7 @@ function SafeMenuItem({
 export function RewardPaymentButton({
   receiver,
   reward,
+  submission,
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
@@ -275,6 +291,7 @@ export function RewardPaymentButton({
                 }}
                 onError={onError}
                 safeInfo={safeInfo}
+                submission={submission}
               />
             ))}
         </Menu>

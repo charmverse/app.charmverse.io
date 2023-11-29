@@ -60,6 +60,61 @@ export function useMultiRewardPayment({
     );
   });
 
+  const prepareGnosisSafeRewardPayment = useCallback(
+    ({
+      recipientAddress,
+      recipientUserId,
+      token,
+      amount,
+      txChainId,
+      applicationId,
+      rewardId,
+      title
+    }: {
+      recipientAddress: string;
+      recipientUserId: string;
+      token: string;
+      amount: string | number;
+      txChainId: number;
+      rewardId?: string;
+      applicationId: string;
+      title?: string;
+    }) => {
+      let data = '0x';
+      let to = recipientAddress;
+      let value = parseUnits(eToNumber(amount), 18).toString();
+
+      // assume this is ERC20 if its not a native token
+      const isERC20Token = token !== getChainById(txChainId)?.nativeCurrency.symbol;
+      if (isERC20Token) {
+        const paymentMethod = paymentMethods.find((method) => method.contractAddress === token);
+        const erc20 = new Interface(ERC20_ABI);
+        const parsedAmount = parseUnits(eToNumber(amount), paymentMethod!.tokenDecimals).toString();
+        data = erc20.encodeFunctionData('transfer', [recipientAddress, parsedAmount]);
+        // send the request to the token contract
+        to = token;
+        value = '0';
+      }
+
+      const defaultTitle = 'Untitled';
+
+      const txMetadata: TransactionWithMetadata = {
+        applicationId,
+        chainId: txChainId,
+        rewardAmount: Number(amount),
+        data,
+        rewardToken: token,
+        title: title ?? (rewardId ? pages[rewardId]?.title : defaultTitle) ?? defaultTitle,
+        to: recipientAddress,
+        userId: recipientUserId,
+        value
+      };
+
+      return txMetadata;
+    },
+    []
+  );
+
   // If the reward is on the same chain as the gnosis safe and the rewardToken of the reward is the same as the native currency of the gnosis safe chain
   const getTransactions: (safeAddress?: string) => TransactionWithMetadata[] = useCallback(
     (safeAddress?: string) => {
@@ -68,38 +123,14 @@ export function useMultiRewardPayment({
           reward.applications
             .filter((application) => application.walletAddress && application.status === 'complete')
             .map((application) => {
-              let data = '0x';
-              let to = application.walletAddress as string;
-              let value = parseUnits(eToNumber(reward.rewardAmount as number), 18).toString();
-
-              // assume this is ERC20 if its not a native token
-              const isERC20Token =
-                safeAddress && reward.rewardToken !== getChainById(reward.chainId as number)?.nativeCurrency.symbol;
-              if (isERC20Token) {
-                const paymentMethod = paymentMethods.find((method) => method.contractAddress === reward.rewardToken);
-                const erc20 = new Interface(ERC20_ABI);
-                const parsedAmount = parseUnits(
-                  eToNumber(reward.rewardAmount as number),
-                  paymentMethod!.tokenDecimals
-                ).toString();
-                data = erc20.encodeFunctionData('transfer', [application.walletAddress, parsedAmount]);
-                // send the request to the token contract
-                to = reward.rewardToken as string;
-                value = '0';
-              }
-
-              return {
-                // convert to checksum address, or else gnosis-safe will fail
-                to: getAddress(to),
-                value,
-                data,
+              return prepareGnosisSafeRewardPayment({
+                amount: reward.rewardAmount as number,
                 applicationId: application.id,
-                userId: application.createdBy,
-                chainId: reward.chainId,
-                rewardAmount: reward.rewardAmount,
-                rewardToken: reward.rewardToken,
-                title: pages[reward.id]?.title || 'Untitled'
-              };
+                recipientAddress: application.walletAddress as string,
+                recipientUserId: application.createdBy,
+                token: reward.rewardToken as string,
+                txChainId: reward.chainId as number
+              });
             })
         )
         .flat();
@@ -135,6 +166,7 @@ export function useMultiRewardPayment({
     isLoading,
     isDisabled,
     getTransactions,
+    prepareGnosisSafeRewardPayment,
     onPaymentSuccess,
     gnosisSafes,
     gnosisSafeData,
