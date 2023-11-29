@@ -1,3 +1,4 @@
+import type { SystemError } from '@charmverse/core/dist/cjs/errors';
 import { log } from '@charmverse/core/log';
 import type { Application, UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -19,6 +20,7 @@ import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment
 import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
@@ -44,7 +46,7 @@ function SafeMenuItem({
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
 }) {
-  const { onPaymentSuccess, getTransactions, prepareGnosisSafeRewardPayment } = useMultiRewardPayment({
+  const { onPaymentSuccess, prepareGnosisSafeRewardPayment } = useMultiRewardPayment({
     rewards: [reward]
   });
 
@@ -72,9 +74,9 @@ function SafeMenuItem({
         onClick();
         try {
           await makePayment();
-        } catch (error: any) {
-          const { message, level } = getPaymentErrorMessage(error);
-          onError(message, level);
+        } catch (error) {
+          const typedError = error as SystemError;
+          onError(typedError.message, typedError.severity);
         }
       }}
     >

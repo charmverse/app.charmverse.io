@@ -1,3 +1,4 @@
+import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
@@ -29,7 +30,6 @@ export type GnosisPaymentProps = {
 
 export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
-  const { showMessage } = useSnackbar();
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
@@ -116,8 +116,11 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       log.error(error);
       // Use utilities for standard error message, but ensure downstream consumers don't think tx succeeded
       const { message, level } = getPaymentErrorMessage(error);
-      showMessage(message, level);
-      throw new Error(message);
+      throw new SystemError({
+        errorType: 'External service',
+        severity: level,
+        message
+      });
     }
   }
 
