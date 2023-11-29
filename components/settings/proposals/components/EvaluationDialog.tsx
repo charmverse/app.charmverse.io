@@ -5,7 +5,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
 
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -140,7 +139,7 @@ export function EvaluationDialog({
                 rules={{ required: true }}
                 render={({ field: { onChange: _onChange, value } }) => (
                   <Select value={value} onChange={_onChange} fullWidth>
-                    <MenuItem value='rubric'>Evaluation</MenuItem>
+                    <MenuItem value='rubric'>Rubric evaluation</MenuItem>
                     <MenuItem value='vote'>Vote</MenuItem>
                     <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
                   </Select>

@@ -51,9 +51,10 @@ export function ProposalSettings({ space }: { space: Space }) {
     setExpanded(newWorkflow.id);
   }
 
-  async function handleSaveWorkflow(workflow: WorkflowTemplateItem) {
+  async function handleSaveWorkflow({ isNew, ...workflow }: WorkflowTemplateItem) {
     await upsertWorkflow(workflow);
     handleUpdateWorkflow(workflow);
+    setExpanded(false);
   }
 
   // updates the state but does not save to the backend

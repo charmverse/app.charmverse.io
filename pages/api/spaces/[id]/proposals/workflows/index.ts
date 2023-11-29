@@ -17,7 +17,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getWorkflowsController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .put(updateWorkflowController)
+  .post(updateWorkflowController)
   .delete(deleteWorkflowController);
 
 async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<WorkflowTemplate[]>) {

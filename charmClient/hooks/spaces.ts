@@ -4,7 +4,7 @@ import type { WorkflowTemplate } from 'lib/proposal/workflows/config';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import type { MaybeString } from './helpers';
-import { useDELETE, useGETImmutable, usePOST } from './helpers';
+import { useDELETE, useGETImmutable, useGET, usePOST } from './helpers';
 
 export function useSearchByDomain(domain: MaybeString) {
   return useGETImmutable<SpaceWithGates>(domain ? `/api/spaces/search-domain` : null, {
@@ -19,7 +19,7 @@ export function useGetPaymentMethods(spaceId: MaybeString) {
 }
 
 export function useGetSpaceProposalWorkflows(spaceId: MaybeString) {
-  return useGETImmutable<PaymentMethod[]>(spaceId ? `/api/payment-methods` : null, {
+  return useGET<PaymentMethod[]>(spaceId ? `/api/payment-methods` : null, {
     spaceId
   });
 }
