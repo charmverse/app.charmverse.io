@@ -3,7 +3,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import Tooltip from '@mui/material/Tooltip';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -68,6 +68,7 @@ type Props = {
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
+  subRowsEmptyValueContent?: ReactElement | string;
 };
 
 /**
@@ -95,7 +96,8 @@ function PropertyValueElement(props: Props) {
     updatedBy,
     updatedAt,
     displayType,
-    mutator = defaultMutator
+    mutator = defaultMutator,
+    subRowsEmptyValueContent
   } = props;
 
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
@@ -183,6 +185,13 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
+    if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
+      return typeof subRowsEmptyValueContent === 'string' ? (
+        <span>{subRowsEmptyValueContent}</span>
+      ) : (
+        subRowsEmptyValueContent ?? null
+      );
+    }
     return (
       <UserAndRoleSelect
         displayType={displayType}
@@ -376,8 +385,13 @@ function PropertyValueElement(props: Props) {
   const hasArrayValue = Array.isArray(value) && value.length > 0;
   const hasStringValue = !Array.isArray(value) && !!value;
   const hasValue = hasCardValue || hasArrayValue || hasStringValue;
+
   if (!hasValue && props.readOnly && displayType !== 'details') {
-    return null;
+    return typeof subRowsEmptyValueContent === 'string' ? (
+      <span>{subRowsEmptyValueContent}</span>
+    ) : (
+      subRowsEmptyValueContent ?? null
+    );
   }
 
   // Explicitly hide the value for this proposal
@@ -387,7 +401,11 @@ function PropertyValueElement(props: Props) {
     } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
       return propertyValueElement;
     } else {
-      return null;
+      return typeof subRowsEmptyValueContent === 'string' ? (
+        <span>{subRowsEmptyValueContent}</span>
+      ) : (
+        subRowsEmptyValueContent ?? null
+      );
     }
   }
   if (props.showTooltip) {

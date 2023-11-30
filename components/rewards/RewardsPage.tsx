@@ -241,6 +241,7 @@ export function RewardsPage({ title }: { title: string }) {
                     onCardClicked={() => {}}
                     onDeleteCard={onDelete}
                     expandSubRowsOnLoad
+                    subRowsEmptyValueContent='--'
                   />
                 )}
                 {activeView.fields.viewType === 'calendar' && (
