@@ -98,6 +98,7 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: sepolia.id,
     viem: sepolia,
+    gnosisUrl: 'https://safe-transaction-sepolia.safe.global',
     chainName: 'Ethereum - Sepolia',
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
     blockExplorerUrls: ['https://sepolia.etherscan.io/'],

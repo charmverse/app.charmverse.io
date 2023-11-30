@@ -1,6 +1,6 @@
 import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 
-import { getGnosisSafeUrl, getGnosisTransactionQueueUrl } from '../utils';
+import { getGnosisSafeUrl, getGnosisTransactionQueueUrl, getGnosisTransactionUrl } from '../utils';
 
 const safeAddress = randomETHWalletAddress();
 
@@ -20,6 +20,25 @@ describe('getGnosisTransactionQueueUrl', () => {
     expect(getGnosisTransactionQueueUrl(safeAddress, 43114)).toBe(`${baseUrl}/avax:${safeAddress}/transactions/queue`);
     expect(getGnosisTransactionQueueUrl(safeAddress, 56)).toBe(`${baseUrl}/bnb:${safeAddress}/transactions/queue`);
     expect(getGnosisTransactionQueueUrl(safeAddress, 137)).toBe(`${baseUrl}/matic:${safeAddress}/transactions/queue`);
+  });
+});
+
+describe('getSafeTransactionUrl', () => {
+  it('should return a link to the safe transaction queue inside the Gnosis Safe app on the correct chain', () => {
+    const exampleHash = '0x1234567890123456789012345678901234567890123456789012345678901234';
+
+    expect(getGnosisTransactionUrl(safeAddress, 1, exampleHash)).toBe(
+      `${baseUrl}/transactions/tx?safe=eth:${safeAddress}&id=${exampleHash}`
+    );
+    expect(getGnosisTransactionUrl(safeAddress, 5, exampleHash)).toBe(
+      `${baseUrl}/transactions/tx?safe=gor:${safeAddress}&id=${exampleHash}`
+    );
+    expect(getGnosisTransactionUrl(safeAddress, 11155111, exampleHash)).toBe(
+      `${baseUrl}/transactions/tx?safe=sep:${safeAddress}&id=${exampleHash}`
+    );
+    expect(getGnosisTransactionUrl(safeAddress, 42161, exampleHash)).toBe(
+      `${baseUrl}/transactions/tx?safe=arb1:${safeAddress}&id=${exampleHash}`
+    );
   });
 });
 
