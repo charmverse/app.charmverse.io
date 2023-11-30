@@ -77,39 +77,39 @@ async function convertProposals() {
               type: 'rubric',
               proposalId: p.id
             }
-          }),
-            await tx.proposalReviewer.updateMany({
-              where: {
-                proposalId: p.id
-              },
-              data: {
-                evaluationId
-              }
-            }),
-            await tx.proposalRubricCriteria.updateMany({
-              where: {
-                proposalId: p.id
-              },
-              data: {
-                evaluationId
-              }
-            }),
-            await tx.proposalRubricCriteriaAnswer.updateMany({
-              where: {
-                proposalId: p.id
-              },
-              data: {
-                evaluationId
-              }
-            }),
-            tx.draftProposalRubricCriteriaAnswer.updateMany({
-              where: {
-                proposalId: p.id
-              },
-              data: {
-                evaluationId
-              }
-            });
+          });
+          await tx.proposalReviewer.updateMany({
+            where: {
+              proposalId: p.id
+            },
+            data: {
+              evaluationId
+            }
+          });
+          await tx.proposalRubricCriteria.updateMany({
+            where: {
+              proposalId: p.id
+            },
+            data: {
+              evaluationId
+            }
+          });
+          await tx.proposalRubricCriteriaAnswer.updateMany({
+            where: {
+              proposalId: p.id
+            },
+            data: {
+              evaluationId
+            }
+          });
+          await tx.draftProposalRubricCriteriaAnswer.updateMany({
+            where: {
+              proposalId: p.id
+            },
+            data: {
+              evaluationId
+            }
+          });
         });
       }
     })
