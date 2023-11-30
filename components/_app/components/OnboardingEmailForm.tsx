@@ -15,12 +15,14 @@ export const schema = yup.object({
     .trim()
     .email()
     .when('emailNewsletter', {
-      is: true,
-      then: yup.string().required('Unselect email options to proceed without email')
+      is: (val: boolean) => val === true,
+      then: () => yup.string().required('Unselect email options to proceed without email'),
+      otherwise: () => yup.string()
     })
     .when('emailNotifications', {
       is: true,
-      then: yup.string().required('Unselect email options to proceed without email')
+      then: () => yup.string().required('Unselect email options to proceed without email'),
+      otherwise: () => yup.string()
     }),
   emailNotifications: yup.boolean(),
   emailNewsletter: yup.boolean()

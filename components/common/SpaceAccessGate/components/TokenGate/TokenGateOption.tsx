@@ -1,4 +1,3 @@
-import type { HumanizedAccsProps } from '@lit-protocol/types';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
@@ -19,7 +18,7 @@ interface Props {
 
 export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
   const { account } = useWeb3Account();
-  const tokenGateConditions = tokenGate.conditions as HumanizedAccsProps;
+  const tokenGateConditions = tokenGate.conditions;
 
   const conditions = humanizeConditionsData({
     ...tokenGateConditions,

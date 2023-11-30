@@ -1,13 +1,15 @@
 import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
 import { getChainById } from 'connectors/chains';
 
-import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 import { LIT_CHAINS } from 'lib/tokenGates/utils';
 import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
 
 import { getNFT } from './getNFTs';
 
-export async function updateTokenGateDetails(tokenGates: TokenGateWithRoles[] | undefined = []) {
+export async function updateTokenGateDetails<T extends { conditions: TokenGateConditions }>(
+  tokenGates: T[] | undefined = []
+): Promise<T[]> {
   const updatedTokenGates = await Promise.all(
     tokenGates.map(async (gate) => {
       const gateConditions = gate.conditions as any;

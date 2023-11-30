@@ -36,7 +36,7 @@ import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true),
+  spaceImage: yup.string().nullable(),
   spaceTemplateOption: yup.mixed<SpaceTemplateType>().oneOf(spaceTemplateIds).default('default')
 });
 type FormValues = yup.InferType<typeof schema>;

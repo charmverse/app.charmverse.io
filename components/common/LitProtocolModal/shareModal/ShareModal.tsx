@@ -83,7 +83,6 @@ function ShareModal(props: Props) {
   const [tokenList, setTokenList] = useState<Token[] | null>(null);
   const [chain, setChain] = useState<Chain>(chainMap[defaultChain]);
   const [showDevMode, setShowDevMode] = useState(false);
-
   const { onUnifiedAccessControlConditionsSelected } = props;
 
   useEffect(() => {
