@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid';
 import { awsS3Bucket } from 'config/constants';
 import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 
-const client = new S3Client([getS3ClientConfig()]);
+const client = new S3Client(getS3ClientConfig());
 
 export async function uploadFileToS3(file: { pathInS3: string; content: Buffer; contentType?: string }) {
   const params: PutObjectCommandInput = {
