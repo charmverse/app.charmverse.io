@@ -160,7 +160,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
 
   const categoryIds = [...proposalCategories.map((c) => c.id), ...forumCategories.map((c) => c.id)];
 
-  const { data: originalPermissions } = useSWR(
+  const { data: originalPermissions, mutate: refreshPermissions } = useSWR(
     currentSpaceId && !forumCategoriesLoading && !proposalCategoriesLoading
       ? `/proposals/list-permissions-${currentSpaceId}-${categoryIds}`
       : null,
@@ -199,7 +199,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
         callback();
         setTouched(false);
         // refresh all caches of permissions in case multiple rows are being updated
-        mutate(`/proposals/list-permissions-${currentSpaceId}`);
+        refreshPermissions();
         showMessage('Permissions updated');
       } catch (error) {
         showMessage('There was an error saving permissions', 'error');
