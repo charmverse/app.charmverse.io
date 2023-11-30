@@ -11,50 +11,53 @@ import type { MemberPropertyValueType } from 'lib/members/interfaces';
 import { useMemberPropertyValues } from './useMemberPropertyValues';
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
-  const { memberPropertyValues = [], isLoading } = useMemberPropertyValues(userId);
+  const { memberPropertyValues } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
   const { data: userDetails } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
-  const memberProperties = useMemo(
-    () =>
-      memberPropertyValues
-        .filter((mpv) => mpv.spaceId === currentSpace?.id)
+  const { memberProperties, isBioRequired, isTimezoneRequired, requiredProperties, nonEmptyRequiredProperties } =
+    useMemo(() => {
+      const _memberProperties = memberPropertyValues
+        ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
         .map((mpv) => mpv.properties)
-        .flat(),
-    [memberPropertyValues, currentSpace?.id]
-  );
+        .flat();
 
-  const requiredProperties = useMemo(
-    () => memberProperties.filter((p) => p.required && !['role', 'join_date'].includes(p.type)) ?? [],
-    [memberProperties]
-  );
+      // Role and join date are non editable properties
+      const _requiredProperties =
+        _memberProperties?.filter((p) => p.required && !['role', 'join_date'].includes(p.type)) ?? [];
+      const _isTimezoneRequired = _requiredProperties.find((p) => p.type === 'timezone');
+      const _isBioRequired = _requiredProperties.find((p) => p.type === 'bio');
+      const propertiesWithoutValue = _requiredProperties
+        .filter(
+          (rp) =>
+            !_memberProperties?.find((mp) => mp.memberPropertyId === rp.memberPropertyId)?.value &&
+            !['bio', 'timezone'].includes(rp.type)
+        )
+        .map((p) => p.memberPropertyId);
 
-  const requiredPropertiesWithoutValue = useMemo(() => {
-    let propertiesWithoutValue = requiredProperties
-      .filter(
-        (rp) =>
-          !memberProperties.find((mp) => mp.memberPropertyId === rp.memberPropertyId)?.value &&
-          !['bio', 'timezone'].includes(rp.type)
-      )
-      .map((p) => p.memberPropertyId);
+      if (userDetails && isTimezoneRequired && !userDetails.timezone) {
+        propertiesWithoutValue.push('timezone');
+      }
 
-    const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone')?.required;
-    const isBioRequired = requiredProperties.find((p) => p.type === 'bio')?.required;
+      if (userDetails && isBioRequired && !userDetails.description) {
+        propertiesWithoutValue.push('bio');
+      }
 
-    if (isTimezoneRequired && !userDetails?.timezone && !isLoading) {
-      propertiesWithoutValue = [...propertiesWithoutValue, 'timezone'];
-    }
-
-    if (isBioRequired && !userDetails?.description && !isLoading) {
-      propertiesWithoutValue = [...propertiesWithoutValue, 'bio'];
-    }
-    return propertiesWithoutValue;
-  }, [requiredProperties, memberProperties, userDetails, isLoading]);
+      return {
+        memberProperties: _memberProperties,
+        requiredProperties: _requiredProperties,
+        isTimezoneRequired: !!_isTimezoneRequired,
+        isBioRequired: !!_isBioRequired,
+        nonEmptyRequiredProperties: propertiesWithoutValue.length !== 0
+      };
+    }, [userDetails, memberPropertyValues, currentSpace?.id]);
 
   return {
     memberProperties,
     requiredProperties,
-    requiredPropertiesWithoutValue
+    isTimezoneRequired,
+    isBioRequired,
+    nonEmptyRequiredProperties
   };
 }
 

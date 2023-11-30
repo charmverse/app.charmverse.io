@@ -194,7 +194,7 @@ export function UserDetailsFormWithSave({
 
   return (
     <>
-      <UserDetailsForm memberProperties={memberProperties} user={user} onChange={onFormChange} />
+      <UserDetailsForm memberProperties={memberProperties ?? []} user={user} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
         <Button
           disableElevation

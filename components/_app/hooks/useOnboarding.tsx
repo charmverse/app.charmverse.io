@@ -2,12 +2,7 @@ import charmClient from 'charmClient';
 import { useMembers } from 'hooks/useMembers';
 import type { LoggedInUser } from 'models';
 
-type IContext = {
-  showOnboardingFlow: boolean;
-  completeOnboarding(): Promise<void>;
-};
-
-export function useOnboarding({ spaceId, user }: { spaceId?: string; user: LoggedInUser | null }): IContext {
+export function useOnboarding({ spaceId, user }: { spaceId?: string; user: LoggedInUser | null }) {
   const { members, mutateMembers, isValidating: isLoadingMembersForSpace } = useMembers();
   const userId = user?.id;
 
@@ -25,6 +20,7 @@ export function useOnboarding({ spaceId, user }: { spaceId?: string; user: Logge
     !isLoadingMembersForSpace && !!spaceMember && !spaceMember.isGuest && spaceMember.onboarded === false;
 
   return {
+    isGuest: spaceMember?.isGuest,
     showOnboardingFlow,
     completeOnboarding
   };

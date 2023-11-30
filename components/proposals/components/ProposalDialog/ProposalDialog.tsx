@@ -164,17 +164,15 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
       }
       footerActions={
         isLoading || page || !newProposal ? null : (
-          <Box mr={10}>
-            <Button
-              disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
-              disabledTooltip={disabledTooltip}
-              onClick={saveForm}
-              loading={isCreatingProposal}
-              data-test='create-proposal-button'
-            >
-              Save
-            </Button>
-          </Box>
+          <Button
+            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+            disabledTooltip={disabledTooltip}
+            onClick={saveForm}
+            loading={isCreatingProposal}
+            data-test='create-proposal-button'
+          >
+            Save
+          </Button>
         )
       }
     >

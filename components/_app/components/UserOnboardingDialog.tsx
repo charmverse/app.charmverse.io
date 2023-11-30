@@ -52,7 +52,7 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
     log.info('[user-journey] Show onboarding flow');
   }, []);
 
-  const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
+  const { nonEmptyRequiredProperties } = useRequiredMemberProperties({
     userId: user.id
   });
 
@@ -64,7 +64,7 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
     );
   }
 
-  if (requiredPropertiesWithoutValue.length) {
+  if (nonEmptyRequiredProperties) {
     return (
       <div data-test='member-onboarding-form'>
         <UserOnboardingDialog key={user.id} currentUser={user} onClose={completeOnboarding} />
@@ -180,17 +180,15 @@ function UserOnboardingDialog({
       hideCloseButton={currentStep === 'email_step' || requiredProperties.length !== 0}
       footerActions={
         currentStep === 'profile_step' ? (
-          <Box mr={4.5}>
-            <Button
-              disableElevation
-              size='large'
-              onClick={saveForm}
-              disabled={isFormClean || !isInputValid}
-              disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
-            >
-              Save
-            </Button>
-          </Box>
+          <Button
+            disableElevation
+            size='large'
+            onClick={saveForm}
+            disabled={isFormClean || !isInputValid}
+            disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
+          >
+            Save
+          </Button>
         ) : null
       }
     >
