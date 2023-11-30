@@ -10,6 +10,7 @@ import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -50,22 +51,6 @@ const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
-
-export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} />)<{
-  top: number;
-  fullWidth?: boolean;
-}>`
-  width: ${({ fullWidth }) => (fullWidth ? '100%' : '860px')};
-  max-width: 100%;
-  margin: 0 auto ${({ top }) => top || 0}px;
-  position: relative;
-  top: ${({ top }) => top || 0}px;
-  padding: 0 40px 0 30px;
-
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    padding: 0 80px;
-  }
-`;
 
 const ScrollContainer = styled.div<{ showPageActionSidebar: boolean }>(
   ({ showPageActionSidebar, theme }) => `
@@ -305,7 +290,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                 setPage={savePage}
               />
             )}
-            <Container
+            <PageEditorContainer
               data-test='page-charmeditor'
               className={fontFamilyClassName}
               top={pageTop}
@@ -442,7 +427,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                   <PageComments page={page} canCreateComments={pagePermissions.comment} />
                 </Box>
               )}
-            </Container>
+            </PageEditorContainer>
           </div>
         </ScrollContainer>
       </div>

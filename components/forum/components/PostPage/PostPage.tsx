@@ -5,9 +5,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ProposalBanner } from 'components/[pageId]/DocumentPage/components/ProposalBanner';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
@@ -335,7 +335,7 @@ export function PostPage({
             postId: post?.id
           })}
         >
-          <Container top={50}>
+          <PageEditorContainer top={50}>
             <Box minHeight={300} data-test='post-charmeditor'>
               <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
               {createdBy && (
@@ -459,7 +459,7 @@ export function PostPage({
                 )}
               </>
             )}
-          </Container>
+          </PageEditorContainer>
           {post && showOtherCategoryPosts && (
             <Box
               width='25%'

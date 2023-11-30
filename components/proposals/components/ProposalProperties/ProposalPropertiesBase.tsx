@@ -18,6 +18,7 @@ import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
+import { AttachRewardButton } from 'components/proposals/AttachRewardButton';
 import { CustomPropertiesAdapter } from 'components/proposals/components/ProposalProperties/CustomPropertiesAdapter';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -514,6 +515,12 @@ export function ProposalPropertiesBase({
               setProposalFormInputs({
                 fields: { properties: properties ? { ...properties } : {} }
               });
+            }}
+          />
+
+          <AttachRewardButton
+            onSave={(values) => {
+              // console.log('🔥 save reward cb', values);
             }}
           />
         </Collapse>

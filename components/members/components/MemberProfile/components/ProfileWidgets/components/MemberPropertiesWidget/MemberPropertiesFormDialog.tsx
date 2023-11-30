@@ -4,7 +4,7 @@ import { Box, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
@@ -23,7 +23,7 @@ type Props = {
   onClose: VoidFunction;
 };
 
-const ContentContainer = styled(Container)`
+const ContentContainer = styled(PageEditorContainer)`
   width: 100%;
   margin-bottom: 100px;
 `;

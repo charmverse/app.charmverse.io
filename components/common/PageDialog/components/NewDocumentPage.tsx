@@ -4,9 +4,9 @@ import { Box, useMediaQuery } from '@mui/material';
 import { useElementSize } from 'usehooks-ts';
 
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
@@ -14,7 +14,7 @@ import { fontClassName } from 'theme/fonts';
 import { EMPTY_PAGE_VALUES } from '../hooks/useNewPage';
 import type { NewPageValues } from '../hooks/useNewPage';
 
-const StyledContainer = styled(Container)`
+const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
 
