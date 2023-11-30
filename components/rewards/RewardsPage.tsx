@@ -273,6 +273,7 @@ export function RewardsPage({ title }: { title: string }) {
                     disableAddingCards
                     readOnlyTitle
                     disableDnd
+                    hideLinkedBounty
                   />
                 )}
               </Box>
