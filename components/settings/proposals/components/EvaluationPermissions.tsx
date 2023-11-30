@@ -1,6 +1,4 @@
-import { ProposalEvaluationType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
-import { Box, Card, IconButton, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -9,18 +7,69 @@ import type {
   SelectOption
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { permissionLevels } from 'lib/proposal/workflows/interfaces';
-import type { EvaluationTemplate, PermissionLevel, SystemRole } from 'lib/proposal/workflows/interfaces';
+import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
+import { permissionLevels, SystemRole } from 'lib/proposal/workflows/interfaces';
+import type { EvaluationTemplate, PermissionLevel } from 'lib/proposal/workflows/interfaces';
 
-import type { EvaluationInput } from './EvaluationDialog';
+import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 
 const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
-  { group: 'system_role', id: 'author', label: 'Author' },
-  { group: 'system_role', id: 'reviewer', label: 'Reviewer' },
-  { group: 'system_role', id: 'space_member', label: 'Member' }
+  {
+    group: 'system_role',
+    icon: (
+      <Tooltip title='Author'>
+        <ProposalIcon color='secondary' fontSize='small' />
+      </Tooltip>
+    ),
+    id: SystemRole.author,
+    label: 'Author'
+  },
+  {
+    group: 'system_role',
+    icon: (
+      <Tooltip title='Reviewers selected for this evaluation'>
+        <ProposalIcon color='secondary' fontSize='small' />
+      </Tooltip>
+    ),
+    id: SystemRole.current_reviewer,
+    label: 'Current Reviewer'
+  },
+  {
+    group: 'system_role',
+    icon: (
+      <Tooltip title='Reviewers of any step in this workflow'>
+        <ProposalIcon color='secondary' fontSize='small' />
+      </Tooltip>
+    ),
+    id: SystemRole.all_reviewers,
+    label: 'All Reviewers'
+  },
+  {
+    group: 'system_role',
+    icon: (
+      <Tooltip title='All members of this space'>
+        <MembersIcon color='secondary' fontSize='small' />
+      </Tooltip>
+    ),
+    id: SystemRole.space_member,
+    label: 'Members'
+  }
 ];
 
-export function EvaluationPermissions<T extends EvaluationInput | EvaluationTemplate>({
+const evaluateVerbs = {
+  rubric: 'Evaluate',
+  vote: 'Vote',
+  pass_fail: 'Review'
+};
+
+const permissionLevelPlaceholders = {
+  view: 'Only admins can view the proposal',
+  comment: 'No one can comment',
+  edit: 'Only admins can edit the proposal',
+  move: 'Only admins can change the current step'
+};
+
+export function EvaluationPermissions<T extends EvaluationTemplateFormItem | EvaluationTemplate>({
   evaluation,
   onChange,
   readOnly
@@ -32,7 +81,7 @@ export function EvaluationPermissions<T extends EvaluationInput | EvaluationTemp
   function updatePermissionLevel(level: PermissionLevel, resources: SelectOption[]) {
     const newPermissions = evaluation.permissions.filter((permission) => permission.level !== level);
     resources.forEach((resource) => {
-      newPermissions.push({ resourceType: resource.group, id: resource.id, level });
+      newPermissions.push({ group: resource.group, id: resource.id, level });
     });
     onChange({ ...evaluation, permissions: newPermissions });
   }
@@ -42,7 +91,7 @@ export function EvaluationPermissions<T extends EvaluationInput | EvaluationTemp
         acc[permission.level] = [];
       }
       acc[permission.level]!.push({
-        group: permission.resourceType,
+        group: permission.group,
         id: permission.id
       });
       return acc;
@@ -58,14 +107,25 @@ export function EvaluationPermissions<T extends EvaluationInput | EvaluationTemp
           <PropertyLabel readOnly>{capitalize(level)}</PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
-            wrapColumn
             variant='outlined'
+            wrapColumn
             value={valuesByLevel[level] || []}
             systemRoles={extraEvaluationRoles}
+            inputPlaceholder={permissionLevelPlaceholders[level]}
             onChange={async (options) => updatePermissionLevel(level, options)}
           />
         </Box>
       ))}
+      <Box className='octo-propertyrow'>
+        <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
+        <UserAndRoleSelect
+          readOnly
+          wrapColumn
+          value={[{ group: 'system_role', id: SystemRole.current_reviewer }]}
+          systemRoles={extraEvaluationRoles}
+          onChange={() => {}}
+        />
+      </Box>
     </>
   );
 }

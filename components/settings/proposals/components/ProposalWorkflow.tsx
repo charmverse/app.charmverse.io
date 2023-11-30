@@ -20,15 +20,16 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getDefaultEvaluationStep } from 'lib/proposal/workflows/defaultEvaluationStep';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
+import { EvaluationContextMenu } from './EvaluationContextMenu';
+import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
 import { EvaluationPermissions } from './EvaluationPermissions';
 import { EvaluationRow } from './EvaluationRow';
 
-export type WorkflowTemplateItem = WorkflowTemplate & { isNew?: boolean };
-
-type EvaluationTemplateItem = Omit<EvaluationTemplate, 'id'> & { id: string | null };
+export type WorkflowTemplateFormItem = WorkflowTemplate & { isNew?: boolean };
 
 export function ProposalWorkflowItem({
   isExpanded,
@@ -43,15 +44,15 @@ export function ProposalWorkflowItem({
 }: {
   isExpanded: boolean;
   toggleRow: (id: string | false) => void;
-  workflow: WorkflowTemplateItem;
-  onUpdate: (workflow: WorkflowTemplateItem) => void;
+  workflow: WorkflowTemplateFormItem;
+  onUpdate: (workflow: WorkflowTemplateFormItem) => void;
   onSave: (workflow: WorkflowTemplate) => void;
   onDelete: (id: string) => void;
   onCancel: (id: string) => void;
   onDuplicate: (workflow: WorkflowTemplate) => void;
   readOnly: boolean;
 }) {
-  const [activeEvaluation, setActiveEvaluation] = useState<EvaluationTemplateItem | null>(null);
+  const [activeEvaluation, setActiveEvaluation] = useState<EvaluationTemplateFormItem | null>(null);
   const [hasUnsavedChanges, setUnsavedChanges] = useState(!!workflow.isNew);
   const { showMessage } = useSnackbar();
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
@@ -87,14 +88,11 @@ export function ProposalWorkflowItem({
   }
 
   function addEvaluationStep(evaluation?: EvaluationTemplate) {
-    const newEvaluation: EvaluationTemplateItem = {
-      title: '',
-      type: 'rubric',
-      permissions: [],
-      ...evaluation,
+    const newEvaluation = getDefaultEvaluationStep(evaluation);
+    setActiveEvaluation({
+      ...newEvaluation,
       id: null
-    };
-    setActiveEvaluation(newEvaluation);
+    });
   }
 
   function deleteEvaluationStep(id: string) {
@@ -207,9 +205,18 @@ export function ProposalWorkflowItem({
                 workflow.evaluations.map((evaluation) => (
                   <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
                     <Box px={2} py={1}>
-                      <Typography variant='h6' gutterBottom>
-                        {evaluation.title}
-                      </Typography>
+                      <Box display='flex' alignItems='center' justifyContent='space-between'>
+                        <Typography variant='h6' gutterBottom>
+                          {evaluation.title}
+                        </Typography>
+                        <EvaluationContextMenu
+                          evaluation={evaluation}
+                          onDelete={deleteEvaluationStep}
+                          onDuplicate={duplicateEvaluationStep}
+                          onRename={openEvaluationStep}
+                          readOnly={readOnly}
+                        />
+                      </Box>
 
                       <Stack flex={1} className='CardDetail content'>
                         <EvaluationPermissions

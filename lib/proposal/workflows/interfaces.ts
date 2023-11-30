@@ -2,14 +2,20 @@ import type { ProposalEvaluationType, ProposalWorkflowTemplate } from '@charmver
 
 export const permissionLevels = ['view', 'comment', 'edit', 'move'] as const;
 export type PermissionLevel = (typeof permissionLevels)[number];
-export const resourceTypes = ['user', 'role', 'system_role'] as const;
-export type ResourceType = (typeof resourceTypes)[number];
+export const permissionGroups = ['user', 'role', 'system_role'] as const;
+export type PermissionGroup = (typeof permissionGroups)[number];
 
-export type SystemRole = 'author' | 'reviewer' | 'space_member';
+//  Note: current_reviewer = the current reviewer of the active proposal evaluation
+export enum SystemRole {
+  author = 'author',
+  current_reviewer = 'current_reviewer',
+  all_reviewers = 'all_reviewers',
+  space_member = 'space_member'
+}
 
 export type SpaceEvaluationPermission = {
   level: PermissionLevel;
-  resourceType: ResourceType;
+  group: PermissionGroup;
   id: string | SystemRole;
 };
 

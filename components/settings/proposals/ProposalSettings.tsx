@@ -15,24 +15,24 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import Legend from '../Legend';
 
-import type { WorkflowTemplateItem } from './components/ProposalWorkflow';
+import type { WorkflowTemplateFormItem } from './components/ProposalWorkflow';
 import { ProposalWorkflowItem } from './components/ProposalWorkflow';
 
 export function ProposalSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { mappedFeatures } = useSpaceFeatures();
   const [expanded, setExpanded] = useState<string | false>(false);
-  const [workflows, setWorkflows] = useState<WorkflowTemplateItem[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowTemplateFormItem[]>([]);
   const { data: currentWorkflowTemplates } = useGetProposalWorkflows(space.id);
   const { trigger: upsertWorkflow } = useUpsertProposalWorkflow(space.id);
   const { trigger: deleteWorkflow } = useDeleteProposalWorkflow(space.id);
 
   useTrackPageView({ type: 'settings/proposals' });
 
-  function addNewWorkflow(workflow?: WorkflowTemplateItem) {
+  function addNewWorkflow(workflow?: WorkflowTemplateFormItem) {
     const lowestIndex = workflows[0]?.index ?? 0;
     const existingIndex = workflows.findIndex((e) => e.id === workflow?.id);
-    const newWorkflow: WorkflowTemplateItem = {
+    const newWorkflow: WorkflowTemplateFormItem = {
       title: '',
       spaceId: space.id,
       evaluations: [],
@@ -51,14 +51,14 @@ export function ProposalSettings({ space }: { space: Space }) {
     setExpanded(newWorkflow.id);
   }
 
-  async function handleSaveWorkflow({ isNew, ...workflow }: WorkflowTemplateItem) {
+  async function handleSaveWorkflow({ isNew, ...workflow }: WorkflowTemplateFormItem) {
     await upsertWorkflow(workflow);
     handleUpdateWorkflow(workflow);
     setExpanded(false);
   }
 
   // updates the state but does not save to the backend
-  async function handleUpdateWorkflow(workflow: WorkflowTemplateItem) {
+  async function handleUpdateWorkflow(workflow: WorkflowTemplateFormItem) {
     setWorkflows((_workflows) => _workflows.map((w) => (w.id === workflow.id ? workflow : w)));
   }
 
@@ -71,8 +71,8 @@ export function ProposalSettings({ space }: { space: Space }) {
     setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
   }
 
-  function duplicateWorkflow(workflow: WorkflowTemplateItem) {
-    addNewWorkflow(workflow);
+  function duplicateWorkflow(workflow: WorkflowTemplateFormItem) {
+    addNewWorkflow({ ...workflow, title: `${workflow.title} (copy)` });
   }
 
   // set the workflow state on load - but from here on out the UI will maintain the latest 'state' since each row can be in an edited state at any given time

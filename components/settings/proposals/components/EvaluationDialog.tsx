@@ -8,34 +8,31 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { permissionLevels, resourceTypes } from 'lib/proposal/workflows/interfaces';
-import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
+import { permissionLevels, permissionGroups } from 'lib/proposal/workflows/interfaces';
+import type {
+  WorkflowTemplate,
+  EvaluationTemplate,
+  SpaceEvaluationPermission
+} from 'lib/proposal/workflows/interfaces';
 
 import { EvaluationPermissions } from './EvaluationPermissions';
 
-export type WorkflowTemplateItem = WorkflowTemplate & { isNew?: boolean };
-
 const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluationType) as ProposalEvaluationType[];
 
-export type EvaluationInput = Omit<EvaluationTemplate, 'id'> & { id: string | null };
+// This type is used for existing and new workflows (id is null until it is saved)
+export type EvaluationTemplateFormItem = Omit<EvaluationTemplate, 'id'> & { id: string | null };
 
 export const schema = yup.object({
   id: yup.string().required(),
   title: yup.string().required(),
-  type: yup.mixed().oneOf(evaluationTypes),
+  type: yup.mixed<ProposalEvaluationType>().oneOf(evaluationTypes).required(),
   permissions: yup
     .array()
     .of(
       yup.object({
         id: yup.string().required(),
-        level: yup
-          .mixed()
-          .oneOf([...permissionLevels])
-          .required(),
-        resourceType: yup
-          .mixed()
-          .oneOf([...resourceTypes])
-          .required()
+        level: yup.mixed<SpaceEvaluationPermission['level']>().oneOf(permissionLevels).required(),
+        group: yup.mixed<SpaceEvaluationPermission['group']>().oneOf(permissionGroups).required()
       })
     )
     .required()
@@ -48,7 +45,7 @@ export function EvaluationDialog({
   onClose,
   onSave
 }: {
-  evaluation: EvaluationInput | null;
+  evaluation: EvaluationTemplateFormItem | null;
   onClose: VoidFunction;
   onSave: (evaluation: EvaluationTemplate) => void;
 }) {
@@ -65,7 +62,7 @@ export function EvaluationDialog({
 
   const formValues = watch();
 
-  function updatePermissions({ permissions }: EvaluationInput) {
+  function updatePermissions({ permissions }: EvaluationTemplateFormItem) {
     setValue('permissions', permissions);
   }
 
@@ -125,7 +122,13 @@ export function EvaluationDialog({
             control={control}
             rules={{ required: true }}
             render={({ field: { onChange: _onChange, value } }) => (
-              <TextField autoFocus={!evaluation?.id} onChange={_onChange} fullWidth value={value} />
+              <TextField
+                placeholder='Community Review'
+                autoFocus={!evaluation?.id}
+                onChange={_onChange}
+                fullWidth
+                value={value}
+              />
             )}
           />
         </div>
@@ -139,9 +142,9 @@ export function EvaluationDialog({
                 rules={{ required: true }}
                 render={({ field: { onChange: _onChange, value } }) => (
                   <Select value={value} onChange={_onChange} fullWidth>
+                    <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
                     <MenuItem value='rubric'>Rubric evaluation</MenuItem>
                     <MenuItem value='vote'>Vote</MenuItem>
-                    <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
                   </Select>
                 )}
               />

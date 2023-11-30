@@ -1,11 +1,13 @@
 import { ProposalEvaluationType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import { DragIndicator, MoreHoriz } from '@mui/icons-material';
-import { Box, Card, IconButton, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import { DragIndicator } from '@mui/icons-material';
+import { Box, Card, IconButton, Typography } from '@mui/material';
 
 import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/sortable';
 import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
+
+import type { ContextMenuProps } from './EvaluationContextMenu';
+import { EvaluationContextMenu } from './EvaluationContextMenu';
 
 const DragIcon = styled(IconButton)`
   cursor: grab;
@@ -28,27 +30,11 @@ export function EvaluationRow({
 }: {
   key: string;
   evaluation: EvaluationTemplate;
-  onDelete: (id: string) => void;
-  onDuplicate: (evaluation: EvaluationTemplate) => void;
-  onRename: (evaluation: EvaluationTemplate) => void;
   onChangeOrder: (selectedId: string, targetId: string) => void;
   readOnly: boolean;
-}) {
+} & ContextMenuProps) {
   const dragKey = `evaluationItem-${key}`;
   const [, , draggableRef, draggableStyle] = useSortable('view', dragKey, !readOnly, onChangeOrder);
-  const popupState = usePopupState({ variant: 'popover', popupId: `menu-${evaluation.id}` });
-
-  function duplicateEvaluation() {
-    onDuplicate(evaluation);
-  }
-
-  function deleteEvaluation() {
-    onDelete(evaluation.id);
-  }
-
-  function renameEvaluation() {
-    onRename(evaluation);
-  }
 
   return (
     <Card style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }}>
@@ -59,22 +45,13 @@ export function EvaluationRow({
         <Typography sx={{ flexGrow: 1 }}>
           {evaluation.title} <em>({friendlyTypes[evaluation.type]})</em>
         </Typography>
-        <Menu {...bindMenu(popupState)} onClick={popupState.close}>
-          <MenuItem disabled={readOnly} onClick={renameEvaluation}>
-            <ListItemText>Rename</ListItemText>
-          </MenuItem>
-          <MenuItem disabled={readOnly} onClick={duplicateEvaluation}>
-            <ListItemText>Duplicate</ListItemText>
-          </MenuItem>
-          <MenuItem disabled={readOnly} onClick={deleteEvaluation}>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-        </Menu>
-        <Box display='flex' gap={2} alignItems='center'>
-          <IconButton size='small' {...bindTrigger(popupState)}>
-            <MoreHoriz fontSize='small' />
-          </IconButton>
-        </Box>
+        <EvaluationContextMenu
+          evaluation={evaluation}
+          onDelete={onDelete}
+          onDuplicate={onDuplicate}
+          onRename={onRename}
+          readOnly={readOnly}
+        />
       </Box>
     </Card>
   );

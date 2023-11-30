@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
+import { getDefaultEvaluationStep } from './defaultEvaluationStep';
 import type { WorkflowTemplate } from './interfaces';
 
 export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spaceId) => [
@@ -7,18 +8,14 @@ export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spa
     id: uuid(),
     title: 'Community Proposals',
     evaluations: [
-      {
-        id: uuid(),
+      getDefaultEvaluationStep({
         title: 'Review',
-        type: 'pass_fail',
-        permissions: []
-      },
-      {
-        id: uuid(),
+        type: 'pass_fail'
+      }),
+      getDefaultEvaluationStep({
         title: 'Community vote',
-        type: 'vote',
-        permissions: []
-      }
+        type: 'vote'
+      })
     ],
     index: 0,
     spaceId
@@ -27,18 +24,14 @@ export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spa
     id: uuid(),
     title: 'Decision Matrix',
     evaluations: [
-      {
-        id: uuid(),
+      getDefaultEvaluationStep({
         title: 'Review',
-        type: 'pass_fail',
-        permissions: []
-      },
-      {
-        id: uuid(),
+        type: 'pass_fail'
+      }),
+      getDefaultEvaluationStep({
         title: 'Rubric evaluation',
-        type: 'rubric',
-        permissions: []
-      }
+        type: 'rubric'
+      })
     ],
     index: 1,
     spaceId
@@ -47,12 +40,10 @@ export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spa
     id: uuid(),
     title: 'Grant Applications',
     evaluations: [
-      {
-        id: uuid(),
+      getDefaultEvaluationStep({
         title: 'Rubric evaluation',
-        type: 'rubric',
-        permissions: []
-      }
+        type: 'rubric'
+      })
     ],
     index: 2,
     spaceId
