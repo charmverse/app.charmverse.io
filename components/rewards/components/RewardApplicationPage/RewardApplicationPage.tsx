@@ -5,8 +5,8 @@ import { Box, Grid, Divider, FormLabel } from '@mui/material';
 import { useState } from 'react';
 
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
@@ -33,7 +33,7 @@ type Props = {
   closeDialog?: VoidFunction;
 };
 
-const StyledContainer = styled(Container)`
+const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
 
