@@ -1,42 +1,32 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import { isValidName } from 'ethers/lib/utils';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import { isValidChainAddress } from 'lib/tokens/validation';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
+import { useWalletForm, type FormValues } from '../hooks/useWalletForm';
 import { getWalletUnifiedAccessControlConditions } from '../utils/getWalletUnifiedAccessControlConditions';
 
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 import { TokenGateFooter } from './TokenGateFooter';
 
-const schema = yup.object({
-  chain: yup.string().required('Chain is required'),
-  contract: yup
-    .string()
-    .required('Contract is required')
-    .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
-});
-
-export type FormValues = yup.InferType<typeof schema>;
-
 export function TokenGateWallet() {
-  const {
-    register,
-    getValues,
-    reset,
-    formState: { errors, isValid }
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-    mode: 'onChange',
-    defaultValues: { contract: '', chain: '' }
-  });
-
   const { setDisplayedPage, handleUnifiedAccessControlConditions } = useTokenGateModal();
 
+  const {
+    getValues,
+    reset,
+    setValue,
+    register,
+    formState: { errors, isValid },
+    provider
+  } = useWalletForm();
+
   const onSubmit = async () => {
-    const values = getValues();
+    const initialValues = getValues();
+    const values: FormValues = {
+      chain: initialValues.chain,
+      contract: initialValues.ensWallet || initialValues.contract
+    };
     const valueProps = getWalletUnifiedAccessControlConditions(values) || [];
     handleUnifiedAccessControlConditions(valueProps);
     setDisplayedPage('review');
@@ -45,6 +35,23 @@ export function TokenGateWallet() {
   const onCancel = () => {
     setDisplayedPage('home');
     reset();
+  };
+
+  const { onChange, ...restRegisterContract } = register('contract');
+
+  const onContractChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e);
+    const value = e.target.value;
+    if (value.endsWith('.eth') && isValidName(value)) {
+      const address = await provider?.resolveName(value);
+      if (address) {
+        setValue('ensWallet', address);
+      } else {
+        setValue('ensWallet', undefined);
+      }
+    } else {
+      setValue('ensWallet', undefined);
+    }
   };
 
   return (
@@ -58,7 +65,8 @@ export function TokenGateWallet() {
         label='Contract Address'
         error={errors.contract?.message}
         helperText={errors.contract?.message}
-        {...register('contract')}
+        onChange={onContractChange}
+        {...restRegisterContract}
       />
       <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </>
