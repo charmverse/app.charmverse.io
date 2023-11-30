@@ -1,5 +1,6 @@
 import { Proposal } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { v4 as uuid } from 'uuid';
 
 // This script is a work in progress
@@ -110,6 +111,24 @@ async function convertProposals() {
               evaluationId
             }
           });
+        });
+      }
+    })
+  );
+}
+
+async function convertSpaces() {
+  const spaces = await prisma.space.findMany({
+    include: {
+      proposalWorkflowTemplates: true
+    }
+  });
+  await Promise.all(
+    spaces.map(async (space) => {
+      if (space.proposalWorkflowTemplates.length === 0) {
+        const defaultWorkflows = getDefaultWorkflows(space.id);
+        await prisma.proposalWorkflowTemplate.createMany({
+          data: defaultWorkflows
         });
       }
     })
