@@ -27,7 +27,9 @@ export function useMemberPropertyValues(memberId: string) {
 
       const isAdmin = user.spaceRoles.find((sr) => sr.spaceId === spaceId)?.isAdmin || false;
       const spaceProps = getValuesForSpace(spaceId)?.properties || [];
-      const hasEditableProps = spaceProps.some((prop) => !MEMBER_PROPERTY_CONFIG[prop.type]?.default);
+      const hasEditableProps = spaceProps.some(
+        (prop) => prop.type === 'name' || !MEMBER_PROPERTY_CONFIG[prop.type]?.default
+      );
 
       return hasEditableProps && (isAdmin || memberId === user.id);
     },

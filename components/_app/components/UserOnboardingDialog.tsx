@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -66,7 +67,7 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
   if (requiredPropertiesWithoutValue.length) {
     return (
       <div data-test='member-onboarding-form'>
-        <UserOnboardingDialog key={user.id} currentUser={user} />
+        <UserOnboardingDialog key={user.id} currentUser={user} onClose={completeOnboarding} />
       </div>
     );
   }
@@ -79,68 +80,50 @@ function UserOnboardingDialog({
   onClose,
   isOnboarding = false
 }: {
-  onClose?: VoidFunction;
+  onClose: VoidFunction;
   currentUser: LoggedInUser;
   isOnboarding?: boolean;
 }) {
   const { showMessage } = useSnackbar();
-  const {
-    control,
-    errors,
-    userDetails: userDetailsData,
-    isValid,
-    memberProperties,
-    values,
-    requiredProperties,
-    requiredPropertiesWithoutValue
-  } = useRequiredMemberPropertiesForm({
+  const { control, errors, isValid, memberProperties, values, requiredProperties } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
   const { space: currentSpace } = useCurrentSpace();
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-  const [userDetails, setUserDetails] = useState<EditableFields>({
-    description: '',
-    timezone: '',
-    name: ''
-  });
-  const [isFormClean, setIsFormClean] = useState(true);
+  const { data: userDetailsData } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
+
+  const [userDetails, setUserDetails] = useState<EditableFields>({});
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
   const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone');
   const isBioRequired = requiredProperties.find((p) => p.type === 'bio');
-  const isNameRequired = requiredProperties.find((p) => p.type === 'name');
-
   const isInputValid =
     requiredProperties.length === 0 ||
-    (isValid &&
-      (!isTimezoneRequired || !!userDetails.timezone) &&
-      (!isBioRequired || !!userDetails.description) &&
-      (!isNameRequired || !!userDetails.name));
+    (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
 
   function onUserDetailsChange(fields: EditableFields) {
     setUserDetails((_form) => ({ ..._form, ...fields }));
-    setIsFormClean(false);
   }
 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
     setMemberDetails(fields);
-    setIsFormClean(false);
   }
+
+  const isFormClean = Object.keys(userDetails).length === 0 && memberDetails.length === 0;
 
   usePreventReload(!isFormClean);
 
   useEffect(() => {
     setUserDetails({
       description: userDetailsData?.description ?? '',
-      timezone: userDetailsData?.timezone ?? '',
-      name: userDetailsData?.name ?? ''
+      timezone: userDetailsData?.timezone ?? ''
     });
   }, [userDetailsData]);
 
   async function saveForm() {
     if (isFormClean) {
-      onClose?.();
+      onClose();
       return;
     }
     if (Object.keys(userDetails).length > 0) {
@@ -150,9 +133,11 @@ function UserOnboardingDialog({
       await updateSpaceValues(currentSpace.id, memberDetails);
     }
     mutateMembers();
-    mutate('/current-user-details');
+    onClose();
+    setUserDetails({});
+    setMemberDetails([]);
     showMessage('Profile updated', 'success');
-    onClose?.();
+    mutate('/current-user-details');
   }
 
   const [currentStep, setCurrentStep] = useState<Step>(
@@ -167,7 +152,7 @@ function UserOnboardingDialog({
     if (!isFormClean) {
       confirmExitPopupState.open();
     } else {
-      onClose?.();
+      onClose();
     }
   };
 
@@ -218,7 +203,6 @@ function UserOnboardingDialog({
               mt: 0
             }}
             user={currentUser}
-            userDetails={userDetails}
             onChange={onUserDetailsChange}
             memberProperties={memberProperties ?? []}
           />
@@ -238,13 +222,13 @@ function UserOnboardingDialog({
           <ConfirmDeleteModal
             onClose={confirmExitPopupState.close}
             title='Unsaved changes'
-            open={confirmExitPopupState.isOpen && !requiredPropertiesWithoutValue.length}
+            open={confirmExitPopupState.isOpen}
             buttonText='Discard'
             secondaryButtonText='Cancel'
             question='Are you sure you want to close this window? You have unsaved changes.'
             onConfirm={() => {
               confirmExitPopupState.close();
-              onClose?.();
+              onClose();
             }}
           />
         </>

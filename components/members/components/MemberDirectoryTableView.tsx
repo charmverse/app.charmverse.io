@@ -162,7 +162,9 @@ function MemberDirectoryTableRow({
               );
             }
             case 'name': {
-              const content = <Typography fontWeight='bold'>{member.profile?.name ?? member.username}</Typography>;
+              const content = (
+                <Typography fontWeight='bold'>{(memberProperty.value as string) ?? member.username}</Typography>
+              );
 
               return (
                 <TableCell key={property.id}>

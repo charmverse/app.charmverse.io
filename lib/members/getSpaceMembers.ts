@@ -78,15 +78,17 @@ export async function getSpaceMembers({
   return (
     spaceRoles
       .map((spaceRole): Member => {
-        const { memberPropertyValues = [], profile, ...userData } = spaceRole.user;
+        const { memberPropertyValues = [], ...userData } = spaceRole.user;
         const roles = spaceRole.spaceRoleToRole.map((sr) => sr.role);
-        const username = profile?.name || userData.username;
+        const nameProperty = visibleProperties.find((property) => property.type === 'name') ?? null;
+        const memberNameProperty = memberPropertyValues.find((prop) => prop.memberPropertyId === nameProperty?.id);
+        const username = (memberNameProperty?.value as string | undefined) || userData.username;
         return {
           id: userData.id,
           createdAt: userData.createdAt,
           deletedAt: userData.deletedAt || undefined,
           updatedAt: userData.updatedAt,
-          profile: (profile as Member['profile']) || undefined,
+          profile: (userData.profile as Member['profile']) || undefined,
           avatar: replaceS3Domain(userData.avatar || undefined),
           avatarTokenId: userData.avatarTokenId || undefined,
           username,
@@ -97,14 +99,7 @@ export async function getSpaceMembers({
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
-          searchValue: getMemberSearchValue(
-            {
-              ...spaceRole.user,
-              name: spaceRole.user.profile?.name ?? null
-            },
-            visiblePropertiesMap,
-            username
-          ),
+          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, username),
           roles,
           isBot: userData.isBot ?? undefined
         };

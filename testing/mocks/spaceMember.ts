@@ -19,7 +19,6 @@ export function createMockSpaceMember(user = createMockUser()): Member {
       timezone: null,
       description: `I am ${user.username}`,
       locale: 'en-US',
-      name: user.username,
       social: {
         discordUsername: `${username}#1234`,
         linkedinURL: `https://www.linkedin.com/in/${username}`,

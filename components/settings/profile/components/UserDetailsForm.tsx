@@ -1,18 +1,18 @@
-import type { IdentityType, UserDetails } from '@charmverse/core/prisma';
+import type { IdentityType, UserDetails as UserDetailsType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
-import { Box, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
 import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
@@ -34,14 +34,13 @@ import { SocialInputs } from './SocialInputs';
 import { TimezoneAutocomplete } from './TimezoneAutocomplete';
 import UserDescription from './UserDescription';
 
-export type EditableFields = Partial<Omit<UserDetails, 'id'>>;
+export type EditableFields = Partial<Omit<UserDetailsType, 'id'>>;
 
 export interface UserDetailsProps {
   user: LoggedInUser;
   sx?: SxProps<Theme>;
   onChange: (user: EditableFields) => void;
   memberProperties: PropertyValueWithDetails[];
-  userDetails?: EditableFields;
 }
 
 const StyledStack = styled(Stack)`
@@ -63,7 +62,9 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ memberProperties, user, userDetails, onChange, sx = {} }: UserDetailsProps) {
+export function UserDetailsForm({ memberProperties, user, onChange, sx = {} }: UserDetailsProps) {
+  const { data: userDetails, isLoading } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
+
   const identityTypes = useIdentityTypes();
 
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
@@ -83,15 +84,9 @@ export function UserDetailsForm({ memberProperties, user, userDetails, onChange,
     onChange({ social });
   };
 
-  const setName = async (name: string) => {
-    onChange({ name });
-  };
+  const disabled = isLoading;
 
   const requiredProperties = memberProperties.filter((mp) => mp.required);
-
-  const isNameRequired = !!requiredProperties.find((prop) => prop.type === 'name');
-
-  const readOnly = !userDetails;
 
   return (
     <>
@@ -117,25 +112,11 @@ export function UserDetailsForm({ memberProperties, user, userDetails, onChange,
           </EditIconContainer>
         </Grid>
         <Grid item>
-          <FieldWrapper label='Name' required={isNameRequired}>
-            <TextField
-              disabled={readOnly}
-              fullWidth
-              value={userDetails?.name || ''}
-              error={isNameRequired ? !userDetails?.name : false}
-              placeholder='John Doe'
-              onChange={(event) => {
-                setName(event.target.value);
-              }}
-            />
-          </FieldWrapper>
-        </Grid>
-        <Grid item>
           <UserDescription
             required={!!requiredProperties.find((prop) => prop.type === 'bio')}
             currentDescription={userDetails?.description}
             save={setDescription}
-            readOnly={readOnly}
+            readOnly={disabled}
           />
         </Grid>
         <Grid item>
@@ -143,10 +124,10 @@ export function UserDetailsForm({ memberProperties, user, userDetails, onChange,
             required={!!requiredProperties.find((prop) => prop.type === 'timezone')}
             userTimezone={userDetails?.timezone}
             save={setTimezone}
-            readOnly={readOnly}
+            readOnly={disabled}
           />
         </Grid>
-        <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={readOnly} />
+        <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={disabled} />
       </Grid>
       <IdentityModal
         isOpen={identityModalState.isOpen}
@@ -165,34 +146,26 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
-  const {
-    requiredProperties,
-    userDetails: defaultUserDetails,
-    memberProperties
-  } = useRequiredMemberProperties({ userId: user.id });
-
+  const { requiredProperties, memberProperties } = useRequiredMemberProperties({ userId: user.id });
   const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone');
   const isBioRequired = requiredProperties.find((p) => p.type === 'bio');
-  const isNameRequired = requiredProperties.find((p) => p.type === 'name');
+  const { data: defaultUserDetails, isLoading } = useSWRImmutable(`/current-user-details`, () =>
+    charmClient.getUserDetails()
+  );
 
   const [userDetails, setForm] = useState<EditableFields>({
     description: '',
-    timezone: '',
-    name: ''
+    timezone: ''
   });
 
   useEffect(() => {
     setForm({
       description: defaultUserDetails?.description ?? '',
-      timezone: defaultUserDetails?.timezone ?? '',
-      name: defaultUserDetails?.name ?? ''
+      timezone: defaultUserDetails?.timezone ?? ''
     });
   }, [defaultUserDetails]);
 
-  const isInputValid =
-    (!isTimezoneRequired || !!userDetails.timezone) &&
-    (!isBioRequired || !!userDetails.description) &&
-    (!isNameRequired || !!userDetails.name);
+  const isInputValid = (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description);
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
   const isFormClean = Object.keys(userDetails).length === 0;
@@ -205,9 +178,10 @@ export function UserDetailsFormWithSave({
 
   async function saveForm() {
     await charmClient.updateUserDetails(userDetails);
-    mutate('/current-user-details');
     await mutateMembers();
+    setForm({});
     showMessage('Profile updated', 'success');
+    mutate('/current-user-details');
   }
 
   useEffect(() => {
@@ -220,17 +194,12 @@ export function UserDetailsFormWithSave({
 
   return (
     <>
-      <UserDetailsForm
-        userDetails={userDetails}
-        memberProperties={memberProperties}
-        user={user}
-        onChange={onFormChange}
-      />
+      <UserDetailsForm memberProperties={memberProperties} user={user} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
         <Button
           disableElevation
           size='large'
-          disabled={isFormClean || !isInputValid}
+          disabled={isLoading || isFormClean || !isInputValid}
           disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
           onClick={saveForm}
         >

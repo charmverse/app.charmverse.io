@@ -18,6 +18,7 @@ export function MemberProperties({ properties }: { properties: PropertyValueWith
           case 'text':
           case 'text_multiline':
           case 'phone':
+          case 'name':
           case 'email':
           case 'number': {
             return (
