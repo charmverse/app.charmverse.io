@@ -1,4 +1,2 @@
-components/common/LitProtocolModal/**/*.js
-components/common/LitProtocolModal/**/*.jsx
 scripts/
 dist/
