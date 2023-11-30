@@ -5,7 +5,7 @@ import { Box, Card, IconButton, ListItemText, Menu, MenuItem, Typography } from 
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 
 import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/sortable';
-import type { EvaluationTemplate } from 'lib/proposal/workflows/config';
+import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 const DragIcon = styled(IconButton)`
   cursor: grab;

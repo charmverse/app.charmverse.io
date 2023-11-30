@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getDefaultWorkflows } from './config';
-import type { WorkflowTemplate } from './config';
+import type { WorkflowTemplate } from './interfaces';
 
 export async function getWorkflowTemplates(spaceId: string) {
   const dbWorkflows = await prisma.proposalWorkflowTemplate.findMany({

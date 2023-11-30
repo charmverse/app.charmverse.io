@@ -2,12 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireSpaceMembership } from 'lib/middleware';
 import { defaultHandler } from 'lib/middleware/handler';
-import type { WorkflowTemplate } from 'lib/proposal/workflows/config';
 import {
   getWorkflowTemplates,
   updateWorkflowTemplate,
   deleteWorkflowTemplate
 } from 'lib/proposal/workflows/controller';
+import type { WorkflowTemplate } from 'lib/proposal/workflows/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 

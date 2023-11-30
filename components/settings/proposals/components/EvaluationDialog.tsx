@@ -8,8 +8,8 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { permissionLevels, resourceTypes } from 'lib/proposal/workflows/config';
-import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/config';
+import { permissionLevels, resourceTypes } from 'lib/proposal/workflows/interfaces';
+import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { EvaluationPermissions } from './EvaluationPermissions';
 

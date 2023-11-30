@@ -1,7 +1,7 @@
 import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
 import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
-import { getDefaultWorkflows } from 'lib/proposal/workflows/config';
+import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import type { SpacePermissionFlags } from '../lib/permissions/spaces';
 
 import {

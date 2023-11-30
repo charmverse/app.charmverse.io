@@ -16,7 +16,7 @@ import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMe
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
-import { getDefaultWorkflows } from 'lib/proposal/workflows/config';
+import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';

@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/config';
+import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { EvaluationDialog } from './EvaluationDialog';
 import { EvaluationPermissions } from './EvaluationPermissions';
