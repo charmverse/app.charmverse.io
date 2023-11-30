@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -28,12 +29,29 @@ type Props = {
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
   expandSubRowsOnLoad?: boolean;
+  rowExpansionLocalStoragePrefix?: string;
 };
 
 function TableRows(props: Props): JSX.Element {
   const { board, cardPages: allCardPages, activeView, onDeleteCard, expandSubRowsOnLoad } = props;
+  const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
+
+  const [collapsedCardIds = [], setCollapsedCardIds] = useLocalStorage<string[]>(
+    hasSubPages && props.rowExpansionLocalStoragePrefix
+      ? `${props.rowExpansionLocalStoragePrefix}-collapsed-rows`
+      : null,
+    []
+  );
+
+  const setIsExpanded = ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
+    if (!expanded) {
+      setCollapsedCardIds((prev) => [...(prev ?? []), cardId]);
+    } else {
+      setCollapsedCardIds((prev) => prev?.filter((id) => id !== cardId) ?? []);
+    }
+  };
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
     // ignore if title is unchanged
@@ -80,6 +98,14 @@ function TableRows(props: Props): JSX.Element {
           readOnlyTitle={props.readOnlyTitle}
           subPages={subPages}
           expandSubRowsOnLoad={expandSubRowsOnLoad}
+          setIsExpanded={subPages?.length ? setIsExpanded : undefined}
+          isExpanded={
+            collapsedCardIds?.length !== 0
+              ? !collapsedCardIds?.includes(card.id)
+              : subPages?.length
+              ? !!props.expandSubRowsOnLoad
+              : false
+          }
         />
       ))}
 

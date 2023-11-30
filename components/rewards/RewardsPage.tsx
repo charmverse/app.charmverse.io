@@ -241,6 +241,7 @@ export function RewardsPage({ title }: { title: string }) {
                     onCardClicked={() => {}}
                     onDeleteCard={onDelete}
                     expandSubRowsOnLoad
+                    rowExpansionLocalStoragePrefix={currentSpace ? `rewards-${currentSpace.id}` : undefined}
                   />
                 )}
                 {activeView.fields.viewType === 'calendar' && (

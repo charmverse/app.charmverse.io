@@ -38,6 +38,7 @@ type Props = {
   readOnlyRows?: boolean;
   disableAddingCards?: boolean;
   expandSubRowsOnLoad?: boolean;
+  rowExpansionLocalStoragePrefix?: string;
 };
 
 function Table(props: Props): JSX.Element {
@@ -50,7 +51,8 @@ function Table(props: Props): JSX.Element {
     views,
     expandSubRowsOnLoad,
     readOnly,
-    readOnlyRows
+    readOnlyRows,
+    rowExpansionLocalStoragePrefix
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -289,6 +291,7 @@ function Table(props: Props): JSX.Element {
               onDeleteCard={props.onDeleteCard}
               readOnlyTitle={props.readOnlyTitle}
               expandSubRowsOnLoad={expandSubRowsOnLoad}
+              rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
             />
           )}
         </div>
