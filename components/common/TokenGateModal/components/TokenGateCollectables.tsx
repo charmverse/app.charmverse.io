@@ -41,7 +41,7 @@ export function TokenGateCollectables() {
         <Select<FormValues['collectableOption']>
           displayEmpty
           fullWidth
-          renderValue={(selected) => selected || 'Standard'}
+          renderValue={(selected) => selected || 'Select a collectible type'}
           {...register('collectableOption')}
         >
           {collectableOptions.map((type) => (
