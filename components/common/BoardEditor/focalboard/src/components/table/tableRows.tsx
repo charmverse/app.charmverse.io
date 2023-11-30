@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
+import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board } from 'lib/focalboard/board';
@@ -98,13 +99,16 @@ function TableRows(props: Props): JSX.Element {
           readOnlyTitle={props.readOnlyTitle}
           subPages={subPages}
           expandSubRowsOnLoad={expandSubRowsOnLoad}
-          setIsExpanded={subPages?.length ? setIsExpanded : undefined}
+          setIsExpanded={setIsExpanded}
+          emptySubPagesPlaceholder={
+            page.bountyId ? (
+              <Box my={2} display='flex' justifyContent='flex-start' mx={3}>
+                <NewWorkButton rewardId={page.bountyId} />
+              </Box>
+            ) : null
+          }
           isExpanded={
-            collapsedCardIds?.length !== 0
-              ? !collapsedCardIds?.includes(card.id)
-              : subPages?.length
-              ? !!props.expandSubRowsOnLoad
-              : false
+            collapsedCardIds?.length !== 0 ? !collapsedCardIds?.includes(card.id) : !!props.expandSubRowsOnLoad
           }
         />
       ))}

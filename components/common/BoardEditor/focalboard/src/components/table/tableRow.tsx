@@ -5,7 +5,7 @@ import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { IconButton, Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { MouseEvent, ReactElement } from 'react';
+import type { MouseEvent, ReactElement, ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
@@ -61,6 +61,7 @@ type Props = {
   indentTitle?: number;
   isNested?: boolean;
   expandSubRowsOnLoad?: boolean;
+  emptySubPagesPlaceholder?: ReactNode;
 };
 
 export const columnWidth = (
@@ -300,19 +301,21 @@ export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages
         setIsExpanded={props.subPages ? props.setIsExpanded : undefined}
       />
       {props.isExpanded &&
-        props.subPages?.map((subPage) => (
-          <ExpandableTableRow
-            key={subPage.card.id}
-            {...props}
-            pageTitle={subPage.page.title}
-            pageUpdatedAt={subPage.page.updatedAt.toISOString()}
-            card={subPage.card}
-            cardPage={subPage.page}
-            subPages={subPage.subPages}
-            indentTitle={30}
-            isNested
-          />
-        ))}
+        (props.subPages?.length === 0
+          ? props.emptySubPagesPlaceholder
+          : props.subPages?.map((subPage) => (
+              <ExpandableTableRow
+                key={subPage.card.id}
+                {...props}
+                pageTitle={subPage.page.title}
+                pageUpdatedAt={subPage.page.updatedAt.toISOString()}
+                card={subPage.card}
+                cardPage={subPage.page}
+                subPages={subPage.subPages}
+                indentTitle={30}
+                isNested
+              />
+            )))}
     </>
   );
 }
