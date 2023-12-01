@@ -1,9 +1,7 @@
 import { log } from '@charmverse/core/log';
-import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
-import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -91,8 +89,6 @@ function UserOnboardingDialog({
   const { space: currentSpace } = useCurrentSpace();
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-  const { data: userDetailsData } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
-
   const [userDetails, setUserDetails] = useState<EditableFields>({});
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
@@ -113,13 +109,6 @@ function UserOnboardingDialog({
   const isFormClean = Object.keys(userDetails).length === 0 && memberDetails.length === 0;
 
   usePreventReload(!isFormClean);
-
-  useEffect(() => {
-    setUserDetails({
-      description: userDetailsData?.description ?? '',
-      timezone: userDetailsData?.timezone ?? ''
-    });
-  }, [userDetailsData]);
 
   async function saveForm() {
     if (isFormClean) {

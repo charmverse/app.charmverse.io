@@ -149,21 +149,10 @@ export function UserDetailsFormWithSave({
   const { requiredProperties, memberProperties } = useRequiredMemberProperties({ userId: user.id });
   const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone');
   const isBioRequired = requiredProperties.find((p) => p.type === 'bio');
-  const { data: defaultUserDetails, isLoading } = useSWRImmutable(`/current-user-details`, () =>
-    charmClient.getUserDetails()
-  );
-
   const [userDetails, setForm] = useState<EditableFields>({
     description: '',
     timezone: ''
   });
-
-  useEffect(() => {
-    setForm({
-      description: defaultUserDetails?.description ?? '',
-      timezone: defaultUserDetails?.timezone ?? ''
-    });
-  }, [defaultUserDetails]);
 
   const isInputValid = (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description);
   const { mutateMembers } = useMembers();
@@ -199,7 +188,7 @@ export function UserDetailsFormWithSave({
         <Button
           disableElevation
           size='large'
-          disabled={isLoading || isFormClean || !isInputValid}
+          disabled={isFormClean || !isInputValid}
           disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
           onClick={saveForm}
         >
