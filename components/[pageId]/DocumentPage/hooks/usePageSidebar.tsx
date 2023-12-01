@@ -30,12 +30,23 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
   const [persistedActiveView, persistActiveView] = useLastSidebarView();
 
   function _setActiveView(view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) {
-    if (currentPageId && typeof view !== 'function') {
-      persistActiveView({
-        [currentPageId]: view
-      });
+    if (currentPageId) {
+      // handle case when a callback is used as the new value
+      if (typeof view === 'function') {
+        return setActiveView((prevView) => {
+          const newValue = view(prevView);
+          persistActiveView({
+            [currentPageId]: newValue
+          });
+          return newValue;
+        });
+      } else {
+        persistActiveView({
+          [currentPageId]: view
+        });
+        return setActiveView(view);
+      }
     }
-    return setActiveView(view);
   }
 
   function closeSidebar() {
