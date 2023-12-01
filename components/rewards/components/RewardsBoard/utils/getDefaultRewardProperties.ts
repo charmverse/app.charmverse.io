@@ -3,7 +3,7 @@ import type { BountyStatus } from '@charmverse/core/prisma-client';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { Constants } from 'lib/focalboard/constants';
 import {
-  ASSIGNEES_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   DUE_DATE_ID,
   REWARD_REVIEWERS_BLOCK_ID,
@@ -29,9 +29,9 @@ const rewardDbProperties = {
     options: rewardStatusOptions,
     type: 'select'
   }),
-  rewardAssignees: (): IPropertyTemplate => ({
-    id: ASSIGNEES_BLOCK_ID,
-    name: 'Assigned',
+  rewardApplicants: (): IPropertyTemplate => ({
+    id: REWARDS_APPLICANTS_BLOCK_ID,
+    name: 'Applicant',
     options: [],
     type: 'person'
   }),
@@ -89,7 +89,7 @@ export function getDefaultRewardProperties(): IPropertyTemplate[] {
   return [
     rewardDbProperties.rewardCreatedAt(),
     rewardDbProperties.rewardDueDate(),
-    rewardDbProperties.rewardAssignees(),
+    rewardDbProperties.rewardApplicants(),
     rewardDbProperties.rewardReviewers(),
     rewardDbProperties.rewardAvailableCount(),
     rewardDbProperties.rewardStatus(),

@@ -29,8 +29,8 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from 'lib/proposal/block
 import {
   REWARD_CHAIN,
   REWARD_TOKEN,
-  ASSIGNEES_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
@@ -231,14 +231,14 @@ function PropertyValueElement(props: Props) {
       />
     );
     // do not show value in reward row
-  } else if (propertyTemplate.id === ASSIGNEES_BLOCK_ID && Array.isArray(propertyValue)) {
+  } else if (propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID && Array.isArray(propertyValue)) {
     propertyValueElement = null;
   } else if (
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||
     propertyTemplate.type === 'proposalAuthor' ||
     propertyTemplate.type === 'proposalReviewer' ||
-    propertyTemplate.id === ASSIGNEES_BLOCK_ID
+    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID
   ) {
     propertyValueElement = (
       <UserSelect
