@@ -8,6 +8,7 @@ import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { Member } from 'lib/members/interfaces';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
@@ -346,7 +347,7 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-type getViewCardsProps = { viewId: string; boardId: string };
+type getViewCardsProps = { viewId: string; boardId: string; localFilters?: FilterGroup | null };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
@@ -354,19 +355,22 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
       const cards = getCards(state);
       const board = state.boards.boards[props.boardId];
       const view = state.views.views[props.viewId];
+      const filter = props.localFilters || view?.fields.filter;
+
       return {
         cards,
         board,
-        view
+        view,
+        filter
       };
     },
-    ({ cards, board, view }) => {
+    ({ cards, board, view, filter }) => {
       if (!view || !board || !cards) {
         return [];
       }
       const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        return CardFilter.applyFilterGroup(view.fields.filter, board.fields.cardProperties, result);
+        return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
       }
       return result;
     }
