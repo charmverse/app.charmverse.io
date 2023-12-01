@@ -47,11 +47,7 @@ function TableRows(props: Props): JSX.Element {
   );
 
   const setIsExpanded = ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
-    if (!expanded) {
-      setCollapsedCardIds((prev) => [...(prev ?? []), cardId]);
-    } else {
-      setCollapsedCardIds((prev) => prev?.filter((id) => id !== cardId) ?? []);
-    }
+    setCollapsedCardIds((prev) => (expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId]));
   };
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
@@ -103,7 +99,7 @@ function TableRows(props: Props): JSX.Element {
           emptySubPagesPlaceholder={
             page.bountyId ? (
               <Box my={2} display='flex' justifyContent='flex-start' mx={3}>
-                <NewWorkButton rewardId={page.bountyId} />
+                <NewWorkButton rewardId={page.bountyId} addIcon variant='outlined' buttonSize='small' />
               </Box>
             ) : null
           }
