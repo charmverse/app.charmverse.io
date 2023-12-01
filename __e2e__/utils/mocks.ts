@@ -5,7 +5,7 @@ import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
 import { baseUrl } from 'config/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createUserFromWallet } from 'lib/users/createUser';

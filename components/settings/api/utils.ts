@@ -24,7 +24,7 @@ export const getWebhookNameSpaceYupSchema = () => {
     WEBHOOK_EVENT_NAMESPACES.reduce(
       (prev, current) => ({
         ...prev,
-        [current]: yup.bool().nullable(false)
+        [current]: yup.bool().nullable()
       }),
       {}
     )

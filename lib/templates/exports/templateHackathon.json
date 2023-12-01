@@ -2319,7 +2319,7 @@
                     },
                     "content": [
                       {
-                        "text": "Climate bounties ",
+                        "text": "Climate rewards ",
                         "type": "text",
                         "marks": [
                           {
@@ -2458,7 +2458,7 @@
                     },
                     "content": [
                       {
-                        "text": "Public Goods bounties ",
+                        "text": "Public Goods rewards ",
                         "type": "text",
                         "marks": [
                           {
@@ -2630,7 +2630,7 @@
               }
             ]
           },
-          "contentText": "Feb 9-17 ONLINE | Feb 9-12 IRL @ at Verci (17 John St, New York, NY)SUBMISSIONSOn February 12, hackers can submit completed projects, design studies, and proofs-of-concept for public consideration. The best projects will be offered further grants, mentoring, investments, and/or partnerships.**Final projects must be submitted by Sunday, February 12th at 12pm EST TRACKSClimate - Sponsored by GreenNFT in partnership with BSICHacker’s eligible for this track, must submit a coherent and actionable project concept demonstrating a capacity to make a material impact on the climate climate crisis.Ideas to explore: Innovation around carbon credits pricing, trade, and verification.Financial mechanisms for funding climate projectsClimate impact and project information access  Judging criteria:Innovative approach deploying Blockchain tech (extra consideration for project that utilize NFT or related technologies)Potential for material impact on the climate crisesTechnical feasibility Economic & business viability Public Goods - Sponsored by MantleDecentralized \"money legos\" have a massive potential in driving real-world impact. Build a project that contributes to a positive sum future for all. Ideas to explore:Crowdfunding dApp (web3 version of GoFundMe, Kickstarter, Patreon, etc.)Gamification: leaderboard, reputation score, etc.Funding mechanisms: NFT auction, Nouns fork, quadratic funding, etc.Judging criteria:Innovative approaches to leveraging web3 tooling for public goodsRelevance and impactPotential for adoptionTechnical feasibilityBonus: can be built on MantlePRIZESClimate bounties - $7,000 (Sponsored by GreenNFT in partnership with BSIC)1st prize $25002nd prize $15003rd prize $1000Online: 2 x $1000Public Goods bounties - $8,000 (Sponsored by Mantle)1st prize $30002nd prize $20003rd prize $1000Online: 2x $2000",
+          "contentText": "Feb 9-17 ONLINE | Feb 9-12 IRL @ at Verci (17 John St, New York, NY)SUBMISSIONSOn February 12, hackers can submit completed projects, design studies, and proofs-of-concept for public consideration. The best projects will be offered further grants, mentoring, investments, and/or partnerships.**Final projects must be submitted by Sunday, February 12th at 12pm EST TRACKSClimate - Sponsored by GreenNFT in partnership with BSICHacker’s eligible for this track, must submit a coherent and actionable project concept demonstrating a capacity to make a material impact on the climate climate crisis.Ideas to explore: Innovation around carbon credits pricing, trade, and verification.Financial mechanisms for funding climate projectsClimate impact and project information access  Judging criteria:Innovative approach deploying Blockchain tech (extra consideration for project that utilize NFT or related technologies)Potential for material impact on the climate crisesTechnical feasibility Economic & business viability Public Goods - Sponsored by MantleDecentralized \"money legos\" have a massive potential in driving real-world impact. Build a project that contributes to a positive sum future for all. Ideas to explore:Crowdfunding dApp (web3 version of GoFundMe, Kickstarter, Patreon, etc.)Gamification: leaderboard, reputation score, etc.Funding mechanisms: NFT auction, Nouns fork, quadratic funding, etc.Judging criteria:Innovative approaches to leveraging web3 tooling for public goodsRelevance and impactPotential for adoptionTechnical feasibilityBonus: can be built on MantlePRIZESClimate rewards - $7,000 (Sponsored by GreenNFT in partnership with BSIC)1st prize $25002nd prize $15003rd prize $1000Online: 2 x $1000Public Goods rewards - $8,000 (Sponsored by Mantle)1st prize $30002nd prize $20003rd prize $1000Online: 2x $2000",
           "galleryImage": null,
           "hasContent": true,
           "headerImage": null,
@@ -4902,7 +4902,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -5555,7 +5557,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -6771,7 +6775,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -7737,7 +7743,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -8110,7 +8118,10 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["e56af877-edfc-4a6c-878c-56a894981fb4", "083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "e56af877-edfc-4a6c-878c-56a894981fb4",
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "6ebd1311-7854-4d4d-bed8-fc8dd57fdfdd",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.digtix.global"
                     },
@@ -8324,7 +8335,10 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["e56af877-edfc-4a6c-878c-56a894981fb4", "083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "e56af877-edfc-4a6c-878c-56a894981fb4",
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "c639c952-a08a-496c-ac12-b47cb9b52485",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.fractal-i.xyz"
                     },
@@ -8639,7 +8653,9 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "6ebd1311-7854-4d4d-bed8-fc8dd57fdfdd",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.convocase.xyz",
                       "f8c41428-4385-49bd-82ef-dcecf200b2c5": [
@@ -9851,7 +9867,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "11529a7a-e533-45a0-84c9-b7f1d2afe7c9",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "contentOrder": []
                   }
@@ -10005,7 +10023,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "862a3932-b6e8-45b3-ab8b-5b5bce83cf51",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "contentOrder": []
                   }
@@ -10170,7 +10190,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "2d9e6902-c4ab-4907-867e-8e503b8d864c",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "headerImage": null,
                     "contentOrder": []
@@ -10305,7 +10327,9 @@
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "74737ad4-016f-4f4f-ac45-11a66f172d72",
                       "a37645c5-84cc-4a9d-b919-52d0c7121ab1": "Team Bunny Rockets",
                       "c4073658-39b7-4a7e-a886-08c23d0f3475": "true",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "headerImage": null,
                     "contentOrder": []
@@ -11480,7 +11504,9 @@
                     "isTemplate": false,
                     "properties": {
                       "0a286876-371d-47d4-98bb-cee117949048": "0731cd9e-c4d3-4c60-b55c-dff4d6ecd4e0",
-                      "0c3e1c0c-c81d-4e15-b0d7-b4d1785eafbb": ["6eddf525-fd3f-447e-aa7d-0289c3965f50"],
+                      "0c3e1c0c-c81d-4e15-b0d7-b4d1785eafbb": [
+                        "6eddf525-fd3f-447e-aa7d-0289c3965f50"
+                      ],
                       "6d7f0697-20b7-48c5-b970-006a3395a274": "www.convocase.xyz",
                       "839513de-888f-4843-9f04-a7084d5867d9": "Marcus Marvin\nLeidianne Rosalie\nSarah Tuku\nPedro Manus"
                     },

@@ -4,6 +4,7 @@ import Avatar from '@mui/material/Avatar';
 import React from 'react';
 
 import { stringToColor } from 'lib/utilities/strings';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge' | '3xLarge';
 export type AvatarVariant = 'circular' | 'rounded' | 'square';
@@ -137,7 +138,7 @@ export default function InitialAvatar({
         ...sx
       }}
       variant={muiVariant}
-      src={avatar ?? undefined}
+      src={replaceS3Domain(avatar ?? undefined)}
       imgProps={{ referrerPolicy: 'no-referrer' }}
       alt={name}
     >

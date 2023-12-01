@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BoardFields } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
 import {
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_BOARD_VIEW_BLOCK_ID,
@@ -9,6 +9,7 @@ import {
 } from 'lib/focalboard/customBlocks/constants';
 import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
 import {
+  defaultRewardViews,
   generateDefaultBoardView,
   generateDefaultCalendarView,
   generateDefaultTableView
@@ -28,7 +29,24 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
     throw new Error('User id not found, cannot craete default rewards board');
   }
 
-  const defaultRewardViews = [DEFAULT_TABLE_VIEW_BLOCK_ID, DEFAULT_BOARD_VIEW_BLOCK_ID, DEFAULT_CALENDAR_VIEW_BLOCK_ID];
+  // safety check - if default board exists, do not override existing fields
+  const existingBlock = await prisma.rewardBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      }
+    }
+  });
+
+  let fields = { viewIds: defaultRewardViews, cardProperties: [] as IPropertyTemplate[] } as BoardFields;
+  if (existingBlock) {
+    const existingFields = existingBlock.fields as unknown as BoardFields;
+    const viewIds = existingFields?.viewIds?.length ? existingFields?.viewIds : defaultRewardViews;
+    const cardProperties = existingFields?.cardProperties?.length ? existingFields?.cardProperties : [];
+
+    fields = { ...(existingBlock.fields as unknown as BoardFields), cardProperties, viewIds };
+  }
 
   // generate / update existing board with 3 default views
   await upsertBlock({
@@ -37,7 +55,7 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
     data: {
       type: 'board',
       id: DEFAULT_BOARD_BLOCK_ID,
-      fields: { viewIds: defaultRewardViews } as BoardFields
+      fields
     }
   });
 

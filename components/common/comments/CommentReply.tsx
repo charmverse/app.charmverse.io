@@ -66,7 +66,7 @@ export function CommentReply({
   return (
     <Stack gap={1}>
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
-        <UserDisplay user={user} hideName={true} />
+        <UserDisplay userId={user.id} hideName={true} />
         <Stack gap={1} width='100%'>
           <CharmEditor
             colorMode='dark'

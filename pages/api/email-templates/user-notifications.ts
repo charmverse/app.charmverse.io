@@ -212,7 +212,7 @@ const user: Pick<User, 'id' | 'avatar' | 'username' | 'email'> = {
 };
 
 const templates = {
-  'Notify the user about bounty notifications': () => {
+  'Notify the user about reward notifications': () => {
     return emails.getPendingNotificationEmail(
       createBountyNotification({
         pageTitle: 'Create a new protocol',

@@ -16,9 +16,11 @@ import { updatePage } from 'lib/pages/server/updatePage';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
+import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
+import { replaceS3Domain } from 'lib/utilities/url';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -75,6 +77,10 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   } catch (error) {
     log.error('Could not convert page with old lists', { pageId: result.id, error });
   }
+
+  result.galleryImage = replaceS3Domain(result.galleryImage);
+  result.headerImage = replaceS3Domain(result.headerImage);
+  result.icon = replaceS3Domain(result.icon);
 
   return res.status(200).json(result);
 }

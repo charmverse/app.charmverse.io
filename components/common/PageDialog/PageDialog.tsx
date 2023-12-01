@@ -52,7 +52,11 @@ function PageDialogBase(props: Props) {
   const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
-  const fullPageUrl = page?.path ? `/${domain}/${page?.path}` : null;
+  const fullPageUrl = page?.path
+    ? `/${domain}/${page?.path}`
+    : applicationContext
+    ? `/${domain}/rewards/applications/${applicationContext.applicationId}`
+    : null;
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
@@ -146,7 +150,7 @@ function PageDialogBase(props: Props) {
         page && <FullPageActionsMenuButton isInsideDialog page={page} onDelete={close} />
       }
       toolbar={
-        contentType === 'page' && (
+        (contentType === 'page' || contentType === 'application') && (
           <Box display='flex' justifyContent='space-between'>
             <Button
               data-test='open-as-page'

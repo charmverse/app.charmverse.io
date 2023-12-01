@@ -122,18 +122,21 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
     }, 500);
   }, [updatePage]);
 
-  const showCard = async (cardId: string | null, isTemplate?: boolean) => {
-    if (cardId === null) {
-      setShownCardId(null);
-      return;
-    }
+  const showCard = useCallback(
+    async (cardId: string | null, isTemplate?: boolean) => {
+      if (cardId === null) {
+        setShownCardId(null);
+        return;
+      }
 
-    if (currentView.fields.openPageIn === 'center_peek' || isTemplate) {
-      setShownCardId(cardId);
-    } else if (currentView.fields.openPageIn === 'full_page') {
-      navigateToSpacePath(`/${cardId}`);
-    }
-  };
+      if (currentView.fields.openPageIn === 'center_peek' || isTemplate) {
+        setShownCardId(cardId);
+      } else if (currentView.fields.openPageIn === 'full_page') {
+        navigateToSpacePath(`/${cardId}`);
+      }
+    },
+    [currentView?.fields.openPageIn, navigateToSpacePath, setShownCardId]
+  );
 
   function stopPropagation(e: KeyboardEvent | MouseEvent | ClipboardEvent) {
     e.stopPropagation();

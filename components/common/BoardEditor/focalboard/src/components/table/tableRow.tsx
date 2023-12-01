@@ -3,17 +3,18 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { IconButton, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { MouseEvent, ReactElement } from 'react';
+import type { MouseEvent, ReactElement, ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -56,10 +57,12 @@ type Props = {
   cardPage: PageMeta;
   readOnlyTitle?: boolean;
   isExpanded?: boolean | null;
-  setIsExpanded?: (expanded: boolean) => void;
+  setIsExpanded?: (option: { expanded: boolean; cardId: string }) => void;
   indentTitle?: number;
   isNested?: boolean;
   expandSubRowsOnLoad?: boolean;
+  subRowsEmptyValueContent?: ReactElement | string;
+  emptySubPagesPlaceholder?: ReactNode;
 };
 
 export const columnWidth = (
@@ -91,7 +94,8 @@ function TableRow(props: Props) {
     setIsExpanded,
     isExpanded,
     indentTitle,
-    isNested
+    isNested,
+    subRowsEmptyValueContent
   } = props;
   const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
@@ -199,9 +203,23 @@ function TableRow(props: Props) {
                 <div className='octo-icontitle' style={{ alignSelf: 'flex-start', alignItems: 'flex-start' }}>
                   {setIsExpanded &&
                     (isExpanded ? (
-                      <CollapseIcon onClick={() => setIsExpanded(false)} />
+                      <CollapseIcon
+                        onClick={() =>
+                          setIsExpanded({
+                            cardId: card.id,
+                            expanded: false
+                          })
+                        }
+                      />
                     ) : isExpanded === false ? (
-                      <ExpandIcon onClick={() => setIsExpanded(true)} />
+                      <ExpandIcon
+                        onClick={() =>
+                          setIsExpanded({
+                            cardId: card.id,
+                            expanded: true
+                          })
+                        }
+                      />
                     ) : (
                       <span style={{ paddingRight: '24px' }}></span>
                     ))}
@@ -258,6 +276,8 @@ function TableRow(props: Props) {
               displayType='table'
               columnRef={columnRef}
               wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
+              // Show this component as the empty values of the subrows, to make it distinct from the empty values of the main row
+              subRowsEmptyValueContent={subRowsEmptyValueContent}
             />
           </div>
         );
@@ -276,39 +296,32 @@ function TableRow(props: Props) {
   );
 }
 
-export function ExpandableTableRow(
-  props: Omit<Props, 'isExpanded' | 'setIsExpanded'> & { isNested?: boolean; subPages?: CardPage[] }
-) {
-  const isExpandedOnRender = props.subPages?.length ? !!props.expandSubRowsOnLoad : null;
-  const [isExpanded, setIsExpanded] = useState<boolean | null>(isExpandedOnRender);
-
-  useEffect(() => {
-    setIsExpanded((v) => {
-      if (v === null && props.subPages?.length) {
-        return !!props.expandSubRowsOnLoad;
-      }
-
-      return v;
-    });
-  }, [props.subPages?.length]);
-
+export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
   return (
     <>
-      <TableRow {...props} isExpanded={isExpanded} setIsExpanded={props.subPages ? setIsExpanded : undefined} />
-      {isExpanded &&
-        props.subPages?.map((subPage) => (
-          <ExpandableTableRow
-            key={subPage.card.id}
-            {...props}
-            pageTitle={subPage.page.title}
-            pageUpdatedAt={subPage.page.updatedAt.toISOString()}
-            card={subPage.card}
-            cardPage={subPage.page}
-            subPages={subPage.subPages}
-            indentTitle={30}
-            isNested
-          />
-        ))}
+      <TableRow
+        {...props}
+        subRowsEmptyValueContent={props.isNested ? props.subRowsEmptyValueContent : undefined}
+        isExpanded={props.isExpanded}
+        setIsExpanded={props.subPages ? props.setIsExpanded : undefined}
+      />
+      {props.isExpanded &&
+        (props.subPages?.length === 0
+          ? props.emptySubPagesPlaceholder
+          : props.subPages?.map((subPage) => (
+              <ExpandableTableRow
+                key={subPage.card.id}
+                {...props}
+                pageTitle={subPage.page.title}
+                pageUpdatedAt={subPage.page.updatedAt.toISOString()}
+                card={subPage.card}
+                cardPage={subPage.page}
+                subPages={subPage.subPages}
+                indentTitle={30}
+                isNested
+                subRowsEmptyValueContent={props.subRowsEmptyValueContent}
+              />
+            )))}
     </>
   );
 }

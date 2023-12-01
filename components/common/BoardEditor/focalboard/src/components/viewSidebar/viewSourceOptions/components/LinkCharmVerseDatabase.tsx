@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { TextField } from '@mui/material';
 import { useMemo, useState } from 'react';
 
-import PagesList from 'components/common/CharmEditor/components/PageList';
+import { PagesList } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
 import { isTruthy } from 'lib/utilities/types';
 

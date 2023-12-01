@@ -8,7 +8,7 @@ import {
   DEFAULT_TABLE_VIEW_BLOCK_ID
 } from 'lib/focalboard/customBlocks/constants';
 import {
-  ASSIGNEES_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
   DUE_DATE_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -18,6 +18,12 @@ import {
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
+
+export const defaultRewardViews = [
+  DEFAULT_TABLE_VIEW_BLOCK_ID,
+  DEFAULT_BOARD_VIEW_BLOCK_ID,
+  DEFAULT_CALENDAR_VIEW_BLOCK_ID
+];
 
 export function generateDefaultCalendarView({
   spaceId,
@@ -67,7 +73,7 @@ export function generateDefaultTableView({ spaceId }: { spaceId: string }) {
   view.fields.columnWidths = {
     [Constants.titleColumnId]: 400,
     [DUE_DATE_ID]: 150,
-    [ASSIGNEES_BLOCK_ID]: 200,
+    [REWARDS_APPLICANTS_BLOCK_ID]: 200,
     [REWARD_REVIEWERS_BLOCK_ID]: 150,
     [REWARDS_AVAILABLE_BLOCK_ID]: 150,
     [REWARD_STATUS_BLOCK_ID]: 150,

@@ -29,6 +29,10 @@ export const useS3UploadInput = ({
       showMessage(`File size must be less than ${fileSizeLimitMB}MB`, 'error');
       return;
     }
+    if (file.name.includes('.htm')) {
+      showMessage('HTML files are not allowed', 'error');
+      return;
+    }
 
     setIsUploading(true);
     setProgress(0);

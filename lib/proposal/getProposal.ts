@@ -28,7 +28,11 @@ export async function getProposal({
           category: true,
           draftRubricAnswers: true,
           rubricAnswers: true,
-          rubricCriteria: true
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       },
       permissions: {

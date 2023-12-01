@@ -4,6 +4,8 @@ import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
 import SelectMenu from 'components/common/Menu';
+import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -28,7 +30,7 @@ interface LayoutOptionsProps {
 
 function LayoutOptions(props: LayoutOptionsProps) {
   const dispatch = useAppDispatch();
-
+  const isAdmin = useIsAdmin();
   const intl = props.intl;
   const hideLayoutSelectOptions = props.hideLayoutSelectOptions ?? false;
   const activeView = props.view;
@@ -157,6 +159,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
           Open pages in
         </Typography>
         <SelectMenu
+          disabled={!isAdmin}
           buttonSize='small'
           selectedValue={activeView.fields.openPageIn ?? 'center_peek'}
           options={[

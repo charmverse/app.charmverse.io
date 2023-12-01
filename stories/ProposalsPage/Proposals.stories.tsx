@@ -97,6 +97,7 @@ export function NewProposal() {
     rubricCriteria: [
       {
         id: '1',
+        index: -1,
         title: 'Spelling and grammar',
         description: 'Has correct punctuation',
         type: 'range',
@@ -107,6 +108,7 @@ export function NewProposal() {
       },
       {
         id: '2',
+        index: -1,
         title: 'Five stars',
         type: 'range',
         parameters: {
@@ -165,6 +167,7 @@ ProposalInEvaluation.parameters = {
         const rubricCriteria: ProposalWithUsersAndRubric['rubricCriteria'] = [
           {
             id: '1',
+            index: -1,
             proposalId: '1',
             title: 'Developer Presence',
             description:
@@ -177,6 +180,7 @@ ProposalInEvaluation.parameters = {
           },
           {
             id: '2',
+            index: -1,
             proposalId: '1',
             title: 'Developer Draw',
             description:
@@ -189,6 +193,7 @@ ProposalInEvaluation.parameters = {
           },
           {
             id: '3',
+            index: -1,
             proposalId: '1',
             title: 'Developer Commitment',
             description: `A\nmulti-line\ndescription`,
@@ -200,6 +205,7 @@ ProposalInEvaluation.parameters = {
           },
           {
             id: '4',
+            index: -1,
             proposalId: '1',
             title: 'Developer activity',
             description: null,
@@ -211,6 +217,7 @@ ProposalInEvaluation.parameters = {
           },
           {
             id: '5',
+            index: -1,
             proposalId: '1',
             title: 'Community engagement',
             description: null,
@@ -222,6 +229,7 @@ ProposalInEvaluation.parameters = {
           },
           {
             id: '6',
+            index: -1,
             proposalId: '1',
             title: 'Twitter activity',
             description: null,
@@ -233,6 +241,7 @@ ProposalInEvaluation.parameters = {
           },
           {
             id: '7',
+            index: -1,
             proposalId: '1',
             title: 'Github activity',
             description: null,

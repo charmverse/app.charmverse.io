@@ -27,7 +27,6 @@ type Props = {
 
 export function RewardApplications({ rewardId, onShowApplication }: Props) {
   const theme = useTheme();
-
   const { updateURLQuery } = useCharmRouter();
 
   const { user } = useUser();

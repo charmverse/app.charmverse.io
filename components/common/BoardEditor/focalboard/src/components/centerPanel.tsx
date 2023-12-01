@@ -146,8 +146,6 @@ function CenterPanel(props: Props) {
   // filter cards by whats accessible
   const cardPages: CardPage[] = useMemo(() => {
     const result = _cards
-      // TODO: dont recreate the card objects, this causes re-rendering on all cards when any card/page is updated
-      // we need to figure another way to grab the page titles probably down-stream
       .map((card) => ({
         card,
         page: pages[card.id]!
@@ -389,7 +387,8 @@ function CenterPanel(props: Props) {
   const kanbanAddCard = useCallback(
     (groupByOptionId?: string) => {
       addCard({
-        groupByOptionId
+        groupByOptionId,
+        show: true
       });
     },
     [addCard]

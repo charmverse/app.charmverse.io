@@ -13,7 +13,7 @@ export type ProposalBoardBlockFields = {
 };
 // Properties block with typed fields
 export type ProposalBoardBlock = ProposalBlock & {
-  fields: ProposalBoardBlockFields;
+  fields: ProposalBoardBlockFields | BoardFields;
   type: 'board';
 };
 

@@ -1,6 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 
 import type { Block as FBBlock } from 'lib/focalboard/block';
+import { replaceS3Domain } from 'lib/utilities/url';
 import type { ServerBlockFields } from 'pages/api/blocks';
 
 export async function fixBlocks(blocks: FBBlock[]): Promise<FBBlock[]> {
@@ -11,13 +12,17 @@ export async function fixBlocks(blocks: FBBlock[]): Promise<FBBlock[]> {
 }
 
 export function blockToFBBlock(block: Block): FBBlock {
+  const fields = block.fields as FBBlock['fields'];
+  if ('headerImage' in fields) {
+    fields.headerImage = replaceS3Domain(fields.headerImage);
+  }
   return {
     ...block,
     deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
     createdAt: new Date(block.createdAt).getTime(),
     updatedAt: new Date(block.updatedAt).getTime(),
     type: block.type as FBBlock['type'],
-    fields: block.fields as FBBlock['fields']
+    fields
   };
 }
 

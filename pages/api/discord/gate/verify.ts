@@ -18,7 +18,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys([{ key: 'spaceId', truthy: true }], 'body'))
+  .use(requireKeys([{ key: 'spaceId', valueType: 'uuid' }], 'body'))
   .post(verifyDiscordGateEndpoint);
 
 async function verifyDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse<Space>) {

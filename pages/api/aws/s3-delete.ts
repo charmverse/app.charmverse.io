@@ -4,6 +4,7 @@ import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { awsS3Bucket } from 'config/constants';
 import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -23,7 +24,7 @@ async function deleteImage(req: NextApiRequest, res: NextApiResponse) {
   const key = urlParts.join('/');
 
   const input: DeleteObjectCommandInput = {
-    Bucket: process.env.S3_UPLOAD_BUCKET as string,
+    Bucket: awsS3Bucket,
     Key: key
   };
 

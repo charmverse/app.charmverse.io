@@ -28,7 +28,7 @@ export function CurrentSpaceProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { publicSpace, accessChecked: publicAccessChecked, isPublicPath } = useSharedPage();
   const isSharedPageLoaded = isPublicPath && publicAccessChecked;
-  // Support for extracting domain from logged in view or shared bounties view
+  // Support for extracting domain from logged in view or shared rewards view
   // domain in query can be either space domain or custom domain
   const domainOrCustomDomain = router.query.domain;
 

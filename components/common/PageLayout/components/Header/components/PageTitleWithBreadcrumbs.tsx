@@ -8,11 +8,11 @@ import { useGetApplication, useGetReward } from 'charmClient/hooks/rewards';
 import Link from 'components/common/Link';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
-import { PageIcon } from '../../PageIcon';
+import { PageIcon } from '../../../../PageIcon';
 
 const BreadCrumb = styled.span`
   display: none;
@@ -146,18 +146,6 @@ function ForumPostTitle({ basePath, pathName, baseTitle }: { basePath: string; p
   );
 }
 
-function BountyPageTitle({ basePath, baseTitle }: { basePath: string; baseTitle: string }) {
-  const [pageTitle] = usePageTitle();
-  return (
-    <PageTitle>
-      <BreadCrumb>
-        <Link href={`${basePath}/bounties`}>{baseTitle}</Link>
-      </BreadCrumb>
-      {pageTitle || 'Untitled'}
-    </PageTitle>
-  );
-}
-
 function RewardsPageTitle({
   basePath,
   baseTitle,
@@ -209,7 +197,7 @@ function DefaultPageTitle() {
 
 export default function PageTitleWithBreadcrumbs({ pageId, pageType }: { pageId?: string; pageType?: PageType }) {
   const router = useRouter();
-  const { mappedFeatures } = useFeaturesAndMembers();
+  const { mappedFeatures } = useSpaceFeatures();
 
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;

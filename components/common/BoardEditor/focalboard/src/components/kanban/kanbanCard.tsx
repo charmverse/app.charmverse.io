@@ -9,7 +9,7 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -33,6 +33,7 @@ type Props = {
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
+  hideLinkedBounty?: boolean;
 };
 
 const BountyFooter = styled.div`
@@ -47,6 +48,21 @@ const BountyFooter = styled.div`
 const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
+
+function RewardMetadata({ bountyId }: { bountyId: string }) {
+  const { rewards } = useRewards();
+  const linkedBounty = rewards?.find((r) => r?.id === bountyId);
+
+  if (!linkedBounty) {
+    return null;
+  }
+
+  return (
+    <BountyFooter>
+      <RewardStatusBadge reward={linkedBounty} truncate />
+    </BountyFooter>
+  );
+}
 
 const KanbanCard = React.memo((props: Props) => {
   const { card, board, onDrop } = props;
@@ -64,11 +80,9 @@ const KanbanCard = React.memo((props: Props) => {
   }
   const { space } = useCurrentSpace();
 
-  const { rewards } = useRewards();
   const router = useRouter();
   const { pages } = usePages();
   const cardPage = pages[card.id];
-  const linkedBounty = rewards?.find((r) => r?.id === cardPage?.bountyId);
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = `/${domain}/${cardPage?.path}`;
 
@@ -153,11 +167,7 @@ const KanbanCard = React.memo((props: Props) => {
               />
             ))}
           </Stack>
-          {linkedBounty && (
-            <BountyFooter>
-              <RewardStatusBadge reward={linkedBounty} truncate />
-            </BountyFooter>
-          )}
+          {!props.hideLinkedBounty && cardPage?.bountyId && <RewardMetadata bountyId={cardPage?.bountyId} />}
         </StyledBox>
       </Link>
       {showConfirmationDialogBox && (
