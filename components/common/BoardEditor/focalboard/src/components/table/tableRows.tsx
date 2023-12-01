@@ -1,5 +1,6 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Box, Typography } from '@mui/material';
+import type { ReactElement } from 'react';
 import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -31,10 +32,19 @@ type Props = {
   readOnlyTitle?: boolean;
   expandSubRowsOnLoad?: boolean;
   rowExpansionLocalStoragePrefix?: string;
+  subRowsEmptyValueContent?: ReactElement | string;
 };
 
 function TableRows(props: Props): JSX.Element {
-  const { board, cardPages: allCardPages, activeView, onDeleteCard, expandSubRowsOnLoad } = props;
+  const {
+    board,
+    cardPages: allCardPages,
+    activeView,
+    onDeleteCard,
+    expandSubRowsOnLoad,
+    subRowsEmptyValueContent
+  } = props;
+
   const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
@@ -106,6 +116,7 @@ function TableRows(props: Props): JSX.Element {
           isExpanded={
             collapsedCardIds?.length !== 0 ? !collapsedCardIds?.includes(card.id) : !!props.expandSubRowsOnLoad
           }
+          subRowsEmptyValueContent={subRowsEmptyValueContent}
         />
       ))}
 

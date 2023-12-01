@@ -242,6 +242,7 @@ export function RewardsPage({ title }: { title: string }) {
                     onDeleteCard={onDelete}
                     expandSubRowsOnLoad
                     rowExpansionLocalStoragePrefix={currentSpace ? `rewards-${currentSpace.id}` : undefined}
+                    subRowsEmptyValueContent='--'
                   />
                 )}
                 {activeView.fields.viewType === 'calendar' && (
@@ -273,6 +274,7 @@ export function RewardsPage({ title }: { title: string }) {
                     disableAddingCards
                     readOnlyTitle
                     disableDnd
+                    hideLinkedBounty
                   />
                 )}
               </Box>

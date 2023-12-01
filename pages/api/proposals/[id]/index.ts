@@ -31,7 +31,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     include: {
       draftRubricAnswers: true,
       rubricAnswers: true,
-      rubricCriteria: true,
+      rubricCriteria: {
+        orderBy: {
+          index: 'asc'
+        }
+      },
       authors: true,
       reviewers: true,
       category: true,

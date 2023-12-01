@@ -78,24 +78,14 @@ function InviteActions({
     setAnchorEl(null);
   };
 
-  const handleInvites = (e: SyntheticEvent<any, Event>) => {
-    onOpenInvitesClick(e);
-    handleClose();
-  };
-
-  const handleTokenGate = (e: SyntheticEvent<any, Event>) => {
-    onOpenTokenGateClick(e);
-    handleClose();
-  };
-
   return (
     <>
       <Tooltip title={!isAdmin ? 'Only space admins can create invite links' : ''} arrow>
         {/* Tooltip on disabled button requires one block element below wrapper */}
         <span>
           <Button
-            id='add-invites-menu'
-            aria-controls={open ? 'demo-customized-menu' : undefined}
+            id='add-invites-button'
+            aria-controls={open ? 'add-invites-menu' : undefined}
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
             disableElevation
@@ -108,15 +98,16 @@ function InviteActions({
         </span>
       </Tooltip>
       <StyledMenu
-        id='demo-customized-menu'
+        id='add-invites-menu'
         MenuListProps={{
-          'aria-labelledby': 'add-invites-menu'
+          'aria-labelledby': 'add-invites-button'
         }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        onClick={handleClose}
       >
-        <MenuItem {...bindTrigger(invitePopupState)} onClick={handleInvites} disableRipple dense>
+        <MenuItem {...bindTrigger(invitePopupState)} onClick={onOpenInvitesClick} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
@@ -127,7 +118,7 @@ function InviteActions({
             />
           </Box>
         </MenuItem>
-        <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={handleTokenGate} disableRipple dense>
+        <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={onOpenTokenGateClick} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText

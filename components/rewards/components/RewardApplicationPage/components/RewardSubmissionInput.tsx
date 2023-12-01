@@ -23,7 +23,7 @@ import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardAp
 const schema = (customReward?: boolean) => {
   return yup.object({
     submission: yup.string().required(),
-    submissionNodes: yup.mixed().required(),
+    submissionNodes: yup.mixed<string>().required(),
     walletAddress: customReward
       ? yup.string()
       : yup.string().required().test('verifyContractFormat', 'Invalid wallet address', isValidChainAddress),
@@ -72,7 +72,7 @@ export function RewardSubmissionInput({
     mode: 'onChange',
     defaultValues: {
       submission: submission?.submission as string,
-      submissionNodes: submission?.submissionNodes as any as JSON,
+      submissionNodes: submission?.submissionNodes as any as string,
       walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address ?? ''
     },
     resolver: yupResolver(schema(hasCustomReward))
@@ -112,7 +112,7 @@ export function RewardSubmissionInput({
                 setValue('submission', content.rawText, {
                   shouldValidate: true
                 });
-                setValue('submissionNodes', content.doc, {
+                setValue('submissionNodes', content.doc as any as string, {
                   shouldValidate: true
                 });
                 setIsEditorTouched(true);

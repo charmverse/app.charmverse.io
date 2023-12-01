@@ -206,15 +206,17 @@ function mapRewardToCardPage({
     page: rewardPage,
     subPages:
       rewardPage && reward && 'applications' in reward
-        ? reward.applications.map((application) =>
-            mapApplicationToCardPage({
-              application,
-              rewardPage,
-              spaceId,
-              reward,
-              members
-            })
-          )
+        ? reward.applications
+            .filter((application) => members[application.createdBy])
+            .map((application) =>
+              mapApplicationToCardPage({
+                application,
+                rewardPage,
+                spaceId,
+                reward,
+                members
+              })
+            )
         : undefined
   };
 }

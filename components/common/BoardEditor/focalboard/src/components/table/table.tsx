@@ -39,6 +39,7 @@ type Props = {
   disableAddingCards?: boolean;
   expandSubRowsOnLoad?: boolean;
   rowExpansionLocalStoragePrefix?: string;
+  subRowsEmptyValueContent?: React.ReactElement | string;
 };
 
 function Table(props: Props): JSX.Element {
@@ -52,7 +53,8 @@ function Table(props: Props): JSX.Element {
     expandSubRowsOnLoad,
     readOnly,
     readOnlyRows,
-    rowExpansionLocalStoragePrefix
+    rowExpansionLocalStoragePrefix,
+    subRowsEmptyValueContent
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -268,6 +270,7 @@ function Table(props: Props): JSX.Element {
                   onDropToGroup={onDropToGroup}
                   readOnlyTitle={props.readOnlyTitle}
                   disableAddingCards={props.disableAddingCards}
+                  subRowsEmptyValueContent={subRowsEmptyValueContent}
                 />
               );
             })}
@@ -292,6 +295,7 @@ function Table(props: Props): JSX.Element {
               readOnlyTitle={props.readOnlyTitle}
               expandSubRowsOnLoad={expandSubRowsOnLoad}
               rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
+              subRowsEmptyValueContent={subRowsEmptyValueContent}
             />
           )}
         </div>
