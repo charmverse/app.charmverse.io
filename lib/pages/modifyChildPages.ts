@@ -54,6 +54,13 @@ export async function modifyChildPages(parentId: string, userId: string, action:
             }
           ]
         }
+      }),
+      prisma.cardNotification.deleteMany({
+        where: {
+          cardId: {
+            in: modifiedChildPageIds
+          }
+        }
       })
     ]);
   } else {
