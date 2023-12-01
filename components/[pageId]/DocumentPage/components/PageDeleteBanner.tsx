@@ -60,7 +60,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
         await navigateToSpacePath(`/${path}`);
       }
     } catch (err) {
-      // Do nothing
+      showMessage((err as any).message ?? 'Could not delete page', 'error');
     } finally {
       setIsMutating(false);
     }
