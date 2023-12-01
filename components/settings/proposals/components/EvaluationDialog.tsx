@@ -1,5 +1,6 @@
 import { ProposalEvaluationType } from '@charmverse/core/prisma';
-import { Box, MenuItem, Select, Stack, TextField } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
@@ -9,15 +10,21 @@ import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { permissionLevels, permissionGroups } from 'lib/proposal/workflows/interfaces';
-import type {
-  WorkflowTemplate,
-  EvaluationTemplate,
-  SpaceEvaluationPermission
-} from 'lib/proposal/workflows/interfaces';
+import type { EvaluationTemplate, SpaceEvaluationPermission } from 'lib/proposal/workflows/interfaces';
+
+import { evaluationIcons } from '../constants';
 
 import { EvaluationPermissions } from './EvaluationPermissions';
 
 const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluationType) as ProposalEvaluationType[];
+
+const StyledListItemText = styled(ListItemText)`
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  margin-bottom: 0;
+  justify-content: space-between;
+`;
 
 // This type is used for existing and new workflows (id is null until it is saved)
 export type EvaluationTemplateFormItem = Omit<EvaluationTemplate, 'id'> & { id: string | null };
@@ -142,9 +149,24 @@ export function EvaluationDialog({
                 rules={{ required: true }}
                 render={({ field: { onChange: _onChange, value } }) => (
                   <Select value={value} onChange={_onChange} fullWidth>
-                    <MenuItem value='pass_fail'>Pass/Fail</MenuItem>
-                    <MenuItem value='rubric'>Rubric evaluation</MenuItem>
-                    <MenuItem value='vote'>Vote</MenuItem>
+                    <MenuItem value='pass_fail'>
+                      <Box display='flex' alignItems='center' width='100%'>
+                        <ListItemIcon>{evaluationIcons.pass_fail}</ListItemIcon>
+                        <StyledListItemText primary='Pass/Fail' secondary='The first reviewer decides' />
+                      </Box>
+                    </MenuItem>
+                    <MenuItem value='rubric'>
+                      <Box display='flex' alignItems='center' width='100%'>
+                        <ListItemIcon>{evaluationIcons.rubric}</ListItemIcon>
+                        <StyledListItemText primary='Rubric' secondary='Score and comment' />
+                      </Box>
+                    </MenuItem>
+                    <MenuItem value='vote'>
+                      <Box display='flex' alignItems='center' width='100%'>
+                        <ListItemIcon>{evaluationIcons.vote}</ListItemIcon>
+                        <StyledListItemText primary='Vote' secondary='Select an option' />
+                      </Box>
+                    </MenuItem>
                   </Select>
                 )}
               />

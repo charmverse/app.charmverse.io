@@ -2,6 +2,7 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import { NonNullablePickerChangeHandler } from '@mui/x-date-pickers/internals/hooks/useViews';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useGetReviewerPool } from 'charmClient/hooks/proposals';
@@ -67,27 +68,19 @@ export const StyledUserPropertyContainer = styled(Box, {
 
 function SelectedOptions({
   value,
+  isRequiredValue = () => true,
   readOnly,
-  readOnlyMessage,
   onRemove,
   wrapColumn
 }: {
   wrapColumn?: boolean;
   readOnly: boolean;
-  readOnlyMessage?: string;
   value: SelectOptionPopulated[];
+  isRequiredValue?: (option: SelectOptionPopulated) => boolean;
   onRemove: (reviewerId: string) => void;
 }) {
   return (
     <>
-      {/* <Stack
-        display='inline-flex'
-        width={wrapColumn ? '100%' : 'min-content'}
-        flexDirection='row'
-        gap={1}
-        rowGap={0.5}
-        flexWrap='wrap'
-      > */}
       {value.map((option) => {
         return (
           <>
@@ -101,7 +94,7 @@ function SelectedOptions({
                 sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
               >
                 <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
-                {!readOnly && (
+                {!readOnly && !isRequiredValue(option) && (
                   <IconButton size='small' onClick={() => onRemove(option.id)}>
                     <CloseIcon
                       sx={{
@@ -117,12 +110,12 @@ function SelectedOptions({
             {option.group === 'role' && (
               <Chip
                 data-test='selected-user-or-role-option'
-                sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
                 label={option.name}
                 // color={option.color}
                 key={option.id}
                 size='small'
-                onDelete={readOnly ? undefined : () => onRemove(option.id)}
+                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
                 deleteIcon={
                   <CloseIcon
                     sx={{
@@ -136,13 +129,13 @@ function SelectedOptions({
             {option.group === 'system_role' && (
               <Chip
                 data-test='selected-user-or-role-option'
-                sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
                 label={option.label}
                 key={option.id}
                 icon={option.icon}
                 variant='outlined'
                 size='small'
-                onDelete={readOnly ? undefined : () => onRemove(option.id)}
+                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
                 deleteIcon={
                   <CloseIcon
                     sx={{
@@ -156,7 +149,6 @@ function SelectedOptions({
           </>
         );
       })}
-      {/* </Stack> */}
     </>
   );
 }
@@ -172,6 +164,7 @@ type Props<T> = {
   showEmptyPlaceholder?: boolean;
   systemRoles?: SystemRoleOptionPopulated[];
   value: T[];
+  isRequiredValue?: (value: SelectOptionPopulated) => boolean;
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
   wrapColumn?: boolean;
@@ -190,6 +183,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   systemRoles = [],
   variant = 'standard',
   value: inputValue,
+  isRequiredValue,
   'data-test': dataTest,
   wrapColumn,
   type = 'roleAndUser'
@@ -304,13 +298,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
             {applicableValues.length === 0 ? (
               showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
             ) : (
-              <SelectedOptions
-                readOnlyMessage={readOnlyMessage}
-                wrapColumn={wrapColumn}
-                readOnly
-                value={populatedValue}
-                onRemove={removeOption}
-              />
+              <SelectedOptions wrapColumn={wrapColumn} readOnly value={populatedValue} onRemove={removeOption} />
             )}
           </Box>
         </Tooltip>
@@ -403,6 +391,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               wrapColumn={wrapColumn}
               readOnly={!!readOnly}
               value={populatedValue}
+              isRequiredValue={isRequiredValue}
               onRemove={removeOption}
             />
           )}

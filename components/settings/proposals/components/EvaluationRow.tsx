@@ -10,8 +10,10 @@ import { evaluationIcons } from '../constants';
 import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
 
-const StyledCard = styled(Card)`
-  cursor: grab;
+const StyledCard = styled(Card, {
+  shouldForwardProp: (prop) => prop !== 'readOnly'
+})<{ readOnly: boolean }>`
+  ${({ readOnly }) => (readOnly ? 'cursor: grab;' : '')}
   ${({ theme }) => theme.breakpoints.up('sm')} {
     .show-on-hover {
       opacity: 0;
@@ -43,7 +45,7 @@ export function EvaluationRow({
   const [, , draggableRef, draggableStyle] = useSortable('view', dragKey, !readOnly, onChangeOrder);
 
   return (
-    <StyledCard style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }}>
+    <StyledCard style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }} readOnly>
       <Box p={1} display='flex' alignItems='center' gap={1} justifyContent='space-between'>
         <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />
 

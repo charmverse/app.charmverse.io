@@ -144,6 +144,13 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
             readOnly={readOnly}
             variant='outlined'
             wrapColumn
+            // required values cannot be removed
+            isRequiredValue={(option) => {
+              if (level === 'view') {
+                return option.id === SystemRole.author || option.id === SystemRole.current_reviewer;
+              }
+              return false;
+            }}
             value={valuesByLevel[level] || []}
             systemRoles={extraEvaluationRoles}
             inputPlaceholder={permissionLevelPlaceholders[level]}
@@ -151,10 +158,12 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
           />
         </Box>
       ))}
-      <Box className='octo-propertyrow'>
+
+      {/* show evaluation action which is uneditable */}
+      <Box className='octo-propertyrow' display='flex' alignItems='center'>
         <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
         {evaluation.type === 'vote' ? (
-          <Typography>Vote permissions are defined by Categories</Typography>
+          <Typography variant='caption'>Vote permissions are defined by Categories</Typography>
         ) : (
           <UserAndRoleSelect
             readOnly
