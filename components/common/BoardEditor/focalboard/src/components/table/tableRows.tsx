@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
+import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -29,6 +31,7 @@ type Props = {
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
   expandSubRowsOnLoad?: boolean;
+  rowExpansionLocalStoragePrefix?: string;
   subRowsEmptyValueContent?: ReactElement | string;
 };
 
@@ -41,8 +44,21 @@ function TableRows(props: Props): JSX.Element {
     expandSubRowsOnLoad,
     subRowsEmptyValueContent
   } = props;
+
+  const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
+
+  const [collapsedCardIds = [], setCollapsedCardIds] = useLocalStorage<string[]>(
+    hasSubPages && props.rowExpansionLocalStoragePrefix
+      ? `${props.rowExpansionLocalStoragePrefix}-collapsed-rows`
+      : null,
+    []
+  );
+
+  const setIsExpanded = ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
+    setCollapsedCardIds((prev) => (expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId]));
+  };
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
     // ignore if title is unchanged
@@ -89,6 +105,17 @@ function TableRows(props: Props): JSX.Element {
           readOnlyTitle={props.readOnlyTitle}
           subPages={subPages}
           expandSubRowsOnLoad={expandSubRowsOnLoad}
+          setIsExpanded={setIsExpanded}
+          emptySubPagesPlaceholder={
+            page.bountyId ? (
+              <Box my={2} display='flex' justifyContent='flex-start' mx={3}>
+                <NewWorkButton rewardId={page.bountyId} addIcon variant='outlined' buttonSize='small' />
+              </Box>
+            ) : null
+          }
+          isExpanded={
+            collapsedCardIds?.length !== 0 ? !collapsedCardIds?.includes(card.id) : !!props.expandSubRowsOnLoad
+          }
           subRowsEmptyValueContent={subRowsEmptyValueContent}
         />
       ))}
