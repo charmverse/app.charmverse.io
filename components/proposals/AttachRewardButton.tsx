@@ -7,8 +7,17 @@ import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import type { RewardReviewer } from 'lib/rewards/interfaces';
 
-export function AttachRewardButton({ onSave }: { onSave: (values: any) => void }) {
+export function AttachRewardButton({
+  onSave,
+  reviewers,
+  assignedSubmitters
+}: {
+  onSave: (values: any) => void;
+  reviewers: RewardReviewer[];
+  assignedSubmitters: string[];
+}) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
 
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
@@ -21,6 +30,8 @@ export function AttachRewardButton({ onSave }: { onSave: (values: any) => void }
 
   function createNewReward() {
     clearRewardValues();
+    setRewardValues({ reviewers, assignedSubmitters });
+
     openNewPage({
       type: 'bounty'
     });
@@ -69,6 +80,7 @@ export function AttachRewardButton({ onSave }: { onSave: (values: any) => void }
             isNewReward
             isTemplate={false}
             expandedByDefault
+            forcedApplicationType='assigned'
           />
         </NewDocumentPage>
       </NewPageDialog>

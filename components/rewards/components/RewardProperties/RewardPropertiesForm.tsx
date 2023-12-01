@@ -36,9 +36,14 @@ type Props = {
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
+  forcedApplicationType?: RewardApplicationType;
 };
 
-const getApplicationType = (values: UpdateableRewardFields) => {
+const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
+  if (forcedApplicationType) {
+    return forcedApplicationType;
+  }
+
   let applicationType: RewardApplicationType = values?.approveSubmitters ? 'application_required' : 'direct_submission';
 
   if (values?.assignedSubmitters?.length) {
@@ -56,10 +61,11 @@ export function RewardPropertiesForm({
   isNewReward,
   isTemplate,
   pageId,
-  expandedByDefault
+  expandedByDefault,
+  forcedApplicationType
 }: Props) {
   const [rewardApplicationType, setRewardApplicationType] = useState<RewardApplicationType>(() =>
-    getApplicationType(values)
+    getApplicationType(values, forcedApplicationType)
   );
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
@@ -75,10 +81,25 @@ export function RewardPropertiesForm({
     applyUpdates({
       maxSubmissions: undefined,
       approveSubmitters: isAssignedReward ? false : rewardApplicationType === 'application_required',
-      assignedSubmitters: isAssignedReward ? [] : null,
       allowMultipleApplications: isAssignedReward ? false : undefined
     });
   }, [rewardApplicationType, isAssignedReward]);
+
+  useEffect(() => {
+    if (isAssignedReward) {
+      if (!values?.assignedSubmitters?.length) {
+        applyUpdates({
+          assignedSubmitters: []
+        });
+      }
+
+      return;
+    }
+
+    applyUpdates({
+      assignedSubmitters: null
+    });
+  }, [rewardApplicationType, isAssignedReward, values?.assignedSubmitters]);
 
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
@@ -242,7 +263,7 @@ export function RewardPropertiesForm({
                 Application Type
               </PropertyLabel>
               <RewardApplicationType
-                readOnly={readOnly}
+                readOnly={readOnly || !!forcedApplicationType}
                 value={rewardApplicationType}
                 onChange={setRewardApplicationType}
               />

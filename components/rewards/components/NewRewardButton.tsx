@@ -4,7 +4,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';
 
 import charmClient from 'charmClient';
-import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { Button } from 'components/common/Button';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
