@@ -20,7 +20,7 @@ import { Constants } from 'lib/focalboard/constants';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import type { Member } from 'lib/members/interfaces';
 import {
-  APPLICANTS_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
@@ -176,7 +176,8 @@ function mapRewardToCardPage({
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
-    [APPLICANTS_BLOCK_ID]: (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || [],
+    [REWARDS_APPLICANTS_BLOCK_ID]:
+      (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || [],
     [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
@@ -240,7 +241,7 @@ function mapApplicationToCardPage({
     ...applicationFields.properties,
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]: null,
-    [APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
+    [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
     [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: null,

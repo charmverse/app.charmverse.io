@@ -3,7 +3,7 @@ import type { BountyStatus } from '@charmverse/core/prisma-client';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { Constants } from 'lib/focalboard/constants';
 import {
-  APPLICANTS_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   DUE_DATE_ID,
   REWARD_REVIEWERS_BLOCK_ID,
@@ -30,7 +30,7 @@ const rewardDbProperties = {
     type: 'select'
   }),
   rewardApplicants: (): IPropertyTemplate => ({
-    id: APPLICANTS_BLOCK_ID,
+    id: REWARDS_APPLICANTS_BLOCK_ID,
     name: 'Applicant',
     options: [],
     type: 'person'

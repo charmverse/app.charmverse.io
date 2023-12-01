@@ -3,7 +3,7 @@ export const DEFAULT_VIEW_BLOCK_ID = '__defaultView';
 export const REWARD_STATUS_BLOCK_ID = '__rewardStatus';
 export const REWARDER_BLOCK_ID = '__rewarder';
 // Reward-specific UI
-export const APPLICANTS_BLOCK_ID = '__applicants';
+export const REWARDS_APPLICANTS_BLOCK_ID = '__applicants';
 export const APPLICANT_BLOCK_ID = '__applicant';
 export const REWARD_REVIEWERS_BLOCK_ID = '__reviewers';
 export const REWARDS_AVAILABLE_BLOCK_ID = '__available';
@@ -16,7 +16,7 @@ export const REWARD_CUSTOM_VALUE = '__rewardCustomValue';
 
 export const defaultRewardPropertyIds = [
   REWARD_STATUS_BLOCK_ID,
-  APPLICANTS_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   APPLICANT_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
