@@ -59,33 +59,39 @@ export async function getCardNotifications({ id, userId }: QueryCondition): Prom
     });
   });
 
-  return cardNotifications.map((notification) => {
-    const notificationMetadata = notification.notificationMetadata;
-    const page = notification.card.page as Page;
-    const cardNotification = {
-      id: notification.id,
-      createdAt: notificationMetadata.createdAt.toISOString(),
-      createdBy: notificationMetadata.author,
-      pageId: page.id,
-      pagePath: page.path,
-      pageTitle: page.title || 'Untitled',
-      spaceDomain: notificationMetadata.space.domain,
-      spaceId: notificationMetadata.spaceId,
-      spaceName: notificationMetadata.space.name,
-      pageType: page.type,
-      type: notification.type,
-      personProperty:
-        notification.personPropertyId && personPropertiesRecord[notification.personPropertyId]
-          ? {
-              id: notification.personPropertyId,
-              name: personPropertiesRecord[notification.personPropertyId].name
-            }
-          : null,
-      archived: !!notificationMetadata.archivedAt,
-      read: !!notificationMetadata.seenAt,
-      group: 'card'
-    } as CardNotification;
+  return (
+    cardNotifications
+      // Don't show notifications for a card whose page was deleted
+      .filter((notification) => !!notification.card.page)
+      .map((notification) => {
+        const notificationMetadata = notification.notificationMetadata;
 
-    return cardNotification;
-  });
+        const page = notification.card.page as Page;
+        const cardNotification = {
+          id: notification.id,
+          createdAt: notificationMetadata.createdAt.toISOString(),
+          createdBy: notificationMetadata.author,
+          pageId: page.id,
+          pagePath: page.path,
+          pageTitle: page.title || 'Untitled',
+          spaceDomain: notificationMetadata.space.domain,
+          spaceId: notificationMetadata.spaceId,
+          spaceName: notificationMetadata.space.name,
+          pageType: page.type,
+          type: notification.type,
+          personProperty:
+            notification.personPropertyId && personPropertiesRecord[notification.personPropertyId]
+              ? {
+                  id: notification.personPropertyId,
+                  name: personPropertiesRecord[notification.personPropertyId].name
+                }
+              : null,
+          archived: !!notificationMetadata.archivedAt,
+          read: !!notificationMetadata.seenAt,
+          group: 'card'
+        } as CardNotification;
+
+        return cardNotification;
+      })
+  );
 }
