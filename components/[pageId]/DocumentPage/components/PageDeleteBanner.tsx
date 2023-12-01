@@ -9,7 +9,9 @@ import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/sr
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
 export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageType; pageId: string }) {
@@ -19,20 +21,30 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   const { pages } = usePages();
   const { sendMessage } = useWebSocketClient();
   const dispatch = useAppDispatch();
+  const { showMessage } = useSnackbar();
+  const { permissions } = usePagePermissions({ pageIdOrPath: pageId });
 
   async function restorePage() {
     if (space) {
-      if (pageType === 'page' || pageType === 'board') {
-        sendMessage({
-          payload: {
-            id: pageId
-          },
-          type: 'page_restored'
-        });
-      } else {
+      try {
         await charmClient.restorePage(pageId);
+
+        if (pageType === 'page' || pageType === 'board') {
+          sendMessage({
+            payload: {
+              id: pageId
+            },
+            type: 'page_restored'
+          });
+        }
+
         await mutate(`pages/${space.id}`);
         dispatch(initialDatabaseLoad({ pageId }));
+      } catch (err) {
+        showMessage((err as any).message ?? 'Could not restore page', 'error');
+        // TODO: handle error
+      } finally {
+        setIsMutating(false);
       }
     }
   }
