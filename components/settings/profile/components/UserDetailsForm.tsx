@@ -146,10 +146,14 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
-  const { requiredProperties, memberProperties } = useRequiredMemberProperties({ userId: user.id });
-  const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone');
-  const isBioRequired = requiredProperties.find((p) => p.type === 'bio');
-  const [userDetails, setForm] = useState<EditableFields>({
+  const {
+    memberProperties,
+    isTimezoneRequired,
+    isBioRequired,
+    userDetails: defaultUserDetails
+  } = useRequiredMemberProperties({ userId: user.id });
+  const [isFormClean, setIsFormClean] = useState(true);
+  const [userDetails, setUserDetails] = useState<EditableFields>({
     description: '',
     timezone: ''
   });
@@ -157,20 +161,27 @@ export function UserDetailsFormWithSave({
   const isInputValid = (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description);
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
-  const isFormClean = Object.keys(userDetails).length === 0;
 
   usePreventReload(!isFormClean);
 
+  useEffect(() => {
+    setUserDetails({
+      description: defaultUserDetails?.description ?? '',
+      timezone: defaultUserDetails?.timezone ?? ''
+    });
+  }, [defaultUserDetails]);
+
   function onFormChange(fields: EditableFields) {
-    setForm((_form) => ({ ..._form, ...fields }));
+    setIsFormClean(false);
+    setUserDetails((_form) => ({ ..._form, ...fields }));
   }
 
   async function saveForm() {
     await charmClient.updateUserDetails(userDetails);
     await mutateMembers();
-    setForm({});
     showMessage('Profile updated', 'success');
     mutate('/current-user-details');
+    setIsFormClean(true);
   }
 
   useEffect(() => {

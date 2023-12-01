@@ -83,7 +83,17 @@ function UserOnboardingDialog({
   isOnboarding?: boolean;
 }) {
   const { showMessage } = useSnackbar();
-  const { control, errors, isValid, memberProperties, values, requiredProperties } = useRequiredMemberPropertiesForm({
+  const {
+    control,
+    isTimezoneRequired,
+    userDetails: defaultUserDetails,
+    isBioRequired,
+    errors,
+    isValid,
+    memberProperties,
+    values,
+    requiredProperties
+  } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
   const { space: currentSpace } = useCurrentSpace();
@@ -92,21 +102,27 @@ function UserOnboardingDialog({
   const [userDetails, setUserDetails] = useState<EditableFields>({});
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
-  const isTimezoneRequired = requiredProperties.find((p) => p.type === 'timezone');
-  const isBioRequired = requiredProperties.find((p) => p.type === 'bio');
+  const [isFormClean, setIsFormClean] = useState(false);
   const isInputValid =
     requiredProperties.length === 0 ||
     (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
 
+  useEffect(() => {
+    setUserDetails({
+      description: defaultUserDetails?.description ?? '',
+      timezone: defaultUserDetails?.timezone ?? ''
+    });
+  }, [defaultUserDetails]);
+
   function onUserDetailsChange(fields: EditableFields) {
+    setIsFormClean(false);
     setUserDetails((_form) => ({ ..._form, ...fields }));
   }
 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
+    setIsFormClean(false);
     setMemberDetails(fields);
   }
-
-  const isFormClean = Object.keys(userDetails).length === 0 && memberDetails.length === 0;
 
   usePreventReload(!isFormClean);
 
@@ -123,8 +139,7 @@ function UserOnboardingDialog({
     }
     mutateMembers();
     onClose();
-    setUserDetails({});
-    setMemberDetails([]);
+    setIsFormClean(true);
     showMessage('Profile updated', 'success');
     mutate('/current-user-details');
   }

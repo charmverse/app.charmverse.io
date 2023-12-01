@@ -35,11 +35,11 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
         )
         .map((p) => p.memberPropertyId);
 
-      if (userDetails && isTimezoneRequired && !userDetails.timezone) {
+      if (userDetails && _isTimezoneRequired && !userDetails.timezone) {
         propertiesWithoutValue.push('timezone');
       }
 
-      if (userDetails && isBioRequired && !userDetails.description) {
+      if (userDetails && _isBioRequired && !userDetails.description) {
         propertiesWithoutValue.push('bio');
       }
 
@@ -57,12 +57,13 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     requiredProperties,
     isTimezoneRequired,
     isBioRequired,
-    nonEmptyRequiredProperties
+    nonEmptyRequiredProperties,
+    userDetails
   };
 }
 
 export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) {
-  const { memberProperties, requiredProperties } = useRequiredMemberProperties({ userId });
+  const { memberProperties, requiredProperties, ...rest } = useRequiredMemberProperties({ userId });
 
   const editableRequiredProperties = requiredProperties.filter(
     (p) =>
@@ -120,6 +121,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     isValid,
     errors,
     memberProperties,
-    requiredProperties
+    requiredProperties,
+    ...rest
   };
 }
