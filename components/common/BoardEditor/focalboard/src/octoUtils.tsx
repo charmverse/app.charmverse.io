@@ -99,10 +99,6 @@ class OctoUtils {
         displayValue = chain ? chain.chainName : '';
         break;
       }
-      case 'rewardApplicantsCount': {
-        displayValue = propertyValue === '0' ? '0' : `Applicants ${propertyValue}`;
-        break;
-      }
       case 'date': {
         if (propertyValue) {
           const singleDate = new Date(parseInt(propertyValue as string, 10));

@@ -333,7 +333,7 @@ function PropertyValueElement(props: Props) {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
     propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
-  } else if (propertyTemplate.type === 'rewardApplicantsCount') {
+  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
     const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
     if (totalApplicants) {
       return (

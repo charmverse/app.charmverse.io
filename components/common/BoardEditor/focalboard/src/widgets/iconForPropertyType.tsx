@@ -35,7 +35,6 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
     case 'proposalEvaluationTotal':
     case 'number':
     case 'tokenAmount':
-    case 'rewardApplicantsCount':
       return <NumbersIcon fontSize='small' {...props} />;
     case 'person':
     case 'proposalEvaluatedBy':

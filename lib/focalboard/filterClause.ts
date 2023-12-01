@@ -173,10 +173,6 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   tokenChain: {
     datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
-  },
-  rewardApplicantsCount: {
-    datatype: 'number',
-    conditions: NumberDataTypeConditions
   }
 };
 
