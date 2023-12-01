@@ -16,15 +16,13 @@ export function RewardsPageWithProviders() {
   return (
     <PageDialogProvider>
       <RewardsProvider>
-        <DbViewSettingsProvider>
-          <RewardBlocksProvider>
-            <RewardsBoardProvider>
-              <RewardsPage title={rewardsTitle} />
+        <RewardBlocksProvider>
+          <RewardsBoardProvider>
+            <RewardsPage title={rewardsTitle} />
 
-              <PageDialogGlobal />
-            </RewardsBoardProvider>
-          </RewardBlocksProvider>
-        </DbViewSettingsProvider>
+            <PageDialogGlobal />
+          </RewardsBoardProvider>
+        </RewardBlocksProvider>
       </RewardsProvider>
     </PageDialogProvider>
   );

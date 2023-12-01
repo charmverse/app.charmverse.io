@@ -47,11 +47,18 @@ export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, h
           color='success'
           variant='outlined'
           disabled={readOnly || !hasApplicationSlots}
+          data-test='approve-reward-button'
           onClick={() => setReviewDecision('approve')}
         >
           {approveLabel}
         </Button>
-        <Button color='error' variant='outlined' disabled={readOnly} onClick={() => setReviewDecision('reject')}>
+        <Button
+          color='error'
+          variant='outlined'
+          disabled={readOnly}
+          data-test='reject-reward-button'
+          onClick={() => setReviewDecision('reject')}
+        >
           Deny
         </Button>
       </Grid>
@@ -67,17 +74,26 @@ export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, h
           <Typography sx={{ mb: 1, whiteSpace: 'pre' }}>This decision is permanent.</Typography>
           <Box display='flex' gap={2} mt={3}>
             {reviewDecision === 'reject' && (
-              <Button color='error' onClick={() => confirmReview('reject')}>
+              <Button
+                data-test='confirm-reject-application-button'
+                color='error'
+                onClick={() => confirmReview('reject')}
+              >
                 Deny
               </Button>
             )}
             {reviewDecision === 'approve' && (
-              <Button loading={isLoading} color='success' onClick={() => confirmReview('approve')}>
+              <Button
+                data-test='confirm-approve-application-button'
+                loading={isLoading}
+                color='success'
+                onClick={() => confirmReview('approve')}
+              >
                 {approveLabel}
               </Button>
             )}
 
-            <Button variant='outlined' color='secondary' onClick={cancel}>
+            <Button data-test='cancel-review-decision-button' variant='outlined' color='secondary' onClick={cancel}>
               Cancel
             </Button>
           </Box>

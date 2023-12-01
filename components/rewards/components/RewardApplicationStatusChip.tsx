@@ -108,6 +108,7 @@ export function RewardApplicationStatusChip({
 }) {
   return (
     <StyledRewardApplicationStatusChip
+      data-test='reward-application-status-chip'
       style={{ justifyContent: 'flex-start' }}
       size={size}
       status={status}

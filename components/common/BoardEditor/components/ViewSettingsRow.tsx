@@ -1,3 +1,4 @@
+import type { SxProps } from '@mui/material';
 import { Stack, Tooltip, Typography } from '@mui/material';
 
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -8,9 +9,10 @@ import type { BoardView } from 'lib/focalboard/boardView';
 type Props = {
   activeView: BoardView;
   canSaveGlobally: boolean;
+  sx?: SxProps;
 };
 
-export function ViewSettingsRow({ activeView, canSaveGlobally }: Props) {
+export function ViewSettingsRow({ activeView, canSaveGlobally, sx }: Props) {
   const localViewSettings = useLocalDbViewSettings(activeView.id);
 
   if (!localViewSettings) {
@@ -60,7 +62,7 @@ export function ViewSettingsRow({ activeView, canSaveGlobally }: Props) {
   }
 
   return (
-    <Stack flex={1} direction='row' justifyContent='flex-end' mx={2} gap={1}>
+    <Stack flex={1} direction='row' justifyContent='flex-end' mx={2} gap={1} sx={sx}>
       <Tooltip title={`Reset local ${getSettingsLabel()} to global default`}>
         <Button onClick={resetLocalSettings} variant='text' color='secondary' size='small'>
           {canSaveGlobally ? 'Reset' : `Reset default ${getSettingsLabel()}`}
