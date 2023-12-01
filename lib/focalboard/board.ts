@@ -39,6 +39,7 @@ export type PropertyType =
   | 'updatedBy'
   | 'tokenAmount'
   | 'tokenChain'
+  | 'rewardApplicantsCount'
   | DatabaseProposalPropertyType;
 
 export const propertyTypesList: PropertyType[] = [

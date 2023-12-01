@@ -333,6 +333,18 @@ function PropertyValueElement(props: Props) {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
     propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
+  } else if (propertyTemplate.type === 'rewardApplicantsCount') {
+    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
+    if (totalApplicants) {
+      return (
+        <TextInput
+          readOnly
+          value={totalApplicants === '0' ? '0' : `Applicants ${totalApplicants}`}
+          onChange={() => {}}
+          displayType='details'
+        />
+      );
+    }
   }
 
   const commonProps = {
@@ -361,12 +373,8 @@ function PropertyValueElement(props: Props) {
       propertyValueElement = (
         <TextInput
           {...commonProps}
-          readOnly={readOnly || [REWARDS_AVAILABLE_BLOCK_ID, REWARD_APPLICANTS_COUNT].includes(propertyTemplate.id)}
-          displayType={
-            [REWARDS_AVAILABLE_BLOCK_ID, REWARD_APPLICANTS_COUNT].includes(propertyTemplate.id)
-              ? 'details'
-              : commonProps.displayType
-          }
+          readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID}
+          displayType={propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ? 'details' : commonProps.displayType}
         />
       );
     }

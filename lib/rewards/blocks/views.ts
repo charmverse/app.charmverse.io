@@ -55,7 +55,7 @@ export function generateDefaultBoardView({ spaceId }: { spaceId: string }) {
   view.id = DEFAULT_BOARD_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
   view.rootId = spaceId;
-  view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT];
+  view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT, REWARD_APPLICANTS_COUNT];
   view.fields.cardOrder = [];
 
   return view;

@@ -88,7 +88,7 @@ const rewardDbProperties = {
     id: REWARD_APPLICANTS_COUNT,
     name: 'No. of Applicants',
     options: [],
-    type: 'number'
+    type: 'rewardApplicantsCount'
   })
 };
 
