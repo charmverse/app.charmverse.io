@@ -11,6 +11,7 @@ import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload }
 import { PubSub } from 'lib/websockets/pubSub';
 
 import { useCurrentSpace } from './useCurrentSpace';
+import { useSnackbar } from './useSnackbar';
 import { useUser } from './useUser';
 
 const socketHost = `${websocketsHost || ''}/`;
@@ -49,6 +50,7 @@ export function WebSocketClientProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
 
   const { current: eventFeed } = useRef(new PubSub<ServerMessage['type'], ServerMessage['payload']>());
+  const { showMessage } = useSnackbar();
 
   const { user } = useUser();
   const { data: authResponse } = useSWRImmutable(user?.id, () => charmClient.socket()); // refresh when user
@@ -111,7 +113,16 @@ export function WebSocketClientProvider({ children }: { children: ReactNode }) {
 
   function sendMessage(message: ClientMessage) {
     pushToMessageLog(message);
-    socket.emit('message', message);
+    if (!socket.connected) {
+      log.warn('Tried to send websocket message without active connection', {
+        ...message,
+        spaceId: space?.id,
+        userId: user?.id
+      });
+      showMessage('Action failed: websocket disconnected.');
+    } else {
+      socket.emit('message', message);
+    }
   }
 
   function clearLog() {
