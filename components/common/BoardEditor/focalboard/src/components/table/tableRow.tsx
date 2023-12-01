@@ -3,7 +3,7 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { IconButton, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent, ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -60,6 +60,7 @@ type Props = {
   indentTitle?: number;
   isNested?: boolean;
   expandSubRowsOnLoad?: boolean;
+  subRowsEmptyValueContent?: ReactElement | string;
 };
 
 export const columnWidth = (
@@ -91,7 +92,8 @@ function TableRow(props: Props) {
     setIsExpanded,
     isExpanded,
     indentTitle,
-    isNested
+    isNested,
+    subRowsEmptyValueContent
   } = props;
   const { space } = useCurrentSpace();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
@@ -258,6 +260,8 @@ function TableRow(props: Props) {
               displayType='table'
               columnRef={columnRef}
               wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
+              // Show this component as the empty values of the subrows, to make it distinct from the empty values of the main row
+              subRowsEmptyValueContent={subRowsEmptyValueContent}
             />
           </div>
         );
@@ -294,7 +298,12 @@ export function ExpandableTableRow(
 
   return (
     <>
-      <TableRow {...props} isExpanded={isExpanded} setIsExpanded={props.subPages ? setIsExpanded : undefined} />
+      <TableRow
+        {...props}
+        subRowsEmptyValueContent={props.isNested ? props.subRowsEmptyValueContent : undefined}
+        isExpanded={isExpanded}
+        setIsExpanded={props.subPages ? setIsExpanded : undefined}
+      />
       {isExpanded &&
         props.subPages?.map((subPage) => (
           <ExpandableTableRow
@@ -307,6 +316,7 @@ export function ExpandableTableRow(
             subPages={subPage.subPages}
             indentTitle={30}
             isNested
+            subRowsEmptyValueContent={props.subRowsEmptyValueContent}
           />
         ))}
     </>

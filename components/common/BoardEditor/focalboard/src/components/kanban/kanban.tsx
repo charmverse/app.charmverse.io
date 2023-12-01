@@ -72,6 +72,7 @@ type Props = {
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
   disableDnd?: boolean;
+  hideLinkedBounty?: boolean;
 };
 
 function Kanban(props: Props) {
@@ -356,6 +357,7 @@ function Kanban(props: Props) {
               onCardClicked={props.onCardClicked}
               showCard={props.showCard}
               disableAddingCards={props.disableAddingCards}
+              hideLinkedBounty={props.hideLinkedBounty}
             />
           ))}
 

@@ -1,5 +1,6 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Box, Typography } from '@mui/material';
+import type { ReactElement } from 'react';
 import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -28,10 +29,18 @@ type Props = {
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
   expandSubRowsOnLoad?: boolean;
+  subRowsEmptyValueContent?: ReactElement | string;
 };
 
 function TableRows(props: Props): JSX.Element {
-  const { board, cardPages: allCardPages, activeView, onDeleteCard, expandSubRowsOnLoad } = props;
+  const {
+    board,
+    cardPages: allCardPages,
+    activeView,
+    onDeleteCard,
+    expandSubRowsOnLoad,
+    subRowsEmptyValueContent
+  } = props;
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
 
@@ -80,6 +89,7 @@ function TableRows(props: Props): JSX.Element {
           readOnlyTitle={props.readOnlyTitle}
           subPages={subPages}
           expandSubRowsOnLoad={expandSubRowsOnLoad}
+          subRowsEmptyValueContent={subRowsEmptyValueContent}
         />
       ))}
 

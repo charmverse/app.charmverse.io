@@ -66,7 +66,11 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
       reviewers: true,
       category: true,
       page: true,
-      rubricCriteria: true
+      rubricCriteria: {
+        orderBy: {
+          index: 'asc'
+        }
+      }
     }
   }) as Promise<ProposalTemplate[]>;
 }
