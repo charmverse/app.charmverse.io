@@ -32,7 +32,8 @@ import {
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
@@ -360,8 +361,12 @@ function PropertyValueElement(props: Props) {
       propertyValueElement = (
         <TextInput
           {...commonProps}
-          readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID}
-          displayType={propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ? 'details' : commonProps.displayType}
+          readOnly={readOnly || [REWARDS_AVAILABLE_BLOCK_ID, REWARD_APPLICANTS_COUNT].includes(propertyTemplate.id)}
+          displayType={
+            [REWARDS_AVAILABLE_BLOCK_ID, REWARD_APPLICANTS_COUNT].includes(propertyTemplate.id)
+              ? 'details'
+              : commonProps.displayType
+          }
         />
       );
     }
@@ -407,6 +412,7 @@ function PropertyValueElement(props: Props) {
       );
     }
   }
+
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>
@@ -414,6 +420,7 @@ function PropertyValueElement(props: Props) {
       </Tooltip>
     );
   }
+
   return propertyValueElement;
 }
 

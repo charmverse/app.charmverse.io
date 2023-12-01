@@ -31,7 +31,8 @@ import {
   REWARD_AMOUNT,
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
-  REWARD_TOKEN
+  REWARD_TOKEN,
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
@@ -181,7 +182,11 @@ function mapRewardToCardPage({
     [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
-    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || ''
+    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
+    [REWARD_APPLICANTS_COUNT]: (reward && 'applications' in reward
+      ? reward.applications.filter((application) => members[application.createdBy]).length
+      : 0
+    ).toString()
   };
 
   const card: Card<RewardPropertyValue> = {
@@ -247,7 +252,8 @@ function mapApplicationToCardPage({
     [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: null,
-    [REWARD_REVIEWERS_BLOCK_ID]: []
+    [REWARD_REVIEWERS_BLOCK_ID]: [],
+    [REWARD_APPLICANTS_COUNT]: null
   };
 
   const card: Card<RewardPropertyValue> = {
