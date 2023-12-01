@@ -39,7 +39,7 @@ export function generateDefaultCalendarView({
   view.id = DEFAULT_CALENDAR_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
   view.rootId = spaceId;
-  view.fields.visiblePropertyIds = [Constants.titleColumnId];
+  view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT];
   view.fields.cardOrder = [];
 
   // default date property
