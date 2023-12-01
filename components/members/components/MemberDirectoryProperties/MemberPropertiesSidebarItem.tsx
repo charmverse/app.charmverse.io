@@ -234,6 +234,7 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
       {!hidePremiumPropertyDetails && (
         <MemberPropertySidebarDetails
           isExpanded={toggled}
+          updateProperty={updateProperty}
           readOnly={!isEditableProperty}
           property={property}
           addPermissions={addPropertyPermissions}
