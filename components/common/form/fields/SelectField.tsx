@@ -27,6 +27,7 @@ type SelectProps = {
   placeholder?: string;
   className?: string;
   forcePopupIcon?: boolean | 'auto';
+  required?: boolean;
 };
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -34,6 +35,7 @@ type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
 export const SelectField = forwardRef<HTMLDivElement, Props>(
   (
     {
+      required,
       label,
       iconLabel,
       inline,
@@ -105,7 +107,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     }, [isOpened, isOptionEditOpened]);
 
     return (
-      <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
+      <FieldWrapper label={label} required={required} inline={inline} iconLabel={iconLabel}>
         <Autocomplete
           data-test='autocomplete'
           className={className}

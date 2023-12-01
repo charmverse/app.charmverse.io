@@ -1,13 +1,14 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, useMediaQuery } from '@mui/material';
-import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
 import { useMembers } from 'hooks/useMembers';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
@@ -42,19 +43,27 @@ export function DialogContainer({
   onClose,
   title,
   fluidSize,
-  hideCloseButton
+  hideCloseButton,
+  footerActions
 }: {
   onClose?: VoidFunction;
   title: string;
   children?: ReactNode;
   fluidSize?: boolean;
   hideCloseButton?: boolean;
+  footerActions?: React.ReactNode;
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <StyledDialog toolbar={<div />} fluidSize={fluidSize} hideCloseButton={hideCloseButton} onClose={onClose}>
+    <StyledDialog
+      toolbar={<div />}
+      fluidSize={fluidSize}
+      hideCloseButton={hideCloseButton}
+      onClose={onClose}
+      footerActions={footerActions}
+    >
       <ScrollableWindow>
         <ContentContainer fullWidth={fullWidth} top={20}>
           {title && <Legend wrap>{title}</Legend>}
@@ -66,9 +75,11 @@ export function DialogContainer({
 }
 
 export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) {
-  const { memberPropertyValues, updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
+  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
+
+  const { control, errors, isValid, memberProperties, values } = useRequiredMemberPropertiesForm({ userId });
 
   async function saveForm() {
     await updateSpaceValues(spaceId, memberDetails);
@@ -78,15 +89,6 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
     setMemberDetails(fields);
   }
-
-  const memberProperties = useMemo(
-    () =>
-      memberPropertyValues
-        ?.filter((mpv) => mpv.spaceId === spaceId)
-        .map((mpv) => mpv.properties)
-        .flat(),
-    [memberPropertyValues, spaceId]
-  );
 
   function onClickClose() {
     // refresh members only after all the editing is finished
@@ -98,6 +100,9 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
   return (
     <DialogContainer title='Edit profile' onClose={onClickClose}>
       <MemberPropertiesForm
+        values={values}
+        control={control}
+        errors={errors}
         properties={memberProperties}
         userId={userId}
         refreshPropertyValues={refreshPropertyValues}
@@ -107,7 +112,7 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
         <Button disableElevation color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
-        <Button disableElevation disabled={isFormClean} onClick={saveForm}>
+        <Button disableElevation disabled={isFormClean || !isValid} onClick={saveForm}>
           Save
         </Button>
       </Box>

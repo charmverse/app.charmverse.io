@@ -16,7 +16,7 @@ export function getPropertiesWithValues(
   { withSpaceDetails }: Options = {}
 ): PropertyValueWithDetails[] {
   return properties.map(
-    ({ enabledViews, id, spaceId, type, name, options, space: { name: spaceName, spaceImage } }) => {
+    ({ enabledViews, id, spaceId, type, name, options, space: { name: spaceName, spaceImage }, required }) => {
       const propertyValue: PropertyValueWithDetails = {
         memberPropertyId: id,
         spaceId,
@@ -24,7 +24,8 @@ export function getPropertiesWithValues(
         name,
         value: propertyValues.find((pv) => pv.memberPropertyId === id)?.value || null,
         options: options as [],
-        enabledViews
+        enabledViews,
+        required
       };
 
       if (withSpaceDetails) {
@@ -61,7 +62,7 @@ export function mapPropertyValueWithDetails({
   memberPropertyId,
   spaceId,
   value,
-  memberProperty: { type, name, enabledViews },
+  memberProperty: { type, name, enabledViews, required },
   space: { spaceImage }
 }: MemberPropertyValue & { memberProperty: MemberProperty; space: Space }): PropertyValueWithDetails {
   return {
@@ -71,6 +72,7 @@ export function mapPropertyValueWithDetails({
     type,
     name,
     spaceImage,
-    enabledViews
+    enabledViews,
+    required
   };
 }
