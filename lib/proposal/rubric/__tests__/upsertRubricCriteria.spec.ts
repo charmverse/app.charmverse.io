@@ -53,7 +53,7 @@ describe('upsertRubricCriteria', () => {
       rubrics[0],
       {
         id: expect.any(String),
-        index: 0,
+        index: 1,
         description: null,
         parameters: {
           max: 7,
