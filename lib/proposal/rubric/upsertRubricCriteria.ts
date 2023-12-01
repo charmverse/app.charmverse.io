@@ -68,7 +68,7 @@ export async function upsertRubricCriteria({
 
     // Update existing rubrics
     await Promise.all(
-      rubricCriteria.map((rubric) => {
+      rubricCriteria.map((rubric, index) => {
         // Don't use the ID if this is not already a criteria for this proposal
         const rubricCriteriaId = rubric.id && existingCriteria.some((c) => c.id === rubric.id) ? rubric.id : uuid();
         return tx.proposalRubricCriteria.upsert({
@@ -77,6 +77,7 @@ export async function upsertRubricCriteria({
           },
           create: {
             id: rubricCriteriaId,
+            index,
             title: rubric.title,
             description: rubric.description,
             type: rubric.type,
@@ -86,6 +87,7 @@ export async function upsertRubricCriteria({
           update: {
             title: rubric.title,
             description: rubric.description,
+            index,
             type: rubric.type,
             parameters: rubric.parameters
           }
@@ -96,6 +98,9 @@ export async function upsertRubricCriteria({
     return tx.proposalRubricCriteria.findMany({
       where: {
         proposalId
+      },
+      orderBy: {
+        index: 'asc'
       }
     });
   });

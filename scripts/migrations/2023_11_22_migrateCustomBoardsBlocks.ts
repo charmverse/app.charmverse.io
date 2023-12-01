@@ -18,7 +18,7 @@ export async function migrateRewardsBlocks() {
     const existingBoardBlock = blocks.find(block => block.id === '__defaultBoard' && block.spaceId === oldBlock.spaceId);
 
 
-    const udpatedFields = existingBoardBlock?.fields ? { ...existingBoardBlock.fields as any, ...oldBlock.fields as any } : oldBlock.fields;
+    const udpatedFields = existingBoardBlock?.fields ? { ...existingBoardBlock.fields as any, ...oldBlock.fields as any, viewIds: [ '__defaultView', '__defaultBoardView', '__defaultCalendarView' ]} : oldBlock.fields;
 
     await upsertRewardBlock({
       spaceId: oldBlock.spaceId,
@@ -83,6 +83,6 @@ async function deleteOldBlocks() {
 }
 
 // migrateProposalsBlocks();
-// migrateRewardsBlocks();
+migrateRewardsBlocks();
 
 // deleteOldBlocks();

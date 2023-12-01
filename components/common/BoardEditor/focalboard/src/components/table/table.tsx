@@ -35,12 +35,23 @@ type Props = {
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
+  readOnlyRows?: boolean;
   disableAddingCards?: boolean;
   expandSubRowsOnLoad?: boolean;
 };
 
 function Table(props: Props): JSX.Element {
-  const { board, cardPages, activeView, visibleGroups, groupByProperty, views, expandSubRowsOnLoad } = props;
+  const {
+    board,
+    cardPages,
+    activeView,
+    visibleGroups,
+    groupByProperty,
+    views,
+    expandSubRowsOnLoad,
+    readOnly,
+    readOnlyRows
+  } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
 
@@ -267,7 +278,7 @@ function Table(props: Props): JSX.Element {
               columnRefs={columnRefs}
               cardPages={cardPages}
               selectedCardIds={props.selectedCardIds}
-              readOnly={props.readOnly}
+              readOnly={readOnly || !!readOnlyRows}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
               offset={offset}
               resizingColumn={resizingColumn}

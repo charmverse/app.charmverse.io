@@ -32,6 +32,7 @@ describe('upsertRubricCriteria', () => {
     expect(rubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
       {
         id: expect.any(String),
+        index: 0,
         description: null,
         parameters: {
           max: 5,
@@ -52,6 +53,7 @@ describe('upsertRubricCriteria', () => {
       rubrics[0],
       {
         id: expect.any(String),
+        index: 1,
         description: null,
         parameters: {
           max: 7,

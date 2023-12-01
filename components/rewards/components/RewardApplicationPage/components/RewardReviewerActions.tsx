@@ -1,14 +1,15 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Box, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { getChainExplorerLink } from 'connectors/chains';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
+import { getGnosisTransactionUrl } from 'lib/gnosis/utils';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
@@ -37,6 +38,25 @@ export function RewardReviewerActions({
   const { showMessage } = useSnackbar();
 
   const { open, isOpen, close } = usePopupState({ variant: 'dialog', popupId: 'confirm-mark-submission-paid' });
+
+  const [pendingSafeTransactionUrl, setPendingSafeTransactionUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (application.status === 'processing' && application.transactions.length) {
+      const safeTransaction = application.transactions.find((_tx) => !!_tx.safeTxHash);
+
+      if (safeTransaction) {
+        const chainId = Number(safeTransaction.chainId);
+        getSafeApiClient({ chainId })
+          .getTransaction(safeTransaction.safeTxHash as string)
+          .then((txData) => {
+            setPendingSafeTransactionUrl(
+              getGnosisTransactionUrl(txData.safe, chainId, safeTransaction.safeTxHash as string)
+            );
+          });
+      }
+    }
+  }, [application.status, application.transactions.length]);
 
   async function recordTransaction(transactionId: string, chainId: number) {
     try {
@@ -86,6 +106,8 @@ export function RewardReviewerActions({
           tokenSymbolOrAddress={reward.rewardToken as string}
           onSuccess={recordTransaction}
           onError={(message) => showMessage(message, 'warning')}
+          submission={application}
+          refreshSubmission={refreshApplication}
         />
       )}
 
@@ -103,6 +125,13 @@ export function RewardReviewerActions({
         >
           <LaunchIcon sx={{ mr: 1 }} />
           View transaction
+        </Button>
+      )}
+
+      {application.status === 'processing' && pendingSafeTransactionUrl && (
+        <Button variant='outlined' color='secondary' external target='_blank' href={pendingSafeTransactionUrl}>
+          <LaunchIcon sx={{ mr: 1 }} />
+          View pending transaction
         </Button>
       )}
       <Modal title='Confirm payment' open={isOpen} onClose={close}>
