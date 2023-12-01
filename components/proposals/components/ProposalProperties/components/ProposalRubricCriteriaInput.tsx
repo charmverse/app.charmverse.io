@@ -15,6 +15,7 @@ import { getNumberFromString } from 'lib/utilities/numbers';
 
 export type RangeProposalCriteria = {
   id: string;
+  index: number;
   title: string;
   description?: string | null;
   type: 'range';
@@ -95,6 +96,7 @@ export function ProposalRubricCriteriaInput({
     const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
     const newCriteria: RangeProposalCriteria = {
       id: uuid(),
+      index: -1,
       description: '',
       title: '',
       type: 'range',
