@@ -1,5 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma-client';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Tooltip } from '@mui/material';
 import { useState } from 'react';
 import { mutate } from 'swr';
 
@@ -24,11 +24,13 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   const { showMessage } = useSnackbar();
   const { permissions } = usePagePermissions({ pageIdOrPath: pageId });
 
+  const canDeleteOrRestore = !!permissions?.delete;
+  const disabledButtonTooltip = !canDeleteOrRestore ? 'You do not have permission to delete or restore this page' : '';
+
   async function restorePage() {
     if (space) {
       try {
-        await charmClient.restorePage(pageId);
-
+        setIsMutating(true);
         if (pageType === 'page' || pageType === 'board') {
           sendMessage({
             payload: {
@@ -36,13 +38,13 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
             },
             type: 'page_restored'
           });
+        } else {
+          await charmClient.restorePage(pageId);
+          await mutate(`pages/${space.id}`);
+          dispatch(initialDatabaseLoad({ pageId }));
         }
-
-        await mutate(`pages/${space.id}`);
-        dispatch(initialDatabaseLoad({ pageId }));
       } catch (err) {
         showMessage((err as any).message ?? 'Could not restore page', 'error');
-        // TODO: handle error
       } finally {
         setIsMutating(false);
       }
@@ -50,10 +52,17 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   }
 
   async function deletePage() {
-    const path = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-    if (path) {
-      await navigateToSpacePath(`/${path}`);
+    try {
+      setIsMutating(true);
       await charmClient.deletePage(pageId);
+      const path = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
+      if (path) {
+        await navigateToSpacePath(`/${path}`);
+      }
+    } catch (err) {
+      // Do nothing
+    } finally {
+      setIsMutating(false);
     }
   }
 
@@ -68,34 +77,30 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
         >
           This page is in Trash
         </div>
-        <Button
-          data-test='banner--restore-archived-page'
-          color={'white' as any}
-          disabled={isMutating}
-          onClick={async () => {
-            setIsMutating(true);
-            await restorePage();
-            setIsMutating(false);
-          }}
-          variant='outlined'
-          size='small'
-        >
-          Restore Page
-        </Button>
-        <Button
-          data-test='banner--permanently-delete'
-          color={'white' as any}
-          disabled={isMutating}
-          onClick={async () => {
-            setIsMutating(true);
-            await deletePage();
-            setIsMutating(false);
-          }}
-          variant='outlined'
-          size='small'
-        >
-          Delete permanently
-        </Button>
+        <Tooltip title={disabledButtonTooltip}>
+          <Button
+            data-test='banner--restore-archived-page'
+            color={'white' as any}
+            disabled={isMutating}
+            onClick={canDeleteOrRestore ? restorePage : undefined}
+            variant='outlined'
+            size='small'
+          >
+            Restore Page
+          </Button>
+        </Tooltip>
+        <Tooltip title={disabledButtonTooltip}>
+          <Button
+            data-test='banner--permanently-delete'
+            color={'white' as any}
+            disabled={isMutating}
+            onClick={canDeleteOrRestore ? deletePage : undefined}
+            variant='outlined'
+            size='small'
+          >
+            Delete permanently
+          </Button>
+        </Tooltip>
       </Box>
     </StyledBanner>
   );
