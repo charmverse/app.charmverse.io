@@ -84,7 +84,7 @@ function FBDialog(props: Props) {
             {!!footerActions && (
               <Stack>
                 <Divider light />
-                <FooterActionsContainer>
+                <FooterActionsContainer className='footer-actions'>
                   <DialogActions sx={{ px: 0 }}>{footerActions}</DialogActions>
                 </FooterActionsContainer>
               </Stack>
