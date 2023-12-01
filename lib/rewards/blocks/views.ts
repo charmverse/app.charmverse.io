@@ -16,7 +16,8 @@ import {
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
 
 export const defaultRewardViews = [
@@ -38,7 +39,7 @@ export function generateDefaultCalendarView({
   view.id = DEFAULT_CALENDAR_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
   view.rootId = spaceId;
-  view.fields.visiblePropertyIds = [Constants.titleColumnId];
+  view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT];
   view.fields.cardOrder = [];
 
   // default date property
@@ -54,7 +55,7 @@ export function generateDefaultBoardView({ spaceId }: { spaceId: string }) {
   view.id = DEFAULT_BOARD_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
   view.rootId = spaceId;
-  view.fields.visiblePropertyIds = [Constants.titleColumnId];
+  view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT];
   view.fields.cardOrder = [];
 
   return view;
