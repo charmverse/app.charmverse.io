@@ -13,7 +13,7 @@ import { statusesAcceptingNewWork } from 'lib/rewards/shared';
 type Props = {
   rewardId?: string;
   addIcon?: boolean;
-  variant?: 'outlined' | 'contained';
+  variant?: 'outlined' | 'contained' | 'text';
   buttonSize?: 'small' | 'medium';
 };
 

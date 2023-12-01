@@ -77,6 +77,14 @@ function TableRows(props: Props): JSX.Element {
     }
   }, []);
 
+  const isExpanded = (cardId: string) => {
+    return collapsedCardIds === null
+      ? false
+      : collapsedCardIds?.length !== 0
+      ? !collapsedCardIds?.includes(cardId)
+      : !!props.expandSubRowsOnLoad;
+  };
+
   return (
     <>
       {cardPages.map(({ page, card, subPages }) => (
@@ -108,14 +116,18 @@ function TableRows(props: Props): JSX.Element {
           setIsExpanded={setIsExpanded}
           emptySubPagesPlaceholder={
             page.bountyId ? (
-              <Box my={2} display='flex' justifyContent='flex-start' mx={3}>
-                <NewWorkButton rewardId={page.bountyId} addIcon variant='outlined' buttonSize='small' />
+              <Box
+                p={1}
+                pl={5}
+                display='flex'
+                justifyContent='flex-start'
+                style={{ backgroundColor: 'var(--input-bg)' }}
+              >
+                <NewWorkButton rewardId={page.bountyId} addIcon variant='text' buttonSize='small' />
               </Box>
             ) : null
           }
-          isExpanded={
-            collapsedCardIds?.length !== 0 ? !collapsedCardIds?.includes(card.id) : !!props.expandSubRowsOnLoad
-          }
+          isExpanded={isExpanded(card.id)}
           subRowsEmptyValueContent={subRowsEmptyValueContent}
         />
       ))}
