@@ -144,6 +144,9 @@ export function ProposalRubricCriteriaInput({
     }
   }
   async function changeOptionsOrder(draggedProperty: string, droppedOnProperty: string) {
+    if (readOnly) {
+      return;
+    }
     const newOrder = [...criteriaList];
     const propIndex = newOrder.findIndex((val) => val.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
@@ -161,12 +164,15 @@ export function ProposalRubricCriteriaInput({
           key={criteria.id}
           name='rubric-option'
           itemId={criteria.id}
+          draggable={!readOnly}
           changeOrderHandler={changeOptionsOrder}
         >
           <CriteriaRow display='flex' alignItems='flex-start' gap={1} mb={1}>
-            <div className='drag-indicator show-on-hover'>
-              <DragIndicator color='secondary' fontSize='small' />
-            </div>
+            {!readOnly && (
+              <div className='drag-indicator show-on-hover'>
+                <DragIndicator color='secondary' fontSize='small' />
+              </div>
+            )}
             <TextInput
               inputProps={{ autoFocus: true }}
               displayType='details'

@@ -157,8 +157,8 @@ export function ProposalProperties({
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
   const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
   const readOnlyReviewers = readOnlyProperties || (!isAdmin && sourceTemplate && sourceTemplate.reviewers.length > 0);
-  // rubric criteria can always be updated by reviewers and admins
-  const readOnlyRubricCriteria = (readOnlyProperties || isFromTemplateSource) && !(isAdmin || isReviewer);
+  // rubric criteria can always be updated by reviewers and admins, but criteria from a template are only editable by admin
+  const readOnlyRubricCriteria = !isAdmin && ((readOnlyProperties && !isReviewer) || isFromTemplateSource);
 
   const canSeeEvaluation =
     (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
