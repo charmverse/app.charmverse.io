@@ -1,23 +1,29 @@
-import { ProposalEvaluationType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { DragIndicator } from '@mui/icons-material';
-import { Box, Card, IconButton, Typography } from '@mui/material';
+import { Box, Card, Typography } from '@mui/material';
 
 import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/sortable';
 import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
+import { evaluationIcons } from '../constants';
+
 import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
 
-const DragIcon = styled(IconButton)`
+const StyledCard = styled(Card)`
   cursor: grab;
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    .show-on-hover {
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+    &:hover {
+      .show-on-hover {
+        opacity: 1;
+      }
+    }
+  }
 `;
-
-const friendlyTypes = {
-  [ProposalEvaluationType.vote]: 'Vote',
-  [ProposalEvaluationType.rubric]: 'Rubric',
-  [ProposalEvaluationType.pass_fail]: 'Pass/Fail'
-};
 
 export function EvaluationRow({
   key,
@@ -37,14 +43,12 @@ export function EvaluationRow({
   const [, , draggableRef, draggableStyle] = useSortable('view', dragKey, !readOnly, onChangeOrder);
 
   return (
-    <Card style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }}>
+    <StyledCard style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }}>
       <Box p={1} display='flex' alignItems='center' gap={1} justifyContent='space-between'>
-        <DragIcon size='small'>
-          <DragIndicator color='secondary' fontSize='small' />
-        </DragIcon>
-        <Typography sx={{ flexGrow: 1 }}>
-          {evaluation.title} <em>({friendlyTypes[evaluation.type]})</em>
-        </Typography>
+        <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />
+
+        {evaluationIcons[evaluation.type]}
+        <Typography sx={{ flexGrow: 1 }}>{evaluation.title}</Typography>
         <EvaluationContextMenu
           evaluation={evaluation}
           onDelete={onDelete}
@@ -53,6 +57,6 @@ export function EvaluationRow({
           readOnly={readOnly}
         />
       </Box>
-    </Card>
+    </StyledCard>
   );
 }

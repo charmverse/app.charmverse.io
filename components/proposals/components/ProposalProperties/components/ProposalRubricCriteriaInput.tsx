@@ -45,7 +45,7 @@ export const CriteriaRow = styled(Box)`
   ${({ theme }) => theme.breakpoints.up('sm')} {
     .show-on-hover {
       opacity: 0;
-      transform: opacity 0.2s ease-in-out;
+      transition: opacity 0.2s ease-in-out;
     }
     &:hover {
       .show-on-hover {

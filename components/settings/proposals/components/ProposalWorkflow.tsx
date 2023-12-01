@@ -23,10 +23,12 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluationStep } from 'lib/proposal/workflows/defaultEvaluationStep';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
+import { evaluationIcons } from '../constants';
+
 import { EvaluationContextMenu } from './EvaluationContextMenu';
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
-import { EvaluationPermissions } from './EvaluationPermissions';
+import { EvaluationPermissionsRow } from './EvaluationPermissions';
 import { EvaluationRow } from './EvaluationRow';
 
 export type WorkflowTemplateFormItem = WorkflowTemplate & { isNew?: boolean };
@@ -203,30 +205,15 @@ export function ProposalWorkflowItem({
                 ))}
               {value === 'Permissions' &&
                 workflow.evaluations.map((evaluation) => (
-                  <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
-                    <Box px={2} py={1}>
-                      <Box display='flex' alignItems='center' justifyContent='space-between'>
-                        <Typography variant='h6' gutterBottom>
-                          {evaluation.title}
-                        </Typography>
-                        <EvaluationContextMenu
-                          evaluation={evaluation}
-                          onDelete={deleteEvaluationStep}
-                          onDuplicate={duplicateEvaluationStep}
-                          onRename={openEvaluationStep}
-                          readOnly={readOnly}
-                        />
-                      </Box>
-
-                      <Stack flex={1} className='CardDetail content'>
-                        <EvaluationPermissions
-                          evaluation={evaluation}
-                          onChange={updateEvaluationStep}
-                          readOnly={readOnly}
-                        />
-                      </Stack>
-                    </Box>
-                  </Card>
+                  <EvaluationPermissionsRow
+                    key={evaluation.id}
+                    evaluation={evaluation}
+                    onDelete={deleteEvaluationStep}
+                    onDuplicate={duplicateEvaluationStep}
+                    onRename={openEvaluationStep}
+                    onChange={updateEvaluationStep}
+                    readOnly={readOnly}
+                  />
                 ))}
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>

@@ -1,4 +1,4 @@
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -11,6 +11,10 @@ import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
 import { permissionLevels, SystemRole } from 'lib/proposal/workflows/interfaces';
 import type { EvaluationTemplate, PermissionLevel } from 'lib/proposal/workflows/interfaces';
 
+import { evaluationIcons, evaluateVerbs } from '../constants';
+
+import type { ContextMenuProps } from './EvaluationContextMenu';
+import { EvaluationContextMenu } from './EvaluationContextMenu';
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 
 const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
@@ -56,18 +60,49 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
   }
 ];
 
-const evaluateVerbs = {
-  rubric: 'Evaluate',
-  vote: 'Vote',
-  pass_fail: 'Review'
-};
-
 const permissionLevelPlaceholders = {
   view: 'Only admins can view the proposal',
   comment: 'No one can comment',
   edit: 'Only admins can edit the proposal',
   move: 'Only admins can change the current step'
 };
+
+export function EvaluationPermissionsRow({
+  evaluation,
+  onDelete,
+  onDuplicate,
+  onRename,
+  onChange,
+  readOnly
+}: {
+  evaluation: EvaluationTemplate;
+  onChange: (evaluation: EvaluationTemplate) => void;
+  readOnly: boolean;
+} & ContextMenuProps) {
+  return (
+    <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
+      <Box px={2} py={1}>
+        <Box display='flex' alignItems='center' gap={1} mb={1} justifyContent='space-between'>
+          {evaluationIcons[evaluation.type]}
+          <Typography variant='h6' sx={{ flexGrow: 1 }}>
+            {evaluation.title}
+          </Typography>
+          <EvaluationContextMenu
+            evaluation={evaluation}
+            onDelete={onDelete}
+            onDuplicate={onDuplicate}
+            onRename={onRename}
+            readOnly={readOnly}
+          />
+        </Box>
+
+        <Stack flex={1} className='CardDetail content'>
+          <EvaluationPermissions evaluation={evaluation} onChange={onChange} readOnly={readOnly} />
+        </Stack>
+      </Box>
+    </Card>
+  );
+}
 
 export function EvaluationPermissions<T extends EvaluationTemplateFormItem | EvaluationTemplate>({
   evaluation,
@@ -118,13 +153,17 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
       ))}
       <Box className='octo-propertyrow'>
         <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
-        <UserAndRoleSelect
-          readOnly
-          wrapColumn
-          value={[{ group: 'system_role', id: SystemRole.current_reviewer }]}
-          systemRoles={extraEvaluationRoles}
-          onChange={() => {}}
-        />
+        {evaluation.type === 'vote' ? (
+          <Typography>Vote permissions are defined by Categories</Typography>
+        ) : (
+          <UserAndRoleSelect
+            readOnly
+            wrapColumn
+            value={[{ group: 'system_role', id: SystemRole.current_reviewer }]}
+            systemRoles={extraEvaluationRoles}
+            onChange={() => {}}
+          />
+        )}
       </Box>
     </>
   );
