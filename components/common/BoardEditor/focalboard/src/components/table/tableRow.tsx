@@ -260,6 +260,7 @@ function TableRow(props: Props) {
               displayType='table'
               columnRef={columnRef}
               wrapColumn={activeView.fields.columnWrappedIds?.includes(template.id)}
+              // Show this component as the empty values of the subrows, to make it distinct from the empty values of the main row
               subRowsEmptyValueContent={subRowsEmptyValueContent}
             />
           </div>
