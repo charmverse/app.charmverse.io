@@ -13,7 +13,6 @@ import { useState } from 'react';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { countCompleteSubmissions } from 'lib/rewards/countRemainingSubmissionSlots';
 
