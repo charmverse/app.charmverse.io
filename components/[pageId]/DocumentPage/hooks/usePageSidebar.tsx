@@ -30,7 +30,7 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
   const [persistedActiveView, persistActiveView] = useLastSidebarView();
 
   function _setActiveView(view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) {
-    if ((currentPageId && typeof view === 'string') || view === null) {
+    if (currentPageId && typeof view !== 'function') {
       persistActiveView({
         [currentPageId]: view
       });
