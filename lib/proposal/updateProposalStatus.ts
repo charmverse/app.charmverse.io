@@ -113,7 +113,11 @@ export async function updateProposalStatus({
         reviewers: true,
         category: true,
         rubricAnswers: true,
-        rubricCriteria: true
+        rubricCriteria: {
+          orderBy: {
+            index: 'asc'
+          }
+        }
       }
     });
 

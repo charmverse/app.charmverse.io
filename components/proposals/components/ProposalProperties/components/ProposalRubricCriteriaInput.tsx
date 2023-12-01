@@ -15,6 +15,7 @@ import { getNumberFromString } from 'lib/utilities/numbers';
 
 export type RangeProposalCriteria = {
   id: string;
+  index: number;
   title: string;
   description?: string | null;
   type: 'range';
@@ -95,6 +96,7 @@ export function ProposalRubricCriteriaInput({
     const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
     const newCriteria: RangeProposalCriteria = {
       id: uuid(),
+      index: -1,
       description: '',
       title: '',
       type: 'range',
@@ -149,6 +151,7 @@ export function ProposalRubricCriteriaInput({
     const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
     setCriteriaList(newOrder);
+    onChange(newOrder);
   }
 
   return (
