@@ -9,7 +9,7 @@ export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation'
 
 export type IPageSidebarContext = {
   activeView: PageSidebarView | null;
-  setActiveView: (view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) => void;
+  setActiveView: (view: PageSidebarView | null) => void;
   isInsideDialog?: boolean;
   closeSidebar: () => void;
   persistedActiveView: Record<string, PageSidebarView | null> | null;
@@ -29,8 +29,8 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
   const { currentPageId } = useCurrentPage();
   const [persistedActiveView, persistActiveView] = useLastSidebarView();
 
-  function _setActiveView(view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) {
-    if (currentPageId && typeof view === 'string') {
+  function _setActiveView(view: PageSidebarView | null) {
+    if (currentPageId) {
       persistActiveView({
         [currentPageId]: view
       });

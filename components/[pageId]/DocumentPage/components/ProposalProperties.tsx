@@ -165,7 +165,7 @@ export function ProposalProperties({
 
   // open the rubric sidebar by default
   useEffect(() => {
-    if (enableSidebar) {
+    if (enableSidebar && canSeeEvaluation) {
       openEvaluation?.();
     }
   }, [canSeeEvaluation]);
