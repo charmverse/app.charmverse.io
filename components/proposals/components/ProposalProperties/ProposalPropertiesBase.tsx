@@ -522,6 +522,8 @@ export function ProposalPropertiesBase({
             onSave={(values) => {
               // console.log('🔥 save reward cb', values);
             }}
+            reviewers={proposalReviewers}
+            assignedSubmitters={proposalAuthorIds}
           />
         </Collapse>
         <Divider
