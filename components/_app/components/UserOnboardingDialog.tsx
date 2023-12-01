@@ -102,7 +102,7 @@ function UserOnboardingDialog({
   const [userDetails, setUserDetails] = useState<EditableFields>({});
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
-  const [isFormClean, setIsFormClean] = useState(false);
+  const [isFormClean, setIsFormClean] = useState(true);
   const isInputValid =
     requiredProperties.length === 0 ||
     (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
