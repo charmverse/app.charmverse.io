@@ -1,9 +1,13 @@
 import charmClient from 'charmClient';
 import { useMembers } from 'hooks/useMembers';
+import { useSpaces } from 'hooks/useSpaces';
 import type { LoggedInUser } from 'models';
+
+export type OnboardingStep = 'email_step' | 'profile_step';
 
 export function useOnboarding({ spaceId, user }: { spaceId?: string; user: LoggedInUser | null }) {
   const { members, mutateMembers, isValidating: isLoadingMembersForSpace } = useMembers();
+  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
   const userId = user?.id;
 
   async function completeOnboarding() {
@@ -17,11 +21,15 @@ export function useOnboarding({ spaceId, user }: { spaceId?: string; user: Logge
 
   const spaceMember = members.find((member) => member.id === userId);
   const showOnboardingFlow =
-    !isLoadingMembersForSpace && !!spaceMember && !spaceMember.isGuest && spaceMember.onboarded === false;
+    !isLoadingMembersForSpace && isSpacesLoaded && !spaceMember?.isGuest && spaceMember?.onboarded === false;
+  // Maybe in the future we could save this as a flag, but assume if user has joined a space arleady then they've already seen the terms and conditions
+  const hasSeenTermsAndConditions = spaces.length > 1;
+  const onboardingStep: OnboardingStep = hasSeenTermsAndConditions ? 'profile_step' : 'email_step';
 
   return {
     isGuest: spaceMember?.isGuest,
-    showOnboardingFlow,
+    onboardingStep: showOnboardingFlow ? onboardingStep : undefined,
+    hasSeenTermsAndConditions,
     completeOnboarding
   };
 }

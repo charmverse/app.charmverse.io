@@ -25,11 +25,10 @@ import { useUser } from 'hooks/useUser';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
+import type { OnboardingStep } from '../hooks/useOnboarding';
 import { useOnboarding } from '../hooks/useOnboarding';
 
 import { OnboardingEmailForm } from './OnboardingEmailForm';
-
-type Step = 'email_step' | 'profile_step';
 
 export function UserOnboardingDialogGlobal() {
   const { space } = useCurrentSpace();
@@ -44,7 +43,7 @@ export function UserOnboardingDialogGlobal() {
 }
 
 function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user: LoggedInUser }) {
-  const { showOnboardingFlow, completeOnboarding } = useOnboarding({ user, spaceId });
+  const { onboardingStep, completeOnboarding } = useOnboarding({ user, spaceId });
 
   useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
@@ -54,10 +53,15 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
     userId: user.id
   });
 
-  if (showOnboardingFlow) {
+  if (onboardingStep) {
     return (
       <div data-test='member-onboarding-form'>
-        <UserOnboardingDialog key={user.id} isOnboarding currentUser={user} onClose={completeOnboarding} />
+        <UserOnboardingDialog
+          key={user.id}
+          initialStep={onboardingStep}
+          currentUser={user}
+          onClose={completeOnboarding}
+        />
       </div>
     );
   }
@@ -73,14 +77,17 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
   return null;
 }
 
+// Case 1: first time user: show email + terms first, then profile
+// Case 2: first time joining a space: show profile
+// Case 3: missing rqeuired information: show profile
 function UserOnboardingDialog({
   currentUser,
   onClose,
-  isOnboarding = false
+  initialStep
 }: {
   onClose: VoidFunction;
   currentUser: LoggedInUser;
-  isOnboarding?: boolean;
+  initialStep?: OnboardingStep;
 }) {
   const { showMessage } = useSnackbar();
   const {
@@ -144,9 +151,7 @@ function UserOnboardingDialog({
     mutate('/current-user-details');
   }
 
-  const [currentStep, setCurrentStep] = useState<Step>(
-    isOnboarding && !currentUser.email ? 'email_step' : 'profile_step'
-  );
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
 
   function goNextStep() {
     setCurrentStep('profile_step');
@@ -166,8 +171,7 @@ function UserOnboardingDialog({
   }
 
   let title = 'Edit your profile';
-
-  if (isOnboarding) {
+  if (initialStep) {
     if (currentStep === 'email_step') {
       title = 'Welcome to CharmVerse';
     } else if (currentStep === 'profile_step') {
