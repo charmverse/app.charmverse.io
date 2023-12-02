@@ -38,8 +38,7 @@ export function MemberPropertySidebarDetails({
   const isAdmin = useIsAdmin();
   const { isFreeSpace } = useIsFreeSpace();
 
-  const isEditablePremiumProperty =
-    isAdmin && (!isFreeSpace || (isFreeSpace && PREMIUM_MEMBER_PROPERTIES.includes(property.type)));
+  const canEditPropertyPermissions = isAdmin && !isFreeSpace;
 
   const memberPropertySidebarItemPopupState = usePopupState({
     variant: 'popover',
@@ -125,7 +124,7 @@ export function MemberPropertySidebarDetails({
                       }}
                     >
                       <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
-                      {isEditablePremiumProperty && (
+                      {canEditPropertyPermissions && (
                         <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
                           <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
                             <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
@@ -146,7 +145,7 @@ export function MemberPropertySidebarDetails({
             )}
           </Stack>
 
-          {isEditablePremiumProperty && (
+          {canEditPropertyPermissions && (
             <Button
               variant='text'
               size='small'
