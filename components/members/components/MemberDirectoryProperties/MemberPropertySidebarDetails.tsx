@@ -38,8 +38,8 @@ export function MemberPropertySidebarDetails({
   const isAdmin = useIsAdmin();
   const { isFreeSpace } = useIsFreeSpace();
 
-  const hidePremiumPropertyDetails = isFreeSpace && PREMIUM_MEMBER_PROPERTIES.includes(property.type);
-  const isEditablePremiumProperty = !isFreeSpace || hidePremiumPropertyDetails;
+  const isEditablePremiumProperty =
+    isAdmin && (!isFreeSpace || (isFreeSpace && PREMIUM_MEMBER_PROPERTIES.includes(property.type)));
 
   const memberPropertySidebarItemPopupState = usePopupState({
     variant: 'popover',
