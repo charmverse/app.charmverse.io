@@ -96,7 +96,6 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
   const { isFreeSpace } = useIsFreeSpace();
 
   const hidePremiumPropertyDetails = isFreeSpace && PREMIUM_MEMBER_PROPERTIES.includes(property.type);
-  const isEditableProperty = admin && (!isFreeSpace || hidePremiumPropertyDetails);
 
   const [{ offset }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -235,7 +234,6 @@ export function MemberPropertySidebarItem({ property }: { property: MemberProper
         <MemberPropertySidebarDetails
           isExpanded={toggled}
           updateProperty={updateProperty}
-          readOnly={!isEditableProperty}
           property={property}
           addPermissions={addPropertyPermissions}
           removePermission={removePropertyPermission}
