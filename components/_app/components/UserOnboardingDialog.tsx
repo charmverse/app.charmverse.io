@@ -34,9 +34,11 @@ type Step = 'email_step' | 'profile_step';
 export function UserOnboardingDialogGlobal() {
   const { space } = useCurrentSpace();
   const { user } = useUser();
+  const { getMemberById } = useMembers();
+  const member = user ? getMemberById(user.id) : null;
 
   // Wait for user to load before deciding what to show
-  if (!user || !space) {
+  if (!user || !space || !member || member.isGuest) {
     return null;
   }
 
@@ -45,14 +47,13 @@ export function UserOnboardingDialogGlobal() {
 
 function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user: LoggedInUser }) {
   const { showOnboardingFlow, completeOnboarding } = useOnboarding({ user, spaceId });
+  const { nonEmptyRequiredProperties } = useRequiredMemberProperties({
+    userId: user.id
+  });
 
   useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
   }, []);
-
-  const { nonEmptyRequiredProperties } = useRequiredMemberProperties({
-    userId: user.id
-  });
 
   if (showOnboardingFlow) {
     return (
