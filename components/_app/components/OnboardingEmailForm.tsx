@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Stack } from '@mui/material';
+import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Stack, Tooltip } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -9,21 +9,19 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { useUser } from 'hooks/useUser';
 
+const emailSchema = yup.string().email().ensure().trim();
+
 export const schema = yup.object({
-  email: yup
-    .string()
-    .ensure()
-    .trim()
-    .email()
+  email: emailSchema
     .when('emailNewsletter', {
-      is: (val: boolean) => val === true,
-      then: () => yup.string().required('Unselect email options to proceed without email'),
-      otherwise: () => yup.string()
+      is: true,
+      then: () => emailSchema.required('Unselect email options to proceed without email'),
+      otherwise: () => emailSchema
     })
     .when('emailNotifications', {
       is: true,
-      then: () => yup.string().required('Unselect email options to proceed without email'),
-      otherwise: () => yup.string()
+      then: () => emailSchema.required('Unselect email options to proceed without email'),
+      otherwise: () => emailSchema
     }),
   emailNotifications: yup.boolean(),
   emailNewsletter: yup.boolean(),
@@ -46,8 +44,8 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
   } = useForm<FormValues>({
     defaultValues: {
       email: user?.email || '',
-      emailNewsletter: !!user?.emailNewsletter,
       emailNotifications: true,
+      emailNewsletter: !!user?.emailNewsletter,
       agreeTermsConditions: false
     },
     // mode: 'onChange',
@@ -117,9 +115,13 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
           />
         </FormGroup>
         <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
-          <Button loading={isMutating} data-test='member-email-next' type='submit' disabled={!isValid}>
-            Next
-          </Button>
+          <Tooltip title={!agreeTermsConditions ? 'You must agree to the terms and conditions to continue' : ''}>
+            <div>
+              <Button loading={isMutating} data-test='member-email-next' type='submit' disabled={!isValid}>
+                Next
+              </Button>
+            </div>
+          </Tooltip>
         </Stack>
       </Stack>
     </form>
