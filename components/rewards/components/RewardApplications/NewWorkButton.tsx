@@ -1,3 +1,4 @@
+import type { ButtonProps } from '@mui/material';
 import { Box, Tooltip } from '@mui/material';
 import { useMemo } from 'react';
 import useSWR from 'swr';
@@ -13,11 +14,12 @@ import { statusesAcceptingNewWork } from 'lib/rewards/shared';
 type Props = {
   rewardId?: string;
   addIcon?: boolean;
-  variant?: 'outlined' | 'contained' | 'text';
-  buttonSize?: 'small' | 'medium';
+  variant?: ButtonProps['variant'];
+  buttonSize?: ButtonProps['size'];
+  color?: ButtonProps['color'];
 };
 
-export function NewWorkButton({ buttonSize, addIcon, rewardId, variant = 'contained' }: Props) {
+export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 'contained' }: Props) {
   const { rewards } = useRewards();
   const { user } = useUser();
   const { updateURLQuery } = useCharmRouter();
@@ -53,13 +55,23 @@ export function NewWorkButton({ buttonSize, addIcon, rewardId, variant = 'contai
   return (
     <Tooltip title={!permissions?.work ? 'You do not have permission to work on this reward' : ''}>
       <Box alignItems='center' display='flex' flexDirection='column' justifyContent='center'>
-        <Button size={buttonSize} variant={variant} disabled={!permissions?.work} onClick={newApplication}>
+        <Button
+          color={color}
+          size={buttonSize}
+          variant={variant}
+          disabled={!permissions?.work}
+          onClick={newApplication}
+        >
           {addIcon ? (
-            <AddIcon fontSize='small' iconSize='small' label={reward.approveSubmitters ? 'Apply' : 'Submit'} />
+            <AddIcon
+              fontSize='small'
+              iconSize='small'
+              label={reward.approveSubmitters ? 'Apply for submission' : 'Create submission'}
+            />
           ) : reward.approveSubmitters ? (
-            'Apply'
+            'Apply for submission'
           ) : (
-            'Submit'
+            'Create submission'
           )}
         </Button>
       </Box>

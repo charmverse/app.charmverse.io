@@ -123,7 +123,7 @@ function TableRows(props: Props): JSX.Element {
                 justifyContent='flex-start'
                 style={{ backgroundColor: 'var(--input-bg)' }}
               >
-                <NewWorkButton rewardId={page.bountyId} addIcon variant='text' buttonSize='small' />
+                <NewWorkButton color='secondary' rewardId={page.bountyId} addIcon variant='text' buttonSize='small' />
               </Box>
             ) : null
           }
