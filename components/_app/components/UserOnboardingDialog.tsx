@@ -51,24 +51,14 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
     userId: user.id
   });
 
-  useEffect(() => {
-    log.info('[user-journey] Show onboarding flow');
-  }, []);
-
   if (showOnboardingFlow) {
     return (
-      <div data-test='member-onboarding-form'>
-        <UserOnboardingDialog key={user.id} isOnboarding currentUser={user} onClose={completeOnboarding} />
-      </div>
+      <UserOnboardingDialog key={user.id} isOnboarding currentUser={user} completeOnboarding={completeOnboarding} />
     );
   }
 
   if (nonEmptyRequiredProperties) {
-    return (
-      <div data-test='member-onboarding-form'>
-        <UserOnboardingDialog key={user.id} currentUser={user} onClose={completeOnboarding} />
-      </div>
-    );
+    return <UserOnboardingDialog key={user.id} currentUser={user} />;
   }
 
   return null;
@@ -76,10 +66,10 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
 
 function UserOnboardingDialog({
   currentUser,
-  onClose,
+  completeOnboarding,
   isOnboarding = false
 }: {
-  onClose: VoidFunction;
+  completeOnboarding?: VoidFunction;
   currentUser: LoggedInUser;
   isOnboarding?: boolean;
 }) {
@@ -92,6 +82,7 @@ function UserOnboardingDialog({
     errors,
     isValid,
     memberProperties,
+    nonEmptyRequiredProperties,
     values,
     requiredProperties
   } = useRequiredMemberPropertiesForm({
@@ -107,6 +98,10 @@ function UserOnboardingDialog({
   const isInputValid =
     requiredProperties.length === 0 ||
     (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
+
+  useEffect(() => {
+    log.info('[user-journey] Show onboarding flow');
+  }, []);
 
   useEffect(() => {
     setUserDetails({
@@ -129,7 +124,7 @@ function UserOnboardingDialog({
 
   async function saveForm() {
     if (isFormClean) {
-      onClose();
+      completeOnboarding?.();
       return;
     }
     if (Object.keys(userDetails).length > 0) {
@@ -139,7 +134,7 @@ function UserOnboardingDialog({
       await updateSpaceValues(currentSpace.id, memberDetails);
     }
     mutateMembers();
-    onClose();
+    completeOnboarding?.();
     setIsFormClean(true);
     showMessage('Profile updated', 'success');
     mutate('/current-user-details');
@@ -154,10 +149,15 @@ function UserOnboardingDialog({
   }
 
   const handleClose = () => {
+    // If there are required properties that must be filled, don't open the discard changes modal
+    if (nonEmptyRequiredProperties) {
+      return;
+    }
+
     if (!isFormClean) {
       confirmExitPopupState.open();
     } else {
-      onClose();
+      completeOnboarding?.();
     }
   };
 
@@ -231,7 +231,7 @@ function UserOnboardingDialog({
             question='Are you sure you want to close this window? You have unsaved changes.'
             onConfirm={() => {
               confirmExitPopupState.close();
-              onClose();
+              completeOnboarding?.();
             }}
           />
         </>
