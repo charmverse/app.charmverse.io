@@ -26,6 +26,8 @@ test.describe.serial('Create two spaces and visit to check cv and space onboardi
     // Turn off member email notifications checkbox so that we can proceed to next step without providing email
     await loggedInPage.memberEmailNotificationsCheckbox.click();
     await loggedInPage.memberTermsAndConditionsCheckbox.click();
+    expect(loggedInPage.memberEmailNotificationsCheckbox).not.toBeChecked();
+    expect(loggedInPage.memberTermsAndConditionsCheckbox).toBeChecked();
     await loggedInPage.memberEmailNextButton.click();
 
     const memberProfileNftList = page.locator('data-test=member-profile-nft-list');
