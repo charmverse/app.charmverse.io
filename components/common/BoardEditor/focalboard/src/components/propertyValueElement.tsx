@@ -1,5 +1,7 @@
 import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import PersonIcon from '@mui/icons-material/Person';
+import { Box, Stack, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
@@ -337,12 +339,12 @@ function PropertyValueElement(props: Props) {
     const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
     if (totalApplicants) {
       return (
-        <TextInput
-          readOnly
-          value={totalApplicants === '0' ? '0' : `Applicants ${totalApplicants}`}
-          onChange={() => {}}
-          displayType='details'
-        />
+        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
+          <Box width={20}>
+            <PersonIcon fontSize='small' />
+          </Box>
+          {totalApplicants}
+        </Stack>
       );
     }
   }
