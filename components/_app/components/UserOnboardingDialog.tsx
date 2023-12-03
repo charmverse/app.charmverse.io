@@ -79,7 +79,7 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
 
 // Case 1: first time user: show email + terms first, then profile
 // Case 2: first time joining a space: show profile
-// Case 3: missing rqeuired information: show profile
+// Case 3: missing required information: show profile
 function UserOnboardingDialog({
   currentUser,
   onClose,

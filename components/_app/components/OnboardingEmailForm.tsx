@@ -95,6 +95,7 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
         />
         <FormGroup>
           <FormControlLabel
+            data-test='member-email-notifications'
             control={<Checkbox {...register('emailNotifications')} checked={emailNotifications} onChange={onChange} />}
             label='Notify me about key activities (e.g., proposal feedback, reward status, mentions, comments)'
           />
@@ -103,6 +104,7 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
             label="Keep me up to date on what's new with CharmVerse."
           />
           <FormControlLabel
+            data-test='member-terms-conditions'
             control={
               <Checkbox {...register('agreeTermsConditions')} checked={agreeTermsConditions} onChange={onChange} />
             }
