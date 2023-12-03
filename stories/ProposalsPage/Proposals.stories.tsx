@@ -118,7 +118,41 @@ export function NewProposal() {
       }
     ],
     title: 'A simple proposition',
-    fields: { properties: {} },
+    fields: {
+      properties: {},
+      draftRewards: [
+        {
+          reward: {
+            fields: {
+              properties: {}
+            },
+            reviewers: [
+              {
+                group: 'user',
+                id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a10'
+              }
+            ],
+            assignedSubmitters: ['a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'],
+            maxSubmissions: 1,
+            approveSubmitters: false,
+            allowMultipleApplications: false,
+            chainId: 1,
+            rewardToken: 'ETH',
+            rewardAmount: 1.337,
+            customReward: null
+          },
+          page: {
+            content: null,
+            contentText: '',
+            title: 'Milestone 1: Release testnet',
+            headerImage: null,
+            icon: null,
+            type: 'bounty'
+          },
+          draftId: '87c65778-a026-444f-9812-60116b8fd07a'
+        }
+      ]
+    },
     type: 'proposal'
   });
 

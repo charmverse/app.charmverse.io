@@ -1,22 +1,26 @@
-import { useRef } from 'react';
+import { v4 } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
+import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
-import { useIsAdmin } from 'hooks/useIsAdmin';
+import type { ProposalDraftReward } from 'lib/proposal/blocks/interfaces';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export function AttachRewardButton({
   onSave,
   reviewers,
-  assignedSubmitters
+  assignedSubmitters,
+  readOnly
 }: {
-  onSave: (values: any) => void;
+  onSave: (draftReward: ProposalDraftReward) => void;
   reviewers: RewardReviewer[];
   assignedSubmitters: string[];
+  readOnly: boolean;
 }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
 
@@ -38,22 +42,12 @@ export function AttachRewardButton({
   }
 
   async function saveForm() {
-    onSave({ reward: rewardValues, page: newPageValues });
+    onSave({ reward: rewardValues, page: newPageValues, draftId: v4() });
     closeDialog();
   }
 
-  let disabledTooltip: string | undefined;
-  if (!newPageValues?.title) {
-    disabledTooltip = 'Page title is required';
-  } else if (!rewardValues.reviewers?.length) {
-    disabledTooltip = 'Reviewer is required';
-  } else if (
-    !rewardValues.customReward &&
-    (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
-  ) {
-    disabledTooltip = 'Reward is required';
-  } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
-    disabledTooltip = 'You need to assign at least one submitter';
+  if (readOnly) {
+    return null;
   }
 
   return (
@@ -62,7 +56,7 @@ export function AttachRewardButton({
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
-        disabledTooltip={disabledTooltip}
+        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues })}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
@@ -86,4 +80,28 @@ export function AttachRewardButton({
       </NewPageDialog>
     </>
   );
+}
+
+export function getDisabledTooltip({
+  newPageValues,
+  rewardValues
+}: {
+  newPageValues: NewPageValues | null;
+  rewardValues: UpdateableRewardFields;
+}) {
+  let disabledTooltip: string | undefined;
+  if (!newPageValues?.title) {
+    disabledTooltip = 'Page title is required';
+  } else if (!rewardValues.reviewers?.length) {
+    disabledTooltip = 'Reviewer is required';
+  } else if (
+    !rewardValues.customReward &&
+    (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
+  ) {
+    disabledTooltip = 'Reward is required';
+  } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
+    disabledTooltip = 'You need to assign at least one submitter';
+  }
+
+  return disabledTooltip;
 }

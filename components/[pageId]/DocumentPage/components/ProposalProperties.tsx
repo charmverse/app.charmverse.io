@@ -83,14 +83,17 @@ export function ProposalProperties({
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
     !isAdmin && sourceTemplate?.fields
-      ? Object.entries((sourceTemplate?.fields as ProposalFields).properties)?.reduce((acc, [key, value]) => {
-          if (!value) {
-            return acc;
-          }
+      ? Object.entries((sourceTemplate?.fields as unknown as ProposalFields).properties)?.reduce(
+          (acc, [key, value]) => {
+            if (!value) {
+              return acc;
+            }
 
-          acc.push(key);
-          return acc;
-        }, [] as string[])
+            acc.push(key);
+            return acc;
+          },
+          [] as string[]
+        )
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
@@ -107,7 +110,7 @@ export function ProposalProperties({
     type: proposalPage.type,
     fields:
       typeof proposal?.fields === 'object' && !!proposal?.fields
-        ? (proposal.fields as ProposalFields)
+        ? (proposal.fields as unknown as ProposalFields)
         : { properties: {} }
   };
 
