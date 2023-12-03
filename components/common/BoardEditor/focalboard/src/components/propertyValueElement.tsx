@@ -340,7 +340,7 @@ function PropertyValueElement(props: Props) {
     if (totalApplicants) {
       return (
         <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
-          <Box width={20}>
+          <Box width={20} display='flex' alignItems='center'>
             <PersonIcon fontSize='small' />
           </Box>
           {totalApplicants}
