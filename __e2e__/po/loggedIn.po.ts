@@ -12,11 +12,20 @@ export class LoggedInPage {
 
   readonly memberEmailInputLocator: Locator;
 
+  readonly memberEmailNotificationsCheckbox: Locator;
+
+  readonly memberTermsAndConditionsCheckbox: Locator;
+
+  readonly memberEmailNextButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.closeModalLocator = this.page.locator('data-test=close-modal');
     this.memberOnboardingSkipEmailLocator = this.page.locator('data-test=member-email-skip');
     this.memberEmailInputLocator = this.page.locator('data-test=member-email-input >> input');
+    this.memberEmailNotificationsCheckbox = this.page.locator('data-test=member-email-notifications');
+    this.memberTermsAndConditionsCheckbox = this.page.locator('data-test=member-terms-conditions');
+    this.memberEmailNextButton = this.page.locator('data-test=member-email-next');
   }
 
   // Utility method for not having the onboarding modal
