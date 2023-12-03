@@ -32,7 +32,8 @@ import {
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
@@ -332,6 +333,18 @@ function PropertyValueElement(props: Props) {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
     propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
+  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
+    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
+    if (totalApplicants) {
+      return (
+        <TextInput
+          readOnly
+          value={totalApplicants === '0' ? '0' : `Applicants ${totalApplicants}`}
+          onChange={() => {}}
+          displayType='details'
+        />
+      );
+    }
   }
 
   const commonProps = {
@@ -407,6 +420,7 @@ function PropertyValueElement(props: Props) {
       );
     }
   }
+
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>
@@ -414,6 +428,7 @@ function PropertyValueElement(props: Props) {
       </Tooltip>
     );
   }
+
   return propertyValueElement;
 }
 
