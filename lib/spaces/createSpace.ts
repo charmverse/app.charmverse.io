@@ -15,6 +15,7 @@ import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
+import { createTestProposal } from 'lib/proposal/createTestProposal';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import { createTestReward } from 'lib/rewards/createTestReward';
@@ -198,6 +199,12 @@ export async function createWorkspace({
   });
 
   await upsertDefaultRewardsBoard({ spaceId: space.id, userId: space.createdBy });
+
+  await createTestProposal({
+    spaceId: space.id,
+    userId: space.createdBy,
+    categoryId: defaultProposalCategories[0].id
+  });
 
   // Handle the population of pages data
   if (spaceTemplate === 'default') {
