@@ -16,6 +16,8 @@ import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMe
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
+import { createTestReward } from 'lib/rewards/createTestReward';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
@@ -188,6 +190,14 @@ export async function createWorkspace({
       }
     }
   });
+
+  // Create a test reward, and the default rewards views
+  await createTestReward({
+    spaceId: space.id,
+    userId: space.createdBy
+  });
+
+  await upsertDefaultRewardsBoard({ spaceId: space.id, userId: space.createdBy });
 
   // Handle the population of pages data
   if (spaceTemplate === 'default') {

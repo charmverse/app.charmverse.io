@@ -140,12 +140,6 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
   logWorkspaceFirstBountyEvents(createdReward);
   logUserFirstBountyEvents(createdReward);
 
-  // Upsert reward board blocks when 1st bounty is created
-  const numberOfBounties = await prisma.bounty.count({ where: { spaceId } });
-  if (numberOfBounties === 1) {
-    await upsertDefaultRewardsBoard({ spaceId, userId });
-  }
-
   return res.status(201).json(createdReward);
 }
 

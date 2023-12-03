@@ -220,73 +220,64 @@ export function RewardsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {rewards && rewards?.length > 0 ? (
-              <Box width='100%'>
-                {activeView.fields.viewType === 'table' && (
-                  <Table
-                    board={activeBoard}
-                    activeView={activeView}
-                    cardPages={cardPages as CardPage[]}
-                    groupByProperty={groupByProperty}
-                    views={views}
-                    visibleGroups={[]}
-                    selectedCardIds={[]}
-                    readOnly={!isAdmin}
-                    disableAddingCards
-                    showCard={showRewardOrApplication}
-                    readOnlyTitle
-                    readOnlyRows
-                    cardIdToFocusOnRender=''
-                    addCard={async () => {}}
-                    onCardClicked={() => {}}
-                    onDeleteCard={onDelete}
-                    expandSubRowsOnLoad
-                    rowExpansionLocalStoragePrefix={currentSpace ? `rewards-${currentSpace.id}` : undefined}
-                    subRowsEmptyValueContent='--'
-                  />
-                )}
-                {activeView.fields.viewType === 'calendar' && (
-                  <CalendarFullView
-                    board={activeBoard}
-                    cards={cards as Card[]}
-                    activeView={activeView}
-                    readOnly={!isAdmin}
-                    dateDisplayProperty={dateDisplayProperty}
-                    showCard={showRewardOrApplication}
-                    addCard={async () => {}}
-                    disableAddingCards
-                  />
-                )}
-
-                {activeView.fields.viewType === 'board' && (
-                  <Kanban
-                    board={activeBoard}
-                    activeView={activeView}
-                    cards={cards as Card[]}
-                    groupByProperty={groupByProperty}
-                    visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
-                    hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
-                    selectedCardIds={[]}
-                    readOnly={!isAdmin}
-                    addCard={async () => {}}
-                    onCardClicked={(e, card) => showRewardOrApplication(card.id)}
-                    showCard={showRewardOrApplication}
-                    disableAddingCards
-                    readOnlyTitle
-                    disableDnd
-                    hideLinkedBounty
-                  />
-                )}
-              </Box>
-            ) : (
-              <Box sx={{ mt: 3 }}>
-                <EmptyStateVideo
-                  description='Getting started with rewards'
-                  videoTitle='Rewards | Getting started with CharmVerse'
-                  videoUrl='https://tiny.charmverse.io/bounties'
+            <Box width='100%'>
+              {activeView.fields.viewType === 'table' && (
+                <Table
+                  board={activeBoard}
+                  activeView={activeView}
+                  cardPages={cardPages as CardPage[]}
+                  groupByProperty={groupByProperty}
+                  views={views}
+                  visibleGroups={[]}
+                  selectedCardIds={[]}
+                  readOnly={!isAdmin}
+                  disableAddingCards
+                  showCard={showRewardOrApplication}
+                  readOnlyTitle
+                  readOnlyRows
+                  cardIdToFocusOnRender=''
+                  addCard={async () => {}}
+                  onCardClicked={() => {}}
+                  onDeleteCard={onDelete}
+                  expandSubRowsOnLoad
+                  rowExpansionLocalStoragePrefix={currentSpace ? `rewards-${currentSpace.id}` : undefined}
+                  subRowsEmptyValueContent='--'
                 />
-              </Box>
-            )}
+              )}
+
+              {activeView.fields.viewType === 'calendar' && (
+                <CalendarFullView
+                  board={activeBoard}
+                  cards={cards as Card[]}
+                  activeView={activeView}
+                  readOnly={!isAdmin}
+                  dateDisplayProperty={dateDisplayProperty}
+                  showCard={showRewardOrApplication}
+                  addCard={async () => {}}
+                  disableAddingCards
+                />
+              )}
+
+              {activeView.fields.viewType === 'board' && (
+                <Kanban
+                  board={activeBoard}
+                  activeView={activeView}
+                  cards={cards as Card[]}
+                  groupByProperty={groupByProperty}
+                  visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
+                  hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
+                  selectedCardIds={[]}
+                  readOnly={!isAdmin}
+                  addCard={async () => {}}
+                  onCardClicked={(e, card) => showRewardOrApplication(card.id)}
+                  showCard={showRewardOrApplication}
+                  disableAddingCards
+                  readOnlyTitle
+                  disableDnd
+                  hideLinkedBounty
+                />
+              )}
+            </Box>
 
             {isAdmin && (
               <ViewSidebar
