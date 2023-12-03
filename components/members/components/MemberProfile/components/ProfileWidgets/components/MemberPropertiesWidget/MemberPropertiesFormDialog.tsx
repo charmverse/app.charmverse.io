@@ -29,6 +29,13 @@ const ContentContainer = styled(Container)`
 `;
 
 const StyledDialog = styled(Dialog)<{ fluidSize?: boolean }>`
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    .footer-actions {
+      width: 100%;
+      padding: 0px 95px;
+    }
+  }
+
   ${(props) =>
     props.fluidSize
       ? `.dialog {
