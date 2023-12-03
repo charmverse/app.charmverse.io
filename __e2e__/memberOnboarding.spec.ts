@@ -9,7 +9,8 @@ import { login } from './utils/session';
 test.describe.serial('Create two spaces and visit to check cv and space onboarding modal', async () => {
   test('Fill the form and create a new space', async ({ page, loggedInPage }) => {
     const { space, user } = await generateUserAndSpace({
-      skipOnboarding: false
+      skipOnboarding: false,
+      email: undefined
     });
 
     await login({ page, userId: user.id });
