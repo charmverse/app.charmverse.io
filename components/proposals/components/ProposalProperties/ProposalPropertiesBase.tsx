@@ -18,7 +18,8 @@ import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import { AttachRewardButton } from 'components/proposals/AttachRewardButton';
+import { AttachRewardButton } from 'components/proposals/components/AttachRewardButton';
+import { ProposalDraftRewards } from 'components/proposals/components/ProposalDraftRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/components/ProposalProperties/CustomPropertiesAdapter';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -185,6 +186,8 @@ export function ProposalPropertiesBase({
     ? pages[proposalFormInputs.proposalTemplateId]
     : null;
 
+  const draftRewards = proposalFormInputs.fields?.draftRewards || [];
+
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
       setProposalFormInputs({
@@ -217,7 +220,7 @@ export function ProposalPropertiesBase({
           proposalTemplateId: templatePage.id,
           evaluationType: proposalTemplate.evaluationType,
           rubricCriteria: proposalTemplate.rubricCriteria,
-          fields: (proposalTemplate.fields as ProposalFields) || {}
+          fields: (proposalTemplate.fields as unknown as ProposalFields) || {}
         });
       }
     }
@@ -510,20 +513,54 @@ export function ProposalPropertiesBase({
             </Box>
           )}
 
+          <ProposalDraftRewards
+            rewards={draftRewards}
+            readOnly={!!readOnlyAuthors}
+            onSave={(draftReward) => {
+              setProposalFormInputs({
+                fields: {
+                  ...proposalFormInputs.fields,
+                  draftRewards: [...(proposalFormInputs.fields?.draftRewards || [])].map((draft) => {
+                    if (draft.draftId === draftReward.draftId) {
+                      return draftReward;
+                    }
+                    return draft;
+                  })
+                }
+              });
+            }}
+            onDelete={(draftId: string) => {
+              setProposalFormInputs({
+                fields: {
+                  ...proposalFormInputs.fields,
+                  draftRewards: [...(proposalFormInputs.fields?.draftRewards || [])].filter(
+                    (draft) => draft.draftId !== draftId
+                  )
+                }
+              });
+            }}
+          />
+
           <CustomPropertiesAdapter
             readOnly={readOnlyAuthors}
             readOnlyProperties={readOnlyCustomProperties}
             proposal={proposalFormInputs}
             onChange={(properties: ProposalPropertiesField) => {
               setProposalFormInputs({
-                fields: { properties: properties ? { ...properties } : {} }
+                fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
               });
             }}
           />
 
           <AttachRewardButton
-            onSave={(values) => {
-              // console.log('🔥 save reward cb', values);
+            readOnly={!!readOnlyAuthors}
+            onSave={(newDraftReward) => {
+              setProposalFormInputs({
+                fields: {
+                  ...proposalFormInputs.fields,
+                  draftRewards: [...(proposalFormInputs.fields?.draftRewards || []), newDraftReward]
+                }
+              });
             }}
             reviewers={proposalReviewers}
             assignedSubmitters={proposalAuthorIds}

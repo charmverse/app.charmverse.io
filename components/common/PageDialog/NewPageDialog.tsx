@@ -60,7 +60,7 @@ export function NewPageDialog({
       footerActions={
         <Box display='flex' gap={1}>
           {!!onCancel && (
-            <Button color='secondary' variant='outlined' onClick={onSave} data-test='cancel-new-page-button'>
+            <Button color='secondary' variant='outlined' onClick={onCancel} data-test='cancel-new-page-button'>
               Cancel
             </Button>
           )}
