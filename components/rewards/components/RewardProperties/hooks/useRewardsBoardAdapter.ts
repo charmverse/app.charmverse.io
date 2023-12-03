@@ -156,6 +156,10 @@ function mapRewardToCardPage({
 }): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
+  const validApplications =
+    reward && 'applications' in reward
+      ? reward.applications.filter((application) => members[application.createdBy])
+      : [];
 
   rewardFields.properties = {
     ...rewardFields.properties,
@@ -165,7 +169,7 @@ function mapRewardToCardPage({
       reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
         ? (
             countRemainingSubmissionSlots({
-              applications: reward.applications ?? [],
+              applications: validApplications,
               limit: reward.maxSubmissions
             }) as number
           )?.toString()
@@ -177,16 +181,12 @@ function mapRewardToCardPage({
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
-    [REWARDS_APPLICANTS_BLOCK_ID]:
-      (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || [],
+    [REWARDS_APPLICANTS_BLOCK_ID]: validApplications.map((a) => a.createdBy),
     [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
     [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
-    [REWARD_APPLICANTS_COUNT]: (reward && 'applications' in reward
-      ? reward.applications.filter((application) => members[application.createdBy]).length
-      : 0
-    ).toString()
+    [REWARD_APPLICANTS_COUNT]: validApplications.length.toString()
   };
 
   const card: Card<RewardPropertyValue> = {
