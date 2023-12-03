@@ -2,8 +2,10 @@ import type { BountyStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { getENSName } from 'lib/blockchain';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
+import { isTruthy } from 'lib/utilities/types';
 
 const handler = apiHandler();
 
@@ -177,9 +179,25 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   function getRecipients(bounty: (typeof bounties)[number]) {
     return bounty.applications
       .filter((application) => application.status === 'paid' && application.walletAddress)
-      .map((application) => ({
-        address: application.walletAddress as string
-      }));
+      .map((application) => {
+        if (application.walletAddress?.endsWith('.eth')) {
+          const ensName = getENSName(application.walletAddress as string)?.then((address) => ({
+            address: address as string
+          }));
+
+          return Promise.resolve(
+            ensName
+              ? {
+                  address: application.walletAddress as string
+                }
+              : null
+          );
+        }
+
+        return Promise.resolve({
+          address: application.walletAddress as string
+        });
+      });
   }
 
   function getUrl(bounty: (typeof bounties)[number]) {
@@ -199,8 +217,10 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const bountiesResponse = bounties.map(
-    (bounty, index): PublicApiReward => ({
+  const bountiesResponse: PublicApiReward[] = [];
+  let index = 0;
+  for (const bounty of bounties) {
+    const bountyResponse = {
       createdAt: bounty.createdAt.toISOString(),
       content: {
         text: bounty.page?.contentText ?? '',
@@ -210,7 +230,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       issuer: {
         address: bounty.author.wallets[0]?.address
       },
-      recipients: getRecipients(bounty),
+      recipients: (await Promise.all(getRecipients(bounty))).filter(isTruthy),
       reward: {
         amount: bounty.rewardAmount,
         chain: bounty.chainId,
@@ -220,8 +240,10 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       title: bounty.page?.title ?? 'Untitled',
       status: bounty.status,
       url: getUrl(bounty)
-    })
-  );
+    };
+    index += 1;
+    bountiesResponse.push(bountyResponse);
+  }
 
   return res.status(200).json(bountiesResponse);
 }

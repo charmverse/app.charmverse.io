@@ -24,6 +24,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import { getENSName } from 'lib/blockchain';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
@@ -204,6 +205,14 @@ export function RewardPaymentButton({
 
       if (chainIdToUse !== chainId) {
         await switchActiveNetwork(chainIdToUse);
+      }
+
+      if (receiver.endsWith('.eth')) {
+        const resolvedWalletAddress = await getENSName(receiver);
+        if (resolvedWalletAddress === null) {
+          onError(`Could not resolve ENS name ${receiver}`);
+          return;
+        }
       }
 
       if (isValidChainAddress(tokenSymbolOrAddress)) {
