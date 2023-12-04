@@ -10,15 +10,7 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
   ({ label, iconLabel, inline, error, multiline = false, required, value, ...inputProps }, ref) => {
     return (
       <FieldWrapper required={required} label={label} inline={inline} iconLabel={iconLabel}>
-        <TextField
-          fullWidth
-          required={required}
-          error={!!error}
-          multiline={multiline}
-          {...inputProps}
-          value={value || ''}
-          ref={ref}
-        />
+        <TextField fullWidth required={required} error={!!error} multiline={multiline} {...inputProps} ref={ref} />
       </FieldWrapper>
     );
   }
