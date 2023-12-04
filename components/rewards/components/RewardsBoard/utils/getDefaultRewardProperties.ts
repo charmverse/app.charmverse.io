@@ -12,7 +12,8 @@ import {
   REWARD_AMOUNT,
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
-  REWARD_TOKEN
+  REWARD_TOKEN,
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 
 const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (typeof Constants)['menuColors'] }[] = [
@@ -82,6 +83,12 @@ const rewardDbProperties = {
     name: 'Reward token',
     options: [],
     type: 'text'
+  }),
+  rewardApplicantsNumber: (): IPropertyTemplate => ({
+    id: REWARD_APPLICANTS_COUNT,
+    name: 'No. of Applicants',
+    options: [],
+    type: 'number'
   })
 };
 
@@ -95,6 +102,7 @@ export function getDefaultRewardProperties(): IPropertyTemplate[] {
     rewardDbProperties.rewardStatus(),
     rewardDbProperties.rewardAmount(),
     rewardDbProperties.rewardChain(),
-    rewardDbProperties.rewardCustomValue()
+    rewardDbProperties.rewardCustomValue(),
+    rewardDbProperties.rewardApplicantsNumber()
   ];
 }

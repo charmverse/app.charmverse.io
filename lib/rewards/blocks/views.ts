@@ -17,7 +17,7 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_TOKEN
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 
 export const defaultRewardViews = [
@@ -55,7 +55,7 @@ export function generateDefaultBoardView({ spaceId }: { spaceId: string }) {
   view.id = DEFAULT_BOARD_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
   view.rootId = spaceId;
-  view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT];
+  view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT, REWARD_APPLICANTS_COUNT];
   view.fields.cardOrder = [];
 
   return view;
@@ -80,7 +80,8 @@ export function generateDefaultTableView({ spaceId }: { spaceId: string }) {
     [REWARD_STATUS_BLOCK_ID]: 150,
     [REWARD_AMOUNT]: 150,
     [REWARD_CHAIN]: 150,
-    [REWARD_CUSTOM_VALUE]: 150
+    [REWARD_CUSTOM_VALUE]: 150,
+    [REWARD_APPLICANTS_COUNT]: 150
   };
 
   // Wrap title comumn by default

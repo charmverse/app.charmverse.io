@@ -93,7 +93,14 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
         />
         <FormGroup>
           <FormControlLabel
-            control={<Checkbox {...register('emailNotifications')} checked={emailNotifications} onChange={onChange} />}
+            control={
+              <Checkbox
+                data-test='member-email-notifications'
+                {...register('emailNotifications')}
+                checked={emailNotifications}
+                onChange={onChange}
+              />
+            }
             label='Notify me about key activities (e.g., proposal feedback, reward status, mentions, comments)'
           />
           <FormControlLabel
@@ -102,7 +109,12 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
           />
           <FormControlLabel
             control={
-              <Checkbox {...register('agreeTermsConditions')} checked={agreeTermsConditions} onChange={onChange} />
+              <Checkbox
+                data-test='member-terms-conditions'
+                {...register('agreeTermsConditions')}
+                checked={agreeTermsConditions}
+                onChange={onChange}
+              />
             }
             label={
               <Typography>

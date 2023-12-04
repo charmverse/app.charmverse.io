@@ -1,5 +1,7 @@
 import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import PersonIcon from '@mui/icons-material/Person';
+import { Box, Stack, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
@@ -32,7 +34,8 @@ import {
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
@@ -332,6 +335,18 @@ function PropertyValueElement(props: Props) {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
     propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
+  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
+    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
+    if (totalApplicants) {
+      return (
+        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
+          <Box width={20} display='flex' alignItems='center'>
+            <PersonIcon fontSize='small' />
+          </Box>
+          {totalApplicants}
+        </Stack>
+      );
+    }
   }
 
   const commonProps = {
@@ -407,6 +422,7 @@ function PropertyValueElement(props: Props) {
       );
     }
   }
+
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>
@@ -414,6 +430,7 @@ function PropertyValueElement(props: Props) {
       </Tooltip>
     );
   }
+
   return propertyValueElement;
 }
 
