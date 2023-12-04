@@ -7,7 +7,7 @@ import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
-import type { ProposalDraftReward } from 'lib/proposal/blocks/interfaces';
+import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
@@ -17,7 +17,7 @@ export function AttachRewardButton({
   assignedSubmitters,
   readOnly
 }: {
-  onSave: (draftReward: ProposalDraftReward) => void;
+  onSave: (reward: ProposalPendingReward) => void;
   reviewers: RewardReviewer[];
   assignedSubmitters: string[];
   readOnly: boolean;
