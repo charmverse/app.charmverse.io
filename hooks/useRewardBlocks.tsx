@@ -13,7 +13,8 @@ import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type {
   RewardBlockInput,
   RewardBlockWithTypedFields,
-  RewardPropertiesBlock
+  RewardPropertiesBlock,
+  RewardPropertiesBlockFields
 } from 'lib/rewards/blocks/interfaces';
 import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
@@ -160,7 +161,13 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
       const updatedProperties = rewardBoardBlock.fields.cardProperties.map((p) =>
         p.id === propertyTemplate.id ? propertyTemplate : p
       );
-      const updatedBlock = { ...rewardBoardBlock, fields: { cardProperties: updatedProperties } };
+      const updatedBlock = {
+        ...rewardBoardBlock,
+        fields: {
+          ...(rewardBoardBlock.fields as BoardFields),
+          cardProperties: updatedProperties
+        }
+      };
 
       try {
         const res = await updateRewardBlocks([updatedBlock]);
