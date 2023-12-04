@@ -12,21 +12,28 @@ import { getDisabledTooltip } from 'components/proposals/components/AttachReward
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
-  rewards: RewardWithUsers[];
+  rewardIds: string[];
   readOnly: boolean;
   onSave: (reward: ProposalPendingReward) => void;
   onDelete: (draftId: string) => void;
 };
 
-export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, rewards }: Props) {
+export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, rewardIds }: Props) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
+  const { getRewardPage } = useRewardPage();
+  const { rewards: allRewards } = useRewards();
+
+  const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
 
   function closeDialog() {
     clearRewardValues();
@@ -46,6 +53,45 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
     setCurrentPendingId(draftId);
   }
 
+  if (rewards.length) {
+    return (
+      <Stack>
+        {rewards.map((reward) => {
+          return (
+            <Stack
+              flexDirection='row'
+              alignItems='center'
+              height='fit-content'
+              flex={1}
+              className='octo-propertyrow'
+              key={reward.id}
+            >
+              <PropertyLabel readOnly highlighted>
+                Reward
+              </PropertyLabel>
+              <SelectPreviewContainer
+                readOnly={readOnly}
+                displayType='details'
+                // open reward (navigate)
+                // onClick={() => editReward({ reward, page, draftId })}
+              >
+                <Stack alignItems='center' gap={1} direction='row'>
+                  <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                    {getRewardPage(reward.id)?.title || 'Untitled reward'}
+                  </Typography>
+                  <RewardTokenInfo
+                    chainId={reward.chainId || null}
+                    symbolOrAddress={reward.rewardToken || null}
+                    rewardAmount={reward.rewardAmount || null}
+                  />
+                </Stack>
+              </SelectPreviewContainer>
+            </Stack>
+          );
+        })}
+      </Stack>
+    );
+  }
   return (
     <Stack>
       {pendingRewards?.map(({ reward, page, draftId }) => {

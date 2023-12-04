@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -43,11 +44,12 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
     include: {
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      rewards: true
     }
   });
 
-  return res.status(200).json(proposals);
+  return res.status(200).json(proposals.map(mapDbProposalToProposal));
 }
 
 async function deprecatedGetProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {

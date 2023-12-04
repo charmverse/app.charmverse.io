@@ -26,6 +26,7 @@ import { useLensProfile } from 'components/settings/account/hooks/useLensProfile
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
 import { usePages } from 'hooks/usePages';
+import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 import type { ProposalCategory } from 'lib/proposal/interface';
@@ -89,6 +90,8 @@ type ProposalPropertiesProps = {
   openEvaluation?: () => void;
   isEvaluationSidebarOpen?: boolean;
   canSeeEvaluation?: boolean;
+  isReviewer?: boolean;
+  rewardIds?: string[] | null;
 };
 
 export function ProposalPropertiesBase({
@@ -117,7 +120,9 @@ export function ProposalPropertiesBase({
   openEvaluation,
   isEvaluationSidebarOpen,
   canSeeEvaluation,
-  readOnlyCustomProperties
+  readOnlyCustomProperties,
+  isReviewer,
+  rewardIds
 }: ProposalPropertiesProps) {
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
@@ -129,6 +134,8 @@ export function ProposalPropertiesBase({
   const { proposalTemplates = [] } = useProposalTemplates();
   const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   const { account } = useWeb3Account();
+  const { user } = useUser();
+
   const previousConfirmationPopup = usePopupState({
     variant: 'popover',
     popupId: 'previous-proposal-status-change-confirmation'
@@ -166,6 +173,7 @@ export function ProposalPropertiesBase({
     }
   }
 
+  const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -272,6 +280,8 @@ export function ProposalPropertiesBase({
                   proposalStatus={proposalStatus}
                   handleProposalStatusUpdate={handleProposalStatusUpdate}
                   evaluationType={proposalFormInputs.evaluationType}
+                  proposalId={proposalId}
+                  canCreateRewards={(!readOnlyReviewers || isReviewer || isAuthor) && !!pendingRewards.length}
                 />
               )}
             </Grid>
@@ -512,7 +522,8 @@ export function ProposalPropertiesBase({
 
           <ProposalRewards
             pendingRewards={pendingRewards}
-            readOnly={!!readOnlyAuthors}
+            rewardIds={rewardIds || []}
+            readOnly={!!readOnlyReviewers && !isReviewer && !isAuthor}
             onSave={(pendingReward) => {
               setProposalFormInputs({
                 fields: {

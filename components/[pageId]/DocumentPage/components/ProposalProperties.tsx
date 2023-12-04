@@ -207,6 +207,8 @@ export function ProposalProperties({
         readOnlyCustomProperties={readOnlyCustomProperties}
         isEvaluationSidebarOpen={isEvaluationSidebarOpen}
         openEvaluation={openEvaluation}
+        isReviewer={isReviewer}
+        rewardIds={proposal?.rewardIds}
       />
       {isPublishingToLens && (
         <CreateLensPublication
