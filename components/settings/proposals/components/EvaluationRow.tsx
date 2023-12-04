@@ -13,7 +13,7 @@ import { EvaluationContextMenu } from './EvaluationContextMenu';
 const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'readOnly'
 })<{ readOnly: boolean }>`
-  ${({ readOnly }) => (readOnly ? 'cursor: grab;' : '')}
+  ${({ readOnly }) => (readOnly ? '' : 'cursor: grab;')}
   ${({ theme }) => theme.breakpoints.up('sm')} {
     .show-on-hover {
       opacity: 0;
@@ -45,9 +45,9 @@ export function EvaluationRow({
   const [, , draggableRef, draggableStyle] = useSortable('view', dragKey, !readOnly, onChangeOrder);
 
   return (
-    <StyledCard style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }} readOnly>
+    <StyledCard style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }} readOnly={readOnly}>
       <Box p={1} display='flex' alignItems='center' gap={1} justifyContent='space-between'>
-        <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />
+        {!readOnly && <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />}
 
         {evaluationIcons[evaluation.type]}
         <Typography sx={{ flexGrow: 1 }}>{evaluation.title}</Typography>

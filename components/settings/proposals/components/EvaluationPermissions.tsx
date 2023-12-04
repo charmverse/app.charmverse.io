@@ -160,10 +160,16 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
       ))}
 
       {/* show evaluation action which is uneditable */}
-      <Box className='octo-propertyrow' display='flex' alignItems='center'>
+      <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
         <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
         {evaluation.type === 'vote' ? (
-          <Typography variant='caption'>Vote permissions are defined by Categories</Typography>
+          <Typography color='secondary' variant='caption'>
+            Vote permissions are specified by Categories
+          </Typography>
+        ) : evaluation.type === 'feedback' ? (
+          <Typography color='secondary' variant='caption'>
+            There is no review step for Feedback
+          </Typography>
         ) : (
           <UserAndRoleSelect
             readOnly

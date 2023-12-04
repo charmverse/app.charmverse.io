@@ -7,7 +7,7 @@ import { MdOutlineThumbsUpDown } from 'react-icons/md';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 export const evaluateVerbs = {
-  [ProposalEvaluationType.feedback]: 'Feedback',
+  [ProposalEvaluationType.feedback]: 'Review',
   [ProposalEvaluationType.vote]: 'Vote',
   [ProposalEvaluationType.rubric]: 'Evaluate',
   [ProposalEvaluationType.pass_fail]: 'Review'
