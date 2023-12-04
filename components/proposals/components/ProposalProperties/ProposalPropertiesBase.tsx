@@ -195,6 +195,7 @@ export function ProposalPropertiesBase({
     : null;
 
   const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
+  const canCreatePendingRewards = (isReviewer || isAuthor) && !rewardIds?.length;
 
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
@@ -281,7 +282,7 @@ export function ProposalPropertiesBase({
                   handleProposalStatusUpdate={handleProposalStatusUpdate}
                   evaluationType={proposalFormInputs.evaluationType}
                   proposalId={proposalId}
-                  canCreateRewards={(!readOnlyReviewers || isReviewer || isAuthor) && !!pendingRewards.length}
+                  canCreateRewards={isReviewer && !!pendingRewards.length}
                 />
               )}
             </Grid>
@@ -526,7 +527,7 @@ export function ProposalPropertiesBase({
           <ProposalRewards
             pendingRewards={pendingRewards}
             rewardIds={rewardIds || []}
-            readOnly={!!readOnlyReviewers && !isReviewer && !isAuthor}
+            readOnly={!isReviewer && !isAuthor}
             onSave={(pendingReward) => {
               setProposalFormInputs({
                 fields: {
@@ -564,7 +565,7 @@ export function ProposalPropertiesBase({
           />
 
           <AttachRewardButton
-            readOnly={!!readOnlyAuthors}
+            readOnly={!canCreatePendingRewards}
             onSave={(newReward) => {
               setProposalFormInputs({
                 fields: {
