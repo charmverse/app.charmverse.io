@@ -13,15 +13,13 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-
-  const acc = await prisma.user.findMany({
+  const acc = await prisma.space.count({
     where: {
-      username: {
-        contains: '0x036'
-      } 
+      discordServerId: {
+        not: null
+      }
     }
   })
-
 
   console.log(JSON.stringify({acc}, null, 2))
 }
