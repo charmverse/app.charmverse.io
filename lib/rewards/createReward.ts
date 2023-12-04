@@ -17,6 +17,7 @@ export type RewardCreationData = UpdateableRewardFields & {
   spaceId: string;
   userId: string;
   pageProps?: RewardPageProps;
+  proposalId?: string | null;
 };
 
 /**
@@ -38,7 +39,8 @@ export async function createReward({
   fields,
   reviewers,
   pageProps,
-  allowMultipleApplications
+  allowMultipleApplications,
+  proposalId
 }: RewardCreationData) {
   if (!rewardAmount && !customReward) {
     throw new InvalidInputError('A reward must have a reward amount or a custom reward assigned');
@@ -86,7 +88,14 @@ export async function createReward({
     rewardAmount,
     rewardToken,
     customReward,
-    allowMultipleApplications: isAssignedReward ? false : allowMultipleApplications
+    allowMultipleApplications: isAssignedReward ? false : allowMultipleApplications,
+    proposal: proposalId
+      ? {
+          connect: {
+            id: proposalId
+          }
+        }
+      : undefined
   };
 
   const rewardPermissions: Prisma.BountyPermissionCreateManyBountyInput[] = [];
