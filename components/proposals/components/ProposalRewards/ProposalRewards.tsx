@@ -14,6 +14,8 @@ import { RewardPropertiesForm } from 'components/rewards/components/RewardProper
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
@@ -26,12 +28,17 @@ type Props = {
   onDelete: (draftId: string) => void;
 };
 
+const rewardQueryKey = 'rewardId';
+
 export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, rewardIds }: Props) {
+  useRewardsNavigation(rewardQueryKey);
+
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
   const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
+  const { updateURLQuery } = useCharmRouter();
 
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
 
@@ -53,6 +60,13 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
     setCurrentPendingId(draftId);
   }
 
+  function openReward(rewardId: string | null) {
+    if (!rewardId) return;
+
+    const pageId = getRewardPage(rewardId)?.id || rewardId;
+    updateURLQuery({ [rewardQueryKey]: pageId });
+  }
+
   if (rewards.length) {
     return (
       <Stack>
@@ -69,12 +83,7 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
               <PropertyLabel readOnly highlighted>
                 Reward
               </PropertyLabel>
-              <SelectPreviewContainer
-                readOnly={readOnly}
-                displayType='details'
-                // open reward (navigate)
-                // onClick={() => editReward({ reward, page, draftId })}
-              >
+              <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={() => openReward(reward.id)}>
                 <Stack alignItems='center' gap={1} direction='row'>
                   <Typography component='span' variant='subtitle1' fontWeight='normal'>
                     {getRewardPage(reward.id)?.title || 'Untitled reward'}
