@@ -39,7 +39,6 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
   const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
   const { updateURLQuery } = useCharmRouter();
-
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
 
   function closeDialog() {
@@ -83,16 +82,22 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
               <PropertyLabel readOnly highlighted>
                 Reward
               </PropertyLabel>
-              <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={() => openReward(reward.id)}>
+              <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
                 <Stack alignItems='center' gap={1} direction='row'>
                   <Typography component='span' variant='subtitle1' fontWeight='normal'>
                     {getRewardPage(reward.id)?.title || 'Untitled reward'}
                   </Typography>
-                  <RewardTokenInfo
-                    chainId={reward.chainId || null}
-                    symbolOrAddress={reward.rewardToken || null}
-                    rewardAmount={reward.rewardAmount || null}
-                  />
+                  {reward.customReward ? (
+                    <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                      {reward.customReward}
+                    </Typography>
+                  ) : (
+                    <RewardTokenInfo
+                      chainId={reward.chainId || null}
+                      symbolOrAddress={reward.rewardToken || null}
+                      rewardAmount={reward.rewardAmount || null}
+                    />
+                  )}
                 </Stack>
               </SelectPreviewContainer>
             </Stack>
@@ -136,11 +141,17 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
                   <Typography component='span' variant='subtitle1' fontWeight='normal'>
                     {page?.title || 'Untitled reward'}
                   </Typography>
-                  <RewardTokenInfo
-                    chainId={reward.chainId || null}
-                    symbolOrAddress={reward.rewardToken || null}
-                    rewardAmount={reward.rewardAmount || null}
-                  />
+                  {reward.customReward ? (
+                    <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                      {reward.customReward}
+                    </Typography>
+                  ) : (
+                    <RewardTokenInfo
+                      chainId={reward.chainId || null}
+                      symbolOrAddress={reward.rewardToken || null}
+                      rewardAmount={reward.rewardAmount || null}
+                    />
+                  )}
                   <Typography
                     component='span'
                     variant='subtitle1'
