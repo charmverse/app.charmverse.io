@@ -40,6 +40,7 @@ export interface IChainDetails {
   rpcUrls: readonly string[];
   blockExplorerUrls: readonly string[];
   alchemyUrl?: string;
+  // See Safe docs for official URLs https://docs.safe.global/safe-core-api/supported-networks
   gnosisUrl?: string;
   iconUrl: string;
   testnet?: boolean;
@@ -329,6 +330,7 @@ const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590'
     },
+    gnosisUrl: 'https://safe-transaction-celo.safe.global',
     rpcUrls: ['https://forno.celo.org'],
     blockExplorerUrls: ['https://explorer.celo.org'],
     iconUrl: '/images/cryptoLogos/celo-celo-logo.svg',
@@ -376,6 +378,7 @@ const RPC: Record<string, IChainDetails> = {
     chainName: 'zkSync Era',
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
+    gnosisUrl: 'https://safe-transaction-zksync.safe.global',
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: 'zksync'
   },
