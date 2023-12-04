@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { Space } from '@charmverse/core/prisma-client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
@@ -33,17 +34,19 @@ import { OnboardingEmailForm } from './OnboardingEmailForm';
 export function UserOnboardingDialogGlobal() {
   const { space } = useCurrentSpace();
   const { user } = useUser();
+  const { getMemberById } = useMembers();
+  const member = user ? getMemberById(user.id) : null;
 
   // Wait for user to load before deciding what to show
-  if (!user || !space) {
+  if (!user || !space || !member || member.isGuest) {
     return null;
   }
 
-  return <LoggedInUserOnboardingDialog user={user} spaceId={space.id} />;
+  return <LoggedInUserOnboardingDialog user={user} space={space} />;
 }
 
-function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user: LoggedInUser }) {
-  const { onboardingStep, completeOnboarding } = useOnboarding({ user, spaceId });
+function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: LoggedInUser }) {
+  const { onboardingStep, completeOnboarding } = useOnboarding({ user, spaceId: space.id });
 
   useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
@@ -55,23 +58,18 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
 
   if (onboardingStep) {
     return (
-      <div data-test='member-onboarding-form'>
-        <UserOnboardingDialog
-          key={user.id}
-          initialStep={onboardingStep}
-          currentUser={user}
-          onClose={completeOnboarding}
-        />
-      </div>
+      <UserOnboardingDialog
+        space={space}
+        key={user.id}
+        initialStep={onboardingStep}
+        currentUser={user}
+        completeOnboarding={completeOnboarding}
+      />
     );
   }
 
   if (nonEmptyRequiredProperties) {
-    return (
-      <div data-test='member-onboarding-form'>
-        <UserOnboardingDialog key={user.id} currentUser={user} onClose={completeOnboarding} />
-      </div>
-    );
+    return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
   }
 
   return null;
@@ -82,13 +80,16 @@ function LoggedInUserOnboardingDialog({ user, spaceId }: { spaceId: string; user
 // Case 3: missing required information: show profile
 function UserOnboardingDialog({
   currentUser,
-  onClose,
-  initialStep
+  completeOnboarding,
+  initialStep,
+  space
 }: {
-  onClose: VoidFunction;
+  completeOnboarding?: () => Promise<void>;
   currentUser: LoggedInUser;
   initialStep?: OnboardingStep;
+  space: Space;
 }) {
+  const [isLoading, setIsLoading] = useState(false);
   const { showMessage } = useSnackbar();
   const {
     control,
@@ -98,12 +99,12 @@ function UserOnboardingDialog({
     errors,
     isValid,
     memberProperties,
+    nonEmptyRequiredProperties,
     values,
     requiredProperties
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
-  const { space: currentSpace } = useCurrentSpace();
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
   const [userDetails, setUserDetails] = useState<EditableFields>({});
@@ -113,6 +114,10 @@ function UserOnboardingDialog({
   const isInputValid =
     requiredProperties.length === 0 ||
     (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
+
+  useEffect(() => {
+    log.info('[user-journey] Show onboarding flow');
+  }, []);
 
   useEffect(() => {
     setUserDetails({
@@ -134,21 +139,24 @@ function UserOnboardingDialog({
   usePreventReload(!isFormClean);
 
   async function saveForm() {
+    setIsLoading(true);
     if (isFormClean) {
-      onClose();
+      await completeOnboarding?.();
+      setIsFormClean(true);
+      setIsLoading(false);
       return;
     }
-    if (Object.keys(userDetails).length > 0) {
-      await charmClient.updateUserDetails(userDetails);
-    }
-    if (currentSpace) {
-      await updateSpaceValues(currentSpace.id, memberDetails);
-    }
-    mutateMembers();
-    onClose();
+    await charmClient.updateUserDetails(userDetails);
+    await updateSpaceValues(space.id, memberDetails);
+    await Promise.all([
+      mutateMembers(),
+      refreshPropertyValues(),
+      completeOnboarding?.(),
+      mutate('/current-user-details')
+    ]);
     setIsFormClean(true);
     showMessage('Profile updated', 'success');
-    mutate('/current-user-details');
+    setIsLoading(false);
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
@@ -158,17 +166,17 @@ function UserOnboardingDialog({
   }
 
   const handleClose = () => {
+    // If there are required properties that must be filled, don't open the discard changes modal
+    if (nonEmptyRequiredProperties) {
+      return;
+    }
+
     if (!isFormClean) {
       confirmExitPopupState.open();
     } else {
-      onClose();
+      completeOnboarding?.();
     }
   };
-
-  // dont show a modal until the space is loaded at least
-  if (!currentSpace) {
-    return null;
-  }
 
   let title = 'Edit your profile';
   if (initialStep) {
@@ -176,7 +184,7 @@ function UserOnboardingDialog({
       title = 'Welcome to CharmVerse';
     } else if (currentStep === 'profile_step') {
       // wrap hyphens with word joiner so that it doesn't wrap: https://en.wikipedia.org/wiki/Word_joiner
-      title = `Welcome to ${currentSpace.name.replace(/-/g, '\ufeff-\ufeff')}! Set up your profile`;
+      title = `Welcome to ${space.name.replace(/-/g, '\ufeff-\ufeff')}! Set up your profile`;
     }
   }
 
@@ -193,6 +201,7 @@ function UserOnboardingDialog({
             size='large'
             onClick={saveForm}
             disabled={isFormClean || !isInputValid}
+            loading={isLoading}
             disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save
@@ -201,7 +210,7 @@ function UserOnboardingDialog({
       }
     >
       {currentStep === 'email_step' ? (
-        <OnboardingEmailForm onClick={goNextStep} spaceId={currentSpace.id} />
+        <OnboardingEmailForm onClick={goNextStep} spaceId={space.id} />
       ) : currentStep === 'profile_step' ? (
         <>
           <UserDetailsForm
@@ -234,7 +243,7 @@ function UserOnboardingDialog({
             question='Are you sure you want to close this window? You have unsaved changes.'
             onConfirm={() => {
               confirmExitPopupState.close();
-              onClose();
+              completeOnboarding?.();
             }}
           />
         </>
