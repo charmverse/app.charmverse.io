@@ -3,7 +3,7 @@ import type { BountyStatus } from '@charmverse/core/prisma-client';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { Constants } from 'lib/focalboard/constants';
 import {
-  ASSIGNEES_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   DUE_DATE_ID,
   REWARD_REVIEWERS_BLOCK_ID,
@@ -12,14 +12,15 @@ import {
   REWARD_AMOUNT,
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
-  REWARD_TOKEN
+  REWARD_TOKEN,
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 
 const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (typeof Constants)['menuColors'] }[] = [
   { id: 'open', value: 'Open', color: 'propColorTeal' },
   { id: 'inProgress', value: 'In Progress', color: 'propColorYellow' },
-  { id: 'complete', value: 'Complete', color: 'propColorPink' },
-  { id: 'paid', value: 'Paid', color: 'propColorGray' }
+  { id: 'complete', value: 'Approved', color: 'propColorBlue' },
+  { id: 'paid', value: 'Paid', color: 'propColorGreen' }
 ];
 
 const rewardDbProperties = {
@@ -29,9 +30,9 @@ const rewardDbProperties = {
     options: rewardStatusOptions,
     type: 'select'
   }),
-  rewardAssignees: (): IPropertyTemplate => ({
-    id: ASSIGNEES_BLOCK_ID,
-    name: 'Assigned',
+  rewardApplicants: (): IPropertyTemplate => ({
+    id: REWARDS_APPLICANTS_BLOCK_ID,
+    name: 'Applicant',
     options: [],
     type: 'person'
   }),
@@ -82,6 +83,12 @@ const rewardDbProperties = {
     name: 'Reward token',
     options: [],
     type: 'text'
+  }),
+  rewardApplicantsNumber: (): IPropertyTemplate => ({
+    id: REWARD_APPLICANTS_COUNT,
+    name: 'No. of Applicants',
+    options: [],
+    type: 'number'
   })
 };
 
@@ -89,12 +96,13 @@ export function getDefaultRewardProperties(): IPropertyTemplate[] {
   return [
     rewardDbProperties.rewardCreatedAt(),
     rewardDbProperties.rewardDueDate(),
-    rewardDbProperties.rewardAssignees(),
+    rewardDbProperties.rewardApplicants(),
     rewardDbProperties.rewardReviewers(),
     rewardDbProperties.rewardAvailableCount(),
     rewardDbProperties.rewardStatus(),
     rewardDbProperties.rewardAmount(),
     rewardDbProperties.rewardChain(),
-    rewardDbProperties.rewardCustomValue()
+    rewardDbProperties.rewardCustomValue(),
+    rewardDbProperties.rewardApplicantsNumber()
   ];
 }

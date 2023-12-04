@@ -89,7 +89,7 @@
     "@bangle.dev/tooltip": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.11.2",
+    "@charmverse/core": "^0.11.4",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
@@ -257,7 +257,7 @@
     "uuid": "^8.3.2",
     "viem": "^1.18.3",
     "wagmi": "^1.4.5",
-    "yup": "^0.32.11",
+    "yup": "^1.3.2",
     "zksync-web3": "^0.16.0"
   },
   "devDependencies": {

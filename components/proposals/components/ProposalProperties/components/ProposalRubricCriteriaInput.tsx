@@ -15,6 +15,7 @@ import { getNumberFromString } from 'lib/utilities/numbers';
 
 export type RangeProposalCriteria = {
   id: string;
+  index: number;
   title: string;
   description?: string | null;
   type: 'range';
@@ -95,6 +96,7 @@ export function ProposalRubricCriteriaInput({
     const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
     const newCriteria: RangeProposalCriteria = {
       id: uuid(),
+      index: -1,
       description: '',
       title: '',
       type: 'range',
@@ -142,6 +144,9 @@ export function ProposalRubricCriteriaInput({
     }
   }
   async function changeOptionsOrder(draggedProperty: string, droppedOnProperty: string) {
+    if (readOnly) {
+      return;
+    }
     const newOrder = [...criteriaList];
     const propIndex = newOrder.findIndex((val) => val.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
@@ -149,6 +154,7 @@ export function ProposalRubricCriteriaInput({
     const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
     setCriteriaList(newOrder);
+    onChange(newOrder);
   }
 
   return (
@@ -158,12 +164,15 @@ export function ProposalRubricCriteriaInput({
           key={criteria.id}
           name='rubric-option'
           itemId={criteria.id}
+          draggable={!readOnly}
           changeOrderHandler={changeOptionsOrder}
         >
           <CriteriaRow display='flex' alignItems='flex-start' gap={1} mb={1}>
-            <div className='drag-indicator show-on-hover'>
-              <DragIndicator color='secondary' fontSize='small' />
-            </div>
+            {!readOnly && (
+              <div className='drag-indicator show-on-hover'>
+                <DragIndicator color='secondary' fontSize='small' />
+              </div>
+            )}
             <TextInput
               inputProps={{ autoFocus: true }}
               displayType='details'

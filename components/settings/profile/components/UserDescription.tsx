@@ -6,7 +6,7 @@ import { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import FieldLabel from 'components/common/form/FieldLabel';
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import debounce from 'lib/utilities/debounce';
 
 export const schema = yup.object({
@@ -19,10 +19,11 @@ type UserDescriptionProps = {
   currentDescription: string | null | undefined;
   save: (description: string) => Promise<void>;
   readOnly?: boolean;
+  required?: boolean;
 };
 
 function UserDescription(props: UserDescriptionProps) {
-  const { currentDescription = '', save, readOnly } = props;
+  const { currentDescription = '', save, readOnly, required } = props;
 
   const {
     register,
@@ -60,26 +61,27 @@ function UserDescription(props: UserDescriptionProps) {
 
   return (
     <Box mt={1}>
-      <FieldLabel>About me</FieldLabel>
-      <TextField
-        {...register('description')}
-        disabled={readOnly}
-        data-testid='edit-description'
-        fullWidth
-        error={!!errors.description}
-        helperText={errors.description?.message}
-        placeholder='Tell the world a bit more about yourself ...'
-        multiline
-        minRows={2}
-        onChange={async (event) => {
-          const val = event.target.value;
-          setValue('description', val.length > 500 ? val.substring(0, 500) : val);
-          await onSave(event);
-        }}
-      />
-      <Box justifyContent='end' display='flex'>
-        {watchDescription.length}/500
-      </Box>
+      <FieldWrapper label='About me' required={required}>
+        <TextField
+          {...register('description')}
+          disabled={readOnly}
+          data-testid='edit-description'
+          fullWidth
+          error={!!errors.description}
+          helperText={errors.description?.message}
+          placeholder='Tell the world a bit more about yourself ...'
+          multiline
+          minRows={2}
+          onChange={async (event) => {
+            const val = event.target.value;
+            setValue('description', val.length > 500 ? val.substring(0, 500) : val);
+            await onSave(event);
+          }}
+        />
+        <Box justifyContent='end' display='flex'>
+          {watchDescription.length}/500
+        </Box>
+      </FieldWrapper>
     </Box>
   );
 }

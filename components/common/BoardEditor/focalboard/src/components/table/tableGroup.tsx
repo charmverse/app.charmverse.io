@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import type { ReactElement } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
@@ -28,6 +29,7 @@ type Props = {
   onDropToGroup: (srcCard: Card, groupID: string, dstCardID: string) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
+  subRowsEmptyValueContent?: ReactElement | string;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -86,6 +88,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           onCardClicked={props.onCardClicked}
           onDrop={props.onDropToCard}
           readOnlyTitle={props.readOnlyTitle}
+          subRowsEmptyValueContent={props.subRowsEmptyValueContent}
         />
       )}
     </div>

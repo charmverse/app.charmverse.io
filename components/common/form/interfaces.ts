@@ -7,8 +7,8 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 export type FieldType = MemberPropertyType;
 
 export type ControlFieldProps = {
-  onChange: (value: any) => void;
-  value: string;
+  onChange?: (value: any) => void;
+  value?: string;
 };
 
 export type SelectFieldProps = {
@@ -26,4 +26,6 @@ export type FieldProps = {
   inline?: boolean;
   error?: string;
   disabled?: boolean;
+  required?: boolean;
+  helperText?: ReactNode;
 } & SelectFieldProps;

@@ -48,7 +48,7 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
   });
 
   if (permissions.delete !== true) {
-    throw new ActionNotPermittedError('You are not allowed to delete this page.');
+    throw new ActionNotPermittedError(`You do not have permissions to ${archive ? 'delete' : 'restore'} this page`);
   }
 
   const { modifiedChildPageIds } = await archivePages({
