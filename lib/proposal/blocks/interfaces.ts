@@ -28,9 +28,9 @@ export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
 
 export type ProposalPropertyValues = { properties: ProposalPropertiesField };
 
-export type ProposalDraftReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
+export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
 
-export type ProposalFields = ProposalPropertyValues & { draftRewards?: ProposalDraftReward[] };
+export type ProposalFields = ProposalPropertyValues & { pendingRewards?: ProposalPendingReward[] };
 
 export type ProposalFieldsProp = { fields: ProposalFields };
 

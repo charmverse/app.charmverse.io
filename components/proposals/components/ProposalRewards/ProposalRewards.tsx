@@ -12,27 +12,21 @@ import { getDisabledTooltip } from 'components/proposals/components/AttachReward
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
-import type { ProposalDraftReward } from 'lib/proposal/blocks/interfaces';
+import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
 type Props = {
-  rewards: ProposalDraftReward[] | undefined;
+  pendingRewards: ProposalPendingReward[] | undefined;
+  rewards: RewardWithUsers[];
   readOnly: boolean;
-  onSave: (draftReward: ProposalDraftReward) => void;
+  onSave: (reward: ProposalPendingReward) => void;
   onDelete: (draftId: string) => void;
 };
 
-const ItemContainer = styled(Stack)`
-  flex-direction: row;
-
-  &:hover .icons': {
-    opacity: 1
-  }
-`;
-
-export function ProposalDraftRewards({ rewards, readOnly, onSave, onDelete }: Props) {
+export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, rewards }: Props) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
-  const [currentDraftId, setCurrentDraftId] = useState<null | string>(null);
+  const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
 
   function closeDialog() {
     clearRewardValues();
@@ -40,21 +34,21 @@ export function ProposalDraftRewards({ rewards, readOnly, onSave, onDelete }: Pr
   }
 
   async function saveForm() {
-    onSave({ reward: rewardValues, page: newPageValues, draftId: currentDraftId || '' });
+    onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
     closeDialog();
   }
 
-  function editReward({ reward, page, draftId }: ProposalDraftReward) {
+  function editReward({ reward, page, draftId }: ProposalPendingReward) {
     if (readOnly) return;
 
     setRewardValues(reward);
     openNewPage(page || undefined);
-    setCurrentDraftId(draftId);
+    setCurrentPendingId(draftId);
   }
 
   return (
     <Stack>
-      {rewards?.map(({ reward, page, draftId }) => {
+      {pendingRewards?.map(({ reward, page, draftId }) => {
         return (
           <Stack
             flexDirection='row'
@@ -99,7 +93,7 @@ export function ProposalDraftRewards({ rewards, readOnly, onSave, onDelete }: Pr
                     color='secondary'
                     fontStyle='italic'
                   >
-                    (draft)
+                    (pending)
                   </Typography>
                 </Stack>
               </SelectPreviewContainer>
