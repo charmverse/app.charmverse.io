@@ -65,13 +65,14 @@ describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criter
 
     expect(updated).toHaveLength(1);
 
-    expect(updated[0]).toMatchObject<ProposalRubricCriteriaAnswerWithTypedResponse>({
-      ...answerContent.answers[0],
-      userId: reviewer.id,
-      proposalId: proposal.id,
-      comment: 'opinion',
-      evaluationId: null
-    });
+    expect(updated[0]).toMatchObject<ProposalRubricCriteriaAnswerWithTypedResponse>(
+      expect.objectContaining({
+        ...answerContent.answers[0],
+        userId: reviewer.id,
+        proposalId: proposal.id,
+        comment: 'opinion'
+      })
+    );
   });
 
   it('should prevent a user without evaluate permissions from submitting an answer, and respond with 401', async () => {

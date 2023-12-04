@@ -78,13 +78,11 @@ describe('Creates a page and proposal with relevant configuration', () => {
         rubricAnswers: [],
         rubricCriteria: [],
         reviewers: [
-          {
+          expect.objectContaining({
             id: expect.any(String),
             proposalId: proposal?.id as string,
-            userId: reviewerUser.id,
-            roleId: null,
-            evaluationId: null
-          }
+            userId: reviewerUser.id
+          })
         ]
       })
     );

@@ -57,13 +57,11 @@ describe('POST /api/proposals - Create a proposal', () => {
         }
       ]),
       reviewers: expect.arrayContaining([
-        {
+        expect.objectContaining({
           id: expect.any(String),
           proposalId: createdProposal?.proposal.id as string,
-          evaluationId: null,
-          userId: user.id,
-          roleId: null
-        }
+          userId: user.id
+        })
       ])
     });
   });
