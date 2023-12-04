@@ -126,7 +126,7 @@ export async function createWorkspace({
 
   await prisma.$transaction([
     prisma.proposalCategory.createMany({ data: defaultProposalCategories }),
-    prisma.proposalWorkflowTemplate.createMany({ data: defaultWorkflows }),
+    prisma.proposalEvaluationWorkflow.createMany({ data: defaultWorkflows }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
     prisma.postCategory.createMany({ data: defaultPostCategories }),
     prisma.postCategoryPermission.createMany({

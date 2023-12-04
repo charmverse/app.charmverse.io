@@ -12,6 +12,7 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 
 import Legend from '../Legend';
 
@@ -35,7 +36,7 @@ export function ProposalSettings({ space }: { space: Space }) {
     const newWorkflow: WorkflowTemplateFormItem = {
       title: '',
       spaceId: space.id,
-      evaluations: [],
+      evaluations: [getDefaultFeedbackEvaluation()],
       ...workflow,
       isNew: true,
       id: uuid(),

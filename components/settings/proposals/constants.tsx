@@ -1,5 +1,5 @@
 import { ProposalEvaluationType } from '@charmverse/core/prisma';
-import { HowToVoteOutlined } from '@mui/icons-material';
+import { FeedbackOutlined, HowToVoteOutlined } from '@mui/icons-material';
 import type { SvgIconProps } from '@mui/material';
 import { SvgIcon, Tooltip } from '@mui/material';
 import { forwardRef } from 'react';
@@ -7,6 +7,7 @@ import { MdOutlineThumbsUpDown } from 'react-icons/md';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 export const evaluateVerbs = {
+  [ProposalEvaluationType.feedback]: 'Feedback',
   [ProposalEvaluationType.vote]: 'Vote',
   [ProposalEvaluationType.rubric]: 'Evaluate',
   [ProposalEvaluationType.pass_fail]: 'Review'
@@ -17,6 +18,11 @@ export const evaluateVerbs = {
 const SvgIconWithRef = forwardRef<SVGSVGElement | null, SvgIconProps>((props, ref) => <SvgIcon ref={ref} {...props} />);
 
 export const evaluationIcons = {
+  [ProposalEvaluationType.feedback]: (
+    <Tooltip title='Feedback'>
+      <FeedbackOutlined color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
   [ProposalEvaluationType.vote]: (
     <Tooltip title='Vote'>
       <HowToVoteOutlined color='secondary' fontSize='small' />

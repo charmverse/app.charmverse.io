@@ -120,14 +120,14 @@ async function convertProposals() {
 async function convertSpaces() {
   const spaces = await prisma.space.findMany({
     include: {
-      proposalWorkflowTemplates: true
+      proposalEvaluationWorkflows: true
     }
   });
   await Promise.all(
     spaces.map(async (space) => {
-      if (space.proposalWorkflowTemplates.length === 0) {
+      if (space.proposalEvaluationWorkflows.length === 0) {
         const defaultWorkflows = getDefaultWorkflows(space.id);
-        await prisma.proposalWorkflowTemplate.createMany({
+        await prisma.proposalEvaluationWorkflow.createMany({
           data: defaultWorkflows
         });
       }

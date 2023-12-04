@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType, ProposalWorkflowTemplate } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalEvaluationWorkflow } from '@charmverse/core/prisma';
 
 export const permissionLevels = ['view', 'comment', 'edit', 'move'] as const;
 export type PermissionLevel = (typeof permissionLevels)[number];
@@ -26,6 +26,6 @@ export type EvaluationTemplate = {
   permissions: SpaceEvaluationPermission[];
 };
 
-export type WorkflowTemplate = Omit<ProposalWorkflowTemplate, 'evaluations'> & {
+export type WorkflowTemplate = Omit<ProposalEvaluationWorkflow, 'evaluations'> & {
   evaluations: EvaluationTemplate[];
 };

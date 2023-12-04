@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getDefaultEvaluationStep } from 'lib/proposal/workflows/defaultEvaluationStep';
+import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons } from '../constants';
@@ -90,7 +90,7 @@ export function ProposalWorkflowItem({
   }
 
   function addEvaluationStep(evaluation?: EvaluationTemplate) {
-    const newEvaluation = getDefaultEvaluationStep(evaluation);
+    const newEvaluation = getDefaultEvaluation(evaluation);
     setActiveEvaluation({
       ...newEvaluation,
       id: null
