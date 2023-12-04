@@ -87,6 +87,7 @@ export function ProposalStepSummary({
               {PROPOSAL_STATUS_LABELS[nextStatus]}
             </Button>
           )}
+
           {!nextStatus && canCreateRewards && proposalId && <CreateProposalRewardsButton proposalId={proposalId} />}
         </Stack>
       </Stack>
