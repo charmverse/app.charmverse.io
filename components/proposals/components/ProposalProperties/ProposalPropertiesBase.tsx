@@ -19,8 +19,8 @@ import { LoadingIcon } from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { AttachRewardButton } from 'components/proposals/components/AttachRewardButton';
-import { ProposalDraftRewards } from 'components/proposals/components/ProposalDraftRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/components/ProposalProperties/CustomPropertiesAdapter';
+import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
@@ -186,7 +186,7 @@ export function ProposalPropertiesBase({
     ? pages[proposalFormInputs.proposalTemplateId]
     : null;
 
-  const draftRewards = proposalFormInputs.fields?.draftRewards || [];
+  const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
 
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
@@ -510,16 +510,16 @@ export function ProposalPropertiesBase({
             </Box>
           )}
 
-          <ProposalDraftRewards
-            rewards={draftRewards}
+          <ProposalRewards
+            pendingRewards={pendingRewards}
             readOnly={!!readOnlyAuthors}
-            onSave={(draftReward) => {
+            onSave={(pendingReward) => {
               setProposalFormInputs({
                 fields: {
                   ...proposalFormInputs.fields,
-                  draftRewards: [...(proposalFormInputs.fields?.draftRewards || [])].map((draft) => {
-                    if (draft.draftId === draftReward.draftId) {
-                      return draftReward;
+                  pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].map((draft) => {
+                    if (draft.draftId === pendingReward.draftId) {
+                      return pendingReward;
                     }
                     return draft;
                   })
@@ -530,7 +530,7 @@ export function ProposalPropertiesBase({
               setProposalFormInputs({
                 fields: {
                   ...proposalFormInputs.fields,
-                  draftRewards: [...(proposalFormInputs.fields?.draftRewards || [])].filter(
+                  pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].filter(
                     (draft) => draft.draftId !== draftId
                   )
                 }
@@ -551,11 +551,11 @@ export function ProposalPropertiesBase({
 
           <AttachRewardButton
             readOnly={!!readOnlyAuthors}
-            onSave={(newDraftReward) => {
+            onSave={(newReward) => {
               setProposalFormInputs({
                 fields: {
                   ...proposalFormInputs.fields,
-                  draftRewards: [...(proposalFormInputs.fields?.draftRewards || []), newDraftReward]
+                  pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || []), newReward]
                 }
               });
             }}
