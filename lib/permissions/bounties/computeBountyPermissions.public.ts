@@ -10,31 +10,27 @@ export async function computeBountyPermissionsPublic({
   userId,
   bounty
 }: {
-  userId: string;
+  userId?: string;
   bounty: Pick<Bounty, 'createdBy' | 'spaceId'> & { permissions: BountyPermission[] };
 }): Promise<BountyPermissionFlags> {
+  const allowedOperations = new AvailableBountyPermissions();
+
+  if (!userId) {
+    return allowedOperations.empty;
+  }
   const { spaceRole } = await hasAccessToSpace({
     spaceId: bounty.spaceId,
     userId
   });
-
-  const allowedOperations = new AvailableBountyPermissions();
 
   if (!spaceRole) {
     return allowedOperations.empty;
   }
 
   if (spaceRole?.isAdmin) {
-    if (
-      bounty.createdBy === userId ||
-      bounty.permissions.some((p) => p.permissionLevel === 'creator' && p.userId === userId)
-    ) {
-      return { ...allowedOperations.full, work: false };
-    }
     return allowedOperations.full;
   }
 
-  // Creator-level permission is mutually exclusive with any other type of permissions
   if (
     bounty.createdBy === userId ||
     bounty.permissions.some((p) => p.permissionLevel === 'creator' && p.userId === userId)

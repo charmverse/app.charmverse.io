@@ -11,7 +11,6 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
-import { getTokenInfo } from 'lib/tokens/tokenData';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 

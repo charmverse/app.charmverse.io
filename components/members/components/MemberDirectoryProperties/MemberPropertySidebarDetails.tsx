@@ -9,6 +9,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'components/common/Button';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 import { MemberPropertyVisibility } from './MemberPropertyVisibility';
@@ -16,7 +19,6 @@ import { MemberPropertyVisibility } from './MemberPropertyVisibility';
 type Props = {
   property: MemberPropertyWithPermissions;
   isExpanded: boolean;
-  readOnly: boolean;
   addPermissions: (propertyId: string, permissions: CreateMemberPropertyPermissionInput[]) => void;
   removePermission: (permission: MemberPropertyPermission) => void;
   updateProperty: (
@@ -28,12 +30,16 @@ type Props = {
 
 export function MemberPropertySidebarDetails({
   isExpanded,
-  readOnly,
   addPermissions,
   removePermission,
   property,
   updateProperty
 }: Props) {
+  const isAdmin = useIsAdmin();
+  const { isFreeSpace } = useIsFreeSpace();
+
+  const canEditPropertyPermissions = isAdmin && !isFreeSpace;
+
   const memberPropertySidebarItemPopupState = usePopupState({
     variant: 'popover',
     popupId: 'member-property-sidebar-item'
@@ -67,16 +73,18 @@ export function MemberPropertySidebarDetails({
             property.type
           ) ? (
             <Stack flexDirection='row' justifyContent='space-between' mr={2}>
-              <Typography pl={4} variant='overline' alignItems='center' display='flex'>
-                Required
-              </Typography>
+              <Tooltip title={isAdmin ? 'Require members to fill this property during onboarding' : ''}>
+                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+                  Required
+                </Typography>
+              </Tooltip>
               <Checkbox
                 size='small'
                 sx={{
                   p: 0
                 }}
                 checked={property.required}
-                disabled={readOnly}
+                disabled={!isAdmin}
                 onChange={(e) => {
                   updateProperty({
                     id: property.id,
@@ -116,7 +124,7 @@ export function MemberPropertySidebarDetails({
                       }}
                     >
                       <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
-                      {!readOnly && (
+                      {canEditPropertyPermissions && (
                         <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
                           <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
                             <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
@@ -137,7 +145,7 @@ export function MemberPropertySidebarDetails({
             )}
           </Stack>
 
-          {!readOnly && (
+          {canEditPropertyPermissions && (
             <Button
               variant='text'
               size='small'
