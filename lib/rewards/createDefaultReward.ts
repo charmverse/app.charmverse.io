@@ -18,7 +18,7 @@ import {
 } from './blocks/constants';
 import { createReward } from './createReward';
 
-export async function createTestReward({ spaceId, userId }: { spaceId: string; userId: string }) {
+export async function createDefaultReward({ spaceId, userId }: { spaceId: string; userId: string }) {
   await createReward({
     spaceId,
     userId,

@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { createTestProposal } from 'lib/proposal/createTestProposal';
+import { createDefaultProposal } from 'lib/proposal/createDefaultProposal';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
-import { createTestReward } from 'lib/rewards/createTestReward';
+import { createDefaultReward } from 'lib/rewards/createDefaultReward';
 
-export async function createTestRewardsAndProposals() {
+export async function createDefaultRewardsAndProposals() {
   const spaces = await prisma.space.findMany({
     select: {
       id: true,
@@ -34,7 +34,7 @@ export async function createTestRewardsAndProposals() {
   for (const space of spaces) {
     try {
       if (space.bounties.length === 0) {
-        await createTestReward({
+        await createDefaultReward({
           spaceId: space.id,
           userId: space.createdBy
         })
@@ -43,7 +43,7 @@ export async function createTestRewardsAndProposals() {
       }
   
       if (space.proposals.length === 0) {
-        await createTestProposal({
+        await createDefaultProposal({
           spaceId: space.id,
           userId: space.createdBy,
           categoryId: space.proposalCategories[0]?.id
@@ -55,4 +55,4 @@ export async function createTestRewardsAndProposals() {
   }
 }
 
-createTestRewardsAndProposals();
+createDefaultRewardsAndProposals();

@@ -14,7 +14,7 @@ import {
 } from './blocks/constants';
 import { createProposal } from './createProposal';
 
-export async function createTestProposal({
+export async function createDefaultProposal({
   categoryId,
   spaceId,
   userId
