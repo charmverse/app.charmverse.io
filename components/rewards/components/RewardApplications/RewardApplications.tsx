@@ -24,16 +24,22 @@ type Props = {
 
 function sortApplications(user: LoggedInUser | null) {
   return (appA: ApplicationMeta, appB: ApplicationMeta) => {
-    if (appA.createdBy === user?.id) {
+    const isApplication1CreatedByUser = appA.createdBy === user?.id;
+    const isApplication2CreatedByUser = appB.createdBy === user?.id;
+    const application1CreatedAt = typeof appA.createdAt === 'string' ? new Date(appA.createdAt) : appA.createdAt;
+    const application2CreatedAt = typeof appB.createdAt === 'string' ? new Date(appB.createdAt) : appB.createdAt;
+
+    if (isApplication1CreatedByUser && isApplication2CreatedByUser) {
+      return application2CreatedAt.getTime() - application1CreatedAt.getTime();
+    }
+
+    if (isApplication1CreatedByUser) {
       return -1;
-    } else if (appB.createdBy === user?.id) {
+    } else if (isApplication2CreatedByUser) {
       return 1;
     }
 
-    const appACreatedAt = typeof appA.createdAt === 'string' ? new Date(appA.createdAt) : appA.createdAt;
-    const appBCreatedAt = typeof appB.createdAt === 'string' ? new Date(appB.createdAt) : appB.createdAt;
-
-    return appBCreatedAt.getTime() - appACreatedAt.getTime();
+    return application2CreatedAt.getTime() - application1CreatedAt.getTime();
   };
 }
 
@@ -72,8 +78,8 @@ function ApplicationRows({
               <Stack gap={1} flexDirection='row' alignItems='center'>
                 <RewardApplicationStatusChip status={application.status} />
                 <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
-                  <IconButton size='small'>
-                    <PlayArrowIcon fontSize='small' onClick={() => openApplication(application.id)} color='primary' />
+                  <IconButton size='small' onClick={() => openApplication(application.id)}>
+                    <PlayArrowIcon fontSize='small' color='primary' />
                   </IconButton>
                 </Tooltip>
               </Stack>
