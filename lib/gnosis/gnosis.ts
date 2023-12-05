@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
+import { RateLimit } from 'async-sema';
 import { RPCList, getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import uniqBy from 'lodash/uniqBy';
@@ -84,10 +85,13 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
   } else {
     const { supported } = isSupportedSafeApiChain(chainId);
     if (supported) {
+      const rateLimiter = RateLimit(5);
+
       const apiClient = getSafeApiClient({ chainId });
       return apiClient.getSafesByOwner(checksumAddress).then((userSafesResponse) =>
         Promise.all(
-          userSafesResponse.safes.map((safeAddr) => {
+          userSafesResponse.safes.map(async (safeAddr) => {
+            await rateLimiter();
             return apiClient.getSafeInfo(safeAddr).then((info) => ({ ...info, chainId }));
           })
         )
@@ -99,12 +103,15 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
 }
 
 export async function getSafesForAddresses(addresses: string[]) {
-  const safes = await Promise.all(
-    RPCList.map((network) => {
-      return Promise.all(addresses.map((address) => getSafesForAddress({ chainId: network.chainId, address })));
-    })
-  ).then((list) => list.flat().flat());
+  const userSafes: SafeData[] = [];
+
+  for (const address of addresses) {
+    const safes = await Promise.all(
+      RPCList.map((network) => getSafesForAddress({ chainId: network.chainId, address }))
+    ).then((list) => list.flat());
+    userSafes.push(...safes);
+  }
 
   // de-dupe safes in case user has multiple addresses and they own the same safe
-  return uniqBy(safes, (safe) => safe.address);
+  return uniqBy(userSafes, (safe) => safe.address);
 }
