@@ -167,26 +167,36 @@ export function ProposalsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            <Box width='100%'>
-              <Table
-                board={activeBoard}
-                activeView={activeView}
-                cardPages={cardPages}
-                groupByProperty={groupByProperty}
-                views={views}
-                visibleGroups={[]}
-                selectedCardIds={[]}
-                readOnly={!isAdmin}
-                disableAddingCards
-                showCard={openPage}
-                readOnlyTitle
-                readOnlyRows
-                cardIdToFocusOnRender=''
-                addCard={async () => {}}
-                onCardClicked={() => {}}
-                onDeleteCard={onDelete}
-              />
-            </Box>
+            {proposals?.length > 0 ? (
+              <Box width='100%'>
+                <Table
+                  board={activeBoard}
+                  activeView={activeView}
+                  cardPages={cardPages}
+                  groupByProperty={groupByProperty}
+                  views={views}
+                  visibleGroups={[]}
+                  selectedCardIds={[]}
+                  readOnly={!isAdmin}
+                  disableAddingCards
+                  showCard={openPage}
+                  readOnlyTitle
+                  readOnlyRows
+                  cardIdToFocusOnRender=''
+                  addCard={async () => {}}
+                  onCardClicked={() => {}}
+                  onDeleteCard={onDelete}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ mt: 3 }}>
+                <EmptyStateVideo
+                  description='Getting started with proposals'
+                  videoTitle='Proposals | Getting started with CharmVerse'
+                  videoUrl='https://tiny.charmverse.io/proposal-builder'
+                />
+              </Box>
+            )}
 
             <ViewSidebar
               views={views}
