@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowTemplate } from './interfaces';
 
 export async function getWorkflowTemplates(spaceId: string) {
-  const dbWorkflows = await prisma.proposalEvaluationWorkflow.findMany({
+  const dbWorkflows = await prisma.proposalWorkflow.findMany({
     where: {
       spaceId
     }
@@ -12,7 +12,7 @@ export async function getWorkflowTemplates(spaceId: string) {
 }
 
 export async function deleteWorkflowTemplate({ spaceId, workflowId }: { spaceId: string; workflowId: string }) {
-  return prisma.proposalEvaluationWorkflow.delete({
+  return prisma.proposalWorkflow.delete({
     where: {
       id: workflowId,
       spaceId
@@ -21,7 +21,7 @@ export async function deleteWorkflowTemplate({ spaceId, workflowId }: { spaceId:
 }
 
 export async function updateWorkflowTemplate(workflow: WorkflowTemplate) {
-  return prisma.proposalEvaluationWorkflow.upsert({
+  return prisma.proposalWorkflow.upsert({
     where: {
       id: workflow.id,
       spaceId: workflow.spaceId

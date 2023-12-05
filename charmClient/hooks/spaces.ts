@@ -1,6 +1,6 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
-import type { WorkflowTemplate } from 'lib/proposal/workflows/interfaces';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import type { MaybeString } from './helpers';
@@ -25,11 +25,11 @@ export function useGetSpaceProposalWorkflows(spaceId: MaybeString) {
 }
 
 export function useGetProposalWorkflows(spaceId: MaybeString) {
-  return useGETImmutable<WorkflowTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposals/workflows` : null);
+  return useGETImmutable<ProposalWorkflowTyped[]>(spaceId ? `/api/spaces/${spaceId}/proposals/workflows` : null);
 }
 
 export function useUpsertProposalWorkflow(spaceId: MaybeString) {
-  return usePOST<WorkflowTemplate>(`/api/spaces/${spaceId}/proposals/workflows`);
+  return usePOST<ProposalWorkflowTyped>(`/api/spaces/${spaceId}/proposals/workflows`);
 }
 
 export function useDeleteProposalWorkflow(spaceId: MaybeString) {

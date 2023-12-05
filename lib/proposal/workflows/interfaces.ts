@@ -1,9 +1,6 @@
-import type { ProposalEvaluationType, ProposalEvaluationWorkflow } from '@charmverse/core/prisma';
+import type { ProposalOperation, ProposalEvaluationType, ProposalWorkflow } from '@charmverse/core/prisma';
 
-export const permissionLevels = ['view', 'comment', 'edit', 'move'] as const;
-export type PermissionLevel = (typeof permissionLevels)[number];
-export const permissionGroups = ['user', 'role', 'system_role'] as const;
-export type PermissionGroup = (typeof permissionGroups)[number];
+export const proposalOperations: ProposalOperation[] = ['view', 'comment', 'edit', 'move'];
 
 //  Note: current_reviewer = the current reviewer of the active proposal evaluation
 export enum SystemRole {
@@ -14,7 +11,7 @@ export enum SystemRole {
 }
 
 export type SpaceEvaluationPermission = {
-  level: PermissionLevel;
+  level: ProposalOperation;
   group: PermissionGroup;
   id: string | SystemRole;
 };
@@ -26,6 +23,6 @@ export type EvaluationTemplate = {
   permissions: SpaceEvaluationPermission[];
 };
 
-export type WorkflowTemplate = Omit<ProposalEvaluationWorkflow, 'evaluations'> & {
+export type WorkflowTemplate = Omit<ProposalWorkflow, 'evaluations'> & {
   evaluations: EvaluationTemplate[];
 };
