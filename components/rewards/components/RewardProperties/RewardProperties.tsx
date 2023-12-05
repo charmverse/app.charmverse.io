@@ -93,7 +93,11 @@ export function RewardProperties(props: {
             <>
               <Divider sx={{ my: 1 }} />
               <Stack mb={1}>
-                <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+                <RewardApplications
+                  applicationRequired={currentReward.approveSubmitters ?? false}
+                  rewardId={currentReward.id}
+                  onShowApplication={onClose}
+                />
               </Stack>
             </>
           )}
