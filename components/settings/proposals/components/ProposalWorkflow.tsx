@@ -1,3 +1,4 @@
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { ExpandMore, MoreHoriz } from '@mui/icons-material';
 import {
   Accordion,
@@ -20,14 +21,13 @@ import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
-import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
 import { EvaluationPermissionsRow } from './EvaluationPermissions';
 import { EvaluationRow } from './EvaluationRow';
 
-export type WorkflowTemplateFormItem = WorkflowTemplate & { isNew?: boolean };
+export type WorkflowTemplateFormItem = ProposalWorkflowTyped & { isNew?: boolean };
 
 export function ProposalWorkflowItem({
   isExpanded,
@@ -44,10 +44,10 @@ export function ProposalWorkflowItem({
   toggleRow: (id: string | false) => void;
   workflow: WorkflowTemplateFormItem;
   onUpdate: (workflow: WorkflowTemplateFormItem) => void;
-  onSave: (workflow: WorkflowTemplate) => void;
+  onSave: (workflow: ProposalWorkflowTyped) => void;
   onDelete: (id: string) => void;
   onCancel: (id: string) => void;
-  onDuplicate: (workflow: WorkflowTemplate) => void;
+  onDuplicate: (workflow: ProposalWorkflowTyped) => void;
   readOnly: boolean;
 }) {
   const [activeEvaluation, setActiveEvaluation] = useState<EvaluationTemplateFormItem | null>(null);
@@ -85,7 +85,7 @@ export function ProposalWorkflowItem({
     setUnsavedChanges(true);
   }
 
-  function addEvaluationStep(evaluation?: EvaluationTemplate) {
+  function addEvaluationStep(evaluation?: WorkflowEvaluationJson) {
     const newEvaluation = getDefaultEvaluation(evaluation);
     setActiveEvaluation({
       ...newEvaluation,
@@ -100,7 +100,7 @@ export function ProposalWorkflowItem({
   }
 
   // note: this only updates the workflow state, does not save to the db
-  function updateEvaluationStep(updates: EvaluationTemplate) {
+  function updateEvaluationStep(updates: WorkflowEvaluationJson) {
     const index = workflow.evaluations.findIndex((e) => e.id === updates.id);
     if (index === -1) {
       workflow.evaluations.push(updates);
@@ -111,7 +111,7 @@ export function ProposalWorkflowItem({
     setUnsavedChanges(true);
   }
 
-  function duplicateEvaluationStep(evaluation: EvaluationTemplate) {
+  function duplicateEvaluationStep(evaluation: WorkflowEvaluationJson) {
     addEvaluationStep(evaluation);
   }
 
@@ -119,7 +119,7 @@ export function ProposalWorkflowItem({
     setActiveEvaluation(null);
   }
 
-  function openEvaluationStep(evaluation: EvaluationTemplate) {
+  function openEvaluationStep(evaluation: WorkflowEvaluationJson) {
     setActiveEvaluation(evaluation);
   }
 

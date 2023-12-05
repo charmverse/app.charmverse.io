@@ -1,14 +1,13 @@
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { MoreHoriz } from '@mui/icons-material';
 import { Box, IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 
-import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
-
 export type ContextMenuProps = {
-  evaluation: EvaluationTemplate;
+  evaluation: WorkflowEvaluationJson;
   onDelete: (id: string) => void;
-  onDuplicate: (evaluation: EvaluationTemplate) => void;
-  onRename: (evaluation: EvaluationTemplate) => void;
+  onDuplicate: (evaluation: WorkflowEvaluationJson) => void;
+  onRename: (evaluation: WorkflowEvaluationJson) => void;
   readOnly: boolean;
 };
 

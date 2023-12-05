@@ -7,7 +7,7 @@ import type {
   ProposalEvaluation,
   ProposalStatus
 } from '@charmverse/core/prisma';
-import type { ProposalReviewerInput } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped, ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
@@ -41,12 +41,10 @@ import {
   previousProposalStatusUpdateMessage
 } from 'lib/proposal/proposalStatusTransition';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import type { WorkflowTemplate } from 'lib/proposal/workflows/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
-import { EvaluationWorkflowSelect } from './components/EvaluationWorkflowSelect';
 import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
 import { ProposalEvaluationsStatus } from './components/ProposalEvaluationsStatus/ProposalEvaluationsStatus';
@@ -55,6 +53,7 @@ import type { RangeProposalCriteria } from './components/ProposalRubricCriteriaI
 import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteriaInput';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
+import { WorkflowSelect } from './components/WorkflowSelect';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;
@@ -246,7 +245,7 @@ export function ProposalPropertiesBase({
     setIsVoteModalOpen(true);
   }
 
-  function selectEvaluationWorkflow(workflow: WorkflowTemplate) {
+  function selectEvaluationWorkflow(workflow: ProposalWorkflowTyped) {
     setProposalFormInputs({
       evaluations: workflow.evaluations.map((evaluation, index) => ({
         id: uuid(),
@@ -290,7 +289,7 @@ export function ProposalPropertiesBase({
             <PropertyLabel readOnly required highlighted>
               Workflow
             </PropertyLabel>
-            <EvaluationWorkflowSelect onChange={selectEvaluationWorkflow} />
+            <WorkflowSelect onChange={selectEvaluationWorkflow} />
           </Box>
         )}
         {isCharmVerse && proposalFormInputs.evaluations.length > 0 && (

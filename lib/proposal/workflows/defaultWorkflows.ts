@@ -1,11 +1,12 @@
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { v4 as uuid } from 'uuid';
 
 import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from './defaultEvaluation';
-import type { WorkflowTemplate } from './interfaces';
 
-export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spaceId) => [
+export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] = (spaceId) => [
   {
     id: uuid(),
+    createdAt: new Date(),
     title: 'Community Proposals',
     evaluations: [
       getDefaultFeedbackEvaluation(),
@@ -23,6 +24,7 @@ export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spa
   },
   {
     id: uuid(),
+    createdAt: new Date(),
     title: 'Decision Matrix',
     evaluations: [
       getDefaultFeedbackEvaluation(),
@@ -40,6 +42,7 @@ export const getDefaultWorkflows: (spaceId: string) => WorkflowTemplate[] = (spa
   },
   {
     id: uuid(),
+    createdAt: new Date(),
     title: 'Grant Applications',
     evaluations: [
       getDefaultFeedbackEvaluation(),

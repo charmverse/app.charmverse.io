@@ -1,4 +1,6 @@
-import { ProposalEvaluationType } from '@charmverse/core/prisma';
+import type { ProposalOperation } from '@charmverse/core/prisma';
+import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { useEffect } from 'react';
@@ -9,12 +11,10 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { permissionLevels, permissionGroups } from 'lib/proposal/workflows/interfaces';
-import type { EvaluationTemplate, SpaceEvaluationPermission } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons } from '../constants';
 
-import { EvaluationPermissions } from './EvaluationPermissions';
+import { proposalOperations, EvaluationPermissions } from './EvaluationPermissions';
 
 const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluationType) as ProposalEvaluationType[];
 
@@ -27,7 +27,7 @@ const StyledListItemText = styled(ListItemText)`
 `;
 
 // This type is used for existing and new workflows (id is null until it is saved)
-export type EvaluationTemplateFormItem = Omit<EvaluationTemplate, 'id'> & { id: string | null };
+export type EvaluationTemplateFormItem = Omit<WorkflowEvaluationJson, 'id'> & { id: string | null };
 
 export const schema = yup.object({
   id: yup.string().required(),
@@ -37,9 +37,10 @@ export const schema = yup.object({
     .array()
     .of(
       yup.object({
-        id: yup.string().required(),
-        level: yup.mixed<SpaceEvaluationPermission['level']>().oneOf(permissionLevels).required(),
-        group: yup.mixed<SpaceEvaluationPermission['group']>().oneOf(permissionGroups).required()
+        operation: yup.mixed<ProposalOperation>().oneOf(proposalOperations).required(),
+        userId: yup.string().nullable(),
+        roleId: yup.string().nullable(),
+        systemRole: yup.mixed<ProposalSystemRole>().oneOf(Object.values(ProposalSystemRole)).nullable()
       })
     )
     .required()
@@ -54,7 +55,7 @@ export function EvaluationDialog({
 }: {
   evaluation: EvaluationTemplateFormItem | null;
   onClose: VoidFunction;
-  onSave: (evaluation: EvaluationTemplate) => void;
+  onSave: (evaluation: WorkflowEvaluationJson) => void;
 }) {
   const {
     control,

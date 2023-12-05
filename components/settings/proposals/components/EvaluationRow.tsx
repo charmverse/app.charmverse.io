@@ -1,9 +1,9 @@
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { DragIndicator } from '@mui/icons-material';
 import { Box, Card, Typography } from '@mui/material';
 
 import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/sortable';
-import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons } from '../constants';
 
@@ -37,7 +37,7 @@ export function EvaluationRow({
   readOnly
 }: {
   key: string;
-  evaluation: EvaluationTemplate;
+  evaluation: WorkflowEvaluationJson;
   onChangeOrder: (selectedId: string, targetId: string) => void;
   readOnly: boolean;
 } & ContextMenuProps) {

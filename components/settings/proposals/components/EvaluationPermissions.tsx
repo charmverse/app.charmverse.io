@@ -1,3 +1,5 @@
+import { ProposalSystemRole, ProposalOperation } from '@charmverse/core/prisma';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
@@ -8,8 +10,6 @@ import type {
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
-import { permissionLevels, SystemRole } from 'lib/proposal/workflows/interfaces';
-import type { EvaluationTemplate, PermissionLevel } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons, evaluateVerbs } from '../constants';
 
@@ -17,7 +17,11 @@ import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 
-const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
+type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move'>;
+
+export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
+
+const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   {
     group: 'system_role',
     icon: (
@@ -25,7 +29,7 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
         <ProposalIcon color='secondary' fontSize='small' />
       </Tooltip>
     ),
-    id: SystemRole.author,
+    id: ProposalSystemRole.author,
     label: 'Author'
   },
   {
@@ -35,7 +39,7 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
         <ProposalIcon color='secondary' fontSize='small' />
       </Tooltip>
     ),
-    id: SystemRole.current_reviewer,
+    id: ProposalSystemRole.current_reviewer,
     label: 'Current Reviewer'
   },
   {
@@ -45,7 +49,7 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
         <ProposalIcon color='secondary' fontSize='small' />
       </Tooltip>
     ),
-    id: SystemRole.all_reviewers,
+    id: ProposalSystemRole.all_reviewers,
     label: 'All Reviewers'
   },
   {
@@ -55,16 +59,16 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<SystemRole>[] = [
         <MembersIcon color='secondary' fontSize='small' />
       </Tooltip>
     ),
-    id: SystemRole.space_member,
+    id: ProposalSystemRole.space_member,
     label: 'Members'
   }
 ];
 
-const permissionLevelPlaceholders = {
-  view: 'Only admins can view the proposal',
-  comment: 'No one can comment',
-  edit: 'Only admins can edit the proposal',
-  move: 'Only admins can change the current step'
+const permissionOperationPlaceholders = {
+  [ProposalOperation.view]: 'Only admins can view the proposal',
+  [ProposalOperation.comment]: 'No one can comment',
+  [ProposalOperation.edit]: 'Only admins can edit the proposal',
+  [ProposalOperation.move]: 'Only admins can change the current step'
 };
 
 export function EvaluationPermissionsRow({
@@ -75,8 +79,8 @@ export function EvaluationPermissionsRow({
   onChange,
   readOnly
 }: {
-  evaluation: EvaluationTemplate;
-  onChange: (evaluation: EvaluationTemplate) => void;
+  evaluation: WorkflowEvaluationJson;
+  onChange: (evaluation: WorkflowEvaluationJson) => void;
   readOnly: boolean;
 } & ContextMenuProps) {
   return (
@@ -104,7 +108,7 @@ export function EvaluationPermissionsRow({
   );
 }
 
-export function EvaluationPermissions<T extends EvaluationTemplateFormItem | EvaluationTemplate>({
+export function EvaluationPermissions<T extends EvaluationTemplateFormItem | WorkflowEvaluationJson>({
   evaluation,
   onChange,
   readOnly
@@ -113,21 +117,27 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
   onChange: (evaluation: T) => void;
   readOnly?: boolean;
 }) {
-  function updatePermissionLevel(level: PermissionLevel, resources: SelectOption[]) {
-    const newPermissions = evaluation.permissions.filter((permission) => permission.level !== level);
+  function updatePermissionOperation(operation: ProposalOperation, resources: SelectOption[]) {
+    const newPermissions = evaluation.permissions.filter((permission) => permission.operation !== operation);
     resources.forEach((resource) => {
-      newPermissions.push({ group: resource.group, id: resource.id, level });
+      const permission: WorkflowEvaluationJson['permissions'][number] =
+        resource.group === 'system_role'
+          ? { operation, systemRole: resource.id as ProposalSystemRole }
+          : resource.group === 'role'
+          ? { operation, roleId: resource.id }
+          : { operation, userId: resource.id };
+      newPermissions.push(permission);
     });
     onChange({ ...evaluation, permissions: newPermissions });
   }
-  const valuesByLevel = evaluation.permissions.reduce<Partial<Record<PermissionLevel, SelectOption[]>>>(
+  const valuesByOperation = evaluation.permissions.reduce<Partial<Record<ProposalOperation, SelectOption[]>>>(
     (acc, permission) => {
-      if (!acc[permission.level]) {
-        acc[permission.level] = [];
+      if (!acc[permission.operation]) {
+        acc[permission.operation] = [];
       }
-      acc[permission.level]!.push({
-        group: permission.group,
-        id: permission.id
+      acc[permission.operation]!.push({
+        group: permission.systemRole ? 'system_role' : permission.roleId ? 'role' : 'user',
+        id: permission.systemRole ?? permission.roleId ?? permission.userId!
       });
       return acc;
     },
@@ -137,24 +147,24 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
     <>
       <Typography variant='body2'>Who can:</Typography>
 
-      {permissionLevels.map((level) => (
-        <Box key={level} className='octo-propertyrow'>
-          <PropertyLabel readOnly>{capitalize(level)}</PropertyLabel>
+      {proposalOperations.map((operation) => (
+        <Box key={operation} className='octo-propertyrow'>
+          <PropertyLabel readOnly>{capitalize(operation)}</PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
             variant='outlined'
             wrapColumn
             // required values cannot be removed
             isRequiredValue={(option) => {
-              if (level === 'view') {
-                return option.id === SystemRole.author || option.id === SystemRole.current_reviewer;
+              if (operation === 'view') {
+                return option.id === ProposalSystemRole.author || option.id === ProposalSystemRole.current_reviewer;
               }
               return false;
             }}
-            value={valuesByLevel[level] || []}
+            value={valuesByOperation[operation] || []}
             systemRoles={extraEvaluationRoles}
-            inputPlaceholder={permissionLevelPlaceholders[level]}
-            onChange={async (options) => updatePermissionLevel(level, options)}
+            inputPlaceholder={permissionOperationPlaceholders[operation]}
+            onChange={async (options) => updatePermissionOperation(operation, options)}
           />
         </Box>
       ))}
@@ -174,7 +184,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
           <UserAndRoleSelect
             readOnly
             wrapColumn
-            value={[{ group: 'system_role', id: SystemRole.current_reviewer }]}
+            value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
             systemRoles={extraEvaluationRoles}
             onChange={() => {}}
           />
