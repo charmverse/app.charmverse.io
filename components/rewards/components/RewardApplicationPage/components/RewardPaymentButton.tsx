@@ -25,7 +25,6 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { getENSName, resolveENSName } from 'lib/blockchain';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
@@ -125,7 +124,7 @@ export function RewardPaymentButton({
   onError = () => {}
 }: Props) {
   const { data: existingSafesData, mutate: refreshSafes } = useMultiWalletSigs();
-  const { account, chainId, signer } = useWeb3Account();
+  const { account, provider, chainId, signer } = useWeb3Account();
   const { user } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -211,7 +210,7 @@ export function RewardPaymentButton({
       let receiverAddress = receiver;
 
       if (receiver.endsWith('.eth') && ethers.utils.isValidName(receiver)) {
-        const resolvedWalletAddress = await resolveENSName(receiver);
+        const resolvedWalletAddress = provider ? await provider.resolveName(receiver) : null;
         if (resolvedWalletAddress === null) {
           onError(`Could not resolve ENS name ${receiver}`);
           return;

@@ -8,7 +8,6 @@ import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { resolveENSName } from 'lib/blockchain';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
@@ -32,7 +31,7 @@ export type GnosisPaymentProps = {
 };
 
 export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess }: GnosisPaymentProps) {
-  const { account, chainId: connectedChainId, signer } = useWeb3Account();
+  const { account, chainId: connectedChainId, signer, provider } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
@@ -60,7 +59,9 @@ export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess 
 
     const recipientAddress =
       transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
-        ? await resolveENSName(transaction.to)
+        ? provider
+          ? await provider.resolveName(transaction.to)
+          : null
         : transaction.to;
 
     if (!recipientAddress) {
