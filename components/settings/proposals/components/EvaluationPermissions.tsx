@@ -184,10 +184,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
           <UserAndRoleSelect
             readOnly
             wrapColumn
-            value={[
-              { group: 'system_role', id: ProposalSystemRole.author },
-              { group: 'system_role', id: ProposalSystemRole.current_reviewer }
-            ]}
+            value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
             systemRoles={extraEvaluationRoles}
             onChange={() => {}}
           />
