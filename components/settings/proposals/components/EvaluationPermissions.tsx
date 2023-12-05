@@ -1,5 +1,4 @@
-import { ProposalSystemRole } from '@charmverse/core/prisma';
-import type { ProposalOperation } from '@charmverse/core/prisma';
+import { ProposalSystemRole, ProposalOperation } from '@charmverse/core/prisma';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
@@ -10,7 +9,6 @@ import type {
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
-import { proposalOperations } from 'lib/proposal/workflows/interfaces';
 import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons, evaluateVerbs } from '../constants';
@@ -18,6 +16,10 @@ import { evaluationIcons, evaluateVerbs } from '../constants';
 import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
+
+type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move'>;
+
+export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
 
 const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   {
@@ -63,10 +65,10 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
 ];
 
 const permissionOperationPlaceholders = {
-  view: 'Only admins can view the proposal',
-  comment: 'No one can comment',
-  edit: 'Only admins can edit the proposal',
-  move: 'Only admins can change the current step'
+  [ProposalOperation.view]: 'Only admins can view the proposal',
+  [ProposalOperation.comment]: 'No one can comment',
+  [ProposalOperation.edit]: 'Only admins can edit the proposal',
+  [ProposalOperation.move]: 'Only admins can change the current step'
 };
 
 export function EvaluationPermissionsRow({
@@ -118,7 +120,13 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
   function updatePermissionOperation(operation: ProposalOperation, resources: SelectOption[]) {
     const newPermissions = evaluation.permissions.filter((permission) => permission.operation !== operation);
     resources.forEach((resource) => {
-      newPermissions.push({ group: resource.group, operation });
+      const permission: EvaluationTemplate['permissions'][number] =
+        resource.group === 'system_role'
+          ? { operation, systemRole: resource.id as ProposalSystemRole }
+          : resource.group === 'role'
+          ? { operation, roleId: resource.id }
+          : { operation, userId: resource.id };
+      newPermissions.push(permission);
     });
     onChange({ ...evaluation, permissions: newPermissions });
   }
@@ -128,8 +136,8 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
         acc[permission.operation] = [];
       }
       acc[permission.operation]!.push({
-        group: permission.group,
-        id: permission.id
+        group: permission.systemRole ? 'system_role' : permission.roleId ? 'role' : 'user',
+        id: permission.systemRole ?? permission.roleId ?? permission.userId!
       });
       return acc;
     },

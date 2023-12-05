@@ -10,12 +10,11 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { proposalOperations } from 'lib/proposal/workflows/interfaces';
 import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons } from '../constants';
 
-import { EvaluationPermissions } from './EvaluationPermissions';
+import { proposalOperations, EvaluationPermissions } from './EvaluationPermissions';
 
 const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluationType) as ProposalEvaluationType[];
 
@@ -38,11 +37,10 @@ export const schema = yup.object({
     .array()
     .of(
       yup.object({
-        id: yup.string().required(),
         operation: yup.mixed<ProposalOperation>().oneOf(proposalOperations).required(),
-        userId: yup.string(),
-        roleId: yup.string(),
-        systemRole: yup.mixed<ProposalSystemRole>().oneOf(Object.values(ProposalSystemRole))
+        userId: yup.string().nullable(),
+        roleId: yup.string().nullable(),
+        systemRole: yup.mixed<ProposalSystemRole>().oneOf(Object.values(ProposalSystemRole)).nullable()
       })
     )
     .required()
