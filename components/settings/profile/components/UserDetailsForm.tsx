@@ -127,7 +127,12 @@ export function UserDetailsForm({ memberProperties, user, onChange, sx = {} }: U
             readOnly={disabled}
           />
         </Grid>
-        <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={disabled} />
+        <SocialInputs
+          memberProperties={memberProperties}
+          social={userDetails?.social as Social}
+          save={setSocial}
+          readOnly={disabled}
+        />
       </Grid>
       <IdentityModal
         isOpen={identityModalState.isOpen}
@@ -148,27 +153,20 @@ export function UserDetailsFormWithSave({
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
   const {
     memberProperties,
-    isTimezoneRequired,
-    isBioRequired,
-    userDetails: defaultUserDetails
+    userDetails: defaultUserDetails,
+    checkHasEmptyRequiredPropertiesFromUserDetails
   } = useRequiredMemberProperties({ userId: user.id });
   const [isFormClean, setIsFormClean] = useState(true);
-  const [userDetails, setUserDetails] = useState<EditableFields>({
-    description: '',
-    timezone: ''
-  });
+  const [userDetails, setUserDetails] = useState<EditableFields>({});
 
-  const isInputValid = (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description);
+  const hasEmptyRequiredProperties = checkHasEmptyRequiredPropertiesFromUserDetails(userDetails);
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
 
   usePreventReload(!isFormClean);
 
   useEffect(() => {
-    setUserDetails({
-      description: defaultUserDetails?.description ?? '',
-      timezone: defaultUserDetails?.timezone ?? ''
-    });
+    setUserDetails(defaultUserDetails ?? {});
   }, [defaultUserDetails]);
 
   function onFormChange(fields: EditableFields) {
@@ -179,8 +177,8 @@ export function UserDetailsFormWithSave({
   async function saveForm() {
     await charmClient.updateUserDetails(userDetails);
     await mutateMembers();
-    showMessage('Profile updated', 'success');
     mutate('/current-user-details');
+    showMessage('Profile updated', 'success');
     setIsFormClean(true);
   }
 
@@ -199,7 +197,7 @@ export function UserDetailsFormWithSave({
         <Button
           disableElevation
           size='large'
-          disabled={isFormClean || !isInputValid}
+          disabled={isFormClean || hasEmptyRequiredProperties}
           disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
           onClick={saveForm}
         >

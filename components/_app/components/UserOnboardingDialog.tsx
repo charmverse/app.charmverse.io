@@ -93,14 +93,13 @@ function UserOnboardingDialog({
   const { showMessage } = useSnackbar();
   const {
     control,
-    isTimezoneRequired,
     userDetails: defaultUserDetails,
-    isBioRequired,
     errors,
     isValid,
     memberProperties,
     nonEmptyRequiredProperties,
     values,
+    checkHasEmptyRequiredPropertiesFromUserDetails,
     requiredProperties
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
@@ -111,19 +110,10 @@ function UserOnboardingDialog({
   const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
   const [isFormClean, setIsFormClean] = useState(true);
-  const isInputValid =
-    requiredProperties.length === 0 ||
-    (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
+  const hasEmptyRequiredProperties = checkHasEmptyRequiredPropertiesFromUserDetails(userDetails);
 
   useEffect(() => {
-    log.info('[user-journey] Show onboarding flow');
-  }, []);
-
-  useEffect(() => {
-    setUserDetails({
-      description: defaultUserDetails?.description ?? '',
-      timezone: defaultUserDetails?.timezone ?? ''
-    });
+    setUserDetails(defaultUserDetails ?? {});
   }, [defaultUserDetails]);
 
   function onUserDetailsChange(fields: EditableFields) {
@@ -200,8 +190,7 @@ function UserOnboardingDialog({
             disableElevation
             size='large'
             onClick={saveForm}
-            disabled={isFormClean || !isInputValid}
-            loading={isLoading}
+            disabled={isFormClean || hasEmptyRequiredProperties || !isValid}
             disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save

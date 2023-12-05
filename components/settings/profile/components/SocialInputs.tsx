@@ -2,12 +2,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import type { ChangeEvent } from 'react';
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import FieldLabel from 'components/common/form/FieldLabel';
-import type { Social } from 'lib/members/interfaces';
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
+import type { PropertyValueWithDetails, Social } from 'lib/members/interfaces';
 import debounce from 'lib/utilities/debounce';
 
 export const schema = yup.object({
@@ -40,6 +41,7 @@ type SocialInputsProps = {
   social?: Social;
   save: (social: Social) => Promise<void>;
   readOnly?: boolean;
+  memberProperties?: PropertyValueWithDetails[];
 };
 
 const initialSocials: Social = {
@@ -50,7 +52,23 @@ const initialSocials: Social = {
 };
 
 export function SocialInputs(props: SocialInputsProps) {
-  const { social = initialSocials, save, readOnly } = props;
+  const { social = initialSocials, memberProperties, save, readOnly } = props;
+
+  const { isGithubRequired, isLinkedinRequired, isTwitterRequired } = useMemo(() => {
+    if (!memberProperties || memberProperties.length === 0) {
+      return {
+        isTwitterRequired: false,
+        isGithubRequired: false,
+        isLinkedinRequired: false
+      };
+    }
+
+    return {
+      isTwitterRequired: memberProperties.some((property) => property.type === 'twitter' && property.required),
+      isGithubRequired: memberProperties.some((property) => property.type === 'github' && property.required),
+      isLinkedinRequired: memberProperties.some((property) => property.type === 'linked_in' && property.required)
+    };
+  }, [memberProperties]);
 
   const {
     register,
@@ -91,52 +109,56 @@ export function SocialInputs(props: SocialInputsProps) {
   return (
     <>
       <Grid item>
-        <FieldLabel>X</FieldLabel>
-        <TextField
-          {...register('twitterURL')}
-          fullWidth
-          disabled={readOnly}
-          error={!!errors.twitterURL}
-          helperText={errors.twitterURL?.message}
-          placeholder='https://twitter.com/charmverse'
-          onChange={onChange}
-        />
+        <FieldWrapper label='X' required={isTwitterRequired}>
+          <TextField
+            {...register('twitterURL')}
+            fullWidth
+            disabled={readOnly}
+            error={!!errors.twitterURL}
+            helperText={errors.twitterURL?.message}
+            placeholder='https://twitter.com/charmverse'
+            onChange={onChange}
+          />
+        </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldLabel>GitHub</FieldLabel>
-        <TextField
-          {...register('githubURL')}
-          disabled={readOnly}
-          fullWidth
-          error={!!errors.githubURL}
-          helperText={errors.githubURL?.message}
-          placeholder='https://github.com/charmverse'
-          onChange={onChange}
-        />
+        <FieldWrapper label='Github' required={isGithubRequired}>
+          <TextField
+            {...register('githubURL')}
+            disabled={readOnly}
+            fullWidth
+            error={!!errors.githubURL}
+            helperText={errors.githubURL?.message}
+            placeholder='https://github.com/charmverse'
+            onChange={onChange}
+          />
+        </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldLabel>Discord</FieldLabel>
-        <TextField
-          {...register('discordUsername')}
-          disabled={readOnly}
-          fullWidth
-          error={!!errors.discordUsername}
-          helperText={errors.discordUsername?.message}
-          placeholder='Username#1234'
-          onChange={onChange}
-        />
+        <FieldWrapper label='Discord'>
+          <TextField
+            {...register('discordUsername')}
+            disabled={readOnly}
+            fullWidth
+            error={!!errors.discordUsername}
+            helperText={errors.discordUsername?.message}
+            placeholder='Username#1234'
+            onChange={onChange}
+          />
+        </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldLabel>LinkedIn</FieldLabel>
-        <TextField
-          {...register('linkedinURL')}
-          disabled={readOnly}
-          fullWidth
-          error={!!errors.linkedinURL}
-          helperText={errors.linkedinURL?.message}
-          placeholder='https://www.linkedin.com/in/alexchibunpoon/'
-          onChange={onChange}
-        />
+        <FieldWrapper label='LinkedIn' required={isLinkedinRequired}>
+          <TextField
+            {...register('linkedinURL')}
+            disabled={readOnly}
+            fullWidth
+            error={!!errors.linkedinURL}
+            helperText={errors.linkedinURL?.message}
+            placeholder='https://www.linkedin.com/in/alexchibunpoon/'
+            onChange={onChange}
+          />
+        </FieldWrapper>
       </Grid>
     </>
   );
