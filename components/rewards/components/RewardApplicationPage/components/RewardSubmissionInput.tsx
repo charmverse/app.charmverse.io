@@ -139,7 +139,7 @@ export function RewardSubmissionInput({
 
           {(currentUserIsAuthor || permissions?.review) && !hasCustomReward && (
             <Grid item>
-              <InputLabel>Address to receive reward (or ENS)</InputLabel>
+              <InputLabel>Address/ENS to receive reward</InputLabel>
               <TextField
                 {...register('walletAddress')}
                 type='text'
