@@ -84,14 +84,23 @@ export interface DocumentPageProps {
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   close?: VoidFunction;
+  insideModal?: boolean;
   enableSidebar?: boolean;
 }
 
-function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, enableSidebar }: DocumentPageProps) {
+function DocumentPage({
+  insideModal = false,
+  page,
+  refreshPage,
+  savePage,
+  readOnly = false,
+  close,
+  enableSidebar
+}: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
   const isLargeScreen = useLgScreen();
-  const { navigateToSpacePath } = useCharmRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const {
     activeView: sidebarView,
     persistedActiveView,
@@ -158,8 +167,8 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const pageTop = getPageTop(page);
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
-  const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  const isRewardsPage = router.pathname === '/[domain]/rewards';
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -354,6 +363,17 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                   readOnly={readOnly || !!enableSuggestingMode}
                   setPage={savePage}
                   readOnlyTitle={!!page.syncWithPageId}
+                  parentInfo={
+                    board
+                      ? {
+                          title: board.title,
+                          id: board.id
+                        }
+                      : null
+                  }
+                  showParentChip={
+                    !!(page.type === 'card' && page.bountyId && page.parentId && board && insideModal && isRewardsPage)
+                  }
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                   <Box my={2} className='font-family-default'>

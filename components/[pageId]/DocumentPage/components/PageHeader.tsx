@@ -6,7 +6,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import type { ListItemButtonProps } from '@mui/material';
-import { ListItemButton, Menu } from '@mui/material';
+import { Chip, ListItemButton, Menu } from '@mui/material';
 import Box from '@mui/material/Box';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -16,6 +16,7 @@ import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIc
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import { randomBannerImage } from './PageBanner';
@@ -73,6 +74,8 @@ type PageHeaderProps = {
   updatedAt: string;
   readOnlyTitle?: boolean;
   placeholder?: string;
+  showParentChip?: boolean;
+  parentInfo?: { title: string; id: string } | null;
 };
 
 function PageHeader({
@@ -83,8 +86,11 @@ function PageHeader({
   title,
   updatedAt,
   readOnlyTitle,
-  placeholder
+  placeholder,
+  parentInfo,
+  showParentChip
 }: PageHeaderProps) {
+  const { navigateToSpacePath } = useCharmRouter();
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
@@ -95,13 +101,23 @@ function PageHeader({
 
   return (
     <>
-      <PageHeaderControls
-        addPageHeader={addPageHeader}
-        headerImage={headerImage}
-        icon={icon}
-        readOnly={readOnly}
-        setPage={setPage}
-      />
+      {showParentChip && parentInfo ? (
+        <Chip
+          label={parentInfo.title}
+          size='small'
+          onClick={() => {
+            navigateToSpacePath(`/${parentInfo.id}`);
+          }}
+        />
+      ) : (
+        <PageHeaderControls
+          addPageHeader={addPageHeader}
+          headerImage={headerImage}
+          icon={icon}
+          readOnly={readOnly}
+          setPage={setPage}
+        />
+      )}
       <PageTitleInput
         readOnly={readOnly || readOnlyTitle}
         value={title}

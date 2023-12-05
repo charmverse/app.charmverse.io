@@ -175,7 +175,14 @@ function PageDialogBase(props: Props) {
       onClose={close}
     >
       {page && contentType === 'page' && (
-        <DocumentPage page={page} savePage={savePage} refreshPage={refreshPage} readOnly={readOnlyPage} close={close} />
+        <DocumentPage
+          insideModal
+          page={page}
+          savePage={savePage}
+          refreshPage={refreshPage}
+          readOnly={readOnlyPage}
+          close={close}
+        />
       )}
       {contentType === 'application' && applicationContext && (
         <RewardApplicationPage
