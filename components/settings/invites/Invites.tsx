@@ -20,7 +20,6 @@ import { PublicInvitesList } from './components/PublicInvitesList';
 import { TokenGates } from './components/TokenGates';
 
 export function Invites({ space }: { space: Space }) {
-  const spaceId = space.id;
   const isAdmin = useIsAdmin();
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
@@ -83,7 +82,7 @@ export function Invites({ space }: { space: Space }) {
           <Box sx={{ my: 2 }} />
         </>
       )}
-      <TokenGates isAdmin={isAdmin} spaceId={spaceId} popupState={popupTokenGateState} />
+      <TokenGates isAdmin={isAdmin} space={space} popupState={popupTokenGateState} />
     </>
   );
 }

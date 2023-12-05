@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { PublicApiBounty } from 'pages/api/v1/bounties/index';
+import type { PublicApiReward } from 'pages/api/v1/bounties/index';
 import { baseUrl } from 'testing/mockApiCall';
 import {
   generateBountyWithSingleApplication,
@@ -45,15 +45,15 @@ describe('GET /api/v1/bounties', () => {
     ]);
 
     const response = (await request(baseUrl).get(`/api/v1/bounties?api_key=${apiToken.token}`).send().expect(200))
-      .body as PublicApiBounty[];
+      .body as PublicApiReward[];
 
     // Both bounties should have been returned
     expect(response.length).toEqual(2);
 
-    const bountyWithPaidFromApi = response.find((b) => b.id === bountyWithPaidApplication.id) as PublicApiBounty;
+    const bountyWithPaidFromApi = response.find((b) => b.id === bountyWithPaidApplication.id) as PublicApiReward;
 
-    expect(bountyWithPaidFromApi).toEqual<PublicApiBounty>(
-      expect.objectContaining<PublicApiBounty>({
+    expect(bountyWithPaidFromApi).toEqual<PublicApiReward>(
+      expect.objectContaining<PublicApiReward>({
         createdAt: bountyWithPaidApplication.createdAt.toISOString(),
         content: {
           text: paidBountyDescription,
@@ -80,10 +80,10 @@ describe('GET /api/v1/bounties', () => {
       })
     );
 
-    const bountyWithInProgressFromApi = response.find((b) => b.id === bountyWithInProgressWork.id) as PublicApiBounty;
+    const bountyWithInProgressFromApi = response.find((b) => b.id === bountyWithInProgressWork.id) as PublicApiReward;
 
-    expect(bountyWithInProgressFromApi).toEqual<PublicApiBounty>(
-      expect.objectContaining<PublicApiBounty>({
+    expect(bountyWithInProgressFromApi).toEqual<PublicApiReward>(
+      expect.objectContaining<PublicApiReward>({
         createdAt: bountyWithInProgressWork.createdAt.toISOString(),
         content: {
           markdown: inProgressBountyDescription,
@@ -152,7 +152,7 @@ describe('GET /api/v1/bounties', () => {
         .set({ authorization: `Bearer ${space2SuperApiToken.token}` })
         .send()
         .expect(200)
-    ).body as PublicApiBounty[];
+    ).body as PublicApiReward[];
 
     // No data should be returned
     expect(response.length).toEqual(0);

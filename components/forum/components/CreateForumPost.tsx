@@ -40,7 +40,7 @@ export function CreateForumPost({
         >
           <CardContent>
             <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' gap={1}>
-              <UserDisplay user={user} avatarSize='medium' hideName mr='10px' />
+              <UserDisplay userId={user?.id} avatarSize='medium' hideName mr='10px' />
               <TextField
                 variant='outlined'
                 placeholder='Create Post'

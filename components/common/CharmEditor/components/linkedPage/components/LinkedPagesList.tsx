@@ -3,8 +3,10 @@ import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/constants';
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
+import type { PageListItem } from 'components/common/PagesList';
+import { PagesList } from 'components/common/PagesList';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
@@ -16,8 +18,6 @@ import { isTruthy } from 'lib/utilities/types';
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
-import type { PageListItem } from '../../PageList';
-import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 
 const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
@@ -51,17 +51,8 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
 
   const forumTitle = features.find((feat) => feat.id === 'forum')?.title ?? 'Forum';
 
-  const allPages: PageListItem[] = useMemo(() => {
-    const categoryPages: PageListItem[] = (categories || []).map((page) => ({
-      id: page.id,
-      path: page.path || '',
-      hasContent: true,
-      title: `${forumTitle} > ${page.name}`,
-      type: 'forum_category',
-      icon: null
-    }));
-
-    const staticPages: PageListItem[] = STATIC_PAGES.map((page) => {
+  const staticPages: PageListItem[] = useMemo(() => {
+    return STATIC_PAGES.map((page) => {
       const feature = features.find((feat) => feat.id === page.feature);
       return {
         id: page.path,
@@ -72,15 +63,27 @@ function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginS
         icon: null
       };
     });
+  }, [features]);
+
+  const allPages: PageListItem[] = useMemo(() => {
+    const categoryPages: PageListItem[] = (categories || []).map((page) => ({
+      id: page.id,
+      path: page.path || '',
+      hasContent: true,
+      title: `${forumTitle} > ${page.name}`,
+      type: 'forum_category',
+      icon: null
+    }));
+
     return [...userPages, ...categoryPages, ...staticPages];
-  }, [categories, userPages]);
+  }, [categories, userPages, staticPages, forumTitle]);
 
   const filteredPages = useMemo(() => {
     if (triggerText) {
       return sortList({ triggerText, list: allPages, prop: 'title' });
     }
-    return userPages;
-  }, [triggerText, userPages]);
+    return [...userPages, ...staticPages];
+  }, [triggerText, userPages, allPages, staticPages]);
 
   const totalItems = filteredPages.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;

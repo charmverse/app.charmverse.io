@@ -5,6 +5,7 @@ import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { PagesList } from 'components/common/PagesList';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -12,11 +13,9 @@ import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 import { sanitizeForRegex } from 'lib/utilities/strings';
-import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
@@ -164,7 +163,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
                   data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
-                  <UserDisplay fontSize={14} user={member} avatarSize='small' />
+                  <UserDisplay fontSize={14} userId={member.id} avatarSize='small' />
                 </MenuItem>
               );
             })}

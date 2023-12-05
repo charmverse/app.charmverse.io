@@ -19,14 +19,14 @@ handler
   .use(
     requireKeys(
       [
-        { key: 'address', truthy: true },
+        { key: 'address', valueType: 'wallet' },
         {
           key: 'sig',
-          truthy: true
+          valueType: 'truthy'
         },
         {
           key: 'data',
-          truthy: true
+          valueType: 'truthy'
         }
       ],
       'body'

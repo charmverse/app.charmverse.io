@@ -27,6 +27,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { useUser } from 'hooks/useUser';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
@@ -42,7 +43,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
   const { navigateToSpacePath, updateURLQuery } = useCharmRouter();
   const isAdmin = useIsAdmin();
-
+  const { user } = useUser();
   const { props, showProposal, hideProposal } = useProposalDialog();
   const { board: activeBoard, views, cardPages, activeView, cards } = useProposalsBoard();
   const router = useRouter();
@@ -143,13 +144,15 @@ export function ProposalsPage({ title }: { title: string }) {
               viewSortPopup={viewSortPopup}
             />
 
-            <ViewHeaderActionsMenu
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setShowSidebar(!showSidebar);
-              }}
-            />
+            {user && (
+              <ViewHeaderActionsMenu
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowSidebar(!showSidebar);
+                }}
+              />
+            )}
           </Stack>
           <Divider />
 
@@ -178,6 +181,7 @@ export function ProposalsPage({ title }: { title: string }) {
                   disableAddingCards
                   showCard={openPage}
                   readOnlyTitle
+                  readOnlyRows
                   cardIdToFocusOnRender=''
                   addCard={async () => {}}
                   onCardClicked={() => {}}

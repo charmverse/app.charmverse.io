@@ -10,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys([{ key: 'spaceId', truthy: true }], 'query'))
+  .use(requireKeys([{ key: 'spaceId', valueType: 'truthy' }], 'query'))
   .get(checkDiscordGateEndpoint);
 
 async function checkDiscordGateEndpoint(req: NextApiRequest, res: NextApiResponse) {

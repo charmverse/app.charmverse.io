@@ -87,6 +87,12 @@ export function useLensProfile() {
   // const authenticated = sessionData?.authenticated ?? false;
   // const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
   // const { handlerLensError } = useHandleLensError();
+  // const wallet = user?.wallets[0]?.address;
+  // const { data: profilesData, loading } = useProfiles({
+  //   where: {
+  //     ownedBy: wallet ? [wallet] : account ? [account] : null
+  //   }
+  // });
 
   // const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
   //   where: {
@@ -123,12 +129,12 @@ export function useLensProfile() {
   //   return true;
   // };
 
-  return {
-    isAuthenticated: false,
-    lensProfile: null,
-    setupLensProfile: () => null,
-    isLoadingProfiles: false
-  };
+  // return {
+  //   isAuthenticated: authenticated,
+  //   lensProfile: !isCyberConnect(space?.domain) ? lensProfile : null,
+  //   setupLensProfile,
+  //   loading
+  // };
 }
 
 function isCyberConnect(domain?: string) {

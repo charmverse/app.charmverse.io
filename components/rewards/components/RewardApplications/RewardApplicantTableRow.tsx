@@ -18,10 +18,14 @@ export function RewardApplicantTableRow({ submission, onClickView }: Props) {
   const member = getMemberById(submission.createdBy);
   const { formatDateTime } = useDateFormatter();
 
+  if (!member) {
+    return null;
+  }
+
   return (
     <TableRow key={submission.id} hover sx={{ '.MuiTableCell-root': { borderBottom: 0 } }}>
       <TableCell size='small'>
-        {member ? <UserDisplay avatarSize='small' user={member} fontSize='small' showMiniProfile /> : 'Anonymous'}
+        <UserDisplay avatarSize='small' userId={member.id} fontSize='small' showMiniProfile />
       </TableCell>
       <TableCell>
         <RewardApplicationStatusChip status={submission.status} />

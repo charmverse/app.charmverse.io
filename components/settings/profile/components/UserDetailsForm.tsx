@@ -10,17 +10,17 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
 import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Social } from 'lib/members/interfaces';
+import type { PropertyValueWithDetails, Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import type { LoggedInUser } from 'models';
@@ -40,6 +40,7 @@ export interface UserDetailsProps {
   user: LoggedInUser;
   sx?: SxProps<Theme>;
   onChange: (user: EditableFields) => void;
+  memberProperties: PropertyValueWithDetails[];
 }
 
 const StyledStack = styled(Stack)`
@@ -61,7 +62,7 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
+export function UserDetailsForm({ memberProperties, user, onChange, sx = {} }: UserDetailsProps) {
   const { data: userDetails, isLoading } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
   const identityTypes = useIdentityTypes();
@@ -84,6 +85,8 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
   };
 
   const disabled = isLoading;
+
+  const requiredProperties = memberProperties.filter((mp) => mp.required);
 
   return (
     <>
@@ -109,10 +112,20 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
           </EditIconContainer>
         </Grid>
         <Grid item>
-          <UserDescription currentDescription={userDetails?.description} save={setDescription} readOnly={disabled} />
+          <UserDescription
+            required={!!requiredProperties.find((prop) => prop.type === 'bio')}
+            currentDescription={userDetails?.description}
+            save={setDescription}
+            readOnly={disabled}
+          />
         </Grid>
         <Grid item>
-          <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={setTimezone} readOnly={disabled} />
+          <TimezoneAutocomplete
+            required={!!requiredProperties.find((prop) => prop.type === 'timezone')}
+            userTimezone={userDetails?.timezone}
+            save={setTimezone}
+            readOnly={disabled}
+          />
         </Grid>
         <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={disabled} />
       </Grid>
@@ -133,27 +146,42 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
-  const [form, setForm] = useState<EditableFields>({});
+  const {
+    memberProperties,
+    isTimezoneRequired,
+    isBioRequired,
+    userDetails: defaultUserDetails
+  } = useRequiredMemberProperties({ userId: user.id });
+  const [isFormClean, setIsFormClean] = useState(true);
+  const [userDetails, setUserDetails] = useState<EditableFields>({
+    description: '',
+    timezone: ''
+  });
+
+  const isInputValid = (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description);
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
-  const { trigger: updateUserDetails } = useSWRMutation(
-    '/api/profile/details',
-    (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
-  );
-  const isFormClean = Object.keys(form).length === 0;
 
   usePreventReload(!isFormClean);
 
+  useEffect(() => {
+    setUserDetails({
+      description: defaultUserDetails?.description ?? '',
+      timezone: defaultUserDetails?.timezone ?? ''
+    });
+  }, [defaultUserDetails]);
+
   function onFormChange(fields: EditableFields) {
-    setForm((_form) => ({ ..._form, ...fields }));
+    setIsFormClean(false);
+    setUserDetails((_form) => ({ ..._form, ...fields }));
   }
 
   async function saveForm() {
-    await updateUserDetails(form);
+    await charmClient.updateUserDetails(userDetails);
     await mutateMembers();
-    setForm({});
     showMessage('Profile updated', 'success');
     mutate('/current-user-details');
+    setIsFormClean(true);
   }
 
   useEffect(() => {
@@ -166,9 +194,15 @@ export function UserDetailsFormWithSave({
 
   return (
     <>
-      <UserDetailsForm user={user} onChange={onFormChange} />
+      <UserDetailsForm memberProperties={memberProperties ?? []} user={user} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
-        <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
+        <Button
+          disableElevation
+          size='large'
+          disabled={isFormClean || !isInputValid}
+          disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
+          onClick={saveForm}
+        >
           Save
         </Button>
       </Box>

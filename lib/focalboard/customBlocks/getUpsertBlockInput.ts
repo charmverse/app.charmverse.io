@@ -10,12 +10,14 @@ import { DEFAULT_BOARD_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
 export function getUpsertBlockInput({
   data: upsertData,
   userId,
-  spaceId
+  spaceId,
+  createOnly = false
 }: {
   data: Board | BoardView | Block;
   userId: string;
   spaceId: string;
   tx?: PrismaTransactionClient;
+  createOnly?: boolean;
 }) {
   if (!upsertData.type || !upsertData.fields) {
     throw new InvalidInputError('Missing required fields');
@@ -27,7 +29,6 @@ export function getUpsertBlockInput({
   const id = data.type === 'board' ? DEFAULT_BOARD_BLOCK_ID : upsertId || v4();
 
   if (data.type === 'board') {
-    // add default bord fields, TODO: insert all default view ids (__defaultView, __defaultBoardView, __defaultCalendarView)
     upsertFields = createBoard({ block: { fields: { ...(data.fields || ({} as any)) } } }).fields;
   }
 
@@ -36,18 +37,19 @@ export function getUpsertBlockInput({
       id_spaceId: {
         id,
         spaceId
-      },
-      type: data.type
+      }
     },
-    update: {
-      ...data,
-      spaceId,
-      fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
-      updatedBy: userId,
-      deletedAt: data.deletedAt ? new Date(data.deletedAt) : undefined,
-      createdAt: data.createdAt ? new Date(data.createdAt) : undefined,
-      updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined
-    },
+    update: createOnly
+      ? {}
+      : {
+          ...data,
+          spaceId,
+          fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
+          updatedBy: userId,
+          deletedAt: data.deletedAt ? new Date(data.deletedAt) : undefined,
+          createdAt: data.createdAt ? new Date(data.createdAt) : undefined,
+          updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined
+        },
     create: {
       id,
       ...data,

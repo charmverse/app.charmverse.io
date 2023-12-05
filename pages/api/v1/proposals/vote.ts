@@ -12,9 +12,9 @@ handler
   .use(
     requireKeys(
       [
-        { key: 'proposalId', truthy: true },
-        { key: 'userId', truthy: true },
-        { key: 'choice', truthy: true }
+        { key: 'proposalId', valueType: 'uuid' },
+        { key: 'userId', valueType: 'uuid' },
+        { key: 'choice', valueType: 'truthy' }
       ],
       'body'
     )

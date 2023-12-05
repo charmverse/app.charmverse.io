@@ -21,7 +21,7 @@ import Legend from '../Legend';
 import { UpgradeChip } from '../subscription/UpgradeWrapper';
 
 export const schema = yup.object({
-  webhookUrl: yup.string().nullable(true),
+  webhookUrl: yup.string().nullable(),
   events: yup
     .object({
       forum: yup.boolean().defined(),

@@ -121,7 +121,7 @@ export function ProposalCategoryContextMenu({ category }: Props) {
   return (
     <>
       <PopperPopup popupContent={popupContent} onClose={onSave}>
-        <IconButton data-test={`open-category-context-menu-${category.id}`} size='small'>
+        <IconButton data-test={`open-category-context-menu-${category.id}`} size='small' className='icons'>
           <MoreHorizIcon fontSize='small' />
         </IconButton>
       </PopperPopup>

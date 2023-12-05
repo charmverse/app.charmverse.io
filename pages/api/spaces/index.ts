@@ -12,6 +12,7 @@ import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { checkUserBlacklistStatus } from 'lib/users/checkUserBlacklistStatus';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -23,6 +24,10 @@ async function getSpaces(req: NextApiRequest, res: NextApiResponse<Space[]>) {
   const sortedSpaces = await getSpacesOfUser(userId);
 
   res.setHeader('Cache-Control', 'no-store');
+
+  sortedSpaces.forEach((space) => {
+    space.spaceImage = replaceS3Domain(space.spaceImage);
+  });
 
   return res.status(200).json(sortedSpaces);
 }

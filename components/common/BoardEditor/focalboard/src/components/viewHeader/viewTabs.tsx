@@ -77,7 +77,6 @@ interface ViewTabsProps {
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
   openViewOptions: () => void;
-  viewIds: string[];
 }
 
 function ViewMenuItem({

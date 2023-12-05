@@ -33,7 +33,7 @@ async function closeRewardController(req: NextApiRequest, res: NextApiResponse<R
   });
 
   if (!permissions.lock) {
-    throw new UnauthorisedActionError('You do not have the permission to close this bounty');
+    throw new UnauthorisedActionError('You do not have the permission to close this reward');
   }
 
   const completeReward = await closeOutReward(rewardId);

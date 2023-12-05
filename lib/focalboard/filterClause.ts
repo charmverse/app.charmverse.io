@@ -83,8 +83,8 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: BooleanDataTypeConditions
   },
   createdBy: {
-    datatype: 'date',
-    conditions: DateDataTypeConditions
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
   },
   createdTime: {
     datatype: 'date',

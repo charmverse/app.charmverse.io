@@ -1,3 +1,4 @@
+import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
@@ -6,29 +7,31 @@ import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 
 import useGnosisSafes from './useGnosisSafes';
 
-export type MultiPaymentResult = {
+export type MetaTransactionDataWithApplicationId = MetaTransactionData & { applicationId: string };
+
+export type GnosisProposeTransactionResult = {
   safeAddress: string;
-  transactions: (MetaTransactionData & { applicationId: string })[];
+  transaction: MetaTransactionDataWithApplicationId;
   txHash: string;
 };
 
 export type GnosisPaymentProps = {
   chainId?: number;
-  onSuccess: (result: MultiPaymentResult) => void;
+  onSuccess: (result: GnosisProposeTransactionResult) => void;
   safeAddress: string;
-  transactions: (MetaTransactionData & { applicationId: string })[];
+  transaction: MetaTransactionDataWithApplicationId;
 };
 
-export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
+export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
-  const { showMessage } = useSnackbar();
+
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
@@ -40,17 +43,31 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
       await switchActiveNetwork(chainId);
     }
 
-    if (!safe || !account || !network?.gnosisUrl || !signer) {
+    if (!safe || !account || !network?.gnosisUrl || !signer || !chainId) {
       return;
     }
 
+    // Increment tx Nonce
+    const nonce = await safe.getNonce();
+
+    const client = getSafeApiClient({ chainId });
+
+    const pendingTx = await client.getPendingTransactions(safeAddress);
+
+    const txNonce = nonce + pendingTx.results.length;
+
     const safeTransaction = await safe.createTransaction({
-      safeTransactionData: transactions.map((transaction) => ({
-        data: transaction.data,
-        to: transaction.to,
-        value: transaction.value,
-        operation: transaction.operation
-      }))
+      safeTransactionData: [
+        {
+          data: transaction.data,
+          to: transaction.to,
+          value: transaction.value,
+          operation: transaction.operation
+        }
+      ],
+      options: {
+        nonce: txNonce
+      }
     });
 
     const txHash = await safe.getTransactionHash(safeTransaction);
@@ -93,22 +110,27 @@ export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess
         origin
       });
     }
-    onSuccess({ safeAddress, transactions, txHash });
+    onSuccess({ safeAddress, transaction, txHash });
   }
 
-  async function makePaymentGraceful() {
+  async function makePaymentWithErrorParser() {
     try {
       await makePayment();
     } catch (error) {
       log.error(error);
+      // Use utilities for standard error message, but ensure downstream consumers don't think tx succeeded
       const { message, level } = getPaymentErrorMessage(error);
-      showMessage(message, level);
+      throw new SystemError({
+        errorType: 'External service',
+        severity: level,
+        message
+      });
     }
   }
 
   return {
     safe,
-    makePayment: makePaymentGraceful
+    makePayment: makePaymentWithErrorParser
   };
 }
 

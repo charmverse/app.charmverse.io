@@ -19,7 +19,7 @@ handler.get(getBounties);
  *        address:
  *          type: string
  *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
- *    Bounty:
+ *    Reward:
  *      type: object
  *      properties:
  *        id:
@@ -74,7 +74,7 @@ handler.get(getBounties);
  *          example: https://app.charmverse.io/my-workspace/bounties/5985679461310778
  *
  */
-export interface PublicApiBounty {
+export interface PublicApiReward {
   id: string;
   createdAt: string;
   content: {
@@ -113,8 +113,8 @@ interface BountyVC {
  * @swagger
  * /bounties:
  *   get:
- *     summary: Retrieve a list of bounties
- *     description: Retrieve bounties from your workspace.
+ *     summary: Retrieve a list of rewards
+ *     description: Retrieve rewards from your space.
  *     tags:
  *      - 'Space API'
  *     parameters:
@@ -123,14 +123,14 @@ interface BountyVC {
  *        type: string
  *     responses:
  *       200:
- *         description: List of bounties
+ *         description: List of rewards
  *         content:
  *            application/json:
  *              schema:
  *                type: array
  *                items:
  *                  type: object
- *                  $ref: '#/components/schemas/Bounty'
+ *                  $ref: '#/components/schemas/Reward'
  */
 async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   const { status } = req.query;
@@ -200,7 +200,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const bountiesResponse = bounties.map(
-    (bounty, index): PublicApiBounty => ({
+    (bounty, index): PublicApiReward => ({
       createdAt: bounty.createdAt.toISOString(),
       content: {
         text: bounty.page?.contentText ?? '',

@@ -79,7 +79,7 @@ export function ApplicationComments({ applicationId }: { applicationId: string }
   }
 
   /**
-   * Application comments use the reward (ex. bounty) page id for the page
+   * Application comments use the reward (ex. reward) page id for the page
    * The root parent id is the application ID
    */
   function buildCommentTree(comments: ApplicationComment[]) {

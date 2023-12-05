@@ -83,7 +83,7 @@ function MembersDisplay({
             gap={0.5}
             sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
           >
-            <UserDisplay fontSize={14} avatarSize='xSmall' user={user} wrapName={wrapColumn} />
+            <UserDisplay fontSize={14} avatarSize='xSmall' userId={user.id} wrapName={wrapColumn} />
             {!readOnly && (
               <IconButton size='small' onClick={() => removeMember(user.id)}>
                 <CloseIcon

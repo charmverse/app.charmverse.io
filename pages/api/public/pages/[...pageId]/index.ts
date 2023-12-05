@@ -12,8 +12,10 @@ import type { PublicPageResponse } from 'lib/pages/interfaces';
 import { getPermissionsClient } from 'lib/permissions/api';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
+import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -211,6 +213,8 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     throw new NotFoundError('Page not found');
   }
 
+  checkPageContent(page.content);
+
   const boardPages: Page[] = [];
   let boards: Board[] = [];
   let cards: Card[] = [];
@@ -280,6 +284,15 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
       }
     });
   }
+
+  boardPages.forEach((p) => {
+    p.headerImage = replaceS3Domain(p.headerImage);
+    p.icon = replaceS3Domain(p.icon);
+  });
+
+  page.headerImage = replaceS3Domain(page.headerImage);
+  page.icon = replaceS3Domain(page.icon);
+
   return res.status(200).json({
     bounty: bounty
       ? {

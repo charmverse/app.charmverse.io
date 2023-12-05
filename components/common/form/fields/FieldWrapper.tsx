@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { ReactNode } from 'react';
 
@@ -8,9 +9,10 @@ type Props = {
   label?: string;
   inline?: boolean;
   iconLabel?: ReactNode;
+  required?: boolean;
 };
 
-export function FieldWrapper({ children, label, inline, iconLabel }: Props) {
+export function FieldWrapper({ required, children, label, inline, iconLabel }: Props) {
   if (!label) {
     return children as JSX.Element;
   }
@@ -20,7 +22,16 @@ export function FieldWrapper({ children, label, inline, iconLabel }: Props) {
       {(label || !!iconLabel) && (
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
-          {label && <FieldLabel noWrap>{label}</FieldLabel>}
+          {label && (
+            <FieldLabel noWrap>
+              {label}
+              {required && (
+                <Typography component='span' color='error'>
+                  *
+                </Typography>
+              )}
+            </FieldLabel>
+          )}
         </Box>
       )}
       {children}

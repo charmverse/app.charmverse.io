@@ -112,6 +112,40 @@ describe('src/cardFilter', () => {
       const result = CardFilter.isClauseMet(filterClauseNotIncludes, board.fields.cardProperties, card1);
       expect(result).toBeTruthy();
     });
+
+    test('should work for createdTime date property', () => {
+      const currentTime = Date.now();
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'createdTime',
+        condition: 'is',
+        values: [currentTime.toString()],
+        filterId: v4()
+      });
+      card1.createdAt = currentTime;
+      const result = CardFilter.isClauseMet(
+        filterClauseIncludes,
+        [{ id: 'createdTime', name: 'Created Time', options: [], type: 'createdTime' }],
+        card1
+      );
+      expect(result).toBeTruthy();
+    });
+
+    test('should work for createdBy multi_select property', () => {
+      const createdBy = v4();
+      const filterClauseIncludes = createFilterClause({
+        propertyId: 'createdBy',
+        condition: 'contains',
+        values: [createdBy],
+        filterId: v4()
+      });
+      card1.createdBy = createdBy;
+      const result = CardFilter.isClauseMet(
+        filterClauseIncludes,
+        [{ id: 'createdBy', name: 'Created By', options: [], type: 'createdBy' }],
+        card1
+      );
+      expect(result).toBeTruthy();
+    });
   });
   describe('verify isFilterGroupMet method', () => {
     test('should return true with no filter', () => {

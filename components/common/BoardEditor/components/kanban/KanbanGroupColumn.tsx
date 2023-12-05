@@ -20,10 +20,11 @@ type Props = {
   addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void> | void;
   onDropToColumn: (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-  onDropToCard: (srcCard: Card, dstCard: Card) => Promise<void>;
+  onDropToCard?: (srcCard: Card, dstCard: Card) => Promise<void>;
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
   disableAddingCards?: boolean;
+  hideLinkedBounty?: boolean;
 };
 
 export function KanbanGroupColumn({
@@ -38,7 +39,8 @@ export function KanbanGroupColumn({
   onDropToCard,
   showCard,
   isManualSort,
-  disableAddingCards
+  disableAddingCards,
+  hideLinkedBounty
 }: Props) {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
@@ -58,6 +60,7 @@ export function KanbanGroupColumn({
           onDrop={onDropToCard}
           showCard={showCard}
           isManualSort={isManualSort}
+          hideLinkedBounty={hideLinkedBounty}
         />
       ))}
       {hasNextPage && (

@@ -41,8 +41,8 @@ export function useProposalsBoardAdapter() {
   const { pages } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
-  // TODO - use different types of views (board, calendar)
-  const localViewSettings = useLocalDbViewSettings(`proposals-${DEFAULT_VIEW_BLOCK_ID}`);
+
+  const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
