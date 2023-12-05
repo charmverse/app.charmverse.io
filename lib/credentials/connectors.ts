@@ -1,4 +1,5 @@
 import { EAS } from '@ethereum-attestation-service/eas-sdk';
+import type { Wallet } from 'ethers';
 import { optimism } from 'viem/chains';
 
 export const easSchemaChains = [optimism.id] as const;
@@ -23,6 +24,6 @@ export function getEasConnector(chainId: EasSchemaChain) {
   return easConnectors[chainId];
 }
 
-export function getEasInstance(chainId: EasSchemaChain) {
+export function getEasInstance(chainId: EasSchemaChain, signer?: Wallet) {
   return new EAS(getEasConnector(chainId).attestationContract);
 }

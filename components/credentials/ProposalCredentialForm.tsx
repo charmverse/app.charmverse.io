@@ -24,7 +24,7 @@ import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 
 import { ProposalCredentialCard } from './ProposalCredentialCard';
 
-const schema = yup.object<Record<keyof ProposalCredential | 'recipient', yup.StringSchema>>({
+const schema = yup.object({
   name: yup.string().required(),
   description: yup.string().required(),
   organization: yup.string().required(),

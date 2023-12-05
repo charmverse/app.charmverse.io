@@ -129,12 +129,12 @@ export function useLensProfile() {
   //   return true;
   // };
 
-  // return {
-  //   isAuthenticated: authenticated,
-  //   lensProfile: !isCyberConnect(space?.domain) ? lensProfile : null,
-  //   setupLensProfile,
-  //   loading
-  // };
+  return {
+    isAuthenticated: false,
+    lensProfile: { handle: '' } as any,
+    setupLensProfile: () => null,
+    loading: false
+  };
 }
 
 function isCyberConnect(domain?: string) {

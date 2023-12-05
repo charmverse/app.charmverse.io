@@ -3,10 +3,10 @@ import type {
   AttestationShareablePackageObject,
   SignedOffchainAttestation
 } from '@ethereum-attestation-service/eas-sdk';
-import { createOffchainURL } from '@ethereum-attestation-service/eas-sdk';
+import { Offchain, createOffchainURL } from '@ethereum-attestation-service/eas-sdk';
 import type { SignerOrProvider } from '@ethereum-attestation-service/eas-sdk/dist/transaction';
 import { getChainById } from 'connectors/chains';
-import { JsonRpcProvider, Wallet } from 'ethers';
+import { Wallet, providers, Signer, VoidSigner } from 'ethers';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
 import { getENSName } from 'lib/blockchain';
@@ -14,12 +14,13 @@ import { isValidChainAddress } from 'lib/tokens/validation';
 
 import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
+import { EthersV5toV6WalletAdapter } from './ethersAdapter';
 import { encodeAttestion, type CredentialData, type CredentialType, getAttestationSchemaId } from './schemas';
 
 type AttestationInput<T extends CredentialType = CredentialType> = {
   recipient: string;
   credential: CredentialData<T>;
-  signer: SignerOrProvider;
+  signer: Wallet;
   attester: string;
   chainId: EasSchemaChain;
   linkedAttestationUid?: string;
@@ -43,8 +44,17 @@ export async function attestOffchain({
 
   const eas = getEasInstance(chainId);
 
-  eas.connect(signer);
-  const offchain = await eas.getOffchain();
+  // We are currently running on pre v1 EAS in order to maintain ethers v5. In order to bypass contract errors, we need to manually instantiate offchain
+  const offchain = new Offchain(
+    {
+      address: eas.contract.address,
+      chainId,
+      version: '1'
+    },
+    1
+  );
+
+  // (signer as any).signTypedData = (signer as any)._signTypedData;
   const signedOffchainAttestation = await offchain.signOffchainAttestation(
     {
       recipient: recipient.toLowerCase(),
@@ -59,7 +69,7 @@ export async function attestOffchain({
       refUID: linkedAttestationUid ?? '0x0000000000000000000000000000000000000000000000000000000000000000',
       data: encodeAttestion(credential)
     },
-    signer as any
+    signer
   );
   return signedOffchainAttestation;
 }
@@ -87,7 +97,7 @@ export async function signCharmverseCredential({
   credential,
   recipient
 }: CharmVerseCredentialInput): Promise<SignedCredential> {
-  const provider = new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
+  const provider = new providers.JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
 
   const wallet = new Wallet(credentialsWalletPrivateKey, provider);
 

@@ -3,15 +3,27 @@ import nc from 'next-connect';
 
 import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
 import { signCharmverseCredential } from 'lib/credentials/attest';
+import { getReceivedCredentials, saveToCeramic } from 'lib/credentials/connectToCeramic';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(attestController);
+handler.use(requireUser).get(getCredentialsController).post(attestController);
+
+async function getCredentialsController(req: NextApiRequest, res: NextApiResponse) {
+  const credentials = await getReceivedCredentials({ account: req.query.account as string });
+  return res.status(201).json(credentials);
+}
 
 async function attestController(req: NextApiRequest, res: NextApiResponse) {
   const signed = await signCharmverseCredential(req.body as CharmVerseCredentialInput);
+
+  console.log('SIGNED', signed);
+
+  const persisted = await saveToCeramic({ credential: signed });
+
+  console.log('RESPONSE', persisted);
 
   return res.status(201).json(signed);
 }
