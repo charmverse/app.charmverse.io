@@ -31,6 +31,9 @@ export async function createDefaultRewardsAndProposals() {
     }
   })
 
+  const totalSpaces = spaces.length;
+  let count = 0;
+
   for (const space of spaces) {
     try {
       if (space.bounties.length === 0) {
@@ -52,6 +55,9 @@ export async function createDefaultRewardsAndProposals() {
     } catch (err) {
       console.error(`Failed to create test rewards and proposals for space ${space.id}`)
     }
+
+    count+=1;
+    console.log(`Created default rewards and proposals for space ${space.id} (${count}/${totalSpaces})`)
   }
 }
 

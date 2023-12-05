@@ -49,7 +49,7 @@ export async function createDefaultProposal({
       sourceTemplateId: null,
       contentText: '',
       type: 'proposal',
-      title: 'Test Proposal',
+      title: 'Default Proposal',
       content: {
         type: 'doc',
         content: [
@@ -78,7 +78,7 @@ export async function createDefaultProposal({
           }
         ],
         [STATUS_BLOCK_ID]: 'draft',
-        [Constants.titleColumnId]: 'Test Proposal'
+        [Constants.titleColumnId]: 'Default Proposal'
       }
     },
     reviewers: [
