@@ -1,8 +1,9 @@
 import type { BountyStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ethers } from 'ethers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { getENSName } from 'lib/blockchain';
+import { resolveENSName } from 'lib/blockchain';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { isTruthy } from 'lib/utilities/types';
@@ -179,24 +180,26 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   function getRecipients(bounty: (typeof bounties)[number]) {
     return bounty.applications
       .filter((application) => application.status === 'paid' && application.walletAddress)
-      .map((application) => {
-        if (application.walletAddress?.endsWith('.eth')) {
-          const ensName = getENSName(application.walletAddress as string)?.then((address) => ({
-            address: address as string
-          }));
+      .map(async (application) => {
+        if (
+          application.walletAddress &&
+          application.walletAddress.endsWith('.eth') &&
+          ethers.utils.isValidName(application.walletAddress)
+        ) {
+          const walletAddress = await resolveENSName(application.walletAddress as string);
 
-          return Promise.resolve(
-            ensName
-              ? {
-                  address: application.walletAddress as string
-                }
-              : null
-          );
+          if (walletAddress) {
+            return null;
+          }
+
+          return {
+            address: walletAddress as string
+          };
         }
 
-        return Promise.resolve({
+        return {
           address: application.walletAddress as string
-        });
+        };
       });
   }
 
@@ -220,7 +223,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   const bountiesResponse: PublicApiReward[] = [];
   let index = 0;
   for (const bounty of bounties) {
-    const bountyResponse = {
+    const bountyResponse: PublicApiReward = {
       createdAt: bounty.createdAt.toISOString(),
       content: {
         text: bounty.page?.contentText ?? '',

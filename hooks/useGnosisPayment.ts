@@ -8,7 +8,7 @@ import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { getENSName } from 'lib/blockchain';
+import { resolveENSName } from 'lib/blockchain';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
@@ -58,7 +58,10 @@ export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess 
 
     const txNonce = nonce + pendingTx.results.length;
 
-    const recipientAddress = transaction.to.endsWith('.eth') ? await getENSName(transaction.to) : transaction.to;
+    const recipientAddress =
+      transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
+        ? await resolveENSName(transaction.to)
+        : transaction.to;
 
     if (!recipientAddress) {
       showMessage('Invalid recipient address', 'error');
