@@ -7,7 +7,7 @@ import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
-import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
