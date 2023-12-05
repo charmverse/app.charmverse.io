@@ -49,7 +49,7 @@ export function EvaluationRow({
       <Box p={1} display='flex' alignItems='center' gap={1} justifyContent='space-between'>
         {!readOnly && <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />}
 
-        {evaluationIcons[evaluation.type]}
+        {evaluationIcons[evaluation.type]()}
         <Typography sx={{ flexGrow: 1 }}>{evaluation.title}</Typography>
         <EvaluationContextMenu
           evaluation={evaluation}

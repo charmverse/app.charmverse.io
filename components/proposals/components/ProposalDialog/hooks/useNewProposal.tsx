@@ -7,6 +7,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
+import { getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -64,7 +65,7 @@ export function useNewProposal({ newProposal }: Props) {
         showMessage((error as Error).message, 'error');
         return;
       }
-      const createdProposal = await createProposalTrigger({
+      await createProposalTrigger({
         authors: formInputs.authors,
         categoryId: formInputs.categoryId,
         pageProps: {
@@ -87,10 +88,8 @@ export function useNewProposal({ newProposal }: Props) {
         throw err;
       });
 
-      if (createdProposal) {
-        mutate(`/api/spaces/${currentSpace.id}/proposals`);
-        setContentUpdated(false);
-      }
+      mutate(`/api/spaces/${currentSpace.id}/proposals`);
+      setContentUpdated(false);
     }
   }
 
@@ -130,7 +129,7 @@ export function useNewProposal({ newProposal }: Props) {
   };
 }
 
-export function emptyState({
+function emptyState({
   userId,
   ...inputs
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
@@ -143,6 +142,7 @@ export function emptyState({
     evaluationType: 'vote',
     proposalTemplateId: null,
     reviewers: [],
+    evaluations: [{ index: 0, result: null, ...getDefaultFeedbackEvaluation() }],
     rubricCriteria: [],
     title: '',
     type: 'proposal',

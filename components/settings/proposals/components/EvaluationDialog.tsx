@@ -151,25 +151,25 @@ export function EvaluationDialog({
                   <Select value={value} onChange={_onChange} fullWidth>
                     <MenuItem value='feedback'>
                       <Box display='flex' alignItems='center' width='100%'>
-                        <ListItemIcon>{evaluationIcons.feedback}</ListItemIcon>
+                        <ListItemIcon>{evaluationIcons.feedback()}</ListItemIcon>
                         <StyledListItemText primary='Feedback' secondary='Request input before evaluation' />
                       </Box>
                     </MenuItem>
                     <MenuItem value='pass_fail'>
                       <Box display='flex' alignItems='center' width='100%'>
-                        <ListItemIcon>{evaluationIcons.pass_fail}</ListItemIcon>
+                        <ListItemIcon>{evaluationIcons.pass_fail()}</ListItemIcon>
                         <StyledListItemText primary='Pass/Fail' secondary='The first reviewer decides yes or no' />
                       </Box>
                     </MenuItem>
                     <MenuItem value='rubric'>
                       <Box display='flex' alignItems='center' width='100%'>
-                        <ListItemIcon>{evaluationIcons.rubric}</ListItemIcon>
+                        <ListItemIcon>{evaluationIcons.rubric()}</ListItemIcon>
                         <StyledListItemText primary='Rubric' secondary='Each reviewer scores and comments' />
                       </Box>
                     </MenuItem>
                     <MenuItem value='vote'>
                       <Box display='flex' alignItems='center' width='100%'>
-                        <ListItemIcon>{evaluationIcons.vote}</ListItemIcon>
+                        <ListItemIcon>{evaluationIcons.vote()}</ListItemIcon>
                         <StyledListItemText primary='Vote' secondary='A threshold of voters Voters' />
                       </Box>
                     </MenuItem>

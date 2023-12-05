@@ -83,7 +83,7 @@ export function EvaluationPermissionsRow({
     <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
       <Box px={2} py={1}>
         <Box display='flex' alignItems='center' gap={1} mb={1} justifyContent='space-between'>
-          {evaluationIcons[evaluation.type]}
+          {evaluationIcons[evaluation.type]()}
           <Typography variant='h6' sx={{ flexGrow: 1 }}>
             {evaluation.title}
           </Typography>

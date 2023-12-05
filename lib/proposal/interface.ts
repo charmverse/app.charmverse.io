@@ -1,4 +1,4 @@
-import type { Page, PageComment, Proposal } from '@charmverse/core/prisma';
+import type { Page, PageComment, Proposal, ProposalEvaluation } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
@@ -33,8 +33,13 @@ export type ProposalRubricData = {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
+type PopulatedEvaluation = ProposalRubricData & ProposalEvaluation;
+
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
-  ProposalRubricData & { page?: { sourceTemplateId: string | null } | null };
+  ProposalRubricData & {
+    evaluations: PopulatedEvaluation[];
+    page?: { sourceTemplateId: string | null } | null;
+  };
 
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };

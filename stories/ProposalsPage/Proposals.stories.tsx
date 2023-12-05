@@ -7,6 +7,7 @@ import { rest } from 'msw';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import { Provider } from 'react-redux';
+import { v4 as uuid } from 'uuid';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
@@ -18,6 +19,8 @@ import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { UserProvider } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import { getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
+import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
@@ -84,11 +87,14 @@ ProposalsPage.parameters = ProposalsPageStory.parameters;
 
 export function NewProposal() {
   const [contentUpdated, setContentUpdated] = useState(false);
+
+  const evaluationWorkflows = getDefaultWorkflows(spaces[0].id);
   const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>({
     authors: [],
     categoryId: null,
     content: null,
     contentText: '',
+    evaluations: [],
     evaluationType: 'rubric',
     headerImage: null,
     icon: null,

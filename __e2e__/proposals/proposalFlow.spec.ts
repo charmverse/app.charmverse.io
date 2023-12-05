@@ -6,7 +6,6 @@ import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 import { test } from '__e2e__/utils/test';
 
-import type { PageWithProposal } from 'lib/pages';
 import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
@@ -17,7 +16,7 @@ test.describe.serial('Proposal Flow', () => {
   let authorBrowserProposalListPage: ProposalsListPage;
   let authorBrowserProposalPage: ProposalPage;
 
-  let pageWithProposal: PageWithProposal;
+  let pagePath: string;
   let proposalId: string;
 
   let proposalAuthor: User;
@@ -80,9 +79,10 @@ test.describe.serial('Proposal Flow', () => {
     await expect(authorBrowserProposalPage.saveDraftButton).toBeEnabled();
     await authorBrowserProposalPage.saveDraftButton.click();
 
-    const response = await authorBrowserProposalPage.waitForJsonResponse<PageWithProposal>('**/api/proposals');
-    pageWithProposal = response;
-    proposalId = pageWithProposal.proposal.id;
+    const response = await authorBrowserProposalPage.waitForJsonResponse<{ id: string }>('**/api/proposals');
+    proposalId = response.id;
+    const page = await prisma.page.findFirstOrThrow({ where: { proposalId }, select: { path: true } });
+    pagePath = page.path;
 
     // verify that the page list was updated
     await expect(authorBrowserProposalListPage.emptyState).not.toBeVisible();
@@ -112,8 +112,8 @@ test.describe.serial('Proposal Flow', () => {
       browserPage: proposalPage.page,
       userId: proposalReviewer.id
     });
-    await proposalPage.goToPage({ domain: space.domain, path: pageWithProposal.path });
-    await proposalPage.waitForDocumentPage({ domain: space.domain, path: pageWithProposal.path });
+    await proposalPage.goToPage({ domain: space.domain, path: pagePath });
+    await proposalPage.waitForDocumentPage({ domain: space.domain, path: pagePath });
 
     await expect(proposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.reviewed);
     await proposalPage.nextStatusButton.click();
@@ -123,7 +123,7 @@ test.describe.serial('Proposal Flow', () => {
 
   test('A proposal author can create a vote', async () => {
     await authorBrowserProposalPage.closeDialog();
-    await authorBrowserProposalPage.goToPage({ domain: space.domain, path: pageWithProposal.path });
+    await authorBrowserProposalPage.goToPage({ domain: space.domain, path: pagePath });
     await expect(authorBrowserProposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.vote_active);
     await authorBrowserProposalPage.nextStatusButton.click();
     await authorBrowserProposalPage.confirmStatusButton.click();

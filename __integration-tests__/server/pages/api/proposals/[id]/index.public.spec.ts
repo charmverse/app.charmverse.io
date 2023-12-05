@@ -1,11 +1,10 @@
 import type { ProposalCategory, ProposalReviewer, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { PageWithProposal } from 'lib/pages';
-import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
@@ -101,9 +100,12 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .send(updateContent)
       .expect(200);
 
-    const updated = await getProposal({ proposalId: page.proposalId! });
+    const proposal = await prisma.proposal.findUniqueOrThrow({
+      where: { id: page.proposalId! },
+      include: { reviewers: true }
+    });
     // Make sure update went through
-    expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>(
+    expect(proposal.reviewers).toEqual<ProposalReviewer[]>(
       expect.arrayContaining([
         expect.objectContaining({
           id: expect.any(String),
@@ -190,10 +192,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
 
     // Make sure update went through
-    const updated = await getProposal({ proposalId: proposalTemplate.id });
-    expect(updated.proposal?.reviewers).toHaveLength(2);
-    expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
-    expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
+    const proposal = await prisma.proposal.findUniqueOrThrow({
+      where: { id: proposalTemplate.id },
+      include: { reviewers: true }
+    });
+    expect(proposal.reviewers).toHaveLength(2);
+    expect(proposal.reviewers.some((r) => r.roleId === role.id)).toBe(true);
+    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should allow an admin to update a draft proposal they did not create', async () => {

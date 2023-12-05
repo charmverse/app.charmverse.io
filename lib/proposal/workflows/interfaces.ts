@@ -26,6 +26,7 @@ export type EvaluationTemplate = {
   permissions: SpaceEvaluationPermission[];
 };
 
+// Replace 'evaluations' JSON db type with proper types
 export type WorkflowTemplate = Omit<ProposalEvaluationWorkflow, 'evaluations'> & {
   evaluations: EvaluationTemplate[];
 };

@@ -17,27 +17,32 @@ export const evaluateVerbs = {
 // source: https://stackoverflow.com/questions/57527896/material-ui-tooltip-doesnt-display-on-custom-component-despite-spreading-props
 const SvgIconWithRef = forwardRef<SVGSVGElement | null, SvgIconProps>((props, ref) => <SvgIcon ref={ref} {...props} />);
 
+const defaultProps: SvgIconProps = {
+  color: 'secondary',
+  fontSize: 'small'
+};
+
 export const evaluationIcons = {
-  [ProposalEvaluationType.feedback]: (
+  [ProposalEvaluationType.feedback]: (props: SvgIconProps = defaultProps) => (
     <Tooltip title='Feedback'>
-      <FeedbackOutlined color='secondary' fontSize='small' />
+      <FeedbackOutlined {...props} />
     </Tooltip>
   ),
-  [ProposalEvaluationType.vote]: (
+  [ProposalEvaluationType.vote]: (props: SvgIconProps = defaultProps) => (
     <Tooltip title='Vote'>
-      <HowToVoteOutlined color='secondary' fontSize='small' />
+      <HowToVoteOutlined {...props} />
     </Tooltip>
   ),
-  [ProposalEvaluationType.rubric]: (
+  [ProposalEvaluationType.rubric]: (props: SvgIconProps = defaultProps) => (
     <Tooltip title='Rubric'>
-      <SvgIconWithRef inheritViewBox color='secondary' fontSize='small'>
+      <SvgIconWithRef inheritViewBox {...props}>
         <RiChatCheckLine />
       </SvgIconWithRef>
     </Tooltip>
   ),
-  [ProposalEvaluationType.pass_fail]: (
+  [ProposalEvaluationType.pass_fail]: (props: SvgIconProps = defaultProps) => (
     <Tooltip title='Pass / Fail'>
-      <SvgIconWithRef inheritViewBox color='secondary' fontSize='small'>
+      <SvgIconWithRef inheritViewBox {...props}>
         <MdOutlineThumbsUpDown />
       </SvgIconWithRef>
     </Tooltip>

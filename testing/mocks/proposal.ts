@@ -18,6 +18,7 @@ export function createMockProposal(
     categoryId: null,
     evaluationType: 'vote',
     reviewers: [],
+    evaluations: [],
     rubricCriteria: [],
     reviewedAt: null,
     reviewedBy: null,

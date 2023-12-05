@@ -4,7 +4,6 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Card,
   Chip,
   IconButton,
   ListItemText,
@@ -23,9 +22,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 import type { WorkflowTemplate, EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
-import { evaluationIcons } from '../constants';
-
-import { EvaluationContextMenu } from './EvaluationContextMenu';
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
 import { EvaluationPermissionsRow } from './EvaluationPermissions';

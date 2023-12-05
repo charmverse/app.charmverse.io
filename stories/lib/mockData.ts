@@ -3,6 +3,7 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import type { LoggedInUser } from 'models/User';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 import { createMockSpace } from 'testing/mocks/space';
@@ -38,7 +39,8 @@ export const memberPropertyTypes = [
   'join_date'
 ] as const;
 
-export const spaces = [createMockSpace({ id: seeds[0] })];
+// use cvt- in domain so that feature flags are enabled
+export const spaces = [createMockSpace({ id: seeds[0], domain: `cvt-${seeds[0]}` })];
 
 export const memberProperties: MemberPropertyWithPermissions[] = memberPropertyTypes.map((type, index) => {
   const memberProperty = createMemberProperty({

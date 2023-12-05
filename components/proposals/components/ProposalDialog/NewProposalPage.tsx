@@ -45,6 +45,7 @@ const StyledContainer = styled(Container)`
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
+
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));

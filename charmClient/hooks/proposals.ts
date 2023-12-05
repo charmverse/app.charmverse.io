@@ -5,7 +5,6 @@ import type {
 } from '@charmverse/core/permissions';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 
-import type { PageWithProposal } from 'lib/pages';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
@@ -62,7 +61,7 @@ export function useGetProposalBlocks(spaceId?: string) {
 // Mutative requests
 
 export function useCreateProposal() {
-  return usePOST<Omit<CreateProposalInput, 'userId'>, PageWithProposal>('/api/proposals');
+  return usePOST<Omit<CreateProposalInput, 'userId'>, { id: string }>('/api/proposals');
 }
 
 export function useUpsertRubricCriteria({ proposalId }: { proposalId: string }) {

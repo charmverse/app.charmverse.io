@@ -3,14 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { PageWithProposal } from 'lib/pages';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { baseUrl } from 'testing/mockApiCall';
 import { createProposalWithUsers, createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;
-let proposal: PageWithProposal;
+let proposalId: string;
 let vote: Vote;
 
 async function getUserVotes(voteId: string) {
@@ -25,13 +24,14 @@ describe('POST /api/v1/proposals/vote', () => {
     user = generated.user;
     space = generated.space;
 
-    proposal = await createProposalWithUsers({
+    const proposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
       reviewers: [user.id],
       proposalStatus: 'vote_active'
     });
+    proposalId = proposal.id;
 
     vote = await createVote({
       pageId: proposal.id,
@@ -56,7 +56,7 @@ describe('POST /api/v1/proposals/vote', () => {
       await request(baseUrl)
         .post(`/api/v1/proposals/vote?api_key=${normalApiToken.token}`)
         .send({
-          proposalId: proposal.id,
+          proposalId,
           userId: user.id,
           choice: '1'
         })
@@ -94,7 +94,7 @@ describe('POST /api/v1/proposals/vote', () => {
         .post(`/api/v1/proposals/vote?spaceId=${space.id}`)
         .set({ authorization: `Bearer ${superApiKey.token}` })
         .send({
-          proposalId: proposal.id,
+          proposalId,
           userId: user.id,
           choice: '1'
         })
@@ -127,7 +127,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .post(`/api/v1/proposals/vote?spaceId=${space.id}`)
       .set({ authorization: `Bearer ${otherSuperApiKey.token}` })
       .send({
-        proposalId: proposal.id,
+        proposalId,
         userId: user.id,
         choice: '1'
       })
@@ -157,7 +157,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .post(`/api/v1/proposals/vote?spaceId=${space.id}`)
       .set({ authorization: `Bearer ${superApiKey.token}` })
       .send({
-        proposalId: proposal.id,
+        proposalId,
         userId: v4(),
         choice: '1'
       })
@@ -167,7 +167,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .post(`/api/v1/proposals/vote?spaceId=${space.id}`)
       .set({ authorization: `Bearer ${superApiKey.token}` })
       .send({
-        proposalId: proposal.id,
+        proposalId,
         userId: user.id,
         choice: '12'
       })
