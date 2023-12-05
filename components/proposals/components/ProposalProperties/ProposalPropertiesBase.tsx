@@ -229,7 +229,7 @@ export function ProposalPropertiesBase({
           proposalTemplateId: templatePage.id,
           evaluationType: proposalTemplate.evaluationType,
           rubricCriteria: proposalTemplate.rubricCriteria,
-          fields: (proposalTemplate.fields as unknown as ProposalFields) || {}
+          fields: (proposalTemplate.fields as ProposalFields) || {}
         });
       }
     }

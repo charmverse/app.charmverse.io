@@ -110,7 +110,7 @@ export function ProposalProperties({
     type: proposalPage.type,
     fields:
       typeof proposal?.fields === 'object' && !!proposal?.fields
-        ? (proposal.fields as unknown as ProposalFields)
+        ? (proposal.fields as ProposalFields)
         : { properties: {} }
   };
 
