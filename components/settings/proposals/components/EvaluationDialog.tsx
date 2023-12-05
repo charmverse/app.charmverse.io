@@ -1,4 +1,5 @@
-import { ProposalEvaluationType } from '@charmverse/core/prisma';
+import type { ProposalOperation } from '@charmverse/core/prisma';
+import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { useEffect } from 'react';
@@ -9,8 +10,8 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { permissionLevels, permissionGroups } from 'lib/proposal/workflows/interfaces';
-import type { EvaluationTemplate, SpaceEvaluationPermission } from 'lib/proposal/workflows/interfaces';
+import { proposalOperations } from 'lib/proposal/workflows/interfaces';
+import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons } from '../constants';
 
@@ -38,8 +39,10 @@ export const schema = yup.object({
     .of(
       yup.object({
         id: yup.string().required(),
-        level: yup.mixed<SpaceEvaluationPermission['level']>().oneOf(permissionLevels).required(),
-        group: yup.mixed<SpaceEvaluationPermission['group']>().oneOf(permissionGroups).required()
+        operation: yup.mixed<ProposalOperation>().oneOf(proposalOperations).required(),
+        userId: yup.string(),
+        roleId: yup.string(),
+        systemRole: yup.mixed<ProposalSystemRole>().oneOf(Object.values(ProposalSystemRole))
       })
     )
     .required()

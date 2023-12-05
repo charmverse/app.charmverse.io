@@ -1,3 +1,4 @@
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireSpaceMembership } from 'lib/middleware';
@@ -7,7 +8,6 @@ import {
   updateWorkflowTemplate,
   deleteWorkflowTemplate
 } from 'lib/proposal/workflows/controller';
-import type { WorkflowTemplate } from 'lib/proposal/workflows/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 
@@ -20,7 +20,7 @@ handler
   .post(updateWorkflowController)
   .delete(deleteWorkflowController);
 
-async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<WorkflowTemplate[]>) {
+async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<ProposalWorkflowTyped[]>) {
   const spaceId = req.query.id as string;
 
   const workflows = await getWorkflowTemplates(spaceId);
@@ -28,7 +28,7 @@ async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<
   return res.status(200).json(workflows);
 }
 
-async function deleteWorkflowController(req: NextApiRequest, res: NextApiResponse<WorkflowTemplate[]>) {
+async function deleteWorkflowController(req: NextApiRequest, res: NextApiResponse<ProposalWorkflowTyped[]>) {
   const spaceId = req.query.id as string;
   const workflowId = req.query.workflowId;
   if (typeof workflowId !== 'string') {
@@ -40,7 +40,7 @@ async function deleteWorkflowController(req: NextApiRequest, res: NextApiRespons
   return res.status(200).end();
 }
 
-async function updateWorkflowController(req: NextApiRequest, res: NextApiResponse<WorkflowTemplate[]>) {
+async function updateWorkflowController(req: NextApiRequest, res: NextApiResponse<ProposalWorkflowTyped[]>) {
   const workflow = req.body;
   if (typeof workflow?.id !== 'string') {
     throw new InvalidInputError(`workflowId is required`);

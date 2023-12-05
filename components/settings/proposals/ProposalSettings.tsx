@@ -34,6 +34,7 @@ export function ProposalSettings({ space }: { space: Space }) {
     const lowestIndex = workflows[0]?.index ?? 0;
     const existingIndex = workflows.findIndex((e) => e.id === workflow?.id);
     const newWorkflow: WorkflowTemplateFormItem = {
+      createdAt: new Date(),
       title: '',
       spaceId: space.id,
       evaluations: [getDefaultFeedbackEvaluation()],

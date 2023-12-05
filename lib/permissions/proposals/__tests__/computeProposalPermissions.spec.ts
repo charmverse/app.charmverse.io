@@ -58,7 +58,8 @@ describe('computeProposalPermissions', () => {
       make_public: false,
       archive: true,
       unarchive: true,
-      evaluate: false
+      evaluate: false,
+      move: false
     });
   });
 
@@ -93,7 +94,8 @@ describe('computeProposalPermissions', () => {
       make_public: false,
       archive: false,
       unarchive: false,
-      evaluate: false
+      evaluate: false,
+      move: false
     });
   });
 
@@ -129,7 +131,8 @@ describe('computeProposalPermissions', () => {
       vote: false,
       make_public: false,
       archive: false,
-      unarchive: false
+      unarchive: false,
+      move: false
     });
   });
 
@@ -203,7 +206,8 @@ describe('computeProposalPermissions', () => {
       make_public: false,
       archive: false,
       unarchive: false,
-      evaluate: false
+      evaluate: false,
+      move: false
     });
 
     const nonDraftStatuses: ProposalStatus[] = ['discussion', 'review', 'reviewed', 'vote_active', 'vote_closed'];
@@ -226,7 +230,8 @@ describe('computeProposalPermissions', () => {
         make_public: false,
         archive: false,
         unarchive: false,
-        evaluate: false
+        evaluate: false,
+        move: false
       });
     }
   });
