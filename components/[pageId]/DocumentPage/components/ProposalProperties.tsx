@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import {
-  useGetAllReviewerUserIds,
+  useGetIsReviewer,
   useGetProposalDetails,
   useGetProposalFlowFlags,
   useUpsertRubricCriteria
@@ -64,16 +64,14 @@ export function ProposalProperties({
 
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
-  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
-    !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
-  );
+  const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
   const { data: proposalFlowFlags, mutate: refreshProposalFlowFlags } = useGetProposalFlowFlags(proposalId);
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
-  const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
+
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
   const isTemplate = proposalPage.type === 'proposal_template';
   const sourceTemplate = isFromTemplateSource
