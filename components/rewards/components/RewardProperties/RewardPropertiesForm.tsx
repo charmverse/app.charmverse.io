@@ -12,6 +12,7 @@ import type { GroupedRole } from 'components/common/BoardEditor/components/prope
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import { ProposalTemplateSelect } from 'components/proposals/components/ProposalProperties/components/ProposalTemplateSelect';
 import { RewardApplicationType } from 'components/rewards/components/RewardProperties/components/RewardApplicationType';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
 import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
@@ -19,8 +20,10 @@ import { RewardTokenProperty } from 'components/rewards/components/RewardPropert
 import type { RewardType } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
+import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
@@ -37,6 +40,9 @@ type Props = {
   isTemplate?: boolean;
   expandedByDefault?: boolean;
   forcedApplicationType?: RewardApplicationType;
+  addPageFromTemplate?: (templateId: string) => void;
+  selectedTemplate?: RewardTemplate | null;
+  resetTemplate?: VoidFunction;
 };
 
 const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
@@ -62,7 +68,10 @@ export function RewardPropertiesForm({
   isTemplate,
   pageId,
   expandedByDefault,
-  forcedApplicationType
+  forcedApplicationType,
+  addPageFromTemplate,
+  selectedTemplate,
+  resetTemplate
 }: Props) {
   const [rewardApplicationType, setRewardApplicationType] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
@@ -74,7 +83,6 @@ export function RewardPropertiesForm({
     id,
     group: 'role'
   }));
-
   const isAssignedReward = rewardApplicationType === 'assigned';
 
   useEffect(() => {
@@ -100,6 +108,8 @@ export function RewardPropertiesForm({
       assignedSubmitters: null
     });
   }, [rewardApplicationType, isAssignedReward, values?.assignedSubmitters]);
+
+  const { templates: rewardTemplates = [] } = useRewardTemplates();
 
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
@@ -206,6 +216,31 @@ export function RewardPropertiesForm({
 
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
+            {!isTemplate && isNewReward && (
+              <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+                <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                  <PropertyLabel readOnly highlighted>
+                    Template
+                  </PropertyLabel>
+                  <Box display='flex' flex={1}>
+                    <ProposalTemplateSelect
+                      options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
+                      value={selectedTemplate?.page ?? null}
+                      onChange={(templatePage) => {
+                        if (!templatePage) {
+                          resetTemplate?.();
+                        }
+                        const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
+                        if (template && addPageFromTemplate) {
+                          addPageFromTemplate(template.page.id);
+                        }
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                 Reviewer
