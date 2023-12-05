@@ -1,4 +1,5 @@
 import { ProposalSystemRole, ProposalOperation } from '@charmverse/core/prisma';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
@@ -9,7 +10,6 @@ import type {
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
-import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons, evaluateVerbs } from '../constants';
 
@@ -79,8 +79,8 @@ export function EvaluationPermissionsRow({
   onChange,
   readOnly
 }: {
-  evaluation: EvaluationTemplate;
-  onChange: (evaluation: EvaluationTemplate) => void;
+  evaluation: WorkflowEvaluationJson;
+  onChange: (evaluation: WorkflowEvaluationJson) => void;
   readOnly: boolean;
 } & ContextMenuProps) {
   return (
@@ -108,7 +108,7 @@ export function EvaluationPermissionsRow({
   );
 }
 
-export function EvaluationPermissions<T extends EvaluationTemplateFormItem | EvaluationTemplate>({
+export function EvaluationPermissions<T extends EvaluationTemplateFormItem | WorkflowEvaluationJson>({
   evaluation,
   onChange,
   readOnly
@@ -120,7 +120,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Eva
   function updatePermissionOperation(operation: ProposalOperation, resources: SelectOption[]) {
     const newPermissions = evaluation.permissions.filter((permission) => permission.operation !== operation);
     resources.forEach((resource) => {
-      const permission: EvaluationTemplate['permissions'][number] =
+      const permission: WorkflowEvaluationJson['permissions'][number] =
         resource.group === 'system_role'
           ? { operation, systemRole: resource.id as ProposalSystemRole }
           : resource.group === 'role'

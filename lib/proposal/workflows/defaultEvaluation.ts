@@ -1,10 +1,9 @@
 import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalSystemRole } from '@charmverse/core/prisma';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { v4 as uuid } from 'uuid';
 
-import type { EvaluationTemplate } from './interfaces';
-
-export function getDefaultEvaluation(evaluation?: Partial<EvaluationTemplate>): EvaluationTemplate {
+export function getDefaultEvaluation(evaluation?: Partial<WorkflowEvaluationJson>): WorkflowEvaluationJson {
   return {
     id: uuid(),
     title: '',
@@ -35,7 +34,7 @@ export function getDefaultEvaluation(evaluation?: Partial<EvaluationTemplate>): 
   };
 }
 
-export function getDefaultFeedbackEvaluation(evaluation?: Partial<EvaluationTemplate>): EvaluationTemplate {
+export function getDefaultFeedbackEvaluation(evaluation?: Partial<WorkflowEvaluationJson>): WorkflowEvaluationJson {
   return {
     id: uuid(),
     title: 'Feedback',

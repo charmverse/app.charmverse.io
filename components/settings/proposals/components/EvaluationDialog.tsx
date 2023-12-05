@@ -1,5 +1,6 @@
 import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { useEffect } from 'react';
@@ -10,7 +11,6 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
-import type { EvaluationTemplate } from 'lib/proposal/workflows/interfaces';
 
 import { evaluationIcons } from '../constants';
 
@@ -27,7 +27,7 @@ const StyledListItemText = styled(ListItemText)`
 `;
 
 // This type is used for existing and new workflows (id is null until it is saved)
-export type EvaluationTemplateFormItem = Omit<EvaluationTemplate, 'id'> & { id: string | null };
+export type EvaluationTemplateFormItem = Omit<WorkflowEvaluationJson, 'id'> & { id: string | null };
 
 export const schema = yup.object({
   id: yup.string().required(),
@@ -55,7 +55,7 @@ export function EvaluationDialog({
 }: {
   evaluation: EvaluationTemplateFormItem | null;
   onClose: VoidFunction;
-  onSave: (evaluation: EvaluationTemplate) => void;
+  onSave: (evaluation: WorkflowEvaluationJson) => void;
 }) {
   const {
     control,
