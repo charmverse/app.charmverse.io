@@ -91,7 +91,7 @@ export function useMultiRewardPayment({
         to = token;
         value = '0';
       } else {
-        to = getAddress(recipientAddress);
+        to = recipientAddress.endsWith('.eth') ? recipientAddress : getAddress(recipientAddress);
       }
 
       const defaultTitle = 'Untitled';

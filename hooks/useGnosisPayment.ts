@@ -8,11 +8,13 @@ import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import { getENSName } from 'lib/blockchain';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { proposeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 
 import useGnosisSafes from './useGnosisSafes';
+import { useSnackbar } from './useSnackbar';
 
 export type MetaTransactionDataWithApplicationId = MetaTransactionData & { applicationId: string };
 
@@ -31,7 +33,7 @@ export type GnosisPaymentProps = {
 
 export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
-
+  const { showMessage } = useSnackbar();
   const [safe] = useGnosisSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
@@ -56,11 +58,18 @@ export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess 
 
     const txNonce = nonce + pendingTx.results.length;
 
+    const recipientAddress = transaction.to.endsWith('.eth') ? await getENSName(transaction.to) : transaction.to;
+
+    if (!recipientAddress) {
+      showMessage('Invalid recipient address', 'error');
+      return;
+    }
+
     const safeTransaction = await safe.createTransaction({
       safeTransactionData: [
         {
           data: transaction.data,
-          to: transaction.to,
+          to: recipientAddress,
           value: transaction.value,
           operation: transaction.operation
         }
