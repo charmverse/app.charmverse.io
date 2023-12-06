@@ -22,7 +22,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
   await createReward({
     spaceId,
     userId,
-    customReward: 'Custom Reward',
+    customReward: 'Meet CharmVerse',
     reviewers: [
       {
         group: 'user',
@@ -47,7 +47,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
         [REWARD_AMOUNT]: '',
         [REWARD_APPLICANTS_COUNT]: '0',
         [REWARD_CHAIN]: '',
-        [REWARD_CUSTOM_VALUE]: 'Custom Reward',
+        [REWARD_CUSTOM_VALUE]: 'Meet CharmVerse',
         [REWARD_STATUS_BLOCK_ID]: '',
         [REWARD_TOKEN]: '',
         [REWARDER_BLOCK_ID]: '',
