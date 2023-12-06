@@ -17,8 +17,8 @@ import {
 import Legend from 'components/settings/Legend';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { LoggedInUser } from 'models';
 
@@ -85,8 +85,6 @@ function UserOnboardingDialog({
   initialStep?: OnboardingStep;
   space: Space;
 }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const { showMessage } = useSnackbar();
   const { requiredProperties } = useRequiredMemberProperties({
     userId: currentUser.id
   });
@@ -125,13 +123,13 @@ function UserOnboardingDialog({
 
   async function saveForm() {
     if (!isFormDirty) {
-      onClose();
+      completeOnboarding?.();
       return;
     }
 
     await onSubmitMemberProperties();
     await onSubmitUserDetails();
-    onClose();
+    completeOnboarding?.();
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');

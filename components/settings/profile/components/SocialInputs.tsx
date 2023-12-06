@@ -21,7 +21,8 @@ const initialSocials: Social = {
 };
 
 export function SocialInputs(props: SocialInputsProps) {
-  const { social = initialSocials, required, errors, onChange, readOnly } = props;
+  const social = props.social ?? initialSocials;
+  const { required, errors, onChange, readOnly } = props;
 
   return (
     <>

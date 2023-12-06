@@ -18,19 +18,12 @@ import { useMemberPropertyValues } from './useMemberPropertyValues';
 
 const requiredString = yup.string().required().ensure().trim();
 
-const nonRequiredString = yup.string().notRequired().ensure().trim();
+const nonRequiredString = yup.string().notRequired().trim();
 
 const TWITTER_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i;
 const GITHUB_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i;
 const LINKEDIN_URL_REGEX =
   /^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i;
-
-export const schema = yup.object({
-  twitterURL: nonRequiredString.matches(TWITTER_URL_REGEX, 'Invalid X link'),
-  githubURL: nonRequiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link'),
-  discordUsername: nonRequiredString,
-  linkedinURL: nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
-});
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
   const { memberPropertyValues } = useMemberPropertyValues(userId);
@@ -122,6 +115,8 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   const { memberProperties = [] } = useRequiredMemberProperties({ userId });
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const { space } = useCurrentSpace();
+  const { mutateMembers } = useMembers();
+
   const {
     control,
     formState: { isValid, errors, isDirty, isSubmitting },
@@ -146,8 +141,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
               return acc;
             }
 
-            acc[property.memberPropertyId] =
-              property.type === 'number' ? yup.number().required() : yup.string().required();
+            acc[property.memberPropertyId] = property.type === 'number' ? yup.number().required() : requiredString;
 
             return acc;
           }
@@ -157,7 +151,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
             return acc;
           }
 
-          acc[property.memberPropertyId] = property.type === 'number' ? yup.number() : yup.string();
+          acc[property.memberPropertyId] = property.type === 'number' ? yup.number() : nonRequiredString;
 
           return acc;
         }, {} as Record<string, any>)
@@ -188,7 +182,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
           space.id,
           Object.entries(getValues()).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
         );
-
+        mutateMembers();
         refreshPropertyValues();
       })();
     }
@@ -207,7 +201,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   return {
     values,
     control,
-    isValid,
+    isValid: Object.keys(errors).length === 0,
     errors,
     isDirty,
     setValue,
@@ -227,7 +221,6 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     isTwitterRequired,
     userDetails: { id, ...userDetails } = {} as UserDetails
   } = useRequiredMemberProperties({ userId });
-  const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
   const {
     formState: { errors, isValid, isDirty, isSubmitting },
@@ -240,8 +233,8 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     defaultValues: userDetails,
     resolver: yupResolver(
       yup.object({
-        description: isBioRequired ? yup.string().required() : yup.string().notRequired(),
-        timezone: isTimezoneRequired ? yup.string().required() : yup.string().notRequired(),
+        description: isBioRequired ? requiredString : nonRequiredString,
+        timezone: isTimezoneRequired ? requiredString : nonRequiredString,
         social: yup.object({
           twitterURL: isTwitterRequired
             ? requiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link')
@@ -277,7 +270,6 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     if (isDirty && isValid) {
       return handleSubmit(async () => {
         await charmClient.updateUserDetails(getValues());
-        mutateMembers();
         mutate('/current-user-details');
         showMessage('Profile updated', 'success');
       })();
@@ -286,7 +278,7 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   return {
     values,
-    isValid,
+    isValid: Object.keys(errors).length === 0,
     isDirty,
     errors,
     onFormChange,
