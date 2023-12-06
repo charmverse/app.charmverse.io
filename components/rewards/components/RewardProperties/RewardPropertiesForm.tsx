@@ -83,6 +83,7 @@ export function RewardPropertiesForm({
     id,
     group: 'role'
   }));
+
   const isAssignedReward = rewardApplicationType === 'assigned';
 
   useEffect(() => {
@@ -92,7 +93,6 @@ export function RewardPropertiesForm({
       allowMultipleApplications: isAssignedReward ? false : undefined
     });
   }, [rewardApplicationType, isAssignedReward]);
-
   useEffect(() => {
     if (isAssignedReward) {
       if (!values?.assignedSubmitters?.length) {
@@ -108,7 +108,6 @@ export function RewardPropertiesForm({
       assignedSubmitters: null
     });
   }, [rewardApplicationType, isAssignedReward, values?.assignedSubmitters]);
-
   const { templates: rewardTemplates = [] } = useRewardTemplates();
 
   useEffect(() => {
