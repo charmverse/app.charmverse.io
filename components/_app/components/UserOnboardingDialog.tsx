@@ -2,9 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
 
-import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
@@ -17,14 +15,11 @@ import {
   useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
-import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
 import type { OnboardingStep } from '../hooks/useOnboarding';
@@ -100,8 +95,10 @@ function UserOnboardingDialog({
     errors: memberPropertiesErrors,
     isValid: isMemberPropertiesValid,
     values: memberPropertiesValues,
-    setValue: setMemberPropertiesValue,
-    isDirty: isMemberPropertiesDirty
+    onFormChange: onMemberPropertiesChange,
+    isDirty: isMemberPropertiesDirty,
+    isSubmitting: isMemberPropertiesSubmitting,
+    onSubmit: onSubmitMemberProperties
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
@@ -110,30 +107,19 @@ function UserOnboardingDialog({
     errors: userDetailsErrors,
     isValid: isUserDetailsValid,
     values: userDetailsValues,
-    setValue: setUserDetailsValue,
-    isDirty: isUserDetailsDirty
+    onFormChange: onUserDetailsChange,
+    isDirty: isUserDetailsDirty,
+    isSubmitting: isUserDetailsSubmitting,
+    onSubmit: onSubmitUserDetails
   } = useRequiredUserDetailsForm({
     userId: currentUser.id
   });
 
   const { space: currentSpace } = useCurrentSpace();
-  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
+  const { refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-  const { mutateMembers } = useMembers();
 
   const isFormDirty = isMemberPropertiesDirty || isUserDetailsDirty;
-
-  function onUserDetailsChange(fields: EditableFields) {
-    Object.entries(fields).forEach(([key, value]) => {
-      setUserDetailsValue(key as keyof EditableFields, value);
-    });
-  }
-
-  function onMemberPropertiesChange(fields: UpdateMemberPropertyValuePayload[]) {
-    fields.forEach((field) => {
-      setMemberPropertiesValue(field.memberPropertyId, field.value);
-    });
-  }
 
   usePreventReload(isFormDirty);
 
@@ -143,20 +129,9 @@ function UserOnboardingDialog({
       return;
     }
 
-    if (isUserDetailsDirty) {
-      await charmClient.updateUserDetails(userDetailsValues);
-    }
-
-    if (currentSpace && isMemberPropertiesDirty) {
-      await updateSpaceValues(
-        currentSpace.id,
-        Object.entries(memberPropertiesValues).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
-      );
-    }
-    mutate('/current-user-details');
-    mutateMembers();
+    await onSubmitMemberProperties();
+    await onSubmitUserDetails();
     onClose();
-    showMessage('Profile updated', 'success');
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
@@ -195,6 +170,7 @@ function UserOnboardingDialog({
             disableElevation
             size='large'
             onClick={saveForm}
+            loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
             disabled={!isFormDirty || !isUserDetailsValid || !isMemberPropertiesValid}
             disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >

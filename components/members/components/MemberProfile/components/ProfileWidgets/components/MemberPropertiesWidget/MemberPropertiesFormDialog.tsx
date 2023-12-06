@@ -9,7 +9,6 @@ import { Button } from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
-import { useMembers } from 'hooks/useMembers';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../../../../../../hooks/useMemberPropertyValues';
@@ -17,7 +16,6 @@ import { useMemberPropertyValues } from '../../../../../../hooks/useMemberProper
 import { MemberPropertiesForm } from './MemberPropertiesForm';
 
 type Props = {
-  spaceId: string;
   userId: string;
   onClose: VoidFunction;
 };
@@ -80,19 +78,16 @@ export function DialogContainer({
   );
 }
 
-export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) {
-  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
-  const { mutateMembers } = useMembers();
+export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
+  const { refreshPropertyValues } = useMemberPropertyValues(userId);
 
-  const { control, errors, isValid, setValue, isDirty, getValues } = useRequiredMemberPropertiesForm({
-    userId
-  });
+  const { control, errors, isValid, setValue, isDirty, isSubmitting, values, onSubmit } =
+    useRequiredMemberPropertiesForm({
+      userId
+    });
 
   async function saveForm() {
-    await updateSpaceValues(
-      spaceId,
-      Object.entries(getValues()).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
-    );
+    await onSubmit();
     onClose();
   }
 
@@ -102,15 +97,10 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
     });
   }
 
-  function onClickClose() {
-    onClose();
-    mutateMembers();
-  }
-
   return (
-    <DialogContainer title='Edit profile' onClose={onClickClose}>
+    <DialogContainer title='Edit profile' onClose={onClose}>
       <MemberPropertiesForm
-        values={getValues()}
+        values={values}
         control={control}
         errors={errors}
         userId={userId}
@@ -121,7 +111,7 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
         <Button disableElevation color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
-        <Button disableElevation disabled={!isDirty || !isValid} onClick={saveForm}>
+        <Button disableElevation disabled={!isDirty || !isValid} loading={isSubmitting} onClick={saveForm}>
           Save
         </Button>
       </Box>

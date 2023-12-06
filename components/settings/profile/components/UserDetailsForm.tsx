@@ -9,9 +9,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import type { FieldErrors } from 'react-hook-form';
-import { mutate } from 'swr';
 
-import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import {
@@ -20,9 +18,7 @@ import {
 } from 'components/members/hooks/useRequiredMemberProperties';
 import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
-import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
@@ -159,24 +155,15 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
-  const { isDirty, setValue, isValid, values, getValues } = useRequiredUserDetailsForm({ userId: user.id });
-
-  const { mutateMembers } = useMembers();
-  const { showMessage } = useSnackbar();
+  const { isDirty, isValid, onFormChange, values, errors, isSubmitting, onSubmit } = useRequiredUserDetailsForm({
+    userId: user.id
+  });
 
   usePreventReload(isDirty);
 
-  function onFormChange(fields: EditableFields) {
-    Object.entries(fields).forEach(([key, value]) => {
-      setValue(key as keyof EditableFields, value);
-    });
-  }
-
   async function saveForm() {
-    await charmClient.updateUserDetails(values);
-    await mutateMembers();
-    mutate('/current-user-details');
-    showMessage('Profile updated', 'success');
+    onSubmit();
+    setUnsavedChanges(false);
   }
 
   useEffect(() => {
@@ -189,14 +176,15 @@ export function UserDetailsFormWithSave({
 
   return (
     <>
-      <UserDetailsForm userDetails={getValues()} user={user} onChange={onFormChange} />
+      <UserDetailsForm userDetails={values} user={user} errors={errors} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
         <Button
           disableElevation
           size='large'
-          disabled={!isDirty || isValid}
+          disabled={!isDirty || !isValid}
           disabledTooltip={!isDirty ? 'No changes to save' : 'Please fill out all required fields'}
           onClick={saveForm}
+          loading={isSubmitting}
         >
           Save
         </Button>

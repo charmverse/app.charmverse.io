@@ -2,13 +2,17 @@ import type { UserDetails } from '@charmverse/core/dist/cjs/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { NON_DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
-import type { MemberPropertyValueType, Social } from 'lib/members/interfaces';
+import type { MemberPropertyValueType, Social, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
 
@@ -116,13 +120,15 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 
 export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) {
   const { memberProperties = [] } = useRequiredMemberProperties({ userId });
-
+  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
+  const { space } = useCurrentSpace();
   const {
     control,
-    formState: { isValid, errors, isDirty },
+    formState: { isValid, errors, isDirty, isSubmitting },
     reset,
     getValues,
-    setValue
+    setValue,
+    handleSubmit
   } = useForm({
     mode: 'onChange',
     resolver: yupResolver(
@@ -175,6 +181,29 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     reset(defaultValues);
   }, [memberProperties, reset]);
 
+  const onSubmit = () => {
+    if (isDirty && isValid && space) {
+      return handleSubmit(async () => {
+        await updateSpaceValues(
+          space.id,
+          Object.entries(getValues()).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+        );
+
+        refreshPropertyValues();
+      })();
+    }
+  };
+
+  function onFormChange(fields: UpdateMemberPropertyValuePayload[]) {
+    fields.forEach((field) => {
+      setValue(field.memberPropertyId, field.value, {
+        shouldDirty: true,
+        shouldValidate: true,
+        shouldTouch: true
+      });
+    });
+  }
+
   return {
     values,
     control,
@@ -182,7 +211,10 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     errors,
     isDirty,
     setValue,
-    getValues
+    getValues,
+    isSubmitting,
+    onSubmit,
+    onFormChange
   };
 }
 
@@ -195,12 +227,14 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     isTwitterRequired,
     userDetails: { id, ...userDetails } = {} as UserDetails
   } = useRequiredMemberProperties({ userId });
-
+  const { mutateMembers } = useMembers();
+  const { showMessage } = useSnackbar();
   const {
-    control,
-    formState: { isValid, errors, isDirty },
-    getValues,
-    setValue
+    formState: { errors, isValid, isDirty, isSubmitting },
+    watch,
+    setValue,
+    handleSubmit,
+    getValues
   } = useForm({
     mode: 'onChange',
     defaultValues: userDetails,
@@ -224,15 +258,39 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     )
   });
 
-  const values = getValues();
+  const values = {
+    description: watch('description'),
+    social: watch('social'),
+    timezone: watch('timezone')
+  };
+
+  function onFormChange(fields: EditableFields) {
+    Object.entries(fields).forEach(([key, value]) => {
+      setValue(key as keyof EditableFields, value, {
+        shouldDirty: true,
+        shouldValidate: true
+      });
+    });
+  }
+
+  function onSubmit() {
+    if (isDirty && isValid) {
+      return handleSubmit(async () => {
+        await charmClient.updateUserDetails(getValues());
+        mutateMembers();
+        mutate('/current-user-details');
+        showMessage('Profile updated', 'success');
+      })();
+    }
+  }
 
   return {
     values,
-    control,
     isValid,
-    errors,
     isDirty,
-    setValue,
-    getValues
+    errors,
+    onFormChange,
+    isSubmitting,
+    onSubmit
   };
 }
