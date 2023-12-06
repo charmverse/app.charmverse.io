@@ -16,6 +16,7 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
@@ -174,7 +175,7 @@ export function RewardSubmissionInput({
                 disabled={
                   (!isValid && submission?.status === 'inProgress') ||
                   !isEditorTouched ||
-                  checkIsContentEmpty(formValues.submissionNodes)
+                  checkIsContentEmpty(formValues.submissionNodes as unknown as PageContent)
                 }
                 type='submit'
                 loading={isSaving}
