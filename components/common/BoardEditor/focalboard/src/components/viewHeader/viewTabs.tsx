@@ -34,7 +34,7 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -76,6 +76,8 @@ interface ViewTabsProps {
   disableUpdatingUrl?: boolean;
   maxTabsShown: number;
   openViewOptions: () => void;
+  readOnlyViewIds?: string[];
+  supportedViewTypes?: IViewType[];
 }
 
 function ViewMenuItem({
@@ -185,7 +187,9 @@ function ViewTabs(props: ViewTabsProps) {
     intl,
     readOnly,
     showView,
-    views: viewsProp
+    views: viewsProp,
+    readOnlyViewIds,
+    supportedViewTypes
   } = props;
   const router = useRouter();
   const [viewMenuAnchorEl, setViewMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -228,7 +232,7 @@ function ViewTabs(props: ViewTabsProps) {
     if (!view) {
       return;
     }
-    if (view && !readOnly && selectedViewId === activeView?.id) {
+    if (view && !readOnly && selectedViewId === activeView?.id && !readOnlyViewIds?.includes(selectedViewId)) {
       setViewMenuAnchorEl(event.currentTarget);
       setDropdownView(view);
     } else {
@@ -447,6 +451,7 @@ function ViewTabs(props: ViewTabsProps) {
               showLabel={true}
               onClose={handleClose}
               onClick={props.onClickNewView}
+              supportedViewTypes={supportedViewTypes}
             />
           )}
         </Box>

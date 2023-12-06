@@ -36,6 +36,7 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
+import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
 import { useRewards } from './hooks/useRewards';
 
@@ -175,10 +176,18 @@ export function RewardsPage({ title }: { title: string }) {
                 activeView={activeView}
                 disableUpdatingUrl
                 maxTabsShown={3}
+                readOnlyViewIds={defaultRewardViews}
+                supportedViewTypes={supportedRewardViewTypes}
               />
 
-              {views.length <= 3 && (
-                <AddViewMenu board={activeBoard} activeView={activeView} views={views} showView={showView} />
+              {!!views.length && views.length <= 3 && (
+                <AddViewMenu
+                  board={activeBoard}
+                  activeView={activeView}
+                  views={views}
+                  showView={showView}
+                  supportedViewTypes={supportedRewardViewTypes}
+                />
               )}
             </Stack>
 
