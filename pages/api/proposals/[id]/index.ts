@@ -36,6 +36,14 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
           index: 'asc'
         }
       },
+      evaluations: {
+        include: {
+          reviewers: true,
+          rubricCriteria: true,
+          rubricAnswers: true,
+          draftRubricAnswers: true
+        }
+      },
       authors: true,
       reviewers: true,
       category: true,

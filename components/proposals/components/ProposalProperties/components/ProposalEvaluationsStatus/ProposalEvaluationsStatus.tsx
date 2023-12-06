@@ -26,6 +26,7 @@ type Props = {
   evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'>[];
   isDraft?: boolean;
 };
+
 export function ProposalEvaluationsStatus({ evaluations, isDraft }: Props) {
   const currentEvaluation = !isDraft && getCurrentEvaluation(evaluations);
 

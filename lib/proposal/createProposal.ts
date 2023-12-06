@@ -1,9 +1,9 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalStatus, PageType } from '@charmverse/core/prisma';
-import type { ProposalEvaluationType, WorkspaceEvent } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType, ProposalEvaluation, WorkspaceEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalWithUsers, ProposalReviewerInput } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -24,6 +24,11 @@ type PageProps = Partial<
   Pick<Page, 'title' | 'content' | 'contentText' | 'sourceTemplateId' | 'headerImage' | 'icon' | 'type'>
 >;
 
+export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'index' | 'title' | 'type'> & {
+  reviewers: ProposalReviewerInput[];
+  rubricCriteria: RubricDataInput[];
+};
+
 export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
@@ -34,6 +39,7 @@ export type CreateProposalInput = {
   spaceId: string;
   evaluationType?: ProposalEvaluationType;
   rubricCriteria?: RubricDataInput[];
+  evaluations: ProposalEvaluationInput[];
   publishToLens?: boolean;
   fields?: ProposalFields;
 };
@@ -50,6 +56,7 @@ export async function createProposal({
   pageProps,
   authors,
   reviewers,
+  evaluations = [],
   evaluationType,
   rubricCriteria,
   publishToLens,
@@ -73,9 +80,18 @@ export async function createProposal({
   if (!validation.valid) {
     throw new InsecureOperationError(`You cannot create a proposal with authors or reviewers outside the space`);
   }
-
+  const evaluationIds = evaluations.map(() => uuid());
+  // apply evaluation ids to reviewers
+  if (evaluationIds.length > 0) {
+    reviewers = evaluations.flatMap((evaluation, index) =>
+      evaluation.reviewers.map((reviewer) => ({
+        ...reviewer,
+        evaluationId: evaluationIds[index]
+      }))
+    );
+  }
   // Using a transaction to ensure both the proposal and page gets created together
-  const [proposal, page] = await prisma.$transaction([
+  const [proposal, , page] = await prisma.$transaction([
     prisma.proposal.create({
       data: {
         // Add page creator as the proposal's first author
@@ -109,6 +125,19 @@ export async function createProposal({
         category: true
       }
     }),
+    prisma.proposalEvaluation.createMany({
+      // we dont save evaluations as part of the template, since they link to workflow id instead
+      data:
+        pageProps?.type === 'proposal_template'
+          ? []
+          : evaluations.map((evaluation, index) => ({
+              id: evaluationIds[index],
+              index: evaluation.index,
+              title: evaluation.title,
+              type: evaluation.type,
+              proposalId
+            }))
+    }),
     createPage({
       data: {
         content: pageProps?.content ?? undefined,
@@ -135,6 +164,12 @@ export async function createProposal({
         rubricCriteria
       })
     : [];
+
+  await Promise.all(
+    evaluations
+      .filter((evaluation) => evaluation.type === 'rubric')
+      .map((evaluation) => upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria: evaluation.rubricCriteria }))
+  );
 
   await publishProposalEvent({
     scope: WebhookEventNames.ProposalStatusChanged,

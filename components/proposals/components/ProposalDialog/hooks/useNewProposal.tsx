@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
-import { getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -16,6 +16,7 @@ type Props = {
 };
 
 export function useNewProposal({ newProposal }: Props) {
+  const isCharmVerse = useIsCharmverseSpace();
   const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
@@ -77,6 +78,7 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
+        evaluations: formInputs.evaluations,
         evaluationType: formInputs.evaluationType,
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
         reviewers: formInputs.reviewers,
@@ -93,30 +95,27 @@ export function useNewProposal({ newProposal }: Props) {
     }
   }
 
-  const disabledTooltip = useMemo(() => {
-    if (!formInputs.title) {
-      return 'Title is required';
-    }
+  let disabledTooltip: string | undefined;
+  if (!formInputs.title) {
+    disabledTooltip = 'Title is required';
+  }
 
-    if (!formInputs.categoryId) {
-      return 'Category is required';
-    }
+  if (!formInputs.categoryId) {
+    disabledTooltip = 'Category is required';
+  }
 
-    if (formInputs.type === 'proposal' && currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
-      return 'Template is required';
-    }
+  if (formInputs.type === 'proposal' && currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
+    disabledTooltip = 'Template is required';
+  }
 
+  // old evalauation logic
+  if (!isCharmVerse) {
     if (formInputs.reviewers.length === 0) {
-      return 'Reviewers are required';
+      disabledTooltip = 'Reviewers are required';
     }
-  }, [
-    currentSpace?.requireProposalTemplate,
-    formInputs.categoryId,
-    formInputs.proposalTemplateId,
-    formInputs.reviewers.length,
-    formInputs.title,
-    formInputs.type
-  ]);
+  } else if (formInputs.evaluations.some((evaluation) => evaluation.type !== 'feedback' && !evaluation.reviewers)) {
+    disabledTooltip = 'Reviewers are required';
+  }
 
   return {
     formInputs,
@@ -142,7 +141,7 @@ function emptyState({
     evaluationType: 'vote',
     proposalTemplateId: null,
     reviewers: [],
-    evaluations: [{ index: 0, result: null, ...getDefaultFeedbackEvaluation() }],
+    evaluations: [],
     rubricCriteria: [],
     title: '',
     type: 'proposal',

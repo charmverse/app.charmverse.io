@@ -97,7 +97,13 @@ export function ProposalProperties({
     categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
-    evaluations: proposal?.evaluations ?? [],
+    evaluations: (proposal?.evaluations ?? []).map((evaluation) => ({
+      ...evaluation,
+      reviewers: evaluation.reviewers.map((reviewer) => ({
+        group: reviewer.roleId ? 'role' : 'user',
+        id: reviewer.roleId ?? (reviewer.userId as string)
+      }))
+    })),
     rubricCriteria: proposal?.rubricCriteria ?? [],
     publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
     reviewers:

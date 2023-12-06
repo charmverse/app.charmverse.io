@@ -33,7 +33,10 @@ export type ProposalRubricData = {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
-type PopulatedEvaluation = ProposalRubricData & ProposalEvaluation;
+type PopulatedEvaluation = ProposalRubricData &
+  ProposalEvaluation & {
+    reviewers: ProposalWithUsers['reviewers'];
+  };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData & {

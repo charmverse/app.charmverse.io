@@ -1,6 +1,12 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type { PageType, ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
+import type {
+  PageType,
+  ProposalEvaluation,
+  ProposalEvaluationType,
+  ProposalRubricCriteria,
+  ProposalStatus
+} from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped, ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
@@ -41,7 +47,7 @@ import { useProposalCategories } from '../../hooks/useProposalCategories';
 
 import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
-import type { ProposalEvaluationInput } from './components/ProposalEvaluationForm';
+import type { ProposalEvaluationValues } from './components/ProposalEvaluationForm';
 import { ProposalEvaluationForm } from './components/ProposalEvaluationForm';
 import { ProposalEvaluationsStatus } from './components/ProposalEvaluationsStatus/ProposalEvaluationsStatus';
 import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
@@ -57,9 +63,10 @@ export type ProposalPropertiesInput = {
   categoryId?: string | null;
   authors: string[];
   reviewers: ProposalReviewerInput[];
+  workflowId?: string | null;
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
-  evaluations: ProposalEvaluationInput[];
+  evaluations: ProposalEvaluationValues[];
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
   fields: ProposalFields;
@@ -75,7 +82,7 @@ type ProposalPropertiesProps = {
   isFromTemplate?: boolean;
   isTemplateRequired?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
-  onChangeProposalEvaluation?: (evaluations: ProposalEvaluationInput) => void;
+  onChangeProposalEvaluation?: (evaluations: ProposalEvaluationValues) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -179,7 +186,6 @@ export function ProposalPropertiesBase({
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
-  const isDraft = isNewProposal || proposalStatus === 'draft';
   const showStatusStepper = !isTemplate && !isCharmVerse;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const templateOptions = proposalTemplates
@@ -225,6 +231,7 @@ export function ProposalPropertiesBase({
             id: reviewer.roleId ?? (reviewer.userId as string)
           })),
           proposalTemplateId: templatePage.id,
+          workflowId: proposalTemplate.workflowId,
           evaluationType: proposalTemplate.evaluationType,
           rubricCriteria: proposalTemplate.rubricCriteria,
           fields: (proposalTemplate.fields as ProposalFields) || {}
@@ -245,6 +252,7 @@ export function ProposalPropertiesBase({
 
   function selectEvaluationWorkflow(workflow: ProposalWorkflowTyped) {
     setProposalFormInputs({
+      workflowId: workflow.id,
       evaluations: workflow.evaluations.map((evaluation, index) => ({
         id: uuid(),
         index,
@@ -340,13 +348,16 @@ export function ProposalPropertiesBase({
             )}
           </>
         )}
-        {isCharmVerse && !isDraft && proposalFormInputs.evaluations.length > 0 && (
+        {isCharmVerse && !isNewProposal && proposalFormInputs.evaluations.length > 0 && (
           <Box className='octo-propertyrow' mb='0 !important'>
             <PropertyLabel readOnly highlighted>
               Status
             </PropertyLabel>
             <Box ml={1}>
-              <ProposalEvaluationsStatus evaluations={proposalFormInputs.evaluations} isDraft={isDraft} />
+              <ProposalEvaluationsStatus
+                evaluations={proposalFormInputs.evaluations}
+                isDraft={proposalStatus === 'draft'}
+              />
             </Box>
           </Box>
         )}

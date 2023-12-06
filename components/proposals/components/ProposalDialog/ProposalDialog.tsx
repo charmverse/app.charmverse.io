@@ -117,8 +117,8 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
     setShowConfirmDialog(false);
   }
 
-  function saveForm() {
-    createProposal();
+  async function saveForm() {
+    await createProposal();
     close();
   }
 
