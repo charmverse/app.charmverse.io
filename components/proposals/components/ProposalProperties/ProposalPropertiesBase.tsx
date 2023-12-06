@@ -249,6 +249,7 @@ export function ProposalPropertiesBase({
         id: uuid(),
         index,
         reviewers: [],
+        rubricCriteria: [],
         title: evaluation.title,
         type: evaluation.type,
         result: null

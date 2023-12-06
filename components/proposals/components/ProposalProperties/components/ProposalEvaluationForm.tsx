@@ -1,14 +1,18 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
 import type { ProposalReviewerInput } from '@charmverse/core/proposals';
-import { ExpandMore } from '@mui/icons-material';
-import { Box, Divider, AccordionDetails, AccordionSummary } from '@mui/material';
-import { useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import type { Theme } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 
+import { ProposalRubricCriteriaInput } from './ProposalRubricCriteriaInput';
+import type { RangeProposalCriteria } from './ProposalRubricCriteriaInput';
+
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'index' | 'title' | 'result' | 'id' | 'type'> & {
   reviewers: ProposalReviewerInput[];
+  rubricCriteria: RangeProposalCriteria[];
 };
 
 type Props = {
@@ -18,6 +22,7 @@ type Props = {
 };
 
 export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Props) {
+  const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   return (
     <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
       <PropertyLabel highlighted fullWidth>
@@ -42,6 +47,27 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Pro
           }}
         />
       </Box>
+      {evaluation.type === 'rubric' && (
+        <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+          <Box
+            display='flex'
+            height='fit-content'
+            flex={1}
+            className='octo-propertyrow'
+            flexDirection={{ xs: 'column', sm: 'row' }}
+            alignItems={{ xs: 'stretch !important', sm: 'flex-start' }}
+          >
+            <PropertyLabel required>Criteria</PropertyLabel>
+            <Box display='flex' flex={1} flexDirection='column'>
+              <ProposalRubricCriteriaInput
+                value={evaluation.rubricCriteria}
+                onChange={(rubricCriteria) => onChange({ ...evaluation, rubricCriteria })}
+                answers={[]}
+              />
+            </Box>
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }
