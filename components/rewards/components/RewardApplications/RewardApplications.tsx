@@ -1,5 +1,5 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, Divider, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useMemo } from 'react';
@@ -18,7 +18,6 @@ import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 
 type Props = {
   rewardId: string;
-  onShowApplication?: VoidFunction;
   applicationRequired: boolean;
 };
 
@@ -68,21 +67,36 @@ function ApplicationRows({
           }
           return (
             <Stack justifyContent='space-between' flexDirection='row' gap={1} key={application.id} alignItems='center'>
-              <Stack gap={1} flexDirection='row' minWidth={200}>
-                <UserDisplay avatarSize='medium' userId={member.id} fontSize='small' hideName showMiniProfile />
-                <Stack>
-                  <Typography>{member.username}</Typography>
-                  <Typography variant='subtitle2'>{formatDateTime(application.updatedAt)}</Typography>
+              <Stack flexDirection='row' alignItems='center'>
+                <Stack gap={1} flexDirection='row' minWidth={250}>
+                  <UserDisplay avatarSize='small' userId={member.id} fontSize='small' hideName showMiniProfile />
+                  <Typography
+                    sx={{
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    {member.username}
+                  </Typography>
                 </Stack>
+                <Typography minWidth={150} whiteSpace='nowrap' variant='subtitle2'>
+                  {formatDateTime(application.updatedAt)}
+                </Typography>
               </Stack>
-              <Stack gap={1} flexDirection='row' alignItems='center'>
-                <RewardApplicationStatusChip status={application.status} />
-                <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
-                  <IconButton size='small' onClick={() => openApplication(application.id)}>
-                    <PlayArrowIcon fontSize='small' color='primary' />
-                  </IconButton>
-                </Tooltip>
+              <Stack minWidth={150}>
+                <RewardApplicationStatusChip
+                  sx={{
+                    width: 'fit-content'
+                  }}
+                  status={application.status}
+                />
               </Stack>
+              <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
+                <IconButton size='small' onClick={() => openApplication(application.id)}>
+                  <ArrowForwardIosIcon fontSize='small' color='secondary' />
+                </IconButton>
+              </Tooltip>
             </Stack>
           );
         })}
@@ -105,7 +119,7 @@ function ApplicationRows({
   );
 }
 
-export function RewardApplications({ rewardId, onShowApplication, applicationRequired }: Props) {
+export function RewardApplications({ rewardId, applicationRequired }: Props) {
   const { updateURLQuery } = useCharmRouter();
 
   const { user } = useUser();
@@ -156,11 +170,11 @@ export function RewardApplications({ rewardId, onShowApplication, applicationReq
 
   if (reward.applications.length === 0) {
     return (
-      <>
+      <Stack my={1}>
         <Stack direction='row' alignItems='center' justifyContent='space-between'>
           <Typography fontWeight='bold'>{applicationRequired ? 'Applications' : 'Submissions'}</Typography>
         </Stack>
-        <Box display='flex' justifyContent='center' alignItems='center' gap={1}>
+        <Stack justifyContent='center' alignItems='center' gap={1}>
           <Typography
             variant='subtitle1'
             sx={{
@@ -170,34 +184,34 @@ export function RewardApplications({ rewardId, onShowApplication, applicationReq
             There are no {applicationRequired ? 'applications' : 'submissions'} yet.
           </Typography>
           <NewWorkButton rewardId={rewardId} />
-        </Box>
-      </>
+        </Stack>
+      </Stack>
     );
   }
 
   if (applicationRequired) {
     return (
-      <Stack gap={1}>
-        <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
-        <Stack flex={1} direction='row' justifyContent='flex-end' mb={1}>
+      <>
+        <Stack flex={1} direction='row' my={1}>
           <NewWorkButton rewardId={rewardId} />
         </Stack>
+        <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
         <Divider
           sx={{
             my: 1
           }}
         />
         <ApplicationRows isApplication openApplication={openApplication} applications={applications} />
-      </Stack>
+      </>
     );
   }
 
   return (
     <>
-      <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
-      <Stack flex={1} direction='row' justifyContent='flex-end' mb={1}>
+      <Stack flex={1} direction='row' my={1}>
         <NewWorkButton rewardId={rewardId} />
       </Stack>
+      <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
     </>
   );
 }
