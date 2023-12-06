@@ -14,13 +14,13 @@ export interface Timezone {
 const timezoneOptions = getTimezonesWithOffset();
 
 export function TimezoneAutocomplete({
-  save,
+  onChange,
   userTimezone,
   readOnly,
   required
 }: {
   userTimezone?: string | null;
-  save: (timezone?: string | null) => void;
+  onChange: (timezone?: string | null) => void;
   readOnly?: boolean;
   required?: boolean;
 }) {
@@ -53,7 +53,7 @@ export function TimezoneAutocomplete({
         isOptionEqualToValue={(option, value) => option.tz === value.tz && option.offset === value.offset}
         onChange={(_, selectOption) => {
           setTimezone(selectOption);
-          save(selectOption?.tz);
+          onChange(selectOption?.tz);
         }}
         options={timezoneOptions}
         size='small'

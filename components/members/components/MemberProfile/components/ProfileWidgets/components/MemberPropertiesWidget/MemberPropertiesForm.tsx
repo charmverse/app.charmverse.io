@@ -4,8 +4,9 @@ import { Controller } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
+import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
 import { useMembers } from 'hooks/useMembers';
-import type { PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberCollections } from '../../../../../../hooks/useMemberCollections';
 import { useMutateMemberPropertyValues } from '../../../../../../hooks/useMutateMemberPropertyValues';
@@ -13,7 +14,6 @@ import { NftsList } from '../CollectionWidget/NftsList';
 import { PoapsList } from '../CollectionWidget/PoapsList';
 
 type Props = {
-  properties?: PropertyValueWithDetails[];
   onChange: (values: UpdateMemberPropertyValuePayload[]) => void;
   showCollectionOptions?: boolean;
   userId: string;
@@ -24,7 +24,6 @@ type Props = {
 };
 
 export function MemberPropertiesForm({
-  properties,
   onChange,
   userId,
   refreshPropertyValues,
@@ -35,7 +34,9 @@ export function MemberPropertiesForm({
 }: Props) {
   const { membersRecord } = useMembers();
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
-
+  const { memberProperties } = useRequiredMemberProperties({
+    userId
+  });
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
     memberId: userId
   });
@@ -59,7 +60,7 @@ export function MemberPropertiesForm({
   return (
     <Box>
       <Box display='flex' flexDirection='column'>
-        {properties?.map((property) => (
+        {memberProperties?.map((property) => (
           <Controller
             key={property.memberPropertyId}
             name={property.memberPropertyId}

@@ -7,20 +7,23 @@ import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { mutate } from 'swr';
-import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
+import {
+  useRequiredMemberProperties,
+  useRequiredUserDetailsForm
+} from 'components/members/hooks/useRequiredMemberProperties';
 import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PropertyValueWithDetails, Social } from 'lib/members/interfaces';
+import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import type { LoggedInUser } from 'models';
@@ -40,7 +43,13 @@ export interface UserDetailsProps {
   user: LoggedInUser;
   sx?: SxProps<Theme>;
   onChange: (user: EditableFields) => void;
-  memberProperties: PropertyValueWithDetails[];
+  userDetails?: EditableFields;
+  errors?: FieldErrors<{
+    description: string | null;
+    social: FieldErrors<Record<keyof Social, string | null>>;
+    timezone: string | null;
+    locale: string | null;
+  }>;
 }
 
 const StyledStack = styled(Stack)`
@@ -62,11 +71,10 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ memberProperties, user, onChange, sx = {} }: UserDetailsProps) {
-  const { data: userDetails, isLoading } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
-
+export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }: UserDetailsProps) {
   const identityTypes = useIdentityTypes();
-
+  const { isBioRequired, isTimezoneRequired, isLinkedinRequired, isGithubRequired, isTwitterRequired } =
+    useRequiredMemberProperties({ userId: user.id });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
@@ -83,10 +91,6 @@ export function UserDetailsForm({ memberProperties, user, onChange, sx = {} }: U
   const setSocial = async (social: Social) => {
     onChange({ social });
   };
-
-  const disabled = isLoading;
-
-  const requiredProperties = memberProperties.filter((mp) => mp.required);
 
   return (
     <>
@@ -113,25 +117,29 @@ export function UserDetailsForm({ memberProperties, user, onChange, sx = {} }: U
         </Grid>
         <Grid item>
           <UserDescription
-            required={!!requiredProperties.find((prop) => prop.type === 'bio')}
-            currentDescription={userDetails?.description}
-            save={setDescription}
-            readOnly={disabled}
+            description={userDetails?.description || ''}
+            onChange={setDescription}
+            error={errors?.description}
+            required={isBioRequired}
           />
         </Grid>
         <Grid item>
           <TimezoneAutocomplete
-            required={!!requiredProperties.find((prop) => prop.type === 'timezone')}
+            required={isTimezoneRequired}
             userTimezone={userDetails?.timezone}
-            save={setTimezone}
-            readOnly={disabled}
+            onChange={setTimezone}
           />
         </Grid>
         <SocialInputs
-          memberProperties={memberProperties}
+          errors={errors?.social as FieldErrors<Record<keyof Social, string | null>>}
+          required={{
+            discordUsername: false,
+            githubURL: isGithubRequired,
+            linkedinURL: isLinkedinRequired,
+            twitterURL: isTwitterRequired
+          }}
           social={userDetails?.social as Social}
-          save={setSocial}
-          readOnly={disabled}
+          onChange={setSocial}
         />
       </Grid>
       <IdentityModal
@@ -151,54 +159,43 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
-  const {
-    memberProperties,
-    userDetails: defaultUserDetails,
-    checkHasEmptyRequiredPropertiesFromUserDetails
-  } = useRequiredMemberProperties({ userId: user.id });
-  const [isFormClean, setIsFormClean] = useState(true);
-  const [userDetails, setUserDetails] = useState<EditableFields>({});
+  const { isDirty, setValue, isValid, values, getValues } = useRequiredUserDetailsForm({ userId: user.id });
 
-  const hasEmptyRequiredProperties = checkHasEmptyRequiredPropertiesFromUserDetails(userDetails);
   const { mutateMembers } = useMembers();
   const { showMessage } = useSnackbar();
 
-  usePreventReload(!isFormClean);
-
-  useEffect(() => {
-    setUserDetails(defaultUserDetails ?? {});
-  }, [defaultUserDetails]);
+  usePreventReload(isDirty);
 
   function onFormChange(fields: EditableFields) {
-    setIsFormClean(false);
-    setUserDetails((_form) => ({ ..._form, ...fields }));
+    Object.entries(fields).forEach(([key, value]) => {
+      setValue(key as keyof EditableFields, value);
+    });
   }
 
   async function saveForm() {
-    await charmClient.updateUserDetails(userDetails);
+    await charmClient.updateUserDetails(values);
     await mutateMembers();
     mutate('/current-user-details');
     showMessage('Profile updated', 'success');
-    setIsFormClean(true);
   }
 
   useEffect(() => {
-    setUnsavedChanges(!isFormClean);
+    setUnsavedChanges(isDirty);
 
     return () => {
       setUnsavedChanges(false);
     };
-  }, [isFormClean]);
+  }, [isDirty]);
 
   return (
     <>
-      <UserDetailsForm memberProperties={memberProperties ?? []} user={user} onChange={onFormChange} />
+      <UserDetailsForm userDetails={getValues()} user={user} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
         <Button
           disableElevation
           size='large'
-          disabled={isFormClean || hasEmptyRequiredProperties}
-          disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
+          disabled={!isDirty || isValid}
+          disabledTooltip={!isDirty ? 'No changes to save' : 'Please fill out all required fields'}
           onClick={saveForm}
         >
           Save

@@ -1,15 +1,32 @@
 import type { UserDetails } from '@charmverse/core/dist/cjs/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWRImmutable from 'swr/immutable';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { NON_DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { MemberPropertyValueType, Social } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
+
+const requiredString = yup.string().required().ensure().trim();
+
+const nonRequiredString = yup.string().notRequired().ensure().trim();
+
+const TWITTER_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i;
+const GITHUB_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i;
+const LINKEDIN_URL_REGEX =
+  /^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i;
+
+export const schema = yup.object({
+  twitterURL: nonRequiredString.matches(TWITTER_URL_REGEX, 'Invalid X link'),
+  githubURL: nonRequiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link'),
+  discordUsername: nonRequiredString,
+  linkedinURL: nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
+});
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
   const { memberPropertyValues } = useMemberPropertyValues(userId);
@@ -33,7 +50,9 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 
     // Role and join date are non editable properties
     const _requiredProperties =
-      _memberProperties?.filter((p) => p.required && !['role', 'join_date'].includes(p.type)) ?? [];
+      _memberProperties?.filter(
+        (p) => p.required && !['role', 'join_date', 'discord', 'profile_pic'].includes(p.type)
+      ) ?? [];
     const _isTimezoneRequired = _requiredProperties.find((p) => p.type === 'timezone');
     const _isBioRequired = _requiredProperties.find((p) => p.type === 'bio');
     const _isTwitterRequired = _requiredProperties.find((p) => p.type === 'twitter');
@@ -82,45 +101,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     };
   }, [userDetails, memberPropertyValues, currentSpace?.id]);
 
-  const checkHasEmptyRequiredPropertiesFromUserDetails = useCallback(
-    (_userDetails?: Partial<Omit<UserDetails, 'id'>>) => {
-      if (requiredProperties.length === 0) {
-        return false;
-      }
-
-      if (!_userDetails) {
-        return true;
-      }
-
-      if (isTimezoneRequired && !_userDetails.timezone) {
-        return true;
-      }
-
-      if (isBioRequired && !_userDetails.description) {
-        return true;
-      }
-
-      const userDetailsSocial = _userDetails?.social as Social;
-
-      if (isTwitterRequired && !userDetailsSocial?.twitterURL) {
-        return true;
-      }
-
-      if (isLinkedinRequired && !userDetailsSocial?.linkedinURL) {
-        return true;
-      }
-
-      if (isGithubRequired && !userDetailsSocial?.githubURL) {
-        return true;
-      }
-
-      return false;
-    },
-    [requiredProperties, isTimezoneRequired, isBioRequired, isTwitterRequired, isLinkedinRequired, isGithubRequired]
-  );
-
   return {
-    checkHasEmptyRequiredPropertiesFromUserDetails,
     memberProperties,
     requiredProperties,
     isTimezoneRequired,
@@ -134,38 +115,44 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 }
 
 export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) {
-  const { memberProperties, requiredProperties, ...rest } = useRequiredMemberProperties({ userId });
-
-  const editableRequiredProperties = requiredProperties.filter(
-    (p) =>
-      ![
-        // Handled by oauth
-        'linked_in',
-        'github',
-        'discord',
-        'twitter',
-        'profile_pic',
-        // Handled separately from space member properties
-        'bio',
-        'timezone'
-      ].includes(p.type)
-  );
+  const { memberProperties = [] } = useRequiredMemberProperties({ userId });
 
   const {
     control,
-    formState: { isValid, errors },
+    formState: { isValid, errors, isDirty },
     reset,
-    getValues
+    getValues,
+    setValue
   } = useForm({
     mode: 'onChange',
     resolver: yupResolver(
       yup.object(
-        Object.values(editableRequiredProperties).reduce((acc, prop) => {
-          if (prop.type === 'multiselect') {
-            acc[prop.memberPropertyId] = yup.array().of(yup.string()).required();
+        memberProperties.reduce((acc, property) => {
+          if (!['name', ...NON_DEFAULT_MEMBER_PROPERTIES].includes(property.type)) {
             return acc;
           }
-          acc[prop.memberPropertyId] = prop.type === 'number' ? yup.number().required() : yup.string().required();
+
+          const isRequired = property.required;
+
+          if (isRequired) {
+            if (property.type === 'multiselect') {
+              acc[property.memberPropertyId] = yup.array().of(yup.string()).required();
+              return acc;
+            }
+
+            acc[property.memberPropertyId] =
+              property.type === 'number' ? yup.number().required() : yup.string().required();
+
+            return acc;
+          }
+
+          if (property.type === 'multiselect') {
+            acc[property.memberPropertyId] = yup.array().of(yup.string());
+            return acc;
+          }
+
+          acc[property.memberPropertyId] = property.type === 'number' ? yup.number() : yup.string();
+
           return acc;
         }, {} as Record<string, any>)
       )
@@ -179,7 +166,9 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
       return;
     }
     const defaultValues = memberProperties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-      acc[prop.memberPropertyId] = prop.value;
+      if (['name', ...NON_DEFAULT_MEMBER_PROPERTIES].includes(prop.type)) {
+        acc[prop.memberPropertyId] = prop.value;
+      }
       return acc;
     }, {});
 
@@ -191,8 +180,59 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     control,
     isValid,
     errors,
-    memberProperties,
-    requiredProperties,
-    ...rest
+    isDirty,
+    setValue,
+    getValues
+  };
+}
+
+export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
+  const {
+    isBioRequired,
+    isGithubRequired,
+    isLinkedinRequired,
+    isTimezoneRequired,
+    isTwitterRequired,
+    userDetails: { id, ...userDetails } = {} as UserDetails
+  } = useRequiredMemberProperties({ userId });
+
+  const {
+    control,
+    formState: { isValid, errors, isDirty },
+    getValues,
+    setValue
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: userDetails,
+    resolver: yupResolver(
+      yup.object({
+        description: isBioRequired ? yup.string().required() : yup.string().notRequired(),
+        timezone: isTimezoneRequired ? yup.string().required() : yup.string().notRequired(),
+        social: yup.object({
+          twitterURL: isTwitterRequired
+            ? requiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link')
+            : nonRequiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link'),
+          githubURL: isGithubRequired
+            ? requiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link')
+            : nonRequiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link'),
+          linkedinURL: isLinkedinRequired
+            ? requiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
+            : nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link'),
+          discordUsername: nonRequiredString
+        })
+      })
+    )
+  });
+
+  const values = getValues();
+
+  return {
+    values,
+    control,
+    isValid,
+    errors,
+    isDirty,
+    setValue,
+    getValues
   };
 }

@@ -13,7 +13,8 @@ import { ProfileWidgets } from 'components/members/components/MemberProfile/comp
 import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
 import {
   useRequiredMemberProperties,
-  useRequiredMemberPropertiesForm
+  useRequiredMemberPropertiesForm,
+  useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
 import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
@@ -91,62 +92,71 @@ function UserOnboardingDialog({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { showMessage } = useSnackbar();
+  const { requiredProperties } = useRequiredMemberProperties({
+    userId: currentUser.id
+  });
   const {
-    control,
-    userDetails: defaultUserDetails,
-    errors,
-    isValid,
-    memberProperties,
-    nonEmptyRequiredProperties,
-    values,
-    checkHasEmptyRequiredPropertiesFromUserDetails,
-    requiredProperties
+    control: memberPropertiesControl,
+    errors: memberPropertiesErrors,
+    isValid: isMemberPropertiesValid,
+    values: memberPropertiesValues,
+    setValue: setMemberPropertiesValue,
+    isDirty: isMemberPropertiesDirty
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
+
+  const {
+    errors: userDetailsErrors,
+    isValid: isUserDetailsValid,
+    values: userDetailsValues,
+    setValue: setUserDetailsValue,
+    isDirty: isUserDetailsDirty
+  } = useRequiredUserDetailsForm({
+    userId: currentUser.id
+  });
+
+  const { space: currentSpace } = useCurrentSpace();
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-  const [userDetails, setUserDetails] = useState<EditableFields>({});
-  const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
   const { mutateMembers } = useMembers();
-  const [isFormClean, setIsFormClean] = useState(true);
-  const hasEmptyRequiredProperties = checkHasEmptyRequiredPropertiesFromUserDetails(userDetails);
 
-  useEffect(() => {
-    setUserDetails(defaultUserDetails ?? {});
-  }, [defaultUserDetails]);
+  const isFormDirty = isMemberPropertiesDirty || isUserDetailsDirty;
 
   function onUserDetailsChange(fields: EditableFields) {
-    setIsFormClean(false);
-    setUserDetails((_form) => ({ ..._form, ...fields }));
+    Object.entries(fields).forEach(([key, value]) => {
+      setUserDetailsValue(key as keyof EditableFields, value);
+    });
   }
 
-  function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    setIsFormClean(false);
-    setMemberDetails(fields);
+  function onMemberPropertiesChange(fields: UpdateMemberPropertyValuePayload[]) {
+    fields.forEach((field) => {
+      setMemberPropertiesValue(field.memberPropertyId, field.value);
+    });
   }
 
-  usePreventReload(!isFormClean);
+  usePreventReload(isFormDirty);
 
   async function saveForm() {
-    setIsLoading(true);
-    if (isFormClean) {
-      await completeOnboarding?.();
-      setIsFormClean(true);
-      setIsLoading(false);
+    if (!isFormDirty) {
+      onClose();
       return;
     }
-    await charmClient.updateUserDetails(userDetails);
-    await updateSpaceValues(space.id, memberDetails);
-    await Promise.all([
-      mutateMembers(),
-      refreshPropertyValues(),
-      completeOnboarding?.(),
-      mutate('/current-user-details')
-    ]);
-    setIsFormClean(true);
+
+    if (isUserDetailsDirty) {
+      await charmClient.updateUserDetails(userDetailsValues);
+    }
+
+    if (currentSpace && isMemberPropertiesDirty) {
+      await updateSpaceValues(
+        currentSpace.id,
+        Object.entries(memberPropertiesValues).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+      );
+    }
+    mutate('/current-user-details');
+    mutateMembers();
+    onClose();
     showMessage('Profile updated', 'success');
-    setIsLoading(false);
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
@@ -156,12 +166,7 @@ function UserOnboardingDialog({
   }
 
   const handleClose = () => {
-    // If there are required properties that must be filled, don't open the discard changes modal
-    if (nonEmptyRequiredProperties) {
-      return;
-    }
-
-    if (!isFormClean) {
+    if (isFormDirty) {
       confirmExitPopupState.open();
     } else {
       completeOnboarding?.();
@@ -190,8 +195,8 @@ function UserOnboardingDialog({
             disableElevation
             size='large'
             onClick={saveForm}
-            disabled={isFormClean || hasEmptyRequiredProperties || !isValid}
-            disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
+            disabled={!isFormDirty || !isUserDetailsValid || !isMemberPropertiesValid}
+            disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save
           </Button>
@@ -203,21 +208,21 @@ function UserOnboardingDialog({
       ) : currentStep === 'profile_step' ? (
         <>
           <UserDetailsForm
+            errors={userDetailsErrors}
+            userDetails={userDetailsValues}
             sx={{
               mt: 0
             }}
             user={currentUser}
             onChange={onUserDetailsChange}
-            memberProperties={memberProperties ?? []}
           />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
-            values={values}
-            control={control}
-            errors={errors}
-            properties={memberProperties}
+            values={memberPropertiesValues}
+            control={memberPropertiesControl}
+            errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
-            onChange={onMemberDetailsChange}
+            onChange={onMemberPropertiesChange}
             userId={currentUser.id}
             showCollectionOptions
           />
