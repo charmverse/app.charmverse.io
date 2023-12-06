@@ -168,7 +168,9 @@ function DocumentPage({
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
+  // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
+  const showParentChip = !!(page.type === 'card' && page.bountyId && board && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -371,9 +373,7 @@ function DocumentPage({
                         }
                       : null
                   }
-                  showParentChip={
-                    !!(page.type === 'card' && page.bountyId && page.parentId && board && insideModal && isRewardsPage)
-                  }
+                  showParentChip={showParentChip}
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                   <Box my={2} className='font-family-default'>

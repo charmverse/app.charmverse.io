@@ -16,7 +16,7 @@ import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIc
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
-import { useCharmRouter } from 'hooks/useCharmRouter';
+import Link from 'components/common/Link';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import { randomBannerImage } from './PageBanner';
@@ -90,7 +90,6 @@ function PageHeader({
   parentInfo,
   showParentChip
 }: PageHeaderProps) {
-  const { navigateToSpacePath } = useCharmRouter();
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
@@ -104,10 +103,12 @@ function PageHeader({
       {showParentChip && parentInfo ? (
         <Chip
           label={parentInfo.title}
-          size='small'
-          onClick={() => {
-            navigateToSpacePath(`/${parentInfo.id}`);
+          sx={{
+            cursor: 'pointer'
           }}
+          size='small'
+          component={Link}
+          href={`/${parentInfo.id}`}
         />
       ) : (
         <PageHeaderControls
