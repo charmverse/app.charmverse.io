@@ -29,7 +29,6 @@ import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
-import charmClient from 'charmClient';
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
@@ -92,6 +91,7 @@ function ViewMenuItem({
   view: BoardView;
   onClick: VoidFunction;
 }) {
+  const hrefProps = href ? { href, component: Link } : {};
   const [isDragging, isOver, columnRef] = useSortable('view', view, true, onDrop);
   return (
     <Stack
@@ -106,13 +106,12 @@ function ViewMenuItem({
     >
       <MenuItem
         onClick={onClick}
-        href={href}
-        component={Link}
         key={view.id}
         dense
         className={isOver ? 'dragover' : ''}
         sx={{ width: '100%' }}
         selected={selected}
+        {...hrefProps}
       >
         <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
         <ListItemIcon>{iconForViewType(view.fields.viewType)}</ListItemIcon>
@@ -203,7 +202,6 @@ function ViewTabs(props: ViewTabsProps) {
     acc[view.id] = view;
     return acc;
   }, {} as Record<string, BoardView>);
-
   // Find the index of the current view
   const currentViewIndex = viewIds.findIndex((viewId) => viewId === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);
@@ -267,7 +265,7 @@ function ViewTabs(props: ViewTabsProps) {
       }
     );
 
-    await charmClient.patchBlock(
+    await mutator.patchBlock(
       board.id,
       { updatedFields: { viewIds: [...viewIds, newView.id] } },
       publishIncrementalUpdate
@@ -283,7 +281,7 @@ function ViewTabs(props: ViewTabsProps) {
     setViewMenuAnchorEl(null);
     const nextViewId = viewIds.find((viewId) => viewId !== dropdownView.id);
     await mutator.deleteBlock(dropdownView, 'delete view');
-    await charmClient.patchBlock(
+    await mutator.patchBlock(
       board.id,
       { updatedFields: { viewIds: viewIds.filter((viewId) => viewId !== dropdownView.id) } },
       publishIncrementalUpdate

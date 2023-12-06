@@ -61,10 +61,12 @@ export function useRewardsBoardAdapter() {
     () => board.fields.viewIds.map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView).filter(Boolean),
     [board.fields.viewIds, rewardBlocks]
   );
-  const queryViewType = viewTypeToBlockId[query?.viewId?.toString() as IViewType];
+  const queryViewType =
+    viewTypeToBlockId[query?.viewId?.toString() as IViewType] || query?.viewId?.toString() || DEFAULT_VIEW_BLOCK_ID;
+
   const activeViewId = board.fields.viewIds?.find((vid) => vid === queryViewType)
     ? queryViewType
-    : board.fields.viewIds?.[0] || DEFAULT_VIEW_BLOCK_ID;
+    : board.fields.viewIds?.[0];
 
   const localViewSettings = useLocalDbViewSettings(`rewards-${space?.id}-${activeViewId}`);
 

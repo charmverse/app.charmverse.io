@@ -13,7 +13,6 @@ import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import charmClient from 'charmClient';
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { Button } from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
@@ -99,11 +98,7 @@ function AddViewMenu(props: AddViewProps) {
       }
     );
 
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
     closePopup();
   }, [viewIds, props.activeView, props.board, props.intl, showView]);
 
@@ -132,11 +127,7 @@ function AddViewMenu(props: AddViewProps) {
       }
     );
 
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
 
     closePopup();
   }, [viewIds, props.activeView, props.board, props.intl, showView]);
@@ -169,11 +160,7 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
     closePopup();
   }, [viewIds, props.board, props.activeView, props.intl, showView]);
 
@@ -223,11 +210,7 @@ function AddViewMenu(props: AddViewProps) {
       }
     );
 
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
 
     closePopup();
   }, [viewIds, props.board, props.activeView, props.intl, showView]);
