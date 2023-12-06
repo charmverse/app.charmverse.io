@@ -115,7 +115,6 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   const { memberProperties = [] } = useRequiredMemberProperties({ userId });
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const { space } = useCurrentSpace();
-  const { mutateMembers } = useMembers();
 
   const {
     control,
@@ -182,7 +181,6 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
           space.id,
           Object.entries(getValues()).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
         );
-        mutateMembers();
         refreshPropertyValues();
       })();
     }
@@ -222,6 +220,8 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     userDetails: { id, ...userDetails } = {} as UserDetails
   } = useRequiredMemberProperties({ userId });
   const { showMessage } = useSnackbar();
+  const { mutateMembers } = useMembers();
+
   const {
     formState: { errors, isValid, isDirty, isSubmitting },
     watch,
@@ -261,7 +261,8 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     Object.entries(fields).forEach(([key, value]) => {
       setValue(key as keyof EditableFields, value, {
         shouldDirty: true,
-        shouldValidate: true
+        shouldValidate: true,
+        shouldTouch: true
       });
     });
   }
@@ -270,7 +271,8 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     if (isDirty && isValid) {
       return handleSubmit(async () => {
         await charmClient.updateUserDetails(getValues());
-        mutate('/current-user-details');
+        await mutate('/current-user-details');
+        await mutateMembers();
         showMessage('Profile updated', 'success');
       })();
     }

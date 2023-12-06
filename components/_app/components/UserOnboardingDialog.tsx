@@ -113,7 +113,6 @@ function UserOnboardingDialog({
     userId: currentUser.id
   });
 
-  const { space: currentSpace } = useCurrentSpace();
   const { refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
 
