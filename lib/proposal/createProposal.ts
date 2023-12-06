@@ -1,15 +1,14 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import { ProposalSystemRole } from '@charmverse/core/prisma';
-import type { Page, ProposalStatus, PageType } from '@charmverse/core/prisma';
+import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 import type {
-  ProposalEvaluationType,
+  Prisma,
   ProposalEvaluation,
-  WorkspaceEvent,
-  Prisma
+  ProposalEvaluationPermission,
+  ProposalEvaluationType
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, ProposalReviewerInput } from '@charmverse/core/proposals';
+import type { ProposalReviewerInput, ProposalWithUsers } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -33,6 +32,7 @@ type PageProps = Partial<
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'index' | 'title' | 'type'> & {
   reviewers: ProposalReviewerInput[];
   rubricCriteria: RubricDataInput[];
+  permissions: ProposalEvaluationPermission[];
 };
 
 export type CreateProposalInput = {
@@ -48,6 +48,7 @@ export type CreateProposalInput = {
   evaluations: ProposalEvaluationInput[];
   publishToLens?: boolean;
   fields?: ProposalFields;
+  workflowId?: string;
 };
 
 export type CreatedProposal = {
@@ -88,22 +89,20 @@ export async function createProposal({
   }
   const evaluationIds = evaluations.map(() => uuid());
 
-  const evaluationReviewerPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
+  const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
   const proposalReviewersToCreate: Prisma.ProposalReviewerCreateManyInput[] = [];
 
   // apply evaluation ids to reviewers
   if (evaluationIds.length > 0) {
     for (let i = 0; i < evaluations.length; i++) {
       const evalStep = { ...evaluations[i], id: evaluationIds[i] };
-      evaluationReviewerPermissionsToCreate.push(
-        ...evalStep.reviewers.map(
-          (r) =>
+      evaluationPermissionsToCreate.push(
+        ...evalStep.permissions.map(
+          (evaluationStepPermission) =>
             ({
               evaluationId: evalStep.id,
-              roleId: r.group === 'role' ? r.id : undefined,
-              userId: r.group === 'user' ? r.id : undefined,
-              operation: 'review',
-              systemRole: ProposalSystemRole[r.group as ProposalSystemRole] ? r.group : undefined
+              operation: evaluationStepPermission.operation,
+              systemRole: evaluationStepPermission.systemRole
             } as Prisma.ProposalEvaluationPermissionCreateManyInput)
         )
       );
@@ -169,7 +168,7 @@ export async function createProposal({
       }),
       prisma.proposalEvaluationPermission.createMany({
         // we dont save evaluations as part of the template, since they link to workflow id instead
-        data: pageProps?.type === 'proposal_template' ? [] : evaluationReviewerPermissionsToCreate
+        data: pageProps?.type === 'proposal_template' ? [] : evaluationPermissionsToCreate
       }),
       prisma.proposalReviewer.createMany({
         data: proposalReviewersToCreate

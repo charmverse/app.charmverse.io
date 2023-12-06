@@ -2,12 +2,12 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type {
   PageType,
-  ProposalEvaluation,
+  ProposalEvaluationPermission,
   ProposalEvaluationType,
   ProposalRubricCriteria,
   ProposalStatus
 } from '@charmverse/core/prisma';
-import type { ProposalWorkflowTyped, ProposalReviewerInput } from '@charmverse/core/proposals';
+import type { ProposalReviewerInput, ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { Box, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
@@ -40,7 +40,10 @@ import {
   nextProposalStatusUpdateMessage,
   previousProposalStatusUpdateMessage
 } from 'lib/proposal/proposalStatusTransition';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import type {
+  ProposalRubricCriteriaAnswerWithTypedResponse,
+  ProposalRubricCriteriaWithTypedParams
+} from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
@@ -256,11 +259,12 @@ export function ProposalPropertiesBase({
       evaluations: workflow.evaluations.map((evaluation, index) => ({
         id: uuid(),
         index,
-        reviewers: [],
-        rubricCriteria: [],
+        reviewers: [] as ProposalReviewerInput[],
+        rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
         title: evaluation.title,
         type: evaluation.type,
-        result: null
+        result: null,
+        permissions: evaluation.permissions as ProposalEvaluationPermission[]
       }))
     });
   }
