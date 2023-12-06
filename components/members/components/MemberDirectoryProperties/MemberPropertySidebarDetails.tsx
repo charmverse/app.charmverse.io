@@ -69,6 +69,30 @@ export function MemberPropertySidebarDetails({
     <>
       <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
+          {['google', 'discord', 'telegram', 'wallet'].includes(property.type) ? (
+            <Stack flexDirection='row' justifyContent='space-between' mr={2}>
+              <Tooltip title={isAdmin ? 'Make this property primary identity within space' : ''}>
+                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+                  Primary identity
+                </Typography>
+              </Tooltip>
+              <Checkbox
+                size='small'
+                sx={{
+                  p: 0
+                }}
+                checked={property.primaryIdentity}
+                disabled={!isAdmin}
+                onChange={(e) => {
+                  updateProperty({
+                    id: property.id,
+                    primaryIdentity: e.target.checked,
+                    required: e.target.checked === true ? true : property.required
+                  });
+                }}
+              />
+            </Stack>
+          ) : null}
           {!['role', 'join_date', 'profile_pic', 'discord'].includes(property.type) ? (
             <Stack flexDirection='row' justifyContent='space-between' mr={2}>
               <Tooltip title={isAdmin ? 'Require members to fill this property during onboarding' : ''}>
@@ -82,7 +106,7 @@ export function MemberPropertySidebarDetails({
                   p: 0
                 }}
                 checked={property.required}
-                disabled={!isAdmin}
+                disabled={!isAdmin || property.primaryIdentity}
                 onChange={(e) => {
                   updateProperty({
                     id: property.id,
