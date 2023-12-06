@@ -32,10 +32,10 @@ type BlockUpdater = (blocks: Block[]) => void;
 export type MutatorUpdaters = {
   patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void>;
   patchBlocks(blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
-  insertBlock(block: Block, updater: BlockUpdater): Promise<Block[]>;
-  insertBlocks(fbBlocks: Block[], updater: BlockUpdater): Promise<Block[]>;
-  deleteBlock(blockId: string, updater: BlockUpdater): Promise<void>;
-  deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void>;
+  insertBlock?: (block: Block, updater: BlockUpdater) => Promise<Block[]>;
+  insertBlocks?: (fbBlocks: Block[], updater: BlockUpdater) => Promise<Block[]>;
+  deleteBlock?: (blockId: string, updater: BlockUpdater) => Promise<void>;
+  deleteBlocks?: (blockIds: string[], updater: BlockUpdater) => Promise<void>;
 };
 
 //
