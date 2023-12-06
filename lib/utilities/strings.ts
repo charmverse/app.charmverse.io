@@ -227,3 +227,11 @@ export function stringSimilarity(str1?: string, str2?: string, gramSize: number 
   }
   return hits / total;
 }
+
+/**
+ * utility function to print an object in a readable format
+ */
+export function prettyPrint(obj: any) {
+  // eslint-disable-next-line no-console
+  console.log(JSON.stringify(obj, null, 2));
+}

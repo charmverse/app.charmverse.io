@@ -110,6 +110,26 @@ describe('GET /api/v1/users/search', () => {
     );
   });
 
+  it('should search user by userId', async () => {
+    const response = (
+      await request(baseUrl)
+        .get(`/api/v1/users/search?&userId=${user3.id}`)
+        .set({ authorization: `Bearer ${superApiKey.token}` })
+        .send()
+        .expect(200)
+    ).body as PublicApiProposal[];
+
+    expect(response).toMatchObject(
+      expect.objectContaining({
+        id: user3.id,
+        wallet: user3Wallet,
+        email: email3,
+        avatar: '',
+        username: user3.username
+      })
+    );
+  });
+
   it('should fail if user is not found or is not a part of the space', async () => {
     const randomEmail = 'random@example.com';
     await createUserFromWallet({ email: randomEmail });
