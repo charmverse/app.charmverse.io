@@ -20,11 +20,9 @@ type Props = {
 export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Props) {
   return (
     <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-      <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-        <PropertyLabel highlighted fullWidth>
-          Evaluation step: {evaluation.title}
-        </PropertyLabel>
-      </Box>
+      <PropertyLabel highlighted fullWidth>
+        Evaluation step: {evaluation.title}
+      </PropertyLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
         <PropertyLabel readOnly required>
           Reviewer

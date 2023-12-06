@@ -9,7 +9,7 @@ type Props = {
   onChange: (value: ProposalWorkflowTyped) => void;
 };
 
-export function WorkflowSelect({ onChange }: Props) {
+export function ProposalWorkflowSelect({ onChange }: Props) {
   const [workflowId, setWorkflowId] = useState('');
   const { space: currentSpace } = useCurrentSpace();
   const { data: options } = useGetProposalWorkflows(currentSpace?.id);

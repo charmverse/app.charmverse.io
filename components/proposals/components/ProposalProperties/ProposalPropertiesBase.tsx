@@ -49,7 +49,7 @@ import type { RangeProposalCriteria } from './components/ProposalRubricCriteriaI
 import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteriaInput';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 import { ProposalTemplateSelect } from './components/ProposalTemplateSelect';
-import { WorkflowSelect } from './components/WorkflowSelect';
+import { ProposalWorkflowSelect } from './components/ProposalWorkflowSelect';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;
@@ -314,17 +314,17 @@ export function ProposalPropertiesBase({
               <PropertyLabel readOnly required highlighted>
                 Workflow
               </PropertyLabel>
-              <WorkflowSelect onChange={selectEvaluationWorkflow} />
+              <ProposalWorkflowSelect onChange={selectEvaluationWorkflow} />
             </Box>
             {proposalFormInputs.evaluations.length > 0 && (
               <Box className='octo-propertyrow' mb='0 !important'>
                 <PropertyLabel />
-                <Box display='flex' flex={1} flexDirection='column'>
+                <Box display='flex' flex={1} flexDirection='column' ml={1}>
                   {proposalFormInputs.evaluations.map(
                     (evaluation, index) =>
                       evaluation.type !== 'feedback' && (
                         <>
-                          <Divider />
+                          <Divider sx={{ m: '0 !important' }} />
                           <ProposalEvaluationForm
                             categoryId={proposalFormInputs.categoryId}
                             evaluation={evaluation}
@@ -333,7 +333,7 @@ export function ProposalPropertiesBase({
                         </>
                       )
                   )}
-                  <Divider />
+                  <Divider sx={{ mt: '0 !important' }} />
                 </Box>
               </Box>
             )}
