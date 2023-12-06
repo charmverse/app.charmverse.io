@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { ConnectedAccounts } from 'components/members/components/ConnectedAccounts';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
 import { ProfileWidgets } from 'components/members/components/MemberProfile/components/ProfileWidgets/ProfileWidgets';
@@ -64,11 +65,7 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     );
   }
 
-  if (nonEmptyRequiredProperties) {
-    return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
-  }
-
-  return null;
+  return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
 }
 
 // Case 1: first time user: show email + terms first, then profile
@@ -189,6 +186,8 @@ function UserOnboardingDialog({
             user={currentUser}
             onChange={onUserDetailsChange}
           />
+          <Legend mt={4}>Build Your Identity</Legend>
+          <ConnectedAccounts userId={currentUser.id} />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
             values={memberPropertiesValues}

@@ -5,28 +5,60 @@ import PersonIcon from '@mui/icons-material/Person';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { SiDiscord } from 'react-icons/si';
 
-export function IdentityIcon({ type }: { type: IdentityType | null }) {
+export function IdentityIcon({
+  type,
+  height = 40,
+  width = 40
+}: {
+  type: IdentityType | null;
+  height?: number;
+  width?: number;
+}) {
   switch (type) {
     case 'Wallet':
-      return <AccountBalanceWalletIcon color='primary' sx={{ height: '40px', width: '40px' }} />;
+      return <AccountBalanceWalletIcon color='primary' style={{ height, width }} />;
 
     case 'Discord':
-      return <SiDiscord color='#5865F2' size={40} />;
+      return (
+        <SiDiscord
+          color='#5865F2'
+          style={{
+            width,
+            height
+          }}
+        />
+      );
 
     case 'Telegram':
-      return <TelegramIcon sx={{ color: '#229ED9', height: '40px', width: '40px' }} />;
+      return <TelegramIcon style={{ color: '#229ED9', height, width }} />;
 
     case 'UnstoppableDomain':
-      return <img src='/images/walletLogos/unstoppable-domains.png' height={40} width={40} />;
+      return (
+        <img
+          src='/images/walletLogos/unstoppable-domains.png'
+          style={{
+            width,
+            height
+          }}
+        />
+      );
 
     case 'Google':
-      return <img src='/images/walletLogos/Google_G.png' height={40} width={40} />;
+      return (
+        <img
+          src='/images/walletLogos/Google_G.png'
+          style={{
+            width,
+            height
+          }}
+        />
+      );
 
     case 'VerifiedEmail':
-      return <EmailIcon sx={{ height: '40px', width: '40px' }} />;
+      return <EmailIcon style={{ height, width }} />;
 
     case 'RandomName':
     default:
-      return <PersonIcon sx={{ color: '#777', height: '40px', width: '40px' }} />;
+      return <PersonIcon style={{ color: '#777', height, width }} />;
   }
 }

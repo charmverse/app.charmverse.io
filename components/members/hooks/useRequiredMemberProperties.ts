@@ -30,16 +30,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: userDetails } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
 
-  const {
-    memberProperties,
-    isBioRequired,
-    isTimezoneRequired,
-    requiredProperties,
-    nonEmptyRequiredProperties,
-    isGithubRequired,
-    isLinkedinRequired,
-    isTwitterRequired
-  } = useMemo(() => {
+  const data = useMemo(() => {
     const _memberProperties = memberPropertyValues
       ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
       .map((mpv) => mpv.properties)
@@ -55,6 +46,10 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     const _isTwitterRequired = _requiredProperties.find((p) => p.type === 'twitter');
     const _isLinkedinRequired = _requiredProperties.find((p) => p.type === 'linked_in');
     const _isGithubRequired = _requiredProperties.find((p) => p.type === 'github');
+    const _isGoogleRequired = _requiredProperties.find((p) => p.type === 'google');
+    const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord');
+    const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet');
+    const _isTelegramRequired = _requiredProperties.find((p) => p.type === 'telegram');
 
     const userDetailsSocial = userDetails?.social as Social;
 
@@ -94,20 +89,17 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       nonEmptyRequiredProperties: propertiesWithoutValue.length !== 0,
       isTwitterRequired: !!_isTwitterRequired,
       isLinkedinRequired: !!_isLinkedinRequired,
-      isGithubRequired: !!_isGithubRequired
+      isGithubRequired: !!_isGithubRequired,
+      isGoogleRequired: !!_isGoogleRequired,
+      isDiscordRequired: !!_isDiscordRequired,
+      isWalletRequired: !!_isWalletRequired,
+      isTelegramRequired: !!_isTelegramRequired
     };
   }, [userDetails, memberPropertyValues, currentSpace?.id]);
 
   return {
-    memberProperties,
-    requiredProperties,
-    isTimezoneRequired,
-    isBioRequired,
-    nonEmptyRequiredProperties,
-    userDetails,
-    isTwitterRequired,
-    isLinkedinRequired,
-    isGithubRequired
+    ...data,
+    userDetails
   };
 }
 
