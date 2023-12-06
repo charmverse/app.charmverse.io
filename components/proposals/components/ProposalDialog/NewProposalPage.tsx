@@ -147,6 +147,14 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                         rubricCriteria
                       });
                     }}
+                    onChangeProposalEvaluation={(updated) => {
+                      formInputs.evaluations = formInputs.evaluations.map((evaluation) =>
+                        evaluation.id === updated.id ? updated : evaluation
+                      );
+                      setFormInputs({
+                        ...formInputs
+                      });
+                    }}
                     readOnlyCustomProperties={readOnlyCustomProperties}
                   />
                 </div>

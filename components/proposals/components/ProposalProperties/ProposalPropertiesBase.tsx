@@ -1,12 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type {
-  PageType,
-  ProposalEvaluationType,
-  ProposalRubricCriteria,
-  ProposalEvaluation,
-  ProposalStatus
-} from '@charmverse/core/prisma';
+import type { PageType, ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped, ProposalReviewerInput } from '@charmverse/core/proposals';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
@@ -47,6 +41,8 @@ import { useProposalCategories } from '../../hooks/useProposalCategories';
 
 import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
+import type { ProposalEvaluationInput } from './components/ProposalEvaluationForm';
+import { ProposalEvaluationForm } from './components/ProposalEvaluationForm';
 import { ProposalEvaluationsStatus } from './components/ProposalEvaluationsStatus/ProposalEvaluationsStatus';
 import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
 import type { RangeProposalCriteria } from './components/ProposalRubricCriteriaInput';
@@ -63,7 +59,7 @@ export type ProposalPropertiesInput = {
   reviewers: ProposalReviewerInput[];
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
-  evaluations: Pick<ProposalEvaluation, 'index' | 'title' | 'result' | 'id' | 'type'>[];
+  evaluations: ProposalEvaluationInput[];
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
   fields: ProposalFields;
@@ -79,6 +75,7 @@ type ProposalPropertiesProps = {
   isFromTemplate?: boolean;
   isTemplateRequired?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
+  onChangeProposalEvaluation?: (evaluations: ProposalEvaluationInput) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -107,6 +104,7 @@ export function ProposalPropertiesBase({
   isFromTemplate,
   isTemplateRequired,
   onChangeRubricCriteria,
+  onChangeProposalEvaluation,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -250,6 +248,7 @@ export function ProposalPropertiesBase({
       evaluations: workflow.evaluations.map((evaluation, index) => ({
         id: uuid(),
         index,
+        reviewers: [],
         title: evaluation.title,
         type: evaluation.type,
         result: null
@@ -283,19 +282,67 @@ export function ProposalPropertiesBase({
       mt={2}
     >
       <div className='octo-propertylist'>
-        {/* workflow is not an option when using a template */}
-        {isCharmVerse && isNewProposal && !isFromTemplate && (
+        {/* Select a template for new proposals */}
+        {isNewProposal && proposalFormInputs.type !== 'proposal_template' && (
           <Box className='octo-propertyrow' mb='0 !important'>
-            <PropertyLabel readOnly required highlighted>
-              Workflow
+            <PropertyLabel readOnly highlighted required={isTemplateRequired}>
+              Template
             </PropertyLabel>
-            <WorkflowSelect onChange={selectEvaluationWorkflow} />
+            <Box display='flex' flex={1}>
+              <ProposalTemplateSelect
+                options={templateOptions}
+                value={proposalTemplatePage ?? null}
+                onChange={(template) => {
+                  if (template === null) {
+                    clearTemplate();
+                    // if user has not updated the content, then just overwrite everything
+                  } else if (proposalFormInputs.contentText?.length === 0) {
+                    applyTemplate(template);
+                  } else {
+                    // set value to trigger a prompt
+                    setSelectedProposalTemplateId(template?.id ?? null);
+                  }
+                }}
+              />
+            </Box>
           </Box>
         )}
-        {isCharmVerse && proposalFormInputs.evaluations.length > 0 && (
+        {/* workflow is not an option when using a template */}
+        {isCharmVerse && isNewProposal && !isFromTemplate && (
+          <>
+            <Box className='octo-propertyrow' mb='0 !important'>
+              <PropertyLabel readOnly required highlighted>
+                Workflow
+              </PropertyLabel>
+              <WorkflowSelect onChange={selectEvaluationWorkflow} />
+            </Box>
+            {proposalFormInputs.evaluations.length > 0 && (
+              <Box className='octo-propertyrow' mb='0 !important'>
+                <PropertyLabel />
+                <Box display='flex' flex={1} flexDirection='column'>
+                  {proposalFormInputs.evaluations.map(
+                    (evaluation, index) =>
+                      evaluation.type !== 'feedback' && (
+                        <>
+                          <Divider />
+                          <ProposalEvaluationForm
+                            categoryId={proposalFormInputs.categoryId}
+                            evaluation={evaluation}
+                            onChange={onChangeProposalEvaluation!}
+                          />
+                        </>
+                      )
+                  )}
+                  <Divider />
+                </Box>
+              </Box>
+            )}
+          </>
+        )}
+        {isCharmVerse && !isDraft && proposalFormInputs.evaluations.length > 0 && (
           <Box className='octo-propertyrow' mb='0 !important'>
             <PropertyLabel readOnly highlighted>
-              {isDraft ? ' ' : 'Status'}
+              Status
             </PropertyLabel>
             <Box ml={1}>
               <ProposalEvaluationsStatus evaluations={proposalFormInputs.evaluations} isDraft={isDraft} />
@@ -362,34 +409,6 @@ export function ProposalPropertiesBase({
               </Box>
             </Box>
           </Box>
-
-          {/* Select a template */}
-          {isNewProposal && proposalFormInputs.type !== 'proposal_template' && (
-            <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted required={isTemplateRequired}>
-                  Template
-                </PropertyLabel>
-                <Box display='flex' flex={1}>
-                  <ProposalTemplateSelect
-                    options={templateOptions}
-                    value={proposalTemplatePage ?? null}
-                    onChange={(template) => {
-                      if (template === null) {
-                        clearTemplate();
-                        // if user has not updated the content, then just overwrite everything
-                      } else if (proposalFormInputs.contentText?.length === 0) {
-                        applyTemplate(template);
-                      } else {
-                        // set value to trigger a prompt
-                        setSelectedProposalTemplateId(template?.id ?? null);
-                      }
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Box>
-          )}
 
           {/* Select authors */}
           <Box justifyContent='space-between' gap={2} alignItems='center'>
@@ -539,9 +558,7 @@ export function ProposalPropertiesBase({
                     Rubric criteria
                   </Typography>
                 ) : (
-                  <PropertyLabel readOnly highlighted>
-                    &nbsp;
-                  </PropertyLabel>
+                  <PropertyLabel />
                 )}
                 <Box display='flex' flex={1} flexDirection='column'>
                   <ProposalRubricCriteriaInput

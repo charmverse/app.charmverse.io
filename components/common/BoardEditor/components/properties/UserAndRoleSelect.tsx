@@ -28,7 +28,7 @@ export type SystemRoleOptionPopulated<T extends string = string> = SystemRoleOpt
   icon: JSX.Element;
   label: string;
 };
-type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated | SystemRoleOptionPopulated;
+export type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated | SystemRoleOptionPopulated;
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
