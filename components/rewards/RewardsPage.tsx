@@ -310,13 +310,14 @@ export function RewardsPage({ title }: { title: string }) {
                 view={activeView}
                 isOpen={!!showSidebar}
                 closeSidebar={() => setShowSidebar(false)}
-                hideLayoutSelectOptions
+                hideLayoutSelectOptions={defaultRewardViews.includes(activeView?.id || '')}
                 hideSourceOptions
                 hideGroupOptions
                 groupByProperty={groupByProperty}
                 page={undefined}
                 pageId={undefined}
                 showView={() => {}}
+                supportedViewTypes={supportedRewardViewTypes}
               />
             )}
           </Stack>
