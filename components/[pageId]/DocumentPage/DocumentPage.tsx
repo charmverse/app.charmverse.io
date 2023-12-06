@@ -200,7 +200,9 @@ function DocumentPage({
 
   useEffect(() => {
     if (page?.type === 'card') {
-      if (!card) {
+      // the two properties are the title and the id which are added to the card as soon as we get the corresponding page
+      const hasCardLoaded = card && Object.keys(card).length > 2;
+      if (!hasCardLoaded) {
         dispatch(databaseViewsLoad({ pageId: page.parentId as string }));
         dispatch(blockLoad({ blockId: page.id }));
         dispatch(blockLoad({ blockId: page.parentId as string }));

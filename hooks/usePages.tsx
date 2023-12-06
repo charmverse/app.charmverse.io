@@ -7,12 +7,12 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { Block } from 'lib/focalboard/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { isTruthy } from 'lib/utilities/types';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -99,12 +99,23 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (data && !isLoading && !pagesDispatched.current) {
-      const cardPages = Object.values(data)
-        .filter(isTruthy)
-        .filter((page) => page.type === 'card');
+      const cardPages: PageMeta[] = [];
+      const boardPages: PageMeta[] = [];
+
+      Object.values(data).forEach((page) => {
+        if (page?.type === 'card') {
+          cardPages.push(page);
+        } else if (page?.type === 'board') {
+          boardPages.push(page);
+        }
+      });
 
       if (cardPages.length) {
         dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
+      }
+
+      if (boardPages.length) {
+        dispatch(updateBoards(boardPages.map((page) => ({ id: page.id, title: page.title, partial: true }))));
       }
       pagesDispatched.current = true;
     }
@@ -241,12 +252,23 @@ export function PagesProvider({ children }: { children: ReactNode }) {
             return pageMap;
           }, {});
 
-          const cardPages = Object.values(pagesToUpdate)
-            .filter(isTruthy)
-            .filter((page) => page.type === 'card');
+          const cardPages: PageMeta[] = [];
+          const boardPages: PageMeta[] = [];
+
+          Object.values(pagesToUpdate).forEach((page) => {
+            if (page?.type === 'card') {
+              cardPages.push(page);
+            } else if (page?.type === 'board') {
+              boardPages.push(page);
+            }
+          });
 
           if (cardPages.length) {
             dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
+          }
+
+          if (boardPages.length) {
+            dispatch(updateBoards(boardPages.map((page) => ({ id: page.id, title: page.title, partial: true }))));
           }
 
           return {
