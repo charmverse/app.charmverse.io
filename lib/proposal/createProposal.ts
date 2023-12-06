@@ -67,7 +67,7 @@ export async function createProposal({
   }
 
   const proposalId = uuid();
-  const proposalStatus: ProposalStatus = 'draft';
+  let proposalStatus: ProposalStatus = 'draft';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
 
@@ -89,6 +89,7 @@ export async function createProposal({
         evaluationId: evaluationIds[index]
       }))
     );
+    proposalStatus = 'published'; // TODO: implement support for drafts
   }
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, , page] = await prisma.$transaction([
