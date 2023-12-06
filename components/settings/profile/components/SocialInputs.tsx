@@ -10,7 +10,7 @@ type SocialInputsProps = {
   onChange: (social: Social) => Promise<void>;
   readOnly?: boolean;
   errors?: FieldErrors<Record<keyof Social, string | null>>;
-  required: Record<keyof Social, boolean>;
+  required?: Record<keyof Social, boolean>;
 };
 
 const initialSocials: Social = {
@@ -27,7 +27,7 @@ export function SocialInputs(props: SocialInputsProps) {
   return (
     <>
       <Grid item>
-        <FieldWrapper label='X' required={required.twitterURL}>
+        <FieldWrapper label='X' required={required?.twitterURL}>
           <TextField
             fullWidth
             value={social.twitterURL}
@@ -45,7 +45,7 @@ export function SocialInputs(props: SocialInputsProps) {
         </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldWrapper label='Github' required={required.githubURL}>
+        <FieldWrapper label='Github' required={required?.githubURL}>
           <TextField
             value={social.githubURL}
             disabled={readOnly}
@@ -81,7 +81,7 @@ export function SocialInputs(props: SocialInputsProps) {
         </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldWrapper label='LinkedIn' required={required.linkedinURL}>
+        <FieldWrapper label='LinkedIn' required={required?.linkedinURL}>
           <TextField
             value={social.linkedinURL}
             disabled={readOnly}

@@ -86,7 +86,7 @@ export function MemberPropertiesWidget({
         <MemberProperties properties={currentSpacePropertyNonEmptyValues} />
       </ProfileWidget>
       {showPropertiesForm && space && user && (
-        <MemberPropertiesFormDialog spaceId={space.id} userId={userId} onClose={hidePropertiesForm} />
+        <MemberPropertiesFormDialog userId={userId} onClose={hidePropertiesForm} />
       )}
     </>
   );
