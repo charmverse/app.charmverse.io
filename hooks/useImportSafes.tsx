@@ -23,12 +23,11 @@ export function useImportSafes() {
     [data]
   );
 
-  async function importSafes(gnosisSigner: Signer) {
+  async function importSafes() {
     if (user) {
       setIsLoadingSafes(true);
       try {
         await importSafesFromWallet({
-          signer: gnosisSigner,
           addresses: user.wallets.map((w) => w.address),
           getWalletDetails
         });
@@ -46,13 +45,12 @@ export function useImportSafes() {
 }
 
 type ImportSafeProps = {
-  signer: Signer;
   addresses: string[];
   getWalletDetails: (address: string) => UserGnosisSafe | null | undefined;
 };
 
-async function importSafesFromWallet({ signer, addresses, getWalletDetails }: ImportSafeProps) {
-  const safes = await getSafesForAddresses(signer, addresses);
+async function importSafesFromWallet({ addresses, getWalletDetails }: ImportSafeProps) {
+  const safes = await getSafesForAddresses(addresses);
 
   const safesData = safes.map((safe) => ({
     address: safe.address,

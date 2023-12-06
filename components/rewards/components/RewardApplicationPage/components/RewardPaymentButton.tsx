@@ -76,6 +76,7 @@ function SafeMenuItem({
       safeTxHash: result.txHash,
       chainId: safeInfo.chainId.toString()
     });
+    showMessage('Transaction added to your Safe', 'success');
 
     refreshSubmission();
   }
@@ -87,7 +88,6 @@ function SafeMenuItem({
         onClick();
         try {
           await makePayment();
-          showMessage('Transaction added to your Safe', 'success');
         } catch (error) {
           const typedError = error as SystemError;
           onError(typedError.message, typedError.severity);
