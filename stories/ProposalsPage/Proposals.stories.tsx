@@ -19,7 +19,6 @@ import { MembersProvider } from 'hooks/useMembers';
 import { PagesProvider } from 'hooks/usePages';
 import { UserProvider } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import { getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
