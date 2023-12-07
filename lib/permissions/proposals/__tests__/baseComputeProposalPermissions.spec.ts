@@ -208,7 +208,7 @@ describe('computeProposalPermissions - base', () => {
       make_public: false,
       archive: true,
       unarchive: true,
-      move: false
+      move: true
     });
   });
 
