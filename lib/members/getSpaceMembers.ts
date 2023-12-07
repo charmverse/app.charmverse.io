@@ -12,6 +12,8 @@ import { getPropertiesWithValues } from 'lib/members/utils';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { replaceS3Domain } from 'lib/utilities/url';
 
+import { getMemberUsername } from './getMemberUsername';
+
 export async function getSpaceMembers({
   requestingUserId,
   spaceId,
@@ -57,7 +59,6 @@ export async function getSpaceMembers({
               spaceId
             }
           },
-          googleAccounts: true,
           telegramUser: true,
           discordUser: true
         }
@@ -75,14 +76,18 @@ export async function getSpaceMembers({
     }
   });
 
+  const memberUsernameRecord: Record<string, string> = {};
+
+  for (const spaceRole of spaceRoles) {
+    const memberUsername = await getMemberUsername({ spaceRoleId: spaceRole.id });
+    memberUsernameRecord[spaceRole.id] = memberUsername;
+  }
+
   return (
     spaceRoles
       .map((spaceRole): Member => {
         const { memberPropertyValues = [], ...userData } = spaceRole.user;
         const roles = spaceRole.spaceRoleToRole.map((sr) => sr.role);
-        const nameProperty = visibleProperties.find((property) => property.type === 'name') ?? null;
-        const memberNameProperty = memberPropertyValues.find((prop) => prop.memberPropertyId === nameProperty?.id);
-        const username = (memberNameProperty?.value as string | undefined) || userData.username;
         return {
           id: userData.id,
           createdAt: userData.createdAt,
@@ -91,7 +96,7 @@ export async function getSpaceMembers({
           profile: (userData.profile as Member['profile']) || undefined,
           avatar: replaceS3Domain(userData.avatar || undefined),
           avatarTokenId: userData.avatarTokenId || undefined,
-          username,
+          username: memberUsernameRecord[spaceRole.id],
           path: userData.path,
           onboarded: spaceRole.onboarded,
           isAdmin: spaceRole.isAdmin,
@@ -99,7 +104,7 @@ export async function getSpaceMembers({
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
           properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
-          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, username),
+          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, memberUsernameRecord[spaceRole.id]),
           roles,
           isBot: userData.isBot ?? undefined
         };

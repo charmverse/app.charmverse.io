@@ -237,11 +237,7 @@ function ShowMoreMenuItem({ onClick, children }: { onClick: VoidFunction; childr
 }
 
 function filterByUserCustomName(member: Member, searchText: string) {
-  return member.properties
-    .find((prop) => prop.type === 'name')
-    ?.value?.toString()
-    .toLowerCase()
-    .match(searchText);
+  return member.username?.toString().toLowerCase().match(searchText);
 }
 
 function filterByDiscordName(member: Member, searchText: string) {
