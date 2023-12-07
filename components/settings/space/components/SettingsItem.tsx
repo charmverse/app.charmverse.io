@@ -13,7 +13,7 @@ interface SettingsItemProps extends ListItemProps {
   children?: ReactNode;
 }
 
-export default function SettingsItem({
+export function SettingsItem({
   text,
   disabled = false,
   hidden = false,

@@ -5,10 +5,16 @@ import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
 
-type Props = {
-  type: FieldType;
+type TextProps = {
+  type: Exclude<FieldType, 'select' | 'multiselect'>;
 } & FieldProps &
   ControlFieldProps;
+type SelectProps = {
+  type: Extract<FieldType, 'select' | 'multiselect'>;
+} & FieldProps &
+  Required<ControlFieldProps>;
+
+type Props = TextProps | SelectProps;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
   ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
@@ -30,7 +36,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'select': {
         return (
           <SelectField
-            {...fieldProps}
+            {...(fieldProps as SelectProps)}
             ref={ref}
             options={options}
             onCreateOption={onCreateOption}
@@ -43,7 +49,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'multiselect': {
         return (
           <SelectField
-            {...fieldProps}
+            {...(fieldProps as SelectProps)}
             ref={ref}
             multiselect
             options={options}

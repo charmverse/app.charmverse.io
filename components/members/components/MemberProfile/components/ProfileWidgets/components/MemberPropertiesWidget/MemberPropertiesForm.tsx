@@ -1,16 +1,11 @@
 import { Box, Divider, Stack } from '@mui/material';
-import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { getFieldTypeRules } from 'components/common/form/fields/util';
 import { useMembers } from 'hooks/useMembers';
-import { useUser } from 'hooks/useUser';
-import type {
-  MemberPropertyValueType,
-  PropertyValueWithDetails,
-  UpdateMemberPropertyValuePayload
-} from 'lib/members/interfaces';
+import type { PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberCollections } from '../../../../../../hooks/useMemberCollections';
 import { useMutateMemberPropertyValues } from '../../../../../../hooks/useMutateMemberPropertyValues';
@@ -23,6 +18,9 @@ type Props = {
   showCollectionOptions?: boolean;
   userId: string;
   refreshPropertyValues: VoidFunction;
+  values: FieldValues;
+  errors: FieldErrors<FieldValues>;
+  control: Control<FieldValues, any>;
 };
 
 export function MemberPropertiesForm({
@@ -30,23 +28,19 @@ export function MemberPropertiesForm({
   onChange,
   userId,
   refreshPropertyValues,
-  showCollectionOptions
+  showCollectionOptions,
+  values,
+  errors,
+  control
 }: Props) {
   const { membersRecord } = useMembers();
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
-  const {
-    control,
-    formState: { errors },
-    reset,
-    getValues
-  } = useForm({ mode: 'onChange' });
-  const { user } = useUser();
+
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
     memberId: userId
   });
-
   function handleOnChange(propertyId: string, option: any) {
-    const submitData = { ...getValues(), [propertyId]: option };
+    const submitData = { ...values, [propertyId]: option };
     const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
       memberPropertyId: key,
       value: submitData[key]
@@ -54,18 +48,6 @@ export function MemberPropertiesForm({
 
     onChange(updateData);
   }
-
-  useEffect(() => {
-    if (!properties) {
-      return;
-    }
-    const defaultValues = properties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-      acc[prop.memberPropertyId] = prop.value;
-      return acc;
-    }, {});
-
-    reset(defaultValues);
-  }, [!!properties]);
 
   function getPlaceholder(type: string) {
     if (type === 'name') {
@@ -94,6 +76,7 @@ export function MemberPropertiesForm({
                 onCreateOption={(option) => createOption(property, option)}
                 onUpdateOption={(option) => updateOption(property, option)}
                 onDeleteOption={(option) => deleteOption(property, option)}
+                required={property.required}
                 onChange={(e) => {
                   field.onChange(e);
                   handleOnChange(property.memberPropertyId, typeof e?.target?.value === 'string' ? e.target.value : e);

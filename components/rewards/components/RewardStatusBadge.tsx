@@ -20,57 +20,32 @@ import { RewardStatusChip } from './RewardChip';
 
 export interface IRewardBadgeProps {
   reward: Reward;
-  layout?: 'row' | 'stacked';
   truncate?: boolean;
   hideStatus?: boolean;
   showEmptyStatus?: boolean;
 }
-export function RewardStatusBadge({
-  truncate = false,
-  showEmptyStatus,
-  hideStatus,
-  reward,
-  layout = 'row'
-}: IRewardBadgeProps) {
-  const { space } = useCurrentSpace();
-
-  const rewardLink = `/${space?.domain}/bounties/${reward.id}`;
-
-  if (layout === 'row') {
-    return (
-      <Grid container direction='column' alignItems='center'>
-        <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              width: '100%',
-              justifyContent: 'space-between',
-              gap: 1,
-              alignItems: 'center',
-              minHeight: '30px'
-            }}
-          >
-            <RewardAmount reward={reward} truncate={truncate} />
-            {!hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
-          </Box>
-        </Grid>
-      </Grid>
-    );
-  } else {
-    return (
-      <Box sx={{ textAlign: 'right' }}>
-        <Box display='flex' alignItems='center' justifyContent='space-between'>
+export function RewardStatusBadge({ truncate = false, showEmptyStatus, hideStatus, reward }: IRewardBadgeProps) {
+  return (
+    <Grid container direction='column' alignItems='center'>
+      <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            width: '100%',
+            justifyContent: 'space-between',
+            gap: 1,
+            alignItems: 'center',
+            minHeight: '30px'
+          }}
+        >
           <RewardAmount reward={reward} truncate={truncate} />
-          <IconButton href={rewardLink} component={Link}>
-            <LaunchIcon fontSize='small' />
-          </IconButton>
+          {!hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
         </Box>
-        {hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
-      </Box>
-    );
-  }
+      </Grid>
+    </Grid>
+  );
 }
 
 export function RewardAmount({

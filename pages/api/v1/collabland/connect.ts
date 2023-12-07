@@ -13,8 +13,8 @@ handler
   .use(
     requireKeys(
       [
-        { key: 'state', truthy: true },
-        { key: 'discordServerId', truthy: true }
+        { key: 'state', valueType: 'string' },
+        { key: 'discordServerId', valueType: 'truthy' }
       ],
       'body'
     )

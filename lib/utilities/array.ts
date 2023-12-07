@@ -1,8 +1,12 @@
 /**
  * Sort an array of objects by a property. Include an optional valuesOrder for looking up the order of a certain value
  */
-export function sortArrayByObjectProperty<T = any>(data: T[], propertyKey: keyof T, valuesOrder?: any[]): T[] {
-  const sortedData = data.sort((first, second) => {
+export function sortArrayByObjectProperty<T = object>(
+  data: Readonly<T[]>,
+  propertyKey: keyof T,
+  valuesOrder?: any[]
+): T[] {
+  const sortedData = [...data].sort((first, second) => {
     let firstPropertyValueIndex = valuesOrder ? valuesOrder.indexOf(first[propertyKey]) : first[propertyKey];
     if (firstPropertyValueIndex === -1) {
       firstPropertyValueIndex = valuesOrder ? valuesOrder.length : data.length;

@@ -28,7 +28,11 @@ export async function getProposal({
           category: true,
           draftRubricAnswers: true,
           rubricAnswers: true,
-          rubricCriteria: true
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       },
       permissions: {
@@ -45,5 +49,5 @@ export async function getProposal({
 
   (proposalPage as any as PageWithProposal).proposal.page = { sourceTemplateId: proposalPage?.sourceTemplateId };
 
-  return proposalPage as PageWithPermissions & { proposal: ProposalWithUsersAndRubric };
+  return proposalPage as unknown as PageWithPermissions & { proposal: ProposalWithUsersAndRubric };
 }

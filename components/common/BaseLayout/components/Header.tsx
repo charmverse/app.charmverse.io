@@ -68,7 +68,7 @@ function UserMenu() {
         {user && (
           <Button variant='outlined' color='secondary' {...bindTrigger(menuPopupState)}>
             {' '}
-            <UserDisplay avatarSize='small' user={user} sx={{ cursor: 'pointer' }} />
+            <UserDisplay avatarSize='small' userId={user.id} sx={{ cursor: 'pointer' }} />
           </Button>
         )}
       </div>

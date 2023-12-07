@@ -82,5 +82,6 @@ export const proposalStatusBoardColors: Record<ProposalStatusWithArchived, keyof
   vote_active: 'propColorPink',
   vote_closed: 'propColorRed',
   evaluation_active: 'propColorRed',
-  evaluation_closed: 'propColorPink'
+  evaluation_closed: 'propColorPink',
+  published: 'propColorGreen'
 };

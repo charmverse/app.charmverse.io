@@ -92,4 +92,50 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       }
     });
   });
+
+  it('should fail if the page contains unsafe content and respond with 401', async () => {
+    const unsafePageContent = {
+      type: 'doc',
+      content: [
+        {
+          type: 'blockquote',
+          attrs: { emoji: '😃', track: [] },
+          content: [
+            {
+              type: 'heading',
+              attrs: { id: null, level: 2, track: [] },
+              content: [
+                {
+                  text: 'www.unsafe.ru',
+                  type: 'text'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    const page = await testUtilsPages.generatePage({
+      createdBy: nonAdminUser.id,
+      spaceId: nonAdminUserSpace.id,
+      contentText: exampleText,
+      path: pagePath,
+      content: unsafePageContent,
+      pagePermissions: [
+        {
+          assignee: { group: 'public' },
+          permissionLevel: 'view'
+        }
+      ]
+    });
+
+    await request(baseUrl).get(`/api/public/pages/${page.id}`).expect(401);
+
+    await prisma.page.delete({
+      where: {
+        id: page.id
+      }
+    });
+  });
 });

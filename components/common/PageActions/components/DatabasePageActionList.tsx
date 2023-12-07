@@ -26,10 +26,8 @@ import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -58,8 +56,6 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const { membersRecord } = useMembers();
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
-  const { formatDateTime, formatDate } = useDateFormatter();
-  const { categories } = useProposalCategories();
   const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
   const { keys } = useApiPageKeys(pageId);
 
@@ -102,7 +98,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   async function exportZippedDatabase() {
     setExportingDatabase(true);
     try {
-      const exportName = `${boardPage?.title ?? 'Untitled'} database export.zip`;
+      const exportName = `${boardPage?.title ?? 'Untitled'} database export`;
 
       const generatedZip = await charmClient.pages.exportZippedDatabasePage({
         databaseId: pageId

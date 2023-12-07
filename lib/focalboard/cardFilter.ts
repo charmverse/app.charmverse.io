@@ -16,9 +16,15 @@ import type {
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
+import { Constants } from './constants';
+
 class CardFilter {
   static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
-    return cards.filter((card) => this.isFilterGroupMet(filterGroup, templates, card));
+    const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
+    const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
+      ? templates
+      : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card));
   }
 
   static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
@@ -54,8 +60,29 @@ class CardFilter {
   }
 
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
-    const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
+    let value = card.fields.properties[filter.propertyId] ?? [];
+    switch (filterProperty?.type) {
+      case 'updatedBy': {
+        value = card.updatedBy;
+        break;
+      }
+      case 'createdBy': {
+        value = card.createdBy;
+        break;
+      }
+      case 'createdTime': {
+        value = card.createdAt;
+        break;
+      }
+      case 'updatedTime': {
+        value = card.updatedAt;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
     const valueArray = (Array.isArray(value) ? value : [value]).map((v: string | number | Record<'id', string>) => {
       // In some cases we get an object with an id as value
@@ -65,7 +92,6 @@ class CardFilter {
 
       return v.toString();
     });
-
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {
@@ -198,10 +224,17 @@ class CardFilter {
         const propertyValue = valueArray[0];
         let sourceValue: { from?: number } = {};
         try {
-          sourceValue = propertyValue ? (JSON.parse(propertyValue) as { from: number }) : { from: undefined };
+          // property value would be a valid number if its createdTime or updatedTime
+          // For custom date properties, it would be stringified object
+          sourceValue = !Number.isNaN(Number(propertyValue))
+            ? { from: Number(propertyValue) }
+            : typeof propertyValue === 'string'
+            ? (JSON.parse(propertyValue) as { from: number })
+            : { from: undefined };
         } catch (error) {
           log.error('Could not parse card property value', { propertyValue, error });
         }
+
         switch (condition) {
           case 'is': {
             return (

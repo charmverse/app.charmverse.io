@@ -12,7 +12,7 @@ import {
   MenuItem,
   Select,
   Stack,
-  Switch,
+  Checkbox,
   TextField,
   Typography
 } from '@mui/material';
@@ -27,7 +27,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
@@ -190,7 +189,7 @@ function FilterPropertyValue({
       />
     );
   } else if (propertyDataType === 'boolean') {
-    return <Switch checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
+    return <Checkbox checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
   } else if (propertyDataType === 'multi_select') {
     if (isPropertyTypeMultiSelect) {
       return (
@@ -255,7 +254,7 @@ function FilterPropertyValue({
                 {selectedMemberIds.map((selectedMemberId) => {
                   const member = members?.find((_member) => _member.id === selectedMemberId);
                   return member ? (
-                    <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} user={member} />
+                    <UserDisplay key={selectedMemberId} avatarSize='xSmall' fontSize={12} userId={member.id} />
                   ) : null;
                 })}
               </SelectMenuItemsContainer>
@@ -265,7 +264,7 @@ function FilterPropertyValue({
           {members.map((member) => {
             return (
               <MenuItem value={member.id} key={member.id}>
-                <UserDisplay user={member} />
+                <UserDisplay userId={member.id} />
               </MenuItem>
             );
           })}

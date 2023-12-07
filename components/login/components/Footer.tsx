@@ -50,12 +50,12 @@ export default function Footer() {
 
   return (
     <Background mt={6} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
-      <Container pt={5} pb={9} px={3}>
-        {customDomain ? (
-          <Box>
-            Powered by <Link href='https://charmverse.io'>Charmverse</Link>
-          </Box>
-        ) : customDomain === null ? (
+      {customDomain ? (
+        <Box px={3} py={3} sx={{ float: 'right' }}>
+          Powered by <Link href='https://charmverse.io'> Charmverse</Link>
+        </Box>
+      ) : customDomain === null ? (
+        <Container pt={5} pb={9} px={3}>
           <Grid container spacing={6}>
             <Grid item xs={12} sm={4}>
               <LinkHeader>Links</LinkHeader>
@@ -94,8 +94,8 @@ export default function Footer() {
               </Box>
             </Grid>
           </Grid>
-        ) : null}
-      </Container>
+        </Container>
+      ) : null}
     </Background>
   );
 }

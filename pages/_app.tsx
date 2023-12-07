@@ -30,12 +30,12 @@ import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
-import { BountiesProvider } from 'hooks/useBounties';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
@@ -91,30 +91,11 @@ import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
-import 'components/common/LitProtocolModal/index.css';
-import 'components/common/LitProtocolModal/reusableComponents/litChainSelector/LitChainSelector.css';
-import 'components/common/LitProtocolModal/reusableComponents/litCheckbox/LitCheckbox.css';
-import 'components/common/LitProtocolModal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
-import 'components/common/LitProtocolModal/reusableComponents/litDeleteModal/LitDeleteModal.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitBackButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitFooter.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitNextButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litHeader/LitHeader.css';
-import 'components/common/LitProtocolModal/reusableComponents/litInput/LitInput.css';
-import 'components/common/LitProtocolModal/shareModal/devMode/DevModeContent.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
-import 'components/common/LitProtocolModal/shareModal/reviewConditions/ReviewConditions.css';
-import 'components/common/LitProtocolModal/shareModal/ShareModal.css';
-import 'components/common/LitProtocolModal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 import 'prosemirror-menu/style/menu.css';
 import 'react-resizable/css/styles.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
@@ -183,9 +164,9 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
           <DataProviders>
             <SettingsDialogProvider>
               <LocalizationProvider>
-                <FocalBoardProvider>
-                  <NotionProvider>
-                    <IntlProvider>
+                <NotionProvider>
+                  <IntlProvider>
+                    <DbViewSettingsProvider>
                       <PageHead {...pageProps} />
 
                       <RouteGuard>
@@ -208,9 +189,9 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
                           <GlobalComponents />
                         </ErrorBoundary>
                       </RouteGuard>
-                    </IntlProvider>
-                  </NotionProvider>
-                </FocalBoardProvider>
+                    </DbViewSettingsProvider>
+                  </IntlProvider>
+                </NotionProvider>
               </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
@@ -246,9 +227,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                       <IsSpaceMemberProvider>
                         <WebSocketClientProvider>
                           <MembersProvider>
-                            <BountiesProvider>
-                              <RewardsProvider>
-                                <PaymentMethodsProvider>
+                            <RewardsProvider>
+                              <PaymentMethodsProvider>
+                                <FocalBoardProvider>
                                   <PagesProvider>
                                     <MemberPropertiesProvider>
                                       <LensProvider config={lensConfig}>
@@ -258,9 +239,9 @@ function DataProviders({ children }: { children: ReactNode }) {
                                       </LensProvider>
                                     </MemberPropertiesProvider>
                                   </PagesProvider>
-                                </PaymentMethodsProvider>
-                              </RewardsProvider>
-                            </BountiesProvider>
+                                </FocalBoardProvider>
+                              </PaymentMethodsProvider>
+                            </RewardsProvider>
                           </MembersProvider>
                         </WebSocketClientProvider>
                       </IsSpaceMemberProvider>

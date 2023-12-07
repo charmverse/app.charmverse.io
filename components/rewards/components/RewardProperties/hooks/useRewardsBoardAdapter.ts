@@ -1,23 +1,26 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import { getDefaultBoard, getDefaultTableView } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import { getDefaultBoard, getDefaultView } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
+import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import type { Member } from 'lib/members/interfaces';
 import {
-  ASSIGNEES_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
@@ -28,7 +31,8 @@ import {
   REWARD_AMOUNT,
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
-  REWARD_TOKEN
+  REWARD_TOKEN,
+  REWARD_APPLICANTS_COUNT
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
@@ -43,26 +47,35 @@ export function useRewardsBoardAdapter() {
   const { rewards } = useRewards();
   const { rewardBoardBlock, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
-
+  const {
+    router: { query }
+  } = useCharmRouter();
   const rewardPage = getRewardPage(boardReward?.id);
-  // TODO - use different types of views (board, calendar)
-  const localViewSettings = useLocalDbViewSettings(`rewards-${DEFAULT_VIEW_BLOCK_ID}`);
 
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
     storedBoard: rewardBoardBlock
   });
 
+  const views = useMemo(
+    () => board.fields.viewIds.map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView).filter(Boolean),
+    [board.fields.viewIds, rewardBlocks]
+  );
+  const queryViewType = viewTypeToBlockId[query?.viewId?.toString() as IViewType];
+  const activeViewId = board.fields.viewIds?.find((vid) => vid === queryViewType)
+    ? queryViewType
+    : board.fields.viewIds?.[0] || DEFAULT_VIEW_BLOCK_ID;
+
+  const localViewSettings = useLocalDbViewSettings(`rewards-${space?.id}-${activeViewId}`);
+
   const activeView = useMemo(() => {
-    // use saved default block or build on the fly
-    // TODO: use different types of views
-    const viewBlock = rewardBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
+    const viewBlock = views?.find((v) => v.id === activeViewId);
 
     if (!viewBlock) {
-      return getDefaultTableView({ storedBoard: rewardBoardBlock });
+      return getDefaultView({ viewType: activeViewId, spaceId: space?.id || '' });
     }
 
-    const boardView = blockToFBBlock(viewBlock) as BoardView;
+    const boardView = blockToFBBlock(viewBlock as any) as BoardView;
 
     // sort by created at desc by default
     if (!boardView.fields.sortOptions?.length) {
@@ -70,7 +83,7 @@ export function useRewardsBoardAdapter() {
     }
 
     return boardView;
-  }, [rewardBlocks, rewardBoardBlock]);
+  }, [views, activeViewId, space?.id]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -115,8 +128,6 @@ export function useRewardsBoardAdapter() {
   // each reward with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
 
-  const views: BoardView[] = [];
-
   return {
     board,
     boardCustomProperties,
@@ -145,15 +156,20 @@ function mapRewardToCardPage({
 }): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
+  const validApplications =
+    reward && 'applications' in reward
+      ? reward.applications.filter((application) => members[application.createdBy])
+      : [];
 
   rewardFields.properties = {
     ...rewardFields.properties,
+    [Constants.titleColumnId]: rewardPage?.title || '',
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]:
       reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
         ? (
             countRemainingSubmissionSlots({
-              applications: reward.applications ?? [],
+              applications: validApplications,
               limit: reward.maxSubmissions
             }) as number
           )?.toString()
@@ -165,15 +181,17 @@ function mapRewardToCardPage({
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
-    [ASSIGNEES_BLOCK_ID]: (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || [],
+    [REWARDS_APPLICANTS_BLOCK_ID]: validApplications.map((a) => a.createdBy),
     [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
-    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || ''
+    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
+    [REWARD_APPLICANTS_COUNT]: validApplications.length.toString()
   };
 
   const card: Card<RewardPropertyValue> = {
-    id: reward?.id || '',
+    // use page id as card id - kanban board is based on usePages
+    id: rewardPage?.id || '',
     spaceId: rewardSpaceId,
     parentId: '',
     schema: 1,
@@ -194,15 +212,17 @@ function mapRewardToCardPage({
     page: rewardPage,
     subPages:
       rewardPage && reward && 'applications' in reward
-        ? reward.applications.map((application) =>
-            mapApplicationToCardPage({
-              application,
-              rewardPage,
-              spaceId,
-              reward,
-              members
-            })
-          )
+        ? reward.applications
+            .filter((application) => members[application.createdBy])
+            .map((application) =>
+              mapApplicationToCardPage({
+                application,
+                rewardPage,
+                spaceId,
+                reward,
+                members
+              })
+            )
         : undefined
   };
 }
@@ -228,11 +248,12 @@ function mapApplicationToCardPage({
     ...applicationFields.properties,
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]: null,
-    [ASSIGNEES_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
+    [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
     [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: null,
-    [REWARD_REVIEWERS_BLOCK_ID]: []
+    [REWARD_REVIEWERS_BLOCK_ID]: [],
+    [REWARD_APPLICANTS_COUNT]: null
   };
 
   const card: Card<RewardPropertyValue> = {

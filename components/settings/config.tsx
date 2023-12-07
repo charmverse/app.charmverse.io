@@ -7,36 +7,29 @@ import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 
-export const spaceSettingsSections = ['space', 'roles', 'invites', 'import', 'api', 'subscription'] as const;
+import { ProposalIcon } from 'components/common/PageIcon';
 
-export type SpaceSettingsSection = (typeof spaceSettingsSections)[number];
+export const premiumSettingSections = ['roles', 'api'] as const;
 
-export const premiumSettingSections: Extract<SpaceSettingsSection, 'roles' | 'api'>[] = ['roles', 'api'];
-
-type SettingsTab<T extends string> = {
-  icon: JSX.Element;
-  path: T;
-  label: string;
-};
-
-export type SpaceSettingsTab = SettingsTab<SpaceSettingsSection>;
-
-export const SETTINGS_TABS: SpaceSettingsTab[] = [
+export const SPACE_SETTINGS_TABS = [
   { icon: <SettingsIcon fontSize='small' />, path: 'space', label: 'Overview' },
   { icon: <UserRoleIcon fontSize='small' />, path: 'roles', label: 'Roles & Permissions' },
   { icon: <GroupAddOutlinedIcon fontSize='small' />, path: 'invites', label: 'Invites' },
   { icon: <FileDownloadOutlinedIcon fontSize='small' />, path: 'import', label: 'Import' },
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
-  { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' }
-];
+  { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' },
+  { icon: <ProposalIcon fontSize='small' />, path: 'proposals', label: 'Proposals' }
+] as const;
 
+export type SpaceSettingsTab = (typeof SPACE_SETTINGS_TABS)[number];
+export type SpaceSettingsSection = SpaceSettingsTab['path'];
 export const accountSettingsSections = ['account', 'profile'] as const;
 
 export type UserSettingsSection = (typeof accountSettingsSections)[number];
 
-export type UserSettingsTab = SettingsTab<UserSettingsSection>;
-
-export const ACCOUNT_TABS: UserSettingsTab[] = [
+export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
   { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' }
-];
+] as const;
+
+export type UserSettingsTab = (typeof ACCOUNT_TABS)[number];

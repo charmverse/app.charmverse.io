@@ -1,5 +1,6 @@
+import type { SystemError } from '@charmverse/core/dist/cjs/errors';
 import { log } from '@charmverse/core/log';
-import type { UserGnosisSafe } from '@charmverse/core/prisma';
+import type { Application, UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Contract } from '@ethersproject/contracts';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -7,57 +8,79 @@ import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import ERC20ABI from 'abis/ERC20.json';
 import { getChainById } from 'connectors/chains';
+import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { parseEther, parseUnits } from 'viem';
+import { getAddress, parseEther, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
+import type { GnosisProposeTransactionResult } from 'hooks/useGnosisPayment';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
-import { useMultiBountyPayment } from 'hooks/useMultiBountyPayment';
+import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import { getSafesForAddress } from 'lib/gnosis';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { shortenHex } from 'lib/utilities/blockchain';
-
-interface Props {
-  receiver: string;
-  amount: string;
-  tokenSymbolOrAddress: string;
-  chainIdToUse: number;
-  onSuccess?: (txId: string, chainId: number) => void;
-  onError?: (err: string, severity?: AlertColor) => void;
-  reward: RewardWithUsers;
-}
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
 function SafeMenuItem({
   label,
   safeInfo,
   reward,
+  submission,
   onClick,
-  onError = () => {}
+  onError = () => {},
+  refreshSubmission
 }: {
   safeInfo: UserGnosisSafe;
   label: string;
   reward: RewardWithUsers;
+  submission: Application;
   onClick: () => void;
   onError: (err: string, severity?: AlertColor) => void;
+  refreshSubmission: () => void;
 }) {
-  const { onPaymentSuccess, getTransactions } = useMultiBountyPayment({ rewards: [reward] });
+  const { prepareGnosisSafeRewardPayment } = useMultiRewardPayment({
+    rewards: [reward]
+  });
+  const { showMessage } = useSnackbar();
 
   const { makePayment } = useGnosisPayment({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
-    transactions: getTransactions(safeInfo.address)
+    transaction: prepareGnosisSafeRewardPayment({
+      amount: reward.rewardAmount as number,
+      applicationId: submission.id,
+      recipientAddress: submission.walletAddress as string,
+      recipientUserId: submission.createdBy,
+      token: reward.rewardToken as string,
+      txChainId: reward.chainId as number,
+      rewardId: reward.id
+    })
   });
+
+  async function onPaymentSuccess(result: GnosisProposeTransactionResult) {
+    await charmClient.rewards.recordTransaction({
+      applicationId: result.transaction.applicationId,
+      transactionId: result.txHash,
+      safeTxHash: result.txHash,
+      chainId: safeInfo.chainId.toString()
+    });
+    showMessage('Transaction added to your Safe', 'success');
+
+    refreshSubmission();
+  }
 
   return (
     <MenuItem
@@ -66,9 +89,9 @@ function SafeMenuItem({
         onClick();
         try {
           await makePayment();
-        } catch (error: any) {
-          const { message, level } = getPaymentErrorMessage(error);
-          onError(message, level);
+        } catch (error) {
+          const typedError = error as SystemError;
+          onError(typedError.message, typedError.severity);
         }
       }}
     >
@@ -77,17 +100,32 @@ function SafeMenuItem({
   );
 }
 
+interface Props {
+  receiver: string;
+  amount: string;
+  tokenSymbolOrAddress: string;
+  chainIdToUse: number;
+  submission: Application;
+  onSuccess?: (txId: string, chainId: number) => void;
+  onError?: (err: string, severity?: AlertColor) => void;
+  reward: RewardWithUsers;
+  refreshSubmission: () => void;
+}
+
 export function RewardPaymentButton({
   receiver,
   reward,
+  refreshSubmission,
+  submission,
   amount,
   chainIdToUse,
   tokenSymbolOrAddress,
   onSuccess = () => {},
   onError = () => {}
 }: Props) {
-  const { data: safesData } = useMultiWalletSigs();
+  const { data: existingSafesData, mutate: refreshSafes } = useMultiWalletSigs();
   const { account, chainId, signer } = useWeb3Account();
+  const { user } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -96,16 +134,51 @@ export function RewardPaymentButton({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const [hasPendingTx, setHasPendingTx] = useState(false);
+  const [sendingTx, setSendingTx] = useState(false);
+
+  const safeApiClient = useMemo(() => {
+    return getSafeApiClient({ chainId: chainIdToUse });
+  }, [chainIdToUse]);
 
   const { data: safeInfos } = useSWR(
-    signer && account ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
+    account && chainIdToUse ? `/connected-gnosis-safes/${account}/${chainIdToUse}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    () => getSafesForAddress({ signer: signer!, chainId: chainIdToUse, address: account! })
+    () =>
+      safeApiClient
+        .getSafesByOwner(getAddress(account!))
+        .then(async (response) =>
+          Promise.all(response.safes.map((safeAddress) => safeApiClient.getSafeInfo(safeAddress)))
+        )
   );
+  useEffect(() => {
+    // This allows auto-syncing of safes, so the user does not need to visit their account to setup their safes
+    if (safeInfos && existingSafesData && user) {
+      const safesToAdd: Parameters<(typeof charmClient)['gnosisSafe']['setMyGnosisSafes']>[0] = [];
+
+      for (const foundSafe of safeInfos) {
+        if (
+          foundSafe.owners.some((owner) => lowerCaseEqual(owner, account as string)) &&
+          !existingSafesData.some((_existingSafe) => lowerCaseEqual(_existingSafe.address, foundSafe.address))
+        ) {
+          safesToAdd.push({
+            address: foundSafe.address,
+            userId: user.id,
+            chainId: chainIdToUse,
+            isHidden: false,
+            owners: foundSafe.owners,
+            threshold: foundSafe.nonce
+          });
+        }
+      }
+
+      if (safesToAdd.length) {
+        charmClient.gnosisSafe.setMyGnosisSafes([...safesToAdd, ...existingSafesData]).then(() => refreshSafes());
+      }
+    }
+  }, [safeInfos?.length, existingSafesData?.length, user, chainIdToUse]);
 
   const safeDataRecord =
-    safesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+    existingSafesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
       if (!record[userGnosisSafe.address]) {
         record[userGnosisSafe.address] = userGnosisSafe;
       }
@@ -128,10 +201,22 @@ export function RewardPaymentButton({
     }
 
     try {
-      setHasPendingTx(true);
+      setSendingTx(true);
 
       if (chainIdToUse !== chainId) {
         await switchActiveNetwork(chainIdToUse);
+      }
+
+      let receiverAddress = receiver;
+
+      if (receiver.endsWith('.eth') && ethers.utils.isValidName(receiver)) {
+        const resolvedWalletAddress = await charmClient.resolveEnsName(receiver);
+        if (resolvedWalletAddress === null) {
+          onError(`Could not resolve ENS name ${receiver}`);
+          return;
+        }
+
+        receiverAddress = resolvedWalletAddress;
       }
 
       if (isValidChainAddress(tokenSymbolOrAddress)) {
@@ -160,19 +245,19 @@ export function RewardPaymentButton({
         const parsedTokenAmount = parseUnits(amount, tokenDecimals);
 
         // get allowance
-        const allowance = await tokenContract.allowance(account, receiver);
+        const allowance = await tokenContract.allowance(account, receiverAddress);
 
         if (BigNumber.from(allowance).lt(parsedTokenAmount)) {
           // approve if the allowance is small
-          await tokenContract.approve(receiver, parsedTokenAmount);
+          await tokenContract.approve(receiverAddress, parsedTokenAmount);
         }
 
         // transfer token
-        const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
+        const tx = await tokenContract.transfer(receiverAddress, parsedTokenAmount);
         onSuccess(tx.hash, chainToUse!.chainId);
       } else {
         const tx = await signer.sendTransaction({
-          to: receiver,
+          to: receiverAddress,
           value: parseEther(amount)
         });
 
@@ -183,7 +268,7 @@ export function RewardPaymentButton({
       log.warn(`Error sending payment on blockchain: ${message}`, { amount, chainId, error });
       onError(message, level);
     } finally {
-      setHasPendingTx(false);
+      setSendingTx(false);
     }
   };
 
@@ -202,9 +287,9 @@ export function RewardPaymentButton({
   return (
     <>
       <Button
-        loading={hasPendingTx}
+        loading={sendingTx}
         color='primary'
-        endIcon={hasSafes && !hasPendingTx ? <KeyboardArrowDownIcon /> : null}
+        endIcon={hasSafes && !sendingTx ? <KeyboardArrowDownIcon /> : null}
         size='small'
         onClick={(e: MouseEvent<HTMLButtonElement>) => {
           if (!hasSafes) {
@@ -234,7 +319,7 @@ export function RewardPaymentButton({
           <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
             Gnosis wallets
           </MenuItem>
-          {safesData
+          {existingSafesData
             ?.filter((s) => !s.isHidden && chainIdToUse === s.chainId)
             .map((safeInfo) => (
               <SafeMenuItem
@@ -246,6 +331,8 @@ export function RewardPaymentButton({
                 }}
                 onError={onError}
                 safeInfo={safeInfo}
+                submission={submission}
+                refreshSubmission={refreshSubmission}
               />
             ))}
         </Menu>

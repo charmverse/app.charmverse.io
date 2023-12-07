@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Feature } from '@charmverse/core/prisma';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -15,18 +15,21 @@ import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
-import { ACCOUNT_TABS, SETTINGS_TABS } from './config';
+import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import ProfileSettings from './profile/ProfileSettings';
+import { ProposalSettings } from './proposals/ProposalSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
@@ -50,7 +53,8 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   invites: Invites,
   roles: RoleSettings,
   subscription: SubscriptionSettings,
-  space: SpaceSettings
+  space: SpaceSettings,
+  proposals: ProposalSettings
 };
 
 function TabPanel(props: TabPanelProps) {
@@ -80,13 +84,15 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
+  const isCharmverse = useIsCharmverseSpace();
+  const { mappedFeatures } = useSpaceFeatures();
 
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   return (
-    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
+    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
         component='aside'
         width={{ xs: '100%', md: 300 }}
@@ -116,21 +122,25 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         )}
         {currentSpace &&
           isSpaceSettingsVisible &&
-          SETTINGS_TABS.map((tab) => (
-            <SidebarLink
-              data-test={`space-settings-tab-${tab.path}`}
-              key={tab.path}
-              label={tab.label}
-              icon={tab.icon}
-              onClick={() => onSelectPath(tab.path)}
-              active={activePath === tab.path}
-              section={tab.path}
-            >
-              {tab.path === 'subscription' && hasPassedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
-                <UpgradeChip forceDisplay upgradeContext='upgrade' />
-              ) : null}
-            </SidebarLink>
-          ))}
+          SPACE_SETTINGS_TABS.map(
+            (tab) =>
+              // TODO: Remove check when publishing new proposal flow
+              (tab.path !== 'proposals' || isCharmverse) && (
+                <SidebarLink
+                  data-test={`space-settings-tab-${tab.path}`}
+                  key={tab.path}
+                  label={mappedFeatures[tab.path as Feature]?.title || tab.label}
+                  icon={tab.icon}
+                  onClick={() => onSelectPath(tab.path)}
+                  active={activePath === tab.path}
+                  section={tab.path}
+                >
+                  {tab.path === 'subscription' && hasPassedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
+                    <UpgradeChip forceDisplay upgradeContext='upgrade' />
+                  ) : null}
+                </SidebarLink>
+              )
+          )}
         {subscriptionEnded && memberSpaces.length > 1 && (
           <Box>
             <SidebarLink
@@ -185,7 +195,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
             </TabPanel>
           );
         })}
-        {SETTINGS_TABS.map((tab) => {
+        {SPACE_SETTINGS_TABS.map((tab) => {
           const TabView = spaceTabs[tab.path];
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>

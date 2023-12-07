@@ -50,36 +50,28 @@ describe('Update proposal specific data', () => {
     });
 
     const [proposalReviewer1, proposalReviewer2, proposalAuthor1, proposalAuthor2] = await Promise.all([
-      prisma.proposalReviewer.findUnique({
+      prisma.proposalReviewer.findFirst({
         where: {
-          userId_proposalId: {
-            proposalId: proposal.id,
-            userId: reviewer1.id
-          }
+          proposalId: proposal.id,
+          userId: reviewer1.id
         }
       }),
-      prisma.proposalReviewer.findUnique({
+      prisma.proposalReviewer.findFirst({
         where: {
-          userId_proposalId: {
-            proposalId: proposal.id,
-            userId: reviewer2.id
-          }
+          proposalId: proposal.id,
+          userId: reviewer2.id
         }
       }),
-      prisma.proposalAuthor.findUnique({
+      prisma.proposalAuthor.findFirst({
         where: {
-          proposalId_userId: {
-            proposalId: proposal.id,
-            userId: author1.id
-          }
+          proposalId: proposal.id,
+          userId: author1.id
         }
       }),
-      prisma.proposalAuthor.findUnique({
+      prisma.proposalAuthor.findFirst({
         where: {
-          proposalId_userId: {
-            proposalId: proposal.id,
-            userId: author2.id
-          }
+          proposalId: proposal.id,
+          userId: author2.id
         }
       })
     ]);

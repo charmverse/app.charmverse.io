@@ -12,7 +12,7 @@ export const upgradeMessages = {
   page_permissions: 'Upgrade to a paid plan to change page permissions',
   forum_permissions: 'Upgrade to a paid plan to change forum permissions',
   proposal_permissions: 'Upgrade to a paid plan to change proposal permissions',
-  bounty_permissions: 'Upgrade to a paid plan to change bounty permissions',
+  bounty_permissions: 'Upgrade to a paid plan to change reward permissions',
   custom_roles: 'Upgrade to a paid plan to use custom roles',
   invite_guests: 'Upgrade to a paid plan to invite members with guest-level access',
   customise_member_property: 'Upgrade to a paid plan to use this member property',

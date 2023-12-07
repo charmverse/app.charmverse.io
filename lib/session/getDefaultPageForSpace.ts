@@ -12,7 +12,7 @@ import { getSubdomainPath, getSpaceUrl, fullyDecodeURI } from 'lib/utilities/bro
 type ViewMeta = PageEventMap['page_view']['meta'];
 
 const staticPagesToDirect: { [key in StaticPageType]?: string } = {
-  bounties_list: '/bounties',
+  bounties_list: '/rewards',
   forum_posts_list: '/forum',
   members_list: '/members',
   proposals_list: '/proposals'

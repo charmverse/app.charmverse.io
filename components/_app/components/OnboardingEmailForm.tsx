@@ -1,29 +1,31 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Stack } from '@mui/material';
+import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Stack, Tooltip } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useSaveOnboardingEmail } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
+import Link from 'components/common/Link';
 import { useUser } from 'hooks/useUser';
 
+const emailSchema = yup.string().email().ensure().trim();
+
 export const schema = yup.object({
-  email: yup
-    .string()
-    .ensure()
-    .trim()
-    .email()
+  email: emailSchema
     .when('emailNewsletter', {
       is: true,
-      then: yup.string().required('Unselect email options to proceed without email')
+      then: () => emailSchema.required('Unselect email options to proceed without email'),
+      otherwise: () => emailSchema
     })
     .when('emailNotifications', {
       is: true,
-      then: yup.string().required('Unselect email options to proceed without email')
+      then: () => emailSchema.required('Unselect email options to proceed without email'),
+      otherwise: () => emailSchema
     }),
   emailNotifications: yup.boolean(),
-  emailNewsletter: yup.boolean()
+  emailNewsletter: yup.boolean(),
+  agreeTermsConditions: yup.boolean().oneOf([true], 'You must agree to the terms and privacy policy to continue')
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -38,12 +40,13 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
     trigger,
     getValues,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isValid }
   } = useForm<FormValues>({
     defaultValues: {
       email: user?.email || '',
+      emailNotifications: true,
       emailNewsletter: !!user?.emailNewsletter,
-      emailNotifications: true
+      agreeTermsConditions: false
     },
     // mode: 'onChange',
     resolver: yupResolver(schema)
@@ -51,6 +54,7 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
 
   const emailNewsletter = getValues('emailNewsletter');
   const emailNotifications = getValues('emailNotifications');
+  const agreeTermsConditions = getValues('agreeTermsConditions');
 
   const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
@@ -89,23 +93,47 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
         />
         <FormGroup>
           <FormControlLabel
-            control={<Checkbox {...register('emailNotifications')} checked={emailNotifications} onChange={onChange} />}
+            control={
+              <Checkbox
+                data-test='member-email-notifications'
+                {...register('emailNotifications')}
+                checked={emailNotifications}
+                onChange={onChange}
+              />
+            }
             label='Notify me about key activities (e.g., proposal feedback, reward status, mentions, comments)'
           />
           <FormControlLabel
             control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
             label="Keep me up to date on what's new with CharmVerse."
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                data-test='member-terms-conditions'
+                {...register('agreeTermsConditions')}
+                checked={agreeTermsConditions}
+                onChange={onChange}
+              />
+            }
+            label={
+              <Typography>
+                I agree to the{' '}
+                <Link target='_blank' external href='https://www.charmverse.io/terms'>
+                  Terms & Conditions
+                </Link>
+              </Typography>
+            }
+          />
         </FormGroup>
         <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
-          <Button
-            loading={isMutating}
-            data-test='member-email-next'
-            type='submit'
-            disabled={Object.keys(errors).length !== 0}
-          >
-            Next
-          </Button>
+          <Tooltip title={!agreeTermsConditions ? 'You must agree to the terms and conditions to continue' : ''}>
+            <div>
+              <Button loading={isMutating} data-test='member-email-next' type='submit' disabled={!isValid}>
+                Next
+              </Button>
+            </div>
+          </Tooltip>
         </Stack>
       </Stack>
     </form>

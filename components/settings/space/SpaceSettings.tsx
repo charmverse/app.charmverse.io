@@ -26,19 +26,20 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
+import { DraggableListItem } from 'components/common/DraggableListItem';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import type { Feature } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { PageIcon } from 'components/common/PageIcon';
+import type { Feature } from 'components/common/PageLayout/components/Sidebar/constants';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
-import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
@@ -47,7 +48,7 @@ import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFrom
 
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput } from './components/NotificationToggles';
-import SettingsItem from './components/SettingsItem';
+import { SettingsItem } from './components/SettingsItem';
 
 export type FormValues = {
   name: string;
@@ -56,9 +57,9 @@ export type FormValues = {
   notificationToggles: NotificationToggles;
 };
 
-const schema: yup.SchemaOf<FormValues> = yup.object({
+const schema: yup.Schema<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true),
+  spaceImage: yup.string().nullable(),
   notificationToggles: yup.object(),
   domain: yup
     .string()
@@ -79,13 +80,14 @@ export function SpaceSettings({
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
-  const { features: allFeatures, memberProfiles: allMemberProfiles } = useFeaturesAndMembers();
+  const { memberProfileTypes: currentMemberProfileTypes } = useMemberProfileTypes();
+  const { features: currentFeatures } = useSpaceFeatures();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
-  const [features, setFeatures] = useState(allFeatures);
-  const [memberProfiles, setMemberProfiles] = useState(allMemberProfiles);
+  const [featuresInput, setFeatures] = useState(currentFeatures);
+  const [memberProfileTypesInput, setMemberProfileProperties] = useState(currentMemberProfileTypes);
   const {
     register,
     handleSubmit,
@@ -146,8 +148,8 @@ export function SpaceSettings({
     await updateSpace({
       id: space.id,
       notificationToggles: notificationToggles as Prisma.InputJsonValue,
-      features,
-      memberProfiles,
+      features: featuresInput,
+      memberProfiles: memberProfileTypesInput,
       name: values.name,
       domain: values.domain,
       spaceImage: values.spaceImage
@@ -175,7 +177,7 @@ export function SpaceSettings({
   }
 
   async function changeOptionsOrder(draggedProperty: Feature, droppedOnProperty: Feature) {
-    const newOrder = [...features];
+    const newOrder = [...featuresInput];
     const propIndex = newOrder.findIndex((_feat) => _feat.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
     const droppedOnIndex = newOrder.findIndex((_feat) => _feat.id === droppedOnProperty); // find the index of the space that was dropped on
@@ -184,17 +186,16 @@ export function SpaceSettings({
   }
 
   async function changeMembersOrder(draggedProperty: MemberProfileName, droppedOnProperty: MemberProfileName) {
-    const newOrder = [...memberProfiles];
+    const newOrder = [...memberProfileTypesInput];
     const propIndex = newOrder.findIndex((_feat) => _feat.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
     const droppedOnIndex = newOrder.findIndex((_feat) => _feat.id === droppedOnProperty); // find the index of the space that was dropped on
     newOrder.splice(droppedOnIndex, 0, deletedElements[0]); // add the property to the new index
-    setMemberProfiles(newOrder);
+    setMemberProfileProperties(newOrder);
   }
 
-  const dataChanged = useMemo(() => {
-    return !isEqual(allFeatures, features) || !isEqual(allMemberProfiles, memberProfiles) || isDirty;
-  }, [allFeatures, features, allMemberProfiles, memberProfiles, isDirty]);
+  const dataChanged =
+    !isEqual(currentFeatures, featuresInput) || !isEqual(currentMemberProfileTypes, memberProfileTypesInput) || isDirty;
 
   useEffect(() => {
     setUnsavedChanges(dataChanged);
@@ -272,7 +273,7 @@ export function SpaceSettings({
               exist, but it won't be visible in the sidebar.
             </Typography>
             <Stack>
-              {features.map(({ id, isHidden, title, path }) => {
+              {featuresInput.map(({ id, isHidden, title, path }) => {
                 return (
                   <DraggableListItem
                     key={id}
@@ -355,7 +356,7 @@ export function SpaceSettings({
               Set the order and turn on and off the visibility of certain onchain profiles for your members.
             </Typography>
             <Stack gap={1}>
-              {memberProfiles
+              {memberProfileTypesInput
                 .filter((mp) => !mp.isHidden)
                 .map(({ id, title }) => (
                   <DraggableListItem
@@ -375,7 +376,7 @@ export function SpaceSettings({
                           key='1'
                           data-test='settings-profiles-option-hide'
                           onClick={() => {
-                            setMemberProfiles((prevState) => {
+                            setMemberProfileProperties((prevState) => {
                               const newState = [...prevState];
                               const index = newState.findIndex((prevMp) => prevMp.id === id);
                               newState[index] = { id, title, isHidden: true };
@@ -397,7 +398,7 @@ export function SpaceSettings({
                   </DraggableListItem>
                 ))}
             </Stack>
-            {isAdmin && memberProfiles.filter((mp) => mp.isHidden).length > 0 && (
+            {isAdmin && memberProfileTypesInput.filter((mp) => mp.isHidden).length > 0 && (
               <Button
                 sx={{ flexGrow: 0 }}
                 {...bindTrigger(memberProfilesPopupState)}
@@ -481,7 +482,7 @@ export function SpaceSettings({
         data-test='add-profiles-modal'
       >
         <List>
-          {memberProfiles
+          {memberProfileTypesInput
             .filter((mp) => mp.isHidden)
             .map(({ id, title }) => (
               <ListItem
@@ -490,7 +491,7 @@ export function SpaceSettings({
                   <Button
                     data-test={`add-profile-button-${id}`}
                     onClick={() => {
-                      setMemberProfiles((prevState) => {
+                      setMemberProfileProperties((prevState) => {
                         const prevMemberProfiles = [...prevState];
                         const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
                         prevMemberProfiles[targetedMemberProfileIndex] = {

@@ -62,10 +62,6 @@ export const customRenderWithContext = (
                 showMessage: () => {},
                 actions: [],
                 message: null,
-                origin: {
-                  vertical: 'bottom',
-                  horizontal: 'left'
-                },
                 severity: 'info',
                 setActions: () => {},
                 setSeverity: () => {},

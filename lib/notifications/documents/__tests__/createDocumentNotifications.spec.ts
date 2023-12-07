@@ -2,7 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { createSubmission } from 'lib/applications/actions';
 import { addComment } from 'lib/comments/addComment';
 import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { createForumPost } from 'lib/forums/posts/createForumPost';
@@ -13,6 +12,7 @@ import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { createReward } from 'lib/rewards/createReward';
+import { work } from 'lib/rewards/work';
 import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
 import { randomETHWalletAddress } from 'lib/utilities/blockchain';
@@ -581,15 +581,12 @@ describe(`Test document events and notifications`, () => {
       ]
     });
 
-    const submission = await createSubmission({
-      bountyId: reward.id,
-      submissionContent: {
-        submission: 'Hello world',
-        submissionNodes: _.doc(_.p('Hello world')).toJSON(),
-        walletAddress: randomETHWalletAddress()
-      },
-      userId: rewardApplicant.id,
-      customReward: false
+    const submission = await work({
+      rewardId: reward.id,
+      submission: 'Hello world',
+      submissionNodes: _.doc(_.p('Hello world')).toJSON(),
+      walletAddress: randomETHWalletAddress(),
+      userId: rewardApplicant.id
     });
 
     const applicationComment = await prisma.applicationComment.create({

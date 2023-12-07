@@ -27,6 +27,7 @@ export type PropertyValueDetails = {
   name: string;
   enabledViews: VisibilityView[];
   options?: SelectOptionType[];
+  required: boolean;
 };
 
 export type PropertyValueWithDetails = PropertyValue & PropertyValueDetails;

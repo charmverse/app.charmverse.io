@@ -8,7 +8,7 @@ describe('getSpaceBlockCount', () => {
   it('should return the most recent block count for the space along with its details', async () => {
     const { space } = await testUtilsUser.generateUserAndSpace();
 
-    const blockCount = await prisma.blockCount.create({
+    await prisma.blockCount.create({
       data: {
         details: {},
         count: 10,
@@ -16,7 +16,7 @@ describe('getSpaceBlockCount', () => {
       }
     });
 
-    const secondBlockCount = await prisma.blockCount.create({
+    await prisma.blockCount.create({
       data: {
         details: {},
         count: 20,
@@ -24,7 +24,7 @@ describe('getSpaceBlockCount', () => {
       }
     });
 
-    const thirdBlockCount = await prisma.blockCount.create({
+    await prisma.blockCount.create({
       data: {
         details: {
           pages: 30

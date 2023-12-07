@@ -1,5 +1,5 @@
-import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
 import type { PageMeta } from '@charmverse/core/pages';
+import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { useMemo, useState } from 'react';
 
@@ -18,6 +18,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
   CATEGORY_BLOCK_ID,
@@ -40,8 +41,8 @@ export function useProposalsBoardAdapter() {
   const { pages } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
-  // TODO - use different types of views (board, calendar)
-  const localViewSettings = useLocalDbViewSettings(`proposals-${DEFAULT_VIEW_BLOCK_ID}`);
+
+  const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
@@ -151,6 +152,7 @@ function mapProposalToCardPage({
 
   proposalFields.properties = {
     ...proposalFields.properties,
+    [Constants.titleColumnId]: proposalPage?.title || '',
     // add default field values on the fly
     [CREATED_AT_ID]:
       proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt

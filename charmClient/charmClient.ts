@@ -36,7 +36,6 @@ import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
-import { BountiesApi } from './apis/bountiesApi';
 import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
@@ -69,8 +68,6 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 //
 class CharmClient {
   blockchain = new BlockchainApi();
-
-  bounties = new BountiesApi();
 
   comments = new CommentsApi();
 
@@ -432,6 +429,10 @@ class CharmClient {
 
   createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
     return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
+  }
+
+  resolveEnsName(ens: string) {
+    return http.GET<string | null>('/api/resolve-ens', { ens });
   }
 }
 

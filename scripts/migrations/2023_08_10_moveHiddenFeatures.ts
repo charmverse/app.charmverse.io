@@ -1,5 +1,5 @@
 import { Feature, prisma } from '@charmverse/core/prisma-client';
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 
 async function moveHiddenFeatures() {
@@ -18,7 +18,10 @@ async function moveHiddenFeatures() {
       data: {
         features:
           hiddenFeatures && hiddenFeatures.length > 0
-            ? STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: hiddenFeatures.includes(page.feature as Feature) }))
+            ? STATIC_PAGES.map((page) => ({
+                id: page.feature,
+                isHidden: hiddenFeatures.includes(page.feature as Feature)
+              }))
             : STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
         memberProfiles: memberProfileNames.map((item) => ({ id: item, isHidden: false }))
       }

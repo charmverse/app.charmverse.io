@@ -31,7 +31,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     include: {
       draftRubricAnswers: true,
       rubricAnswers: true,
-      rubricCriteria: true,
+      rubricCriteria: {
+        orderBy: {
+          index: 'asc'
+        }
+      },
       authors: true,
       reviewers: true,
       category: true,
@@ -70,7 +74,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     proposal.rubricAnswers = [];
   }
 
-  return res.status(200).json(proposal as ProposalWithUsersAndRubric);
+  return res.status(200).json(proposal as unknown as ProposalWithUsersAndRubric);
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {

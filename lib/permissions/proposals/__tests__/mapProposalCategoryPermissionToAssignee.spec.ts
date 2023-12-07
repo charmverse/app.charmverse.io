@@ -16,7 +16,6 @@ describe('mapProposalCategoryPermissionToAssignee', () => {
       roleId: null,
       spaceId: null,
       permissionLevel: 'view',
-      proposalOperations: [],
       categoryOperations: []
     };
 
@@ -40,7 +39,6 @@ describe('mapProposalCategoryPermissionToAssignee', () => {
       roleId: null,
       spaceId: v4(),
       permissionLevel: 'full_access',
-      proposalOperations: [],
       categoryOperations: []
     };
 
@@ -65,7 +63,6 @@ describe('mapProposalCategoryPermissionToAssignee', () => {
       roleId: v4(),
       spaceId: null,
       permissionLevel: 'full_access',
-      proposalOperations: [],
       categoryOperations: []
     };
 
@@ -91,7 +88,6 @@ describe('mapProposalCategoryPermissionToAssignee', () => {
         roleId: null,
         spaceId: null,
         permissionLevel: 'full_access',
-        proposalOperations: [],
         categoryOperations: []
       };
 
@@ -110,7 +106,6 @@ describe('mapProposalCategoryPermissionToAssignee', () => {
         roleId: v4(),
         spaceId: v4(),
         permissionLevel: 'full_access',
-        proposalOperations: [],
         categoryOperations: []
       };
 

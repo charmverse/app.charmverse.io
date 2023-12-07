@@ -46,7 +46,6 @@ import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { usePageSidebar } from './hooks/usePageSidebar';
 
-// const BountyProperties = dynamic(() => import('./components/BountyProperties/BountyProperties'), { ssr: false });
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
@@ -85,14 +84,23 @@ export interface DocumentPageProps {
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   close?: VoidFunction;
+  insideModal?: boolean;
   enableSidebar?: boolean;
 }
 
-function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, enableSidebar }: DocumentPageProps) {
+function DocumentPage({
+  insideModal = false,
+  page,
+  refreshPage,
+  savePage,
+  readOnly = false,
+  close,
+  enableSidebar
+}: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
   const isLargeScreen = useLgScreen();
-  const { navigateToSpacePath } = useCharmRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const {
     activeView: sidebarView,
     persistedActiveView,
@@ -103,7 +111,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const blocksDispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const [containerRef, { width: containerWidth }] = useElementSize();
   const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
@@ -159,8 +167,10 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const pageTop = getPageTop(page);
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
-  const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  // Check if we are on the rewards page, as parent chip is only shown on rewards page
+  const isRewardsPage = router.pathname === '/[domain]/rewards';
+  const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -190,10 +200,12 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
 
   useEffect(() => {
     if (page?.type === 'card') {
-      if (!card) {
-        blocksDispatch(databaseViewsLoad({ pageId: page.parentId as string }));
-        blocksDispatch(blockLoad({ blockId: page.id }));
-        blocksDispatch(blockLoad({ blockId: page.parentId as string }));
+      // the two properties are the title and the id which are added to the card as soon as we get the corresponding page
+      const hasCardLoaded = card && Object.keys(card).length > 2;
+      if (!hasCardLoaded) {
+        dispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+        dispatch(blockLoad({ blockId: page.id }));
+        dispatch(blockLoad({ blockId: page.parentId as string }));
       }
     }
   }, [page.id]);
@@ -315,7 +327,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
               <CharmEditor
                 placeholderText={
                   page.type === 'bounty' || page.type === 'bounty_template'
-                    ? `Describe the bounty. Type '/' to see the list of available commands`
+                    ? `Describe the reward. Type '/' to see the list of available commands`
                     : undefined
                 }
                 key={editorKey}
@@ -355,6 +367,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                   readOnly={readOnly || !!enableSuggestingMode}
                   setPage={savePage}
                   readOnlyTitle={!!page.syncWithPageId}
+                  parentId={showParentChip ? card.parentId : null}
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                   <Box my={2} className='font-family-default'>

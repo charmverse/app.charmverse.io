@@ -97,6 +97,7 @@ export function NewProposal() {
     rubricCriteria: [
       {
         id: '1',
+        index: -1,
         title: 'Spelling and grammar',
         description: 'Has correct punctuation',
         type: 'range',
@@ -107,6 +108,7 @@ export function NewProposal() {
       },
       {
         id: '2',
+        index: -1,
         title: 'Five stars',
         type: 'range',
         parameters: {
@@ -165,6 +167,7 @@ ProposalInEvaluation.parameters = {
         const rubricCriteria: ProposalWithUsersAndRubric['rubricCriteria'] = [
           {
             id: '1',
+            index: -1,
             proposalId: '1',
             title: 'Developer Presence',
             description:
@@ -173,10 +176,12 @@ ProposalInEvaluation.parameters = {
             parameters: {
               min: 0,
               max: 2
-            }
+            },
+            evaluationId: null
           },
           {
             id: '2',
+            index: -1,
             proposalId: '1',
             title: 'Developer Draw',
             description:
@@ -185,10 +190,12 @@ ProposalInEvaluation.parameters = {
             parameters: {
               min: 0,
               max: 10
-            }
+            },
+            evaluationId: null
           },
           {
             id: '3',
+            index: -1,
             proposalId: '1',
             title: 'Developer Commitment',
             description: `A\nmulti-line\ndescription`,
@@ -196,10 +203,12 @@ ProposalInEvaluation.parameters = {
             parameters: {
               min: 0,
               max: 4
-            }
+            },
+            evaluationId: null
           },
           {
             id: '4',
+            index: -1,
             proposalId: '1',
             title: 'Developer activity',
             description: null,
@@ -207,10 +216,12 @@ ProposalInEvaluation.parameters = {
             parameters: {
               min: 0,
               max: 4
-            }
+            },
+            evaluationId: null
           },
           {
             id: '5',
+            index: -1,
             proposalId: '1',
             title: 'Community engagement',
             description: null,
@@ -218,10 +229,12 @@ ProposalInEvaluation.parameters = {
             parameters: {
               min: 0,
               max: 4
-            }
+            },
+            evaluationId: null
           },
           {
             id: '6',
+            index: -1,
             proposalId: '1',
             title: 'Twitter activity',
             description: null,
@@ -229,10 +242,12 @@ ProposalInEvaluation.parameters = {
             parameters: {
               min: 0,
               max: 4
-            }
+            },
+            evaluationId: null
           },
           {
             id: '7',
+            index: -1,
             proposalId: '1',
             title: 'Github activity',
             description: null,
@@ -240,7 +255,8 @@ ProposalInEvaluation.parameters = {
             parameters: {
               min: 0,
               max: 4
-            }
+            },
+            evaluationId: null
           }
         ];
         const rubricAnswers: ProposalWithUsersAndRubric['rubricAnswers'] = [
@@ -250,7 +266,8 @@ ProposalInEvaluation.parameters = {
             criteriaId: criteria.id,
             userId: userProfile.id,
             comment: 'Nice job',
-            response: { score: criteria.parameters.max - 1 }
+            response: { score: criteria.parameters.max - 1 },
+            evaluationId: criteria.evaluationId
           })),
           ...rubricCriteria.map((criteria) => ({
             rubricCriteriaId: criteria.id,
@@ -258,15 +275,16 @@ ProposalInEvaluation.parameters = {
             criteriaId: criteria.id,
             userId: members[1].id,
             comment: 'Needs work and probably some more details',
-            response: { score: criteria.parameters.min + 1 }
+            response: { score: criteria.parameters.min + 1 },
+            evaluationId: criteria.evaluationId
           }))
         ];
         const proposal = createMockProposal({
           authors: [{ proposalId: '', userId: members[0].id }],
           reviewers: [
-            { id: '1', proposalId: '', roleId: null, userId: userProfile.id },
-            { id: '2', proposalId: '', roleId: null, userId: members[0].id },
-            { id: '3', proposalId: '', roleId: null, userId: members[1].id }
+            { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
+            { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
+            { evaluationId: null, id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
           ],
           categoryId: proposalCategories[0].id,
           evaluationType: 'rubric',

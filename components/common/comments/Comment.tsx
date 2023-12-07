@@ -173,7 +173,7 @@ export function Comment({
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
-              <UserDisplay showMiniProfile avatarSize='small' user={commentUser} hideName={true} />
+              <UserDisplay showMiniProfile avatarSize='small' userId={commentUser?.id} hideName={true} />
             </Box>
             <Typography
               mr={1}

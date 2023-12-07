@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import Link from 'components/common/Link';
-import { NoAccessPageIcon, PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';

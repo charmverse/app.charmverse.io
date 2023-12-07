@@ -81,24 +81,23 @@ export function useHandleLensError() {
 }
 
 export function useLensProfile() {
+  const { user } = useUser();
   const { account } = useWeb3Account();
   const { data: sessionData } = useSession();
   const authenticated = sessionData?.authenticated ?? false;
   const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
   const { handlerLensError } = useHandleLensError();
-
-  const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
+  const wallet = user?.wallets[0]?.address;
+  const { data: profilesData, loading } = useProfiles({
     where: {
-      ownedBy: account ? [account] : null
+      ownedBy: wallet ? [wallet] : account ? [account] : null
     }
   });
 
   const { execute } = useLogin();
-  const { showMessage } = useSnackbar();
 
   const lensProfile = sessionProfile ?? profilesData?.[0] ?? null;
 
-  const { user } = useUser();
   const { space } = useCurrentSpace();
 
   const setupLensProfile = async () => {
@@ -125,9 +124,9 @@ export function useLensProfile() {
 
   return {
     isAuthenticated: authenticated,
-    lensProfile: !isCyberConnect(space?.domain) && lensProfile,
+    lensProfile: !isCyberConnect(space?.domain) ? lensProfile : null,
     setupLensProfile,
-    isLoadingProfiles
+    loading
   };
 }
 

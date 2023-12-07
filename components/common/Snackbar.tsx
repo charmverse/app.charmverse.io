@@ -31,7 +31,6 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
     severity,
     message,
     actions,
-    origin,
     handleClose,
     isOpen,
     autoHideDuration = props.autoHideDuration ?? 5000
@@ -51,7 +50,7 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
     handleClose: handleCloseProp,
     isOpen: isOpenProp,
     message: messageProp,
-    origin: originProp,
+    origin: originProp = { vertical: 'bottom', horizontal: 'left' },
     severity: severityProp
   } = props;
 

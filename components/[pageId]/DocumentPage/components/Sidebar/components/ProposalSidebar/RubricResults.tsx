@@ -139,7 +139,7 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
             {criteria.answers.map((answer) => (
               <>
                 <Box display='flex' justifyContent='space-between' width='100%' key={answer.userId}>
-                  <UserDisplay avatarSize='xSmall' user={membersRecord[answer.userId]} />
+                  <UserDisplay avatarSize='xSmall' userId={answer.userId} />
                   <span>
                     {answer.score}
                     <Typography color='secondary' component='span'>

@@ -7,6 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
+import { awsS3Bucket } from 'config/constants';
 import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -26,11 +27,12 @@ const makeRouteHandler = (options: Options = {}): Handler => {
   const route: NextRouteHandler = async function routeRequest(req, res) {
     // eslint-disable-next-line no-use-before-define
     const missing = missingEnvs();
+
     const userId = req.session.user.id;
     if (missing.length > 0) {
       res.status(500).json({ error: `Next S3 Upload: Missing ENVs ${missing.join(', ')}` });
     } else {
-      const bucket = process.env.S3_UPLOAD_BUCKET;
+      const bucket = awsS3Bucket;
 
       let filename = decodeURIComponent(req.query.filename as string);
       const validCharacters = /^[\000-\177]*$/;
@@ -93,7 +95,7 @@ let missingEnvs = (): string[] => {
   if (!process.env.S3_UPLOAD_REGION) {
     keys.push('S3_UPLOAD_REGION');
   }
-  if (!process.env.S3_UPLOAD_BUCKET) {
+  if (!awsS3Bucket) {
     keys.push('S3_UPLOAD_BUCKET');
   }
   return keys;
