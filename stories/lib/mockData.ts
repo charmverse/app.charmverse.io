@@ -104,7 +104,6 @@ export const spaceRoles: ListSpaceRolesResponse[] = [
 export const proposalCategories: ProposalCategoryWithPermissions[] = generateDefaultProposalCategoriesInput(
   'space-id'
 ).map((cat, i) => ({
-  id: 'some-id',
   permissions: {
     manage_permissions: true,
     edit: true,

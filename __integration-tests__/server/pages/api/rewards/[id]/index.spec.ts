@@ -35,6 +35,7 @@ describe('GET /api/rewards/:id - get reward details', () => {
       ...reward,
       reviewers: [],
       allowedSubmitterRoles: null,
+      assignedSubmitters: null,
       updatedAt: expect.any(String),
       createdAt: expect.any(String),
       page: {

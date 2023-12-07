@@ -66,10 +66,10 @@ export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 
             <AddIcon
               fontSize='small'
               iconSize='small'
-              label={reward.approveSubmitters ? 'Apply for submission' : 'Create submission'}
+              label={reward.approveSubmitters ? 'Apply for reward' : 'Create submission'}
             />
           ) : reward.approveSubmitters ? (
-            'Apply for submission'
+            'Apply for reward'
           ) : (
             'Create submission'
           )}

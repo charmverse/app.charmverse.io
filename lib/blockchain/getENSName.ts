@@ -14,8 +14,23 @@ export function getENSName(address: string) {
     }
     return null;
   }
+
   return provider.lookupAddress(address).catch((error) => {
     log.warn('Error looking up ENS name for address', { error });
+    return null;
+  });
+}
+
+export function resolveENSName(ensName: string) {
+  if (!provider) {
+    if (!isTestEnv) {
+      log.warn('No api key provided for Alchemy');
+    }
+    return null;
+  }
+
+  return provider.resolveName(ensName).catch((error) => {
+    log.warn('Error resolving ENS name', { error });
     return null;
   });
 }

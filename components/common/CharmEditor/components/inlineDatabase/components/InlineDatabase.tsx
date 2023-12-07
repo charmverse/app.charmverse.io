@@ -12,6 +12,7 @@ import { makeSelectSortedViews, makeSelectView } from 'components/common/BoardEd
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -158,34 +159,36 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
 
   return (
     <>
-      <StylesContainer
-        className='focalboard-body'
-        containerWidth={containerWidth}
-        onKeyPress={stopPropagation}
-        onKeyDown={stopPropagation}
-        onPaste={stopPropagation}
-      >
-        <CenterPanel
-          currentRootPageId={pageId}
-          disableUpdatingUrl
-          showView={setCurrentViewId}
-          onDeleteView={deleteView}
-          hideBanner
-          readOnly={readOnly}
-          board={board}
-          embeddedBoardPath={boardPage.path}
-          setPage={debouncedPageUpdate}
-          showCard={showCard}
-          activeView={currentView}
-          views={views}
-          page={boardPage}
-          // Show more tabs on shared inline database as the space gets increased
-          maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
-        />
-      </StylesContainer>
-      {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-        <PageDialog key={shownCardId} pageId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
-      )}
+      <DbViewSettingsProvider>
+        <StylesContainer
+          className='focalboard-body'
+          containerWidth={containerWidth}
+          onKeyPress={stopPropagation}
+          onKeyDown={stopPropagation}
+          onPaste={stopPropagation}
+        >
+          <CenterPanel
+            currentRootPageId={pageId}
+            disableUpdatingUrl
+            showView={setCurrentViewId}
+            onDeleteView={deleteView}
+            hideBanner
+            readOnly={readOnly}
+            board={board}
+            embeddedBoardPath={boardPage.path}
+            setPage={debouncedPageUpdate}
+            showCard={showCard}
+            activeView={currentView}
+            views={views}
+            page={boardPage}
+            // Show more tabs on shared inline database as the space gets increased
+            maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
+          />
+        </StylesContainer>
+        {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+          <PageDialog key={shownCardId} pageId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
+        )}
+      </DbViewSettingsProvider>
       <FocalBoardPortal />
     </>
   );

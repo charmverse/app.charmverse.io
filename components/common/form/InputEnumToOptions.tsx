@@ -33,6 +33,9 @@ export default function InputEnumToOptions<T extends string>({
         onChange={(ev) => {
           onChange(ev.target.value as T);
         }}
+        onOpen={(ev) => {
+          ev.stopPropagation();
+        }}
         {...props}
       >
         {options.map((option) => {

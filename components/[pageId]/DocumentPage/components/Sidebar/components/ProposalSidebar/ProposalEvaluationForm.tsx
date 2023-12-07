@@ -10,7 +10,9 @@ import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
 // result and id are not used for creating evaluations, so add them here
-export type ProposalEvaluationValues = ProposalEvaluationInput & Pick<ProposalEvaluation, 'result' | 'id'>;
+// leave out permissions which are picked up on the backend based on workflowId
+export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permissions'> &
+  Pick<ProposalEvaluation, 'result' | 'id'>;
 
 type Props = {
   evaluation: ProposalEvaluationValues;

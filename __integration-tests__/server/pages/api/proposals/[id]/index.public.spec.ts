@@ -105,7 +105,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       include: { reviewers: true }
     });
     // Make sure update went through
-    expect(proposal.reviewers).toEqual<ProposalReviewer[]>(
+    expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>(
       expect.arrayContaining([
         expect.objectContaining({
           id: expect.any(String),
