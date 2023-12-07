@@ -64,16 +64,16 @@ function ConnectedAccount({
   );
 }
 
-function DiscordAccountConnect({ user }: { user: LoggedInUser }) {
-  const connectedDiscordAccount = user.discordUser;
+function DiscordAccountConnect({
+  isDiscordRequired,
+  connectedDiscordAccount
+}: {
+  isDiscordRequired: boolean;
+  connectedDiscordAccount?: LoggedInUser['discordUser'];
+}) {
   const { connect, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
   const { isOnCustomDomain } = useCustomDomain();
   const { updateURLQuery } = useCharmRouter();
-
-  const { isDiscordRequired } = useRequiredMemberProperties({
-    userId: user.id
-  });
-
   return (
     <ConnectedAccount
       icon={<IdentityIcon type='Discord' height={22} width={22} />}
@@ -101,8 +101,13 @@ function DiscordAccountConnect({ user }: { user: LoggedInUser }) {
   );
 }
 
-function WalletConnect({ user }: { user: LoggedInUser }) {
-  const connectedWallet = user?.wallets?.[0];
+function WalletConnect({
+  isWalletRequired,
+  connectedWallet
+}: {
+  isWalletRequired: boolean;
+  connectedWallet?: LoggedInUser['wallets'][number];
+}) {
   const { updateUser } = useUser();
   const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { isSigning } = useWeb3Account();
@@ -122,10 +127,6 @@ function WalletConnect({ user }: { user: LoggedInUser }) {
       enableAutosign: false,
       signSuccess
     });
-
-  const { isWalletRequired } = useRequiredMemberProperties({
-    userId: user.id
-  });
 
   const isConnectingWallet = isConnectingIdentity || isVerifyingWallet || isSigning;
 
@@ -155,14 +156,15 @@ function WalletConnect({ user }: { user: LoggedInUser }) {
   );
 }
 
-function TelegramAccountConnect({ user }: { user: LoggedInUser }) {
-  const connectedTelegramAccount = user?.telegramUser;
+function TelegramAccountConnect({
+  isTelegramRequired,
+  connectedTelegramAccount
+}: {
+  isTelegramRequired: boolean;
+  connectedTelegramAccount?: LoggedInUser['telegramUser'];
+}) {
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
   const { updateURLQuery } = useCharmRouter();
-
-  const { isTelegramRequired } = useRequiredMemberProperties({
-    userId: user.id
-  });
 
   return (
     <>
@@ -189,12 +191,15 @@ function TelegramAccountConnect({ user }: { user: LoggedInUser }) {
   );
 }
 
-function GoogleAccountConnect({ user }: { user: LoggedInUser }) {
-  const connectedGoogleAccount = user?.googleAccounts?.[0];
+function GoogleAccountConnect({
+  isGoogleRequired,
+  connectedGoogleAccount
+}: {
+  isGoogleRequired: boolean;
+  connectedGoogleAccount?: LoggedInUser['googleAccounts'][number];
+}) {
   const { loginWithGooglePopup, isConnectingGoogle } = useGoogleLogin();
-  const { isGoogleRequired } = useRequiredMemberProperties({
-    userId: user.id
-  });
+
   const { updateURLQuery } = useCharmRouter();
 
   return (
@@ -218,19 +223,25 @@ function GoogleAccountConnect({ user }: { user: LoggedInUser }) {
   );
 }
 
-export function ConnectedAccounts() {
-  const { user } = useUser();
+export function ConnectedAccounts({ user }: { user: LoggedInUser }) {
+  const { isGoogleRequired, isDiscordRequired, isWalletRequired, isTelegramRequired } = useRequiredMemberProperties({
+    userId: user.id
+  });
 
-  if (!user) {
-    return null;
-  }
+  const connectedGoogleAccount = user.googleAccounts?.[0];
+  const connectedDiscordAccount = user.discordUser;
+  const connectedTelegramAccount = user.telegramUser;
+  const connectedWallet = user.wallets?.[0];
 
   return (
     <Stack gap={1}>
-      <DiscordAccountConnect user={user} />
-      <GoogleAccountConnect user={user} />
-      <TelegramAccountConnect user={user} />
-      <WalletConnect user={user} />
+      <DiscordAccountConnect isDiscordRequired={isDiscordRequired} connectedDiscordAccount={connectedDiscordAccount} />
+      <GoogleAccountConnect isGoogleRequired={isGoogleRequired} connectedGoogleAccount={connectedGoogleAccount} />
+      <TelegramAccountConnect
+        isTelegramRequired={isTelegramRequired}
+        connectedTelegramAccount={connectedTelegramAccount}
+      />
+      <WalletConnect isWalletRequired={isWalletRequired} connectedWallet={connectedWallet} />
     </Stack>
   );
 }

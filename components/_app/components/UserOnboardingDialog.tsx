@@ -215,7 +215,7 @@ function UserOnboardingDialog({
             onChange={onUserDetailsChange}
           />
           <Legend mt={4}>Build Your Identity</Legend>
-          <ConnectedAccounts />
+          <ConnectedAccounts user={currentUser} />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
             values={memberPropertiesValues}
