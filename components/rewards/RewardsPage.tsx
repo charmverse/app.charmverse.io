@@ -245,6 +245,7 @@ export function RewardsPage({ title }: { title: string }) {
                     subRowsEmptyValueContent='--'
                   />
                 )}
+
                 {activeView.fields.viewType === 'calendar' && (
                   <CalendarFullView
                     board={activeBoard}

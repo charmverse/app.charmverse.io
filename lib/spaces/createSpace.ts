@@ -15,8 +15,11 @@ import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
+import { createDefaultProposal } from 'lib/proposal/createDefaultProposal';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
+import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
+import { createDefaultReward } from 'lib/rewards/createDefaultReward';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
 import type { WorkspaceExport } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
@@ -190,6 +193,20 @@ export async function createWorkspace({
         })
       }
     }
+  });
+
+  // Create a test reward, and the default rewards views
+  await createDefaultReward({
+    spaceId: space.id,
+    userId: space.createdBy
+  });
+
+  await upsertDefaultRewardsBoard({ spaceId: space.id, userId: space.createdBy });
+
+  await createDefaultProposal({
+    spaceId: space.id,
+    userId: space.createdBy,
+    categoryId: defaultProposalCategories[0].id
   });
 
   // Handle the population of pages data

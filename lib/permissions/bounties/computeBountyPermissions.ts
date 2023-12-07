@@ -100,7 +100,9 @@ export async function computeBountyPermissions({
       },
       { role: [], space: [], user: [] } as Record<'space' | 'role' | 'user', BountyPermission[]>
     );
-    const isRoleRestrictedReward = mappedPermissions.role.some((p) => p.permissionLevel === 'submitter');
+    const isRoleRestrictedReward =
+      mappedPermissions.role.some((p) => p.permissionLevel === 'submitter') ||
+      mappedPermissions.user.some((p) => p.permissionLevel === 'submitter');
 
     // Default to explicit space-wide permission
     if (!isRoleRestrictedReward) {

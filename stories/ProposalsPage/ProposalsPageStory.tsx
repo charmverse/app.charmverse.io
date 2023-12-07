@@ -17,8 +17,8 @@ export const proposals = [
   createMockProposal({
     authors: [{ proposalId: '', userId: members[0].id }],
     reviewers: [
-      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id },
-      { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id }
+      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
+      { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
     ],
     categoryId: proposalCategories[0].id,
     evaluationType: 'vote',
@@ -26,14 +26,18 @@ export const proposals = [
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[1].id }],
-    reviewers: [{ evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id }],
+    reviewers: [
+      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
+    ],
     categoryId: proposalCategories[1].id,
     evaluationType: 'vote',
     status: 'discussion'
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[2].id }],
-    reviewers: [{ evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id }],
+    reviewers: [
+      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
+    ],
     categoryId: proposalCategories[2].id,
     evaluationType: 'rubric',
     status: 'review'

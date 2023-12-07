@@ -1,5 +1,6 @@
 import type { SafeTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getAddress } from 'viem';
+import { mantle, mantleTestnet } from 'viem/chains';
 
 import * as http from 'adapters/http';
 
@@ -152,7 +153,7 @@ interface GetTransactionsApiResponse {
   results: GetTransactionsData[];
 }
 
-export function getSafesByOwner({
+export function getMantleSafesByOwner({
   serviceUrl,
   chainId,
   address
@@ -166,7 +167,7 @@ export function getSafesByOwner({
   });
 }
 
-export function getSafeData({
+export function getMantleSafeData({
   serviceUrl,
   chainId,
   address
@@ -180,7 +181,7 @@ export function getSafeData({
   });
 }
 
-export function proposeTransaction({
+export function proposeMantleSafeTransaction({
   safeTransactionData,
   txHash,
   signature,
@@ -210,7 +211,7 @@ export function proposeTransaction({
   );
 }
 
-export function getTransaction({ safeTxHash, chainId }: { chainId: number; safeTxHash: string }) {
+export function getMantleSafeTransaction({ safeTxHash, chainId }: { chainId: number; safeTxHash: string }) {
   return http.GET<SafeTransaction>(
     // 1 indicates the safeAddress, it works for now but it's not ideal
     `https://gateway.multisig.mantle.xyz/v1/chains/${chainId}/transactions/multisig_1_${safeTxHash}`,
@@ -221,7 +222,7 @@ export function getTransaction({ safeTxHash, chainId }: { chainId: number; safeT
   );
 }
 
-export async function getAllTransactions({
+export async function getAllMantleSafeTransactions({
   safeAddress,
   chainId,
   executed
@@ -262,4 +263,7 @@ export async function getAllTransactions({
     (transaction) =>
       transaction.transaction.txStatus !== 'AWAITING_EXECUTION' && transaction.transaction.txInfo.type === 'Transfer'
   );
+}
+export function isMantleChain(chainId: number) {
+  return chainId === mantle.id || chainId === mantleTestnet.id;
 }
