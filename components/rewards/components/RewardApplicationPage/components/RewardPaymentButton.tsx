@@ -8,6 +8,7 @@ import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import ERC20ABI from 'abis/ERC20.json';
 import { getChainById } from 'connectors/chains';
+import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -206,6 +207,18 @@ export function RewardPaymentButton({
         await switchActiveNetwork(chainIdToUse);
       }
 
+      let receiverAddress = receiver;
+
+      if (receiver.endsWith('.eth') && ethers.utils.isValidName(receiver)) {
+        const resolvedWalletAddress = await charmClient.resolveEnsName(receiver);
+        if (resolvedWalletAddress === null) {
+          onError(`Could not resolve ENS name ${receiver}`);
+          return;
+        }
+
+        receiverAddress = resolvedWalletAddress;
+      }
+
       if (isValidChainAddress(tokenSymbolOrAddress)) {
         const tokenContract = new Contract(tokenSymbolOrAddress, ERC20ABI, signer);
 
@@ -232,19 +245,19 @@ export function RewardPaymentButton({
         const parsedTokenAmount = parseUnits(amount, tokenDecimals);
 
         // get allowance
-        const allowance = await tokenContract.allowance(account, receiver);
+        const allowance = await tokenContract.allowance(account, receiverAddress);
 
         if (BigNumber.from(allowance).lt(parsedTokenAmount)) {
           // approve if the allowance is small
-          await tokenContract.approve(receiver, parsedTokenAmount);
+          await tokenContract.approve(receiverAddress, parsedTokenAmount);
         }
 
         // transfer token
-        const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
+        const tx = await tokenContract.transfer(receiverAddress, parsedTokenAmount);
         onSuccess(tx.hash, chainToUse!.chainId);
       } else {
         const tx = await signer.sendTransaction({
-          to: receiver,
+          to: receiverAddress,
           value: parseEther(amount)
         });
 

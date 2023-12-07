@@ -104,7 +104,7 @@ function PageHeader({
     <>
       {parentPage ? (
         <Chip
-          label={parentPage.title}
+          label={parentPage.title || 'Untitled'}
           sx={{
             cursor: 'pointer'
           }}

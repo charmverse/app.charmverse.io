@@ -2,6 +2,7 @@ import type { Bounty } from '@charmverse/core/prisma';
 import { Interface } from '@ethersproject/abi';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getChainById } from 'connectors/chains';
+import { ethers } from 'ethers';
 import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import { getAddress, parseUnits } from 'viem';
@@ -89,7 +90,10 @@ export function useMultiRewardPayment({
         to = token;
         value = '0';
       } else {
-        to = getAddress(recipientAddress);
+        to =
+          recipientAddress.endsWith('.eth') && ethers.utils.isValidName(recipientAddress)
+            ? recipientAddress
+            : getAddress(recipientAddress);
       }
 
       const defaultTitle = 'Untitled';
@@ -111,34 +115,10 @@ export function useMultiRewardPayment({
     []
   );
 
-  // If the reward is on the same chain as the gnosis safe and the rewardToken of the reward is the same as the native currency of the gnosis safe chain
-  const getTransactions: (safeAddress?: string) => TransactionWithMetadata[] = useCallback(
-    (safeAddress?: string) => {
-      return bountiesToPay
-        .map((reward) =>
-          reward.applications
-            .filter((application) => application.walletAddress && application.status === 'complete')
-            .map((application) => {
-              return prepareGnosisSafeRewardPayment({
-                amount: reward.rewardAmount as number,
-                applicationId: application.id,
-                recipientAddress: application.walletAddress as string,
-                recipientUserId: application.createdBy,
-                token: reward.rewardToken as string,
-                txChainId: reward.chainId as number
-              });
-            })
-        )
-        .flat();
-    },
-    [rewards, gnosisSafes]
-  );
-
   const isDisabled = bountiesToPay.length === 0;
 
   return {
     isDisabled,
-    getTransactions,
     prepareGnosisSafeRewardPayment,
     gnosisSafes,
     gnosisSafeData,
