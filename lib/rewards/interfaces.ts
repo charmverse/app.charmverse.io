@@ -16,12 +16,14 @@ export type RewardWithUsers = Bounty & {
   reviewers: RewardReviewer[];
   applications: ApplicationMeta[];
   allowedSubmitterRoles: string[] | null;
+  assignedSubmitters: string[] | null;
 };
 
 export type RewardWithUsersAndPageMeta = Bounty & {
   reviewers: RewardReviewer[];
   applications: ApplicationMeta[];
   allowedSubmitterRoles: string[] | null;
+  assignedSubmitters: string[] | null;
   page: Pick<Page, 'id' | 'title' | 'path'>;
 };
 
