@@ -11,14 +11,17 @@ import { StyledFocalboardTextInput } from 'components/common/BoardEditor/compone
 import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import { ProposalTemplateSelect } from 'components/proposals/components/ProposalProperties/components/ProposalTemplateSelect';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
 import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import type { RewardType } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
+import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
@@ -34,6 +37,9 @@ type Props = {
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
+  addPageFromTemplate?: (templateId: string) => void;
+  selectedTemplate?: RewardTemplate | null;
+  resetTemplate?: VoidFunction;
 };
 
 export function RewardPropertiesForm({
@@ -44,8 +50,10 @@ export function RewardPropertiesForm({
   isNewReward,
   isTemplate,
   pageId,
-  refreshPermissions,
-  expandedByDefault
+  expandedByDefault,
+  addPageFromTemplate,
+  selectedTemplate,
+  resetTemplate
 }: Props) {
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
@@ -54,7 +62,7 @@ export function RewardPropertiesForm({
     id,
     group: 'role'
   }));
-
+  const { templates: rewardTemplates = [] } = useRewardTemplates();
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
       setRewardType('Custom');
@@ -145,6 +153,31 @@ export function RewardPropertiesForm({
 
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
+            {!isTemplate && isNewReward && (
+              <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+                <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                  <PropertyLabel readOnly highlighted>
+                    Template
+                  </PropertyLabel>
+                  <Box display='flex' flex={1}>
+                    <ProposalTemplateSelect
+                      options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
+                      value={selectedTemplate?.page ?? null}
+                      onChange={(templatePage) => {
+                        if (!templatePage) {
+                          resetTemplate?.();
+                        }
+                        const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
+                        if (template && addPageFromTemplate) {
+                          addPageFromTemplate(template.page.id);
+                        }
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                 Reviewer

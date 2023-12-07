@@ -22,6 +22,7 @@ import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
@@ -156,28 +157,30 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     return (
       <>
         <div data-test='database-page' className='focalboard-body full-page'>
-          <CenterPanel
-            currentRootPageId={page.id}
-            readOnly={Boolean(readOnlyBoard)}
-            board={board}
-            setPage={setPage}
-            pageIcon={page.icon}
-            showCard={showCard}
-            showView={showView}
-            activeView={activeView || undefined}
-            views={boardViews}
-            page={page}
-          />
-          {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-            <PageDialog
-              key={shownCardId}
-              pageId={shownCardId}
-              onClose={() => {
-                showCard(null);
-              }}
-              readOnly={readOnly}
+          <DbViewSettingsProvider>
+            <CenterPanel
+              currentRootPageId={page.id}
+              readOnly={Boolean(readOnlyBoard)}
+              board={board}
+              setPage={setPage}
+              pageIcon={page.icon}
+              showCard={showCard}
+              showView={showView}
+              activeView={activeView || undefined}
+              views={boardViews}
+              page={page}
             />
-          )}
+            {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+              <PageDialog
+                key={shownCardId}
+                pageId={shownCardId}
+                onClose={() => {
+                  showCard(null);
+                }}
+                readOnly={readOnly}
+              />
+            )}
+          </DbViewSettingsProvider>
         </div>
         {/** include the root portal for focalboard's popup */}
         <FocalBoardPortal />

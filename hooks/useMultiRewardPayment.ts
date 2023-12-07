@@ -34,18 +34,16 @@ export function useMultiRewardPayment({
   rewards: Pick<RewardWithUsers, 'applications' | 'chainId' | 'id' | 'rewardAmount' | 'rewardToken'>[];
   selectedApplicationIds?: string[];
 }) {
-  const [isLoading, setIsLoading] = useState(false);
   const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
-  const { mutateRewards: refreshRewards } = useRewards();
-  const { account, chainId, signer } = useWeb3Account();
+  const { account, chainId } = useWeb3Account();
 
   const { pages } = usePages();
 
   const [paymentMethods] = usePaymentMethods();
   const { data: gnosisSafes } = useSWR(
-    signer && account && chainId ? `/connected-gnosis-safes/${account}` : null,
+    account && chainId ? `/connected-gnosis-safes/${account}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    () => getSafesForAddress({ signer: signer!, chainId: chainId!, address: account! })
+    () => getSafesForAddress({ chainId: chainId!, address: account! })
   );
 
   const bountiesToPay = rewards.filter((reward) => {
@@ -120,7 +118,6 @@ export function useMultiRewardPayment({
   const isDisabled = bountiesToPay.length === 0;
 
   return {
-    isLoading,
     isDisabled,
     prepareGnosisSafeRewardPayment,
     gnosisSafes,

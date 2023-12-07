@@ -9,7 +9,7 @@ import { getAddress } from 'viem';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import { proposeTransaction } from 'lib/gnosis/mantleClient';
+import { isMantleChain, proposeMantleSafeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 
 import useGnosisSafes from './useGnosisSafes';
@@ -93,8 +93,8 @@ export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess 
     const senderAddress = getAddress(account);
 
     const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-    if (chainId === 5001 || chainId === 5000) {
-      await proposeTransaction({
+    if (isMantleChain(chainId)) {
+      await proposeMantleSafeTransaction({
         safeTransactionData: {
           ...safeTransaction.data,
           // Need to convert to string because mantle doesn't support big numbers
