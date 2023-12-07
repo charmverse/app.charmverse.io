@@ -1,5 +1,4 @@
-import type { MemberProperty } from '@charmverse/core/prisma-client';
-import { prisma, MemberPropertyType } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
