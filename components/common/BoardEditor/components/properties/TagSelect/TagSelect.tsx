@@ -97,6 +97,7 @@ type Props = {
   readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
   multiselect?: boolean;
+  includeSelectedOptions?: boolean;
   noOptionsText?: string;
   options: IPropertyOption[];
   propertyValue: string | string[];
@@ -114,6 +115,7 @@ export function TagSelect({
   readOnly,
   readOnlyMessage,
   canEditOptions = false,
+  includeSelectedOptions,
   options,
   propertyValue,
   multiselect = false,
@@ -195,6 +197,7 @@ export function TagSelect({
     <StyledSelect
       data-test={dataTest}
       canEditOptions={canEditOptions}
+      includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}
       autoOpen

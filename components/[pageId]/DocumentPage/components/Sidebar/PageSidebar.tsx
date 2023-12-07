@@ -64,6 +64,7 @@ type SidebarProps = {
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
   proposalId: string | null;
+  proposalEvaluationId?: string;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -157,6 +158,7 @@ function SidebarContents({
   threads,
   openSidebar,
   proposalId,
+  proposalEvaluationId,
   proposal,
   refreshProposal
 }: SidebarProps & { proposal?: ProposalWithUsersAndRubric; refreshProposal: VoidFunction }) {

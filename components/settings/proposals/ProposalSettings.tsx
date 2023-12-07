@@ -11,6 +11,7 @@ import {
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 
@@ -27,6 +28,7 @@ export function ProposalSettings({ space }: { space: Space }) {
   const { data: currentWorkflowTemplates } = useGetProposalWorkflows(space.id);
   const { trigger: upsertWorkflow } = useUpsertProposalWorkflow(space.id);
   const { trigger: deleteWorkflow } = useDeleteProposalWorkflow(space.id);
+  const { showMessage } = useSnackbar();
 
   useTrackPageView({ type: 'settings/proposals' });
 
@@ -65,6 +67,10 @@ export function ProposalSettings({ space }: { space: Space }) {
   }
 
   async function handleDeleteWorkflow(id: string) {
+    if (workflows.length === 1) {
+      showMessage('You must have at least one workflow', 'error');
+      return;
+    }
     await deleteWorkflow({ workflowId: id });
     setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
   }

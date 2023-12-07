@@ -90,6 +90,7 @@ export interface DocumentPageProps {
 function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, enableSidebar }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
+  const [proposalEvaluationId, setProposalEvaluationId] = useState();
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath } = useCharmRouter();
   const {
@@ -425,6 +426,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                       pageId={page.id}
                       spaceId={page.spaceId}
                       proposalId={proposalId}
+                      proposalEvaluationId={proposalEvaluationId}
                       pagePermissions={pagePermissions}
                       editorState={editorState}
                       sidebarView={sidebarView}
