@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
+import { Alert } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
@@ -49,7 +50,7 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     log.info('[user-journey] Show onboarding flow');
   }, []);
 
-  const { nonEmptyRequiredProperties } = useRequiredMemberProperties({
+  const { hasEmptyRequiredProperties } = useRequiredMemberProperties({
     userId: user.id
   });
 
@@ -61,12 +62,20 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
         initialStep={onboardingStep}
         currentUser={user}
         completeOnboarding={completeOnboarding}
+        hasEmptyRequiredProperties={hasEmptyRequiredProperties}
       />
     );
   }
 
-  if (nonEmptyRequiredProperties) {
-    return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
+  if (hasEmptyRequiredProperties) {
+    return (
+      <UserOnboardingDialog
+        space={space}
+        key={user.id}
+        currentUser={user}
+        hasEmptyRequiredProperties={hasEmptyRequiredProperties}
+      />
+    );
   }
 
   return null;
@@ -79,12 +88,14 @@ function UserOnboardingDialog({
   currentUser,
   completeOnboarding,
   initialStep,
-  space
+  space,
+  hasEmptyRequiredProperties
 }: {
   completeOnboarding?: () => Promise<void>;
   currentUser: LoggedInUser;
   initialStep?: OnboardingStep;
   space: Space;
+  hasEmptyRequiredProperties?: boolean;
 }) {
   const { requiredProperties, requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
@@ -188,6 +199,7 @@ function UserOnboardingDialog({
         <OnboardingEmailForm onClick={goNextStep} spaceId={space.id} />
       ) : currentStep === 'profile_step' ? (
         <>
+          {hasEmptyRequiredProperties ? <Alert severity='info'>Please fill out all required fields</Alert> : null}
           <UserDetailsForm
             errors={userDetailsErrors}
             userDetails={userDetailsValues}

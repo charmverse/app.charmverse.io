@@ -111,7 +111,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       isTimezoneRequired: !!_isTimezoneRequired,
       isBioRequired: !!_isBioRequired,
       requiredPropertiesWithoutValue,
-      nonEmptyRequiredProperties: requiredPropertiesWithoutValue.length !== 0,
+      hasEmptyRequiredProperties: requiredPropertiesWithoutValue.length !== 0,
       isTwitterRequired: !!_isTwitterRequired,
       isLinkedinRequired: !!_isLinkedinRequired,
       isGithubRequired: !!_isGithubRequired,
