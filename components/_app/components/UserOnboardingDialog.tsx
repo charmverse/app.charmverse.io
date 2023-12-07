@@ -86,7 +86,7 @@ function UserOnboardingDialog({
   initialStep?: OnboardingStep;
   space: Space;
 }) {
-  const { requiredProperties } = useRequiredMemberProperties({
+  const { requiredProperties, requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
   const {
@@ -169,7 +169,14 @@ function UserOnboardingDialog({
             size='large'
             onClick={saveForm}
             loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
-            disabled={!isFormDirty || !isUserDetailsValid || !isMemberPropertiesValid}
+            disabled={
+              !isFormDirty ||
+              !isUserDetailsValid ||
+              !isMemberPropertiesValid ||
+              requiredPropertiesWithoutValue.some((requiredProperty) =>
+                ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
+              )
+            }
             disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save
@@ -191,7 +198,7 @@ function UserOnboardingDialog({
             onChange={onUserDetailsChange}
           />
           <Legend mt={4}>Build Your Identity</Legend>
-          <ConnectedAccounts userId={currentUser.id} />
+          <ConnectedAccounts />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
             values={memberPropertiesValues}

@@ -11,7 +11,6 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import Modal from 'components/common/Modal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 import { MemberPropertyVisibility } from './MemberPropertyVisibility';
@@ -93,7 +92,7 @@ export function MemberPropertySidebarDetails({
               />
             </Stack>
           ) : null}
-          {!['role', 'join_date', 'profile_pic', 'discord'].includes(property.type) ? (
+          {!['role', 'join_date', 'profile_pic'].includes(property.type) ? (
             <Stack flexDirection='row' justifyContent='space-between' mr={2}>
               <Tooltip title={isAdmin ? 'Require members to fill this property during onboarding' : ''}>
                 <Typography pl={4} variant='overline' alignItems='center' display='flex'>

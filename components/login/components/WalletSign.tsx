@@ -22,21 +22,23 @@ interface Props {
   onError?: (err: any) => void;
 }
 
-export function WalletSign({
-  signSuccess,
-  buttonStyle,
-  buttonSize,
-  ButtonComponent = PrimaryButton,
-  buttonOutlined,
+export function useWalletSign({
   enableAutosign,
   loading,
-  onError
-}: Props) {
+  onError,
+  signSuccess
+}: {
+  enableAutosign: boolean;
+  onError?: (err: any) => void;
+  loading?: boolean;
+  signSuccess: (authSig: AuthSig) => void | Promise<any>;
+}) {
   const { isConnectingIdentity, connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
   const { account, requestSignature, isSigning, walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isVerifyingWallet, setIsVerifyingWallet] = useState(false);
   const showLoadingState = loading || isSigning || isVerifyingWallet;
+
   useEffect(() => {
     // Do not trigger signature if user is on a mobile device
     if (!isTouchScreen() && !isSigning && enableAutosign && verifiableWalletDetected && !isConnectingIdentity) {
@@ -54,7 +56,7 @@ export function WalletSign({
         .then(signSuccess)
         .catch((error) => {
           log.error('Error requesting wallet signature in login page', { error });
-          showMessage('Wallet signature cancelled', 'info');
+          showMessage(error?.message || 'Wallet signature cancelled', 'info');
           onError?.(error);
         })
         .finally(() => {
@@ -62,6 +64,40 @@ export function WalletSign({
         });
     }
   }
+
+  return {
+    verifiableWalletDetected,
+    isConnectingIdentity,
+    connectWallet,
+    isWalletSelectorModalOpen,
+    generateWalletAuth,
+    showLoadingState
+  };
+}
+
+export function WalletSign({
+  signSuccess,
+  buttonStyle,
+  buttonSize,
+  ButtonComponent = PrimaryButton,
+  buttonOutlined,
+  enableAutosign,
+  loading,
+  onError
+}: Props) {
+  const {
+    connectWallet,
+    generateWalletAuth,
+    isConnectingIdentity,
+    isWalletSelectorModalOpen,
+    showLoadingState,
+    verifiableWalletDetected
+  } = useWalletSign({
+    enableAutosign: !!enableAutosign,
+    loading,
+    onError,
+    signSuccess
+  });
 
   if (!verifiableWalletDetected || isConnectingIdentity) {
     return (
