@@ -124,7 +124,7 @@ export function RewardPaymentButton({
   onError = () => {}
 }: Props) {
   const { data: existingSafesData, mutate: refreshSafes } = useMultiWalletSigs();
-  const { account, provider, chainId, signer } = useWeb3Account();
+  const { account, chainId, signer } = useWeb3Account();
   const { user } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -210,7 +210,7 @@ export function RewardPaymentButton({
       let receiverAddress = receiver;
 
       if (receiver.endsWith('.eth') && ethers.utils.isValidName(receiver)) {
-        const resolvedWalletAddress = provider ? await provider.resolveName(receiver) : null;
+        const resolvedWalletAddress = await charmClient.resolveEnsName(receiver);
         if (resolvedWalletAddress === null) {
           onError(`Could not resolve ENS name ${receiver}`);
           return;
