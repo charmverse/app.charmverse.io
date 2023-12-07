@@ -1,18 +1,12 @@
-import styled from '@emotion/styled';
-import { Stack, SvgIcon, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
-import DiscordIcon from 'public/images/logos/discord_logo.svg';
+import { useUser } from 'hooks/useUser';
 
 import { useRequiredMemberProperties } from '../hooks/useRequiredMemberProperties';
-
-const ImageIcon = styled.img`
-  width: 1.5rem;
-  height: 1.5rem;
-`;
 
 function ConnectedAccount({
   icon,
@@ -40,6 +34,8 @@ function ConnectedAccount({
 }
 
 export function ConnectedAccounts({ userId }: { userId: string }) {
+  const { user } = useUser();
+  const hasConnectedWallet = user?.wallets.length !== 0;
   const { isGoogleRequired, isDiscordRequired, isWalletRequired, isTelegramRequired } = useRequiredMemberProperties({
     userId
   });
@@ -58,7 +54,7 @@ export function ConnectedAccounts({ userId }: { userId: string }) {
       <ConnectedAccount
         account='telegram'
         icon={<IdentityIcon type='Telegram' height={25} width={25} />}
-        required={isGoogleRequired}
+        required={isTelegramRequired}
       />
       <ConnectedAccount
         account='wallet'
