@@ -48,7 +48,6 @@ export function EvaluationRow({
     <StyledCard style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }} readOnly={readOnly}>
       <Box p={1} display='flex' alignItems='center' gap={1} justifyContent='space-between'>
         {!readOnly && <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />}
-
         {evaluationIcons[evaluation.type]()}
         <Typography sx={{ flexGrow: 1 }}>{evaluation.title}</Typography>
         <EvaluationContextMenu
