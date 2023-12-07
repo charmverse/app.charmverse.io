@@ -7,7 +7,6 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePendingLocalAction } from 'hooks/usePendingLocalAction';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 
@@ -23,33 +22,29 @@ export function Invites({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
-  const { isPendingAction, setPendingAction } = usePendingLocalAction('open-token-gate-modal');
-  const isTokenGatePending = useRef(false);
+
+  const isOpeningTokenGate = useRef(false);
+
   const { connectWallet } = useContext(Web3Connection);
   const { account } = useWeb3Account();
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
   useTrackPageView({ type: 'settings/invites' });
-
-  if (account && isTokenGatePending.current) {
-    setPendingAction();
-    isTokenGatePending.current = false;
-  }
-
   function handleTokenGate() {
     if (account) {
       popupTokenGateState.open();
     } else {
-      isTokenGatePending.current = true;
+      isOpeningTokenGate.current = true;
+      // This is where we need to solve the walletSelectorModal auto closing
       connectWallet();
     }
   }
 
   useEffect(() => {
-    if (account && isPendingAction) {
+    if (account && isOpeningTokenGate.current) {
       popupTokenGateState.open();
-      isTokenGatePending.current = false;
+      isOpeningTokenGate.current = false;
     }
-  }, [account, isPendingAction]);
+  }, [account]);
 
   return (
     <>
@@ -69,8 +64,6 @@ export function Invites({ space }: { space: Space }) {
         <InviteActions
           onOpenInvitesClick={popupInvitesState.open}
           onOpenTokenGateClick={handleTokenGate}
-          invitePopupState={popupInvitesState}
-          tokenGatePopupState={popupTokenGateState}
           isAdmin={isAdmin}
         />
       </Legend>

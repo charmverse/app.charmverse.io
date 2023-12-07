@@ -56,6 +56,7 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
 
   // close the modal after signing in
   useEffect(() => {
+    // Code path causing an error in token gate modal
     if (isConnected && isWalletSelectorModalOpen) {
       closeWalletSelectorModal();
     }
