@@ -3,7 +3,7 @@ import { ApplicationStatus } from '@charmverse/core/prisma';
 import type { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
 import { BigNumber } from 'ethers';
 
-import { getAllTransactions, getTransaction } from './mantleClient';
+import { getAllMantleSafeTransactions, getMantleSafeTransaction } from './mantleClient';
 import { getSafeApiClient } from './safe/getSafeApiClient';
 
 export type SafeTxStatusDetails = {
@@ -21,7 +21,7 @@ export async function getSafeTxStatus({
 }): Promise<SafeTxStatusDetails | null> {
   try {
     if (chainId === 5000 || chainId === 5001) {
-      const safeTx = await getTransaction({
+      const safeTx = await getMantleSafeTransaction({
         chainId,
         safeTxHash
       });
@@ -40,14 +40,14 @@ export async function getSafeTxStatus({
         return { status: ApplicationStatus.cancelled, chainTxHash: txHash, safeTxHash };
       }
 
-      const executedTxs = await getAllTransactions({ safeAddress, chainId, executed: true });
+      const executedTxs = await getAllMantleSafeTransactions({ safeAddress, chainId, executed: true });
       // execution info is missing for cancelled txs
       const replacedTx = executedTxs.find((tx) => tx.transaction.executionInfo?.nonce === detailedExecutionInfo.nonce);
 
       if (replacedTx) {
         // transaction id format multisig_safeaddress_safetxhash
         const replacedSafeTxHash = replacedTx.transaction.id.split('_')[2];
-        const replacedSafeTx = await getTransaction({
+        const replacedSafeTx = await getMantleSafeTransaction({
           chainId,
           safeTxHash: replacedSafeTxHash
         });

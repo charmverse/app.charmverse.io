@@ -7,7 +7,7 @@ import DoDisturbOutlinedIcon from '@mui/icons-material/DoDisturbOutlined';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
 import RuleIcon from '@mui/icons-material/Rule';
-import type { SvgIconTypeMap } from '@mui/material';
+import type { SvgIconTypeMap, SxProps } from '@mui/material';
 import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
@@ -100,8 +100,10 @@ export function RewardApplicationStatusIcon({
 export function RewardApplicationStatusChip({
   status,
   size = 'small',
-  showIcon
+  showIcon,
+  sx
 }: {
+  sx?: SxProps;
   size?: ChipProps['size'];
   status: ApplicationStatus;
   showIcon?: boolean;
@@ -111,6 +113,7 @@ export function RewardApplicationStatusChip({
       data-test='reward-application-status-chip'
       style={{ justifyContent: 'flex-start' }}
       size={size}
+      sx={sx}
       status={status}
       label={REWARD_APPLICATION_STATUS_LABELS[status]}
       variant='filled'
