@@ -1,18 +1,5 @@
 import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 
-export const proposalStatusTransitionRecord: Record<ProposalStatus, ProposalStatus[]> = {
-  draft: ['discussion'],
-  discussion: ['draft', 'draft', 'review', 'evaluation_active'],
-  review: ['discussion', 'reviewed'],
-  reviewed: ['vote_active', 'discussion'],
-  vote_active: [],
-  vote_closed: [],
-  evaluation_active: [],
-  evaluation_closed: []
-};
-
-export const PROPOSAL_STATUSES = Object.keys(proposalStatusTransitionRecord) as ProposalStatus[];
-
 export type ProposalStatusWithArchived = ProposalStatus | 'archived';
 
 export function getProposalStatuses(evaluationType: ProposalEvaluationType = 'vote'): ProposalStatus[] {
@@ -31,7 +18,8 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   vote_active: 'Vote Active',
   vote_closed: 'Vote Closed',
   evaluation_active: 'Evaluation Active',
-  evaluation_closed: 'Evaluation Closed'
+  evaluation_closed: 'Evaluation Closed',
+  published: 'Evaluation in progress'
 };
 
 export const PROPOSAL_STATUS_LABELS_WITH_ARCHIVED: Record<ProposalStatusWithArchived, string> = {
@@ -69,7 +57,8 @@ export const proposalStatusDetails: Record<ProposalStatus, string> = {
   vote_active: 'Space members are voting on this proposal',
   vote_closed: 'The vote is complete',
   evaluation_active: 'Reviewers are evaluating this proposal',
-  evaluation_closed: 'Evaluation is complete'
+  evaluation_closed: 'Evaluation is complete',
+  published: 'Evaluation is in progress'
 };
 
 export function previousProposalStatusUpdateMessage(status: ProposalStatus) {

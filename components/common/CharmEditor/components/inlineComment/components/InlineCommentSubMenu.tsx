@@ -112,7 +112,12 @@ export function InlineCommentSubMenu({
             emptyPlaceholderContent='Everyone'
             readOnlyMessage='Everyone'
             value={threadAccessGroups}
-            onChange={setThreadAccessGroups}
+            onChange={(options) => {
+              const commentOptions = options.filter(
+                (option) => option.group === 'user' || option.group === 'role'
+              ) as ThreadAccessGroup[];
+              setThreadAccessGroups(commentOptions);
+            }}
           />
           <Divider />
         </Stack>

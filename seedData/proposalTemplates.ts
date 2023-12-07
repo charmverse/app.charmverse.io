@@ -506,7 +506,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Treasury',
         color: 'gray'
       },
-      fields: null
+      fields: null,
+      workflowId: null
     }
   },
   {
@@ -1637,7 +1638,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Treasury',
         color: 'gray'
       },
-      fields: null
+      fields: null,
+      workflowId: null
     }
   },
   {
@@ -2056,7 +2058,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Treasury',
         color: 'gray'
       },
-      fields: null
+      fields: null,
+      workflowId: null
     }
   },
   {
@@ -2403,7 +2406,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Protocol',
         color: 'pink'
       },
-      fields: null
+      fields: null,
+      workflowId: null
     }
   },
   {
@@ -3092,7 +3096,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Metagoverance',
         color: 'pink'
       },
-      fields: null
+      fields: null,
+      workflowId: null
     }
   },
   {
@@ -3779,7 +3784,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         title: 'Metagoverance',
         color: 'pink'
       },
-      fields: null
+      fields: null,
+      workflowId: null
     }
   }
 ];

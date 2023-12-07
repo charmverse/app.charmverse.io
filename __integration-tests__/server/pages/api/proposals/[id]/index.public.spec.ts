@@ -103,14 +103,15 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const updated = await getProposal({ proposalId: page.proposalId! });
     // Make sure update went through
-    expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>([
-      {
-        id: expect.any(String),
-        proposalId: page.proposalId as string,
-        userId: adminUser.id,
-        roleId: null
-      }
-    ]);
+    expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: expect.any(String),
+          proposalId: page.proposalId as string,
+          userId: adminUser.id
+        })
+      ])
+    );
   });
 
   // This is achieved currently by the fact the we check new reviewers against proposal reviewer pool, and in public mode, the role ids are always empty

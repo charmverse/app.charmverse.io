@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
-import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import type { RoleOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
@@ -24,7 +24,7 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { Reward, RewardWithUsers, RewardReviewer } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -73,7 +73,7 @@ export function RewardPropertiesForm({
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
-  const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
+  const allowedSubmittersValue: RoleOption[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
   }));
@@ -229,8 +229,11 @@ export function RewardPropertiesForm({
                 readOnly={readOnly}
                 value={values.reviewers ?? []}
                 onChange={async (options) => {
+                  const reviewerOptions = options.filter(
+                    (option) => option.group === 'role' || option.group === 'user'
+                  ) as RewardReviewer[];
                   await applyUpdates({
-                    reviewers: options.map((option) => ({ group: option.group, id: option.id }))
+                    reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
                   });
                 }}
               />
