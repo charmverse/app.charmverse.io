@@ -19,7 +19,7 @@ type IDiscordConnectionContext = {
   isLoading: boolean;
   connect: (options?: { onboarding?: boolean }) => Promise<void> | void;
   error?: string;
-  popupLogin: (redirectUrl: string, type: 'login' | 'connect', options?: { onboarding?: boolean }) => void;
+  popupLogin: (redirectUrl: string, type: 'login' | 'connect') => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
@@ -75,12 +75,11 @@ export function DiscordProvider({ children }: Props) {
       });
   }
 
-  function popupLogin(redirectUrl: string, type: 'login' | 'connect', options?: { onboarding?: boolean }) {
+  function popupLogin(redirectUrl: string, type: 'login' | 'connect') {
     const discordLoginPath = getDiscordLoginPath({
       type,
       redirectUrl,
-      authFlowType: 'popup',
-      onboarding: options?.onboarding
+      authFlowType: 'popup'
     });
 
     const loginCallback = async ({ code }: { code: string | null }) => {

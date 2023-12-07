@@ -152,6 +152,14 @@ function UserOnboardingDialog({
     setCurrentStep('profile_step');
   }
 
+  const isSaveButtonDisabled =
+    !isFormDirty ||
+    !isUserDetailsValid ||
+    !isMemberPropertiesValid ||
+    requiredPropertiesWithoutValue.some((requiredProperty) =>
+      ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
+    );
+
   const handleClose = () => {
     updateURLQuery({ onboarding: null });
     if (isFormDirty) {
@@ -184,14 +192,7 @@ function UserOnboardingDialog({
             size='large'
             onClick={saveForm}
             loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
-            disabled={
-              !isFormDirty ||
-              !isUserDetailsValid ||
-              !isMemberPropertiesValid ||
-              requiredPropertiesWithoutValue.some((requiredProperty) =>
-                ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
-              )
-            }
+            disabled={isSaveButtonDisabled}
             disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save

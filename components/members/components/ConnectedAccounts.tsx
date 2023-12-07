@@ -7,7 +7,9 @@ import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { useWalletSign } from 'components/login/components/WalletSign';
+import { TelegramLoginIframe } from 'components/settings/account/components/TelegramLoginIframe';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
@@ -54,7 +56,7 @@ function ConnectedAccount({
         >
           <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%'>
             {children}
-            {icon}
+            {!loading ? icon : null}
           </Stack>
         </Button>
       </FieldWrapper>
@@ -66,6 +68,7 @@ function DiscordAccountConnect({ user }: { user: LoggedInUser }) {
   const connectedDiscordAccount = user.discordUser;
   const { connect, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
   const { isOnCustomDomain } = useCustomDomain();
+  const { updateURLQuery } = useCharmRouter();
 
   const { isDiscordRequired } = useRequiredMemberProperties({
     userId: user.id
@@ -78,8 +81,10 @@ function DiscordAccountConnect({ user }: { user: LoggedInUser }) {
       required={isDiscordRequired}
       disabled={!!connectedDiscordAccount || isDiscordLoading}
       onClick={() => {
-        if (isOnCustomDomain) {
-          popupLogin('/', 'connect', { onboarding: true });
+        if (!isOnCustomDomain) {
+          // Since this opens a new window, we need to keep the onboarding modal open via adding the onboarding query param
+          updateURLQuery({ onboarding: true });
+          popupLogin('/', 'connect');
         } else {
           connect({ onboarding: true });
         }
@@ -153,27 +158,34 @@ function WalletConnect({ user }: { user: LoggedInUser }) {
 function TelegramAccountConnect({ user }: { user: LoggedInUser }) {
   const connectedTelegramAccount = user?.telegramUser;
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
+  const { updateURLQuery } = useCharmRouter();
 
   const { isTelegramRequired } = useRequiredMemberProperties({
     userId: user.id
   });
 
   return (
-    <ConnectedAccount
-      label='Telegram'
-      icon={<IdentityIcon type='Telegram' height={22} width={22} />}
-      required={isTelegramRequired}
-      disabled={!!connectedTelegramAccount || isConnectingToTelegram}
-      onClick={connectTelegram}
-    >
-      {!connectedTelegramAccount ? (
-        <Typography variant='subtitle1'>Connect with Telegram</Typography>
-      ) : (
-        <Typography variant='subtitle1'>
-          Connected as {(connectedTelegramAccount.account as unknown as Partial<TelegramAccount>)?.username}
-        </Typography>
-      )}
-    </ConnectedAccount>
+    <>
+      <ConnectedAccount
+        label='Telegram'
+        icon={<IdentityIcon type='Telegram' height={22} width={22} />}
+        required={isTelegramRequired}
+        disabled={!!connectedTelegramAccount || isConnectingToTelegram}
+        onClick={() => {
+          updateURLQuery({ onboarding: true });
+          connectTelegram();
+        }}
+      >
+        {!connectedTelegramAccount ? (
+          <Typography variant='subtitle1'>Connect with Telegram</Typography>
+        ) : (
+          <Typography variant='subtitle1'>
+            Connected as {(connectedTelegramAccount.account as unknown as Partial<TelegramAccount>)?.username}
+          </Typography>
+        )}
+      </ConnectedAccount>
+      <TelegramLoginIframe />
+    </>
   );
 }
 
@@ -183,6 +195,7 @@ function GoogleAccountConnect({ user }: { user: LoggedInUser }) {
   const { isGoogleRequired } = useRequiredMemberProperties({
     userId: user.id
   });
+  const { updateURLQuery } = useCharmRouter();
 
   return (
     <ConnectedAccount
@@ -190,7 +203,9 @@ function GoogleAccountConnect({ user }: { user: LoggedInUser }) {
       icon={<IdentityIcon type='Google' height={22} width={22} />}
       required={isGoogleRequired}
       disabled={!!connectedGoogleAccount || isConnectingGoogle}
+      loading={isConnectingGoogle}
       onClick={() => {
+        updateURLQuery({ onboarding: true });
         loginWithGooglePopup({ type: 'connect' });
       }}
     >
