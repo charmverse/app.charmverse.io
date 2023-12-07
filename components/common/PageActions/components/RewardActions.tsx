@@ -31,8 +31,7 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
       (submission) => submissionIsComplete({ application: submission }) || submission.status === 'rejected'
     );
 
-  const isMarkrewardCompletedEnabled =
-    rewardPermissions?.lock && (reward?.status === 'inProgress' || reward.status === 'open');
+  const isMarkrewardCompletedEnabled = rewardPermissions?.lock && reward.status === 'open';
 
   async function markRewardAsPaid() {
     try {
