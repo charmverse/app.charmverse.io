@@ -27,7 +27,6 @@ handler.get(async (req, res) => {
   const redirectUrl = getDiscordRedirectUrl(req.headers.host, redirectPath);
   const subdomain = getSpaceDomainFromHost(redirectUrl.host);
   const redirect = subdomain ? redirectPath : redirectUrl.pathname + redirectUrl.search;
-  const onboarding = (state?.onboarding as string) === 'true';
   const tempAuthCode = req.query.code;
 
   if (req.query.error || typeof tempAuthCode !== 'string') {
@@ -70,18 +69,10 @@ handler.get(async (req, res) => {
       return res.redirect(redirectWithError);
     }
     await req.session.save();
-    if (onboarding) {
-      const url = new URL(redirect);
-      url.searchParams.append('onboarding', 'true');
-      res.redirect(url.toString());
-    }
     return res.redirect(redirect);
   }
 
   const urlSearchParams = new URLSearchParams();
-  if (onboarding) {
-    urlSearchParams.append('onboarding', 'true');
-  }
 
   if (req.query.guild_id) {
     urlSearchParams.append('guild_id', req.query.guild_id as string);

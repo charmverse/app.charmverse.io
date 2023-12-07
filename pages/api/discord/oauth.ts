@@ -22,7 +22,6 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
     redirect: string;
     type: AuthType;
     authFlowType?: OauthFlowType;
-    onboarding?: string;
   };
 
   const authFlowType = query.authFlowType ?? 'page';
@@ -33,8 +32,7 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
   const state = encodeURIComponent(
     JSON.stringify({
       redirect,
-      type: query.type,
-      onboarding: query.onboarding
+      type: query.type
     })
   );
 

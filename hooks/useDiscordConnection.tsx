@@ -17,7 +17,7 @@ interface Props {
 type IDiscordConnectionContext = {
   isConnected: boolean;
   isLoading: boolean;
-  connect: (options?: { onboarding?: boolean }) => Promise<void> | void;
+  connect: () => Promise<void> | void;
   error?: string;
   popupLogin: (redirectUrl: string, type: 'login' | 'connect') => void;
 };
@@ -42,15 +42,14 @@ export function DiscordProvider({ children }: Props) {
   const connectedWithDiscord = Boolean(user?.discordUser);
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
 
-  async function connect(options: { onboarding?: boolean } = { onboarding: false }) {
+  async function connect() {
     if (!isConnectDiscordLoading) {
       if (connectedWithDiscord) {
         await disconnect();
       } else {
         const discordLoginPath = getDiscordLoginPath({
           type: 'connect',
-          redirectUrl: encodeURIComponent(window.location.href.split('?')[0]),
-          onboarding: options?.onboarding
+          redirectUrl: encodeURIComponent(window.location.href.split('?')[0])
         });
 
         window.location.replace(discordLoginPath);

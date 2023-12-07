@@ -1,6 +1,13 @@
-import type { MemberProperty } from '@charmverse/core/prisma-client';
+import type {
+  DiscordUser,
+  GoogleAccount,
+  MemberProperty,
+  TelegramUser,
+  UserWallet
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import {
   getAccessibleMemberPropertiesBySpace,
   getAllMemberPropertiesBySpace
@@ -11,6 +18,7 @@ import type { Member } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { replaceS3Domain } from 'lib/utilities/url';
+import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { getMemberUsername } from './getMemberUsername';
 
@@ -59,8 +67,10 @@ export async function getSpaceMembers({
               spaceId
             }
           },
+          wallets: true,
           telegramUser: true,
-          discordUser: true
+          discordUser: true,
+          googleAccounts: true
         }
       },
       spaceRoleToRole: {
@@ -86,7 +96,32 @@ export async function getSpaceMembers({
   return (
     spaceRoles
       .map((spaceRole): Member => {
-        const { memberPropertyValues = [], ...userData } = spaceRole.user;
+        const {
+          memberPropertyValues = [],
+          googleAccounts,
+          discordUser,
+          wallets = [],
+          telegramUser,
+          ...userData
+        } = spaceRole.user;
+        const properties = getPropertiesWithValues(visibleProperties, memberPropertyValues);
+
+        const visiblePropertyIds = visibleProperties.map((mp) => mp.id);
+
+        properties.forEach((property) => {
+          if (visiblePropertyIds.includes(property.memberPropertyId)) {
+            if (property.type === 'wallet') {
+              property.value = wallets[0]?.address;
+            } else if (property.type === 'telegram') {
+              property.value = (telegramUser?.account as unknown as TelegramAccount)?.username;
+            } else if (property.type === 'discord') {
+              property.value = (discordUser?.account as unknown as DiscordAccount)?.username;
+            } else if (property.type === 'google') {
+              property.value = googleAccounts[0]?.name;
+            }
+          }
+        });
+
         const roles = spaceRole.spaceRoleToRole.map((sr) => sr.role);
         return {
           id: userData.id,
@@ -103,7 +138,7 @@ export async function getSpaceMembers({
           isGuest: !!spaceRole.isGuest && !spaceRole.isAdmin,
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
-          properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
+          properties,
           searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, memberUsernameRecord[spaceRole.id]),
           roles,
           isBot: userData.isBot ?? undefined

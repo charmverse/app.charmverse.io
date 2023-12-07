@@ -72,7 +72,6 @@ function DiscordAccountConnect({
   connectedDiscordAccount?: LoggedInUser['discordUser'];
 }) {
   const { connect, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
-  const { isOnCustomDomain } = useCustomDomain();
   const { updateURLQuery } = useCharmRouter();
   return (
     <ConnectedAccount
@@ -81,13 +80,8 @@ function DiscordAccountConnect({
       required={isDiscordRequired}
       disabled={!!connectedDiscordAccount || isDiscordLoading}
       onClick={() => {
-        if (!isOnCustomDomain) {
-          // Since this opens a new window, we need to keep the onboarding modal open via adding the onboarding query param
-          updateURLQuery({ onboarding: true });
-          popupLogin('/', 'connect');
-        } else {
-          connect({ onboarding: true });
-        }
+        updateURLQuery({ onboarding: true });
+        popupLogin('/', 'connect');
       }}
     >
       {connectedDiscordAccount ? (
