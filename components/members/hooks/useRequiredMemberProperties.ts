@@ -30,7 +30,9 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
   const { user: currentUser } = useUser();
   const { memberPropertyValues } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
-  const { data: userDetails } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
+  const { data: userDetails, isLoading: isLoadingUserDetails } = useSWRImmutable(`/current-user-details`, () =>
+    charmClient.getUserDetails()
+  );
 
   const data = useMemo(() => {
     const _memberProperties = memberPropertyValues
@@ -89,23 +91,24 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       requiredPropertiesWithoutValue.push('github');
     }
 
-    if (_isWalletRequired && (currentUser?.wallets ?? []).length === 0) {
+    if (currentUser && _isWalletRequired && (currentUser.wallets ?? []).length === 0) {
       requiredPropertiesWithoutValue.push('wallet');
     }
 
-    if (_isGoogleRequired && (currentUser?.googleAccounts ?? []).length === 0) {
+    if (currentUser && _isGoogleRequired && (currentUser.googleAccounts ?? []).length === 0) {
       requiredPropertiesWithoutValue.push('google');
     }
 
-    if (_isDiscordRequired && !currentUser?.discordUser) {
+    if (currentUser && _isDiscordRequired && !currentUser.discordUser) {
       requiredPropertiesWithoutValue.push('discord');
     }
 
-    if (_isTelegramRequired && !currentUser?.telegramUser) {
+    if (currentUser && _isTelegramRequired && !currentUser.telegramUser) {
       requiredPropertiesWithoutValue.push('telegram');
     }
 
     return {
+      isLoadingUserDetails,
       memberProperties: _memberProperties,
       requiredProperties: _requiredProperties,
       isTimezoneRequired: !!_isTimezoneRequired,
@@ -234,6 +237,7 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     isLinkedinRequired,
     isTimezoneRequired,
     isTwitterRequired,
+    isLoadingUserDetails,
     userDetails: { id, ...userDetails } = {} as UserDetails
   } = useRequiredMemberProperties({ userId });
   const { showMessage } = useSnackbar();
@@ -244,7 +248,8 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     watch,
     setValue,
     handleSubmit,
-    getValues
+    getValues,
+    reset
   } = useForm({
     mode: 'onChange',
     defaultValues: userDetails,
@@ -267,6 +272,12 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
       })
     )
   });
+
+  useEffect(() => {
+    if (!isLoadingUserDetails) {
+      reset(userDetails);
+    }
+  }, [isLoadingUserDetails]);
 
   const values = {
     description: watch('description'),

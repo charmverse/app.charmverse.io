@@ -17,9 +17,9 @@ interface Props {
 type IDiscordConnectionContext = {
   isConnected: boolean;
   isLoading: boolean;
-  connect: VoidFunction;
+  connect: (options?: { onboarding?: boolean }) => Promise<void> | void;
   error?: string;
-  popupLogin: (redirectUrl: string, type?: 'login' | 'connect') => void;
+  popupLogin: (redirectUrl: string, type: 'login' | 'connect', options?: { onboarding?: boolean }) => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
@@ -42,14 +42,15 @@ export function DiscordProvider({ children }: Props) {
   const connectedWithDiscord = Boolean(user?.discordUser);
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
 
-  async function connect() {
+  async function connect(options: { onboarding?: boolean } = { onboarding: false }) {
     if (!isConnectDiscordLoading) {
       if (connectedWithDiscord) {
         await disconnect();
       } else {
         const discordLoginPath = getDiscordLoginPath({
           type: 'connect',
-          redirectUrl: encodeURIComponent(window.location.href.split('?')[0])
+          redirectUrl: encodeURIComponent(window.location.href.split('?')[0]),
+          onboarding: options?.onboarding
         });
 
         window.location.replace(discordLoginPath);
@@ -74,11 +75,12 @@ export function DiscordProvider({ children }: Props) {
       });
   }
 
-  function popupLogin(redirectUrl: string, type: 'login' | 'connect' = 'login') {
+  function popupLogin(redirectUrl: string, type: 'login' | 'connect', options?: { onboarding?: boolean }) {
     const discordLoginPath = getDiscordLoginPath({
       type,
       redirectUrl,
-      authFlowType: 'popup'
+      authFlowType: 'popup',
+      onboarding: options?.onboarding
     });
 
     const loginCallback = async ({ code }: { code: string | null }) => {

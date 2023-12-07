@@ -79,9 +79,9 @@ function DiscordAccountConnect({ user }: { user: LoggedInUser }) {
       disabled={!!connectedDiscordAccount || isDiscordLoading}
       onClick={() => {
         if (isOnCustomDomain) {
-          popupLogin('/', 'connect');
+          popupLogin('/', 'connect', { onboarding: true });
         } else {
-          connect();
+          connect({ onboarding: true });
         }
       }}
     >

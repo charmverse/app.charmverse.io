@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -18,6 +19,7 @@ import {
 } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -45,7 +47,7 @@ export function UserOnboardingDialogGlobal() {
 
 function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: LoggedInUser }) {
   const { onboardingStep, completeOnboarding } = useOnboarding({ user, spaceId: space.id });
-
+  const { query } = useRouter();
   useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
   }, []);
@@ -67,7 +69,7 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     );
   }
 
-  if (hasEmptyRequiredProperties) {
+  if (hasEmptyRequiredProperties || query.onboarding === 'true') {
     return (
       <UserOnboardingDialog
         space={space}
@@ -97,6 +99,7 @@ function UserOnboardingDialog({
   space: Space;
   hasEmptyRequiredProperties?: boolean;
 }) {
+  const { updateURLQuery } = useCharmRouter();
   const { requiredProperties, requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
@@ -150,6 +153,7 @@ function UserOnboardingDialog({
   }
 
   const handleClose = () => {
+    updateURLQuery({ onboarding: null });
     if (isFormDirty) {
       confirmExitPopupState.open();
     } else {
