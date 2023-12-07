@@ -15,6 +15,7 @@ export function createMemberProperty(
     enabledViews: ['gallery', 'table', 'profile'],
     options: null,
     required: false,
+    primaryIdentity: false,
     ...memberProperty
   };
 }

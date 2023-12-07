@@ -65,7 +65,11 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     );
   }
 
-  return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
+  if (nonEmptyRequiredProperties) {
+    return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
+  }
+
+  return null;
 }
 
 // Case 1: first time user: show email + terms first, then profile
