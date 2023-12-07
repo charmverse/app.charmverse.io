@@ -1,8 +1,7 @@
-import { prisma } from '@charmverse/core/prisma-client';
-
 import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { Constants } from 'lib/focalboard/constants';
+import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
 
 import {
   AUTHORS_BLOCK_ID,
@@ -19,22 +18,10 @@ export async function createDefaultProposal({
   spaceId,
   userId
 }: {
-  categoryId?: string;
+  categoryId: string;
   spaceId: string;
   userId: string;
 }) {
-  if (!categoryId) {
-    const category = await prisma.proposalCategory.findFirstOrThrow({
-      where: {
-        spaceId
-      },
-      select: {
-        id: true
-      }
-    });
-    categoryId = category.id;
-  }
-
   await createProposal({
     categoryId,
     spaceId,
@@ -43,6 +30,22 @@ export async function createDefaultProposal({
     evaluationType: 'vote',
     publishToLens: false,
     rubricCriteria: [],
+    evaluations: [
+      {
+        index: 0,
+        ...getDefaultFeedbackEvaluation(),
+        reviewers: [{ group: 'system_role', id: 'space_member' }],
+        rubricCriteria: []
+      },
+      {
+        index: 1,
+        title: 'Review',
+        type: 'pass_fail',
+        reviewers: [{ group: 'system_role', id: 'space_member' }],
+        rubricCriteria: [],
+        permissions: getDefaultPermissions()
+      }
+    ],
     pageProps: {
       headerImage: null,
       icon: null,

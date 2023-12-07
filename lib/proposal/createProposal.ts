@@ -1,20 +1,14 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalStatus } from '@charmverse/core/prisma';
-import type {
-  Prisma,
-  ProposalEvaluation,
-  ProposalEvaluationPermission,
-  ProposalEvaluationType
-} from '@charmverse/core/prisma-client';
+import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalReviewerInput, ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalWithUsers, WorkflowEvaluationJson, ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -32,23 +26,29 @@ type PageProps = Partial<
   >
 >;
 
-export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'index' | 'title' | 'type'> & {
+export type ProposalReviewerInput = {
+  group: 'system_role' | 'role' | 'user';
+  id: string;
+  evaluationId?: string;
+};
+
+export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
   reviewers: ProposalReviewerInput[];
   rubricCriteria: RubricDataInput[];
-  permissions: ProposalEvaluationPermission[];
+  permissions?: WorkflowEvaluationJson['permissions']; // pass these in to override workflow defaults
 };
 
 export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
   categoryId: string;
-  reviewers?: TargetPermissionGroup<'role' | 'user'>[];
+  reviewers?: ProposalReviewerInput[];
   authors?: string[];
   userId: string;
   spaceId: string;
   evaluationType?: ProposalEvaluationType;
   rubricCriteria?: RubricDataInput[];
-  evaluations: ProposalEvaluationInput[];
+  evaluations?: ProposalEvaluationInput[];
   publishToLens?: boolean;
   fields?: ProposalFields;
   workflowId?: string;
@@ -70,7 +70,8 @@ export async function createProposal({
   evaluationType,
   rubricCriteria,
   publishToLens,
-  fields
+  fields,
+  workflowId
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -80,6 +81,14 @@ export async function createProposal({
   let proposalStatus: ProposalStatus = 'draft';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
+
+  const workflow = workflowId
+    ? ((await prisma.proposalWorkflow.findUnique({
+        where: {
+          id: workflowId
+        }
+      })) as ProposalWorkflowTyped | null)
+    : null;
 
   const validation = await validateProposalAuthorsAndReviewers({
     authors: authorsList,
@@ -94,21 +103,24 @@ export async function createProposal({
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
-  // apply evaluation ids to reviewers
-  if (evaluationIds.length > 0) {
-    for (let i = 0; i < evaluations.length; i++) {
-      const evalStep = { ...evaluations[i], id: evaluationIds[i] };
+  // retrieve permissions and apply evaluation ids to reviewers
+  if (evaluations.length > 0) {
+    evaluations.forEach(({ id: evaluationId, permissions: permissionsInput }, index) => {
+      const configuredEvaluation = workflow?.evaluations.find((e) => e.id === evaluationId);
+      const permissions = configuredEvaluation?.permissions ?? permissionsInput;
+      if (!permissions) {
+        throw new Error(
+          `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
+        );
+      }
       evaluationPermissionsToCreate.push(
-        ...evalStep.permissions.map(
-          (evaluationStepPermission) =>
-            ({
-              evaluationId: evalStep.id,
-              operation: evaluationStepPermission.operation,
-              systemRole: evaluationStepPermission.systemRole
-            } as Prisma.ProposalEvaluationPermissionCreateManyInput)
-        )
+        ...permissions.map((permission) => ({
+          evaluationId: evaluationIds[index],
+          operation: permission.operation,
+          systemRole: permission.systemRole
+        }))
       );
-    }
+    });
 
     reviewers = evaluations.flatMap((evaluation, index) =>
       evaluation.reviewers.map((reviewer) => ({

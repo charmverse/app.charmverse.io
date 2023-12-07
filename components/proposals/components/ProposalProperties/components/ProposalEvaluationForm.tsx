@@ -11,7 +11,9 @@ import { ProposalRubricCriteriaInput } from './ProposalRubricCriteriaInput';
 import type { RangeProposalCriteria } from './ProposalRubricCriteriaInput';
 
 // result and id are not used for creating evaluations, so add them here
-export type ProposalEvaluationValues = ProposalEvaluationInput & Pick<ProposalEvaluation, 'result' | 'id'>;
+// leave out permissions which are picked up on the backend based on workflowId
+export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permissions'> &
+  Pick<ProposalEvaluation, 'result' | 'id'>;
 
 type Props = {
   evaluation: ProposalEvaluationValues;
