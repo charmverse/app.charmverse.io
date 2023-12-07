@@ -30,6 +30,7 @@ type Context = {
   removePropertyPermission: (permission: MemberPropertyPermission) => Promise<void>;
   mutateProperties: KeyedMutator<MemberPropertyWithPermissions[]>;
   updateMemberPropertyVisibility: (payload: UpdateMemberPropertyVisibilityPayload) => Promise<void>;
+  toggleMemberProperty: (payload: { propertyId: string; toggle: boolean }) => Promise<void>;
 };
 
 const MemberPropertiesContext = createContext<Readonly<Context>>({
@@ -41,7 +42,8 @@ const MemberPropertiesContext = createContext<Readonly<Context>>({
   addPropertyPermissions: () => Promise.resolve({} as any),
   removePropertyPermission: () => Promise.resolve(),
   mutateProperties: () => Promise.resolve({} as any),
-  updateMemberPropertyVisibility: () => Promise.resolve({} as any)
+  updateMemberPropertyVisibility: () => Promise.resolve({} as any),
+  toggleMemberProperty: () => Promise.resolve({} as any)
 });
 
 export function MemberPropertiesProvider({ children }: { children: ReactNode }) {
@@ -55,6 +57,37 @@ export function MemberPropertiesProvider({ children }: { children: ReactNode }) 
     () => {
       return charmClient.members.getMemberProperties(space!.id);
     }
+  );
+
+  const toggleMemberProperty = useCallback(
+    async ({ propertyId, toggle }: { propertyId: string; toggle: boolean }) => {
+      if (space?.id) {
+        await charmClient.members.togglePrimaryIdentity({
+          propertyId,
+          spaceId: space.id,
+          toggle
+        });
+        mutateProperties((state) => {
+          return state
+            ? state.map((p) => {
+                if (p.id === propertyId) {
+                  return {
+                    ...p,
+                    required: toggle ? true : p.required,
+                    isPrimaryIdentity: toggle
+                  };
+                }
+
+                return {
+                  ...p,
+                  isPrimaryIdentity: false
+                };
+              })
+            : undefined;
+        });
+      }
+    },
+    [space?.id]
   );
 
   const addProperty = useCallback(
@@ -183,7 +216,8 @@ export function MemberPropertiesProvider({ children }: { children: ReactNode }) 
         removePropertyPermission,
         addPropertyPermissions,
         mutateProperties,
-        updateMemberPropertyVisibility
+        updateMemberPropertyVisibility,
+        toggleMemberProperty
       } as Context),
     [properties, addProperty]
   );

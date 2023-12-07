@@ -11,6 +11,7 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import Modal from 'components/common/Modal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 import { MemberPropertyVisibility } from './MemberPropertyVisibility';
@@ -36,7 +37,7 @@ export function MemberPropertySidebarDetails({
 }: Props) {
   const isAdmin = useIsAdmin();
   const { isFreeSpace } = useIsFreeSpace();
-
+  const { toggleMemberProperty } = useMemberProperties();
   const canEditPropertyPermissions = isAdmin && !isFreeSpace;
 
   const memberPropertySidebarItemPopupState = usePopupState({
@@ -83,10 +84,9 @@ export function MemberPropertySidebarDetails({
                 checked={property.primaryIdentity}
                 disabled={!isAdmin}
                 onChange={(e) => {
-                  updateProperty({
-                    id: property.id,
-                    primaryIdentity: e.target.checked,
-                    required: e.target.checked === true ? true : property.required
+                  toggleMemberProperty({
+                    propertyId: property.id,
+                    toggle: e.target.checked
                   });
                 }}
               />

@@ -97,4 +97,10 @@ export class MembersApi {
   banMember({ spaceId, userId }: RemoveMemberInput) {
     return http.DELETE(`/api/spaces/${spaceId}/members/${userId}/ban`);
   }
+
+  togglePrimaryIdentity({ toggle, spaceId, propertyId }: { spaceId: string; propertyId: string; toggle: boolean }) {
+    return http.PUT(`/api/spaces/${spaceId}/members/properties/${propertyId}/toggle-primary-identity`, {
+      toggle
+    });
+  }
 }
