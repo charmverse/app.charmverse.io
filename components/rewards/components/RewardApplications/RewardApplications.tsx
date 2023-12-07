@@ -1,6 +1,6 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Box, Divider, IconButton, Stack, Tooltip } from '@mui/material';
+import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useMemo } from 'react';
 
@@ -11,7 +11,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
-import { formatDateTime } from 'lib/utilities/dates';
+import { formatDate, formatDateTime } from 'lib/utilities/dates';
 import type { LoggedInUser } from 'models';
 
 import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
@@ -66,38 +66,45 @@ function ApplicationRows({
             return null;
           }
           return (
-            <Stack justifyContent='space-between' flexDirection='row' gap={1} key={application.id} alignItems='center'>
-              <Stack flexDirection='row' alignItems='center'>
-                <Stack gap={1} flexDirection='row' minWidth={250}>
-                  <UserDisplay avatarSize='small' userId={member.id} fontSize='small' hideName showMiniProfile />
-                  <Typography
-                    sx={{
-                      whiteSpace: 'nowrap',
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {member.username}
-                  </Typography>
-                </Stack>
-                <Typography minWidth={150} whiteSpace='nowrap' variant='subtitle2'>
-                  {formatDateTime(application.updatedAt)}
+            <Grid container display='flex' gap={2} key={application.id} alignItems='center' minWidth={500}>
+              <Grid item xs={4} md={5} display='flex' flexDirection='row' gap={1}>
+                <UserDisplay avatarSize='small' userId={member.id} fontSize='small' hideName showMiniProfile />
+                <Typography
+                  sx={{
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {member.username}
                 </Typography>
-              </Stack>
-              <Stack minWidth={150}>
+              </Grid>
+
+              <Grid item xs={2}>
+                <Tooltip title={`Updated at ${formatDateTime(application.updatedAt)}`}>
+                  <Typography minWidth={150} whiteSpace='nowrap' variant='subtitle2'>
+                    {formatDate(application.updatedAt, { withYear: true })}
+                  </Typography>
+                </Tooltip>
+              </Grid>
+
+              <Grid item xs={3}>
                 <RewardApplicationStatusChip
                   sx={{
                     width: 'fit-content'
                   }}
                   status={application.status}
                 />
-              </Stack>
-              <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
-                <IconButton size='small' onClick={() => openApplication(application.id)}>
-                  <ArrowForwardIosIcon fontSize='small' color='secondary' />
-                </IconButton>
-              </Tooltip>
-            </Stack>
+              </Grid>
+
+              <Grid item xs={1}>
+                <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
+                  <IconButton size='small' onClick={() => openApplication(application.id)}>
+                    <ArrowForwardIosIcon fontSize='small' color='secondary' />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Grid>
           );
         })}
 
