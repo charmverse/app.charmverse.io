@@ -17,6 +17,7 @@ import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/em
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
 import Link from 'components/common/Link';
+import { usePages } from 'hooks/usePages';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import { randomBannerImage } from './PageBanner';
@@ -74,8 +75,7 @@ type PageHeaderProps = {
   updatedAt: string;
   readOnlyTitle?: boolean;
   placeholder?: string;
-  showParentChip?: boolean;
-  parentInfo?: { title: string; id: string } | null;
+  parentId?: string | null;
 };
 
 function PageHeader({
@@ -87,9 +87,11 @@ function PageHeader({
   updatedAt,
   readOnlyTitle,
   placeholder,
-  parentInfo,
-  showParentChip
+  parentId
 }: PageHeaderProps) {
+  const { pages } = usePages();
+  const parentPage = parentId ? pages[parentId] : null;
+
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
@@ -100,15 +102,15 @@ function PageHeader({
 
   return (
     <>
-      {showParentChip && parentInfo ? (
+      {parentPage ? (
         <Chip
-          label={parentInfo.title}
+          label={parentPage.title}
           sx={{
             cursor: 'pointer'
           }}
           size='small'
           component={Link}
-          href={`/${parentInfo.id}`}
+          href={`/${parentPage.path}`}
         />
       ) : (
         <PageHeaderControls

@@ -170,7 +170,7 @@ function DocumentPage({
   const isSharedPage = router.pathname.startsWith('/share');
   // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
-  const showParentChip = !!(page.type === 'card' && page.bountyId && board && insideModal && isRewardsPage);
+  const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -200,7 +200,9 @@ function DocumentPage({
 
   useEffect(() => {
     if (page?.type === 'card') {
-      if (!card) {
+      // the two properties are the title and the id which are added to the card as soon as we get the corresponding page
+      const hasCardLoaded = card && Object.keys(card).length > 2;
+      if (!hasCardLoaded) {
         dispatch(databaseViewsLoad({ pageId: page.parentId as string }));
         dispatch(blockLoad({ blockId: page.id }));
         dispatch(blockLoad({ blockId: page.parentId as string }));
@@ -365,15 +367,7 @@ function DocumentPage({
                   readOnly={readOnly || !!enableSuggestingMode}
                   setPage={savePage}
                   readOnlyTitle={!!page.syncWithPageId}
-                  parentInfo={
-                    board
-                      ? {
-                          title: board.title,
-                          id: board.id
-                        }
-                      : null
-                  }
-                  showParentChip={showParentChip}
+                  parentId={showParentChip ? card.parentId : null}
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                   <Box my={2} className='font-family-default'>
