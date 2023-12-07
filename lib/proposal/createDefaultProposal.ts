@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { Constants } from 'lib/focalboard/constants';
@@ -39,6 +41,7 @@ export async function createDefaultProposal({
       },
       {
         index: 1,
+        id: uuid(),
         title: 'Review',
         type: 'pass_fail',
         reviewers: [{ group: 'system_role', id: 'space_member' }],
