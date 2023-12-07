@@ -82,7 +82,7 @@ function ApplicationRows({
 
               <Grid item xs={2}>
                 <Tooltip title={`Updated at ${formatDateTime(application.updatedAt)}`}>
-                  <Typography minWidth={150} whiteSpace='nowrap' variant='subtitle2'>
+                  <Typography whiteSpace='nowrap' variant='subtitle2' width='fit-content'>
                     {formatDate(application.updatedAt, { withYear: true })}
                   </Typography>
                 </Tooltip>
