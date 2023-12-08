@@ -7,6 +7,7 @@ import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
+import AddViewMenu from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
@@ -35,6 +36,7 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
+import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
 import { useRewards } from './hooks/useRewards';
 
@@ -124,7 +126,7 @@ export function RewardsPage({ title }: { title: string }) {
   };
 
   const showView = (boardViewId: string) => {
-    const viewId = Object.entries(viewTypeToBlockId).find(([, blockId]) => blockId === boardViewId)?.[0] ?? 'table';
+    const viewId = Object.entries(viewTypeToBlockId).find(([, blockId]) => blockId === boardViewId)?.[0] ?? boardViewId;
     if (viewId === activeView?.id) return;
     updateURLQuery({ viewId });
   };
@@ -163,19 +165,31 @@ export function RewardsPage({ title }: { title: string }) {
         </DatabaseTitle>
         <>
           <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1}>
-            <Stack mb={0.5}>
+            <Stack mb={0.5} direction='row' alignItems='center'>
               <ViewTabs
-                onDeleteView={() => {}}
-                onClickNewView={() => {}}
+                openViewOptions={() => setShowSidebar(true)}
                 board={activeBoard}
                 views={views}
-                readOnly
+                readOnly={!isAdmin}
                 showView={showView}
                 activeView={activeView}
                 disableUpdatingUrl
                 maxTabsShown={3}
-                openViewOptions={() => {}}
+                readOnlyViewIds={defaultRewardViews}
+                supportedViewTypes={supportedRewardViewTypes}
               />
+
+              {!!views.length && views.length <= 3 && (
+                <Stack mb='-5px'>
+                  <AddViewMenu
+                    board={activeBoard}
+                    activeView={activeView}
+                    views={views}
+                    showView={showView}
+                    supportedViewTypes={supportedRewardViewTypes}
+                  />
+                </Stack>
+              )}
             </Stack>
 
             <Stack direction='row' alignItems='center' mb={1} gap={0.5}>
@@ -297,13 +311,14 @@ export function RewardsPage({ title }: { title: string }) {
                 view={activeView}
                 isOpen={!!showSidebar}
                 closeSidebar={() => setShowSidebar(false)}
-                hideLayoutSelectOptions
+                hideLayoutSelectOptions={defaultRewardViews.includes(activeView?.id || '')}
                 hideSourceOptions
                 hideGroupOptions
                 groupByProperty={groupByProperty}
                 page={undefined}
                 pageId={undefined}
                 showView={() => {}}
+                supportedViewTypes={supportedRewardViewTypes}
               />
             )}
           </Stack>
