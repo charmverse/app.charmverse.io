@@ -3,11 +3,11 @@ import { useCallback } from 'react';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 
+import { isSupportedViewType } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import SelectMenu from 'components/common/Menu';
-import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 
@@ -26,6 +26,7 @@ interface LayoutOptionsProps {
   view: BoardView;
   intl: IntlShape;
   hideLayoutSelectOptions?: boolean;
+  supportedViewTypes?: IViewType[];
 }
 
 function LayoutOptions(props: LayoutOptionsProps) {
@@ -34,6 +35,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
   const intl = props.intl;
   const hideLayoutSelectOptions = props.hideLayoutSelectOptions ?? false;
   const activeView = props.view;
+  const { supportedViewTypes } = props;
 
   const boardText = intl.formatMessage({
     id: 'View.Board',
@@ -136,22 +138,30 @@ function LayoutOptions(props: LayoutOptionsProps) {
     <Box onClick={(e) => e.stopPropagation()}>
       {!hideLayoutSelectOptions && (
         <Grid container spacing={1} px={1}>
-          <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
-            <BoardIcon />
-            {boardText}
-          </LayoutOption>
-          <LayoutOption active={activeView.fields.viewType === 'table'} onClick={handleAddViewTable}>
-            <TableIcon />
-            {tableText}
-          </LayoutOption>
-          <LayoutOption active={activeView.fields.viewType === 'gallery'} onClick={handleAddViewGallery}>
-            <GalleryIcon />
-            {galleryText}
-          </LayoutOption>
-          <LayoutOption active={activeView.fields.viewType === 'calendar'} onClick={handleAddViewCalendar}>
-            <CalendarIcon />
-            Calendar
-          </LayoutOption>
+          {isSupportedViewType('board', supportedViewTypes) && (
+            <LayoutOption active={activeView.fields.viewType === 'board'} onClick={handleAddViewBoard}>
+              <BoardIcon />
+              {boardText}
+            </LayoutOption>
+          )}
+          {isSupportedViewType('table', supportedViewTypes) && (
+            <LayoutOption active={activeView.fields.viewType === 'table'} onClick={handleAddViewTable}>
+              <TableIcon />
+              {tableText}
+            </LayoutOption>
+          )}
+          {isSupportedViewType('gallery', supportedViewTypes) && (
+            <LayoutOption active={activeView.fields.viewType === 'gallery'} onClick={handleAddViewGallery}>
+              <GalleryIcon />
+              {galleryText}
+            </LayoutOption>
+          )}
+          {isSupportedViewType('calendar', supportedViewTypes) && (
+            <LayoutOption active={activeView.fields.viewType === 'calendar'} onClick={handleAddViewCalendar}>
+              <CalendarIcon />
+              Calendar
+            </LayoutOption>
+          )}
         </Grid>
       )}
       <Stack pr={1} pl={2} my={1} alignItems='center' flexDirection='row' justifyContent='space-between'>

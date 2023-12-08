@@ -78,7 +78,7 @@ function _appendQuery(path: string, data: Params) {
     .map((key) => {
       const value = data[key];
       return Array.isArray(value)
-        ? `${value.map((v: string) => `${key}[]=${v}`).join('&')}`
+        ? `${value.map((v: string) => `${key}=${v}`).join('&')}`
         : `${key}=${encodeURIComponent(value)}`;
     })
     .join('&');

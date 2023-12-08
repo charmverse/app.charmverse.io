@@ -17,6 +17,7 @@ import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createDefaultProposal } from 'lib/proposal/createDefaultProposal';
 import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
+import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import { createDefaultReward } from 'lib/rewards/createDefaultReward';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
@@ -124,9 +125,11 @@ export async function createWorkspace({
   const defaultProposalCategories = generateDefaultProposalCategoriesInput(space.id);
   const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
   const defaultPostCategories = generateDefaultPostCategories(space.id);
+  const defaultWorkflows = getDefaultWorkflows(space.id);
 
   await prisma.$transaction([
     prisma.proposalCategory.createMany({ data: defaultProposalCategories }),
+    prisma.proposalWorkflow.createMany({ data: defaultWorkflows }),
     prisma.memberProperty.createMany({ data: defaultProperties }),
     prisma.postCategory.createMany({ data: defaultPostCategories }),
     prisma.postCategoryPermission.createMany({

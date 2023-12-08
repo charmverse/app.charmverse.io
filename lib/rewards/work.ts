@@ -67,7 +67,7 @@ export async function work({
     );
 
     // Don't allow users to create new apps
-  } else if (reward.status !== 'open' && reward.status !== 'inProgress' && !applicationId) {
+  } else if (reward.status !== 'open' && !applicationId) {
     throw new WrongStateError('Cannot create new applicaton on a closed reward');
   }
 

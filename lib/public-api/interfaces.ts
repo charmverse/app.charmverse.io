@@ -23,7 +23,7 @@ export type BoardPropertyValue = string | string[] | number | null | boolean | R
  *          example: https://google.com/image.png
  *        wallet:
  *          type: string
- *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *          example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
  *        username:
  *          type: string
  *          example: testuser

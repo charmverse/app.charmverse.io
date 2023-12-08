@@ -36,6 +36,7 @@ export async function createReward({
   rewardToken = 'ETH',
   customReward,
   allowedSubmitterRoles,
+  assignedSubmitters,
   dueDate,
   fields,
   reviewers,
@@ -66,6 +67,8 @@ export async function createReward({
 
   const rewardId = v4();
 
+  const isAssignedReward = Array.isArray(assignedSubmitters) && assignedSubmitters.length > 0;
+
   const rewardCreateInput: Prisma.BountyCreateInput = {
     id: rewardId,
     space: {
@@ -81,22 +84,33 @@ export async function createReward({
     dueDate,
     fields: fields as any,
     chainId,
-    approveSubmitters,
-    maxSubmissions,
+    approveSubmitters: isAssignedReward ? false : approveSubmitters,
+    maxSubmissions: isAssignedReward ? assignedSubmitters?.length : maxSubmissions,
     rewardAmount,
     rewardToken,
     customReward,
-    allowMultipleApplications
+    allowMultipleApplications: isAssignedReward ? false : allowMultipleApplications
   };
 
   const rewardPermissions: Prisma.BountyPermissionCreateManyBountyInput[] = [];
 
-  allowedSubmitterRoles?.forEach((roleId) =>
-    rewardPermissions.push({
-      permissionLevel: 'submitter',
-      roleId
-    })
-  );
+  // assign submitter roles only if reward is not assigned
+  if (isAssignedReward) {
+    assignedSubmitters?.forEach((submitterUserId) =>
+      rewardPermissions.push({
+        permissionLevel: 'submitter',
+        userId: submitterUserId
+      })
+    );
+  } else {
+    allowedSubmitterRoles?.forEach((roleId) =>
+      rewardPermissions.push({
+        permissionLevel: 'submitter',
+        roleId
+      })
+    );
+  }
+
   reviewers?.forEach((reviewer) => {
     const permissionLevel: BountyPermissionLevel = 'reviewer';
     if (reviewer.group === 'role') {

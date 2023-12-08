@@ -74,7 +74,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     proposal.rubricAnswers = [];
   }
 
-  return res.status(200).json(proposal as ProposalWithUsersAndRubric);
+  return res.status(200).json(proposal as unknown as ProposalWithUsersAndRubric);
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {

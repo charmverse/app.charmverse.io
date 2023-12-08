@@ -45,7 +45,7 @@ export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey
       });
     }
 
-    if (querySpaceId && bodySpaceId && querySpaceId !== bodySpaceId) {
+    if (!spaceIdKey && querySpaceId && bodySpaceId && querySpaceId !== bodySpaceId) {
       throw new ApiError({
         message: 'Your request refers to multiple spaces. Remove unneeded space ID',
         errorType: 'Access denied'
