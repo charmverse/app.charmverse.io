@@ -195,6 +195,11 @@ export async function generateImportWorkspacePages({
     rootSpacePermissionId?: string;
     oldNewPermissionMap: Record<string, string>;
   }) {
+    // Don't process duplicate nodes in the export
+    if (oldNewRecordIdHashMap[node.id]) {
+      return;
+    }
+
     const existingNewPageId =
       node.type === 'page' || isBoardPageType(node.type) ? oldNewRecordIdHashMap[node.id] : undefined;
 
