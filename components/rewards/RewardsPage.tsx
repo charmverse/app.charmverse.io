@@ -165,10 +165,9 @@ export function RewardsPage({ title }: { title: string }) {
         </DatabaseTitle>
         <>
           <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1}>
-            <Stack mb={0.5} direction='row' gap={1}>
+            <Stack mb={0.5} direction='row' alignItems='center'>
               <ViewTabs
-                onDeleteView={() => {}}
-                openViewOptions={() => {}}
+                openViewOptions={() => setShowSidebar(true)}
                 board={activeBoard}
                 views={views}
                 readOnly={!isAdmin}
@@ -181,13 +180,15 @@ export function RewardsPage({ title }: { title: string }) {
               />
 
               {!!views.length && views.length <= 3 && (
-                <AddViewMenu
-                  board={activeBoard}
-                  activeView={activeView}
-                  views={views}
-                  showView={showView}
-                  supportedViewTypes={supportedRewardViewTypes}
-                />
+                <Stack mb='-5px'>
+                  <AddViewMenu
+                    board={activeBoard}
+                    activeView={activeView}
+                    views={views}
+                    showView={showView}
+                    supportedViewTypes={supportedRewardViewTypes}
+                  />
+                </Stack>
               )}
             </Stack>
 
