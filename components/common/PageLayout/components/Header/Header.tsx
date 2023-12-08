@@ -79,7 +79,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         }}
       >
         <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
+          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} post={forumPostInfo?.forumPost} />
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
