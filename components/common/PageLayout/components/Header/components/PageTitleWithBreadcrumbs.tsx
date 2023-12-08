@@ -144,7 +144,7 @@ function ForumPostTitle({
   basePath: string;
   pathName: string;
   sectionName: string;
-  post: PostWithVotes | null;
+  post?: PostWithVotes | null;
 }) {
   const [pageTitle] = usePageTitle();
   const title = pathName === '/[domain]/forum' ? 'All Categories' : pageTitle;
