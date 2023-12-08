@@ -224,7 +224,7 @@ export default function PageTitleWithBreadcrumbs({
 }: {
   pageId?: string;
   pageType?: PageType;
-  post: PostWithVotes | null | undefined;
+  post?: PostWithVotes | null;
 }) {
   const router = useRouter();
   const { mappedFeatures } = useSpaceFeatures();
