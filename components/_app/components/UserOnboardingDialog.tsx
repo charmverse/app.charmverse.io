@@ -2,9 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
 
-import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
@@ -13,17 +11,15 @@ import { ProfileWidgets } from 'components/members/components/MemberProfile/comp
 import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
 import {
   useRequiredMemberProperties,
-  useRequiredMemberPropertiesForm
+  useRequiredMemberPropertiesForm,
+  useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
-import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
 import type { OnboardingStep } from '../hooks/useOnboarding';
@@ -89,74 +85,50 @@ function UserOnboardingDialog({
   initialStep?: OnboardingStep;
   space: Space;
 }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const { showMessage } = useSnackbar();
+  const { requiredProperties } = useRequiredMemberProperties({
+    userId: currentUser.id
+  });
   const {
-    control,
-    isTimezoneRequired,
-    userDetails: defaultUserDetails,
-    isBioRequired,
-    errors,
-    isValid,
-    memberProperties,
-    nonEmptyRequiredProperties,
-    values,
-    requiredProperties
+    control: memberPropertiesControl,
+    errors: memberPropertiesErrors,
+    isValid: isMemberPropertiesValid,
+    values: memberPropertiesValues,
+    onFormChange: onMemberPropertiesChange,
+    isDirty: isMemberPropertiesDirty,
+    isSubmitting: isMemberPropertiesSubmitting,
+    onSubmit: onSubmitMemberProperties
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
-  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
+
+  const {
+    errors: userDetailsErrors,
+    isValid: isUserDetailsValid,
+    values: userDetailsValues,
+    onFormChange: onUserDetailsChange,
+    isDirty: isUserDetailsDirty,
+    isSubmitting: isUserDetailsSubmitting,
+    onSubmit: onSubmitUserDetails
+  } = useRequiredUserDetailsForm({
+    userId: currentUser.id
+  });
+
+  const { refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-  const [userDetails, setUserDetails] = useState<EditableFields>({});
-  const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
-  const { mutateMembers } = useMembers();
-  const [isFormClean, setIsFormClean] = useState(true);
-  const isInputValid =
-    requiredProperties.length === 0 ||
-    (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
 
-  useEffect(() => {
-    log.info('[user-journey] Show onboarding flow');
-  }, []);
+  const isFormDirty = isMemberPropertiesDirty || isUserDetailsDirty;
 
-  useEffect(() => {
-    setUserDetails({
-      description: defaultUserDetails?.description ?? '',
-      timezone: defaultUserDetails?.timezone ?? ''
-    });
-  }, [defaultUserDetails]);
-
-  function onUserDetailsChange(fields: EditableFields) {
-    setIsFormClean(false);
-    setUserDetails((_form) => ({ ..._form, ...fields }));
-  }
-
-  function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    setIsFormClean(false);
-    setMemberDetails(fields);
-  }
-
-  usePreventReload(!isFormClean);
+  usePreventReload(isFormDirty);
 
   async function saveForm() {
-    setIsLoading(true);
-    if (isFormClean) {
-      await completeOnboarding?.();
-      setIsFormClean(true);
-      setIsLoading(false);
+    if (!isFormDirty) {
+      completeOnboarding?.();
       return;
     }
-    await charmClient.updateUserDetails(userDetails);
-    await updateSpaceValues(space.id, memberDetails);
-    await Promise.all([
-      mutateMembers(),
-      refreshPropertyValues(),
-      completeOnboarding?.(),
-      mutate('/current-user-details')
-    ]);
-    setIsFormClean(true);
-    showMessage('Profile updated', 'success');
-    setIsLoading(false);
+
+    await onSubmitMemberProperties();
+    await onSubmitUserDetails();
+    completeOnboarding?.();
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
@@ -166,12 +138,7 @@ function UserOnboardingDialog({
   }
 
   const handleClose = () => {
-    // If there are required properties that must be filled, don't open the discard changes modal
-    if (nonEmptyRequiredProperties) {
-      return;
-    }
-
-    if (!isFormClean) {
+    if (isFormDirty) {
       confirmExitPopupState.open();
     } else {
       completeOnboarding?.();
@@ -200,9 +167,9 @@ function UserOnboardingDialog({
             disableElevation
             size='large'
             onClick={saveForm}
-            disabled={isFormClean || !isInputValid}
-            loading={isLoading}
-            disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
+            loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
+            disabled={!isFormDirty || !isUserDetailsValid || !isMemberPropertiesValid}
+            disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save
           </Button>
@@ -214,21 +181,21 @@ function UserOnboardingDialog({
       ) : currentStep === 'profile_step' ? (
         <>
           <UserDetailsForm
+            errors={userDetailsErrors}
+            userDetails={userDetailsValues}
             sx={{
               mt: 0
             }}
             user={currentUser}
             onChange={onUserDetailsChange}
-            memberProperties={memberProperties ?? []}
           />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
-            values={values}
-            control={control}
-            errors={errors}
-            properties={memberProperties}
+            values={memberPropertiesValues}
+            control={memberPropertiesControl}
+            errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
-            onChange={onMemberDetailsChange}
+            onChange={onMemberPropertiesChange}
             userId={currentUser.id}
             showCollectionOptions
           />

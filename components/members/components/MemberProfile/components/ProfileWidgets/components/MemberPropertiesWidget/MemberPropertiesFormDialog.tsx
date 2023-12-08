@@ -2,7 +2,6 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
@@ -10,7 +9,6 @@ import { Button } from 'components/common/Button';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
-import { useMembers } from 'hooks/useMembers';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../../../../../../hooks/useMemberPropertyValues';
@@ -18,7 +16,6 @@ import { useMemberPropertyValues } from '../../../../../../hooks/useMemberProper
 import { MemberPropertiesForm } from './MemberPropertiesForm';
 
 type Props = {
-  spaceId: string;
   userId: string;
   onClose: VoidFunction;
 };
@@ -81,36 +78,31 @@ export function DialogContainer({
   );
 }
 
-export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) {
-  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
-  const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
-  const { mutateMembers } = useMembers();
+export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
+  const { refreshPropertyValues } = useMemberPropertyValues(userId);
 
-  const { control, errors, isValid, memberProperties, values } = useRequiredMemberPropertiesForm({ userId });
+  const { control, errors, isValid, setValue, isDirty, isSubmitting, values, onSubmit } =
+    useRequiredMemberPropertiesForm({
+      userId
+    });
 
   async function saveForm() {
-    await updateSpaceValues(spaceId, memberDetails);
+    await onSubmit();
     onClose();
   }
 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    setMemberDetails(fields);
+    fields.forEach((field) => {
+      setValue(field.memberPropertyId, field.value);
+    });
   }
 
-  function onClickClose() {
-    // refresh members only after all the editing is finished
-    onClose();
-    mutateMembers();
-  }
-
-  const isFormClean = memberDetails.length === 0;
   return (
-    <DialogContainer title='Edit profile' onClose={onClickClose}>
+    <DialogContainer title='Edit profile' onClose={onClose}>
       <MemberPropertiesForm
         values={values}
         control={control}
         errors={errors}
-        properties={memberProperties}
         userId={userId}
         refreshPropertyValues={refreshPropertyValues}
         onChange={onMemberDetailsChange}
@@ -119,7 +111,7 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
         <Button disableElevation color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
-        <Button disableElevation disabled={isFormClean || !isValid} onClick={saveForm}>
+        <Button disableElevation disabled={!isDirty || !isValid} loading={isSubmitting} onClick={saveForm}>
           Save
         </Button>
       </Box>

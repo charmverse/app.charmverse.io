@@ -1,45 +1,16 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import type { ChangeEvent } from 'react';
-import { useEffect, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import type { FieldErrors } from 'react-hook-form';
 
-import FieldLabel from 'components/common/form/FieldLabel';
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { Social } from 'lib/members/interfaces';
-import debounce from 'lib/utilities/debounce';
-
-export const schema = yup.object({
-  twitterURL: yup
-    .string()
-    .notRequired()
-    .ensure()
-    .trim()
-    .matches(/^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i, 'Invalid X link'),
-  githubURL: yup
-    .string()
-    .notRequired()
-    .ensure()
-    .trim()
-    .matches(/^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i, 'Invalid GitHub link'),
-  discordUsername: yup.string().notRequired().ensure().trim(),
-  linkedinURL: yup
-    .string()
-    .notRequired()
-    .ensure()
-    .matches(
-      /^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i,
-      'Invalid LinkedIn link'
-    )
-});
-
-export type FormValues = yup.InferType<typeof schema>;
 
 type SocialInputsProps = {
   social?: Social;
-  save: (social: Social) => Promise<void>;
+  onChange: (social: Social) => Promise<void>;
   readOnly?: boolean;
+  errors?: FieldErrors<Record<keyof Social, string | null>>;
+  required?: Record<keyof Social, boolean>;
 };
 
 const initialSocials: Social = {
@@ -50,93 +21,82 @@ const initialSocials: Social = {
 };
 
 export function SocialInputs(props: SocialInputsProps) {
-  const { social = initialSocials, save, readOnly } = props;
-
-  const {
-    register,
-    trigger,
-    reset,
-    setValue,
-    formState: { errors },
-    getValues
-  } = useForm<FormValues>({
-    defaultValues: social,
-    resolver: yupResolver(schema),
-    mode: 'onChange'
-  });
-
-  const values = getValues();
-
-  const onChange = useCallback(
-    debounce(async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      if (!readOnly) {
-        setValue(event.target.name as keyof Social, event.target.value);
-        const validation = await trigger();
-
-        if (validation) {
-          await save({
-            ...values,
-            [event.target.name]: event.target.value ?? ''
-          });
-        }
-      }
-    }, 300),
-    [readOnly, values]
-  );
-
-  useEffect(() => {
-    reset(social);
-  }, [social]);
+  const social = props.social ?? initialSocials;
+  const { required, errors, onChange, readOnly } = props;
 
   return (
     <>
       <Grid item>
-        <FieldLabel>X</FieldLabel>
-        <TextField
-          {...register('twitterURL')}
-          fullWidth
-          disabled={readOnly}
-          error={!!errors.twitterURL}
-          helperText={errors.twitterURL?.message}
-          placeholder='https://twitter.com/charmverse'
-          onChange={onChange}
-        />
+        <FieldWrapper label='X' required={required?.twitterURL}>
+          <TextField
+            fullWidth
+            value={social.twitterURL}
+            disabled={readOnly}
+            error={!!errors?.twitterURL?.message}
+            helperText={errors?.twitterURL?.message}
+            placeholder='https://twitter.com/charmverse'
+            onChange={(event) => {
+              onChange({
+                ...social,
+                twitterURL: event.target.value
+              });
+            }}
+          />
+        </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldLabel>GitHub</FieldLabel>
-        <TextField
-          {...register('githubURL')}
-          disabled={readOnly}
-          fullWidth
-          error={!!errors.githubURL}
-          helperText={errors.githubURL?.message}
-          placeholder='https://github.com/charmverse'
-          onChange={onChange}
-        />
+        <FieldWrapper label='Github' required={required?.githubURL}>
+          <TextField
+            value={social.githubURL}
+            disabled={readOnly}
+            fullWidth
+            error={!!errors?.githubURL?.message}
+            helperText={errors?.githubURL?.message}
+            placeholder='https://github.com/charmverse'
+            onChange={(event) => {
+              onChange({
+                ...social,
+                githubURL: event.target.value
+              });
+            }}
+          />
+        </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldLabel>Discord</FieldLabel>
-        <TextField
-          {...register('discordUsername')}
-          disabled={readOnly}
-          fullWidth
-          error={!!errors.discordUsername}
-          helperText={errors.discordUsername?.message}
-          placeholder='Username#1234'
-          onChange={onChange}
-        />
+        <FieldWrapper label='Discord'>
+          <TextField
+            value={social.discordUsername}
+            disabled={readOnly}
+            fullWidth
+            error={!!errors?.discordUsername?.message}
+            helperText={errors?.discordUsername?.message}
+            placeholder='Username#1234'
+            onChange={(event) => {
+              onChange({
+                ...social,
+                discordUsername: event.target.value
+              });
+            }}
+          />
+        </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldLabel>LinkedIn</FieldLabel>
-        <TextField
-          {...register('linkedinURL')}
-          disabled={readOnly}
-          fullWidth
-          error={!!errors.linkedinURL}
-          helperText={errors.linkedinURL?.message}
-          placeholder='https://www.linkedin.com/in/alexchibunpoon/'
-          onChange={onChange}
-        />
+        <FieldWrapper label='LinkedIn' required={required?.linkedinURL}>
+          <TextField
+            value={social.linkedinURL}
+            disabled={readOnly}
+            fullWidth
+            error={!!errors?.linkedinURL?.message}
+            helperText={errors?.linkedinURL?.message}
+            placeholder='https://www.linkedin.com/in/alexchibunpoon/'
+            onChange={(event) => {
+              onChange({
+                ...social,
+                linkedinURL: event.target.value
+              });
+            }}
+          />
+        </FieldWrapper>
       </Grid>
     </>
   );
