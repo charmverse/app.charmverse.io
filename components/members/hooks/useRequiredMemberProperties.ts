@@ -108,7 +108,6 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     }
 
     return {
-      isLoadingUserDetails,
       memberProperties: _memberProperties,
       requiredProperties: _requiredProperties,
       isTimezoneRequired: !!_isTimezoneRequired,
@@ -127,6 +126,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 
   return {
     ...data,
+    isLoadingUserDetails,
     userDetails
   };
 }
@@ -280,9 +280,9 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
   }, [isLoadingUserDetails]);
 
   const values = {
-    description: watch('description'),
-    social: watch('social'),
-    timezone: watch('timezone')
+    description: getValues('description'),
+    social: getValues('social'),
+    timezone: getValues('timezone')
   };
 
   function onFormChange(fields: EditableFields) {
@@ -308,7 +308,7 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   return {
     values,
-    isValid: Object.keys(errors).length === 0,
+    isValid,
     isDirty,
     errors,
     onFormChange,
