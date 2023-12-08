@@ -1,4 +1,4 @@
-import type { Prisma, Space } from '@charmverse/core/prisma';
+import type { PrimaryMemberIdentity, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -11,7 +11,8 @@ import {
   ListItem,
   List,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
+  Select
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
@@ -265,6 +266,32 @@ export function SpaceSettings({
               watch={watch}
               setValue={setValue}
             />
+          </Grid>
+          <Grid item>
+            <FieldLabel>Primary Identity</FieldLabel>
+            <Typography variant='caption' mb={1} component='p'>
+              Choose the primary identity for your space. This will be the required identity that your members will have
+              to provide when they first join and it will be used to display the member.
+            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Select
+                variant='outlined'
+                value={space.primaryMemberIdentity ?? 'none'}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateSpace({
+                    id: space.id,
+                    primaryMemberIdentity: value === 'none' ? null : (value as PrimaryMemberIdentity)
+                  });
+                }}
+              >
+                <MenuItem value='none'>None</MenuItem>
+                <MenuItem value='discord'>Discord</MenuItem>
+                <MenuItem value='google'>Google</MenuItem>
+                <MenuItem value='telegram'>Telegram</MenuItem>
+                <MenuItem value='wallet'>Wallet</MenuItem>
+              </Select>
+            </Box>
           </Grid>
           <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>

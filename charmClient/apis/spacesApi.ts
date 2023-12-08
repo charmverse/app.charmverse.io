@@ -103,16 +103,4 @@ export class SpacesApi {
   exportSpaceData({ spaceId, data }: { spaceId: string; data: ZippedDataRequest }) {
     return http.POST(`/api/spaces/${spaceId}/export-data`, data);
   }
-
-  updateSpacePrimaryMemberIdentity({
-    primaryMemberIdentity,
-    spaceId
-  }: {
-    spaceId: string;
-    primaryMemberIdentity?: PrimaryMemberIdentity;
-  }) {
-    return http.PUT(`/api/spaces/${spaceId}/primary-member-identity`, {
-      primaryMemberIdentity
-    });
-  }
 }
