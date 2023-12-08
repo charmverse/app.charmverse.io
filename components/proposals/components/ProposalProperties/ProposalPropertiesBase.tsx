@@ -46,12 +46,14 @@ import type {
 } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import type { ProposalEvaluationValues } from '../../../[pageId]/DocumentPage/components/Sidebar/components/ProposalSidebar/ProposalEvaluationForm';
+import { ProposalEvaluationForm } from '../../../[pageId]/DocumentPage/components/Sidebar/components/ProposalSidebar/ProposalEvaluationForm';
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 
+import { EvaluationStepper } from './components/EvaluationStepper/EvaluationStepper';
 import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
-import type { ProposalEvaluationValues } from './components/ProposalEvaluationForm';
-import { ProposalEvaluationForm } from './components/ProposalEvaluationForm';
+import { ProposalEvaluationSelect } from './components/ProposalEvaluationSelect';
 import { ProposalEvaluationsStatus } from './components/ProposalEvaluationsStatus/ProposalEvaluationsStatus';
 import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
 import type { RangeProposalCriteria } from './components/ProposalRubricCriteriaInput';
@@ -85,7 +87,7 @@ type ProposalPropertiesProps = {
   isFromTemplate?: boolean;
   isTemplateRequired?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
-  onChangeProposalEvaluation?: (evaluations: ProposalEvaluationValues) => void;
+  changeEvaluationStep?: (evaluationId: string) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -102,7 +104,7 @@ type ProposalPropertiesProps = {
   snapshotProposalId?: string | null;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   readOnlyCustomProperties?: string[];
-  openEvaluation?: () => void;
+  openEvaluation?: (evaluationId?: string) => void;
   isEvaluationSidebarOpen?: boolean;
   canSeeEvaluation?: boolean;
 };
@@ -114,7 +116,7 @@ export function ProposalPropertiesBase({
   isFromTemplate,
   isTemplateRequired,
   onChangeRubricCriteria,
-  onChangeProposalEvaluation,
+  changeEvaluationStep,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -181,6 +183,16 @@ export function ProposalPropertiesBase({
       default:
         await updateProposalStatus?.(newStatus);
         break;
+    }
+  }
+
+  async function handleEvaluationChange({ evaluationId, toDraft }: { evaluationId?: string; toDraft?: boolean }) {
+    if (toDraft) {
+      await updateProposalStatus?.('draft');
+    } else if (evaluationId) {
+      // move to the next evaluation step
+      // console.log('handleEvaluationChange', evaluationId);
+      await changeEvaluationStep?.(evaluationId);
     }
   }
 
@@ -284,6 +296,10 @@ export function ProposalPropertiesBase({
     lensProposalPropertyState = lensProfile && account ? 'show_toggle' : 'hide';
   }
 
+  function handleClickEvaluationStep(evaluationId: string) {
+    openEvaluation?.(evaluationId);
+  }
+
   return (
     <Box
       className='CardDetail content'
@@ -295,6 +311,18 @@ export function ProposalPropertiesBase({
       mt={2}
     >
       <div className='octo-propertylist'>
+        {isCharmVerse && (
+          <>
+            <Box mb={1}>
+              <EvaluationStepper
+                evaluations={proposalFormInputs.evaluations}
+                isDraft={proposalStatus === 'draft'}
+                onClick={handleClickEvaluationStep}
+              />
+            </Box>
+            <Divider />
+          </>
+        )}
         {/* Select a template for new proposals */}
         {isNewProposal && proposalFormInputs.type !== 'proposal_template' && (
           <Box className='octo-propertyrow' mb='0 !important'>
@@ -320,8 +348,7 @@ export function ProposalPropertiesBase({
             </Box>
           </Box>
         )}
-        {/* workflow is not an option when using a template */}
-        {isCharmVerse && isNewProposal && !isFromTemplate && (
+        {isCharmVerse && isNewProposal && (
           <>
             <Box className='octo-propertyrow' mb='0 !important'>
               <PropertyLabel readOnly required highlighted>
@@ -329,7 +356,7 @@ export function ProposalPropertiesBase({
               </PropertyLabel>
               <ProposalWorkflowSelect onChange={selectEvaluationWorkflow} />
             </Box>
-            {proposalFormInputs.evaluations.length > 0 && (
+            {/* {proposalFormInputs.evaluations.length > 0 && (
               <Box className='octo-propertyrow' mb='0 !important'>
                 <PropertyLabel />
                 <Box display='flex' flex={1} flexDirection='column' ml={1}>
@@ -349,26 +376,13 @@ export function ProposalPropertiesBase({
                   <Divider sx={{ mt: '0 !important' }} />
                 </Box>
               </Box>
-            )}
+            )} */}
           </>
-        )}
-        {isCharmVerse && !isNewProposal && proposalFormInputs.evaluations.length > 0 && (
-          <Box className='octo-propertyrow' mb='0 !important'>
-            <PropertyLabel readOnly highlighted>
-              Status
-            </PropertyLabel>
-            <Box ml={1}>
-              <ProposalEvaluationsStatus
-                evaluations={proposalFormInputs.evaluations}
-                isDraft={proposalStatus === 'draft'}
-              />
-            </Box>
-          </Box>
         )}
         {showStatusStepper && (
           <>
             <Grid container mb={2}>
-              {!isNewProposal && !isCharmVerse && (
+              {!isNewProposal && (
                 <ProposalStepSummary
                   archived={archived}
                   proposalFlowFlags={proposalFlowFlags}
@@ -396,7 +410,38 @@ export function ProposalPropertiesBase({
             </Stack>
           </>
         )}
+
+        {isCharmVerse && !isNewProposal && (
+          <Stack
+            direction='row'
+            gap={1}
+            alignItems='center'
+            sx={{ cursor: 'pointer' }}
+            onClick={() => setDetailsExpanded((v) => !v)}
+          >
+            <Typography fontWeight='bold'>Details</Typography>
+            <IconButton size='small'>
+              <KeyboardArrowDown
+                fontSize='small'
+                sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
+              />
+            </IconButton>
+          </Stack>
+        )}
         <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
+          {isCharmVerse && (
+            <Box className='octo-propertyrow' mb='0 !important'>
+              <PropertyLabel readOnly highlighted>
+                Current step
+              </PropertyLabel>
+              <ProposalEvaluationSelect
+                evaluations={proposalFormInputs.evaluations}
+                isDraft={proposalStatus === 'draft'}
+                onChange={handleEvaluationChange}
+                readOnly={isNewProposal}
+              />
+            </Box>
+          )}
           {showStatusStepper && (
             <Box mt={2} mb={2}>
               <OldProposalStepper
@@ -607,12 +652,12 @@ export function ProposalPropertiesBase({
           }}
         />
 
-        {canSeeEvaluation && (
+        {!isCharmVerse && canSeeEvaluation && (
           <Box display='flex' justifyContent='center' py={2}>
             <Button
               disabled={isEvaluationSidebarOpen}
               startIcon={SIDEBAR_VIEWS.proposal_evaluation.icon}
-              onClick={openEvaluation}
+              onClick={() => openEvaluation?.()}
             >
               Open evaluation
             </Button>

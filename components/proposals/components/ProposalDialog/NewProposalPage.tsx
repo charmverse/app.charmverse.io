@@ -8,6 +8,7 @@ import { useElementSize } from 'usehooks-ts';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
+import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
@@ -45,6 +46,7 @@ const StyledContainer = styled(Container)`
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
+  const [proposalEvaluationId, setProposalEvaluationId] = useState();
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -147,18 +149,29 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                         rubricCriteria
                       });
                     }}
-                    onChangeProposalEvaluation={(updated) => {
-                      formInputs.evaluations = formInputs.evaluations.map((evaluation) =>
-                        evaluation.id === updated.id ? updated : evaluation
-                      );
-                      setFormInputs({
-                        ...formInputs
-                      });
-                    }}
                     readOnlyCustomProperties={readOnlyCustomProperties}
                   />
                 </div>
               </div>
+              <PageSidebar
+                id='page-action-sidebar'
+                spaceId={currentSpace?.id}
+                proposalEvaluationId={proposalEvaluationId}
+                // pagePermissions={pagePermissions}
+                // editorState={editorState}
+                // sidebarView={sidebarView}
+                // closeSidebar={closeSidebar}
+                // openSidebar={setActiveView}
+                // threads={threads}
+                onChangeProposalEvaluation={(updated) => {
+                  formInputs.evaluations = formInputs.evaluations.map((evaluation) =>
+                    evaluation.id === updated.id ? updated : evaluation
+                  );
+                  setFormInputs({
+                    ...formInputs
+                  });
+                }}
+              />
             </CharmEditor>
           </Box>
         </StyledContainer>

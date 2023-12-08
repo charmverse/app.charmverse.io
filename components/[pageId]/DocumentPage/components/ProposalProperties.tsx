@@ -34,7 +34,7 @@ interface ProposalPropertiesProps {
   snapshotProposalId: string | null;
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
-  openEvaluation?: () => void;
+  openEvaluation?: (evaluationId?: string) => void;
   isEvaluationSidebarOpen?: boolean;
   proposalPage: PageWithContent;
 }
@@ -161,6 +161,10 @@ export function ProposalProperties({
     mutateProposals();
   }
 
+  async function changeEvaluationStep(evaluationId: string) {
+    // Call backend
+  }
+
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
   const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
   const readOnlyReviewers = readOnlyProperties || (!isAdmin && sourceTemplate && sourceTemplate.reviewers.length > 0);
@@ -205,6 +209,7 @@ export function ProposalProperties({
         snapshotProposalId={snapshotProposalId}
         updateProposalStatus={updateProposalStatus}
         onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
+        changeEvaluationStep={changeEvaluationStep}
         proposalFormInputs={proposalFormInputs}
         setProposalFormInputs={onChangeProperties}
         isPublishingToLens={isPublishingToLens}

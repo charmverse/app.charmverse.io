@@ -99,6 +99,7 @@ function DocumentPage({
 }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
+  const [proposalEvaluationId, setProposalEvaluationId] = useState();
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
@@ -439,6 +440,7 @@ function DocumentPage({
                       pageId={page.id}
                       spaceId={page.spaceId}
                       proposalId={proposalId}
+                      proposalEvaluationId={proposalEvaluationId}
                       pagePermissions={pagePermissions}
                       editorState={editorState}
                       sidebarView={sidebarView}

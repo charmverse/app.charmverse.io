@@ -16,6 +16,7 @@ type SelectProps = {
   multiselect?: boolean;
   options?: SelectOptionType[];
   disabled?: boolean;
+  includeSelectedOptions?: boolean;
   canEditOptions?: boolean;
   noOptionsText?: string;
   onChange: (option: string | string[]) => void;
@@ -50,6 +51,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       onBlur,
       placeholder,
       className,
+      includeSelectedOptions = false,
       forcePopupIcon = 'auto',
       noOptionsText,
       ...inputProps
@@ -122,7 +124,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           clearOnBlur
           handleHomeEndKeys
           multiple
-          filterSelectedOptions
+          filterSelectedOptions={!includeSelectedOptions}
           sx={{ minWidth: 150, width: '100%', zIndex: 1 }}
           options={options}
           autoHighlight
