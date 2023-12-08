@@ -281,10 +281,25 @@ export async function createWorkspace({
     userId: space.createdBy
   });
 
+  const spaceProposalCategories = await prisma.proposalCategory.findMany({
+    where: {
+      spaceId: space.id
+    },
+    select: {
+      id: true,
+      title: true
+    },
+    orderBy: {
+      title: 'asc'
+    }
+  });
+
   await createDefaultProposal({
     spaceId: space.id,
     userId: space.createdBy,
-    categoryId: defaultProposalCategories[0].id
+    categoryId:
+      spaceProposalCategories.find((c) => c.title.toLowerCase().match('general'))?.id ??
+      spaceProposalCategories[spaceProposalCategories.length - 1].id
   });
 
   // Add default stablecoin methods
