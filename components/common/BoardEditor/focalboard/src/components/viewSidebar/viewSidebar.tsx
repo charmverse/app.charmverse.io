@@ -4,7 +4,7 @@ import { memo, useEffect, useState } from 'react';
 
 import { ProposalCategoriesList } from 'components/proposals/components/ProposalCategoriesList';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 import { StyledSidebar } from './styledSidebar';
@@ -32,6 +32,7 @@ interface Props {
   hideLayoutSelectOptions?: boolean;
   hidePropertiesRow?: boolean;
   withProposalCategories?: boolean;
+  supportedViewTypes?: IViewType[];
 }
 
 function getDefaultView(hasBoardView: boolean): SidebarView {
@@ -70,6 +71,7 @@ function ViewSidebar(props: Props) {
                     hideLayoutSelectOptions={props.hideLayoutSelectOptions}
                     board={props.board}
                     view={props.view}
+                    supportedViewTypes={props.supportedViewTypes}
                   />
                 </>
               )}

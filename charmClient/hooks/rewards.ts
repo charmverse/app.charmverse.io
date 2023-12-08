@@ -81,5 +81,5 @@ export function useUpdateRewardBlocks(spaceId: string) {
 }
 
 export function useDeleteRewardBlocks(spaceId: string) {
-  return useDELETE<string[]>(`/api/spaces/${spaceId}/rewards/blocks`);
+  return useDELETE<{ blockIds: string[] }>(`/api/spaces/${spaceId}/rewards/blocks`);
 }
