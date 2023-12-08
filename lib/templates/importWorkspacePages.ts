@@ -28,7 +28,6 @@ type WorkspaceImportOptions = ImportParams & {
   oldNewCustomProposalPropertyIdHashMap?: Record<string, string>;
   oldNewCustomRewardPropertyIdHashMap?: Record<string, string>;
 };
-
 type UpdateRefs = {
   oldNewRecordIdHashMap: Record<string, string>;
   pages: Page[];
@@ -253,12 +252,11 @@ export async function generateImportWorkspacePages({
             return {
               ...permission,
               permissionLevel: permission.permissionLevel ?? 'full_access',
-              spaceId: permission.spaceId ? (importingToDifferentSpace ? permission.spaceId : space.id) : undefined,
-              roleId: permission.roleId
-                ? importingToDifferentSpace
+              spaceId: permission.spaceId && importingToDifferentSpace ? space.id : permission.spaceId,
+              roleId:
+                permission.roleId && importingToDifferentSpace
                   ? oldNewRoleIdHashMap?.[permission.roleId]
-                  : permission.roleId
-                : undefined,
+                  : permission.roleId,
               userId: permission.userId ? (importingToDifferentSpace ? space.createdBy : permission.userId) : undefined,
               inheritedFromPermission: newSourcePermissionId,
               id: newPagePermissionId
@@ -556,7 +554,8 @@ export async function importWorkspacePages({
   updateTitle,
   includePermissions,
   resetPaths,
-  oldNewRoleIdHashMap
+  oldNewRoleIdHashMap,
+  importingToDifferentSpace
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const _target = await getSpace(targetSpaceIdOrDomain);
 
@@ -572,14 +571,15 @@ export async function importWorkspacePages({
     bountyPermissionArgs,
     oldNewRecordIdHashMap
   } = await generateImportWorkspacePages({
-    targetSpaceIdOrDomain,
+    targetSpaceIdOrDomain: _target.id,
     exportData,
     exportName,
     parentId,
     updateTitle,
     includePermissions,
     resetPaths,
-    oldNewRoleIdHashMap
+    oldNewRoleIdHashMap,
+    importingToDifferentSpace
   });
 
   const pagesToCreate = pageArgs.length;
