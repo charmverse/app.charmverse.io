@@ -90,6 +90,9 @@ export function SpaceSettings({
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
   const [featuresInput, setFeatures] = useState(currentFeatures);
+  const [primaryMemberIdentity, setPrimaryMemberIdentity] = useState<PrimaryMemberIdentity | null>(
+    space.primaryMemberIdentity
+  );
   const [memberProfileTypesInput, setMemberProfileProperties] = useState(currentMemberProfileTypes);
   const {
     register,
@@ -132,6 +135,12 @@ export function SpaceSettings({
 
   useTrackPageView({ type: 'settings/space' });
 
+  useEffect(() => {
+    if (space) {
+      setPrimaryMemberIdentity(space.primaryMemberIdentity);
+    }
+  }, [space.id]);
+
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
 
@@ -155,6 +164,7 @@ export function SpaceSettings({
       memberProfiles: memberProfileTypesInput,
       name: values.name,
       domain: values.domain,
+      primaryMemberIdentity,
       spaceImage: values.spaceImage
     });
 
@@ -198,7 +208,10 @@ export function SpaceSettings({
   }
 
   const dataChanged =
-    !isEqual(currentFeatures, featuresInput) || !isEqual(currentMemberProfileTypes, memberProfileTypesInput) || isDirty;
+    !isEqual(currentFeatures, featuresInput) ||
+    !isEqual(currentMemberProfileTypes, memberProfileTypesInput) ||
+    isDirty ||
+    space.primaryMemberIdentity !== primaryMemberIdentity;
 
   useEffect(() => {
     setUnsavedChanges(dataChanged);
@@ -277,14 +290,10 @@ export function SpaceSettings({
             </Typography>
             <Box display='flex' alignItems='center' gap={1}>
               <Select
-                variant='outlined'
-                value={space.primaryMemberIdentity ?? 'none'}
+                value={primaryMemberIdentity ?? 'none'}
                 onChange={(e) => {
                   const value = e.target.value;
-                  updateSpace({
-                    id: space.id,
-                    primaryMemberIdentity: value === 'none' ? null : (value as PrimaryMemberIdentity)
-                  });
+                  setPrimaryMemberIdentity(value === 'none' ? null : (value as PrimaryMemberIdentity));
                 }}
               >
                 <MenuItem value='none'>

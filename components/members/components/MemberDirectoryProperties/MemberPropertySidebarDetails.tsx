@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'components/common/Button';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -37,6 +38,7 @@ export function MemberPropertySidebarDetails({
 }: Props) {
   const isAdmin = useIsAdmin();
   const { isFreeSpace } = useIsFreeSpace();
+  const { space } = useCurrentSpace();
   const canEditPropertyPermissions = isAdmin && !isFreeSpace;
 
   const memberPropertySidebarItemPopupState = usePopupState({
@@ -64,31 +66,39 @@ export function MemberPropertySidebarDetails({
     }
   }, [memberPropertySidebarItemPopupState.isOpen]);
 
+  const disabled = !isAdmin || space?.primaryMemberIdentity === property.type;
+
   return (
     <>
       <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
-          {!['role', 'join_date', 'profile_pic', 'google', 'discord', 'telegram', 'wallet'].includes(property.type) ? (
+          {!['role', 'join_date', 'profile_pic'].includes(property.type) ? (
             <Stack flexDirection='row' justifyContent='space-between' mr={2}>
               <Tooltip title={isAdmin ? 'Require members to fill this property during onboarding' : ''}>
                 <Typography pl={4} variant='overline' alignItems='center' display='flex'>
                   Required
                 </Typography>
               </Tooltip>
-              <Checkbox
-                size='small'
-                sx={{
-                  p: 0
-                }}
-                checked={property.required}
-                disabled={!isAdmin}
-                onChange={(e) => {
-                  updateProperty({
-                    id: property.id,
-                    required: e.target.checked
-                  });
-                }}
-              />
+              <Tooltip
+                title={space?.primaryMemberIdentity === property.type ? 'Primary identity must always be required' : ''}
+              >
+                <div>
+                  <Checkbox
+                    size='small'
+                    sx={{
+                      p: 0
+                    }}
+                    checked={property.required}
+                    disabled={disabled}
+                    onChange={(e) => {
+                      updateProperty({
+                        id: property.id,
+                        required: e.target.checked
+                      });
+                    }}
+                  />
+                </div>
+              </Tooltip>
             </Stack>
           ) : null}
           <Stack>

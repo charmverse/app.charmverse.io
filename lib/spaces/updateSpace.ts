@@ -38,15 +38,17 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
   }
 
   if (updates.primaryMemberIdentity) {
-    await prisma.memberProperty.updateMany({
-      where: {
-        spaceId,
-        type: updates.primaryMemberIdentity
-      },
-      data: {
-        required: true
-      }
-    });
+    await prisma.$transaction([
+      prisma.memberProperty.updateMany({
+        where: {
+          spaceId,
+          type: updates.primaryMemberIdentity
+        },
+        data: {
+          required: true
+        }
+      })
+    ]);
   }
 
   const updatedSpace = await prisma.space.update({

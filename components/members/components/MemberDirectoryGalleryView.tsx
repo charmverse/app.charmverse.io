@@ -54,8 +54,8 @@ function MemberDirectoryGalleryCard({
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
   const isGoogleHidden = !propertiesRecord.google?.enabledViews.includes('gallery');
   const isTelegramHidden = !propertiesRecord.telegram?.enabledViews.includes('gallery');
-  const googleProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.google.id);
-  const telegramProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.telegram.id);
+  const googleProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.google?.id);
+  const telegramProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.telegram?.id);
 
   const { showUserId } = useMemberDialog();
 
