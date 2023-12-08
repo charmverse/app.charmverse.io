@@ -20559,6 +20559,12 @@
       }
     ],
     "notificationToggles": {},
+    "defaultPagePermissionGroup": "full_access",
+    "hiddenFeatures": [],
+    "requireProposalTemplate": false,
+    "publicBountyBoard": false,
+    "publicProposals": false,
+    "defaultPublicPages": false,
     "memberProperties": [
       {
         "id": "6194454d-7ad6-43f7-ab1b-d3888db24cc4",

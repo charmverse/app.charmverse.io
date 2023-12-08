@@ -26060,6 +26060,12 @@
       }
     ],
     "notificationToggles": {},
+    "defaultPagePermissionGroup": "view",
+    "hiddenFeatures": [],
+    "requireProposalTemplate": true,
+    "publicBountyBoard": false,
+    "publicProposals": false,
+    "defaultPublicPages": false,
     "memberProperties": [
       {
         "id": "06a92eb7-151f-42e3-bd45-5dcbaa471ebe",
