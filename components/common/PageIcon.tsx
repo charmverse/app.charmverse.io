@@ -1,6 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import MembersIcon from '@mui/icons-material/AccountCircle';
 import FilledPageIcon from '@mui/icons-material/DescriptionOutlined';
 import EmptyPageIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -102,7 +102,7 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
     } else if (pageType === 'rewards') {
       iconComponent = <BountyIcon />;
     } else if (pageType === 'members') {
-      iconComponent = <AccountCircleIcon />;
+      iconComponent = <MembersIcon />;
     } else if (pageType === 'forum' || pageType === 'forum_category') {
       iconComponent = <MessageOutlinedIcon />;
     } else if (isEditorEmpty) {
@@ -128,4 +128,4 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
   );
 }
 
-export { ProposalIcon };
+export { MembersIcon, ProposalIcon };

@@ -388,8 +388,11 @@ export function ProposalPropertiesBase({
                 value={proposalReviewers}
                 proposalCategoryId={proposalFormInputs.categoryId}
                 onChange={async (options) => {
+                  const reviewerOptions = options.filter(
+                    (option) => option.group === 'role' || option.group === 'user'
+                  ) as ProposalReviewerInput[];
                   await setProposalFormInputs({
-                    reviewers: options.map((option) => ({ group: option.group, id: option.id }))
+                    reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
                   });
                 }}
               />

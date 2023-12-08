@@ -1,7 +1,7 @@
 import type { LensConfig } from '@lens-protocol/react-web';
 import { LensProvider, development, production } from '@lens-protocol/react-web';
 import { bindings } from '@lens-protocol/wagmi';
-import { Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
@@ -54,9 +54,7 @@ function Context({ children }: { children: ReactNode }) {
         <CurrentSpaceContext.Provider value={spaceContext.current}>
           <MembersProvider>
             <MemberPropertiesProvider>
-              <LensProvider config={lensConfig}>
-                <Paper>{children}</Paper>
-              </LensProvider>
+              <LensProvider config={lensConfig}>{children}</LensProvider>
             </MemberPropertiesProvider>
           </MembersProvider>
         </CurrentSpaceContext.Provider>
@@ -71,12 +69,21 @@ function ShowSettingsProfile({ path }: { path: SettingsPath }) {
   function setUnsavedChanges() {}
   return (
     <Context>
-      <SettingsContent
-        activePath={activePath}
-        onSelectPath={setActivePath}
-        onClose={onClose}
-        setUnsavedChanges={setUnsavedChanges}
-      />
+      <Box maxWidth='lg'>
+        <Paper
+          sx={{
+            maxHeight: 800,
+            height: { md: '90vh' }
+          }}
+        >
+          <SettingsContent
+            activePath={activePath}
+            onSelectPath={setActivePath}
+            onClose={onClose}
+            setUnsavedChanges={setUnsavedChanges}
+          />
+        </Paper>
+      </Box>
     </Context>
   );
 }

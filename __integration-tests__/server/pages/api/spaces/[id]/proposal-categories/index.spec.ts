@@ -64,8 +64,7 @@ describe('POST /api/spaces/[id]/proposal-categories - Create a proposal category
         public: null,
         proposalCategoryId: proposalCategory.id,
         permissionLevel: 'full_access',
-        categoryOperations: [],
-        proposalOperations: []
+        categoryOperations: []
       })
     );
   });

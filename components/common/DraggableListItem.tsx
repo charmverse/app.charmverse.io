@@ -7,10 +7,10 @@ interface DraggableListItemProps extends BoxProps {
   name: string;
   itemId: string;
   disabled?: boolean;
-  changeOrderHandler: (draggedProperty: string, droppedOnProperty: string) => Promise<void>;
+  changeOrderHandler: (draggedProperty: string, droppedOnProperty: string) => void;
 }
 
-export default function DraggableListItem({
+export function DraggableListItem({
   itemId,
   children,
   name,

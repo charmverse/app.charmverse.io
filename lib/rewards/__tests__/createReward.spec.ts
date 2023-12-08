@@ -62,7 +62,49 @@ describe('createReward', () => {
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
       reviewers: expect.arrayContaining(reviewers),
-      allowedSubmitterRoles: [submitterRole.id]
+      allowedSubmitterRoles: [submitterRole.id],
+      assignedSubmitters: null
+    });
+  });
+
+  it('should successfully create assigned reward based on assignedSubmitters', async () => {
+    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
+      { id: user.id, group: 'user' },
+      { id: reviewerRole.id, group: 'role' }
+    ];
+
+    const rewardData: RewardCreationData = {
+      spaceId: space.id,
+      userId: user.id,
+      chainId: 2,
+      rewardAmount: 100,
+      rewardToken: 'ETH',
+      approveSubmitters: true,
+      allowMultipleApplications: true,
+      maxSubmissions: 10,
+      dueDate: new Date(),
+      customReward: 'Special Badge',
+      fields: { fieldName: 'sampleField', type: 'text' },
+      reviewers,
+      allowedSubmitterRoles: [submitterRole.id],
+      assignedSubmitters: [user.id]
+    };
+
+    const { reward } = await createReward(rewardData);
+
+    expect(reward).toMatchObject({
+      chainId: 2,
+      rewardAmount: 100,
+      rewardToken: 'ETH',
+      approveSubmitters: false,
+      allowMultipleApplications: false,
+      maxSubmissions: 1,
+      dueDate: expect.any(Date),
+      customReward: 'Special Badge',
+      fields: { fieldName: 'sampleField', type: 'text' },
+      reviewers: expect.arrayContaining(reviewers),
+      allowedSubmitterRoles: null,
+      assignedSubmitters: [user.id]
     });
   });
 

@@ -34,9 +34,7 @@ export async function rollupRewardStatus({ rewardId }: { rewardId: string }): Pr
     newStatus = 'open';
   } else {
     const submissionSummary = countValueOccurrences<ApplicationStatus>(reward.applications, 'status');
-    if (submissionSummary.inProgress > 0 || submissionSummary.review > 0) {
-      newStatus = 'inProgress';
-    } else if (submissionSummary.complete > 0) {
+    if (submissionSummary.complete > 0) {
       newStatus = 'complete';
     } else if (submissionSummary.paid === reward.maxSubmissions) {
       newStatus = 'paid';

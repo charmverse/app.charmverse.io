@@ -227,3 +227,16 @@ export function stringSimilarity(str1?: string, str2?: string, gramSize: number 
   }
   return hits / total;
 }
+
+/**
+ * utility function to print an object in a readable format
+ *
+ * also returns object so it can be used (for example writing out to a file)
+ */
+export function prettyPrint(obj: any) {
+  const prettified = JSON.stringify(obj, null, 2);
+  // eslint-disable-next-line no-console
+  console.log(prettified);
+
+  return prettified;
+}

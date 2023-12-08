@@ -7,7 +7,11 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { getRewardOrThrow } from './getReward';
 import type { RewardReviewer, RewardWithUsers } from './interfaces';
 
-export type RewardUsersUpdate = { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null };
+export type RewardUsersUpdate = {
+  reviewers?: RewardReviewer[];
+  allowedSubmitterRoles?: string[] | null;
+  assignedSubmitters?: string[] | null;
+};
 
 export async function setRewardUsers({
   rewardId,
@@ -28,14 +32,23 @@ export async function setRewardUsers({
     if (!stringUtils.isUUID(rewardId)) {
       throw new InvalidInputError(`Please provide a valid reward id`);
     }
-    if (users.allowedSubmitterRoles) {
+    if (users.allowedSubmitterRoles || users.assignedSubmitters) {
       await _tx.bountyPermission.deleteMany({
         where: {
           bountyId: rewardId,
           permissionLevel: 'submitter'
         }
       });
-      if (users.allowedSubmitterRoles.length) {
+
+      if (!!users.assignedSubmitters && !!users.assignedSubmitters.length) {
+        await _tx.bountyPermission.createMany({
+          data: users.assignedSubmitters.map((userId) => ({
+            bountyId: rewardId,
+            permissionLevel: 'submitter',
+            userId
+          }))
+        });
+      } else if (users?.allowedSubmitterRoles?.length) {
         await _tx.bountyPermission.createMany({
           data: users.allowedSubmitterRoles.map((roleId) => ({
             bountyId: rewardId,

@@ -1,5 +1,6 @@
+import type { CSSProperties } from 'react';
 import type React from 'react';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { DragElementWrapper, DragSourceOptions, DragPreviewOptions } from 'react-dnd';
 import { useDrag, useDrop } from 'react-dnd';
 
@@ -48,9 +49,18 @@ export function useSortable<T, E = HTMLDivElement>(
   item: T,
   enabled: boolean,
   handler: (src: T, st: T) => void
-): [boolean, boolean, React.RefObject<E>] {
+): [boolean, boolean, React.RefObject<E>, CSSProperties] {
   const ref = useRef<E>(null);
   const [isDragging, isOver, drag, drop] = useSortableBase(itemType, item, enabled, handler);
   drop(drag(ref));
-  return [isDragging, isOver, ref];
+  const styles = useMemo<CSSProperties>(
+    () => ({
+      opacity: isDragging ? 0.5 : 1,
+      transition: `background-color 150ms ease-in-out`,
+      backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
+      cursor: isDragging ? 'grab' : undefined
+    }),
+    [isDragging, isOver]
+  );
+  return [isDragging, isOver, ref, styles];
 }

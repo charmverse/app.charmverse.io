@@ -53,7 +53,7 @@ function ViewSidebar(props: Props) {
   }, [props.isOpen]);
 
   return (
-    <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
+    <ClickAwayListener mouseEvent={props.isOpen ? 'onMouseDown' : false} onClickAway={props.closeSidebar}>
       <Collapse
         in={props.isOpen}
         orientation='horizontal'
