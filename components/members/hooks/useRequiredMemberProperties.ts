@@ -199,7 +199,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   return {
     values,
     control,
-    isValid: Object.keys(errors).length === 0,
+    isValid,
     errors,
     isDirty,
     setValue,
@@ -224,7 +224,6 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   const {
     formState: { errors, isValid, isDirty, isSubmitting },
-    watch,
     setValue,
     handleSubmit,
     getValues
@@ -252,9 +251,9 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
   });
 
   const values = {
-    description: watch('description'),
-    social: watch('social'),
-    timezone: watch('timezone')
+    description: getValues('description'),
+    social: getValues('social'),
+    timezone: getValues('timezone')
   };
 
   function onFormChange(fields: EditableFields) {
@@ -280,7 +279,7 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   return {
     values,
-    isValid: Object.keys(errors).length === 0,
+    isValid,
     isDirty,
     errors,
     onFormChange,
