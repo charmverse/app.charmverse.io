@@ -134,9 +134,11 @@ export async function createProposal({
   const reviewersInput = reviewers?.map(
     (r) =>
       ({
-        ...r,
+        id: r.id,
+        evaluationId: r.evaluationId,
         proposalId,
         roleId: r.group === 'role' ? r.id : undefined,
+        systemRole: r.group === 'system_role' ? r.id : undefined,
         userId: r.group === 'user' ? r.id : undefined
       } as Prisma.ProposalReviewerCreateManyInput)
   );
