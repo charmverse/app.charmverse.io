@@ -28,7 +28,13 @@ describe('getImportData', () => {
         memberProperties: [],
         notificationToggles: [],
         proposalBlocks: [],
-        rewardBlocks: []
+        rewardBlocks: [],
+        defaultPagePermissionGroup: space.defaultPagePermissionGroup,
+        defaultPublicPages: space.defaultPublicPages,
+        hiddenFeatures: space.hiddenFeatures,
+        publicBountyBoard: space.publicBountyBoard,
+        publicProposals: space.publicProposals,
+        requireProposalTemplate: space.requireProposalTemplate
       },
       pages: [],
       roles: [],
