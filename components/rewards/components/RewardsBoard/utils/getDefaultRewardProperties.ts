@@ -18,7 +18,6 @@ import {
 
 const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (typeof Constants)['menuColors'] }[] = [
   { id: 'open', value: 'Open', color: 'propColorTeal' },
-  { id: 'inProgress', value: 'In Progress', color: 'propColorYellow' },
   { id: 'complete', value: 'Approved', color: 'propColorBlue' },
   { id: 'paid', value: 'Paid', color: 'propColorGreen' }
 ];
