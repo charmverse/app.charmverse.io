@@ -94,7 +94,7 @@ export async function getNFTs({
         ...(filterSpam
           ? {
               spamConfidenceLevel: 'HIGH',
-              'excludeFilters[]': ['SPAM']
+              excludeFilters: ['SPAM']
             }
           : {})
       });

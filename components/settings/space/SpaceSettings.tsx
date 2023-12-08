@@ -1,5 +1,6 @@
 import type { PrimaryMemberIdentity, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import PersonIcon from '@mui/icons-material/Person';
 import {
   Box,
   Grid,
@@ -19,8 +20,9 @@ import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { FaDiscord, FaGoogle, FaTelegram, FaWallet } from 'react-icons/fa';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
@@ -285,11 +287,36 @@ export function SpaceSettings({
                   });
                 }}
               >
-                <MenuItem value='none'>None</MenuItem>
-                <MenuItem value='discord'>Discord</MenuItem>
-                <MenuItem value='google'>Google</MenuItem>
-                <MenuItem value='telegram'>Telegram</MenuItem>
-                <MenuItem value='wallet'>Wallet</MenuItem>
+                <MenuItem value='none'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <PersonIcon style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Member's choice</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='discord'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <FaDiscord style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Discord</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='google'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <FaGoogle style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Google</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='telegram'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <FaTelegram style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Telegram</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='wallet'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <FaWallet style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Wallet</Typography>
+                  </Stack>
+                </MenuItem>
               </Select>
             </Box>
           </Grid>
