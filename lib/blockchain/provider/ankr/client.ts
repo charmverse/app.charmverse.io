@@ -8,6 +8,7 @@ import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
+import { isMantleChain } from 'lib/gnosis/mantleClient';
 import { paginatedCall } from 'lib/utilities/async';
 
 import type { NFTData } from '../../getNFTs';
@@ -38,7 +39,7 @@ export async function getNFTs({
     return [];
   }
   const provider = new AnkrProvider(advancedAPIEndpoint);
-  if (chainId === 5000) {
+  if (isMantleChain(chainId)) {
     // TODO: find a provider that indexes the Mantle blockchain for NFTs
     return [];
   }
@@ -49,7 +50,7 @@ export async function getNFTs({
       await rateLimiter();
       return provider.getNFTsByOwner({
         ...params,
-        blockchain,
+        blockchain: blockchain as AnkrBlockchain,
         walletAddress: address
       });
     },
@@ -101,7 +102,7 @@ type GetNFTOwnerInput = {
 
 export async function getNFTOwners({ address, chainId }: GetNFTOwnerInput): Promise<string[]> {
   // TODO: handle Mantle: https://ethereum.stackexchange.com/questions/144319/how-to-get-all-the-owners-from-an-nft-collection
-  if (chainId === 5000) {
+  if (isMantleChain(chainId)) {
     log.warn('TODO: Support mantle NFT for owner validation');
     return [];
   }
@@ -114,7 +115,7 @@ export async function getNFTOwners({ address, chainId }: GetNFTOwnerInput): Prom
       return provider.getNFTHolders({
         ...params,
         contractAddress: address,
-        blockchain
+        blockchain: blockchain as AnkrBlockchain
       });
     },
     (response) => (response.nextPageToken ? { pageToken: response.nextPageToken } : null)

@@ -4,6 +4,8 @@ import useSWRMutation from 'swr/mutation';
 
 import * as http from 'adapters/http';
 
+export type MaybeString = string | null | undefined;
+
 export function useGET<T = unknown>(path: string | undefined | null, query: any = {}) {
   const requestUrl = path ? path + getQueryString(query) : null;
   return useSWR<T>(requestUrl, http.GET);

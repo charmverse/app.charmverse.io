@@ -84,14 +84,23 @@ export interface DocumentPageProps {
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   close?: VoidFunction;
+  insideModal?: boolean;
   enableSidebar?: boolean;
 }
 
-function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, enableSidebar }: DocumentPageProps) {
+function DocumentPage({
+  insideModal = false,
+  page,
+  refreshPage,
+  savePage,
+  readOnly = false,
+  close,
+  enableSidebar
+}: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
 
   const isLargeScreen = useLgScreen();
-  const { navigateToSpacePath } = useCharmRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const {
     activeView: sidebarView,
     persistedActiveView,
@@ -158,8 +167,10 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
   const pageTop = getPageTop(page);
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
-  const router = useRouter();
   const isSharedPage = router.pathname.startsWith('/share');
+  // Check if we are on the rewards page, as parent chip is only shown on rewards page
+  const isRewardsPage = router.pathname === '/[domain]/rewards';
+  const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
 
@@ -189,7 +200,9 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
 
   useEffect(() => {
     if (page?.type === 'card') {
-      if (!card) {
+      // the two properties are the title and the id which are added to the card as soon as we get the corresponding page
+      const hasCardLoaded = card && Object.keys(card).length > 2;
+      if (!hasCardLoaded) {
         dispatch(databaseViewsLoad({ pageId: page.parentId as string }));
         dispatch(blockLoad({ blockId: page.id }));
         dispatch(blockLoad({ blockId: page.parentId as string }));
@@ -354,6 +367,7 @@ function DocumentPage({ page, refreshPage, savePage, readOnly = false, close, en
                   readOnly={readOnly || !!enableSuggestingMode}
                   setPage={savePage}
                   readOnlyTitle={!!page.syncWithPageId}
+                  parentId={showParentChip ? card.parentId : null}
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                   <Box my={2} className='font-family-default'>

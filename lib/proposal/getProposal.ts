@@ -49,5 +49,5 @@ export async function getProposal({
 
   (proposalPage as any as PageWithProposal).proposal.page = { sourceTemplateId: proposalPage?.sourceTemplateId };
 
-  return proposalPage as PageWithPermissions & { proposal: ProposalWithUsersAndRubric };
+  return proposalPage as unknown as PageWithPermissions & { proposal: ProposalWithUsersAndRubric };
 }

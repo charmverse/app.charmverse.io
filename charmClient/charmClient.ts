@@ -430,6 +430,10 @@ class CharmClient {
   createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
     return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
   }
+
+  resolveEnsName(ens: string) {
+    return http.GET<string | null>('/api/resolve-ens', { ens });
+  }
 }
 
 const charmClient = new CharmClient();

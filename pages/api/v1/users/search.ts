@@ -11,7 +11,6 @@ const handler = superApiHandler();
 handler.get(searchUser);
 
 /**
- * @example https://github.com/jellydn/next-swagger-doc/blob/main/example/models/organization.ts
  *
  * @swagger
  * components:
@@ -24,7 +23,7 @@ handler.get(searchUser);
  *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
  *        wallet:
  *          type: string
- *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *          example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
  *        username:
  *          type: string
  *          example: admin
@@ -47,6 +46,11 @@ type SearchUserResponseBody = UserProfile;
  *       - 'Partner API'
  *     parameters:
  *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: User id to search by
+ *       - in: query
  *         name: email
  *         schema:
  *           type: string
@@ -67,13 +71,14 @@ type SearchUserResponseBody = UserProfile;
 async function searchUser(req: NextApiRequest, res: NextApiResponse<SearchUserResponseBody>) {
   const email = (req.query.email as string) || '';
   const wallet = (req.query.wallet as string) || '';
+  const userId = (req.query.userId as string) || '';
   const spaceIds = req.spaceIdRange;
 
   if (!spaceIds || !spaceIds.length) {
     throw new InvalidStateError('Space ID is undefined');
   }
 
-  const result = await searchUserProfile({ email, wallet, spaceIds });
+  const result = await searchUserProfile({ email, wallet, userId, spaceIds });
 
   return res.status(200).json(result);
 }

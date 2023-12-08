@@ -23,7 +23,8 @@ const PROPOSAL_STATUS_ICONS: Record<ProposalStatusWithArchived, ReactNode> = {
   vote_closed: <BarChartOutlinedIcon />,
   evaluation_active: <HowToVoteOutlinedIcon />,
   evaluation_closed: <BarChartOutlinedIcon />,
-  archived: <ArchivedOutlinedIcon />
+  archived: <ArchivedOutlinedIcon />,
+  published: <HowToVoteOutlinedIcon />
 };
 
 export const ProposalStatusColors: Record<ProposalStatusWithArchived, BrandColor> = {
@@ -35,7 +36,8 @@ export const ProposalStatusColors: Record<ProposalStatusWithArchived, BrandColor
   vote_closed: 'red',
   evaluation_active: 'pink',
   evaluation_closed: 'red',
-  archived: 'gray'
+  archived: 'gray',
+  published: 'green'
 };
 
 const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatusWithArchived }>`

@@ -19,8 +19,8 @@ describe('getGnosisTransactionQueueUrl', () => {
     }));
 
     jest.mock('../mantleClient.ts', () => ({
-      getTransaction: getMantleTransactionMock,
-      getAllTransactions: getAllMantleTransactionsMock
+      getMantleSafeTransaction: getMantleTransactionMock,
+      getAllMantleSafeTransactions: getAllMantleTransactionsMock
     }));
   });
 
