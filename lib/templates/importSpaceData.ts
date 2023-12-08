@@ -26,7 +26,7 @@ export type SpaceDataImportResult = Omit<SpaceDataExport, 'pages'> & {
 export async function importSpaceData(importParams: ImportParams): Promise<SpaceDataImportResult> {
   const targetSpace = await getSpace(importParams.targetSpaceIdOrDomain);
 
-  const { roles, oldNewRecordIdHashMap } = await importRoles(importParams);
+  const { roles, oldNewRecordIdHashMap: oldNewRoleIdHashMap } = await importRoles(importParams);
 
   const { proposalCategories, oldNewIdMap: oldNewProposalCategoryIdMap } = await importProposalCategories(importParams);
   const { postCategories, oldNewIdMap: oldNewPostCategoryIdMap } = await importPostCategories(importParams);
@@ -39,7 +39,9 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
     ...importParams,
     updateTitle: false,
     resetPaths: true,
-    includePermissions: false
+    includePermissions: true,
+    oldNewRoleIdHashMap,
+    importingToDifferentSpace: true
   });
 
   const importedSpaceSettings = await importSpaceSettings(importParams);
@@ -59,7 +61,7 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
     postCategories,
     proposalCategories,
     oldNewHashMaps: {
-      roles: oldNewRecordIdHashMap,
+      roles: oldNewRoleIdHashMap,
       proposalCategories: oldNewProposalCategoryIdMap,
       postCategories: oldNewPostCategoryIdMap,
       pages: oldNewPageIdMap,

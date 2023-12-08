@@ -20,6 +20,7 @@ import type { ImportParams, OldNewIdHashMap } from './interfaces';
 type WorkspaceImportOptions = ImportParams & {
   // Parent id of root pages, could be another page or null if space is parent
   parentId?: string | null;
+  importingToDifferentSpace?: boolean;
   updateTitle?: boolean;
   includePermissions?: boolean;
   resetPaths?: boolean;
@@ -131,7 +132,8 @@ export async function generateImportWorkspacePages({
   updateTitle,
   includePermissions,
   resetPaths,
-  oldNewRoleIdHashMap
+  oldNewRoleIdHashMap,
+  importingToDifferentSpace
 }: WorkspaceImportOptions): Promise<
   {
     pageArgs: Prisma.PageCreateArgs[];
@@ -238,21 +240,31 @@ export async function generateImportWorkspacePages({
     rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
 
     const pagePermissions = includePermissions
-      ? node.permissions.map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
-          const newPagePermissionId = uuid();
+      ? node.permissions
+          .map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
+            const newPagePermissionId = uuid();
 
-          oldNewPermissionMap[permission.id] = newPagePermissionId;
+            oldNewPermissionMap[permission.id] = newPagePermissionId;
 
-          const newSourcePermissionId = inheritedFromPermission
-            ? oldNewPermissionMap[inheritedFromPermission]
-            : undefined;
+            const newSourcePermissionId = inheritedFromPermission
+              ? oldNewPermissionMap[inheritedFromPermission]
+              : undefined;
 
-          return {
-            ...permission,
-            inheritedFromPermission: newSourcePermissionId,
-            id: newPagePermissionId
-          };
-        })
+            return {
+              ...permission,
+              permissionLevel: permission.permissionLevel ?? 'full_access',
+              spaceId: permission.spaceId ? (importingToDifferentSpace ? permission.spaceId : space.id) : undefined,
+              roleId: permission.roleId
+                ? importingToDifferentSpace
+                  ? oldNewRoleIdHashMap?.[permission.roleId]
+                  : permission.roleId
+                : undefined,
+              userId: permission.userId ? (importingToDifferentSpace ? space.createdBy : permission.userId) : undefined,
+              inheritedFromPermission: newSourcePermissionId,
+              id: newPagePermissionId
+            };
+          })
+          .filter((permission) => permission.userId || permission.roleId || permission.spaceId || permission.public)
       : [
           {
             id: newPermissionId,
