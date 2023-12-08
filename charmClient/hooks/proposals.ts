@@ -19,9 +19,8 @@ import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
+import type { MaybeString } from './helpers';
 import { useGET, usePOST, usePUT, useDELETE } from './helpers';
-
-type MaybeString = string | null | undefined;
 
 // Getters
 
