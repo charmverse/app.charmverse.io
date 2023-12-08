@@ -37,7 +37,6 @@ export function MemberPropertySidebarDetails({
 }: Props) {
   const isAdmin = useIsAdmin();
   const { isFreeSpace } = useIsFreeSpace();
-  const { toggleMemberProperty } = useMemberProperties();
   const canEditPropertyPermissions = isAdmin && !isFreeSpace;
 
   const memberPropertySidebarItemPopupState = usePopupState({

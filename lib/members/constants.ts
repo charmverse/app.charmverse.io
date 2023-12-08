@@ -6,7 +6,6 @@ type MemberPropertyConfig = {
   readonly?: boolean;
   default?: boolean;
   unhideable?: boolean;
-  togglePrimaryIdentity?: boolean;
 };
 
 // the following properties are listed in the order they should appear in the UI. Chronological sort is guaranteed since es2015
@@ -35,8 +34,7 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
   discord: {
     label: 'Discord',
     default: true,
-    readonly: true,
-    togglePrimaryIdentity: true
+    readonly: true
   },
   twitter: {
     label: 'X',
@@ -67,20 +65,17 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
   google: {
     label: 'Google',
     default: true,
-    hidden: true,
-    togglePrimaryIdentity: true
+    hidden: true
   },
   wallet: {
     label: 'Wallet',
     default: true,
-    hidden: true,
-    togglePrimaryIdentity: true
+    hidden: true
   },
   telegram: {
     label: 'Telegram',
     default: true,
-    hidden: true,
-    togglePrimaryIdentity: true
+    hidden: true
   },
   email: {
     label: 'Email'

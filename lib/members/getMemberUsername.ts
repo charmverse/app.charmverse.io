@@ -38,31 +38,20 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
       },
       space: {
         select: {
-          memberProperties: {
-            where: {
-              type: {
-                in: ['google', 'discord', 'telegram', 'wallet']
-              }
-            },
-            select: {
-              type: true,
-              primaryIdentity: true
-            }
-          }
+          primaryMemberIdentity: true
         }
       }
     }
   });
 
+  const primaryMemberIdentity = spaceRole.space.primaryMemberIdentity;
+
   const username = spaceRole.user.username;
-  const primaryIdentityMemberProperty = spaceRole.space.memberProperties.find(
-    (memberProperty) => memberProperty.primaryIdentity
-  );
-  if (!primaryIdentityMemberProperty) {
+  if (!primaryMemberIdentity) {
     return username;
   }
 
-  if (primaryIdentityMemberProperty.type === 'google') {
+  if (primaryMemberIdentity === 'google') {
     const firstGoogleAccount = spaceRole.user.googleAccounts[0];
     if (!firstGoogleAccount) {
       return username;
@@ -70,7 +59,7 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
     return firstGoogleAccount.name;
   }
 
-  if (primaryIdentityMemberProperty.type === 'discord') {
+  if (primaryMemberIdentity === 'discord') {
     const discordUserAccount = spaceRole.user.discordUser?.account as unknown as DiscordAccount;
     if (!discordUserAccount) {
       return username;
@@ -78,7 +67,7 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
     return discordUserAccount.username;
   }
 
-  if (primaryIdentityMemberProperty.type === 'telegram') {
+  if (primaryMemberIdentity === 'telegram') {
     const telegramUserAccount = spaceRole.user.telegramUser?.account as unknown as TelegramAccount;
     if (!telegramUserAccount) {
       return username;
@@ -86,7 +75,7 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
     return telegramUserAccount.username;
   }
 
-  if (primaryIdentityMemberProperty.type === 'wallet') {
+  if (primaryMemberIdentity === 'wallet') {
     const firstWallet = spaceRole.user.wallets[0];
     if (!firstWallet) {
       return username;

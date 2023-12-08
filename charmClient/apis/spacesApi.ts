@@ -1,5 +1,5 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
-import type { Space, Prisma } from '@charmverse/core/prisma';
+import type { Space, Prisma, PrimaryMemberIdentity } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
@@ -102,5 +102,17 @@ export class SpacesApi {
 
   exportSpaceData({ spaceId, data }: { spaceId: string; data: ZippedDataRequest }) {
     return http.POST(`/api/spaces/${spaceId}/export-data`, data);
+  }
+
+  updateSpacePrimaryMemberIdentity({
+    primaryMemberIdentity,
+    spaceId
+  }: {
+    spaceId: string;
+    primaryMemberIdentity?: PrimaryMemberIdentity;
+  }) {
+    return http.PUT(`/api/spaces/${spaceId}/primary-member-identity`, {
+      primaryMemberIdentity
+    });
   }
 }
