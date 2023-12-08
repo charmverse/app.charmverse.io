@@ -228,6 +228,11 @@ export async function createWorkspace({
       userId: space.createdBy,
       categoryId: defaultProposalCategories[0].id
     });
+
+    await updateSpacePermissionConfigurationMode({
+      permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',
+      spaceId: space.id
+    });
     // Interim codepath until all spaces are migrated to the new template
     // I copied over most of the code from the default space template path with some small adjustments
   } else if (spaceTemplate && !productionReadyTemplates.includes(spaceTemplate)) {
@@ -286,17 +291,17 @@ export async function createWorkspace({
       userId: space.createdBy,
       categoryId: defaultProposalCategories[0].id
     });
+
+    await updateSpacePermissionConfigurationMode({
+      permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',
+      spaceId: space.id
+    });
   } else if (spaceTemplate) {
     await importSpaceData({
       targetSpaceIdOrDomain: space.id,
       exportName: spaceTemplate
     });
   }
-
-  const updatedSpace = await updateSpacePermissionConfigurationMode({
-    permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',
-    spaceId: space.id
-  });
 
   // Add default stablecoin methods
   await setupDefaultPaymentMethods({ spaceIdOrSpace: space });
@@ -311,5 +316,5 @@ export async function createWorkspace({
 
   logSpaceCreation(space);
 
-  return updatedSpace;
+  return prisma.space.findUniqueOrThrow({ where: { id: space.id } });
 }
