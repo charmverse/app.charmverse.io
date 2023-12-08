@@ -469,7 +469,13 @@ describe('exportSpaceData', () => {
         features: space.features,
         memberProfiles: space.memberProfiles,
         memberProperties: [memberProperty],
-        notificationToggles: space.notificationToggles
+        notificationToggles: space.notificationToggles,
+        defaultPagePermissionGroup: space.defaultPagePermissionGroup,
+        defaultPublicPages: space.defaultPublicPages,
+        hiddenFeatures: space.hiddenFeatures,
+        publicBountyBoard: space.publicBountyBoard,
+        publicProposals: space.publicProposals,
+        requireProposalTemplate: space.requireProposalTemplate
       },
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
@@ -500,7 +506,13 @@ describe('exportSpaceData', () => {
         features: space.features,
         memberProfiles: space.memberProfiles,
         memberProperties: [memberProperty],
-        notificationToggles: space.notificationToggles
+        notificationToggles: space.notificationToggles,
+        defaultPagePermissionGroup: space.defaultPagePermissionGroup,
+        defaultPublicPages: space.defaultPublicPages,
+        hiddenFeatures: space.hiddenFeatures,
+        publicBountyBoard: space.publicBountyBoard,
+        publicProposals: space.publicProposals,
+        requireProposalTemplate: space.requireProposalTemplate
       },
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
@@ -531,6 +543,15 @@ describe('exportSpaceData', () => {
 
     expect(fileContent).toMatchObject<SpaceDataExport>({
       space: {
+        defaultPagePermissionGroup: space.defaultPagePermissionGroup,
+        defaultPublicPages: space.defaultPublicPages,
+        hiddenFeatures: space.hiddenFeatures,
+        publicBountyBoard: space.publicBountyBoard,
+        publicProposals: space.publicProposals,
+        requireProposalTemplate: space.requireProposalTemplate,
+        features: space.features,
+        memberProfiles: space.memberProfiles,
+        notificationToggles: space.notificationToggles,
         proposalBlocks: expect.arrayContaining([
           {
             ...customProposalBlockBoard,
@@ -555,16 +576,13 @@ describe('exportSpaceData', () => {
             updatedAt: customRewardBlockView.updatedAt.toISOString()
           }
         ]),
-        features: space.features,
-        memberProfiles: space.memberProfiles,
         memberProperties: [
           {
             ...memberProperty,
             createdAt: memberProperty.createdAt.toISOString() as any,
             updatedAt: memberProperty.updatedAt.toISOString() as any
           }
-        ],
-        notificationToggles: space.notificationToggles
+        ]
       },
       roles: expect.arrayContaining([
         { ...proposalReviewerRole, createdAt: proposalReviewerRole.createdAt.toISOString() },

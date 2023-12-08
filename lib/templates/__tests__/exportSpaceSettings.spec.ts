@@ -261,6 +261,12 @@ describe('exportSpaceSettings', () => {
         notificationToggles: space.notificationToggles,
         features: space.features,
         memberProfiles: space.memberProfiles,
+        defaultPagePermissionGroup: space.defaultPagePermissionGroup,
+        defaultPublicPages: space.defaultPublicPages,
+        hiddenFeatures: space.hiddenFeatures,
+        publicBountyBoard: space.publicBountyBoard,
+        publicProposals: space.publicProposals,
+        requireProposalTemplate: space.requireProposalTemplate,
         memberProperties: [
           {
             ...memberProperty,

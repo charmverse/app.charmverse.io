@@ -37,7 +37,20 @@ export async function importSpaceSettings({
 
   const targetSpace = await getSpace(targetSpaceIdOrDomain);
 
-  const { features, memberProfiles, memberProperties, proposalBlocks, rewardBlocks, notificationToggles } = space;
+  const {
+    features,
+    memberProfiles,
+    memberProperties,
+    proposalBlocks,
+    rewardBlocks,
+    notificationToggles,
+    defaultPagePermissionGroup,
+    hiddenFeatures,
+    requireProposalTemplate,
+    publicBountyBoard,
+    publicProposals,
+    defaultPublicPages
+  } = space;
 
   const { oldNewRecordIdHashMap } = await importRoles({ targetSpaceIdOrDomain, ...importParams });
 
@@ -88,7 +101,14 @@ export async function importSpaceSettings({
       data: {
         features: features as Prisma.InputJsonValue[],
         memberProfiles: memberProfiles as Prisma.InputJsonValue[],
-        notificationToggles: notificationToggles as Prisma.InputJsonValue
+        notificationToggles: notificationToggles as Prisma.InputJsonValue,
+        // new
+        defaultPagePermissionGroup,
+        hiddenFeatures,
+        requireProposalTemplate,
+        publicBountyBoard,
+        publicProposals,
+        defaultPublicPages
       }
     }),
     prisma.memberProperty.createMany({

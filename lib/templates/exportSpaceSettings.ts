@@ -8,7 +8,18 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-export type SpaceSettingsExport = Pick<Space, 'features' | 'memberProfiles' | 'notificationToggles'> & {
+export type SpaceSettingsExport = Pick<
+  Space,
+  | 'features'
+  | 'memberProfiles'
+  | 'notificationToggles'
+  | 'defaultPagePermissionGroup'
+  | 'hiddenFeatures'
+  | 'requireProposalTemplate'
+  | 'publicBountyBoard'
+  | 'publicProposals'
+  | 'defaultPublicPages'
+> & {
   memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
   rewardBlocks: RewardBlock[];
   proposalBlocks: ProposalBlock[];
@@ -34,6 +45,12 @@ export async function exportSpaceSettings({
       features: true,
       memberProfiles: true,
       notificationToggles: true,
+      defaultPagePermissionGroup: true,
+      hiddenFeatures: true,
+      requireProposalTemplate: true,
+      publicBountyBoard: true,
+      publicProposals: true,
+      defaultPublicPages: true,
       memberProperties: {
         include: {
           permissions: true

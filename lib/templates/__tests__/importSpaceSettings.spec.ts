@@ -279,6 +279,15 @@ describe('importSpaceSettings', () => {
 
     expect(updatedSpace).toMatchObject(
       expect.objectContaining<SpaceSettingsExport>({
+        notificationToggles: sourceSpace.notificationToggles,
+        features: sourceSpace.features,
+        memberProfiles: sourceSpace.memberProfiles,
+        defaultPagePermissionGroup: sourceSpace.defaultPagePermissionGroup,
+        defaultPublicPages: sourceSpace.defaultPublicPages,
+        hiddenFeatures: sourceSpace.hiddenFeatures,
+        publicBountyBoard: sourceSpace.publicBountyBoard,
+        publicProposals: sourceSpace.publicProposals,
+        requireProposalTemplate: sourceSpace.requireProposalTemplate,
         proposalBlocks: expect.arrayContaining<ProposalBlock>([
           {
             ...customProposalBlockBoard,
@@ -319,9 +328,6 @@ describe('importSpaceSettings', () => {
             updatedAt: expect.any(Date)
           }
         ]),
-        notificationToggles: sourceSpace.notificationToggles,
-        features: sourceSpace.features,
-        memberProfiles: sourceSpace.memberProfiles,
         memberProperties: [
           {
             ...memberProperty,
@@ -495,6 +501,15 @@ describe('importSpaceSettings', () => {
 
     expect(updatedSpace).toMatchObject(
       expect.objectContaining<SpaceSettingsExport>({
+        notificationToggles: sourceSpace.notificationToggles,
+        features: sourceSpace.features,
+        memberProfiles: sourceSpace.memberProfiles,
+        defaultPagePermissionGroup: sourceSpace.defaultPagePermissionGroup,
+        defaultPublicPages: sourceSpace.defaultPublicPages,
+        hiddenFeatures: sourceSpace.hiddenFeatures,
+        publicBountyBoard: sourceSpace.publicBountyBoard,
+        publicProposals: sourceSpace.publicProposals,
+        requireProposalTemplate: sourceSpace.requireProposalTemplate,
         proposalBlocks: expect.arrayContaining<ProposalBlock>([
           {
             ...customProposalBlockBoard,
@@ -581,9 +596,6 @@ describe('importSpaceSettings', () => {
             updatedAt: expect.any(Date)
           }
         ]),
-        notificationToggles: sourceSpace.notificationToggles,
-        features: sourceSpace.features,
-        memberProfiles: sourceSpace.memberProfiles,
         memberProperties: [
           {
             ...memberProperty,

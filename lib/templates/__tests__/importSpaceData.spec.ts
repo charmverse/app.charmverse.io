@@ -12,7 +12,6 @@ import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permis
 import type {
   MemberProperty,
   MemberPropertyPermission,
-  Page,
   Post,
   PostCategory,
   Proposal,
@@ -497,6 +496,15 @@ describe('importSpaceData', () => {
         }))
       ),
       space: {
+        notificationToggles: sourceSpace.notificationToggles,
+        features: sourceSpace.features,
+        memberProfiles: sourceSpace.memberProfiles,
+        defaultPagePermissionGroup: sourceSpace.defaultPagePermissionGroup,
+        defaultPublicPages: sourceSpace.defaultPublicPages,
+        hiddenFeatures: sourceSpace.hiddenFeatures,
+        publicBountyBoard: sourceSpace.publicBountyBoard,
+        publicProposals: sourceSpace.publicProposals,
+        requireProposalTemplate: sourceSpace.requireProposalTemplate,
         proposalBlocks: expect.arrayContaining<ProposalBlock>([
           {
             ...customProposalBlockBoard,
@@ -537,9 +545,6 @@ describe('importSpaceData', () => {
             updatedAt: expect.any(Date)
           }
         ]),
-        notificationToggles: sourceSpace.notificationToggles,
-        features: sourceSpace.features,
-        memberProfiles: sourceSpace.memberProfiles,
         memberProperties: [
           {
             ...memberProperty,
@@ -694,6 +699,15 @@ describe('importSpaceData', () => {
         }))
       ),
       space: {
+        notificationToggles: sourceSpace.notificationToggles,
+        features: sourceSpace.features,
+        memberProfiles: sourceSpace.memberProfiles,
+        defaultPagePermissionGroup: sourceSpace.defaultPagePermissionGroup,
+        defaultPublicPages: sourceSpace.defaultPublicPages,
+        hiddenFeatures: sourceSpace.hiddenFeatures,
+        publicBountyBoard: sourceSpace.publicBountyBoard,
+        publicProposals: sourceSpace.publicProposals,
+        requireProposalTemplate: sourceSpace.requireProposalTemplate,
         proposalBlocks: expect.arrayContaining<ProposalBlock>([
           {
             ...customProposalBlockBoard,
@@ -734,9 +748,6 @@ describe('importSpaceData', () => {
             updatedAt: expect.any(Date)
           }
         ]),
-        notificationToggles: sourceSpace.notificationToggles,
-        features: sourceSpace.features,
-        memberProfiles: sourceSpace.memberProfiles,
         memberProperties: [
           {
             ...memberProperty,
