@@ -7,6 +7,9 @@ import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
+import type { UserProfile } from 'lib/public-api/interfaces';
+import type { UserInfo } from 'lib/public-api/searchUserProfile';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = defaultHandler();
@@ -62,7 +65,12 @@ handler.post(
  *           type: array
  *           description: Child comments of this comment. By default, this array is empty unless you request comments as a tree
  *           example: []
- *
+ *         user:
+ *           type: object
+ *           description: User profile of the user who created the comment
+ *           oneOf:
+ *             - $ref: '#/components/schemas/SearchUserResponseBody'
+ *             - type: null
  */
 export type PublicApiProposalComment = {
   id: string;
@@ -76,6 +84,7 @@ export type PublicApiProposalComment = {
   upvotes: number;
   downvotes: number;
   children: PublicApiProposalComment[];
+  user?: UserProfile;
 };
 
 async function mapReducePageComments({
@@ -84,6 +93,7 @@ async function mapReducePageComments({
 }: {
   comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt' | 'createdBy'> & {
     votes: Pick<PageCommentVote, 'upvoted'>[];
+    user?: UserProfile;
   })[];
   reduceToTree?: boolean;
 }): Promise<PublicApiProposalComment[]> {
@@ -120,7 +130,8 @@ async function mapReducePageComments({
       },
       upvotes,
       downvotes,
-      children: []
+      children: [],
+      user: comment.user ?? undefined
     };
 
     // Remove unneeded votes
@@ -169,6 +180,15 @@ async function mapReducePageComments({
  *         description: Optional parameter to get the comments as a tree structure
  *         schema:
  *           type: boolean
+ *       - name: expand
+ *         in: query
+ *         required: false
+ *         description: An array of additional fields to expand
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [user]
  *     responses:
  *       200:
  *         description: List of proposal comments
@@ -200,6 +220,12 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
     }
   });
 
+  const expand = Array.isArray(req.query.expand)
+    ? req.query.expand
+    : typeof req.query.expand === 'string'
+    ? [req.query.expand]
+    : [];
+
   const proposalComments = await prisma.pageComment.findMany({
     where: {
       pageId: proposal.id
@@ -215,12 +241,24 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
         select: {
           upvoted: true
         }
-      }
+      },
+      ...(expand.includes('user')
+        ? {
+            user: {
+              select: userProfileSelect
+            }
+          }
+        : {})
     }
   });
 
   const mappedComments = await mapReducePageComments({
-    comments: proposalComments,
+    comments: proposalComments.map((proposalComment) => {
+      return {
+        ...proposalComment,
+        user: proposalComment.user ? getUserProfile(proposalComment.user as UserInfo) : undefined
+      };
+    }),
     reduceToTree: req.query.resultsAsTree === 'true'
   });
 
