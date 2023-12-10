@@ -256,6 +256,8 @@ function Table(props: Props): JSX.Element {
           resizingColumn={resizingColumn}
           columnRefs={columnRefs}
           readOnly={props.readOnly}
+          checkedIds={checkedIds}
+          setCheckedIds={setCheckedIds}
         />
 
         {/* Table rows */}

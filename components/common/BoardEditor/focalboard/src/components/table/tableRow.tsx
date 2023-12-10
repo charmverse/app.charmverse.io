@@ -68,8 +68,8 @@ type Props = {
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
-const StyledCheckbox = styled(Checkbox)<{ checked?: boolean }>`
-  ${({ checked }) => (!checked ? `opacity: 0;` : '')}
+export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`
+  ${({ show }) => (!show ? `opacity: 0;` : '')}
   transition: opacity 250ms ease-in-out;
 
   &:hover {
@@ -223,6 +223,7 @@ function TableRow(props: Props) {
           {setCheckedIds && (
             <StyledCheckbox
               checked={isChecked}
+              show={isChecked}
               onChange={(e) => {
                 setCheckedIds((checkedIds) => {
                   if (e.target.checked) {
