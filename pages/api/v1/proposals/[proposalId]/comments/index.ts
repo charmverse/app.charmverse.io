@@ -256,7 +256,7 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
     comments: proposalComments.map((proposalComment) => {
       return {
         ...proposalComment,
-        user: proposalComment.user ? getUserProfile(proposalComment.user as UserInfo) : undefined
+        user: proposalComment.user ? getUserProfile(proposalComment.user as unknown as UserInfo) : undefined
       };
     }),
     reduceToTree: req.query.resultsAsTree === 'true'
