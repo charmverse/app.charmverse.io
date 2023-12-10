@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
-export type UserInfo = User & {
+export type UserInfo = Pick<User, 'id' | 'avatar' | 'email' | 'username'> & {
   googleAccounts: Pick<GoogleAccount, 'email'>[];
   wallets: Pick<UserWallet, 'address'>[];
 };
@@ -63,7 +63,7 @@ export async function searchUserProfile({
           }
         ]
       },
-      include: userProfileSelect
+      select: userProfileSelect
     });
   }
 
@@ -77,7 +77,7 @@ export async function searchUserProfile({
           }
         ]
       },
-      include: userProfileSelect
+      select: userProfileSelect
     });
   }
 
@@ -86,7 +86,7 @@ export async function searchUserProfile({
       where: {
         AND: [spaceIds ? { spaceRoles: { some: { spaceId: { in: spaceIds } } } } : {}, { id: userId }]
       },
-      include: userProfileSelect
+      select: userProfileSelect
     });
   }
 
