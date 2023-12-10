@@ -4,7 +4,7 @@ import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box } from '@mui/material';
-import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent, ReactElement, ReactNode } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
@@ -13,8 +13,8 @@ import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/upd
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
+import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -97,9 +97,6 @@ function TableRow(props: Props) {
     isNested,
     subRowsEmptyValueContent
   } = props;
-  const { space } = useCurrentSpace();
-  const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
-  const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
   const [isDragging, isOver, cardRef] = useSortable(
@@ -108,6 +105,13 @@ function TableRow(props: Props) {
     !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped),
     props.onDrop
   );
+  const selection = useContext(SelectionContext);
+  const isSelected = useSelected(cardRef, selection);
+
+  const { space } = useCurrentSpace();
+  const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
+  const [title, setTitle] = useState('');
+
   const handleDeleteCard = async () => {
     if (!card) {
       Utils.assertFailure();
@@ -171,7 +175,14 @@ function TableRow(props: Props) {
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
       ref={cardRef}
-      style={{ opacity: isDragging ? 0.5 : 1, backgroundColor: isNested ? 'var(--input-bg)' : 'transparent' }}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
+        ...(isSelected && {
+          background: 'rgba(35, 131, 226, 0.14)',
+          zIndex: 85
+        })
+      }}
     >
       {!props.readOnly && (
         <Box className='icons row-actions' onClick={handleClick}>
