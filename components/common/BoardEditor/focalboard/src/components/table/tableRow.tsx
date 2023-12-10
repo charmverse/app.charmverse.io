@@ -159,10 +159,12 @@ function TableRow(props: Props) {
     if (setCheckedIds) {
       setCheckedIds((checkedIds) => {
         if (isSelected && !checkedIds.includes(card.id)) {
-          return [...checkedIds, card.id];
+          return Array.from(new Set([...checkedIds, card.id]));
+        } else if (!isSelected && checkedIds.includes(card.id)) {
+          return checkedIds.filter((checkedId) => checkedId !== card.id);
         }
 
-        return checkedIds.filter((checkedId) => checkedId !== card.id);
+        return checkedIds;
       });
     }
   }, [isSelected]);
@@ -227,7 +229,7 @@ function TableRow(props: Props) {
               onChange={(e) => {
                 setCheckedIds((checkedIds) => {
                   if (e.target.checked) {
-                    return [...checkedIds, card.id];
+                    return Array.from(new Set([...checkedIds, card.id]));
                   }
 
                   return checkedIds.filter((checkedId) => checkedId !== card.id);

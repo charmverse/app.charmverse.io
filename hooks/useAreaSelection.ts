@@ -16,8 +16,6 @@ interface UseAreaSelectionProps {
 const boxNode = document.createElement('div');
 boxNode.style.position = 'fixed';
 boxNode.style.background = 'hsl(206deg 100% 50% / 5%)';
-boxNode.style.boxShadow = 'inset 0 0 0 2px hsl(206deg 100% 50% / 50%)';
-boxNode.style.borderRadius = '2px';
 boxNode.style.pointerEvents = 'none';
 boxNode.style.mixBlendMode = 'multiply';
 
