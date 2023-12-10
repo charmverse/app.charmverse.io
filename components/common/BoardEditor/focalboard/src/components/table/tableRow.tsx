@@ -1,5 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
+import styled from '@emotion/styled';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -66,6 +67,18 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
+
+const StyledCheckbox = styled(Checkbox)<{ checked?: boolean }>`
+  ${({ checked }) => (!checked ? `opacity: 0;` : '')}
+  transition: opacity 250ms ease-in-out;
+
+  &:hover {
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+  }
+
+  padding: 0;
+`;
 
 export const columnWidth = (
   resizingColumn: string,
@@ -208,7 +221,7 @@ function TableRow(props: Props) {
             </Box>
           </Box>
           {setCheckedIds && (
-            <Checkbox
+            <StyledCheckbox
               checked={isChecked}
               onChange={(e) => {
                 setCheckedIds((checkedIds) => {
