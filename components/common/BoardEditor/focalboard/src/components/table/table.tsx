@@ -1,7 +1,7 @@
 import { Add } from '@mui/icons-material';
 import { Typography, Box } from '@mui/material';
-import type { ForwardedRef, LegacyRef, ReactNode } from 'react';
-import React, { forwardRef, useCallback, useRef } from 'react';
+import type { LegacyRef, ReactNode } from 'react';
+import React, { forwardRef, useCallback, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
@@ -69,7 +69,8 @@ function Table(props: Props): JSX.Element {
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
-  const { selection, setSelection } = useAreaSelection({ container: selectContainerRef });
+  const { selection } = useAreaSelection({ container: selectContainerRef });
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const { offset, resizingColumn } = useEfficientDragLayer((monitor) => {
     if (monitor.getItemType() === 'horizontalGrip') {
@@ -309,6 +310,8 @@ function Table(props: Props): JSX.Element {
                 expandSubRowsOnLoad={expandSubRowsOnLoad}
                 rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
                 subRowsEmptyValueContent={subRowsEmptyValueContent}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
               />
             )}
           </TableRowsContainer>

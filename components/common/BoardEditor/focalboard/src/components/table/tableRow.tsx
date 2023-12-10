@@ -3,9 +3,9 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box } from '@mui/material';
+import { Box, Checkbox } from '@mui/material';
 import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import type { MouseEvent, ReactElement, ReactNode } from 'react';
+import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
@@ -63,6 +63,8 @@ type Props = {
   expandSubRowsOnLoad?: boolean;
   subRowsEmptyValueContent?: ReactElement | string;
   emptySubPagesPlaceholder?: ReactNode;
+  isChecked?: boolean;
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 export const columnWidth = (
@@ -95,7 +97,9 @@ function TableRow(props: Props) {
     isExpanded,
     indentTitle,
     isNested,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    isChecked,
+    setCheckedIds
   } = props;
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
@@ -139,6 +143,18 @@ function TableRow(props: Props) {
   }, []);
 
   useEffect(() => {
+    if (setCheckedIds) {
+      setCheckedIds((checkedIds) => {
+        if (isSelected && !checkedIds.includes(card.id)) {
+          return [...checkedIds, card.id];
+        }
+
+        return checkedIds.filter((checkedId) => checkedId !== card.id);
+      });
+    }
+  }, [isSelected]);
+
+  useEffect(() => {
     setTitle(pageTitle);
   }, [pageTitle]);
 
@@ -178,18 +194,38 @@ function TableRow(props: Props) {
       style={{
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
-        ...(isSelected && {
+        ...((isSelected || isChecked) && {
           background: 'rgba(35, 131, 226, 0.14)',
           zIndex: 85
         })
       }}
     >
       {!props.readOnly && (
-        <Box className='icons row-actions' onClick={handleClick}>
-          <Box className='charm-drag-handle'>
-            <DragIndicatorIcon color='secondary' />
+        <>
+          <Box className='icons row-actions' onClick={handleClick}>
+            <Box className='charm-drag-handle'>
+              <DragIndicatorIcon color='secondary' />
+            </Box>
           </Box>
-        </Box>
+          {setCheckedIds && (
+            <Checkbox
+              checked={isChecked}
+              onChange={(e) => {
+                setCheckedIds((checkedIds) => {
+                  if (e.target.checked) {
+                    return [...checkedIds, card.id];
+                  }
+
+                  return checkedIds.filter((checkedId) => checkedId !== card.id);
+                });
+              }}
+              size='small'
+              disableFocusRipple
+              disableRipple
+              disableTouchRipple
+            />
+          )}
+        </>
       )}
 
       {/* Columns, one per property */}
