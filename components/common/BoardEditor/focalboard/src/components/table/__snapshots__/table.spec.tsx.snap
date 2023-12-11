@@ -281,11 +281,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -419,11 +419,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -587,6 +587,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -619,12 +620,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -642,12 +643,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -665,12 +666,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -959,11 +960,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -1091,11 +1092,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -1253,6 +1254,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -1285,12 +1287,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1308,12 +1310,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1331,12 +1333,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1628,11 +1630,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -1766,11 +1768,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -1934,6 +1936,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -1966,12 +1969,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1989,12 +1992,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2012,12 +2015,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2306,11 +2309,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -2438,11 +2441,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
             style="opacity: 1; background-color: transparent;"
           >
             <div
               class="icons row-actions MuiBox-root css-0"
+              draggable="true"
             >
               <div
                 class="charm-drag-handle MuiBox-root css-0"
@@ -2600,6 +2603,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -2632,12 +2636,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2655,12 +2659,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2678,12 +2682,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2949,6 +2953,7 @@ exports[`components/table/Table should match snapshot 1`] = `
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -2981,12 +2986,12 @@ exports[`components/table/Table should match snapshot 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3004,12 +3009,12 @@ exports[`components/table/Table should match snapshot 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3333,6 +3338,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
         />
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -3365,12 +3371,12 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3388,12 +3394,12 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3549,6 +3555,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
         />
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 0px;"
         >
           <div
             class="Calculation count octo-table-cell disabled  "
@@ -3581,12 +3588,12 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3604,12 +3611,12 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>

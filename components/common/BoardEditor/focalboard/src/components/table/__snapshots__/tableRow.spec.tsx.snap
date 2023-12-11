@@ -8,11 +8,11 @@ exports[`components/table/TableRow should match snapshot 1`] = `
     <div
       class="TableRow octo-table-row"
       data-test="database-row-card-1"
-      draggable="true"
       style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
+        draggable="true"
       >
         <div
           class="charm-drag-handle MuiBox-root css-0"
@@ -105,11 +105,11 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
     <div
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
-      draggable="true"
       style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
+        draggable="true"
       >
         <div
           class="charm-drag-handle MuiBox-root css-0"
@@ -202,11 +202,11 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
     <div
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
-      draggable="true"
       style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
+        draggable="true"
       >
         <div
           class="charm-drag-handle MuiBox-root css-0"
@@ -347,11 +347,11 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
     <div
       class="TableRow octo-table-row selected"
       data-test="database-row-card-1"
-      draggable="true"
       style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
+        draggable="true"
       >
         <div
           class="charm-drag-handle MuiBox-root css-0"
@@ -444,7 +444,6 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
     <div
       class="TableRow octo-table-row"
       data-test="database-row-card-1"
-      draggable="true"
       style="opacity: 1; background-color: transparent;"
     >
       <div
@@ -523,11 +522,11 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
     <div
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
-      draggable="true"
       style="opacity: 1; background-color: transparent;"
     >
       <div
         class="icons row-actions MuiBox-root css-0"
+        draggable="true"
       >
         <div
           class="charm-drag-handle MuiBox-root css-0"

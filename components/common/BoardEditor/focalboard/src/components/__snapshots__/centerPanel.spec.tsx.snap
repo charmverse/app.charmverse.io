@@ -16,7 +16,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
           class="css-1y52uev-MuiStack-root"
         >
           <div
-            class="ViewHeader "
+            class="ViewHeader  "
           >
             <div
               class="MuiTabs-root css-5t1ahk-MuiTabs-root"
@@ -726,7 +726,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
           class="css-1y52uev-MuiStack-root"
         >
           <div
-            class="ViewHeader "
+            class="ViewHeader  "
           >
             <div
               class="MuiTabs-root css-5t1ahk-MuiTabs-root"
@@ -1114,7 +1114,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
           class="css-1y52uev-MuiStack-root"
         >
           <div
-            class="ViewHeader "
+            class="ViewHeader  "
           >
             <div
               class="MuiTabs-root css-5t1ahk-MuiTabs-root"
@@ -1714,7 +1714,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
           class="css-1y52uev-MuiStack-root"
         >
           <div
-            class="ViewHeader "
+            class="ViewHeader  "
           >
             <div
               class="MuiTabs-root css-5t1ahk-MuiTabs-root"
@@ -2059,6 +2059,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 />
                 <div
                   class="CalculationRow octo-table-row"
+                  style="margin-left: 25px;"
                 >
                   <div
                     class="Calculation count octo-table-cell   "
