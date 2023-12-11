@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -159,6 +160,9 @@ async function mapReducePageComments({
 
   return rootComments;
 }
+
+const supportedExpandKey = ['user'];
+
 /**
  * @swagger
  * /proposals/{proposalIdOrPath}/comments:
@@ -220,11 +224,20 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
     }
   });
 
+  // If a single key=value pair is passed its converted into a string
   const expand = Array.isArray(req.query.expand)
     ? req.query.expand
     : typeof req.query.expand === 'string'
     ? [req.query.expand]
     : [];
+
+  const hasUnsupportedExpandKey = expand.some((expandKey) => !supportedExpandKey.includes(expandKey));
+
+  if (hasUnsupportedExpandKey) {
+    throw new InvalidInputError(
+      `Unsupported expand key: ${expand}. Please provide one of ${supportedExpandKey.join(',')}`
+    );
+  }
 
   const proposalComments = await prisma.pageComment.findMany({
     where: {
