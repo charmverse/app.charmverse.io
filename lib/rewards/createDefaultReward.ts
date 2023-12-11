@@ -51,12 +51,12 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
         [REWARD_STATUS_BLOCK_ID]: '',
         [REWARD_TOKEN]: '',
         [REWARDER_BLOCK_ID]: '',
-        [Constants.titleColumnId]: 'Default Reward'
+        [Constants.titleColumnId]: 'Getting Started'
       }
     },
     pageProps: {
       type: 'bounty',
-      title: 'Default Reward',
+      title: 'Getting Started',
       sourceTemplateId: null,
       headerImage: null,
       icon: null,

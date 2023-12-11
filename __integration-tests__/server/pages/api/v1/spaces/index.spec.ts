@@ -19,7 +19,7 @@ beforeAll(async () => {
   superApiKey = await generateSuperApiKey();
 });
 
-describe('GET /api/v1/spaces', () => {
+describe('POST /api/v1/spaces', () => {
   it('should respond 401 when api token is missing or invalid', async () => {
     const response = await request(baseUrl).post('/api/v1/spaces').send();
 

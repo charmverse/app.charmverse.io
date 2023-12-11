@@ -36,13 +36,6 @@ export interface PageWithBlocks {
   bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
 }
 
-export type ExportedPage = PageNodeWithChildren<
-  Page & Partial<PageWithBlocks> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
->;
-
-export interface WorkspaceExport {
-  pages: ExportedPage[];
-}
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
     node?.content.forEach((childNode) => {
@@ -63,6 +56,14 @@ type ExportWorkspaceOptions = {
   skipProposalTemplates?: boolean;
 };
 
+export type ExportedPage = PageNodeWithChildren<
+  Page & Partial<PageWithBlocks> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
+>;
+
+export type WorkspacePagesExport = {
+  pages: ExportedPage[];
+};
+
 export async function exportWorkspacePages({
   sourceSpaceIdOrDomain,
   rootPageIds,
@@ -70,7 +71,7 @@ export async function exportWorkspacePages({
   skipProposals = false,
   skipBountyTemplates = false,
   skipProposalTemplates = false
-}: ExportWorkspaceOptions): Promise<WorkspaceExport> {
+}: ExportWorkspaceOptions): Promise<WorkspacePagesExport> {
   const isUuid = validate(sourceSpaceIdOrDomain);
 
   const space = await prisma.space.findUnique({
@@ -88,7 +89,7 @@ export async function exportWorkspacePages({
     }
   });
 
-  const exportData: WorkspaceExport = {
+  const exportData: WorkspacePagesExport = {
     pages: []
   };
 
@@ -213,7 +214,7 @@ export async function exportWorkspacePages({
 export async function exportWorkspacePagesToDisk({
   exportName,
   ...props
-}: ExportWorkspaceOptions & { exportName: string }): Promise<{ data: WorkspaceExport; path: string }> {
+}: ExportWorkspaceOptions & { exportName: string }): Promise<{ data: WorkspacePagesExport; path: string }> {
   const exportData = await exportWorkspacePages(props);
 
   const exportFolder = path.join(__dirname, 'exports');
@@ -225,7 +226,7 @@ export async function exportWorkspacePagesToDisk({
   }
 
   // Continue writing only if an export name was provided
-  const exportFilePath = path.join(exportFolder, `${exportName}.json`);
+  const exportFilePath = path.join(exportFolder, `${exportName}${exportName.endsWith('.json') ? '' : '.json'}`);
 
   await fs.writeFile(exportFilePath, JSON.stringify(exportData, null, 2));
 
