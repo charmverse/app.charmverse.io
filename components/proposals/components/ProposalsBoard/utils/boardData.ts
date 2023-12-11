@@ -129,5 +129,7 @@ export function getDefaultTableView({
     ? view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID)
     : [];
 
+  view.fields.openPageIn = 'full_page';
+
   return view;
 }
