@@ -8,8 +8,6 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
 
-type StepType = ProposalEvaluationType | 'draft';
-
 type Props = {
   evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'>[];
   isDraft?: boolean;
@@ -18,7 +16,7 @@ type Props = {
   onChange: ({ toDraft, evaluationId }: { toDraft?: boolean; evaluationId?: string }) => void;
 };
 
-const evaluationLabels = {
+export const evaluationLabels = {
   draft: 'Only authors can view and edit',
   [ProposalEvaluationType.feedback]: 'Request feedback',
   [ProposalEvaluationType.vote]: 'Evaluation by vote',
@@ -36,6 +34,7 @@ export function ProposalEvaluationSelect({ evaluations, isDraft, readOnly, onCha
   const propertyOptions = [
     {
       id: 'draft',
+      description: evaluationLabels.draft,
       value: 'Draft',
       color: 'grey'
     },
@@ -61,6 +60,7 @@ export function ProposalEvaluationSelect({ evaluations, isDraft, readOnly, onCha
       return {
         id: evaluation.id,
         disabled,
+        description: evaluationLabels[evaluation.type],
         value: evaluation.title,
         color: 'grey'
       };

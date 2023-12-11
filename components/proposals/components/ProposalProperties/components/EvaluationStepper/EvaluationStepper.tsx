@@ -2,6 +2,8 @@ import type { ProposalEvaluation } from '@charmverse/core/prisma';
 
 import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
 
+import { evaluationLabels } from '../ProposalEvaluationSelect';
+
 import { Stepper } from './components/Stepper';
 
 type EvaluationStepperProps = {
@@ -20,13 +22,13 @@ export function EvaluationStepper({ evaluations, isDraft, currentStep, onClick }
       disabled: true,
       completed: currentValue !== 'draft', // draft is complete if it is any other step
       value: 'draft',
-      description: 'Only authors and admins can view and edit'
+      description: evaluationLabels.draft
     },
     ...evaluations.map((evaluation) => ({
       label: evaluation.title,
       completed: !!evaluation.result,
       disabled: evaluation.type === 'feedback',
-      description: evaluation.title,
+      description: evaluationLabels[evaluation.type],
       value: evaluation.id
     }))
   ];

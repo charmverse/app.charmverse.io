@@ -13,7 +13,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from 'components/common/PageLayout/components/Header/components/DocumentHeaderElements';
-import { useNewProposal } from 'components/proposals/components/ProposalDialog/hooks/useNewProposal';
+import { useNewProposal } from 'components/proposals/new/hooks/useNewProposal';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,8 +21,8 @@ import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import type { ProposalPageAndPropertiesInput } from './NewProposalPage';
-import { NewProposalPage } from './NewProposalPage';
+import type { ProposalPageAndPropertiesInput } from '../../new/NewProposalPage';
+import { NewProposalPage } from '../../new/NewProposalPage';
 
 interface Props {
   pageId?: string;

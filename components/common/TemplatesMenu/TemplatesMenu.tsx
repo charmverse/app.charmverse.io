@@ -8,6 +8,7 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
+import Link from 'components/common/Link';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import LoadingComponent from '../LoadingComponent';
@@ -84,14 +85,16 @@ export function TemplatesMenu({
         pages.map((page) => {
           return (
             <MenuItem
+              component={Link}
               data-test={`select-option-${page.id}`}
               key={page.id}
               dense
               sx={{ display: 'flex', justifyContent: 'space-between' }}
-              onClick={() => {
-                addPageFromTemplate(page.id);
-                popupState.close();
-              }}
+              href={`/proposals/new?template=${page.id}`}
+              // onClick={() => {
+              //   addPageFromTemplate(page.id);
+              //   popupState.close();
+              // }}
             >
               <ListItemIcon>
                 <DescriptionOutlinedIcon />
@@ -115,10 +118,11 @@ export function TemplatesMenu({
       {enableNewTemplates && [
         <Divider key='templates-menu-divider' />,
         <MenuItem
+          component={Link}
           key='templates-menu-new-item'
           dense
           sx={{ color: `${theme.palette.primary.main} !important` }}
-          onClick={createTemplate}
+          href='/proposals/new?type=proposal_template'
         >
           <AddIcon />
           <ListItemText>New template</ListItemText>

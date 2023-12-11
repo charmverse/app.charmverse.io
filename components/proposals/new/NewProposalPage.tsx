@@ -21,8 +21,8 @@ import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
-import type { ProposalPropertiesInput } from '../ProposalProperties/ProposalPropertiesBase';
-import { ProposalPropertiesBase } from '../ProposalProperties/ProposalPropertiesBase';
+import type { ProposalPropertiesInput } from '../components/ProposalProperties/ProposalPropertiesBase';
+import { ProposalPropertiesBase } from '../components/ProposalProperties/ProposalPropertiesBase';
 
 export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   title?: string; // title is saved to the same state that's used in ProposalPage

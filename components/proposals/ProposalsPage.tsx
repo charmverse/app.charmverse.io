@@ -30,8 +30,8 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useUser } from 'hooks/useUser';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
-import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
 import { useProposals } from './hooks/useProposals';
+import type { ProposalPageAndPropertiesInput } from './new/NewProposalPage';
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();

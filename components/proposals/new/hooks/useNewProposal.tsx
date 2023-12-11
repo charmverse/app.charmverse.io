@@ -11,8 +11,10 @@ import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
+export type NewProposalInput = Partial<ProposalPageAndPropertiesInput> | null;
+
 type Props = {
-  newProposal: Partial<ProposalPageAndPropertiesInput> | null;
+  newProposal: NewProposalInput;
 };
 
 export function useNewProposal({ newProposal }: Props) {

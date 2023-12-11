@@ -44,14 +44,18 @@ export function DesktopStepper({ steps, onClick, value }: StepperProps) {
                     <Typography fontWeight={500}>{position + 1}</Typography>
                   )}
                 </div>
-                <Typography
-                  textAlign='center'
-                  fontWeight={currentPosition === position ? 600 : 400}
-                  fontSize={14}
-                  whiteSpace='nowrap'
-                >
-                  {step.label}
-                </Typography>
+                <span onMouseOver={(e) => e.stopPropagation()} onFocus={(e) => e.stopPropagation()}>
+                  <Tooltip title={step.description} placement='bottom'>
+                    <Typography
+                      textAlign='center'
+                      fontWeight={currentPosition === position ? 600 : 400}
+                      fontSize={14}
+                      whiteSpace='nowrap'
+                    >
+                      {step.label}
+                    </Typography>
+                  </Tooltip>
+                </span>
               </StepperStack>
             </Tooltip>
           </Grid>

@@ -432,13 +432,13 @@ export function ProposalPropertiesBase({
           {isCharmVerse && (
             <Box className='octo-propertyrow' mb='0 !important'>
               <PropertyLabel readOnly highlighted>
-                Current step
+                Evaluation step
               </PropertyLabel>
               <ProposalEvaluationSelect
                 evaluations={proposalFormInputs.evaluations}
                 isDraft={proposalStatus === 'draft'}
                 onChange={handleEvaluationChange}
-                readOnly={isNewProposal}
+                readOnly={isNewProposal || !!archived}
               />
             </Box>
           )}

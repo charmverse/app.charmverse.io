@@ -11,8 +11,8 @@ import { v4 as uuid } from 'uuid';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import type { ProposalPageAndPropertiesInput } from 'components/proposals/components/ProposalDialog/NewProposalPage';
-import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
+import type { ProposalPageAndPropertiesInput } from 'components/proposals/new/NewProposalPage';
+import { NewProposalPage as ProposalPageComponent } from 'components/proposals/new/NewProposalPage';
 import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MembersProvider } from 'hooks/useMembers';

@@ -14,8 +14,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
-
-import type { ProposalPageAndPropertiesInput } from './ProposalDialog/NewProposalPage';
+import type { ProposalPageAndPropertiesInput } from '../new/NewProposalPage';
 
 export function NewProposalButton({
   showProposal,
@@ -79,7 +78,7 @@ export function NewProposalButton({
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
-            <Button disabled={!canCreateProposal} onClick={onClickCreate} data-test='new-proposal-button'>
+            <Button disabled={!canCreateProposal} href='/proposals/new' data-test='new-proposal-button'>
               Create
             </Button>
             <Button
