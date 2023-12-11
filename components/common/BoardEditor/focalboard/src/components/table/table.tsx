@@ -302,6 +302,8 @@ function Table(props: Props): JSX.Element {
                     readOnlyTitle={props.readOnlyTitle}
                     disableAddingCards={props.disableAddingCards}
                     subRowsEmptyValueContent={subRowsEmptyValueContent}
+                    checkedIds={checkedIds}
+                    setCheckedIds={setCheckedIds}
                   />
                 );
               })}
