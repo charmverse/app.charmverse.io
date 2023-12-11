@@ -73,7 +73,7 @@ function Table(props: Props): JSX.Element {
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
-  const { selection, setSelection, setDrawArea } = useAreaSelection({ container: selectContainerRef });
+  const { selection, setSelection, setDrawArea } = useAreaSelection({ readOnly, container: selectContainerRef });
 
   const { offset, resizingColumn } = useEfficientDragLayer((monitor) => {
     if (monitor.getItemType() === 'horizontalGrip') {

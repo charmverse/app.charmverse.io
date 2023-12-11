@@ -200,7 +200,7 @@ function TableHeaders(props: Props): JSX.Element {
 
   return (
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
-      {setCheckedIds && !readOnly && (
+      {setCheckedIds && !readOnly && cards.length !== 0 && (
         <StyledCheckbox
           checked={checkedIds.length === cards.length}
           onChange={() => {

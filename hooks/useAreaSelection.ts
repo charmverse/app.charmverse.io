@@ -11,17 +11,23 @@ interface DrawnArea {
 }
 interface UseAreaSelectionProps {
   container: RefObject<HTMLElement> | undefined;
+  readOnly?: boolean;
 }
 
-const boxNode = document.createElement('div');
-boxNode.style.position = 'fixed';
-boxNode.style.background = 'hsl(206deg 100% 50% / 5%)';
-boxNode.style.pointerEvents = 'none';
-boxNode.style.mixBlendMode = 'multiply';
-boxNode.style.zIndex = '10';
+function createBoxNode() {
+  if (typeof document === 'undefined') return null;
+  const boxNode = document.createElement('div');
+  boxNode.style.position = 'fixed';
+  boxNode.style.background = 'hsl(206deg 100% 50% / 5%)';
+  boxNode.style.pointerEvents = 'none';
+  boxNode.style.mixBlendMode = 'multiply';
+  boxNode.style.zIndex = '10';
 
-export function useAreaSelection({ container = { current: document.body } }: UseAreaSelectionProps) {
-  const boxElement = useRef<HTMLDivElement>(boxNode);
+  return boxNode;
+}
+
+export function useAreaSelection({ container = { current: document.body }, readOnly = false }: UseAreaSelectionProps) {
+  const boxElement = useRef<HTMLDivElement | null>(createBoxNode());
   const [mouseDown, setMouseDown] = useState<boolean>(false);
   const [selection, setSelection] = useState<DOMRect | null>(null);
   const [drawArea, setDrawArea] = useState<DrawnArea>({
@@ -76,7 +82,7 @@ export function useAreaSelection({ container = { current: document.body } }: Use
 
   useEffect(() => {
     const containerElement = container.current;
-    if (containerElement) {
+    if (containerElement && !readOnly) {
       containerElement.addEventListener('mousedown', handleMouseDown);
       document.addEventListener('mouseup', handleMouseUp);
 
@@ -85,7 +91,7 @@ export function useAreaSelection({ container = { current: document.body } }: Use
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [container]);
+  }, [container, readOnly]);
 
   useEffect(() => {
     const { start, end } = drawArea;
@@ -105,8 +111,8 @@ export function useAreaSelection({ container = { current: document.body } }: Use
         }
       } else if (containerElement.contains(selectionBoxElement)) {
         containerElement.removeChild(selectionBoxElement);
-        boxElement.current.style.height = '0';
-        boxElement.current.style.width = '0';
+        selectionBoxElement.style.height = '0';
+        selectionBoxElement.style.width = '0';
       }
     }
   }, [mouseDown, container, boxElement]);
