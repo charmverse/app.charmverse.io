@@ -24,7 +24,15 @@ const StyledStack = styled(Stack)`
   z-index: 1;
   margin-bottom: 4px;
   overflow: auto;
+  width: 100%;
   margin-right: 8px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 const StyledMenuItem = styled(MenuItem)`

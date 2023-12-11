@@ -112,10 +112,17 @@ function ViewHeader(props: Props) {
     });
   }
 
+  const showViewHeaderRowsMenu = checkedIds.length !== 0 && setCheckedIds && activeBoard;
+
   return (
     <Stack gap={0.75}>
-      <div key={viewsBoard.id} className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
-        {checkedIds.length !== 0 && setCheckedIds && activeBoard ? (
+      <div
+        key={viewsBoard.id}
+        className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''} ${
+          props.showActionsOnHover ? 'hide-actions' : ''
+        }`}
+      >
+        {showViewHeaderRowsMenu ? (
           <ViewHeaderRowsMenu
             board={activeBoard}
             cards={cards}

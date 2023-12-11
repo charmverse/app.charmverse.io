@@ -1,7 +1,7 @@
 import { Add } from '@mui/icons-material';
 import { Typography, Box } from '@mui/material';
 import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
-import React, { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
