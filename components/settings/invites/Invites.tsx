@@ -2,6 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { Box, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useContext, useEffect, useRef } from 'react';
+import { useAccount } from 'wagmi';
 
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
@@ -27,10 +28,12 @@ export function Invites({ space }: { space: Space }) {
 
   const { connectWallet } = useContext(Web3Connection);
   const { account } = useWeb3Account();
+  const { isConnected } = useAccount();
+
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
   useTrackPageView({ type: 'settings/invites' });
   function handleTokenGate() {
-    if (account) {
+    if (account || isConnected) {
       popupTokenGateState.open();
     } else {
       isOpeningTokenGate.current = true;
@@ -44,7 +47,7 @@ export function Invites({ space }: { space: Space }) {
       popupTokenGateState.open();
       isOpeningTokenGate.current = false;
     }
-  }, [account]);
+  }, [account, isConnected]);
 
   return (
     <>
