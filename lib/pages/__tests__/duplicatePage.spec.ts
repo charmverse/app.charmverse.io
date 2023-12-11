@@ -220,6 +220,8 @@ describe('duplicatePage', () => {
         bountyId: bountyPage.id
       }
     });
-    expect(permissions.length).toBe(3); // 1 is added by default for some reason
+
+    // 2 role permissions should have been ported over
+    expect(permissions.length).toBe(2);
   });
 });

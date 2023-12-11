@@ -97,3 +97,5 @@ export const HIDDEN_MEMBER_PROPERTIES = propertyTypes.filter((prop) => MEMBER_PR
 export const DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter((prop) => MEMBER_PROPERTY_CONFIG[prop].default);
 
 export const PREMIUM_MEMBER_PROPERTIES: MemberPropertyType[] = ['role'];
+
+export const NON_DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter((prop) => !DEFAULT_MEMBER_PROPERTIES.includes(prop));

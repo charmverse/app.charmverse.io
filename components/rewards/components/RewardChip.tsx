@@ -14,7 +14,6 @@ import type { BrandColor } from 'theme/colors';
 const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
-  inProgress: 'In Progress',
   complete: 'Approved',
   paid: 'Paid'
 };
@@ -22,7 +21,6 @@ const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
 const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
   suggestion: 'purple',
   open: 'teal',
-  inProgress: 'yellow',
   complete: 'blue',
   paid: 'green'
 };
@@ -71,7 +69,6 @@ const StyledRewardStatusChip = styled(StyledStatusChip)<{ status?: RewardStatus 
 export const REWARD_STATUS_ICONS: Record<RewardStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
-  inProgress: <AssignmentIndIcon />,
   complete: <CheckCircleOutlineIcon />,
   paid: <PaidIcon />
 };

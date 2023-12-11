@@ -29,7 +29,15 @@ const schema = (customReward?: boolean) => {
     submissionNodes: yup.mixed<string>().required(),
     walletAddress: customReward
       ? yup.string()
-      : yup.string().required().test('verifyContractFormat', 'Invalid wallet address', isValidChainAddress),
+      : yup
+          .string()
+          .required()
+          .test('verifyContractFormat', 'Invalid wallet address', (address) => {
+            if (address.endsWith('eth')) {
+              return true;
+            }
+            return isValidChainAddress(address);
+          }),
     rewardInfo: yup.string()
   });
 };
@@ -141,7 +149,7 @@ export function RewardSubmissionInput({
 
           {(currentUserIsAuthor || permissions?.review) && !hasCustomReward && (
             <Grid item>
-              <InputLabel>Address to receive reward</InputLabel>
+              <InputLabel>Address/ENS to receive reward</InputLabel>
               <TextField
                 {...register('walletAddress')}
                 type='text'

@@ -7,7 +7,7 @@ import webbrowser
 
 import time
 
-defaukt_api_test="""
+default_api_test="""
 import type { Application, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
@@ -154,7 +154,7 @@ import type { Application } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
-import { generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateBounty } from 'testing/setupDatabase';
 import type { WorkUpsertData } from '../work';
 import { work } from '../work';
 
@@ -162,7 +162,7 @@ let user: any;
 let space: any;
 
 beforeAll(async () => {
-  ({ user, space } = await generateUserAndSpace());
+  ({ user, space } = await testUtilsUser.generateUserAndSpace());
 });
 
 describe('work', () => {
@@ -295,7 +295,9 @@ The goal of this project is to allow space members to create rewards, have users
 common_generators = """
 For writing tests,
 
-These common generators can help you
+These common generators can help you.
+
+When generating IDs always use a v4 uuid as the generator
 
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
 
@@ -327,7 +329,7 @@ const reward = await generateBounty({
 final_instruction=""""
 Only write the code if I confirm. If you have any questions, ask me before you write the code
 
-Never mock unless asked to. Use generators or prisma directly. Generate basic test data inside describe blocks. Make each unit test from state of other tests when the test would mutate data
+Never mock unless asked to. Use generators or prisma directly. Generate basic test data inside describe blocks. Make each unit test independent from state of other tests when the test would mutate data
 
 Always confirm Success and Error cases with me before writing code
 
@@ -483,19 +485,14 @@ def unit_test(code_to_test_path, example_tests):
     # Replace pyperclip.copy(prompt) with:
     return prompt
 
-def api_test(code_to_test_path, example_tests=""):
+def api_test(code_to_test_path, example_tests):
 
     with open(code_to_test_path, 'r') as file:
       code_to_test = file.read()
 
     # If example is not provided, attempt to read it from the file
     if not example_tests:
-        default_example_path = get_absolute_path("__integration-tests__/server/pages/api/reward-applications/work.spec.ts")
-
-        print("Using default API Test example", default_example_path)
-        with open(default_example_path, 'r') as file:
-            example = file.read()
-
+        example = default_api_test
 
 
     prompt = f"""
@@ -560,7 +557,7 @@ def main():
     
     link = input("Enter the link of the library to write tests for: ")
 
-    test_types = ["unit", "API", "E2E"]
+    test_types = ["unit", "API"]
     
     print("Available test types:")
 
@@ -596,7 +593,7 @@ def main():
 
     print("Copied prompt to clipboard")
 
-    confirm = input("Open ChatGPT? y/n")
+    confirm = input("Open ChatGPT? y/n: ")
 
     if confirm == "y" or confirm == "yes":
       print("Opening browser")
