@@ -427,7 +427,7 @@ class CharmClient {
     });
   }
 
-  createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
+  createEvents({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload[] }) {
     return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
   }
 

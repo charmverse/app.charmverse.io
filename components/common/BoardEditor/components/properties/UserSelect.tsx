@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Box, Stack } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
@@ -20,6 +20,7 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
   'data-test'?: string;
+  open?: boolean;
 };
 
 type ContainerProps = {
@@ -110,9 +111,14 @@ export function UserSelect({
   readOnly,
   showEmptyPlaceholder,
   wrapColumn,
+  open,
   'data-test': dataTest
 }: Props): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(open);
+
+  useEffect(() => {
+    setIsOpen(open);
+  }, [open]);
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {

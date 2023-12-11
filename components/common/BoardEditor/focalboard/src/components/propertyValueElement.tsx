@@ -262,17 +262,19 @@ function PropertyValueElement(props: Props) {
           const newUserIds = newValue.filter((id) => !previousValue.includes(id));
           Promise.all(
             newUserIds.map((userId) =>
-              charmClient.createEvent({
+              charmClient.createEvents({
                 spaceId: board.spaceId,
-                payload: {
-                  cardId: card.id,
-                  cardProperty: {
-                    id: propertyTemplate.id,
-                    name: propertyTemplate.name,
-                    value: userId
-                  },
-                  scope: WebhookEventNames.CardPersonPropertyAssigned
-                }
+                payload: [
+                  {
+                    cardId: card.id,
+                    cardProperty: {
+                      id: propertyTemplate.id,
+                      name: propertyTemplate.name,
+                      value: userId
+                    },
+                    scope: WebhookEventNames.CardPersonPropertyAssigned
+                  }
+                ]
               })
             )
           );

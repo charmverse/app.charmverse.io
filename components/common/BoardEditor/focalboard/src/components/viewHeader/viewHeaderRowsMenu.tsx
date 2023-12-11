@@ -2,11 +2,16 @@ import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Box, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState, type Dispatch, type SetStateAction, useRef } from 'react';
+import { useState, useRef } from 'react';
+import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
+import charmClient from 'charmClient';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import type { CreateEventPayload } from 'lib/notifications/interfaces';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../mutator';
 
@@ -46,14 +51,16 @@ const StyledMenuItem = styled(MenuItem)`
   }
 `;
 
-function SelectPropertyTemplateMenu({
+function SelectMenu({
   board,
   cards,
-  propertyTemplate
+  propertyTemplate,
+  children
 }: {
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
+  children: (option: { isSelectOpen: boolean }) => ReactNode;
 }) {
   const popupState = usePopupState({ variant: 'popover' });
   // Without this state, the options menu list is not placed in the correct position
@@ -62,8 +69,6 @@ function SelectPropertyTemplateMenu({
   if (cards.length === 0) {
     return null;
   }
-
-  const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
   return (
     <>
@@ -78,6 +83,7 @@ function SelectPropertyTemplateMenu({
       >
         {propertyTemplate.name}
       </StyledMenuItem>
+
       <Menu
         anchorEl={ref.current}
         open={popupState.isOpen}
@@ -97,6 +103,28 @@ function SelectPropertyTemplateMenu({
             padding: '2px 4px'
           }}
         >
+          {children({ isSelectOpen })}
+        </Box>
+      </Menu>
+    </>
+  );
+}
+
+function SelectPropertyTemplateMenu({
+  board,
+  cards,
+  propertyTemplate
+}: {
+  board: Board;
+  cards: Card[];
+  propertyTemplate: IPropertyTemplate<PropertyType>;
+}) {
+  const propertyValue = cards[0].fields.properties[propertyTemplate.id];
+
+  return (
+    <SelectMenu board={board} cards={cards} propertyTemplate={propertyTemplate}>
+      {({ isSelectOpen }) => {
+        return (
           <TagSelect
             isOpen={isSelectOpen}
             canEditOptions
@@ -117,9 +145,64 @@ function SelectPropertyTemplateMenu({
             }}
             displayType='table'
           />
-        </Box>
-      </Menu>
-    </>
+        );
+      }}
+    </SelectMenu>
+  );
+}
+
+function PersonPropertyTemplateMenu({
+  board,
+  cards,
+  propertyTemplate
+}: {
+  board: Board;
+  cards: Card[];
+  propertyTemplate: IPropertyTemplate<PropertyType>;
+}) {
+  const propertyValue = cards[0].fields.properties[propertyTemplate.id];
+
+  return (
+    <SelectMenu board={board} cards={cards} propertyTemplate={propertyTemplate}>
+      {({ isSelectOpen }) => {
+        return (
+          <UserSelect
+            open={isSelectOpen}
+            displayType='table'
+            memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
+            onChange={(newValue) => {
+              mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+              const previousValue = propertyValue
+                ? typeof propertyValue === 'string'
+                  ? [propertyValue]
+                  : (propertyValue as string[])
+                : [];
+              const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+              charmClient.createEvents({
+                spaceId: board.spaceId,
+                payload: newUserIds
+                  .map((userId) =>
+                    cards.map(
+                      (card) =>
+                        ({
+                          cardId: card.id,
+                          cardProperty: {
+                            id: propertyTemplate.id,
+                            name: propertyTemplate.name,
+                            value: userId
+                          },
+                          scope: WebhookEventNames.CardPersonPropertyAssigned
+                        } as CreateEventPayload)
+                    )
+                  )
+                  .flat()
+              });
+            }}
+            showEmptyPlaceholder
+          />
+        );
+      }}
+    </SelectMenu>
   );
 }
 
@@ -174,6 +257,10 @@ function PropertyTemplateMenu({
     case 'select':
     case 'multiSelect': {
       return <SelectPropertyTemplateMenu board={board} cards={cards} propertyTemplate={propertyTemplate} />;
+    }
+
+    case 'person': {
+      return <PersonPropertyTemplateMenu board={board} cards={cards} propertyTemplate={propertyTemplate} />;
     }
 
     default: {
