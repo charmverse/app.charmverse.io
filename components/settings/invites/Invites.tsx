@@ -37,7 +37,6 @@ export function Invites({ space }: { space: Space }) {
       popupTokenGateState.open();
     } else {
       isOpeningTokenGate.current = true;
-      // This is where we need to solve the walletSelectorModal auto closing
       connectWallet();
     }
   }
