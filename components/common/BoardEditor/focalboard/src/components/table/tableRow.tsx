@@ -157,7 +157,7 @@ function TableRow(props: Props) {
   }, []);
 
   useEffect(() => {
-    if (setCheckedIds) {
+    if (setCheckedIds && selection) {
       setCheckedIds((checkedIds) => {
         if (isSelected && !checkedIds.includes(card.id)) {
           return Array.from(new Set([...checkedIds, card.id]));
@@ -168,7 +168,7 @@ function TableRow(props: Props) {
         return checkedIds;
       });
     }
-  }, [isSelected]);
+  }, [isSelected, selection]);
 
   useEffect(() => {
     setTitle(pageTitle);
@@ -228,7 +228,7 @@ function TableRow(props: Props) {
               className='table-row-checkbox'
               checked={isChecked}
               show={isChecked}
-              onChange={(e) => {
+              onChange={() => {
                 setCheckedIds((checkedIds) => {
                   if (!isChecked) {
                     return Array.from(new Set([...checkedIds, card.id]));
@@ -247,7 +247,7 @@ function TableRow(props: Props) {
       )}
 
       {/* Columns, one per property */}
-      {visiblePropertyTemplates.map((template, templateIndex) => {
+      {visiblePropertyTemplates.map((template) => {
         if (template.id === Constants.titleColumnId) {
           return (
             <Box

@@ -12,7 +12,7 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
@@ -97,11 +97,32 @@ function ViewHeader(props: Props) {
     }
   }
 
+  const propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
+
+  if (activeView?.fields?.visiblePropertyIds.length) {
+    activeView.fields.visiblePropertyIds.forEach((propertyId) => {
+      const property = activeBoard?.fields.cardProperties.find((p) => p.id === propertyId);
+      if (property) {
+        propertyTemplates.push(property);
+      }
+    });
+  } else {
+    activeBoard?.fields.cardProperties.forEach((property) => {
+      propertyTemplates.push(property);
+    });
+  }
+
   return (
     <Stack gap={0.75}>
       <div key={viewsBoard.id} className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
-        {checkedIds.length !== 0 && setCheckedIds ? (
-          <ViewHeaderRowsMenu checkedIds={checkedIds} setCheckedIds={setCheckedIds} />
+        {checkedIds.length !== 0 && setCheckedIds && activeBoard ? (
+          <ViewHeaderRowsMenu
+            board={activeBoard}
+            cards={cards}
+            checkedIds={checkedIds}
+            setCheckedIds={setCheckedIds}
+            propertyTemplates={propertyTemplates}
+          />
         ) : (
           <>
             <ViewTabs

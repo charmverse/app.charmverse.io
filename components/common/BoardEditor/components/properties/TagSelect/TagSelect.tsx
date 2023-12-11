@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Stack } from '@mui/material';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   mapPropertyOptionToSelectOption,
@@ -89,6 +89,7 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
 `;
 
 type Props = {
+  isOpen?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
@@ -119,9 +120,10 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
-  'data-test': dataTest
+  'data-test': dataTest,
+  isOpen = false
 }: Props) {
-  const [isOpened, setIsOpened] = useState(false);
+  const [isOpened, setIsOpened] = useState(isOpen);
 
   const onEdit = useCallback(() => {
     if (!readOnly) {
@@ -132,6 +134,12 @@ export function TagSelect({
   const selectOptions = useMemo(() => {
     return options.map((o) => mapPropertyOptionToSelectOption(o));
   }, [options]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsOpened(isOpen);
+    }
+  }, [isOpen]);
 
   const selectValue = useMemo(() => {
     if (multiselect) {

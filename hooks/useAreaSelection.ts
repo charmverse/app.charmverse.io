@@ -42,13 +42,13 @@ export function useAreaSelection({ container = { current: document.body } }: Use
 
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
+      setMouseDown(true);
+
       const containerElement = container.current;
       const isTableRowCheckbox =
         (e.target as HTMLElement)?.classList.contains('table-row-checkbox') ||
         (e.target as HTMLElement)?.parentElement?.classList.contains('table-row-checkbox');
       if (isTableRowCheckbox) return;
-
-      setMouseDown(true);
 
       if (containerElement && containerElement.contains(e.target as HTMLElement)) {
         document.addEventListener('mousemove', handleMouseMove);
@@ -71,6 +71,7 @@ export function useAreaSelection({ container = { current: document.body } }: Use
     document.body.style.userSelect = 'initial';
     document.removeEventListener('mousemove', handleMouseMove);
     setMouseDown(false);
+    setSelection(null);
   }, []);
 
   useEffect(() => {
@@ -104,6 +105,8 @@ export function useAreaSelection({ container = { current: document.body } }: Use
         }
       } else if (containerElement.contains(selectionBoxElement)) {
         containerElement.removeChild(selectionBoxElement);
+        boxElement.current.style.height = '0';
+        boxElement.current.style.width = '0';
       }
     }
   }, [mouseDown, container, boxElement]);
