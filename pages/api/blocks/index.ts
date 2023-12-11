@@ -294,8 +294,8 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
 }
 
 async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
-  // TODO: remove use of req.body after browsers update - 06/2023
-  const blockIds: string[] = (req.query.blockIds || req.body) ?? [];
+  const queryBlockIds = (req.query.blockIds ?? []) as string[];
+  const blockIds = typeof queryBlockIds === 'string' ? [queryBlockIds] : queryBlockIds;
   const userId = req.session.user.id as string | undefined;
 
   const blocks = await prisma.block.findMany({

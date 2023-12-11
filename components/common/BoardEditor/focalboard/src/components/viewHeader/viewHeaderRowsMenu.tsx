@@ -1,17 +1,19 @@
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Box, Stack, Typography } from '@mui/material';
-import type { Dispatch, SetStateAction } from 'react';
+import { MenuItem, Stack, Typography } from '@mui/material';
+import { useState, type Dispatch, type SetStateAction } from 'react';
+
+import mutator from '../../mutator';
 
 const StyledStack = styled(Stack)`
   background: ${({ theme }) => theme.palette.background.paper};
   flex-direction: row;
   align-items: center;
   z-index: 1;
-  margin-bottom: 6.5px;
+  margin-bottom: 4px;
 `;
 
-const StyledItem = styled(Box)`
+const StyledItem = styled(MenuItem)`
   border-left: 1px solid ${({ theme }) => theme.palette.divider};
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
@@ -43,6 +45,20 @@ export function ViewHeaderRowsMenu({
   setCheckedIds: Dispatch<SetStateAction<string[]>>;
   checkedIds: string[];
 }) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function deleteCheckedCards() {
+    setIsDeleting(true);
+    try {
+      await mutator.deleteBlocks(checkedIds, 'delete cards');
+    } catch (_) {
+      //
+    } finally {
+      setCheckedIds([]);
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <StyledStack>
       <StyledItem>
@@ -50,7 +66,7 @@ export function ViewHeaderRowsMenu({
           {checkedIds.length} selected
         </Typography>
       </StyledItem>
-      <StyledItem>
+      <StyledItem onClick={deleteCheckedCards} disabled={isDeleting}>
         <DeleteOutlinedIcon fontSize='small' />
       </StyledItem>
     </StyledStack>

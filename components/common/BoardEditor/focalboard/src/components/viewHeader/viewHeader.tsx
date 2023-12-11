@@ -130,79 +130,78 @@ function ViewHeader(props: Props) {
                 />
               </Box>
             )}
-
-            <div className='octo-spacer' />
-
-            <Box className='view-actions'>
-              {!props.readOnly && activeView && (
-                <>
-                  {/* Display by */}
-
-                  {withDisplayBy && (
-                    <ViewHeaderDisplayByMenu
-                      properties={activeBoard?.fields.cardProperties ?? []}
-                      activeView={activeView}
-                      dateDisplayPropertyName={dateDisplayProperty?.name}
-                    />
-                  )}
-
-                  {/* Filter */}
-                  <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-
-                  {/* Sort */}
-                  {withSortBy && (
-                    <ViewSortControl
-                      activeBoard={activeBoard}
-                      activeView={activeView}
-                      cards={cards}
-                      viewSortPopup={viewSortPopup}
-                    />
-                  )}
-                </>
-              )}
-
-              {/* Search - disabled until we can access page data inside the redux selector */}
-
-              {/* <ViewHeaderSearch/> */}
-
-              {/* Link to view embedded table in full - check that at least one view is created */}
-              {props.embeddedBoardPath && !!views.length && (
-                <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
-                  <Tooltip title='Open as full page' placement='top'>
-                    <span>
-                      <IconButton
-                        icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
-                        style={{ width: '32px' }}
-                      />
-                    </span>
-                  </Tooltip>
-                </Link>
-              )}
-
-              {/* Options menu */}
-
-              {!props.readOnly && activeView && (
-                <>
-                  <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
-
-                  {/* New card button */}
-
-                  {activeBoard?.fields.sourceType !== 'proposals' && (
-                    <NewCardButton
-                      addCard={props.addCard}
-                      addCardFromTemplate={addPageFromTemplate}
-                      addCardTemplate={props.addCardTemplate}
-                      editCardTemplate={props.editCardTemplate}
-                      showCard={props.showCard}
-                      deleteCardTemplate={deleteCardTemplate}
-                      boardId={viewsBoard.id}
-                    />
-                  )}
-                </>
-              )}
-            </Box>
           </>
         )}
+        <div className='octo-spacer' />
+
+        <Box className='view-actions'>
+          {!props.readOnly && activeView && (
+            <>
+              {/* Display by */}
+
+              {withDisplayBy && (
+                <ViewHeaderDisplayByMenu
+                  properties={activeBoard?.fields.cardProperties ?? []}
+                  activeView={activeView}
+                  dateDisplayPropertyName={dateDisplayProperty?.name}
+                />
+              )}
+
+              {/* Filter */}
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+
+              {/* Sort */}
+              {withSortBy && (
+                <ViewSortControl
+                  activeBoard={activeBoard}
+                  activeView={activeView}
+                  cards={cards}
+                  viewSortPopup={viewSortPopup}
+                />
+              )}
+            </>
+          )}
+
+          {/* Search - disabled until we can access page data inside the redux selector */}
+
+          {/* <ViewHeaderSearch/> */}
+
+          {/* Link to view embedded table in full - check that at least one view is created */}
+          {props.embeddedBoardPath && !!views.length && (
+            <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
+              <Tooltip title='Open as full page' placement='top'>
+                <span>
+                  <IconButton
+                    icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
+                    style={{ width: '32px' }}
+                  />
+                </span>
+              </Tooltip>
+            </Link>
+          )}
+
+          {/* Options menu */}
+
+          {!props.readOnly && activeView && (
+            <>
+              <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
+
+              {/* New card button */}
+
+              {activeBoard?.fields.sourceType !== 'proposals' && (
+                <NewCardButton
+                  addCard={props.addCard}
+                  addCardFromTemplate={addPageFromTemplate}
+                  addCardTemplate={props.addCardTemplate}
+                  editCardTemplate={props.editCardTemplate}
+                  showCard={props.showCard}
+                  deleteCardTemplate={deleteCardTemplate}
+                  boardId={viewsBoard.id}
+                />
+              )}
+            </>
+          )}
+        </Box>
       </div>
 
       {activeView && <ViewSettingsRow sx={{ mx: 0 }} activeView={activeView} canSaveGlobally />}
