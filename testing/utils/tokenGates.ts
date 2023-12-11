@@ -6,6 +6,7 @@ export async function generateTokenGate({ userId, spaceId }: { spaceId: string; 
       conditions: {},
       createdBy: userId,
       resourceId: {},
+      type: 'lit',
       space: {
         connect: {
           id: spaceId

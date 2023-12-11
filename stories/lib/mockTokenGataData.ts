@@ -247,6 +247,7 @@ export const mockTokenGateResult: TokenGateEvaluationResult = {
 
 function mockTokenGate(gate: UnifiedAccessControlConditions) {
   return createMockTokenGate({
+    type: 'lit',
     conditions: {
       unifiedAccessControlConditions: gate
     },

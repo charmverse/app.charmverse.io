@@ -4,7 +4,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { TokenGateConditions, TokenGateWithRoles } from './interfaces';
+import type { TokenGateWithRoles } from './interfaces';
 
 export type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
 
@@ -13,7 +13,7 @@ type TokenGateResult = TokenGateWithRoles & TokenGateJwtResult;
 type Props = {
   userId: string;
   spaceId: string;
-  tokens: { signedToken: string; tokenGateId: string }[];
+  tokens: { signedToken?: string; tokenGateId: string }[];
 };
 export async function verifyTokenGates({ spaceId, userId, tokens }: Props): Promise<TokenGateResult[]> {
   if (!spaceId || !userId) {
@@ -49,28 +49,40 @@ export async function verifyTokenGates({ spaceId, userId, tokens }: Props): Prom
   const verifiedTokenGates: TokenGateResult[] = (
     await Promise.all(
       tokens.map(async (tk) => {
-        const { verifyJwt } = await import('@lit-protocol/lit-node-client');
-        const result = verifyJwt({ jwt: tk.signedToken });
-        const matchingTokenGate = tokenGates.find((g) => g.id === tk.tokenGateId);
-        const payload = result?.payload as any;
-        // Only check against existing token gates for this space
-        if (
-          matchingTokenGate &&
-          // Perform additional checks here as per https://github.com/LIT-Protocol/lit-minimal-jwt-example/blob/main/server.js
-          result?.verified &&
-          payload?.orgId === space.id
-        ) {
-          const embeddedTokenGateId = JSON.parse(payload.extraData).tokenGateId;
+        const matchingTokenGate = tokenGates.find((g) => g.id === tk.tokenGateId) as TokenGateWithRoles | undefined;
 
-          if (embeddedTokenGateId === tk.tokenGateId) {
-            return {
-              ...matchingTokenGate,
-              jwt: tk.signedToken,
-              conditions: matchingTokenGate.conditions as TokenGateConditions,
-              verified: true,
-              grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.roleId)
-            };
+        if (!matchingTokenGate) {
+          return null;
+        }
+
+        if (matchingTokenGate.type === 'lit' && tk.signedToken) {
+          const { verifyJwt } = await import('@lit-protocol/lit-node-client');
+          const result = verifyJwt({ jwt: tk.signedToken });
+          const payload = result?.payload as any;
+
+          if (
+            // Perform additional checks here as per https://github.com/LIT-Protocol/lit-minimal-jwt-example/blob/main/server.js
+            result?.verified &&
+            payload?.orgId === space.id
+          ) {
+            const embeddedTokenGateId = JSON.parse(payload.extraData).tokenGateId;
+
+            if (embeddedTokenGateId === tk.tokenGateId) {
+              return {
+                ...matchingTokenGate,
+                jwt: tk.signedToken,
+                verified: true,
+                grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.role.id)
+              };
+            }
           }
+        } else {
+          return {
+            ...matchingTokenGate,
+            jwt: tk.signedToken,
+            verified: true,
+            grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.role.id)
+          };
         }
 
         return null;

@@ -1,44 +1,8 @@
-import type { TokenGate } from '@charmverse/core/prisma';
-import type { AuthSig, JsonSigningResourceId } from '@lit-protocol/types';
+import type { AuthSig } from '@lit-protocol/types';
 
 import * as http from 'adapters/http';
-import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
-import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
-import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 export class TokenGatesApi {
-  // Token Gates
-  getTokenGates(query: { spaceId: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  getTokenGatesForSpace(query: { spaceDomain: string }) {
-    return http.GET<TokenGateWithRoles[]>('/api/token-gates', query);
-  }
-
-  saveTokenGate(
-    tokenGate: Partial<Omit<TokenGate, 'resourceId'> & { resourceId: JsonSigningResourceId }>
-  ): Promise<TokenGate> {
-    return http.POST<TokenGate>('/api/token-gates', tokenGate);
-  }
-
-  deleteTokenGate(id: string) {
-    return http.DELETE<TokenGate>(`/api/token-gates/${id}`);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  verifyTokenGate(
-    verification: Omit<TokenGateVerificationRequest, 'userId'>
-  ): Promise<{ error?: string; success?: boolean }> {
-    return http.POST('/api/token-gates/verify', verification);
-  }
-
-  evaluateTokenGateEligibility(
-    verification: Omit<TokenGateEvaluationAttempt, 'userId'>
-  ): Promise<TokenGateEvaluationResult> {
-    return http.POST('/api/token-gates/evaluate', verification);
-  }
-
   reevaluateRoles(verification: { authSig: AuthSig; spaceId: string; userId: string }): Promise<string[]> {
     return http.POST('/api/token-gates/reevaluate', verification);
   }

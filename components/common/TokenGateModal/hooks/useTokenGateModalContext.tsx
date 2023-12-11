@@ -13,11 +13,12 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useCreateLitToken, useCreateTokenGate } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import type { Lock, TokenGate } from 'lib/tokenGates/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { createAuthSigs, getAllChains } from '../utils/helpers';
 
-export type DisplayedPage = 'tokens' | 'collectables' | 'home' | 'review' | 'wallet' | 'dao';
+export type DisplayedPage = 'tokens' | 'collectables' | 'home' | 'review' | 'wallet' | 'dao' | 'unlock';
 export type Flow = 'single' | 'multiple_all' | 'multiple_one';
 
 export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions'> & {
@@ -28,11 +29,13 @@ export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccess
 
 type IContext = {
   handleUnifiedAccessControlConditions: (conditions: UnifiedAccessControlConditions) => void;
-  createUnifiedAccessControlConditions: () => Promise<void>;
+  onSubmit: (type: TokenGate['type']) => Promise<void>;
   unifiedAccessControlConditions: UnifiedAccessControlConditions;
   flow: Flow;
+  lock?: Lock;
   setFlow: (flow: Flow) => void;
   resetModal: () => void;
+  handleLock: (lock: Lock) => void;
   displayedPage: DisplayedPage;
   setDisplayedPage: (page: DisplayedPage) => void;
   onClose: () => void;
@@ -42,7 +45,7 @@ type IContext = {
 
 export const TokenGateModalContext = createContext<Readonly<IContext>>({
   handleUnifiedAccessControlConditions: () => undefined,
-  createUnifiedAccessControlConditions: async () => undefined,
+  onSubmit: async () => undefined,
   unifiedAccessControlConditions: [],
   flow: 'single',
   setFlow: () => undefined,
@@ -50,7 +53,9 @@ export const TokenGateModalContext = createContext<Readonly<IContext>>({
   displayedPage: 'home',
   setDisplayedPage: () => undefined,
   onClose: () => undefined,
+  handleLock: () => undefined,
   loadingToken: false,
+  lock: undefined,
   error: undefined
 });
 
@@ -59,6 +64,7 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
   const [unifiedAccessControlConditions, setUnifiedAccessControlConditions] = useState<UnifiedAccessControlConditions>(
     []
   );
+  const [lock, setLock] = useState<Lock>();
   const litClient = useLitProtocol();
   const { error: tokenError, isMutating: tokenLoading, trigger: triggerToken } = useCreateTokenGate();
   const { error: litError, isMutating: litLoading, trigger: triggerLitToken } = useCreateLitToken(litClient);
@@ -72,6 +78,10 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
     const orOperator = { operator: 'or' };
     const operator = flow === 'multiple_all' ? andOperator : flow === 'multiple_one' ? orOperator : undefined;
     setUnifiedAccessControlConditions((prevState) => [...prevState, operator, ...conditions].filter(isTruthy));
+  };
+
+  const handleLock = (_lock: Lock) => {
+    setLock(_lock);
   };
 
   const clearAllAccessControlConditions = () => {
@@ -120,31 +130,66 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
         conditions,
         resourceId,
         spaceId,
+        type: 'lit',
         id: tokenGateId
       });
 
-      mutate(`tokenGates/${spaceId}`);
+      mutate(`/api/token-gates`);
     }
 
     resetModal();
+    onClose();
+  };
+
+  const createUnlockProtocolGate = async () => {
+    if (lock) {
+      const id = uuid();
+
+      await triggerToken({
+        conditions: {
+          contract: lock.contract,
+          chainId: lock.chainId,
+          name: lock.name || ''
+        },
+        type: 'unlock',
+        resourceId: {},
+        spaceId,
+        id
+      });
+
+      mutate(`/api/token-gates`);
+      resetModal();
+      onClose();
+    }
+  };
+
+  const onSubmit = async (type: TokenGate['type']) => {
+    if (type === 'unlock') {
+      await createUnlockProtocolGate();
+    } else if (type === 'lit') {
+      await createUnifiedAccessControlConditions();
+    }
   };
 
   const value = useMemo(
     () => ({
       handleUnifiedAccessControlConditions,
-      createUnifiedAccessControlConditions,
+      onSubmit,
       resetModal,
       setDisplayedPage,
       setFlow,
       onClose,
+      handleLock,
       unifiedAccessControlConditions,
       displayedPage,
+      lock,
       flow,
       loadingToken: tokenLoading || litLoading,
       error: tokenError?.message || typeof litError?.message === 'string' ? litError?.message : undefined
     }),
     [
       flow,
+      lock,
       unifiedAccessControlConditions,
       displayedPage,
       tokenLoading,
@@ -153,6 +198,7 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
       litError?.message,
       resetModal,
       onClose,
+      handleLock,
       handleUnifiedAccessControlConditions
     ]
   );

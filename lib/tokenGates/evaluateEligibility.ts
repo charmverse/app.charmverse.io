@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
-import type { Role, Space } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { arrayUtils } from '@charmverse/core/utilities';
 import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import type { AuthSig } from '@lit-protocol/types';
 import promiseRetry from 'promise-retry';
@@ -9,8 +8,10 @@ import { validate } from 'uuid';
 
 import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError } from 'lib/utilities/errors';
+import { isTruthy } from 'lib/utilities/types';
 
-import type { TokenGateConditions, TokenGateWithRoles } from './interfaces';
+import type { TokenGateWithRoles } from './interfaces';
+import { getLockDetails } from './unlock/getLockDetails';
 
 type TokenGateJwt = {
   signedToken: string;
@@ -41,12 +42,6 @@ export async function evaluateTokenGateEligibility({
   authSig,
   spaceIdOrDomain
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
-  if (!litClient.ready) {
-    await litClient.connect().catch((err) => {
-      log.debug('Error connecting to lit node', err);
-    });
-  }
-
   const validUuid = validate(spaceIdOrDomain);
 
   const space = await prisma.space.findFirst({
@@ -71,47 +66,9 @@ export async function evaluateTokenGateEligibility({
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
   }
 
-  if (!litClient.ready) {
-    throw new InvalidStateError('Lit client is not available');
-  }
-
   const tokenGateResults: (TokenGateJwt | null)[] = await Promise.all(
     space.tokenGates.map(async (tokenGate) => {
-      return promiseRetry<TokenGateJwt | null>(
-        async (retry, retryCount): Promise<TokenGateJwt | null> => {
-          return litClient
-            .getSignedToken({
-              authSig,
-              // note that we used to store 'chain' but now it is an array
-              // TODO: migrate old token gate conditions to all be an array?
-              chain: (tokenGate.conditions as TokenGateConditions).chains?.[0],
-              resourceId: tokenGate.resourceId as any,
-              ...(tokenGate.conditions as TokenGateConditions)
-            })
-            .then((signedToken: string) => {
-              return {
-                signedToken,
-                tokenGate: tokenGate as TokenGateWithRoles
-              };
-            })
-            .catch((error) => {
-              if (error.errorCode === 'rpc_error') {
-                log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
-                  retryCount,
-                  tokenGateId: tokenGate.id
-                });
-                retry(error);
-              }
-              return null;
-            });
-        },
-        {
-          factor: 1.1, // default is 2, but we don't want to wait that long because we are expecting 400 errors sometimes from the Lit network unrelated to capacity
-          maxTimeout: 5000,
-          minTimeout: 100,
-          retries: 5
-        }
-      ).catch((error) => {
+      return getTokenGateResults(tokenGate as TokenGateWithRoles, authSig).catch((error) => {
         log.warn('Error verifying token gate', {
           error,
           spaceId: space.id,
@@ -123,7 +80,7 @@ export async function evaluateTokenGateEligibility({
     })
   );
 
-  const successGates = tokenGateResults.filter((result) => result !== null) as TokenGateJwt[];
+  const successGates = tokenGateResults.filter(isTruthy);
 
   if (successGates.length === 0) {
     return {
@@ -152,4 +109,81 @@ export async function evaluateTokenGateEligibility({
     gateTokens: successGates,
     roles: eligibleRoles
   };
+}
+
+export async function getTokenGateResults(tokenGate: TokenGateWithRoles, authSig: AuthSig) {
+  if (tokenGate.type === 'unlock') {
+    return getUnlockProtocolTokenGateResults(tokenGate, authSig);
+  } else {
+    return getLitTokenGateResults(tokenGate, authSig);
+  }
+}
+
+export async function getUnlockProtocolTokenGateResults(tokenGate: TokenGateWithRoles<'unlock'>, authSig: AuthSig) {
+  const result = await getLockDetails({
+    walletAddress: authSig.address,
+    contract: tokenGate.conditions.contract,
+    chainId: tokenGate.conditions.chainId
+  });
+
+  const now = new Date().getTime();
+
+  if (result.balanceOf === 1 && result.expirationTimestamp && result.expirationTimestamp > now) {
+    return {
+      signedToken: '',
+      tokenGate
+    };
+  }
+
+  return null;
+}
+export async function getLitTokenGateResults(
+  tokenGate: TokenGateWithRoles<'lit'>,
+  authSig: AuthSig
+): Promise<TokenGateJwt | null> {
+  if (!litClient.ready) {
+    await litClient.connect().catch((err) => {
+      log.debug('Error connecting to lit node', err);
+    });
+  }
+
+  if (!litClient.ready) {
+    throw new InvalidStateError('Lit client is not available');
+  }
+
+  return promiseRetry<TokenGateJwt | null>(
+    async (retry, retryCount): Promise<TokenGateJwt | null> => {
+      return litClient
+        .getSignedToken({
+          authSig,
+          // note that we used to store 'chain' but now it is an array
+          // TODO: migrate old token gate conditions to all be an array?
+          chain: tokenGate.conditions.chains?.[0],
+          resourceId: tokenGate.resourceId as any,
+          ...tokenGate.conditions
+        })
+        .then((signedToken: string) => {
+          return {
+            signedToken,
+            tokenGate
+          };
+        })
+        .catch((error) => {
+          if (error.errorCode === 'rpc_error') {
+            log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
+              retryCount,
+              tokenGateId: tokenGate.id
+            });
+            retry(error);
+          }
+          return null;
+        });
+    },
+    {
+      factor: 1.1, // default is 2, but we don't want to wait that long because we are expecting 400 errors sometimes from the Lit network unrelated to capacity
+      maxTimeout: 5000,
+      minTimeout: 100,
+      retries: 5
+    }
+  );
 }

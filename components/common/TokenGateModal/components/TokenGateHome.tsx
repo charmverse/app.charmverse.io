@@ -6,6 +6,7 @@ import type { ElementType } from 'react';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import UnlockProtocolIcon from 'public/images/logos/unlock_protocol_logo.svg';
 import GrantorIcon from 'public/images/template_icons/grantor_icon.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
 
@@ -42,6 +43,11 @@ const requirementButton: ButtonProps[] = [
     title: 'MolochDAOv2.1',
     icon: WaterDropIcon,
     iconColor: 'error'
+  },
+  {
+    name: 'unlock',
+    title: 'Unlock Protocol',
+    icon: UnlockProtocolIcon
   }
 ];
 
@@ -54,21 +60,23 @@ export function TokenGateHome() {
   return (
     <>
       <FieldLabel>Select Requirements</FieldLabel>
-      {requirementButton.map((btn) => (
-        <Box key={btn.name}>
-          <Button
-            variant='outlined'
-            fullWidth
-            size='large'
-            color='inherit'
-            sx={{ justifyContent: 'left', px: 3, py: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}
-            startIcon={<SvgIcon component={btn.icon} inheritViewBox color={btn.iconColor} />}
-            onClick={() => setDisplayedPage(btn.name)}
-          >
-            {btn.title}
-          </Button>
-        </Box>
-      ))}
+      {requirementButton
+        .filter((btn) => !(btn.name === 'unlock' && flow !== 'single')) // filter unlock button if the user is in a multiple token gate flow
+        .map((btn) => (
+          <Box key={btn.name}>
+            <Button
+              variant='outlined'
+              fullWidth
+              size='large'
+              color='inherit'
+              sx={{ justifyContent: 'left', px: 3, py: 2, overflow: 'hidden', textOverflow: 'ellipsis' }}
+              startIcon={<SvgIcon component={btn.icon} inheritViewBox color={btn.iconColor} />}
+              onClick={() => setDisplayedPage(btn.name)}
+            >
+              {btn.title}
+            </Button>
+          </Box>
+        ))}
       <TokenGateFooter onCancel={onCancel} />
     </>
   );
