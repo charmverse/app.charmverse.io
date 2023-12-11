@@ -49,9 +49,11 @@ handler.post(
  *               type: string
  *               example: "## This is a comment."
  *         createdBy:
- *           type: string
- *           description: User ID of the user who created the comment
- *           example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *           oneOf:
+ *             - type: string
+ *               description: User ID of the user who created the comment
+ *               example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *             - $ref: '#/components/schemas/SearchUserResponseBody'
  *         createdAt:
  *           type: string
  *           description: ISO Timestamp of comment creation date
@@ -66,16 +68,10 @@ handler.post(
  *           type: array
  *           description: Child comments of this comment. By default, this array is empty unless you request comments as a tree
  *           example: []
- *         user:
- *           type: object
- *           description: User profile of the user who created the comment
- *           oneOf:
- *             - $ref: '#/components/schemas/SearchUserResponseBody'
- *             - type: null
  */
 export type PublicApiProposalComment = {
   id: string;
-  createdBy: string;
+  createdBy: string | UserProfile;
   createdAt: string;
   parentId: string | null;
   content: {
@@ -85,16 +81,15 @@ export type PublicApiProposalComment = {
   upvotes: number;
   downvotes: number;
   children: PublicApiProposalComment[];
-  user?: UserProfile;
 };
 
 async function mapReducePageComments({
   comments,
   reduceToTree
 }: {
-  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt' | 'createdBy'> & {
+  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt'> & {
     votes: Pick<PageCommentVote, 'upvoted'>[];
-    user?: UserProfile;
+    createdBy: string | UserProfile;
   })[];
   reduceToTree?: boolean;
 }): Promise<PublicApiProposalComment[]> {
@@ -131,8 +126,7 @@ async function mapReducePageComments({
       },
       upvotes,
       downvotes,
-      children: [],
-      user: comment.user ?? undefined
+      children: []
     };
 
     // Remove unneeded votes
@@ -161,7 +155,7 @@ async function mapReducePageComments({
   return rootComments;
 }
 
-const supportedExpandKey = ['user'];
+const expandableFields = ['user'];
 
 /**
  * @swagger
@@ -231,11 +225,11 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
     ? [req.query.expand]
     : [];
 
-  const hasUnsupportedExpandKey = expand.some((expandKey) => !supportedExpandKey.includes(expandKey));
+  const hasUnsupportedExpandableFields = expand.some((expandField) => !expandableFields.includes(expandField));
 
-  if (hasUnsupportedExpandKey) {
+  if (hasUnsupportedExpandableFields) {
     throw new InvalidInputError(
-      `Unsupported expand key: ${expand}. Please provide one of ${supportedExpandKey.join(',')}`
+      `Unsupported expand field: ${expand}. Please provide one of ${expandableFields.join(',')}`
     );
   }
 
@@ -269,7 +263,9 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
     comments: proposalComments.map((proposalComment) => {
       return {
         ...proposalComment,
-        user: proposalComment.user ? getUserProfile(proposalComment.user as unknown as UserInfo) : undefined
+        createdBy: proposalComment.user
+          ? getUserProfile(proposalComment.user as unknown as UserInfo)
+          : proposalComment.createdBy
       };
     }),
     reduceToTree: req.query.resultsAsTree === 'true'
