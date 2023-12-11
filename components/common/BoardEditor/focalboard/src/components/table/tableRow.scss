@@ -19,4 +19,10 @@
   &.selected {
     background-color: rgba(90, 200, 255, 0.2);
   }
+
+  &:hover {
+    .open-button {
+      display: block;
+    }
+  }
 }
