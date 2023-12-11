@@ -134,9 +134,8 @@ export async function createProposal({
   const reviewersInput = reviewers?.map(
     (r) =>
       ({
-        id: r.id,
+        // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
         evaluationId: r.evaluationId,
-        proposalId,
         roleId: r.group === 'role' ? r.id : undefined,
         systemRole: r.group === 'system_role' ? r.id : undefined,
         userId: r.group === 'user' ? r.id : undefined
@@ -144,7 +143,7 @@ export async function createProposal({
   );
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const [proposal, , , page] = await prisma.$transaction([
+  const [proposal, , page] = await prisma.$transaction([
     prisma.proposal.create({
       data: {
         // Add page creator as the proposal's first author
@@ -158,6 +157,20 @@ export async function createProposal({
         authors: {
           createMany: {
             data: authorsList.map((author) => ({ userId: author }))
+          }
+        },
+        evaluations: {
+          createMany: {
+            data:
+              // we dont save evaluations as part of the template, since they link to workflow id instead
+              pageProps?.type === 'proposal_template'
+                ? []
+                : evaluations.map((evaluation, index) => ({
+                    id: evaluationIds[index],
+                    index: evaluation.index,
+                    title: evaluation.title,
+                    type: evaluation.type
+                  }))
           }
         },
         reviewers: reviewersInput
@@ -174,19 +187,6 @@ export async function createProposal({
         reviewers: true,
         category: true
       }
-    }),
-    prisma.proposalEvaluation.createMany({
-      // we dont save evaluations as part of the template, since they link to workflow id instead
-      data:
-        pageProps?.type === 'proposal_template'
-          ? []
-          : evaluations.map((evaluation, index) => ({
-              id: evaluationIds[index],
-              index: evaluation.index,
-              title: evaluation.title,
-              type: evaluation.type,
-              proposalId
-            }))
     }),
     prisma.proposalEvaluationPermission.createMany({
       // we dont save evaluations as part of the template, since they link to workflow id instead
