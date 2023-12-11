@@ -73,6 +73,34 @@ type Props = {
   subRowsEmptyValueContent?: ReactElement | string;
 };
 
+export const validatePropertyValue = (propType: string, val: string): boolean => {
+  if (val === '') {
+    return true;
+  }
+  switch (propType) {
+    case 'number':
+      return !Number.isNaN(parseInt(val, 10));
+    case 'email': {
+      const emailRegexp =
+        // eslint-disable-next-line max-len
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return emailRegexp.test(val);
+    }
+    case 'url': {
+      const urlRegexp =
+        // eslint-disable-next-line max-len
+        /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
+      return urlRegexp.test(val);
+    }
+    case 'text':
+      return true;
+    case 'phone':
+      return true;
+    default:
+      return false;
+  }
+};
+
 /**
  * Hide these values if user is not an evalutor for the proposal
  */
@@ -138,34 +166,6 @@ function PropertyValueElement(props: Props) {
     }
     setServerValue(props.card.fields.properties[props.propertyTemplate.id] || '');
   }, [value, props.card.fields.properties[props.propertyTemplate.id]]);
-
-  const validateProp = (propType: string, val: string): boolean => {
-    if (val === '') {
-      return true;
-    }
-    switch (propType) {
-      case 'number':
-        return !Number.isNaN(parseInt(val, 10));
-      case 'email': {
-        const emailRegexp =
-          // eslint-disable-next-line max-len
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return emailRegexp.test(val);
-      }
-      case 'url': {
-        const urlRegexp =
-          // eslint-disable-next-line max-len
-          /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
-        return urlRegexp.test(val);
-      }
-      case 'text':
-        return true;
-      case 'phone':
-        return true;
-      default:
-        return false;
-    }
-  };
 
   let propertyValueElement: ReactNode = null;
 
@@ -364,7 +364,7 @@ function PropertyValueElement(props: Props) {
       mutator.changePropertyValue(card, propertyTemplate.id, value);
     },
     onCancel: () => setValue(propertyValue || ''),
-    validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+    validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
     spellCheck: propertyTemplate.type === 'text',
     wrapColumn: props.wrapColumn ?? false,
     columnRef: props.columnRef

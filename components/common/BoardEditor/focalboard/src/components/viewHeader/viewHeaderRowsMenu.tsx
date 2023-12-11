@@ -7,6 +7,7 @@ import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
 import charmClient from 'charmClient';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -14,6 +15,7 @@ import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../mutator';
+import { validatePropertyValue } from '../propertyValueElement';
 
 const StyledStack = styled(Stack)`
   background: ${({ theme }) => theme.palette.background.paper};
@@ -51,20 +53,18 @@ const StyledMenuItem = styled(MenuItem)`
   }
 `;
 
-function SelectMenu({
-  board,
+function PropertyMenu({
   cards,
   propertyTemplate,
   children
 }: {
-  board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
-  children: (option: { isSelectOpen: boolean }) => ReactNode;
+  children: (option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode;
 }) {
   const popupState = usePopupState({ variant: 'popover' });
   // Without this state, the options menu list is not placed in the correct position
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [isPropertyOpen, setIsPropertyOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
   if (cards.length === 0) {
     return null;
@@ -77,7 +77,7 @@ function SelectMenu({
         onClick={() => {
           popupState.open();
           setTimeout(() => {
-            setIsSelectOpen(true);
+            setIsPropertyOpen(true);
           }, 150);
         }}
       >
@@ -95,7 +95,7 @@ function SelectMenu({
         elevation={1}
         onClose={() => {
           popupState.close();
-          setIsSelectOpen(false);
+          setIsPropertyOpen(false);
         }}
       >
         <Box
@@ -103,7 +103,7 @@ function SelectMenu({
             padding: '2px 4px'
           }}
         >
-          {children({ isSelectOpen })}
+          {children({ isPropertyOpen, closeMenu: popupState.close })}
         </Box>
       </Menu>
     </>
@@ -122,11 +122,11 @@ function SelectPropertyTemplateMenu({
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
   return (
-    <SelectMenu board={board} cards={cards} propertyTemplate={propertyTemplate}>
-      {({ isSelectOpen }) => {
+    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+      {({ isPropertyOpen }) => {
         return (
           <TagSelect
-            isOpen={isSelectOpen}
+            isOpen={isPropertyOpen}
             canEditOptions
             multiselect={propertyTemplate.type === 'multiSelect'}
             propertyValue={propertyValue as string}
@@ -147,7 +147,7 @@ function SelectPropertyTemplateMenu({
           />
         );
       }}
-    </SelectMenu>
+    </PropertyMenu>
   );
 }
 
@@ -163,11 +163,11 @@ function PersonPropertyTemplateMenu({
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
   return (
-    <SelectMenu board={board} cards={cards} propertyTemplate={propertyTemplate}>
-      {({ isSelectOpen }) => {
+    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+      {({ isPropertyOpen }) => {
         return (
           <UserSelect
-            open={isSelectOpen}
+            open={isPropertyOpen}
             displayType='table'
             memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
             onChange={(newValue) => {
@@ -202,7 +202,42 @@ function PersonPropertyTemplateMenu({
           />
         );
       }}
-    </SelectMenu>
+    </PropertyMenu>
+  );
+}
+
+function TextPropertyTemplateMenu({
+  cards,
+  propertyTemplate
+}: {
+  cards: Card[];
+  propertyTemplate: IPropertyTemplate<PropertyType>;
+}) {
+  const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
+  const [value, setValue] = useState(propertyValue);
+
+  return (
+    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+      {({ closeMenu }) => {
+        return (
+          <TextInput
+            className='octo-propertyvalue'
+            placeholderText='Empty'
+            value={value.toString()}
+            autoExpand={true}
+            onChange={setValue}
+            displayType='details'
+            onSave={async () => {
+              await mutator.changePropertyValues(cards, propertyTemplate.id, value);
+              closeMenu();
+            }}
+            onCancel={() => setValue(propertyValue || '')}
+            validator={(newValue: string) => validatePropertyValue(propertyTemplate.type, newValue)}
+            spellCheck={propertyTemplate.type === 'text'}
+          />
+        );
+      }}
+    </PropertyMenu>
   );
 }
 
@@ -264,7 +299,7 @@ function PropertyTemplateMenu({
     }
 
     default: {
-      return <StyledMenuItem>{propertyTemplate.name}</StyledMenuItem>;
+      return <TextPropertyTemplateMenu cards={cards} propertyTemplate={propertyTemplate} />;
     }
   }
 }
