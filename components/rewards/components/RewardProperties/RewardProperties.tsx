@@ -18,7 +18,6 @@ export function RewardProperties(props: {
   pageId: string;
   pagePath: string;
   rewardChanged?: () => void;
-  onClose?: () => void;
   showApplications?: boolean;
   isTemplate?: boolean;
   expandedRewardProperties?: boolean;
@@ -28,7 +27,6 @@ export function RewardProperties(props: {
     pageId,
     readOnly: parentReadOnly = false,
     rewardChanged,
-    onClose,
     showApplications,
     isTemplate,
     expandedRewardProperties
