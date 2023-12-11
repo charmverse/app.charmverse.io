@@ -1,7 +1,7 @@
 import { Add } from '@mui/icons-material';
 import { Typography, Box } from '@mui/material';
-import type { LegacyRef, ReactNode } from 'react';
-import React, { forwardRef, useCallback, useRef, useState } from 'react';
+import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
+import React, { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
@@ -42,6 +42,8 @@ type Props = {
   expandSubRowsOnLoad?: boolean;
   rowExpansionLocalStoragePrefix?: string;
   subRowsEmptyValueContent?: React.ReactElement | string;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -64,13 +66,14 @@ function Table(props: Props): JSX.Element {
     readOnly,
     readOnlyRows,
     rowExpansionLocalStoragePrefix,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    setCheckedIds,
+    checkedIds
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
-  const { selection } = useAreaSelection({ container: selectContainerRef });
-  const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const { selection, setSelection, setDrawArea } = useAreaSelection({ container: selectContainerRef });
 
   const { offset, resizingColumn } = useEfficientDragLayer((monitor) => {
     if (monitor.getItemType() === 'horizontalGrip') {
@@ -233,6 +236,11 @@ function Table(props: Props): JSX.Element {
     (srcCard: Card, dstCard: Card) => {
       Utils.log(`onDropToCard: ${dstCard.title}`);
       onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
+      setSelection(null);
+      setDrawArea({
+        end: undefined,
+        start: undefined
+      });
     },
     [activeView]
   );
@@ -243,6 +251,13 @@ function Table(props: Props): JSX.Element {
     },
     [board, groupByProperty]
   );
+
+  const selectionContextValue = useMemo(() => {
+    return {
+      selection,
+      setSelection
+    };
+  }, [selection]);
 
   return (
     <div className='Table' ref={drop}>
@@ -261,7 +276,7 @@ function Table(props: Props): JSX.Element {
         />
 
         {/* Table rows */}
-        <SelectionContext.Provider value={selection}>
+        <SelectionContext.Provider value={selectionContextValue}>
           <TableRowsContainer ref={selectContainerRef}>
             {activeView.fields.groupById &&
               visibleGroups.map((group) => {

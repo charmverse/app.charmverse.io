@@ -93,6 +93,7 @@ export const columnWidth = (
 };
 
 function TableRow(props: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const {
     cardPage,
     hasContent,
@@ -116,13 +117,13 @@ function TableRow(props: Props) {
   } = props;
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardRef] = useSortable(
+  const [isDragging, isOver, cardHandlerRef] = useSortable(
     'card',
     card,
     !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped),
     props.onDrop
   );
-  const selection = useContext(SelectionContext);
+  const { selection } = useContext(SelectionContext);
   const isSelected = useSelected(cardRef, selection);
 
   const { space } = useCurrentSpace();
@@ -209,7 +210,7 @@ function TableRow(props: Props) {
       style={{
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
-        ...((isSelected || isChecked) && {
+        ...(isChecked && {
           background: 'rgba(35, 131, 226, 0.14)',
           zIndex: 85
         })
@@ -217,18 +218,19 @@ function TableRow(props: Props) {
     >
       {!props.readOnly && (
         <>
-          <Box className='icons row-actions' onClick={handleClick}>
+          <Box className='icons row-actions' onClick={handleClick} ref={cardHandlerRef}>
             <Box className='charm-drag-handle'>
               <DragIndicatorIcon color='secondary' />
             </Box>
           </Box>
           {setCheckedIds && (
             <StyledCheckbox
+              className='table-row-checkbox'
               checked={isChecked}
               show={isChecked}
               onChange={(e) => {
                 setCheckedIds((checkedIds) => {
-                  if (e.target.checked) {
+                  if (!isChecked) {
                     return Array.from(new Set([...checkedIds, card.id]));
                   }
 

@@ -18,10 +18,10 @@ boxNode.style.position = 'fixed';
 boxNode.style.background = 'hsl(206deg 100% 50% / 5%)';
 boxNode.style.pointerEvents = 'none';
 boxNode.style.mixBlendMode = 'multiply';
+boxNode.style.zIndex = '10';
 
 export function useAreaSelection({ container = { current: document.body } }: UseAreaSelectionProps) {
-  const boxRef = useRef<HTMLDivElement>(boxNode);
-  const boxElement = boxRef;
+  const boxElement = useRef<HTMLDivElement>(boxNode);
   const [mouseDown, setMouseDown] = useState<boolean>(false);
   const [selection, setSelection] = useState<DOMRect | null>(null);
   const [drawArea, setDrawArea] = useState<DrawnArea>({
@@ -43,6 +43,10 @@ export function useAreaSelection({ container = { current: document.body } }: Use
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
       const containerElement = container.current;
+      const isTableRowCheckbox =
+        (e.target as HTMLElement)?.classList.contains('table-row-checkbox') ||
+        (e.target as HTMLElement)?.parentElement?.classList.contains('table-row-checkbox');
+      if (isTableRowCheckbox) return;
 
       setMouseDown(true);
 
@@ -106,7 +110,9 @@ export function useAreaSelection({ container = { current: document.body } }: Use
 
   return {
     selection,
-    setSelection
+    setSelection,
+    boxElement,
+    setDrawArea
   };
 }
 
@@ -145,4 +151,10 @@ function drawSelectionBox(boxElement: HTMLElement, start: Coordinates, end: Coor
   }
 }
 
-export const SelectionContext = createContext<DOMRect | null>(null);
+export const SelectionContext = createContext<{
+  selection: DOMRect | null;
+  setSelection: React.Dispatch<React.SetStateAction<DOMRect | null>>;
+}>({
+  selection: null,
+  setSelection: () => {}
+});

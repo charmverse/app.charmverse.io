@@ -89,6 +89,7 @@ type State = {
 
 function CenterPanel(props: Props) {
   const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -556,6 +557,8 @@ function CenterPanel(props: Props) {
               editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
+              checkedIds={checkedIds}
+              setCheckedIds={setCheckedIds}
             />
           )}
         </div>
@@ -644,6 +647,8 @@ function CenterPanel(props: Props) {
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
+                    checkedIds={checkedIds}
+                    setCheckedIds={setCheckedIds}
                   />
                 )}
                 {activeBoard && activeView?.fields.viewType === 'calendar' && (
