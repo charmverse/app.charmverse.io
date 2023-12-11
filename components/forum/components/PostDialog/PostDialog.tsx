@@ -171,6 +171,7 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
               setContentUpdated(true);
               setFormInputs((__formInputs) => ({ ...emptyPost, ...(__formInputs ?? {}), ..._formInputs }));
             }}
+            isInsideDialog
             post={post ?? null}
             spaceId={spaceId}
             contentUpdated={contentUpdated}
