@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -11,7 +12,51 @@ import type { PublicApiProposalComment } from '../index';
 
 const handler = superApiHandler();
 
-handler.put(requireKeys(['contentMarkdown'], 'body'), updateProposalComment);
+handler.delete(deleteProposalComment).put(requireKeys(['contentMarkdown'], 'body'), updateProposalComment);
+
+/**
+ * @swagger
+ * /proposals/{proposalIdOrPath}/comments/{commentId}:
+ *   delete:
+ *     summary: Delete a proposal comment
+ *     tags:
+ *      - 'Partner API'
+ *     parameters:
+ *       - name: proposalIdOrPath
+ *         in: params
+ *         required: true
+ *         type: string
+ *         description: ID or page path of the related proposal
+ *       - name: commentId
+ *         in: params
+ *         required: true
+ *         type: string
+ *         description: ID of the comment to update
+ *
+ */
+async function deleteProposalComment(req: NextApiRequest, res: NextApiResponse<PublicApiProposalComment>) {
+  // This should never be undefined, but adding this safeguard for future proofing
+
+  const result = await prisma.pageComment.findFirstOrThrow({
+    where: {
+      id: req.query.commentId as string,
+      page: {
+        spaceId: req.authorizedSpaceId
+          ? req.authorizedSpaceId
+          : {
+              in: req.spaceIdRange
+            }
+      }
+    },
+    select: {
+      id: true
+    }
+  });
+
+  log.debug('[public-api] Deleted comment', { query: req.query, result });
+
+  return res.status(200).end();
+}
 
 /**
  * @swagger
@@ -120,6 +165,8 @@ async function updateProposalComment(req: NextApiRequest, res: NextApiResponse<P
     parentId: proposalComment.parentId,
     children: []
   };
+
+  log.debug('[public-api] Updated comment content', { query: req.query, commentId: proposalComment.id });
 
   return res.status(200).json(apiComment);
 }
