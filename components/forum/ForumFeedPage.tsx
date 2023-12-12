@@ -32,7 +32,7 @@ export function ForumPage() {
   const { navigateToSpacePath, router } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
-  const { createPost, showPost } = usePostDialog();
+  const { createPost, hidePost, showPost } = usePostDialog();
   const { categories, isLoading: isCategoriesLoading, getPostableCategories } = useForumCategories();
   const [, setTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
@@ -77,13 +77,18 @@ export function ForumPage() {
     }
   }
   useEffect(() => {
-    if (router.isReady && typeof router.query.postId === 'string') {
+    if (!router.isReady) {
+      return;
+    }
+    if (typeof router.query.postId === 'string') {
       showPost({
         postId: router.query.postId,
         onClose() {
           setUrlWithoutRerender(router.pathname, { postId: null });
         }
       });
+    } else if (!router.query.postId) {
+      hidePost();
     }
   }, [router.isReady, router.query.postId]);
 

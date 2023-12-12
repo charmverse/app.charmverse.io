@@ -67,7 +67,7 @@ export function RewardPropertiesForm({
   selectedTemplate,
   resetTemplate
 }: Props) {
-  const [rewardApplicationType, setRewardApplicationType] = useState<RewardApplicationType>(() =>
+  const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values)
   );
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
@@ -80,16 +80,25 @@ export function RewardPropertiesForm({
 
   const isAssignedReward = rewardApplicationType === 'assigned';
 
-  useEffect(() => {
-    applyUpdates({
-      maxSubmissions: undefined,
-      approveSubmitters: isAssignedReward ? false : rewardApplicationType === 'application_required',
-      assignedSubmitters: isAssignedReward ? [] : null,
-      allowMultipleApplications: isAssignedReward ? false : undefined
-    });
-  }, [rewardApplicationType, isAssignedReward]);
-
   const { templates: rewardTemplates = [] } = useRewardTemplates();
+
+  const setRewardApplicationType = useCallback((updatedType: RewardApplicationType) => {
+    if (updatedType === 'direct_submission') {
+      applyUpdates({
+        approveSubmitters: false,
+        assignedSubmitters: null
+      });
+    }
+
+    if (updatedType === 'application_required') {
+      applyUpdates({
+        approveSubmitters: true,
+        assignedSubmitters: null
+      });
+    }
+
+    setRewardApplicationTypeRaw(updatedType);
+  }, []);
 
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
@@ -138,17 +147,11 @@ export function RewardPropertiesForm({
   }, []);
 
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {
-    if (!submitters.length) {
-      applyUpdates({
-        assignedSubmitters: []
-      });
-
-      return;
-    }
-
     applyUpdates({
       assignedSubmitters: submitters,
-      maxSubmissions: submitters.length
+      maxSubmissions: submitters.length,
+      approveSubmitters: false,
+      allowMultipleApplications: false
     });
   }, []);
 
@@ -372,7 +375,7 @@ export function RewardPropertiesForm({
             {/* Select authors */}
             {isAssignedReward && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly required={isNewReward && !isTemplate} highlighted>
+                <PropertyLabel readOnly required={!isTemplate && !readOnly} highlighted>
                   Assigned applicants
                 </PropertyLabel>
                 <Box display='flex' flex={1}>
@@ -382,6 +385,11 @@ export function RewardPropertiesForm({
                     onChange={updateAssignedSubmitters}
                     wrapColumn
                     showEmptyPlaceholder
+                    error={
+                      !isNewReward && !values?.assignedSubmitters?.length && !readOnly
+                        ? 'Assigned reward requires at least one assignee'
+                        : undefined
+                    }
                   />
                 </Box>
               </Box>

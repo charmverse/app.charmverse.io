@@ -4,6 +4,38 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
+export type UserInfo = Pick<User, 'id' | 'avatar' | 'email' | 'username'> & {
+  googleAccounts: Pick<GoogleAccount, 'email'>[];
+  wallets: Pick<UserWallet, 'address'>[];
+};
+
+export const userProfileSelect = {
+  avatar: true,
+  email: true,
+  username: true,
+  id: true,
+  wallets: {
+    select: {
+      address: true
+    }
+  },
+  googleAccounts: {
+    select: {
+      email: true
+    }
+  }
+} satisfies Prisma.UserSelect;
+
+export function getUserProfile(user: UserInfo): UserProfile {
+  return {
+    id: user.id,
+    avatar: user.avatar || '',
+    wallet: user.wallets[0]?.address || '',
+    email: user.email || user.googleAccounts[0]?.email || '',
+    username: user.username
+  };
+}
+
 export async function searchUserProfile({
   userId,
   email,
@@ -19,17 +51,7 @@ export async function searchUserProfile({
     throw new InvalidInputError('Either user id, email or wallet address must be provided');
   }
 
-  let user:
-    | (User & {
-        googleAccounts: GoogleAccount[];
-        wallets: UserWallet[];
-      })
-    | null = null;
-
-  const relationships = {
-    wallets: true,
-    googleAccounts: true
-  } satisfies Prisma.UserInclude;
+  let user: UserInfo | null = null;
 
   if (email) {
     user = await prisma.user.findFirst({
@@ -41,7 +63,7 @@ export async function searchUserProfile({
           }
         ]
       },
-      include: relationships
+      select: userProfileSelect
     });
   }
 
@@ -55,7 +77,7 @@ export async function searchUserProfile({
           }
         ]
       },
-      include: relationships
+      select: userProfileSelect
     });
   }
 
@@ -64,7 +86,7 @@ export async function searchUserProfile({
       where: {
         AND: [spaceIds ? { spaceRoles: { some: { spaceId: { in: spaceIds } } } } : {}, { id: userId }]
       },
-      include: relationships
+      select: userProfileSelect
     });
   }
 
@@ -78,13 +100,11 @@ export async function searchUserProfile({
     }
   }
 
-  const profile: UserProfile = {
-    id: user.id,
-    avatar: user.avatar || '',
-    wallet: wallet || user.wallets[0]?.address || '',
-    email: email || user.email || user.googleAccounts[0]?.email || '',
-    username: user.username
-  };
+  const userProfile = getUserProfile(user);
 
-  return profile;
+  return {
+    ...userProfile,
+    email: email || userProfile.email,
+    wallet: wallet || userProfile.wallet
+  };
 }

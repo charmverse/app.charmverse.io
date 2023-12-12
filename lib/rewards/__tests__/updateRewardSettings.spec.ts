@@ -108,6 +108,30 @@ describe('updateRewardSettings', () => {
     });
   });
 
+  it('should make reward application required (from assigned)', async () => {
+    const newReward = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      approveSubmitters: false
+    });
+
+    const updateContent: UpdateableRewardFields = {
+      assignedSubmitters: [user.id]
+    };
+
+    const updatedReward = await updateRewardSettings({ rewardId: newReward.id, updateContent });
+
+    expect(updatedReward.assignedSubmitters).toMatchObject([user.id]);
+
+    const updatedReward2 = await updateRewardSettings({
+      rewardId: reward.id,
+      updateContent: { assignedSubmitters: null, approveSubmitters: true }
+    });
+
+    expect(updatedReward2.assignedSubmitters).toBe(null);
+    expect(updatedReward2.approveSubmitters).toBe(true);
+  });
+
   it('should set maxSubmissions without any prior submissions', async () => {
     const testReward = await generateBounty({
       createdBy: user.id,
