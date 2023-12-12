@@ -9,7 +9,6 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { useWalletSign } from 'components/login/components/WalletSign';
 import { TelegramLoginIframe } from 'components/settings/account/components/TelegramLoginIframe';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
-import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
@@ -65,13 +64,14 @@ function ConnectedAccount({
 
 function DiscordAccountConnect({
   isDiscordRequired,
-  connectedDiscordAccount
+  connectedDiscordAccount,
+  setIsOnboardingModalOpen
 }: {
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
   isDiscordRequired: boolean;
   connectedDiscordAccount?: LoggedInUser['discordUser'];
 }) {
   const { isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
-  const { updateURLQuery } = useCharmRouter();
   return (
     <ConnectedAccount
       icon={<IdentityIcon type='Discord' size='small' />}
@@ -79,7 +79,7 @@ function DiscordAccountConnect({
       required={isDiscordRequired}
       disabled={!!connectedDiscordAccount || isDiscordLoading}
       onClick={() => {
-        updateURLQuery({ onboarding: true });
+        setIsOnboardingModalOpen(true);
         popupLogin('/', 'connect');
       }}
     >
@@ -151,13 +151,14 @@ function WalletConnect({
 
 function TelegramAccountConnect({
   isTelegramRequired,
-  connectedTelegramAccount
+  connectedTelegramAccount,
+  setIsOnboardingModalOpen
 }: {
   isTelegramRequired: boolean;
   connectedTelegramAccount?: LoggedInUser['telegramUser'];
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
-  const { updateURLQuery } = useCharmRouter();
 
   return (
     <>
@@ -167,7 +168,7 @@ function TelegramAccountConnect({
         required={isTelegramRequired}
         disabled={!!connectedTelegramAccount || isConnectingToTelegram}
         onClick={() => {
-          updateURLQuery({ onboarding: true });
+          setIsOnboardingModalOpen(true);
           connectTelegram();
         }}
       >
@@ -186,14 +187,14 @@ function TelegramAccountConnect({
 
 function GoogleAccountConnect({
   isGoogleRequired,
-  connectedGoogleAccount
+  connectedGoogleAccount,
+  setIsOnboardingModalOpen
 }: {
   isGoogleRequired: boolean;
   connectedGoogleAccount?: LoggedInUser['googleAccounts'][number];
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
   const { loginWithGooglePopup, isConnectingGoogle } = useGoogleLogin();
-
-  const { updateURLQuery } = useCharmRouter();
 
   return (
     <ConnectedAccount
@@ -203,7 +204,7 @@ function GoogleAccountConnect({
       disabled={!!connectedGoogleAccount || isConnectingGoogle}
       loading={isConnectingGoogle}
       onClick={() => {
-        updateURLQuery({ onboarding: true });
+        setIsOnboardingModalOpen(true);
         loginWithGooglePopup({ type: 'connect' });
       }}
     >
@@ -216,7 +217,13 @@ function GoogleAccountConnect({
   );
 }
 
-export function ConnectedAccounts({ user }: { user: LoggedInUser }) {
+export function ConnectedAccounts({
+  user,
+  setIsOnboardingModalOpen
+}: {
+  user: LoggedInUser;
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
+}) {
   const { isGoogleRequired, isDiscordRequired, isWalletRequired, isTelegramRequired } = useRequiredMemberProperties({
     userId: user.id
   });
@@ -228,9 +235,18 @@ export function ConnectedAccounts({ user }: { user: LoggedInUser }) {
 
   return (
     <Stack gap={1}>
-      <DiscordAccountConnect isDiscordRequired={isDiscordRequired} connectedDiscordAccount={connectedDiscordAccount} />
-      <GoogleAccountConnect isGoogleRequired={isGoogleRequired} connectedGoogleAccount={connectedGoogleAccount} />
+      <DiscordAccountConnect
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
+        isDiscordRequired={isDiscordRequired}
+        connectedDiscordAccount={connectedDiscordAccount}
+      />
+      <GoogleAccountConnect
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
+        isGoogleRequired={isGoogleRequired}
+        connectedGoogleAccount={connectedGoogleAccount}
+      />
       <TelegramAccountConnect
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
         isTelegramRequired={isTelegramRequired}
         connectedTelegramAccount={connectedTelegramAccount}
       />

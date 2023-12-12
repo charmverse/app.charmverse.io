@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
@@ -47,7 +46,8 @@ export function UserOnboardingDialogGlobal() {
 
 function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: LoggedInUser }) {
   const { onboardingStep, completeOnboarding } = useOnboarding({ user, spaceId: space.id });
-  const { query } = useRouter();
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
+
   useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
   }, []);
@@ -65,17 +65,19 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
         currentUser={user}
         completeOnboarding={completeOnboarding}
         hasEmptyRequiredProperties={hasEmptyRequiredProperties}
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
       />
     );
   }
 
-  if (hasEmptyRequiredProperties || query.onboarding === 'true') {
+  if (hasEmptyRequiredProperties || isOnboardingModalOpen) {
     return (
       <UserOnboardingDialog
         space={space}
         key={user.id}
         currentUser={user}
         hasEmptyRequiredProperties={hasEmptyRequiredProperties}
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
       />
     );
   }
@@ -91,13 +93,15 @@ function UserOnboardingDialog({
   completeOnboarding,
   initialStep,
   space,
-  hasEmptyRequiredProperties
+  hasEmptyRequiredProperties,
+  setIsOnboardingModalOpen
 }: {
   completeOnboarding?: () => Promise<void>;
   currentUser: LoggedInUser;
   initialStep?: OnboardingStep;
   space: Space;
   hasEmptyRequiredProperties?: boolean;
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
   const { updateURLQuery } = useCharmRouter();
   const { requiredProperties, requiredPropertiesWithoutValue } = useRequiredMemberProperties({
@@ -161,7 +165,7 @@ function UserOnboardingDialog({
     );
 
   const handleClose = () => {
-    updateURLQuery({ onboarding: null });
+    setIsOnboardingModalOpen(false);
     if (isFormDirty) {
       confirmExitPopupState.open();
     } else {
@@ -215,7 +219,7 @@ function UserOnboardingDialog({
             onChange={onUserDetailsChange}
           />
           <Legend mt={4}>Build Your Identity</Legend>
-          <ConnectedAccounts user={currentUser} />
+          <ConnectedAccounts user={currentUser} setIsOnboardingModalOpen={setIsOnboardingModalOpen} />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
             values={memberPropertiesValues}
