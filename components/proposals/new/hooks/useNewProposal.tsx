@@ -121,8 +121,8 @@ export function useNewProposal({ newProposal }: Props) {
 
   return {
     formInputs,
-    setFormInputs,
     clearFormInputs,
+    setFormInputs,
     createProposal,
     disabledTooltip,
     isCreatingProposal,

@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from '@mui/material';
 
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
-import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 
 export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDialog?: boolean; pageId?: string }) {

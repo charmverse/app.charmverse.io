@@ -31,13 +31,11 @@ import { useUser } from 'hooks/useUser';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import { useProposals } from './hooks/useProposals';
-import type { ProposalPageAndPropertiesInput } from './new/NewProposalPage';
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { proposals } = useProposals();
-  const [newProposal, setNewProposal] = useState<Partial<ProposalPageAndPropertiesInput> | null>(null);
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
@@ -80,11 +78,6 @@ export function ProposalsPage({ title }: { title: string }) {
 
   function closeDialog() {
     updateURLQuery({ id: null });
-    setNewProposal(null);
-  }
-
-  function showNewProposal(input: Partial<ProposalPageAndPropertiesInput> = {}) {
-    setNewProposal(input);
   }
 
   const onDelete = useCallback(async (proposalId: string) => {
@@ -128,7 +121,7 @@ export function ProposalsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewProposalButton showProposal={openPage} showNewProposal={showNewProposal} />
+                <NewProposalButton showProposal={openPage} />
               </Box>
             </Box>
           </Box>
@@ -218,9 +211,7 @@ export function ProposalsPage({ title }: { title: string }) {
           </Stack>
         </Box>
       )}
-      {(props.pageId || newProposal) && (
-        <ProposalDialog pageId={props.pageId} newProposal={newProposal} closeDialog={closeDialog} />
-      )}
+      {props.pageId && <ProposalDialog pageId={props.pageId} closeDialog={closeDialog} />}
     </DatabaseContainer>
   );
 }

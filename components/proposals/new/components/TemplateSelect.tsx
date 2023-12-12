@@ -12,7 +12,7 @@ type Props = {
   onChange: (value: PageMeta | null) => void;
 };
 
-export function ProposalTemplateSelect({ disabled, options, value, onChange }: Props) {
+export function TemplateSelect({ disabled, options, value, onChange }: Props) {
   const propertyOptions = options.map((option) => ({
     id: option.id,
     color: 'gray',

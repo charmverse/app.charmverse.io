@@ -2,18 +2,18 @@ import type { ProposalEvaluation } from '@charmverse/core/prisma';
 
 import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
 
-import { evaluationLabels } from '../ProposalEvaluationSelect';
+import { evaluationLabels } from '../ProposalProperties/components/ProposalEvaluationSelect';
 
 import { Stepper } from './components/Stepper';
 
 type EvaluationStepperProps = {
   evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'>[];
   isDraft?: boolean;
-  currentStep?: string;
-  onClick: (selectedValue: string) => void;
+  disabled?: boolean; // used for new proposal UI
+  onClick?: (selectedValue: string) => void;
 };
 
-export function EvaluationStepper({ evaluations, isDraft, currentStep, onClick }: EvaluationStepperProps) {
+export function EvaluationStepper({ evaluations, isDraft, disabled, onClick = () => {} }: EvaluationStepperProps) {
   const currentEvaluation = getCurrentEvaluation(evaluations);
   const currentValue = isDraft ? 'draft' : currentEvaluation?.id;
   const steps = [
@@ -27,7 +27,7 @@ export function EvaluationStepper({ evaluations, isDraft, currentStep, onClick }
     ...evaluations.map((evaluation) => ({
       label: evaluation.title,
       completed: !!evaluation.result,
-      disabled: evaluation.type === 'feedback',
+      disabled: disabled || evaluation.type === 'feedback',
       description: evaluationLabels[evaluation.type],
       value: evaluation.id
     }))

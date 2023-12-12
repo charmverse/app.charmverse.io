@@ -43,8 +43,8 @@ import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
+import { usePageSidebar } from './components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
-import { usePageSidebar } from './hooks/usePageSidebar';
 
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),

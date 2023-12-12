@@ -5,11 +5,7 @@ const stepperSize = 25;
 
 export const StepperStack = styled(Stack)<{ isCurrent: boolean; isComplete: boolean; isDisabled: boolean }>(
   ({ theme, isComplete, isCurrent, isDisabled }) => {
-    const currentColor = isCurrent
-      ? theme.palette.teal.main
-      : isComplete
-      ? theme.palette.purple.main
-      : theme.palette.gray.main;
+    const currentColor = isCurrent ? theme.palette.primary.main : theme.palette.gray.main;
     return `
 
     cursor: ${isDisabled ? 'default' : 'pointer'};
@@ -18,6 +14,7 @@ export const StepperStack = styled(Stack)<{ isCurrent: boolean; isComplete: bool
       width: ${stepperSize}px;
       height: ${stepperSize}px;
       background-color: ${currentColor};
+      color: ${isCurrent ? 'white' : theme.palette.text.primary};
       transition: background-color 150ms ease-in-out;
       justify-content: center;
       align-items: center;

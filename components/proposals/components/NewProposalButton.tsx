@@ -8,21 +8,12 @@ import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
-import type { ProposalPageAndPropertiesInput } from '../new/NewProposalPage';
 
-export function NewProposalButton({
-  showProposal,
-  showNewProposal
-}: {
-  showProposal: (pageId: string) => void;
-  showNewProposal: (input?: Partial<ProposalPageAndPropertiesInput>) => void;
-}) {
+export function NewProposalButton({ showProposal }: { showProposal: (pageId: string) => void }) {
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
@@ -35,42 +26,8 @@ export function NewProposalButton({
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
   const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
-
-  async function createProposalFromTemplate(templateId: string) {
-    const proposalTemplate = proposalTemplates?.find((proposal) => proposal.id === templateId);
-    if (proposalTemplate) {
-      showNewProposal({
-        contentText: proposalTemplate.page.contentText ?? '',
-        content: proposalTemplate.page.content as PageContent,
-        proposalTemplateId: templateId,
-        evaluationType: proposalTemplate.evaluationType,
-        headerImage: proposalTemplate.page.headerImage,
-        icon: proposalTemplate.page.icon,
-        categoryId: proposalTemplate.categoryId as string,
-        reviewers: proposalTemplate.reviewers.map((reviewer) => ({
-          group: reviewer.roleId ? 'role' : 'user',
-          id: (reviewer.roleId ?? reviewer.userId) as string
-        })),
-        rubricCriteria: proposalTemplate.rubricCriteria,
-        fields: (proposalTemplate.fields as ProposalFields) || {},
-        type: 'proposal'
-      });
-    }
-  }
-
   function deleteProposalTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
-  }
-
-  async function createProposalTemplate() {
-    showNewProposal({
-      type: 'proposal_template'
-    });
-    popupState.close();
-  }
-
-  async function onClickCreate() {
-    showNewProposal();
   }
 
   return (
@@ -95,9 +52,6 @@ export function NewProposalButton({
       <TemplatesMenu
         isLoading={isLoadingTemplates}
         pages={proposalTemplatePages}
-        addPageFromTemplate={createProposalFromTemplate}
-        createTemplate={createProposalTemplate}
-        editTemplate={(pageId) => showProposal(pageId)}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
         boardTitle='Proposals'

@@ -15,7 +15,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import type { IPageSidebarContext } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import type { IPageSidebarContext } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';

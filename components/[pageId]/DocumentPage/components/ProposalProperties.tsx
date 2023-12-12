@@ -1,5 +1,6 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import { Box } from '@mui/material';
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -182,57 +183,67 @@ export function ProposalProperties({
   }, [canSeeEvaluation]);
 
   return (
-    <>
-      <ProposalPropertiesBase
-        canSeeEvaluation={canSeeEvaluation}
-        proposalLensLink={proposal?.lensPostLink ?? undefined}
-        archived={!!proposal?.archived}
-        isFromTemplate={!!proposal?.page?.sourceTemplateId}
-        proposalFlowFlags={proposalFlowFlags}
-        proposalStatus={proposal?.status}
-        proposalId={proposal?.id}
-        pageId={pageId}
-        readOnlyAuthors={readOnlyProperties}
-        readOnlyCategory={readOnlyCategory}
-        isAdmin={isAdmin}
-        readOnlyRubricCriteria={readOnlyRubricCriteria}
-        readOnlyProposalEvaluationType={
-          readOnlyProperties ||
-          // dont let users change type after status moves to Feedback, and forward
-          (proposal?.status !== 'draft' && !isTemplate) ||
-          isFromTemplateSource
+    <Box
+      className='CardDetail content'
+      sx={{
+        '.octo-propertyname .Button': {
+          paddingLeft: 0
         }
-        readOnlyReviewers={readOnlyReviewers}
-        rubricAnswers={proposal?.rubricAnswers}
-        isTemplate={isTemplate}
-        rubricCriteria={proposal?.rubricCriteria}
-        snapshotProposalId={snapshotProposalId}
-        updateProposalStatus={updateProposalStatus}
-        onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
-        changeEvaluationStep={changeEvaluationStep}
-        proposalFormInputs={proposalFormInputs}
-        setProposalFormInputs={onChangeProperties}
-        isPublishingToLens={isPublishingToLens}
-        readOnlyCustomProperties={readOnlyCustomProperties}
-        isEvaluationSidebarOpen={isEvaluationSidebarOpen}
-        openEvaluation={openEvaluation}
-      />
-      {isPublishingToLens && (
-        <CreateLensPublication
-          onError={() => {
-            setIsPublishingToLens(false);
-          }}
-          publicationType='post'
-          content={proposalPage.content as PageContent}
-          proposalId={proposalId}
-          proposalPath={proposalPage.path}
-          onSuccess={async () => {
-            await refreshProposal();
-            setIsPublishingToLens(false);
-          }}
-          proposalTitle={proposalPage.title}
+      }}
+      mt={2}
+    >
+      <div className='octo-propertylist'>
+        <ProposalPropertiesBase
+          canSeeEvaluation={canSeeEvaluation}
+          proposalLensLink={proposal?.lensPostLink ?? undefined}
+          archived={!!proposal?.archived}
+          isFromTemplate={!!proposal?.page?.sourceTemplateId}
+          proposalFlowFlags={proposalFlowFlags}
+          proposalStatus={proposal?.status}
+          proposalId={proposal?.id}
+          pageId={pageId}
+          readOnlyAuthors={readOnlyProperties}
+          readOnlyCategory={readOnlyCategory}
+          isAdmin={isAdmin}
+          readOnlyRubricCriteria={readOnlyRubricCriteria}
+          readOnlyProposalEvaluationType={
+            readOnlyProperties ||
+            // dont let users change type after status moves to Feedback, and forward
+            (proposal?.status !== 'draft' && !isTemplate) ||
+            isFromTemplateSource
+          }
+          readOnlyReviewers={readOnlyReviewers}
+          rubricAnswers={proposal?.rubricAnswers}
+          isTemplate={isTemplate}
+          rubricCriteria={proposal?.rubricCriteria}
+          snapshotProposalId={snapshotProposalId}
+          updateProposalStatus={updateProposalStatus}
+          onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
+          changeEvaluationStep={changeEvaluationStep}
+          proposalFormInputs={proposalFormInputs}
+          setProposalFormInputs={onChangeProperties}
+          isPublishingToLens={isPublishingToLens}
+          readOnlyCustomProperties={readOnlyCustomProperties}
+          isEvaluationSidebarOpen={isEvaluationSidebarOpen}
+          openEvaluation={openEvaluation}
         />
-      )}
-    </>
+        {isPublishingToLens && (
+          <CreateLensPublication
+            onError={() => {
+              setIsPublishingToLens(false);
+            }}
+            publicationType='post'
+            content={proposalPage.content as PageContent}
+            proposalId={proposalId}
+            proposalPath={proposalPage.path}
+            onSuccess={async () => {
+              await refreshProposal();
+              setIsPublishingToLens(false);
+            }}
+            proposalTitle={proposalPage.title}
+          />
+        )}
+      </div>
+    </Box>
   );
 }

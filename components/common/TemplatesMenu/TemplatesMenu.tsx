@@ -20,10 +20,7 @@ import { TemplatePageMenuActions } from './TemplatePageMenuActions';
  */
 interface Props {
   pages?: PageMeta[];
-  createTemplate: () => void;
-  editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
-  addPageFromTemplate: (pageId: string) => void;
   anchorEl?: Element;
   popupState: PopupState;
   boardTitle?: string;
@@ -35,10 +32,7 @@ interface Props {
 export function TemplatesMenu({
   pages,
   anchorEl,
-  addPageFromTemplate,
-  createTemplate,
   deleteTemplate,
-  editTemplate,
   popupState,
   boardTitle,
   enableItemOptions,
@@ -103,14 +97,7 @@ export function TemplatesMenu({
 
               {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
               <Box ml={1} onClick={(e) => e.stopPropagation()}>
-                {enableItemOptions && (
-                  <TemplatePageMenuActions
-                    editTemplate={editTemplate}
-                    deleteTemplate={deleteTemplate}
-                    pageId={page.id}
-                    closeParentPopup={popupState.close}
-                  />
-                )}
+                {enableItemOptions && <TemplatePageMenuActions deleteTemplate={deleteTemplate} pageId={page.id} />}
               </Box>
             </MenuItem>
           );
