@@ -5,9 +5,7 @@ import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
-import { bindTrigger } from 'material-ui-popup-state/hooks';
-import type { PopupState } from 'material-ui-popup-state/hooks';
-import type { MouseEvent, SyntheticEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { memo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -51,23 +49,13 @@ const StyledMenu = styled((props: MenuProps) => (
   }
 }));
 
-export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>;
-
 interface InviteActionsProps {
   isAdmin: boolean;
-  invitePopupState: PopupState;
-  tokenGatePopupState: PopupState;
-  onOpenInvitesClick: (e: SyntheticEvent<any, Event>) => void;
-  onOpenTokenGateClick: (e: SyntheticEvent<any, Event>) => void;
+  onOpenInvitesClick: () => void;
+  onOpenTokenGateClick: () => void;
 }
 
-function InviteActions({
-  isAdmin,
-  invitePopupState,
-  tokenGatePopupState,
-  onOpenInvitesClick,
-  onOpenTokenGateClick
-}: InviteActionsProps) {
+function InviteActions({ isAdmin, onOpenInvitesClick, onOpenTokenGateClick }: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -107,7 +95,7 @@ function InviteActions({
         onClose={handleClose}
         onClick={handleClose}
       >
-        <MenuItem {...bindTrigger(invitePopupState)} onClick={onOpenInvitesClick} disableRipple dense>
+        <MenuItem onClick={onOpenInvitesClick} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
@@ -118,7 +106,7 @@ function InviteActions({
             />
           </Box>
         </MenuItem>
-        <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={onOpenTokenGateClick} disableRipple dense>
+        <MenuItem onClick={onOpenTokenGateClick} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText

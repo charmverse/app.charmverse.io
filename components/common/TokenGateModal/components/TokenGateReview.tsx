@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { Card, CardContent, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
@@ -52,9 +53,18 @@ export function TokenGateReview() {
   }, [error, showMessage]);
 
   const onSubmit = async () => {
-    await createUnifiedAccessControlConditions();
-    showMessage('Token gate created successfully', 'success');
-    onClose();
+    try {
+      await createUnifiedAccessControlConditions();
+      showMessage('Token gate created successfully', 'success');
+      onClose();
+    } catch (e: any) {
+      if (e?.name === 'UserRejectedRequestError') {
+        showMessage('Signature rejected by the user', 'warning');
+      } else {
+        showMessage(`Could not create token gate conditions: ${e.message || 'unknown reason'}`, 'error');
+        log.error('Error while creating token gate conditions', { error: e });
+      }
+    }
   };
 
   const handleMultipleConditions = (_flow: Flow) => {
