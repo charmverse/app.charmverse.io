@@ -118,6 +118,10 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
 
     const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
 
+    if (!authSig || !authSigTypes[0]) {
+      return;
+    }
+
     const litSuccess = await triggerLitToken({
       unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
       chain: authSigTypes[0], // etherum or solana
