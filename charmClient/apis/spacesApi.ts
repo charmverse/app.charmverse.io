@@ -1,5 +1,5 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
-import type { Space, Prisma, PrimaryMemberIdentity } from '@charmverse/core/prisma';
+import type { Space, Prisma } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';

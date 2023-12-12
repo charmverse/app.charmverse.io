@@ -1,10 +1,19 @@
+import type { PrimaryMemberIdentity } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { shortenHex } from 'lib/utilities/blockchain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
-export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }) {
+export type UserIdentities = {
+  username: string;
+  discordUser?: { account: DiscordAccount } | null;
+  googleAccounts?: { name: string }[];
+  telegramUser?: { account: TelegramAccount } | null;
+  wallets?: { address: string; ensname?: string }[];
+};
+
+export async function getMemberUsernameBySpaceRole({ spaceRoleId }: { spaceRoleId: string }) {
   const spaceRole = await prisma.spaceRole.findUniqueOrThrow({
     where: {
       id: spaceRoleId
@@ -46,13 +55,26 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
 
   const primaryMemberIdentity = spaceRole.space.primaryMemberIdentity;
 
-  const username = spaceRole.user.username;
+  return getMemberUsername({
+    user: spaceRole.user as UserIdentities,
+    primaryMemberIdentity
+  });
+}
+
+export function getMemberUsername({
+  user,
+  primaryMemberIdentity
+}: {
+  primaryMemberIdentity: PrimaryMemberIdentity | null;
+  user: UserIdentities;
+}) {
+  const username = user.username;
   if (!primaryMemberIdentity) {
     return username;
   }
 
   if (primaryMemberIdentity === 'google') {
-    const firstGoogleAccount = spaceRole.user.googleAccounts[0];
+    const firstGoogleAccount = user.googleAccounts?.[0];
     if (!firstGoogleAccount) {
       return username;
     }
@@ -60,7 +82,7 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
   }
 
   if (primaryMemberIdentity === 'discord') {
-    const discordUserAccount = spaceRole.user.discordUser?.account as unknown as DiscordAccount;
+    const discordUserAccount = user.discordUser?.account as unknown as DiscordAccount;
     if (!discordUserAccount) {
       return username;
     }
@@ -68,7 +90,7 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
   }
 
   if (primaryMemberIdentity === 'telegram') {
-    const telegramUserAccount = spaceRole.user.telegramUser?.account as unknown as TelegramAccount;
+    const telegramUserAccount = user.telegramUser?.account as unknown as TelegramAccount;
     if (!telegramUserAccount) {
       return username;
     }
@@ -76,7 +98,7 @@ export async function getMemberUsername({ spaceRoleId }: { spaceRoleId: string }
   }
 
   if (primaryMemberIdentity === 'wallet') {
-    const firstWallet = spaceRole.user.wallets[0];
+    const firstWallet = user.wallets?.[0];
     if (!firstWallet) {
       return username;
     }

@@ -1,10 +1,4 @@
-import type {
-  DiscordUser,
-  GoogleAccount,
-  MemberProperty,
-  TelegramUser,
-  UserWallet
-} from '@charmverse/core/prisma-client';
+import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
@@ -20,6 +14,7 @@ import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { replaceS3Domain } from 'lib/utilities/url';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
+import type { UserIdentities } from './getMemberUsername';
 import { getMemberUsername } from './getMemberUsername';
 
 export async function getSpaceMembers({
@@ -59,6 +54,11 @@ export async function getSpaceMembers({
             spaceId
           },
     include: {
+      space: {
+        select: {
+          primaryMemberIdentity: true
+        }
+      },
       user: {
         include: {
           profile: true,
@@ -89,7 +89,10 @@ export async function getSpaceMembers({
   const memberUsernameRecord: Record<string, string> = {};
 
   for (const spaceRole of spaceRoles) {
-    const memberUsername = await getMemberUsername({ spaceRoleId: spaceRole.id });
+    const memberUsername = getMemberUsername({
+      user: spaceRole.user as UserIdentities,
+      primaryMemberIdentity: spaceRole.space.primaryMemberIdentity
+    });
     memberUsernameRecord[spaceRole.id] = memberUsername;
   }
 

@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
-import { getMemberUsername } from 'lib/members/getMemberUsername';
+import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
 import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
@@ -181,7 +181,7 @@ async function sendEmail({
 }) {
   const notificationSpaceId = notification.spaceId;
 
-  const spaceRoleId = await prisma.spaceRole.findFirstOrThrow({
+  const notificationAuthorSpaceRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
       userId: notification.createdBy.id,
       spaceId: notificationSpaceId
@@ -191,7 +191,18 @@ async function sendEmail({
     }
   });
 
-  notification.createdBy.username = await getMemberUsername({ spaceRoleId: spaceRoleId.id });
+  const notificationTargetSpaceRole = await prisma.spaceRole.findFirstOrThrow({
+    where: {
+      userId: notification.createdBy.id,
+      spaceId: notificationSpaceId
+    },
+    select: {
+      id: true
+    }
+  });
+
+  notification.createdBy.username = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationAuthorSpaceRole.id });
+  user.username = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationTargetSpaceRole.id });
 
   const template = emails.getPendingNotificationEmail(notification, user);
   const result = await mailer.sendEmail({

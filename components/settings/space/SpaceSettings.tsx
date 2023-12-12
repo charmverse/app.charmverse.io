@@ -1,6 +1,6 @@
 import type { PrimaryMemberIdentity, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import {
   Box,
   Grid,
@@ -48,6 +48,8 @@ import type { NotificationToggleOption, NotificationToggles } from 'lib/notifica
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
+
+import { IdentityIcon } from '../profile/components/IdentityIcon';
 
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput } from './components/NotificationToggles';
@@ -134,12 +136,6 @@ export function SpaceSettings({
   );
 
   useTrackPageView({ type: 'settings/space' });
-
-  useEffect(() => {
-    if (space) {
-      setPrimaryMemberIdentity(space.primaryMemberIdentity);
-    }
-  }, [space.id]);
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
@@ -298,31 +294,31 @@ export function SpaceSettings({
               >
                 <MenuItem value='none'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <PersonIcon style={{ width: 18, height: 18 }} />
+                    <PersonOutlinedIcon style={{ width: 18, height: 18 }} />
                     <Typography variant='body2'>Member's choice</Typography>
                   </Stack>
                 </MenuItem>
                 <MenuItem value='discord'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <FaDiscord style={{ width: 18, height: 18 }} />
+                    <IdentityIcon size='xSmall' type='Discord' />
                     <Typography variant='body2'>Discord</Typography>
                   </Stack>
                 </MenuItem>
                 <MenuItem value='google'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <FaGoogle style={{ width: 18, height: 18 }} />
+                    <IdentityIcon size='xSmall' type='Google' />
                     <Typography variant='body2'>Google</Typography>
                   </Stack>
                 </MenuItem>
                 <MenuItem value='telegram'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <FaTelegram style={{ width: 18, height: 18 }} />
+                    <IdentityIcon size='xSmall' type='Telegram' />
                     <Typography variant='body2'>Telegram</Typography>
                   </Stack>
                 </MenuItem>
                 <MenuItem value='wallet'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <FaWallet style={{ width: 18, height: 18 }} />
+                    <IdentityIcon size='xSmall' type='Wallet' />
                     <Typography variant='body2'>Wallet</Typography>
                   </Stack>
                 </MenuItem>

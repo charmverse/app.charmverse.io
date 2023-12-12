@@ -10,7 +10,6 @@ import { useWalletSign } from 'components/login/components/WalletSign';
 import { TelegramLoginIframe } from 'components/settings/account/components/TelegramLoginIframe';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
@@ -22,7 +21,7 @@ import { shortenHex } from 'lib/utilities/blockchain';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
-import { useRequiredMemberProperties } from '../hooks/useRequiredMemberProperties';
+import { useRequiredMemberProperties } from '../../members/hooks/useRequiredMemberProperties';
 
 function ConnectedAccount({
   icon,
@@ -71,11 +70,11 @@ function DiscordAccountConnect({
   isDiscordRequired: boolean;
   connectedDiscordAccount?: LoggedInUser['discordUser'];
 }) {
-  const { connect, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
+  const { isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
   const { updateURLQuery } = useCharmRouter();
   return (
     <ConnectedAccount
-      icon={<IdentityIcon type='Discord' height={22} width={22} />}
+      icon={<IdentityIcon type='Discord' size='small' />}
       label='Discord'
       required={isDiscordRequired}
       disabled={!!connectedDiscordAccount || isDiscordLoading}
@@ -127,7 +126,7 @@ function WalletConnect({
   return (
     <ConnectedAccount
       label='Wallet'
-      icon={<IdentityIcon type='Wallet' height={22} width={22} />}
+      icon={<IdentityIcon type='Wallet' size='small' />}
       required={isWalletRequired}
       disabled={!!connectedWallet || isConnectingWallet}
       loading={showLoadingState || isConnectingWallet || isWalletSelectorModalOpen}
@@ -164,7 +163,7 @@ function TelegramAccountConnect({
     <>
       <ConnectedAccount
         label='Telegram'
-        icon={<IdentityIcon type='Telegram' height={22} width={22} />}
+        icon={<IdentityIcon type='Telegram' size='small' />}
         required={isTelegramRequired}
         disabled={!!connectedTelegramAccount || isConnectingToTelegram}
         onClick={() => {
@@ -199,7 +198,7 @@ function GoogleAccountConnect({
   return (
     <ConnectedAccount
       label='Google'
-      icon={<IdentityIcon type='Google' height={22} width={22} />}
+      icon={<IdentityIcon type='Google' size='small' />}
       required={isGoogleRequired}
       disabled={!!connectedGoogleAccount || isConnectingGoogle}
       loading={isConnectingGoogle}

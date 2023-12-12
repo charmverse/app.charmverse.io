@@ -5,15 +5,36 @@ import PersonIcon from '@mui/icons-material/Person';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { SiDiscord } from 'react-icons/si';
 
-export function IdentityIcon({
-  type,
-  height = 40,
-  width = 40
-}: {
-  type: IdentityType | null;
-  height?: number;
-  width?: number;
-}) {
+type IconSize = 'medium' | 'small' | 'xSmall';
+
+const sizeStyleMap: Record<
+  IconSize,
+  {
+    height: number;
+    width: number;
+    fontSize: string;
+  }
+> = {
+  medium: {
+    height: 40,
+    width: 40,
+    fontSize: '1.25rem'
+  },
+  small: {
+    height: 24,
+    width: 24,
+    fontSize: '1rem !important'
+  },
+  xSmall: {
+    height: 20,
+    width: 20,
+    fontSize: '.9rem !important'
+  }
+};
+
+export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | null; size?: IconSize }) {
+  const { height, width } = sizeStyleMap[size];
+
   switch (type) {
     case 'Wallet':
       return <AccountBalanceWalletIcon color='primary' style={{ height, width }} />;
