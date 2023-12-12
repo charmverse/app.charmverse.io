@@ -10,7 +10,7 @@ import { nftCheck } from '../utils/utils';
 
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 
-export function TokengateNft() {
+export function TokenGateNft() {
   const {
     register,
     watch,

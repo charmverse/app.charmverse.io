@@ -1,57 +1,17 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { FormHelperText } from '@mui/material';
 import { unlockChains } from 'connectors/chains';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import { useFormContext } from 'react-hook-form';
 
-import { useReviewLock } from 'charmClient/hooks/tokenGates';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import { isValidChainAddress } from 'lib/tokens/validation';
 
-import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
+import type { FormValues } from '../hooks/useCollectablesForm';
 
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
-import { TokenGateFooter } from './TokenGateFooter';
-
-const schema = yup.object({
-  chain: yup.string().required('Chain is required'),
-  contract: yup
-    .string()
-    .required('Contract is required')
-    .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
-});
-
-export type FormValues = yup.InferType<typeof schema>;
 
 export function TokenGateUnlockProtocol() {
   const {
     register,
-    getValues,
-    reset,
-    formState: { errors, isValid }
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-    mode: 'onChange',
-    defaultValues: { contract: '', chain: '' }
-  });
-
-  const { setDisplayedPage, handleLock } = useTokenGateModal();
-  const { trigger, isMutating, error } = useReviewLock();
-
-  const onSubmit = async () => {
-    const values = getValues();
-    const lockData = await trigger({ chainId: Number(values.chain), contract: values.contract });
-
-    if (lockData) {
-      handleLock(lockData);
-      setDisplayedPage('review');
-    }
-  };
-
-  const onCancel = () => {
-    setDisplayedPage('home');
-    reset();
-  };
+    formState: { errors }
+  } = useFormContext<FormValues>();
 
   return (
     <>
@@ -67,8 +27,6 @@ export function TokenGateUnlockProtocol() {
         helperText={errors.contract?.message}
         {...register('contract')}
       />
-      {error?.message && <FormHelperText error>{error?.message}</FormHelperText>}
-      <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} loading={isMutating} />
     </>
   );
 }
