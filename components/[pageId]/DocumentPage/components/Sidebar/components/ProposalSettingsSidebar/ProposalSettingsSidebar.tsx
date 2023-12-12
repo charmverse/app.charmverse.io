@@ -24,26 +24,28 @@ export function ProposalSettingsSidebar({ proposal, onChangeProposal }: Props) {
 
   const canEdit = isAdmin;
 
+  const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
+
   return (
     // <Box className='octo-propertyrow' mb='0 !important'>
     <Box display='flex' flex={1} flexDirection='column' ml={1}>
-      {proposal?.evaluations.map((evaluation) => (
-        <>
-          <Divider sx={{ m: '0 !important' }} />
-          <Typography variant='subtitle1'>{evaluation.type}</Typography>
-          <ProposalEvaluationForm
-            categoryId={proposal.categoryId}
-            evaluation={evaluation}
-            onChange={(updated) => {
-              const evaluations = proposal.evaluations.map((e) => (e.id === updated.id ? updated : e));
-              onChangeProposal?.({
-                ...proposal,
-                evaluations
-              });
-            }}
-          />
-        </>
-      ))}
+      {proposal &&
+        evaluationsWithConfig?.map((evaluation) => (
+          <>
+            <Divider sx={{ mb: 1 }} />
+            <ProposalEvaluationForm
+              categoryId={proposal.categoryId}
+              evaluation={evaluation}
+              onChange={(updated) => {
+                const evaluations = proposal.evaluations.map((e) => (e.id === updated.id ? updated : e));
+                onChangeProposal?.({
+                  ...proposal,
+                  evaluations
+                });
+              }}
+            />
+          </>
+        ))}
     </Box>
   );
 }

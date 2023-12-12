@@ -14,7 +14,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { NoCommentsMessage } from '../CommentsSidebar';
 
-import { RubricEvaluationForm } from './RubricEvaluationForm';
+import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
 
 type Props = {
@@ -70,7 +70,7 @@ export function OldProposalEvaluationSidebar({ pageId, proposalId }: Props) {
     const tabs = [
       [
         'Your evaluation',
-        <RubricEvaluationForm
+        <RubricAnswersForm
           key='evaluate'
           proposalId={proposalId!}
           answers={myRubricAnswers}

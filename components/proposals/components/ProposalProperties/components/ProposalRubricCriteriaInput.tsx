@@ -1,12 +1,13 @@
 import type { ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { CloseOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
-import { Box, Grid, IconButton, Tooltip, Typography } from '@mui/material';
+import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
+import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import { Button } from 'components/common/Button';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ReactDndProvider from 'components/common/ReactDndProvider';
@@ -33,14 +34,9 @@ type Props = {
 
 export const CriteriaRow = styled(Box)`
   position: relative;
-
-  ${({ theme }) => theme.breakpoints.up('xs')} {
-    flex-direction: column;
-  }
-
-  ${({ theme }) => theme.breakpoints.up('sm')} {
-    flex-direction: row;
-  }
+  flex-direction: column;
+  border: 1px solid var(--input-border);
+  padding: 4px;
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
     .show-on-hover {
@@ -60,7 +56,7 @@ export const CriteriaRow = styled(Box)`
   .drag-indicator {
     cursor: grab;
     margin-top: 7px;
-    margin-left: -20px;
+    margin-left: -28px;
     position: absolute;
   }
 
@@ -68,9 +64,9 @@ export const CriteriaRow = styled(Box)`
     position: relative;
   }
   .to-pseudo-element::before {
-    content: '-';
-    left: -8px;
-    top: 4px;
+    content: 'to';
+    left: -24px;
+    top: 6px;
     position: absolute;
     font-size: 16px;
     color: var(--secondary-text);
@@ -173,89 +169,87 @@ export function ProposalRubricCriteriaInput({
                 <DragIndicator color='secondary' fontSize='small' />
               </div>
             )}
-            <TextInput
+            <TextField
               inputProps={{ autoFocus: true }}
-              displayType='details'
-              fullWidth={false}
-              onChange={(title) => setCriteriaProperty(criteria.id, { title })}
-              placeholderText='Add a label...'
-              readOnly={readOnly}
-              readOnlyMessage={readOnlyMessage}
-              value={criteria.title}
+              multiline
+              fullWidth
+              onChange={(e) => setCriteriaProperty(criteria.id, { title: e.target.value })}
+              placeholder='Add a label...'
+              disabled={readOnly}
+              defaultValue={criteria.title}
             />
-            <TextInput
-              displayType='details'
-              multiline={true}
-              onChange={(description) => setCriteriaProperty(criteria.id, { description })}
-              placeholderText='Add a description...'
-              readOnly={readOnly}
+            <TextField
+              // displayType='details'
+              multiline
+              fullWidth
+              onChange={(e) => setCriteriaProperty(criteria.id, { description: e.target.value })}
+              placeholder='Add a description...'
+              disabled={readOnly}
               sx={{ flexGrow: 1, width: '100%' }}
-              value={criteria.description ?? ''}
+              defaultValue={criteria.description ?? ''}
             />
-            <Box display='flex' gap={1} alignItems='flex-start'>
-              <Grid container width={90} spacing={1}>
-                <Grid xs item>
-                  <div>
-                    <IntegerInput
-                      onChange={(min) => {
-                        setCriteriaProperty(criteria.id, {
-                          parameters: { ...criteria.parameters, min }
-                        });
-                      }}
-                      readOnly={readOnly}
-                      readOnlyMessage={readOnlyMessage}
-                      value={criteria.parameters.min}
-                    />
-                    <Typography
-                      align='center'
-                      component='div'
-                      className='show-on-hover'
-                      color='secondary'
-                      variant='caption'
-                    >
-                      min
-                    </Typography>
-                  </div>
-                </Grid>
-                <Grid xs item>
-                  <div className='to-pseudo-element'>
-                    <IntegerInput
-                      inputProps={{
-                        min: typeof criteria.parameters.min === 'number' ? criteria.parameters.min + 1 : undefined
-                      }}
-                      onChange={(max) => {
-                        setCriteriaProperty(criteria.id, {
-                          parameters: { ...criteria.parameters, max }
-                        });
-                      }}
-                      readOnly={readOnly}
-                      readOnlyMessage={readOnlyMessage}
-                      value={criteria.parameters.max}
-                    />
-                    <Typography
-                      align='center'
-                      component='div'
-                      className='show-on-hover'
-                      variant='caption'
-                      color='secondary'
-                    >
-                      max
-                    </Typography>
-                  </div>
-                </Grid>
+            <Grid container spacing={4}>
+              <Grid xs item>
+                <div>
+                  <TextField
+                    inputProps={{ type: 'number' }}
+                    onChange={(e) => {
+                      setCriteriaProperty(criteria.id, {
+                        parameters: { ...criteria.parameters, min: getNumberFromString(e.target.value) }
+                      });
+                    }}
+                    disabled={readOnly}
+                    defaultValue={criteria.parameters.min}
+                  />
+                  <Typography
+                    align='center'
+                    component='div'
+                    className='show-on-hover'
+                    color='secondary'
+                    variant='caption'
+                  >
+                    min
+                  </Typography>
+                </div>
               </Grid>
-            </Box>
+              <Grid xs item>
+                <div className='to-pseudo-element'>
+                  <TextField
+                    inputProps={{
+                      type: 'number',
+                      min: typeof criteria.parameters.min === 'number' ? criteria.parameters.min + 1 : undefined
+                    }}
+                    onChange={(e) => {
+                      setCriteriaProperty(criteria.id, {
+                        parameters: { ...criteria.parameters, max: getNumberFromString(e.target.value) }
+                      });
+                    }}
+                    disabled={readOnly}
+                    defaultValue={criteria.parameters.max}
+                  />
+                  <Typography
+                    align='center'
+                    component='div'
+                    className='show-on-hover'
+                    variant='caption'
+                    color='secondary'
+                  >
+                    max
+                  </Typography>
+                </div>
+              </Grid>
+            </Grid>
             {!readOnly && (
-              <Box
-                className='show-on-hover delete-icon'
-                position={{ xs: 'absolute', sm: 'relative' }}
-                right={{ xs: -25, sm: 0 }}
-              >
-                <Tooltip title='Delete'>
-                  <IconButton size='small' onClick={() => handleClickDelete(criteria.id)}>
-                    <DeleteIcon color='secondary' fontSize='small' />
-                  </IconButton>
-                </Tooltip>
+              <Box display='flex' width='100%' justifyContent='flex-end'>
+                <Button
+                  variant='outlined'
+                  color='secondary'
+                  startIcon={<DeleteIcon color='secondary' />}
+                  size='small'
+                  onClick={() => handleClickDelete(criteria.id)}
+                >
+                  Delete
+                </Button>
               </Box>
             )}
           </CriteriaRow>

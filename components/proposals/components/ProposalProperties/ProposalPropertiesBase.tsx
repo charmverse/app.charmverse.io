@@ -38,12 +38,12 @@ import { ProposalEvaluationForm } from '../../../[pageId]/DocumentPage/component
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 import { EvaluationStepper } from '../EvaluationStepper/EvaluationStepper';
 
+import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
+import { ProposalRubricCriteriaInput } from './components/OldProposalRubricCriteriaInput';
 import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
 import { ProposalEvaluationSelect } from './components/ProposalEvaluationSelect';
 import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
-import type { RangeProposalCriteria } from './components/ProposalRubricCriteriaInput';
-import { ProposalRubricCriteriaInput } from './components/ProposalRubricCriteriaInput';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 
 export type ProposalPropertiesInput = {

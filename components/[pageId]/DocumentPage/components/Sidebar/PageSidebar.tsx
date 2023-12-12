@@ -46,7 +46,7 @@ export const SIDEBAR_VIEWS = {
   proposal_evaluation_settings: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
     tooltip: 'Manage reviewers, rubric, and vote options',
-    title: 'Set up evaluations'
+    title: 'Evaluation settings'
   },
   comments: {
     icon: <MessageOutlined fontSize='small' />,
@@ -87,7 +87,7 @@ function PageSidebarComponent(props: SidebarProps) {
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
 
-  const showEvaluationSidebar =
+  const showEvaluationSidebarIcon =
     proposal?.evaluationType === 'rubric' &&
     (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed');
 
@@ -129,7 +129,7 @@ function PageSidebarComponent(props: SidebarProps) {
             </Typography>
             {openSidebar && (
               <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-                {showEvaluationSidebar && (
+                {showEvaluationSidebarIcon && (
                   <SidebarViewIcon view='proposal_evaluation' activeView={sidebarView} onClick={openSidebar} />
                 )}
                 <SidebarViewIcon view='comments' activeView={sidebarView} onClick={openSidebar} />
@@ -149,7 +149,7 @@ function PageSidebarComponent(props: SidebarProps) {
       rightActions={
         openSidebar && (
           <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-            {showEvaluationSidebar && (
+            {showEvaluationSidebarIcon && (
               <SidebarViewIcon
                 view='proposal_evaluation'
                 size='medium'
@@ -205,14 +205,18 @@ function SidebarContents({
       )}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar
-          pageId={pageId}
+          pageId={pageId!}
           spaceId={spaceId}
           readOnly={!pagePermissions?.edit_content}
           state={editorState}
         />
       )}
       {sidebarView === 'comments' && (
-        <CommentsSidebar openSidebar={openSidebar!} threads={threads} canCreateComments={!!pagePermissions?.comment} />
+        <CommentsSidebar
+          openSidebar={openSidebar!}
+          threads={threads || {}}
+          canCreateComments={!!pagePermissions?.comment}
+        />
       )}
     </>
   );

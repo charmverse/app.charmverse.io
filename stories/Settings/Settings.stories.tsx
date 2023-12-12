@@ -1,23 +1,12 @@
-import type { LensConfig } from '@lens-protocol/react-web';
-import { LensProvider, development, production } from '@lens-protocol/react-web';
-import { bindings } from '@lens-protocol/wagmi';
 import { Box, Paper } from '@mui/material';
 import { rest } from 'msw';
-import type { ReactNode } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { SettingsContent } from 'components/settings/SettingsContent';
-import { isProdEnv } from 'config/constants';
-import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
-import { MembersProvider } from 'hooks/useMembers';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
-import type { IContext as ISpacesContext } from 'hooks/useSpaces';
-import { SpacesContext } from 'hooks/useSpaces';
-import { UserProvider } from 'hooks/useUser';
 
-import { spaces as _spaces, userProfile } from '../lib/mockData';
+import { spaces as _spaces } from '../lib/mockData';
 
 // clone spaces so we can mutate it
 const spaces = [..._spaces].map((s) => ({ ...s }));
@@ -27,48 +16,12 @@ space.notificationToggles = {
   rewards: false
 };
 
-const lensConfig: LensConfig = {
-  bindings: bindings(),
-  environment: isProdEnv ? production : development
-};
-
-function Context({ children }: { children: ReactNode }) {
-  // mock the current space since it usually relies on the URL
-  const spaceContext = useRef<ICurrentSpaceContext>({
-    isLoading: false,
-    refreshCurrentSpace: () => {},
-    space
-  });
-  const spacesContext = useRef<ISpacesContext>({
-    spaces,
-    memberSpaces: spaces,
-    setSpace: () => {},
-    setSpaces: () => {},
-    isLoaded: true,
-    createNewSpace: async () => ({} as any),
-    isCreatingSpace: false
-  });
-  return (
-    <UserProvider>
-      <SpacesContext.Provider value={spacesContext.current}>
-        <CurrentSpaceContext.Provider value={spaceContext.current}>
-          <MembersProvider>
-            <MemberPropertiesProvider>
-              <LensProvider config={lensConfig}>{children}</LensProvider>
-            </MemberPropertiesProvider>
-          </MembersProvider>
-        </CurrentSpaceContext.Provider>
-      </SpacesContext.Provider>
-    </UserProvider>
-  );
-}
-
 function ShowSettingsProfile({ path }: { path: SettingsPath }) {
   const [activePath, setActivePath] = useState<SettingsPath | undefined>(path);
   function onClose() {}
   function setUnsavedChanges() {}
   return (
-    <Context>
+    <GlobalContext currentSpace={space}>
       <Box maxWidth='lg'>
         <Paper
           sx={{
@@ -84,7 +37,7 @@ function ShowSettingsProfile({ path }: { path: SettingsPath }) {
           />
         </Paper>
       </Box>
-    </Context>
+    </GlobalContext>
   );
 }
 

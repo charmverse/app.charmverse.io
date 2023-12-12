@@ -431,7 +431,6 @@ function DocumentPage({
                       pageId={page.id}
                       pagePath={page.path}
                       readOnly={readOnly}
-                      onClose={close}
                       showApplications
                       expandedRewardProperties
                       isTemplate={page.type === 'bounty_template'}

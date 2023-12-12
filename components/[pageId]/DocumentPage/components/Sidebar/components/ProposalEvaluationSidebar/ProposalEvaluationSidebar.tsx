@@ -14,12 +14,12 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { NoCommentsMessage } from '../CommentsSidebar';
 
-import { RubricEvaluationForm } from './RubricEvaluationForm';
+import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
 
 export type Props = {
   pageId?: string;
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations'>;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'status' | 'evaluationType'>;
   evaluationId?: string;
   refreshProposal?: VoidFunction;
 };
@@ -72,7 +72,7 @@ export function ProposalEvaluationSidebar({ pageId, proposal, evaluationId, refr
     const tabs = [
       [
         'Your evaluation',
-        <RubricEvaluationForm
+        <RubricAnswersForm
           key='evaluate'
           proposalId={proposal?.id || ''}
           answers={myRubricAnswers}
