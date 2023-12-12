@@ -53,6 +53,14 @@ async function deleteProposalComment(req: NextApiRequest, res: NextApiResponse<P
     }
   });
 
+  if (result) {
+    await prisma.pageComment.delete({
+      where: {
+        id: result.id
+      }
+    });
+  }
+
   log.debug('[public-api] Deleted comment', { query: req.query, result });
 
   return res.status(200).end();
