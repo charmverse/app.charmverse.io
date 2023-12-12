@@ -1,4 +1,3 @@
-import { Paper } from '@mui/material';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
@@ -11,23 +10,20 @@ export default {
   component: RewardPropertiesForm
 };
 export function RewardsPage() {
-  const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
-  const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
-    useNewReward();
+  const { newPageValues, updateNewPageValues } = useNewPage();
+  const { rewardValues, setRewardValues } = useNewReward();
 
   return (
     <GlobalContext>
-      <Paper>
-        <NewDocumentPage titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
-          <RewardPropertiesForm
-            onChange={setRewardValues}
-            values={rewardValues}
-            isNewReward
-            isTemplate={false}
-            expandedByDefault
-          />
-        </NewDocumentPage>
-      </Paper>
+      <NewDocumentPage titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
+        <RewardPropertiesForm
+          onChange={setRewardValues}
+          values={rewardValues}
+          isNewReward
+          isTemplate={false}
+          expandedByDefault
+        />
+      </NewDocumentPage>
     </GlobalContext>
   );
 }
