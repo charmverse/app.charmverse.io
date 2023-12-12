@@ -1,6 +1,6 @@
 import type { Post, PostCategory } from '@charmverse/core/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
@@ -18,6 +18,7 @@ import { CommentSort } from 'components/common/comments/CommentSort';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import { getUpdatedCommentVote, processComments, sortComments } from 'components/common/comments/utils';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
@@ -47,6 +48,7 @@ import { DraftPostBanner } from './DraftPostBanner';
 type Props = {
   spaceId: string;
   post: Post | null;
+  isInsideDialog?: boolean;
   setFormInputs: (params: Partial<FormInputs>) => void;
   formInputs: FormInputs;
   contentUpdated: boolean;
@@ -58,6 +60,7 @@ type Props = {
 
 export function PostPage({
   onTitleChange,
+  isInsideDialog,
   post,
   spaceId,
   setFormInputs,
@@ -110,7 +113,9 @@ export function PostPage({
   const [commentSort, setCommentSort] = useState<CommentSortType>('latest');
 
   const isLoading = !postComments && isValidating;
+  const isPublishedPost = post && !post.isDraft;
 
+  const postCategory = getForumCategoryById(categoryId);
   const createdBy = getMemberById(post?.createdBy);
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
@@ -337,12 +342,24 @@ export function PostPage({
         >
           <Container top={50}>
             <Box minHeight={300} data-test='post-charmeditor'>
+              {isPublishedPost && isInsideDialog && (
+                <Chip
+                  label={postCategory?.name}
+                  sx={{
+                    cursor: 'pointer',
+                    opacity: postCategory ? 1 : 0
+                  }}
+                  size='small'
+                  component={Link}
+                  href={`/forum/${postCategory?.path}`}
+                />
+              )}
               <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
               {createdBy && (
                 <UserDisplay showMiniProfile userId={createdBy.id} avatarSize='small' fontSize='medium' mt={2} mb={3} />
               )}
               <Box my={2}>
-                <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
+                {canEdit && <PostCategoryInput setCategoryId={updateCategoryId} categoryId={categoryId} />}
               </Box>
               <CharmEditor
                 allowClickingFooter={true}

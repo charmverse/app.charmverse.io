@@ -32,7 +32,7 @@ export async function setRewardUsers({
     if (!stringUtils.isUUID(rewardId)) {
       throw new InvalidInputError(`Please provide a valid reward id`);
     }
-    if (users.allowedSubmitterRoles || users.assignedSubmitters) {
+    if ('allowedSubmitterRoles' in users || 'assignedSubmitters' in users) {
       await _tx.bountyPermission.deleteMany({
         where: {
           bountyId: rewardId,

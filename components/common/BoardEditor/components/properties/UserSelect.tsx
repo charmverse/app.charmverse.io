@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Box, Stack } from '@mui/material';
 import { useCallback, useState } from 'react';
 
+import { ErrorWrapper } from 'components/common/BoardEditor/components/properties/ErrorWrapper';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
@@ -20,6 +21,7 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
   'data-test'?: string;
+  error?: string;
 };
 
 type ContainerProps = {
@@ -110,7 +112,8 @@ export function UserSelect({
   readOnly,
   showEmptyPlaceholder,
   wrapColumn,
-  'data-test': dataTest
+  'data-test': dataTest,
+  error
 }: Props): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -131,50 +134,54 @@ export function UserSelect({
 
   if (!isOpen) {
     return (
-      <SelectPreviewContainer
-        data-test={dataTest}
-        isHidden={isOpen}
-        displayType={displayType}
-        readOnly={readOnly}
-        onClick={onClickToEdit}
-      >
-        <Stack gap={0.5}>
-          {memberIds.length === 0 ? (
-            showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
-          ) : (
-            <MembersDisplay
-              wrapColumn={wrapColumn ?? false}
-              readOnly={true}
-              memberIds={memberIds}
-              setMemberIds={_onChange}
-            />
-          )}
-        </Stack>
-      </SelectPreviewContainer>
+      <ErrorWrapper error={error}>
+        <SelectPreviewContainer
+          data-test={dataTest}
+          isHidden={isOpen}
+          displayType={displayType}
+          readOnly={readOnly}
+          onClick={onClickToEdit}
+        >
+          <Stack gap={0.5}>
+            {memberIds.length === 0 ? (
+              showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
+            ) : (
+              <MembersDisplay
+                wrapColumn={wrapColumn ?? false}
+                readOnly={true}
+                memberIds={memberIds}
+                setMemberIds={_onChange}
+              />
+            )}
+          </Stack>
+        </SelectPreviewContainer>
+      </ErrorWrapper>
     );
   }
   return (
-    <StyledUserPropertyContainer displayType={displayType}>
-      <InputSearchMemberMultiple
-        data-test={dataTest}
-        disableClearable
-        clearOnBlur
-        open
-        openOnFocus
-        disableCloseOnSelect
-        defaultValue={memberIds}
-        onClose={() => setIsOpen(false)}
-        fullWidth
-        onChange={_onChange}
-        getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
-        readOnly={readOnly}
-        placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
-        inputVariant='standard'
-        forcePopupIcon={false}
-        renderTags={() => (
-          <MembersDisplay wrapColumn={true} readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
-        )}
-      />
-    </StyledUserPropertyContainer>
+    <ErrorWrapper error={error}>
+      <StyledUserPropertyContainer displayType={displayType}>
+        <InputSearchMemberMultiple
+          data-test={dataTest}
+          disableClearable
+          clearOnBlur
+          open
+          openOnFocus
+          disableCloseOnSelect
+          defaultValue={memberIds}
+          onClose={() => setIsOpen(false)}
+          fullWidth
+          onChange={_onChange}
+          getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
+          readOnly={readOnly}
+          placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
+          inputVariant='standard'
+          forcePopupIcon={false}
+          renderTags={() => (
+            <MembersDisplay wrapColumn={true} readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
+          )}
+        />
+      </StyledUserPropertyContainer>
+    </ErrorWrapper>
   );
 }
