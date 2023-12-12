@@ -1,9 +1,14 @@
 import * as yup from 'yup';
 
+import { isValidChainAddress } from 'lib/tokens/validation';
+
 import type { TokenGate } from './interfaces';
 
 const UnlockProtocolSchema = yup.object().shape({
-  contract: yup.string().required(),
+  contract: yup
+    .string()
+    .required()
+    .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value)),
   chainId: yup.number().required()
 });
 
