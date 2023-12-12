@@ -17,41 +17,46 @@ import { NoCommentsMessage } from '../CommentsSidebar';
 import { RubricEvaluationForm } from './RubricEvaluationForm';
 import { RubricResults } from './RubricResults';
 
-type Props = {
+export type Props = {
   pageId?: string;
-  proposalId: string | null;
-  proposal?: ProposalWithUsersAndRubric;
-  refreshProposal: VoidFunction;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations'>;
+  evaluationId?: string;
+  refreshProposal?: VoidFunction;
 };
 
-export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal }: Props) {
+export function ProposalEvaluationSidebar({ pageId, proposal, evaluationId, refreshProposal }: Props) {
+  const evaluation = useMemo(
+    () => proposal?.evaluations.find((e) => e.id === evaluationId),
+    [evaluationId, proposal?.evaluations]
+  );
+
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
   const { permissions: proposalPermissions } = useProposalPermissions({
-    proposalIdOrPath: proposalId
+    proposalIdOrPath: proposal?.id
   });
   const { data: reviewerUserIds } = useGetAllReviewerUserIds(
-    !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
+    !!pageId && evaluation?.type === 'rubric' ? pageId : undefined
   );
   const canAnswerRubric = proposalPermissions?.evaluate;
   const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
-  const rubricCriteria = proposal?.rubricCriteria;
+  const rubricCriteria = evaluation?.rubricCriteria;
 
   const myRubricAnswers = useMemo(
-    () => proposal?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],
-    [user?.id, proposal?.rubricAnswers]
+    () => evaluation?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],
+    [user?.id, evaluation?.rubricAnswers]
   );
   const myDraftRubricAnswers = useMemo(
-    () => proposal?.draftRubricAnswers.filter((answer) => answer.userId === user?.id),
-    [user?.id, proposal?.draftRubricAnswers]
+    () => evaluation?.draftRubricAnswers.filter((answer) => answer.userId === user?.id),
+    [user?.id, evaluation?.draftRubricAnswers]
   );
 
   const canViewRubricAnswers = isAdmin || isReviewer;
 
   async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
     if (!isDraft) {
-      await refreshProposal();
+      await refreshProposal?.();
       // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
       setRubricView(1);
     }
@@ -64,16 +69,12 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
    *
    * */
   const evaluationTabs = useMemo<TabConfig[]>(() => {
-    const proposalStatus = proposal?.status;
-    if (proposalStatus !== 'evaluation_active' && proposalStatus !== 'evaluation_closed') {
-      return [];
-    }
     const tabs = [
       [
         'Your evaluation',
         <RubricEvaluationForm
           key='evaluate'
-          proposalId={proposalId!}
+          proposalId={proposal?.id || ''}
           answers={myRubricAnswers}
           draftAnswers={myDraftRubricAnswers}
           criteriaList={rubricCriteria!}
@@ -85,7 +86,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
       canViewRubricAnswers &&
         ([
           'Results',
-          <RubricResults key='results' answers={proposal?.rubricAnswers ?? []} criteriaList={rubricCriteria || []} />,
+          <RubricResults key='results' answers={evaluation?.rubricAnswers ?? []} criteriaList={rubricCriteria || []} />,
           { sx: { p: 0 } }
         ] as TabConfig)
     ].filter(isTruthy);
@@ -94,7 +95,7 @@ export function ProposalSidebar({ pageId, proposal, proposalId, refreshProposal 
     canAnswerRubric,
     canViewRubricAnswers,
     proposal,
-    proposalId,
+    evaluation,
     myDraftRubricAnswers,
     myRubricAnswers,
     rubricCriteria

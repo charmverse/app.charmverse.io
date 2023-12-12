@@ -6,15 +6,20 @@ import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
-import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import { CommentsSidebar } from './components/CommentsSidebar';
 import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
-import { ProposalSidebar } from './components/ProposalSidebar/ProposalSidebar';
+import { OldProposalEvaluationSidebar } from './components/ProposalEvaluationSidebar/OldProposalEvaluationSidebar';
+import type { Props as EvaluationSidebarProps } from './components/ProposalEvaluationSidebar/ProposalEvaluationSidebar';
+import { ProposalEvaluationSidebar } from './components/ProposalEvaluationSidebar/ProposalEvaluationSidebar';
+import type { Props as ProposalSettingsProps } from './components/ProposalSettingsSidebar/ProposalSettingsSidebar';
+import { ProposalSettingsSidebar } from './components/ProposalSettingsSidebar/ProposalSettingsSidebar';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 import type { PageSidebarView } from './hooks/usePageSidebar';
 
@@ -38,9 +43,9 @@ export const SIDEBAR_VIEWS = {
     tooltip: 'View evaluation',
     title: 'Evaluation'
   },
-  proposal_evaluation_config: {
+  proposal_evaluation_settings: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'Configure evaluations',
+    tooltip: 'Manage reviewers, rubric, and vote options',
     title: 'Set up evaluations'
   },
   comments: {
@@ -58,25 +63,29 @@ export const SIDEBAR_VIEWS = {
 type SidebarProps = {
   // eslint-disable-next-line react/no-unused-prop-types
   id: string;
-  pageId: string;
+  pageId?: string;
   spaceId: string;
-  threads: Record<string, ThreadWithComments | undefined>;
-  editorState: EditorState | null;
-  pagePermissions: PagePermissionFlags | null;
+  threads?: Record<string, ThreadWithComments | undefined>;
+  editorState?: EditorState | null;
+  pagePermissions?: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
   openSidebar?: (view: PageSidebarView) => void; // leave undefined to hide navigation
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
-  proposalId: string | null;
+  proposalId?: string | null;
+  proposal?: EvaluationSidebarProps['proposal'];
+  proposalInput?: ProposalSettingsProps['proposal'];
+  onChangeProposal?: (formInput: ProposalSettingsProps['proposal']) => void;
+  refreshProposal?: VoidFunction;
   proposalEvaluationId?: string;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { id, proposalId, sidebarView, openSidebar, closeSidebar } = props;
+  const { id, proposal, proposalInput, onChangeProposal, refreshProposal, sidebarView, openSidebar, closeSidebar } =
+    props;
   const isMdScreen = useMdScreen();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
-  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
 
   const showEvaluationSidebar =
     proposal?.evaluationType === 'rubric' &&
@@ -128,7 +137,7 @@ function PageSidebarComponent(props: SidebarProps) {
               </Box>
             )}
           </Box>
-          <SidebarContents {...props} proposal={proposal} refreshProposal={refreshProposal} />
+          <SidebarContents {...props} />
         </Box>
       </DesktopContainer>
     </Slide>
@@ -156,7 +165,7 @@ function PageSidebarComponent(props: SidebarProps) {
       contentSx={{ pr: 0, pb: 0, pl: 1 }}
     >
       <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
-        <SidebarContents {...props} proposal={proposal} refreshProposal={refreshProposal} />
+        <SidebarContents {...props} />
       </Box>
     </MobileDialog>
   );
@@ -173,17 +182,26 @@ function SidebarContents({
   proposalId,
   proposalEvaluationId,
   proposal,
+  proposalInput,
+  onChangeProposal,
   refreshProposal
-}: SidebarProps & { proposal?: ProposalWithUsersAndRubric; refreshProposal: VoidFunction }) {
+}: SidebarProps) {
+  const isCharmVerse = useIsCharmverseSpace();
   return (
     <>
-      {sidebarView === 'proposal_evaluation' && (
-        <ProposalSidebar
-          pageId={pageId}
-          proposal={proposal}
-          proposalId={proposalId}
-          refreshProposal={refreshProposal}
-        />
+      {sidebarView === 'proposal_evaluation' &&
+        (isCharmVerse ? (
+          <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />
+        ) : (
+          <ProposalEvaluationSidebar
+            pageId={pageId}
+            proposal={proposal}
+            evaluationId={proposalEvaluationId}
+            refreshProposal={refreshProposal}
+          />
+        ))}
+      {sidebarView === 'proposal_evaluation_settings' && (
+        <ProposalSettingsSidebar proposal={proposalInput} onChangeProposal={onChangeProposal} />
       )}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar

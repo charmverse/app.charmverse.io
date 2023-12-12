@@ -20,7 +20,7 @@ import Legend from '../Legend';
 import type { WorkflowTemplateFormItem } from './components/ProposalWorkflow';
 import { ProposalWorkflowItem } from './components/ProposalWorkflow';
 
-export function ProposalSettings({ space }: { space: Space }) {
+export function ProposalSpaceSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { mappedFeatures } = useSpaceFeatures();
   const [expanded, setExpanded] = useState<string | false>(false);

@@ -9,6 +9,7 @@ import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
@@ -121,6 +122,7 @@ function DocumentPage({
   const proposalId = page.proposalId;
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId });
+  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
   // keep a ref in sync for printing
@@ -419,6 +421,8 @@ function DocumentPage({
                       proposalPage={page}
                       isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
                       openEvaluation={openEvaluation}
+                      proposal={proposal}
+                      refreshProposal={refreshProposal}
                     />
                   )}
                   {reward && (
@@ -447,6 +451,8 @@ function DocumentPage({
                       closeSidebar={closeSidebar}
                       openSidebar={setActiveView}
                       threads={threads}
+                      proposal={proposal}
+                      refreshProposal={refreshProposal}
                     />
                   )}
                 </CardPropertiesWrapper>

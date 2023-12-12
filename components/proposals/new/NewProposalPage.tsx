@@ -29,7 +29,7 @@ import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/createProposal';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -360,16 +360,15 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                     proposalEvaluationId={proposalEvaluationId}
                     // pagePermissions={pagePermissions}
                     // editorState={editorState}
-                    sidebarView={showSidebar ? 'proposal_evaluation_config' : null}
+                    sidebarView={showSidebar ? 'proposal_evaluation_settings' : null}
                     closeSidebar={() => setShowSidebar(false)}
                     // openSidebar={setActiveView}
                     // threads={threads}
-                    onChangeProposalEvaluation={(updated) => {
-                      formInputs.evaluations = formInputs.evaluations.map((evaluation) =>
-                        evaluation.id === updated.id ? updated : evaluation
-                      );
+                    proposalInput={formInputs}
+                    onChangeProposal={(updated) => {
                       setFormInputs({
-                        ...formInputs
+                        ...formInputs,
+                        ...updated
                       });
                     }}
                   />

@@ -23,6 +23,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { CreateLensPublication } from './CreateLensPublication';
@@ -38,6 +39,8 @@ interface ProposalPropertiesProps {
   openEvaluation?: (evaluationId?: string) => void;
   isEvaluationSidebarOpen?: boolean;
   proposalPage: PageWithContent;
+  proposal?: ProposalWithUsersAndRubric;
+  refreshProposal: VoidFunction;
 }
 
 export function ProposalProperties({
@@ -50,9 +53,10 @@ export function ProposalProperties({
   readOnly,
   isEvaluationSidebarOpen,
   openEvaluation,
-  proposalPage
+  proposalPage,
+  proposal,
+  refreshProposal
 }: ProposalPropertiesProps) {
-  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { mutate: mutateNotifications } = useNotifications();
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
@@ -151,8 +155,8 @@ export function ProposalProperties({
         proposalId,
         authors: proposal.authors.map(({ userId }) => userId),
         reviewers: proposal.reviewers.map((reviewer) => ({
-          id: reviewer.roleId ?? (reviewer.userId as string),
-          group: reviewer.roleId ? 'role' : 'user'
+          id: reviewer.roleId ?? reviewer.userId ?? (reviewer.systemRole as string),
+          group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role'
         })),
         ...values
       });

@@ -1,5 +1,4 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
-import type { ProposalReviewerInput } from '@charmverse/core/proposals';
 import { Box } from '@mui/material';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -8,6 +7,7 @@ import { ProposalRubricCriteriaInput } from 'components/proposals/components/Pro
 import type { RangeProposalCriteria } from 'components/proposals/components/ProposalProperties/components/ProposalRubricCriteriaInput';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 
 // result and id are not used for creating evaluations, so add them here
 // leave out permissions which are picked up on the backend based on workflowId

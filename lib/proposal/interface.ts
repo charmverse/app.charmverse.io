@@ -1,16 +1,15 @@
 import type { Page, PageComment, Proposal, ProposalEvaluation } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
-import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
-
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
 } from './rubric/interfaces';
 
 export interface ProposalReviewerInput {
-  group: Extract<AssignablePermissionGroups, 'role' | 'user'>;
+  group: 'system_role' | 'role' | 'user';
   id: string;
+  evaluationId?: string;
 }
 
 export interface NewProposalCategory {

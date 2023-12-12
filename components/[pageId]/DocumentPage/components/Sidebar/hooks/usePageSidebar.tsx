@@ -5,7 +5,7 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 
 import { useLastSidebarView } from './useLastSidebarView';
 
-export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation' | 'proposal_evaluation_config';
+export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation' | 'proposal_evaluation_settings';
 
 export type IPageSidebarContext = {
   activeView: PageSidebarView | null;

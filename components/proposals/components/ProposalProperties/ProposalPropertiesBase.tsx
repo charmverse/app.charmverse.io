@@ -24,8 +24,7 @@ import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/createProposal';
-import type { ProposalCategory } from 'lib/proposal/interface';
+import type { ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
 import {
   getProposalStatuses,
   nextProposalStatusUpdateMessage,
@@ -34,8 +33,8 @@ import {
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ProposalEvaluationValues } from '../../../[pageId]/DocumentPage/components/Sidebar/components/ProposalSidebar/ProposalEvaluationForm';
-import { ProposalEvaluationForm } from '../../../[pageId]/DocumentPage/components/Sidebar/components/ProposalSidebar/ProposalEvaluationForm';
+import type { ProposalEvaluationValues } from '../../../[pageId]/DocumentPage/components/Sidebar/components/ProposalSettingsSidebar/components/ProposalEvaluationForm';
+import { ProposalEvaluationForm } from '../../../[pageId]/DocumentPage/components/Sidebar/components/ProposalSettingsSidebar/components/ProposalEvaluationForm';
 import { useProposalCategories } from '../../hooks/useProposalCategories';
 import { EvaluationStepper } from '../EvaluationStepper/EvaluationStepper';
 
@@ -235,47 +234,6 @@ export function ProposalPropertiesBase({
 
   return (
     <>
-      {/* {isCharmVerse && (
-        <>
-          <Box mb={1}>
-            <EvaluationStepper
-              evaluations={proposalFormInputs.evaluations}
-              isDraft={proposalStatus === 'draft'}
-              onClick={handleClickEvaluationStep}
-            />
-          </Box>
-          <Divider />
-        </>
-      )} */}
-      {/* {isCharmVerse && isNewProposal && (
-          <>
-            <Box className='octo-propertyrow' mb='0 !important'>
-              <PropertyLabel readOnly required highlighted>
-                Workflow
-              </PropertyLabel>
-              <ProposalWorkflowSelect onChange={selectEvaluationWorkflow} />
-            </Box>
-            {/* {proposalFormInputs.evaluations.length > 0 && (
-              <Box className='octo-propertyrow' mb='0 !important'>
-                <PropertyLabel />
-                <Box display='flex' flex={1} flexDirection='column' ml={1}>
-                  {proposalFormInputs.evaluations.map(
-                    (evaluation, index) =>
-                      evaluation.type !== 'feedback' && (
-                        <>
-                          <Divider sx={{ m: '0 !important' }} />
-                          <ProposalEvaluationForm
-                            categoryId={proposalFormInputs.categoryId}
-                            evaluation={evaluation}
-                            onChange={onChangeProposalEvaluation!}
-                          />
-                        </>
-                      )
-                  )}
-                  <Divider sx={{ mt: '0 !important' }} />
-                </Box>
-              </Box>
-            )} */}
       {showStatusStepper && (
         <>
           <Grid container mb={2}>

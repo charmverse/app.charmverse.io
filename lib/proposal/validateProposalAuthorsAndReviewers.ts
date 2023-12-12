@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProposalReviewerInput } from './createProposal';
+import type { ProposalReviewerInput } from './interface';
 
 export type ProposalUsersToValidate = {
   spaceId: string;

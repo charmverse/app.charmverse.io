@@ -29,7 +29,7 @@ import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import ProfileSettings from './profile/ProfileSettings';
-import { ProposalSettings } from './proposals/ProposalSettings';
+import { ProposalSpaceSettings } from './proposals/ProposalSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
@@ -54,7 +54,7 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   roles: RoleSettings,
   subscription: SubscriptionSettings,
   space: SpaceSettings,
-  proposals: ProposalSettings
+  proposals: ProposalSpaceSettings
 };
 
 function TabPanel(props: TabPanelProps) {
