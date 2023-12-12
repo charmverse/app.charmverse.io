@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { KeyedMutator } from 'swr';
+import { useSWRConfig, type KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetRewards } from 'charmClient/hooks/rewards';
@@ -36,6 +36,7 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
 export function RewardsProvider({ children }: { children: ReactNode }) {
   const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
+  const { mutate } = useSWRConfig();
 
   const { data, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
   const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
@@ -76,9 +77,13 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
         },
         { revalidate: false }
       );
+
+      // update cache for single reward get
+      mutate(`/api/rewards/${rewardId}`, reward, false);
+
       return reward;
     },
-    [mutateRewards]
+    [mutate, mutateRewards]
   );
 
   useEffect(() => {
