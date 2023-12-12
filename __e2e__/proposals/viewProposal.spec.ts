@@ -223,14 +223,6 @@ test.describe.serial('View proposal', () => {
 
     await proposalListPage.getProposalRowOpenLocator(discussionProposal.id).click();
 
-    await expect(proposalListPage.dialog).toBeVisible();
-
-    await expect(proposalListPage.openAsPageButton).toBeVisible();
-
-    await proposalListPage.page.waitForTimeout(500);
-
-    await proposalListPage.openAsPageButton.click();
-
     // Check we can see the contents
     await proposalListPage.waitForDocumentPage({
       domain: space.domain,

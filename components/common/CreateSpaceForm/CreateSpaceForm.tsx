@@ -187,6 +187,8 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     setStep('select_template');
   }
 
+  const errorText = typeof saveError === 'string' ? saveError : saveError?.message ?? 'Error creating space';
+
   if (step === 'join_space') {
     return (
       <Box>
@@ -285,7 +287,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
             </Grid>
             {saveError && (
               <Grid item>
-                <Alert severity='error'>{saveError}</Alert>
+                <Alert severity='error'>{errorText}</Alert>
               </Grid>
             )}
           </Grid>

@@ -1,28 +1,17 @@
-import { isProdEnv } from '@bangle.dev/utils';
-import { production, development, LensProvider } from '@lens-protocol/react-web';
-import type { LensConfig } from '@lens-protocol/react-web';
-import { bindings } from '@lens-protocol/wagmi';
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import { rest } from 'msw';
-import type { ReactNode } from 'react';
-import { useRef, useState } from 'react';
-import { Provider } from 'react-redux';
+import { useState } from 'react';
+import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import type { ProposalPageAndPropertiesInput } from 'components/proposals/components/ProposalDialog/NewProposalPage';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
-import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { MembersProvider } from 'hooks/useMembers';
-import { PagesProvider } from 'hooks/usePages';
-import { UserProvider } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories, spaces, userProfile } from '../lib/mockData';
+import { members, proposalCategories, userProfile } from '../lib/mockData';
 
 import { ProposalsPageStory } from './ProposalsPageStory';
 
@@ -31,52 +20,11 @@ export default {
   component: ProposalPageComponent
 };
 
-const space = spaces[0];
-
-const reduxStore = mockStateStore([], {
-  boards: {
-    boards: []
-  },
-  comments: {
-    comments: [],
-    loadedCardComments: []
-  }
-});
-
-const lensConfig: LensConfig = {
-  bindings: bindings(),
-  environment: isProdEnv ? production : development
-};
-
-function Context({ children }: { children: ReactNode }) {
-  // mock the current space since it usually relies on the URL
-  const spaceContext = useRef<ICurrentSpaceContext>({
-    isLoading: false,
-    refreshCurrentSpace: () => {},
-    space
-  });
-  return (
-    <UserProvider>
-      <CurrentSpaceContext.Provider value={spaceContext.current}>
-        <MembersProvider>
-          <Provider store={reduxStore}>
-            <LensProvider config={lensConfig}>{children}</LensProvider>
-          </Provider>
-        </MembersProvider>
-      </CurrentSpaceContext.Provider>
-    </UserProvider>
-  );
-}
-
 export function ProposalsPage() {
   return (
-    <Context>
-      <PagesProvider>
-        <Paper>
-          <ProposalsPageStory />
-        </Paper>
-      </PagesProvider>
-    </Context>
+    <GlobalContext>
+      <ProposalsPageStory />
+    </GlobalContext>
   );
 }
 
@@ -123,18 +71,16 @@ export function NewProposal() {
   });
 
   return (
-    <Context>
-      <Paper>
-        <ProposalPageComponent
-          formInputs={formInputs}
-          setFormInputs={(_formInputs) => {
-            setContentUpdated(true);
-            setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
-          }}
-          contentUpdated={contentUpdated}
-        />
-      </Paper>
-    </Context>
+    <GlobalContext>
+      <ProposalPageComponent
+        formInputs={formInputs}
+        setFormInputs={(_formInputs) => {
+          setContentUpdated(true);
+          setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
+        }}
+        contentUpdated={contentUpdated}
+      />
+    </GlobalContext>
   );
 }
 
@@ -147,13 +93,11 @@ export function ProposalInEvaluation() {
   });
 
   return (
-    <Context>
-      <Paper>
-        <Box sx={{ overflowY: 'auto' }}>
-          <DocumentPage page={page} refreshPage={async () => {}} readOnly={true} savePage={() => {}} />
-        </Box>
-      </Paper>
-    </Context>
+    <GlobalContext>
+      <Box sx={{ overflowY: 'auto' }}>
+        <DocumentPage page={page} refreshPage={async () => {}} readOnly={true} savePage={() => {}} />
+      </Box>
+    </GlobalContext>
   );
 }
 

@@ -93,7 +93,7 @@ test.describe.serial('Proposal Flow', () => {
   test('A proposal author can move draft proposal to feedback', async () => {
     await authorBrowserProposalListPage.openProposalCard(proposalId);
 
-    await expect(authorBrowserProposalPage.dialog).toBeVisible();
+    await authorBrowserProposalPage.waitForDocumentPage({ domain: space.domain, path: pageWithProposal.path });
     await expect(authorBrowserProposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.discussion);
 
     await authorBrowserProposalPage.nextStatusButton.click();
@@ -122,8 +122,7 @@ test.describe.serial('Proposal Flow', () => {
   });
 
   test('A proposal author can create a vote', async () => {
-    await authorBrowserProposalPage.closeDialog();
-    await authorBrowserProposalPage.goToPage({ domain: space.domain, path: pageWithProposal.path });
+    await authorBrowserProposalListPage.page.reload();
     await expect(authorBrowserProposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.vote_active);
     await authorBrowserProposalPage.nextStatusButton.click();
     await authorBrowserProposalPage.confirmStatusButton.click();
