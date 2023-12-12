@@ -3,17 +3,15 @@ import { type ReactNode } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import { useWalletSign } from 'components/login/components/WalletSign';
+import { WalletSign } from 'components/login/components/WalletSign';
 import { TelegramLoginIframe } from 'components/settings/account/components/TelegramLoginIframe';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { shortenHex } from 'lib/utilities/blockchain';
@@ -42,16 +40,7 @@ function ConnectedAccount({
   return (
     <Stack gap={1} width={275}>
       <FieldWrapper label={label} required={required}>
-        <Button
-          loading={loading}
-          onClick={onClick}
-          color='secondary'
-          sx={{
-            cursor: 'pointer'
-          }}
-          variant='outlined'
-          disabled={disabled}
-        >
+        <Button loading={loading} onClick={onClick} color='secondary' variant='outlined' disabled={disabled}>
           <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%'>
             {children}
             {!loading ? icon : null}
@@ -102,8 +91,6 @@ function WalletConnect({
   connectedWallet?: LoggedInUser['wallets'][number];
 }) {
   const { updateUser } = useUser();
-  const { isConnectingIdentity } = useWeb3ConnectionManager();
-  const { isSigning } = useWeb3Account();
 
   const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
     '/profile/add-wallets',
@@ -115,37 +102,34 @@ function WalletConnect({
     }
   );
 
-  const { isWalletSelectorModalOpen, verifiableWalletDetected, generateWalletAuth, connectWallet, showLoadingState } =
-    useWalletSign({
-      enableAutosign: false,
-      signSuccess
-    });
-
-  const isConnectingWallet = isConnectingIdentity || isVerifyingWallet || isSigning;
-
-  return (
+  return connectedWallet ? (
     <ConnectedAccount
-      label='Wallet'
       icon={<IdentityIcon type='Wallet' size='small' />}
       required={isWalletRequired}
-      disabled={!!connectedWallet || isConnectingWallet}
-      loading={showLoadingState || isConnectingWallet || isWalletSelectorModalOpen}
-      onClick={() => {
-        if (!verifiableWalletDetected || isConnectingIdentity) {
-          connectWallet();
-        } else {
-          generateWalletAuth();
-        }
-      }}
+      disabled
+      label='Wallet'
     >
-      {connectedWallet ? (
-        <Typography variant='subtitle1'>Connected as {shortenHex(connectedWallet.address)}</Typography>
-      ) : !verifiableWalletDetected || isConnectingIdentity ? (
-        <Typography variant='subtitle1'>Connect a wallet</Typography>
-      ) : (
-        <Typography variant='subtitle1'>Verify wallet</Typography>
-      )}
+      <Typography variant='subtitle1'>Connected as {shortenHex(connectedWallet.address)}</Typography>
     </ConnectedAccount>
+  ) : (
+    <Stack gap={1} width={275}>
+      <FieldWrapper label='Wallet' required={isWalletRequired}>
+        <WalletSign buttonSize='medium' buttonColor='secondary' signSuccess={signSuccess} buttonOutlined>
+          {({ needsVerification, isLoading }) => {
+            return (
+              <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%'>
+                {needsVerification ? (
+                  <Typography variant='subtitle1'>Verify wallet</Typography>
+                ) : (
+                  <Typography variant='subtitle1'>Connect a wallet</Typography>
+                )}
+                {!isLoading && !isVerifyingWallet && <IdentityIcon type='Wallet' size='small' />}
+              </Stack>
+            );
+          }}
+        </WalletSign>
+      </FieldWrapper>
+    </Stack>
   );
 }
 
