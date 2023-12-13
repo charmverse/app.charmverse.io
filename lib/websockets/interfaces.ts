@@ -184,6 +184,13 @@ type PagesRestored = {
   payload: Resource[];
 };
 
+type LogoutUser = {
+  type: 'logout';
+  payload: {
+    userId: string;
+  };
+};
+
 export type ClientMessage =
   | SubscribeToWorkspace
   | PageDeleted
@@ -210,7 +217,8 @@ export type ServerMessage =
   | ThreadsUpdated
   | SpaceSubscriptionUpdated
   | NotionImportCompleted
-  | PagesRestored;
+  | PagesRestored
+  | LogoutUser;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

@@ -11,6 +11,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMarkNotificationFromUrl } from 'hooks/useMarkNotificationFromUrl';
 import { getPagesListCacheKey, usePages } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useUser } from 'hooks/useUser';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
@@ -22,6 +24,9 @@ export function GlobalComponents() {
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setPages } = usePages();
+  const { logoutUser, user } = useUser();
+  const { logoutWallet } = useWeb3Account();
+
   const { openSettings, isOpen: isSettingsDialogOpen } = useSettingsDialog();
   // Register logs to Datadog
   useDatadogLogger();
@@ -54,11 +59,21 @@ export function GlobalComponents() {
     }
   };
 
+  const handleLogoutUserEvent = async (payload: WebSocketPayload<'logout'>) => {
+    if (user && payload.userId === user.id) {
+      logoutWallet();
+      await logoutUser();
+      router.push('/');
+    }
+  };
+
   // Moving it inside usePages doesn't work since <FocalboardProvider> is located aboev
   useEffect(() => {
     const unsubscribeRestoreListener = subscribe('pages_restored', handlePagesRestoredEvent);
+    const unsubscribeLogoutListener = subscribe('logout', handleLogoutUserEvent);
     return () => {
       unsubscribeRestoreListener();
+      unsubscribeLogoutListener();
     };
   }, [currentSpace?.id]);
 
