@@ -50,7 +50,6 @@ function MemberDirectoryTableRow({
 }) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
-  const discordUsername = (member.profile?.social as Social)?.discordUsername;
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
   const { showUserId } = useMemberDialog();
@@ -108,17 +107,6 @@ function MemberDirectoryTableRow({
                       <Chip label={role.name} key={role.id} size='small' variant='outlined' />
                     ))}
                   </Stack>
-                </TableCell>
-              );
-            }
-            case 'discord': {
-              return (
-                <TableCell key={property.id}>
-                  {discordUsername ? (
-                    <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} />
-                  ) : (
-                    '-'
-                  )}
                 </TableCell>
               );
             }
@@ -191,6 +179,9 @@ function MemberDirectoryTableRow({
             case 'text':
             case 'phone':
             case 'email':
+            case 'google':
+            case 'telegram':
+            case 'discord':
             case 'number': {
               return (
                 <TableCell key={property.id}>

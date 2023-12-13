@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { MemberPropertyType, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
@@ -9,7 +9,14 @@ import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 export type UpdateableSpaceFields = Partial<
   Pick<
     Space,
-    'hiddenFeatures' | 'domain' | 'name' | 'spaceImage' | 'features' | 'memberProfiles' | 'notificationToggles'
+    | 'hiddenFeatures'
+    | 'domain'
+    | 'name'
+    | 'spaceImage'
+    | 'features'
+    | 'memberProfiles'
+    | 'notificationToggles'
+    | 'primaryMemberIdentity'
   >
 >;
 
@@ -30,6 +37,22 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     throw new InvalidInputError('Domain cannot be empty');
   }
 
+  const primaryMemberIdentity = updates?.primaryMemberIdentity?.toLocaleLowerCase() ?? '';
+
+  if (['google', 'wallet', 'telegram', 'discord'].includes(primaryMemberIdentity)) {
+    await prisma.$transaction([
+      prisma.memberProperty.updateMany({
+        where: {
+          spaceId,
+          type: primaryMemberIdentity as MemberPropertyType
+        },
+        data: {
+          required: true
+        }
+      })
+    ]);
+  }
+
   const updatedSpace = await prisma.space.update({
     where: {
       id: spaceId
@@ -41,7 +64,8 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       hiddenFeatures: updates.hiddenFeatures,
       notificationToggles: updates.notificationToggles as any,
       features: updates.features as any,
-      memberProfiles: updates.memberProfiles as any
+      memberProfiles: updates.memberProfiles as any,
+      primaryMemberIdentity: updates.primaryMemberIdentity
     }
   });
 
