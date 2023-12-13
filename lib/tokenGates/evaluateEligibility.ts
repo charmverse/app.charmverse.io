@@ -42,6 +42,12 @@ export async function evaluateTokenGateEligibility({
   authSig,
   spaceIdOrDomain
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
+  if (!litClient.ready) {
+    await litClient.connect().catch((err) => {
+      log.debug('Error connecting to lit node', err);
+    });
+  }
+
   const validUuid = validate(spaceIdOrDomain);
 
   const space = await prisma.space.findFirst({
@@ -64,6 +70,10 @@ export async function evaluateTokenGateEligibility({
 
   if (!space) {
     throw new DataNotFoundError(`Space with ${validUuid ? 'id' : 'domain'} ${spaceIdOrDomain} not found.`);
+  }
+
+  if (!litClient.ready) {
+    throw new InvalidStateError('Lit client is not available');
   }
 
   const tokenGateResults: (TokenGateJwt | null)[] = await Promise.all(
@@ -141,16 +151,6 @@ export async function getLitTokenGateResults(
   tokenGate: TokenGateWithRoles<'lit'>,
   authSig: AuthSig
 ): Promise<TokenGateJwt | null> {
-  if (!litClient.ready) {
-    await litClient.connect().catch((err) => {
-      log.debug('Error connecting to lit node', err);
-    });
-  }
-
-  if (!litClient.ready) {
-    throw new InvalidStateError('Lit client is not available');
-  }
-
   return promiseRetry<TokenGateJwt | null>(
     async (retry, retryCount): Promise<TokenGateJwt | null> => {
       return litClient
