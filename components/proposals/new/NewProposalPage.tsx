@@ -356,8 +356,10 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                     sidebarView={showSidebar ? 'proposal_evaluation_settings' : null}
                     closeSidebar={() => setShowSidebar(false)}
                     proposalInput={formInputs}
-                    onChangeEvaluation={(updated) => {
-                      const evaluations = formInputs.evaluations.map((e) => (e.id === updated.id ? updated : e));
+                    onChangeEvaluation={(evaluationId, updates) => {
+                      const evaluations = formInputs.evaluations.map((e) =>
+                        e.id === evaluationId ? { ...e, ...updates } : e
+                      );
                       setFormInputs({
                         ...formInputs,
                         evaluations

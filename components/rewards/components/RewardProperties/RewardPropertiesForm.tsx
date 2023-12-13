@@ -12,7 +12,7 @@ import type { RoleOption } from 'components/common/BoardEditor/components/proper
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
-import { ProposalTemplateSelect } from 'components/proposals/new/components/TemplateSelect';
+import { TemplateSelect } from 'components/proposals/new/components/TemplateSelect';
 import { RewardApplicationType } from 'components/rewards/components/RewardProperties/components/RewardApplicationType';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
 import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
@@ -206,7 +206,7 @@ export function RewardPropertiesForm({
                     Template
                   </PropertyLabel>
                   <Box display='flex' flex={1}>
-                    <ProposalTemplateSelect
+                    <TemplateSelect
                       options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
                       value={selectedTemplate?.page ?? null}
                       onChange={(templatePage) => {

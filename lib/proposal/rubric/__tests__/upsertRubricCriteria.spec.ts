@@ -74,6 +74,7 @@ describe('upsertRubricCriteria', () => {
 
     const rubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
+      evaluationId: null,
       rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }]
     });
 

@@ -8,6 +8,7 @@ import type { ProposalReviewerInput } from './interface';
 
 export type UpdateProposalRequest = {
   proposalId: string;
+  evaluationId?: string | null;
   authors?: string[];
   reviewers?: ProposalReviewerInput[];
   categoryId?: string | null;
@@ -18,6 +19,7 @@ export type UpdateProposalRequest = {
 
 export async function updateProposal({
   proposalId,
+  evaluationId,
   authors,
   reviewers,
   categoryId,

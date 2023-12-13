@@ -14,11 +14,12 @@ type RubricAnswerData<T extends ProposalRubricCriteriaType = ProposalRubricCrite
   ProposalRubricCriteriaAnswerWithTypedResponse<T>,
   'rubricCriteriaId' | 'response'
 > & { comment?: string };
+
 export type RubricAnswerUpsert = {
   isDraft?: boolean;
   userId: string;
   proposalId: string;
-  evaluationId: string | null;
+  evaluationId?: string | null;
   answers: RubricAnswerData[];
 };
 

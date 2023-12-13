@@ -36,7 +36,7 @@ export async function createDefaultProposal({
       {
         index: 0,
         ...getDefaultFeedbackEvaluation(),
-        reviewers: [{ group: 'system_role', id: 'space_member' }],
+        reviewers: [{ systemRole: 'space_member' }],
         rubricCriteria: []
       },
       {
@@ -44,7 +44,7 @@ export async function createDefaultProposal({
         id: uuid(),
         title: 'Review',
         type: 'pass_fail',
-        reviewers: [{ group: 'system_role', id: 'space_member' }],
+        reviewers: [{ systemRole: 'space_member' }],
         rubricCriteria: [],
         permissions: getDefaultPermissions()
       }

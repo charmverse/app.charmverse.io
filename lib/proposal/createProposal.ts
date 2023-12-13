@@ -28,7 +28,7 @@ type PageProps = Partial<
 >;
 
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
-  reviewers: Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>[];
+  reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
   permissions?: WorkflowEvaluationJson['permissions']; // pass these in to override workflow defaults
 };

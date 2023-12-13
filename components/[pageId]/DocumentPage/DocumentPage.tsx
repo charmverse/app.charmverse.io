@@ -7,7 +7,11 @@ import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
-import { useUpdateProposal, useGetProposalDetails, useUpsertRubricCriteria } from 'charmClient/hooks/proposals';
+import {
+  useUpdateProposalEvaluation,
+  useGetProposalDetails,
+  useUpsertRubricCriteria
+} from 'charmClient/hooks/proposals';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import type { ProposalEvaluationValues } from 'components/[pageId]/DocumentPage/components/Sidebar/components/ProposalSettingsSidebar/components/ProposalEvaluationForm';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
@@ -125,7 +129,7 @@ function DocumentPage({
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId });
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
-  const { trigger: updateProposal } = useUpdateProposal({ proposalId });
+  const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
@@ -203,7 +207,7 @@ function DocumentPage({
         rubricCriteria: updatedEvaluation.rubricCriteria
       });
     } else {
-      await updateProposal({
+      await updateProposalEvaluation({
         evaluationId,
         ...updatedEvaluation
       });

@@ -17,6 +17,7 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
@@ -69,15 +70,19 @@ export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
 }
 
+export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Omit<UpdateEvaluationRequest, 'proposalId'>>(`/api/proposals/${proposalId}/evaluation`);
+}
+
 export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/proposals/${proposalId}/rubric-criteria`);
+  return usePUT<Omit<RubricCriteriaUpsert, 'proposalId'>>(`/api/proposals/${proposalId}/rubric-criteria`);
 }
 export function useUpsertRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+  return usePUT<Pick<RubricAnswerUpsert, 'evaluationId' | 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+  return usePUT<Pick<RubricAnswerUpsert, 'evaluationId' | 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {

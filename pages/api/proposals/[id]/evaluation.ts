@@ -5,10 +5,8 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import { updateProposal } from 'lib/proposal/updateProposal';
+import { updateProposalEvaluation } from 'lib/proposal/updateProposalEvaluation';
+import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -17,90 +15,20 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(updateProposalController)
-  .get(getProposalController);
+  .put(updateEvaluationEndpoint);
 
-async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
-  const proposalId = req.query.id as string;
-  const userId = req.session.user?.id;
-
-  const proposal = await prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    },
-    include: {
-      draftRubricAnswers: true,
-      rubricAnswers: true,
-      rubricCriteria: {
-        orderBy: {
-          index: 'asc'
-        }
-      },
-      evaluations: {
-        include: {
-          reviewers: true,
-          rubricCriteria: true,
-          rubricAnswers: true,
-          draftRubricAnswers: true
-        }
-      },
-      authors: true,
-      reviewers: true,
-      category: true,
-      page: { select: { sourceTemplateId: true } }
-    }
-  });
-
-  if (!proposal) {
-    throw new NotFoundError();
-  }
-  const computed = await req.basePermissionsClient.pages.computePagePermissions({
-    // Proposal id is the same as page
-    resourceId: proposal?.id,
-    userId
-  });
-  if (computed.read !== true) {
-    throw new NotFoundError();
-  }
-
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId: proposal.spaceId,
-    userId
-  });
-
-  const reviewerIds =
-    !spaceRole || spaceRole.isAdmin
-      ? []
-      : await getAllReviewerUserIds({
-          proposalId: proposal.id
-        });
-
-  const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
-
-  if (!canSeeAnswers) {
-    proposal.draftRubricAnswers = [];
-    proposal.rubricAnswers = [];
-  }
-
-  return res.status(200).json(proposal as unknown as ProposalWithUsersAndRubric);
-}
-
-async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
+async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, publishToLens, authors, reviewers, categoryId, evaluationType, fields } =
-    req.body as UpdateProposalRequest;
+  const { evaluationId, reviewers } = req.body as UpdateEvaluationRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
       id: proposalId
     },
     include: {
-      authors: true,
       reviewers: true,
-      rubricAnswers: true,
-      rubricCriteria: true,
       page: {
         select: {
           type: true
@@ -142,9 +70,11 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     const newReviewers = (reviewers ?? []).filter(
       (updatedReviewer) =>
         !proposal.reviewers.some((proposalReviewer) => {
-          return updatedReviewer.group === 'role'
-            ? proposalReviewer.roleId === updatedReviewer.id
-            : proposalReviewer.userId === updatedReviewer.id;
+          return (
+            proposalReviewer.roleId === updatedReviewer.roleId ||
+            proposalReviewer.userId === updatedReviewer.userId ||
+            proposalReviewer.systemRole === updatedReviewer.systemRole
+          );
         })
     );
     if (newReviewers.length > 0) {
@@ -152,20 +82,20 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
         resourceId: proposal.categoryId as string
       });
       for (const reviewer of newReviewers) {
-        if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
+        if (reviewer.roleId && !reviewerPool.roleIds.includes(reviewer.roleId)) {
           const role = await prisma.role.findUnique({
             where: {
-              id: reviewer.id
+              id: reviewer.roleId
             },
             select: {
               name: true
             }
           });
           throw new InsecureOperationError(`${role?.name} role cannot be added as a reviewer to this proposal`);
-        } else if (reviewer.group === 'user' && !reviewerPool.userIds.includes(reviewer.id)) {
+        } else if (reviewer.userId && !reviewerPool.userIds.includes(reviewer.userId)) {
           const user = await prisma.user.findUnique({
             where: {
-              id: reviewer.id
+              id: reviewer.userId
             },
             select: {
               username: true
@@ -177,15 +107,10 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  await updateProposal({
+  await updateProposalEvaluation({
     proposalId: proposal.id,
     evaluationId,
-    authors,
-    reviewers,
-    categoryId,
-    evaluationType,
-    publishToLens,
-    fields
+    reviewers
   });
 
   return res.status(200).end();
