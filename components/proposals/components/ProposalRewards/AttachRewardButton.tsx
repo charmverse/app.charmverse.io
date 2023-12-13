@@ -1,3 +1,4 @@
+import { Box, Stack } from '@mui/material';
 import { v4 } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
@@ -15,12 +16,14 @@ export function AttachRewardButton({
   onSave,
   reviewers,
   assignedSubmitters,
-  readOnly
+  readOnly,
+  children
 }: {
   onSave: (reward: ProposalPendingReward) => void;
   reviewers: RewardReviewer[];
   assignedSubmitters: string[];
   readOnly: boolean;
+  children?: React.ReactNode;
 }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
 
@@ -52,7 +55,13 @@ export function AttachRewardButton({
 
   return (
     <>
-      <AddAPropertyButton onClick={createNewReward}>+ Add a reward</AddAPropertyButton>
+      {children ? (
+        <Stack onClick={createNewReward} direction='row' flex={1}>
+          {children}
+        </Stack>
+      ) : (
+        <AddAPropertyButton onClick={createNewReward}>+ Add a reward</AddAPropertyButton>
+      )}
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}

@@ -1,14 +1,19 @@
+import type { ProposalReviewer } from '@charmverse/core/dist/cjs/prisma-client';
 import styled from '@emotion/styled';
-import { Delete } from '@mui/icons-material';
-import { IconButton, Stack, Typography } from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
+import { Box, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { getDisabledTooltip } from 'components/proposals/components/AttachRewardButton';
+import {
+  AttachRewardButton,
+  getDisabledTooltip
+} from 'components/proposals/components/ProposalRewards/AttachRewardButton';
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
@@ -17,6 +22,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -26,11 +32,21 @@ type Props = {
   readOnly: boolean;
   onSave: (reward: ProposalPendingReward) => void;
   onDelete: (draftId: string) => void;
+  reviewers: ProposalReviewerInput[];
+  assignedSubmitters: string[];
 };
 
 const rewardQueryKey = 'rewardId';
 
-export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, rewardIds }: Props) {
+export function ProposalRewards({
+  pendingRewards,
+  readOnly,
+  onSave,
+  onDelete,
+  rewardIds,
+  reviewers,
+  assignedSubmitters
+}: Props) {
   useRewardsNavigation(rewardQueryKey);
 
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
@@ -40,6 +56,7 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
   const { rewards: allRewards } = useRewards();
   const { updateURLQuery } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
+  const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
   function closeDialog() {
     clearRewardValues();
@@ -65,114 +82,154 @@ export function ProposalRewards({ pendingRewards, readOnly, onSave, onDelete, re
     const pageId = getRewardPage(rewardId)?.id || rewardId;
     updateURLQuery({ [rewardQueryKey]: pageId });
   }
-
+  // <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
   if (rewards.length) {
     return (
       <Stack>
-        {rewards.map((reward) => {
-          return (
-            <Stack
-              flexDirection='row'
-              alignItems='center'
-              height='fit-content'
-              flex={1}
-              className='octo-propertyrow'
-              key={reward.id}
-            >
-              <PropertyLabel readOnly highlighted>
-                Reward
-              </PropertyLabel>
-              <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
-                <Stack alignItems='center' gap={1} direction='row'>
-                  <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                    {getRewardPage(reward.id)?.title || 'Untitled reward'}
-                  </Typography>
-                  {reward.customReward ? (
-                    <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                      {reward.customReward}
-                    </Typography>
-                  ) : (
-                    <RewardTokenInfo
-                      chainId={reward.chainId || null}
-                      symbolOrAddress={reward.rewardToken || null}
-                      rewardAmount={reward.rewardAmount || null}
-                    />
-                  )}
+        <Stack flexDirection='row' alignItems='center' height='fit-content' flex={1} className='octo-propertyrow'>
+          <PropertyLabel readOnly highlighted>
+            Reward
+          </PropertyLabel>
+
+          <Stack gap={0.5} flex={1}>
+            {rewards.map((reward) => {
+              return (
+                <Stack
+                  alignItems='center'
+                  gap={1}
+                  direction='row'
+                  sx={{
+                    '&:hover .icons': {
+                      opacity: 1
+                    }
+                  }}
+                  key={reward.id}
+                  flex={1}
+                >
+                  <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
+                    <Stack direction='row'>
+                      <Grid container>
+                        <Grid item xs={6}>
+                          <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                            {getRewardPage(reward.id)?.title || 'Untitled reward'}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Stack alignItems='center' direction='row' height='100%'>
+                            {reward.customReward ? (
+                              <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                                {reward.customReward}
+                              </Typography>
+                            ) : (
+                              <RewardTokenInfo
+                                chainId={reward.chainId || null}
+                                symbolOrAddress={reward.rewardToken || null}
+                                rewardAmount={reward.rewardAmount || null}
+                              />
+                            )}
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    </Stack>
+                  </SelectPreviewContainer>
                 </Stack>
-              </SelectPreviewContainer>
-            </Stack>
-          );
-        })}
+              );
+            })}
+          </Stack>
+        </Stack>
       </Stack>
     );
   }
+
   return (
     <Stack>
-      {pendingRewards?.map(({ reward, page, draftId }) => {
-        return (
-          <Stack
-            flexDirection='row'
-            alignItems='center'
-            height='fit-content'
-            flex={1}
-            className='octo-propertyrow'
-            key={draftId}
-          >
-            <PropertyLabel readOnly highlighted>
-              Reward
-            </PropertyLabel>
+      <Stack flexDirection='row' alignItems='center' height='fit-content' flex={1} className='octo-propertyrow'>
+        <PropertyLabel readOnly highlighted>
+          Reward
+        </PropertyLabel>
+        {!!pendingRewards?.length && (
+          <Stack gap={0.5} flex={1}>
+            {pendingRewards.map(({ reward, page, draftId }) => {
+              return (
+                <Stack
+                  alignItems='center'
+                  gap={1}
+                  direction='row'
+                  sx={{
+                    '&:hover .icons': {
+                      opacity: 1
+                    }
+                  }}
+                  key={draftId}
+                  flex={1}
+                >
+                  <SelectPreviewContainer readOnly={readOnly} displayType='details'>
+                    <Stack direction='row'>
+                      <Grid container>
+                        <Grid item xs={6}>
+                          <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                            {page?.title || 'Untitled reward'}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Stack alignItems='center' direction='row' height='100%'>
+                            {reward.customReward ? (
+                              <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                                {reward.customReward}
+                              </Typography>
+                            ) : (
+                              <RewardTokenInfo
+                                chainId={reward.chainId || null}
+                                symbolOrAddress={reward.rewardToken || null}
+                                rewardAmount={reward.rewardAmount || null}
+                              />
+                            )}
+                          </Stack>
+                        </Grid>
+                      </Grid>
 
-            <Stack
-              alignItems='center'
-              gap={1}
-              direction='row'
-              sx={{
-                '&:hover .icons': {
-                  opacity: 1
-                }
-              }}
-            >
-              <SelectPreviewContainer
-                readOnly={readOnly}
-                displayType='details'
-                onClick={() => editReward({ reward, page, draftId })}
-              >
-                <Stack alignItems='center' gap={1} direction='row'>
-                  <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                    {page?.title || 'Untitled reward'}
-                  </Typography>
-                  {reward.customReward ? (
-                    <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                      {reward.customReward}
-                    </Typography>
-                  ) : (
-                    <RewardTokenInfo
-                      chainId={reward.chainId || null}
-                      symbolOrAddress={reward.rewardToken || null}
-                      rewardAmount={reward.rewardAmount || null}
-                    />
-                  )}
-                  <Typography
-                    component='span'
-                    variant='subtitle1'
-                    fontWeight='normal'
-                    color='secondary'
-                    fontStyle='italic'
-                  >
-                    (pending)
-                  </Typography>
+                      <Stack className='icons' sx={{ opacity: 0, transition: 'all 0.2s ease' }} direction='row' gap={1}>
+                        <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
+                          <Edit color='secondary' fontSize='small' />
+                        </IconButton>
+                        <IconButton size='small' onClick={() => onDelete(draftId)}>
+                          <Delete color='secondary' fontSize='small' />
+                        </IconButton>
+                      </Stack>
+                    </Stack>
+                  </SelectPreviewContainer>
                 </Stack>
-              </SelectPreviewContainer>
+              );
+            })}
 
-              <Stack className='icons' sx={{ opacity: 0, transition: 'all 0.2s ease' }}>
-                <IconButton size='small' onClick={() => onDelete(draftId)}>
-                  <Delete color='secondary' fontSize='small' />
-                </IconButton>
-              </Stack>
-            </Stack>
+            <Box mt={-1}>
+              <AttachRewardButton
+                readOnly={!canCreatePendingRewards}
+                onSave={onSave}
+                reviewers={reviewers}
+                assignedSubmitters={assignedSubmitters}
+              />
+            </Box>
           </Stack>
-        );
-      })}
+        )}
+        {!pendingRewards?.length &&
+          (canCreatePendingRewards ? (
+            <AttachRewardButton
+              readOnly={false}
+              onSave={onSave}
+              reviewers={reviewers}
+              assignedSubmitters={assignedSubmitters}
+            >
+              <SelectPreviewContainer displayType='details'>
+                <EmptyPlaceholder>Empty</EmptyPlaceholder>
+              </SelectPreviewContainer>
+            </AttachRewardButton>
+          ) : (
+            <SelectPreviewContainer displayType='details' readOnly>
+              <EmptyPlaceholder>Empty</EmptyPlaceholder>
+            </SelectPreviewContainer>
+          ))}
+      </Stack>
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}

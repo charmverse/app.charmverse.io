@@ -18,8 +18,8 @@ import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import { AttachRewardButton } from 'components/proposals/components/AttachRewardButton';
 import { CustomPropertiesAdapter } from 'components/proposals/components/ProposalProperties/CustomPropertiesAdapter';
+import { AttachRewardButton } from 'components/proposals/components/ProposalRewards/AttachRewardButton';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -195,7 +195,6 @@ export function ProposalPropertiesBase({
     : null;
 
   const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
-  const canCreatePendingRewards = (isReviewer || isAuthor) && !rewardIds?.length;
 
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
@@ -526,9 +525,23 @@ export function ProposalPropertiesBase({
 
           <ProposalRewards
             pendingRewards={pendingRewards}
+            reviewers={proposalReviewers}
+            assignedSubmitters={proposalAuthorIds}
             rewardIds={rewardIds || []}
             readOnly={!isReviewer && !isAuthor}
             onSave={(pendingReward) => {
+              const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
+              if (!isExisting) {
+                setProposalFormInputs({
+                  fields: {
+                    ...proposalFormInputs.fields,
+                    pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || []), pendingReward]
+                  }
+                });
+
+                return;
+              }
+
               setProposalFormInputs({
                 fields: {
                   ...proposalFormInputs.fields,
@@ -562,20 +575,6 @@ export function ProposalPropertiesBase({
                 fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
               });
             }}
-          />
-
-          <AttachRewardButton
-            readOnly={!canCreatePendingRewards}
-            onSave={(newReward) => {
-              setProposalFormInputs({
-                fields: {
-                  ...proposalFormInputs.fields,
-                  pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || []), newReward]
-                }
-              });
-            }}
-            reviewers={proposalReviewers}
-            assignedSubmitters={proposalAuthorIds}
           />
         </Collapse>
         <Divider
