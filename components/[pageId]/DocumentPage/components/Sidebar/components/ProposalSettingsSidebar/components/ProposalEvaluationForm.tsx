@@ -16,10 +16,11 @@ export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permission
 type Props = {
   evaluation: ProposalEvaluationValues;
   categoryId?: string | null;
-  onChange: (criteria: ProposalEvaluationValues) => void;
+  onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
+  readOnly: boolean;
 };
 
-export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Props) {
+export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readOnly }: Props) {
   const reviewerOptions = evaluation.reviewers
     // .filter((reviewer) => reviewer.group === 'role' || reviewer.group === 'user')
     .map((reviewer) => ({
@@ -29,7 +30,6 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Pro
 
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
-      ...evaluation,
       reviewers: reviewers.map((r) => ({
         // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
         // evaluationId: r.evaluationId,
@@ -61,6 +61,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Pro
             data-test='proposal-reviewer-select'
             emptyPlaceholderContent='Select user or role'
             value={reviewerOptions}
+            readOnly={readOnly}
             variant='outlined'
             proposalCategoryId={categoryId}
             onChange={handleOnChangeReviewers}
@@ -76,6 +77,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Pro
           </FormLabel>
           <Box display='flex' flex={1} flexDirection='column'>
             <ProposalRubricCriteriaInput
+              readOnly={readOnly}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
                 onChange({

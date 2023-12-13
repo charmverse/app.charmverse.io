@@ -1,44 +1,101 @@
-import { Edit as EditIcon } from '@mui/icons-material';
-import { Alert, Box, Typography, IconButton, SvgIcon } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { RiChatCheckLine } from 'react-icons/ri';
+import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
+import { Box, FormLabel, Stack, Typography } from '@mui/material';
 
-import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
-import LoadingComponent from 'components/common/LoadingComponent';
-import type { TabConfig } from 'components/common/MultiTabs';
-import MultiTabs from 'components/common/MultiTabs';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import { evaluationIcons } from 'components/settings/proposals/constants';
+import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
-
-import { NoCommentsMessage } from '../../CommentsSidebar';
-
-import { RubricAnswersForm } from './RubricAnswersForm';
-import { RubricResults } from './RubricResults';
+import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 export type Props = {
-  pageId?: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'authors' | 'evaluations' | 'status' | 'evaluationType'>;
   evaluation: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
-  goToEditProposal: VoidFunction;
+  isCurrent: boolean;
 };
 
-export function PassFailEvaluation({ pageId, proposal, evaluation, refreshProposal, goToEditProposal }: Props) {
+export function PassFailEvaluation({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
   const isAdmin = useIsAdmin();
+  const { membersRecord } = useMembers();
   const { user } = useUser();
+  const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
-  const isAuthor = proposal?.authors.find((author) => author.userId === user?.id);
+  const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
+    group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
+    id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
+  }));
+
+  const isReviewer = isAdmin || evaluation.reviewers.some((author) => author.userId === user?.id);
+  const reviewedBy = evaluation.decidedBy ? membersRecord[evaluation.decidedBy] : null;
+  const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
+  const disabledTooltip = !isCurrent ? 'Evaluation is not current' : !isReviewer ? 'You are not a reviewer' : null;
+
+  async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
+    await updateProposalEvaluation({
+      evaluationId: evaluation.id,
+      result
+    });
+    refreshProposal?.();
+  }
+
   return (
-    <Box>
-      <Typography>
-        <Box display='flex' alignItems='center'>
-          <Box mr={1}>{evaluationIcons[evaluation.type]()}</Box>
-          <Box>{evaluation.title}</Box>
+    <>
+      <Box mb={2}>
+        <FormLabel>
+          <Typography component='span' variant='subtitle1'>
+            {evaluation.type === 'vote' ? 'Vote privileges' : 'Reviewer'}
+          </Typography>
+        </FormLabel>
+        <UserAndRoleSelect readOnly={true} value={reviewerOptions} onChange={() => {}} />
+      </Box>
+      {!evaluation.result && (
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Submit your review:
+            </Typography>
+          </FormLabel>
+          <Box display='flex' justifyContent='flex-end' gap={1}>
+            <Button
+              onClick={() => onSubmitReview('fail')}
+              disabled={!!disabledTooltip}
+              disabledTooltip={disabledTooltip}
+              color='error'
+            >
+              Reject
+            </Button>
+            <Button
+              onClick={() => onSubmitReview('pass')}
+              disabled={!!disabledTooltip}
+              disabledTooltip={disabledTooltip}
+              color='success'
+            >
+              Pass
+            </Button>
+          </Box>
         </Box>
-      </Typography>
-    </Box>
+      )}
+      {evaluation.result === 'pass' && (
+        <Stack flexDirection='row' gap={2} alignItems='center'>
+          <ApprovedIcon color='success' fontSize='large' />
+          <Box>
+            <Typography>Approved by {reviewedBy?.username}</Typography>
+            <Typography variant='caption'>{completedDate}</Typography>
+          </Box>
+        </Stack>
+      )}
+      {evaluation.result === 'fail' && (
+        <Stack flexDirection='row' gap={2} alignItems='center'>
+          <RejectedIcon color='error' fontSize='large' />
+          <Box>
+            <Typography>Rejected by {reviewedBy?.username}</Typography>
+            <Typography variant='caption'>{completedDate}</Typography>
+          </Box>
+        </Stack>
+      )}
+    </>
   );
 }

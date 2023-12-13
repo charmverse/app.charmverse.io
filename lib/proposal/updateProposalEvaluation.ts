@@ -1,13 +1,21 @@
-import type { ProposalReviewer } from '@charmverse/core/prisma';
+import type { ProposalReviewer, ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export type UpdateEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
+  result?: ProposalEvaluationResult | null;
+  decidedBy?: string;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
 };
 
-export async function updateProposalEvaluation({ proposalId, evaluationId, reviewers }: UpdateEvaluationRequest) {
+export async function updateProposalEvaluation({
+  proposalId,
+  evaluationId,
+  result,
+  decidedBy,
+  reviewers
+}: UpdateEvaluationRequest) {
   await prisma.$transaction(async (tx) => {
     // updatereviewers only when it is present in request payload
     if (reviewers) {
@@ -23,6 +31,17 @@ export async function updateProposalEvaluation({ proposalId, evaluationId, revie
           proposalId,
           ...reviewer
         }))
+      });
+    }
+    if (result && decidedBy) {
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          result,
+          decidedBy
+        }
       });
     }
   });

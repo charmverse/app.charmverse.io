@@ -127,17 +127,11 @@ function PageSidebarComponent(props: SidebarProps) {
               {sidebarTitle}
             </Typography>
             {openSidebar && (
-              <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-                {showEvaluationSidebarIcon && (
-                  <SidebarViewIcon
-                    view='proposal_evaluation'
-                    isActive={!!sidebarView?.includes('proposal')}
-                    onClick={openSidebar}
-                  />
-                )}
-                <SidebarViewIcon view='comments' isActive={sidebarView === 'comments'} onClick={openSidebar} />
-                <SidebarViewIcon view='suggestions' isActive={sidebarView === 'suggestions'} onClick={openSidebar} />
-              </Box>
+              <SidebarNavigationIcons
+                activeView={sidebarView}
+                showEvaluationSidebarIcon={showEvaluationSidebarIcon}
+                openSidebar={openSidebar}
+              />
             )}
           </Box>
           <SidebarContents {...props} />
@@ -151,28 +145,11 @@ function PageSidebarComponent(props: SidebarProps) {
       onClose={closeSidebar}
       rightActions={
         openSidebar && (
-          <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-            {showEvaluationSidebarIcon && (
-              <SidebarViewIcon
-                view='proposal_evaluation'
-                size='medium'
-                isActive={!!sidebarView?.includes('proposal')}
-                onClick={openSidebar}
-              />
-            )}
-            <SidebarViewIcon
-              view='comments'
-              size='medium'
-              isActive={sidebarView === 'comments'}
-              onClick={openSidebar}
-            />
-            <SidebarViewIcon
-              view='suggestions'
-              size='medium'
-              isActive={sidebarView === 'suggestions'}
-              onClick={openSidebar}
-            />
-          </Box>
+          <SidebarNavigationIcons
+            activeView={sidebarView}
+            showEvaluationSidebarIcon={showEvaluationSidebarIcon}
+            openSidebar={openSidebar}
+          />
         )
       }
       contentSx={{ pr: 0, pb: 0, pl: 1 }}
@@ -190,7 +167,7 @@ function SidebarNavigationIcons({
   activeView
 }: {
   showEvaluationSidebarIcon: boolean;
-  openSidebar: VoidFunction;
+  openSidebar: (view: PageSidebarView) => void;
   activeView?: PageSidebarView | null;
 }) {
   return (

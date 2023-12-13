@@ -71,7 +71,7 @@ export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
 }
 
 export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Omit<UpdateEvaluationRequest, 'proposalId'>>(`/api/proposals/${proposalId}/evaluation`);
+  return usePUT<Partial<Omit<UpdateEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/evaluation`);
 }
 
 export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {

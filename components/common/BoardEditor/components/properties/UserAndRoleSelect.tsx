@@ -68,7 +68,7 @@ export const StyledUserPropertyContainer = styled(Box, {
 
 function SelectedOptions({
   value,
-  isRequiredValue = () => true,
+  isRequiredValue = () => false,
   readOnly,
   onRemove,
   wrapColumn

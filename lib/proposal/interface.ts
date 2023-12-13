@@ -1,4 +1,10 @@
-import type { Page, PageComment, Proposal, ProposalEvaluation } from '@charmverse/core/prisma';
+import type {
+  Page,
+  PageComment,
+  Proposal,
+  ProposalEvaluation,
+  ProposalEvaluationPermission
+} from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type {
@@ -34,6 +40,7 @@ export type ProposalRubricData = {
 
 export type PopulatedEvaluation = ProposalRubricData &
   ProposalEvaluation & {
+    permissions: ProposalEvaluationPermission[];
     reviewers: ProposalWithUsers['reviewers'];
   };
 

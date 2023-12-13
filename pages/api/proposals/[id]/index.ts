@@ -38,6 +38,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       },
       evaluations: {
         include: {
+          permissions: true,
           reviewers: true,
           rubricCriteria: true,
           rubricAnswers: true,
@@ -82,6 +83,9 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     proposal.rubricAnswers = [];
   }
 
+  // filter out evaluation-specific reviewers
+  proposal.reviewers = proposal.reviewers.filter((reviewer) => !reviewer.evaluationId);
+
   return res.status(200).json(proposal as unknown as ProposalWithUsersAndRubric);
 }
 
@@ -89,8 +93,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, publishToLens, authors, reviewers, categoryId, evaluationType, fields } =
-    req.body as UpdateProposalRequest;
+  const { publishToLens, authors, reviewers, categoryId, evaluationType, fields } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -179,7 +182,6 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
 
   await updateProposal({
     proposalId: proposal.id,
-    evaluationId,
     authors,
     reviewers,
     categoryId,

@@ -36,6 +36,7 @@ export function ProposalSettingsSidebar({ proposal, onChangeEvaluation }: Props)
             <Divider sx={{ mb: 1 }} />
             <ProposalEvaluationForm
               categoryId={proposal.categoryId}
+              readOnly={!canEdit}
               evaluation={evaluation}
               onChange={(updated) => {
                 onChangeEvaluation?.(evaluation.id, updated);

@@ -1,44 +1,76 @@
-import { Edit as EditIcon } from '@mui/icons-material';
-import { Alert, Box, Typography, IconButton, SvgIcon } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { RiChatCheckLine } from 'react-icons/ri';
+import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
+import { Box, FormLabel, Stack, Typography } from '@mui/material';
 
-import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
-import LoadingComponent from 'components/common/LoadingComponent';
-import type { TabConfig } from 'components/common/MultiTabs';
-import MultiTabs from 'components/common/MultiTabs';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import { evaluationIcons } from 'components/settings/proposals/constants';
+import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { Button } from 'components/common/Button';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
-
-import { NoCommentsMessage } from '../../CommentsSidebar';
-
-import { RubricAnswersForm } from './RubricAnswersForm';
-import { RubricResults } from './RubricResults';
+import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 export type Props = {
-  pageId?: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'authors' | 'evaluations' | 'status' | 'evaluationType'>;
   evaluation: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
-  goToEditProposal: VoidFunction;
+  isCurrent: boolean;
 };
 
-export function FeedbackEvaluation({ pageId, proposal, evaluation, refreshProposal, goToEditProposal }: Props) {
+export function FeedbackEvaluation({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
   const isAdmin = useIsAdmin();
   const { user } = useUser();
+  const { trigger: updateProposalEvaluation, isMutating } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
-  const isAuthor = proposal?.authors.find((author) => author.userId === user?.id);
+  const reviewerOptions = evaluation.permissions
+    .filter((permission) => permission.operation === 'move')
+    .map((permission) => ({
+      group: permission.roleId ? 'role' : permission.userId ? 'user' : 'system_role',
+      id: (permission.roleId ?? permission.userId ?? permission.systemRole) as string
+    }));
+  const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === evaluation.id) || -1;
+  const nextEvaluation = proposal?.evaluations[currentEvaluationIndex + 1];
+  const isMover = isAdmin || proposal?.authors.some((author) => author.userId === user?.id);
+  const disabledTooltip = !isCurrent
+    ? 'Evaluation is not in feedback'
+    : !isMover
+    ? 'You do not have permission to move this evaluation'
+    : null;
+  async function onMoveForward() {
+    await updateProposalEvaluation({
+      evaluationId: evaluation.id,
+      result: 'pass'
+    });
+    refreshProposal?.();
+  }
+
   return (
-    <Box>
-      <Typography>
-        <Box display='flex' alignItems='center'>
-          <Box mr={1}>{evaluationIcons[evaluation.type]()}</Box>
-          <Box>{evaluation.title}</Box>
+    <>
+      <Box mb={2}>
+        <FormLabel>
+          <Typography component='span' variant='subtitle1'>
+            {evaluation.type === 'vote' ? 'Vote privileges' : 'Reviewer'}
+          </Typography>
+        </FormLabel>
+        <UserAndRoleSelect readOnly={true} value={reviewerOptions} onChange={() => {}} />
+      </Box>
+      <Box display='flex' justifyContent='flex-end' alignItems='center'>
+        {/* <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Move to next evaluation when feedback is complete
+            </Typography>
+          </FormLabel> */}
+        <Box display='flex' justifyContent='flex-end' gap={1}>
+          <Button
+            loading={isMutating}
+            onClick={onMoveForward}
+            disabled={!!disabledTooltip}
+            disabledTooltip={disabledTooltip}
+          >
+            Move to {nextEvaluation?.title}
+          </Button>
         </Box>
-      </Typography>
-    </Box>
+      </Box>
+    </>
   );
 }
