@@ -23,6 +23,7 @@ interface Props {
   onError?: (err: any) => void;
   children?: ReactNode | ((options: { needsVerification: boolean; isLoading: boolean }) => ReactNode);
   buttonColor?: 'primary' | 'secondary';
+  onClick?: VoidFunction;
 }
 
 export function WalletSign({
@@ -35,6 +36,7 @@ export function WalletSign({
   buttonColor = 'primary',
   loading,
   onError,
+  onClick,
   children
 }: Props) {
   const { isConnectingIdentity, connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
@@ -51,6 +53,7 @@ export function WalletSign({
   }, [verifiableWalletDetected]);
 
   async function generateWalletAuth() {
+    onClick?.();
     setIsVerifyingWallet(true);
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
       await signSuccess(walletAuthSignature);
@@ -77,6 +80,7 @@ export function WalletSign({
         size={buttonSize ?? 'large'}
         loading={isWalletSelectorModalOpen || isConnectingIdentity}
         onClick={() => {
+          onClick?.();
           connectWallet();
         }}
         variant={buttonOutlined ? 'outlined' : undefined}

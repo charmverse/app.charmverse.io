@@ -85,10 +85,12 @@ function DiscordAccountConnect({
 
 function WalletConnect({
   isWalletRequired,
-  connectedWallet
+  connectedWallet,
+  setIsOnboardingModalOpen
 }: {
   isWalletRequired: boolean;
   connectedWallet?: LoggedInUser['wallets'][number];
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
   const { updateUser } = useUser();
 
@@ -109,12 +111,22 @@ function WalletConnect({
       disabled
       label='Wallet'
     >
-      <Typography variant='subtitle1'>Connected as {shortenHex(connectedWallet.address)}</Typography>
+      <Typography variant='subtitle1'>
+        Connected as {connectedWallet.ensname ?? shortenHex(connectedWallet.address)}
+      </Typography>
     </ConnectedAccount>
   ) : (
     <Stack gap={1} width={275}>
       <FieldWrapper label='Wallet' required={isWalletRequired}>
-        <WalletSign buttonSize='medium' buttonColor='secondary' signSuccess={signSuccess} buttonOutlined>
+        <WalletSign
+          onClick={() => {
+            setIsOnboardingModalOpen(true);
+          }}
+          buttonSize='medium'
+          buttonColor='secondary'
+          signSuccess={signSuccess}
+          buttonOutlined
+        >
           {({ needsVerification, isLoading }) => {
             return (
               <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%'>
@@ -234,7 +246,11 @@ export function ConnectedAccounts({
         isTelegramRequired={isTelegramRequired}
         connectedTelegramAccount={connectedTelegramAccount}
       />
-      <WalletConnect isWalletRequired={isWalletRequired} connectedWallet={connectedWallet} />
+      <WalletConnect
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
+        isWalletRequired={isWalletRequired}
+        connectedWallet={connectedWallet}
+      />
     </Stack>
   );
 }

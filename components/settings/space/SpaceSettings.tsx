@@ -296,25 +296,25 @@ export function SpaceSettings({
                     <Typography variant='body2'>Member's choice</Typography>
                   </Stack>
                 </MenuItem>
-                <MenuItem value='discord'>
+                <MenuItem value='Discord'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
                     <IdentityIcon size='xSmall' type='Discord' />
                     <Typography variant='body2'>Discord</Typography>
                   </Stack>
                 </MenuItem>
-                <MenuItem value='google'>
+                <MenuItem value='Google'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
                     <IdentityIcon size='xSmall' type='Google' />
                     <Typography variant='body2'>Google</Typography>
                   </Stack>
                 </MenuItem>
-                <MenuItem value='telegram'>
+                <MenuItem value='Telegram'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
                     <IdentityIcon size='xSmall' type='Telegram' />
                     <Typography variant='body2'>Telegram</Typography>
                   </Stack>
                 </MenuItem>
-                <MenuItem value='wallet'>
+                <MenuItem value='Wallet'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
                     <IdentityIcon size='xSmall' type='Wallet' />
                     <Typography variant='body2'>Wallet</Typography>

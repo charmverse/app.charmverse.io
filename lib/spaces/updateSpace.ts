@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { MemberPropertyType, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
@@ -37,12 +37,14 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     throw new InvalidInputError('Domain cannot be empty');
   }
 
-  if (updates.primaryMemberIdentity) {
+  const primaryMemberIdentity = updates?.primaryMemberIdentity?.toLocaleLowerCase() ?? '';
+
+  if (['google', 'wallet', 'telegram', 'discord'].includes(primaryMemberIdentity)) {
     await prisma.$transaction([
       prisma.memberProperty.updateMany({
         where: {
           spaceId,
-          type: updates.primaryMemberIdentity
+          type: primaryMemberIdentity as MemberPropertyType
         },
         data: {
           required: true

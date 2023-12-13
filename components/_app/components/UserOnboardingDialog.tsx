@@ -18,7 +18,6 @@ import {
 } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
-import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -103,7 +102,6 @@ function UserOnboardingDialog({
   hasEmptyRequiredProperties?: boolean;
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
-  const { updateURLQuery } = useCharmRouter();
   const { requiredProperties, requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
@@ -156,13 +154,14 @@ function UserOnboardingDialog({
     setCurrentStep('profile_step');
   }
 
-  const isSaveButtonDisabled =
-    !isFormDirty ||
+  const hideCloseButton =
     !isUserDetailsValid ||
     !isMemberPropertiesValid ||
     requiredPropertiesWithoutValue.some((requiredProperty) =>
       ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
     );
+
+  const isSaveButtonDisabled = !isFormDirty || hideCloseButton;
 
   const handleClose = () => {
     setIsOnboardingModalOpen(false);
@@ -188,7 +187,7 @@ function UserOnboardingDialog({
       fluidSize={currentStep === 'email_step'}
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
-      hideCloseButton={currentStep === 'email_step' || requiredProperties.length !== 0}
+      hideCloseButton={currentStep === 'email_step' || hideCloseButton}
       footerActions={
         currentStep === 'profile_step' ? (
           <Button

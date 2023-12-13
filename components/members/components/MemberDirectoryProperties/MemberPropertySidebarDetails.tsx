@@ -12,7 +12,6 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 import { MemberPropertyVisibility } from './MemberPropertyVisibility';
@@ -66,7 +65,7 @@ export function MemberPropertySidebarDetails({
     }
   }, [memberPropertySidebarItemPopupState.isOpen]);
 
-  const disabled = !isAdmin || space?.primaryMemberIdentity === property.type;
+  const disabled = !isAdmin || space?.primaryMemberIdentity?.toLowerCase() === property.type;
 
   return (
     <>
@@ -80,7 +79,11 @@ export function MemberPropertySidebarDetails({
                 </Typography>
               </Tooltip>
               <Tooltip
-                title={space?.primaryMemberIdentity === property.type ? 'Primary identity must always be required' : ''}
+                title={
+                  space?.primaryMemberIdentity?.toLocaleLowerCase() === property.type
+                    ? 'Primary identity must always be required'
+                    : ''
+                }
               >
                 <div>
                   <Checkbox
