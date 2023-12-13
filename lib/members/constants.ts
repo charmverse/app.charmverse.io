@@ -18,7 +18,6 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
   },
   name: {
     label: 'Name',
-    default: true,
     unhideable: true
   },
   role: {

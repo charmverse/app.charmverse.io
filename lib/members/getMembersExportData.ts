@@ -51,9 +51,6 @@ export async function getMembersExportData(spaceId: string) {
         case 'bio': {
           return member.profile?.description;
         }
-        case 'name': {
-          return memberProperty?.value ?? member.username;
-        }
         case 'role': {
           return member.roles.map((r) => r.name);
         }
