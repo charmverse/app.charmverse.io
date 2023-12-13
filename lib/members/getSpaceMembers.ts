@@ -113,9 +113,7 @@ export async function getSpaceMembers({
 
         properties.forEach((property) => {
           if (visiblePropertyIds.includes(property.memberPropertyId)) {
-            if (property.type === 'wallet') {
-              property.value = wallets[0]?.address;
-            } else if (property.type === 'telegram') {
+            if (property.type === 'telegram') {
               property.value = (telegramUser?.account as unknown as TelegramAccount)?.username;
             } else if (property.type === 'discord') {
               property.value = (discordUser?.account as unknown as DiscordAccount)?.username;
