@@ -76,7 +76,7 @@ type PageHeaderProps = {
   placeholder?: string;
   parentId?: string | null;
   insideModal?: boolean;
-  pageId: string;
+  pageId?: string;
 };
 
 function PageHeader({

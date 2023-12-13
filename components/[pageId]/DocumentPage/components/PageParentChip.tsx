@@ -6,7 +6,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePages } from 'hooks/usePages';
 
 type Props = {
-  pageId: string;
+  pageId?: string;
   parentId?: string | null;
   insideModal?: boolean;
 };
@@ -19,7 +19,7 @@ export function PageParentChip({ pageId, parentId, insideModal }: Props) {
     updateURLQuery
   } = useCharmRouter();
 
-  const page = pages[pageId];
+  const page = pageId ? pages[pageId] : null;
   const parentPage = parentId ? pages[parentId] : null;
 
   const parentProposalId = page?.type === 'bounty' && page.bountyId && getRewardById(page.bountyId)?.proposalId;
