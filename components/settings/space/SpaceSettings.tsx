@@ -1,5 +1,6 @@
-import type { Prisma, Space } from '@charmverse/core/prisma';
+import type { IdentityType, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import {
   Box,
   Grid,
@@ -11,15 +12,17 @@ import {
   ListItem,
   List,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
+  Select
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { FaDiscord, FaGoogle, FaTelegram, FaWallet } from 'react-icons/fa';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
@@ -45,6 +48,8 @@ import type { NotificationToggleOption, NotificationToggles } from 'lib/notifica
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
+
+import { IdentityIcon } from '../profile/components/IdentityIcon';
 
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput } from './components/NotificationToggles';
@@ -87,6 +92,7 @@ export function SpaceSettings({
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
   const [featuresInput, setFeatures] = useState(currentFeatures);
+  const [primaryMemberIdentity, setPrimaryMemberIdentity] = useState<IdentityType | null>(space.primaryMemberIdentity);
   const [memberProfileTypesInput, setMemberProfileProperties] = useState(currentMemberProfileTypes);
   const {
     register,
@@ -152,6 +158,7 @@ export function SpaceSettings({
       memberProfiles: memberProfileTypesInput,
       name: values.name,
       domain: values.domain,
+      primaryMemberIdentity,
       spaceImage: values.spaceImage
     });
 
@@ -195,7 +202,10 @@ export function SpaceSettings({
   }
 
   const dataChanged =
-    !isEqual(currentFeatures, featuresInput) || !isEqual(currentMemberProfileTypes, memberProfileTypesInput) || isDirty;
+    !isEqual(currentFeatures, featuresInput) ||
+    !isEqual(currentMemberProfileTypes, memberProfileTypesInput) ||
+    isDirty ||
+    space.primaryMemberIdentity !== primaryMemberIdentity;
 
   useEffect(() => {
     setUnsavedChanges(dataChanged);
@@ -265,6 +275,53 @@ export function SpaceSettings({
               watch={watch}
               setValue={setValue}
             />
+          </Grid>
+          <Grid item>
+            <FieldLabel>Primary Identity</FieldLabel>
+            <Typography variant='caption' mb={1} component='p'>
+              Choose the primary identity for your space. This will be the required identity that your members will have
+              to provide when they first join and it will be used to display the member.
+            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Select
+                value={primaryMemberIdentity ?? 'none'}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPrimaryMemberIdentity(value === 'none' ? null : (value as IdentityType));
+                }}
+              >
+                <MenuItem value='none'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <PersonOutlinedIcon style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Member's choice</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='Discord'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <IdentityIcon size='xSmall' type='Discord' />
+                    <Typography variant='body2'>Discord</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='Google'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <IdentityIcon size='xSmall' type='Google' />
+                    <Typography variant='body2'>Google</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='Telegram'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <IdentityIcon size='xSmall' type='Telegram' />
+                    <Typography variant='body2'>Telegram</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value='Wallet'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <IdentityIcon size='xSmall' type='Wallet' />
+                    <Typography variant='body2'>Wallet</Typography>
+                  </Stack>
+                </MenuItem>
+              </Select>
+            </Box>
           </Grid>
           <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>

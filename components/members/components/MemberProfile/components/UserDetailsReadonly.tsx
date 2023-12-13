@@ -6,21 +6,13 @@ import charmClient from 'charmClient';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useUser } from 'hooks/useUser';
-import type { Social } from 'lib/members/interfaces';
+import type { Member, Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 import { SocialIcons } from '../../SocialIcons';
 
-type UserFields = {
-  id: string;
-  path: string;
-  avatar?: string | null;
-  username: string;
-  profile?: any;
-};
-
 type UserDetailsMiniProps = {
-  user: UserFields;
+  user: Member;
   sx?: SxProps<Theme>;
 };
 
@@ -28,12 +20,21 @@ export function UserDetailsReadonly({ user, sx = {} }: UserDetailsMiniProps) {
   const { user: currentUser } = useUser();
 
   const { data: userDetails } = useSWRImmutable(`/userDetails/${user.id}`, () => {
-    return user.profile || (currentUser?.id === user.id && charmClient.getUserDetails());
+    return (user.profile as any) || (currentUser?.id === user.id && charmClient.getUserDetails());
   });
-  const socialDetails = (userDetails?.social as Social | undefined) ?? {};
 
+  const googleProperty = user.properties?.find((p) => p.type === 'google');
+  const telegramProperty = user.properties?.find((p) => p.type === 'telegram');
+  const discordProperty = user.properties?.find((p) => p.type === 'discord');
+  const githubProperty = user.properties?.find((p) => p.type === 'github');
+  const twitterProperty = user.properties?.find((p) => p.type === 'twitter');
+  const linkedinProperty = user.properties?.find((p) => p.type === 'linked_in');
+
+  const socialDetails = (userDetails?.social as Social | undefined) ?? {};
   const hideSocials =
-    socialDetails?.discordUsername?.length === 0 &&
+    (discordProperty?.value as string)?.length === 0 &&
+    (telegramProperty?.value as string)?.length === 0 &&
+    (googleProperty?.value as string)?.length === 0 &&
     socialDetails?.githubURL?.length === 0 &&
     socialDetails?.twitterURL?.length === 0 &&
     socialDetails?.linkedinURL?.length === 0;
@@ -47,7 +48,19 @@ export function UserDetailsReadonly({ user, sx = {} }: UserDetailsMiniProps) {
         </Grid>
         {!hideSocials && (
           <Grid item mt={1} height={40}>
-            <SocialIcons social={socialDetails} />
+            <SocialIcons
+              social={{
+                ...socialDetails,
+                telegramUsername: telegramProperty?.value as string,
+                googleName: googleProperty?.value as string
+              }}
+              showDiscord={!!discordProperty?.enabledViews?.includes('profile')}
+              showTwitter={!!twitterProperty?.enabledViews?.includes('profile')}
+              showGithub={!!githubProperty?.enabledViews?.includes('profile')}
+              showLinkedIn={!!linkedinProperty?.enabledViews?.includes('profile')}
+              showGoogle={!!googleProperty?.enabledViews?.includes('profile')}
+              showTelegram={!!telegramProperty?.enabledViews?.includes('profile')}
+            />
           </Grid>
         )}
         {userDetails && (

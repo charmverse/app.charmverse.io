@@ -1,9 +1,10 @@
-import type { MemberProperty } from '@charmverse/core/prisma-client';
-import { prisma, MemberPropertyType } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { getAllMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
 import { getSpaceMembers } from 'lib/members/getSpaceMembers';
+import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 export async function getMembersExportData(spaceId: string) {
   const members = await getSpaceMembers({ spaceId, skipAccessCheck: true });
@@ -18,6 +19,7 @@ export async function getMembersExportData(spaceId: string) {
               name: true
             }
           },
+          telegramUser: true,
           wallets: true,
           discordUser: true
         }
@@ -56,7 +58,10 @@ export async function getMembersExportData(spaceId: string) {
           return member.roles.map((r) => r.name);
         }
         case 'discord': {
-          return member.profile?.social?.discordUsername || user?.discordUser?.account;
+          return (
+            member.profile?.social?.discordUsername ||
+            (user?.discordUser?.account as unknown as DiscordAccount)?.username
+          );
         }
         case 'twitter': {
           return member.profile?.social?.twitterURL;
@@ -72,6 +77,15 @@ export async function getMembersExportData(spaceId: string) {
         }
         case 'join_date': {
           return member.joinDate;
+        }
+        case 'wallet': {
+          return user?.wallets[0]?.address;
+        }
+        case 'google': {
+          return user?.googleAccounts[0]?.name;
+        }
+        case 'telegram': {
+          return (user?.telegramUser?.account as unknown as TelegramAccount)?.username;
         }
         // map values for selects and multiselects
         case 'select':

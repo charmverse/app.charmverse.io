@@ -63,24 +63,6 @@ export function SocialInputs(props: SocialInputsProps) {
         </FieldWrapper>
       </Grid>
       <Grid item>
-        <FieldWrapper label='Discord'>
-          <TextField
-            value={social.discordUsername}
-            disabled={readOnly}
-            fullWidth
-            error={!!errors?.discordUsername?.message}
-            helperText={errors?.discordUsername?.message}
-            placeholder='Username#1234'
-            onChange={(event) => {
-              onChange({
-                ...social,
-                discordUsername: event.target.value
-              });
-            }}
-          />
-        </FieldWrapper>
-      </Grid>
-      <Grid item>
         <FieldWrapper label='LinkedIn' required={required?.linkedinURL}>
           <TextField
             value={social.linkedinURL}
