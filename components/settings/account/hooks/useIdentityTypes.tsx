@@ -8,8 +8,11 @@ import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain
 import randomName from 'lib/utilities/randomName';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
+import { useLensProfile } from './useLensProfile';
+
 export function useIdentityTypes() {
   const { user } = useUser();
+  const { lensProfile } = useLensProfile();
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (!user) {
@@ -80,6 +83,15 @@ export function useIdentityTypes() {
       });
     });
 
+    if (lensProfile) {
+      types.push({
+        type: 'Lens',
+        username: (lensProfile.metadata?.displayName ?? lensProfile.handle?.fullHandle ?? '').split('/')[1],
+        isInUse: user.identityType === 'Lens',
+        icon: <IdentityIcon type='Lens' />
+      });
+    }
+
     types.push({
       type: 'RandomName',
       username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
@@ -88,7 +100,7 @@ export function useIdentityTypes() {
     });
 
     return types;
-  }, [user]);
+  }, [user, lensProfile]);
 
   return identityTypes;
 }

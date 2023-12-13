@@ -203,7 +203,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
 
 const lensConfig: LensConfig = {
   bindings: wagmiBindings(),
-  environment: isProdEnv ? production : development
+  environment: production
 };
 
 function DataProviders({ children }: { children: ReactNode }) {
