@@ -98,16 +98,17 @@ export async function createProposal({
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
-  let reviewersInput = reviewers?.map(
-    (r) =>
-      ({
-        // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
-        evaluationId: r.evaluationId,
-        roleId: r.group === 'role' ? r.id : undefined,
-        systemRole: r.group === 'system_role' ? r.id : undefined,
-        userId: r.group === 'user' ? r.id : undefined
-      } as Prisma.ProposalReviewerCreateManyInput)
-  );
+  let reviewersInput =
+    reviewers?.map(
+      (r) =>
+        ({
+          // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
+          proposalId,
+          roleId: r.group === 'role' ? r.id : undefined,
+          systemRole: r.group === 'system_role' ? r.id : undefined,
+          userId: r.group === 'user' ? r.id : undefined
+        } as Prisma.ProposalReviewerCreateManyInput)
+    ) || [];
 
   // retrieve permissions and apply evaluation ids to reviewers
   if (evaluations.length > 0) {
@@ -139,7 +140,7 @@ export async function createProposal({
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const [proposal, , page] = await prisma.$transaction([
+  const [proposal, createdReviewers, , page] = await prisma.$transaction([
     prisma.proposal.create({
       data: {
         // Add page creator as the proposal's first author
@@ -169,20 +170,16 @@ export async function createProposal({
                   }))
           }
         },
-        reviewers: reviewersInput
-          ? {
-              createMany: {
-                data: reviewersInput
-              }
-            }
-          : undefined,
         fields
       },
       include: {
         authors: true,
-        reviewers: true,
         category: true
       }
+    }),
+    prisma.proposalReviewer.createMany({
+      // we dont save evaluations as part of the template, since they link to workflow id instead
+      data: reviewersInput
     }),
     prisma.proposalEvaluationPermission.createMany({
       // we dont save evaluations as part of the template, since they link to workflow id instead
@@ -239,6 +236,12 @@ export async function createProposal({
 
   return {
     page: page as PageWithPermissions,
-    proposal: { ...proposal, rubricCriteria: upsertedCriteria, draftRubricAnswers: [], rubricAnswers: [] }
+    proposal: {
+      ...proposal,
+      reviewers: createdReviewers,
+      rubricCriteria: upsertedCriteria,
+      draftRubricAnswers: [],
+      rubricAnswers: []
+    }
   };
 }
