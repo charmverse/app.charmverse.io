@@ -54,7 +54,11 @@ export function ProposalRewards({
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
   const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
-  const { updateURLQuery } = useCharmRouter();
+  const {
+    updateURLQuery,
+    navigateToSpacePath,
+    router: { query }
+  } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
@@ -79,10 +83,17 @@ export function ProposalRewards({
   function openReward(rewardId: string | null) {
     if (!rewardId) return;
 
+    const modalView = !!query.id;
+
+    if (!modalView) {
+      navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
+      return;
+    }
+
     const pageId = getRewardPage(rewardId)?.id || rewardId;
     updateURLQuery({ [rewardQueryKey]: pageId });
   }
-  // <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
+
   if (rewards.length) {
     return (
       <Stack>

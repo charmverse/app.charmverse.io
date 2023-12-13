@@ -353,6 +353,8 @@ function DocumentPage({
                   setPage={savePage}
                   readOnlyTitle={!!page.syncWithPageId}
                   parentId={showParentChip ? card.parentId : null}
+                  insideModal={insideModal}
+                  pageId={page.id}
                 />
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                   <Box my={2} className='font-family-default'>
