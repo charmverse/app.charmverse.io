@@ -5,7 +5,8 @@ import charmClient from 'charmClient';
 import { useFilePicker } from 'hooks/useFilePicker';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { DEFAULT_MAX_FILE_SIZE_MB, FORM_DATA_FILE_PART_NAME } from 'lib/file/constants';
+import type { ResizeType } from 'lib/file/constants';
+import { DEFAULT_MAX_FILE_SIZE_MB, FORM_DATA_FILE_PART_NAME, FORM_DATA_IMAGE_RESIZE_TYPE } from 'lib/file/constants';
 
 export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
@@ -13,11 +14,11 @@ export type UploadedFileCallback = (info: UploadedFileInfo) => void;
 export const useS3UploadInput = ({
   onFileUpload,
   fileSizeLimitMB = DEFAULT_MAX_FILE_SIZE_MB,
-  resize = false
+  resizeType = 'emoji'
 }: {
   onFileUpload: UploadedFileCallback;
   fileSizeLimitMB?: number;
-  resize?: boolean;
+  resizeType?: ResizeType;
 }) => {
   const { showMessage } = useSnackbar();
   const [isUploading, setIsUploading] = useState(false);
@@ -39,9 +40,10 @@ export const useS3UploadInput = ({
     setFileName(file.name || '');
 
     try {
-      if (resize) {
+      if (resizeType) {
         const formData = new FormData();
         formData.append(FORM_DATA_FILE_PART_NAME, file);
+        formData.append(FORM_DATA_IMAGE_RESIZE_TYPE, resizeType);
         const { url } = await charmClient.resizeImage(formData);
         onFileUpload({ url, fileName: file.name || '', size: file.size });
       } else {

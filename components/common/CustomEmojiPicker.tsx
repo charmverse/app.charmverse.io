@@ -59,7 +59,6 @@ export function CustomEmojiPicker({ onUpdate }: { onUpdate: (icon: string) => vo
               }}
               uploadDisclaimer={`Recommended size is ${DEFAULT_IMAGE_SIZE} × ${DEFAULT_IMAGE_SIZE} pixels`}
               setImage={onUpdate}
-              resize
             />
           </Stack>
         ]
