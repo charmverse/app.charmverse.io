@@ -182,7 +182,6 @@ function MemberDirectoryGalleryCard({
             case 'phone':
             case 'email':
             case 'url':
-            case 'wallet':
             case 'number': {
               return (
                 memberProperty?.value && (

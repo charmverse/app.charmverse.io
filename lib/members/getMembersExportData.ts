@@ -78,9 +78,6 @@ export async function getMembersExportData(spaceId: string) {
         case 'join_date': {
           return member.joinDate;
         }
-        case 'wallet': {
-          return user?.wallets[0]?.address;
-        }
         case 'google': {
           return user?.googleAccounts[0]?.name;
         }

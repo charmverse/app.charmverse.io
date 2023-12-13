@@ -54,8 +54,6 @@ export async function getSpacesPropertyValues({
         return { ...pv, value: spaceMetadataMap[pv.spaceId]?.roles || [] };
       } else if (pv.type === 'join_date') {
         return { ...pv, value: spaceMetadataMap[pv.spaceId]?.joinDate };
-      } else if (pv.type === 'wallet') {
-        pv.value = user.wallets[0]?.address;
       } else if (pv.type === 'telegram') {
         pv.value = (user.telegramUser?.account as unknown as TelegramAccount)?.username;
       } else if (pv.type === 'discord') {

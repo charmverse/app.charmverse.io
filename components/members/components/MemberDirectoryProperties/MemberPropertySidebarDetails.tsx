@@ -104,58 +104,60 @@ export function MemberPropertySidebarDetails({
               </Tooltip>
             </Stack>
           ) : null}
-          <Stack>
-            <Box pl={4} mr={2}>
-              <MemberPropertyVisibility property={property} />
-            </Box>
-            {property?.permissions.length ? (
-              <Stack>
-                <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
-                  <Typography pl={4} variant='overline'>
-                    Restricted to roles:
+          {property.type !== 'wallet' && (
+            <Stack>
+              <Box pl={4} mr={2}>
+                <MemberPropertyVisibility property={property} />
+              </Box>
+              {property?.permissions.length ? (
+                <Stack>
+                  <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
+                    <Typography pl={4} variant='overline'>
+                      Restricted to roles:
+                    </Typography>
+                  </Tooltip>
+                  {property?.permissions.map((permission) => (
+                    <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
+                      <MenuItem
+                        dense
+                        sx={{
+                          pl: 4,
+                          alignItems: 'center',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          '&:hover .icons': {
+                            opacity: 1
+                          },
+                          flex: 1,
+                          '& .MuiListItemIcon-root': {
+                            minWidth: 30
+                          }
+                        }}
+                      >
+                        <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
+                        {canEditPropertyPermissions && (
+                          <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
+                            <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
+                              <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
+                            </Tooltip>
+                          </IconButton>
+                        )}
+                      </MenuItem>
+                    </Stack>
+                  ))}
+                </Stack>
+              ) : (
+                <Tooltip title={`Everyone in space can see ${property.name} property`} disableInteractive>
+                  <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+                    Everyone in space
+                    <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
                   </Typography>
                 </Tooltip>
-                {property?.permissions.map((permission) => (
-                  <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
-                    <MenuItem
-                      dense
-                      sx={{
-                        pl: 4,
-                        alignItems: 'center',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        '&:hover .icons': {
-                          opacity: 1
-                        },
-                        flex: 1,
-                        '& .MuiListItemIcon-root': {
-                          minWidth: 30
-                        }
-                      }}
-                    >
-                      <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
-                      {canEditPropertyPermissions && (
-                        <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
-                          <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
-                            <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
-                          </Tooltip>
-                        </IconButton>
-                      )}
-                    </MenuItem>
-                  </Stack>
-                ))}
-              </Stack>
-            ) : (
-              <Tooltip title={`Everyone in space can see ${property.name} property`} disableInteractive>
-                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
-                  Everyone in space
-                  <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
-                </Typography>
-              </Tooltip>
-            )}
-          </Stack>
+              )}
+            </Stack>
+          )}
 
-          {canEditPropertyPermissions && (
+          {canEditPropertyPermissions && property.type !== 'wallet' && (
             <Button
               variant='text'
               size='small'

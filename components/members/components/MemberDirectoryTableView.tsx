@@ -182,7 +182,6 @@ function MemberDirectoryTableRow({
             case 'google':
             case 'telegram':
             case 'discord':
-            case 'wallet':
             case 'number': {
               return (
                 <TableCell key={property.id}>
