@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import type { IntegrationModel } from 'components/settings/profile/components/IdentityModal';
+import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
@@ -13,6 +14,7 @@ import { useLensProfile } from './useLensProfile';
 export function useIdentityTypes() {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
+  const { farcasterProfile } = useFarcasterProfile();
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (!user) {
@@ -92,6 +94,15 @@ export function useIdentityTypes() {
       });
     }
 
+    if (farcasterProfile) {
+      types.push({
+        type: 'Farcaster',
+        username: farcasterProfile.body.displayName ?? '',
+        isInUse: user.identityType === 'Farcaster',
+        icon: <IdentityIcon type='Farcaster' />
+      });
+    }
+
     types.push({
       type: 'RandomName',
       username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
@@ -100,7 +111,7 @@ export function useIdentityTypes() {
     });
 
     return types;
-  }, [user, lensProfile]);
+  }, [user, lensProfile, farcasterProfile]);
 
   return identityTypes;
 }

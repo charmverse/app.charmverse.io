@@ -90,6 +90,18 @@ export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | n
       );
     }
 
+    case 'Farcaster': {
+      return (
+        <img
+          src='/images/logos/farcaster_logo.svg'
+          style={{
+            width,
+            height
+          }}
+        />
+      );
+    }
+
     case 'RandomName':
     default:
       return <PersonIcon style={{ color: '#777', height, width }} />;
