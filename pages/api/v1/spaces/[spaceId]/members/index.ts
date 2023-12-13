@@ -1,11 +1,11 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { isTestEnv } from 'config/constants';
-import { NotFoundError, requireKeys, requireSuperApiKey } from 'lib/middleware';
-import { getSummonProfile } from 'lib/profile/getSummonProfile';
+import { requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { defaultHandler } from 'lib/public-api/handler';
-import type { CreateSpaceMemberRequestBody, UserProfile } from 'lib/public-api/interfaces';
+import type { UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
@@ -29,7 +29,20 @@ handler.use(requireKeys([{ key: 'wallet', valueType: 'wallet' }], 'body')).post(
  *       content:
  *          application/json:
  *             schema:
- *                $ref: '#/components/schemas/CreateSpaceMemberRequestBody'
+ *                 CreateSpaceMemberRequestBody:
+ *                   required:
+ *                     - wallet
+ *                   type: object
+ *                   properties:
+ *                     summonUserId:
+ *                       type: string
+ *                       example: 'Cb817Edf301aE'
+ *                     email:
+ *                       type: string
+ *                       example: john.doe@gmail.com
+ *                     wallet:
+ *                       type: string
+ *                       example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
  *     responses:
  *       200:
  *         description: User profile and list of roles
@@ -38,6 +51,12 @@ handler.use(requireKeys([{ key: 'wallet', valueType: 'wallet' }], 'body')).post(
  *              schema:
  *                $ref: '#/components/schemas/UserProfile'
  */
+
+type CreateSpaceMemberRequestBody = {
+  email?: string;
+  summonUserId?: string;
+  wallet: string;
+};
 
 async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserProfile>) {
   const spaceId = req.query.spaceId as string;
@@ -62,19 +81,10 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
     });
   }
 
-  const summonProfile = await getSummonProfile({
-    userId: user.id,
-    summonApiUrl
-  });
-
-  if (!summonProfile) {
-    throw new NotFoundError('Summon profile not found');
-  }
-
   await addUserToSpace({
     spaceId,
     userId: user.id,
-    userXpsEngineId: summonProfile.id
+    userXpsEngineId: payload.summonUserId
   });
 
   await syncSummonSpaceRoles({
@@ -82,6 +92,8 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
     userId: user.id,
     summonApiUrl
   });
+
+  log.debug('[public-api] Added user to space', { spaceId, userId: user.id, summonUserId: payload.summonUserId });
 
   return res.status(200).json(user);
 }
