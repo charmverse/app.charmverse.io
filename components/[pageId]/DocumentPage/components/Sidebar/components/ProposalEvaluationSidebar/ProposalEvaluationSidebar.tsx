@@ -1,4 +1,5 @@
-import { Alert, SvgIcon } from '@mui/material';
+import { Edit as EditIcon } from '@mui/icons-material';
+import { Alert, IconButton, SvgIcon } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
@@ -22,14 +23,20 @@ export type Props = {
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'status' | 'evaluationType'>;
   evaluationId?: string;
   refreshProposal?: VoidFunction;
+  goToEditProposal: VoidFunction;
 };
 
-export function ProposalEvaluationSidebar({ pageId, proposal, evaluationId, refreshProposal }: Props) {
+export function ProposalEvaluationSidebar({
+  pageId,
+  proposal,
+  evaluationId,
+  refreshProposal,
+  goToEditProposal
+}: Props) {
   const evaluation = useMemo(
     () => proposal?.evaluations.find((e) => e.id === evaluationId),
     [evaluationId, proposal?.evaluations]
   );
-
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
@@ -68,38 +75,7 @@ export function ProposalEvaluationSidebar({ pageId, proposal, evaluationId, refr
    *  Results: visible to anyone when evaluation is active or closed, disabled if you are not a reviewer
    *
    * */
-  const evaluationTabs = useMemo<TabConfig[]>(() => {
-    const tabs = [
-      [
-        'Your evaluation',
-        <RubricAnswersForm
-          key='evaluate'
-          proposalId={proposal?.id || ''}
-          answers={myRubricAnswers}
-          draftAnswers={myDraftRubricAnswers}
-          criteriaList={rubricCriteria!}
-          onSubmit={onSubmitEvaluation}
-          disabled={!canAnswerRubric}
-        />,
-        { sx: { p: 0 } } // disable default padding of tab panel
-      ] as TabConfig,
-      canViewRubricAnswers &&
-        ([
-          'Results',
-          <RubricResults key='results' answers={evaluation?.rubricAnswers ?? []} criteriaList={rubricCriteria || []} />,
-          { sx: { p: 0 } }
-        ] as TabConfig)
-    ].filter(isTruthy);
-    return tabs;
-  }, [
-    canAnswerRubric,
-    canViewRubricAnswers,
-    proposal,
-    evaluation,
-    myDraftRubricAnswers,
-    myRubricAnswers,
-    rubricCriteria
-  ]);
+  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results'] : ['Your evaluation'];
 
   return (
     <>
@@ -110,7 +86,40 @@ export function ProposalEvaluationSidebar({ pageId, proposal, evaluationId, refr
               ? 'Evaluation results are only visible to Reviewers'
               : 'Only Reviewers can submit an evaluation'}
           </Alert>
-          <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} />
+
+          <MultiTabs
+            activeTab={rubricView}
+            setActiveTab={setRubricView}
+            tabs={evaluationTabs}
+            endAdornmentComponent={
+              <IconButton onClick={goToEditProposal} size='small'>
+                <EditIcon color='secondary' fontSize='small' />
+              </IconButton>
+            }
+          >
+            {({ value }) => (
+              <>
+                {value === 'Your evaluation' && (
+                  <RubricAnswersForm
+                    key='evaluate'
+                    proposalId={proposal?.id || ''}
+                    answers={myRubricAnswers}
+                    draftAnswers={myDraftRubricAnswers}
+                    criteriaList={rubricCriteria!}
+                    onSubmit={onSubmitEvaluation}
+                    disabled={!canAnswerRubric}
+                  />
+                )}
+                {value === 'Your evaluation' && (
+                  <RubricResults
+                    key='results'
+                    answers={evaluation?.rubricAnswers ?? []}
+                    criteriaList={rubricCriteria || []}
+                  />
+                )}
+              </>
+            )}
+          </MultiTabs>
         </>
       )}
       {evaluationTabs.length === 0 && !proposal && <LoadingComponent isLoading={true} />}

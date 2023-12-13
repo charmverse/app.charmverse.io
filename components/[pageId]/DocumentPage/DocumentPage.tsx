@@ -1,16 +1,15 @@
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { useMediaQuery } from '@mui/material';
-import Box from '@mui/material/Box';
+import { useMediaQuery, Divider, Box } from '@mui/material';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
-import { useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useUpdateProposal, useGetProposalDetails, useUpsertRubricCriteria } from 'charmClient/hooks/proposals';
 import { useGetReward } from 'charmClient/hooks/rewards';
+import type { ProposalEvaluationValues } from 'components/[pageId]/DocumentPage/components/Sidebar/components/ProposalSettingsSidebar/components/ProposalEvaluationForm';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -22,11 +21,14 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { EvaluationStepper } from 'components/proposals/components/EvaluationStepper/EvaluationStepper';
+import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useLgScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
@@ -99,8 +101,8 @@ function DocumentPage({
   enableSidebar
 }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
-
-  const [proposalEvaluationId, setProposalEvaluationId] = useState();
+  const isCharmVerse = useIsCharmverseSpace();
+  const [proposalEvaluationId, setProposalEvaluationId] = useState<string | undefined>();
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
@@ -123,17 +125,10 @@ function DocumentPage({
 
   const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId });
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
+  const { trigger: updateProposal } = useUpdateProposal({ proposalId });
+  const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
-  // keep a ref in sync for printing
-  const printRef = useRef(null);
-  useEffect(() => {
-    if (printRef?.current !== _printRef?.current) {
-      setPageProps({
-        printRef
-      });
-    }
-  }, [printRef, _printRef]);
 
   const card = useAppSelector((state) => {
     if (page?.type !== 'card' && page?.type !== 'card_template') {
@@ -200,6 +195,45 @@ function DocumentPage({
       setConnectionError(null);
     }
   }
+
+  async function onChangeEvaluation(evaluationId: string, updatedEvaluation: Partial<ProposalEvaluationValues>) {
+    if (updatedEvaluation.rubricCriteria) {
+      await upsertRubricCriteria({
+        evaluationId,
+        rubricCriteria: updatedEvaluation.rubricCriteria
+      });
+    } else {
+      await updateProposal({
+        evaluationId,
+        ...updatedEvaluation
+      });
+    }
+    await refreshProposal();
+  }
+
+  const openEvaluation = useCallback(
+    (evaluationId?: string) => {
+      if (evaluationId) {
+        if (proposalEvaluationId === evaluationId) {
+          // close the sidebar if u click on the active step
+          setActiveView(null);
+          setProposalEvaluationId(undefined);
+          return;
+        }
+        setProposalEvaluationId(evaluationId);
+      }
+      if (enableSidebar) {
+        setActiveView('proposal_evaluation');
+      } else {
+        persistActiveView({
+          [page.id]: 'proposal_evaluation'
+        });
+        // go to full page view
+        navigateToSpacePath(`/${page.path}`);
+      }
+    },
+    [page.path, page.id, sidebarView, setActiveView, proposalEvaluationId, enableSidebar]
+  );
 
   useEffect(() => {
     if (page?.type === 'card') {
@@ -269,17 +303,15 @@ function DocumentPage({
     }
   }, [!!persistedActiveView, enableSidebar, page.id]);
 
-  const openEvaluation = useCallback(() => {
-    if (enableSidebar) {
-      setActiveView('proposal_evaluation');
-    } else {
-      persistActiveView({
-        [page.id]: 'proposal_evaluation'
+  // keep a ref in sync for printing
+  const printRef = useRef(null);
+  useEffect(() => {
+    if (printRef?.current !== _printRef?.current) {
+      setPageProps({
+        printRef
       });
-      // go to full page view
-      navigateToSpacePath(`/${page.path}`);
     }
-  }, [enableSidebar, setActiveView]);
+  }, [printRef, _printRef]);
 
   return (
     <>
@@ -372,6 +404,19 @@ function DocumentPage({
                   readOnlyTitle={!!page.syncWithPageId}
                   parentId={showParentChip ? card.parentId : null}
                 />
+                {isCharmVerse && proposal && !isLoading && (
+                  <>
+                    <Box my={2} mb={1}>
+                      <EvaluationStepper
+                        evaluations={proposal.evaluations || []}
+                        selected={proposalEvaluationId}
+                        isDraft={proposal.status === 'draft'}
+                        onClick={openEvaluation}
+                      />
+                    </Box>
+                    <Divider />
+                  </>
+                )}
                 {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                   <Box my={2} className='font-family-default'>
                     <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
@@ -437,7 +482,7 @@ function DocumentPage({
                     />
                   )}
                   {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-                  {(enableComments || enableSuggestingMode) && (
+                  {(enableComments || enableSuggestingMode || page.type === 'proposal') && (
                     <PageSidebar
                       id='page-action-sidebar'
                       pageId={page.id}
@@ -451,6 +496,8 @@ function DocumentPage({
                       openSidebar={setActiveView}
                       threads={threads}
                       proposal={proposal}
+                      proposalInput={proposal}
+                      onChangeEvaluation={onChangeEvaluation}
                       refreshProposal={refreshProposal}
                     />
                   )}

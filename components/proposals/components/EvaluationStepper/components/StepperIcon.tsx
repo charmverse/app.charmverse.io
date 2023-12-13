@@ -3,8 +3,8 @@ import { Stack } from '@mui/material';
 
 const stepperSize = 25;
 
-export const StepperStack = styled(Stack)<{ isCurrent: boolean; isComplete: boolean; isDisabled: boolean }>(
-  ({ theme, isComplete, isCurrent, isDisabled }) => {
+export const StepperStack = styled(Stack)<{ isCurrent: boolean; isSelected: boolean; isDisabled: boolean }>(
+  ({ theme, isSelected, isCurrent, isDisabled }) => {
     const currentColor = isCurrent ? theme.palette.primary.main : theme.palette.gray.main;
     return `
 
@@ -30,7 +30,7 @@ export const StepperStack = styled(Stack)<{ isCurrent: boolean; isComplete: bool
         height: 100%;
         width: 100%;
         box-shadow: 0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${currentColor};
-        opacity: ${isCurrent ? 1 : 0};
+        opacity: ${isSelected ? 1 : 0};
         transition: opacity 150ms ease-in-out;
       }
     }

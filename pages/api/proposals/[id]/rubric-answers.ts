@@ -34,10 +34,11 @@ async function upsertProposalAnswersController(
     throw new ActionNotPermittedError(`You cannot update your answer for this proposal`);
   }
 
-  const { answers, isDraft } = req.body as RubricAnswerUpsert;
+  const { answers, evaluationId, isDraft } = req.body as RubricAnswerUpsert;
 
   await upsertRubricAnswers({
     isDraft,
+    evaluationId,
     proposalId,
     answers,
     userId

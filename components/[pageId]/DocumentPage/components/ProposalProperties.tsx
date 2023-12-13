@@ -7,9 +7,9 @@ import { useCallback, useEffect, useState } from 'react';
 import charmClient from 'charmClient';
 import {
   useGetAllReviewerUserIds,
-  useGetProposalDetails,
   useGetProposalFlowFlags,
-  useUpsertRubricCriteria
+  useUpsertRubricCriteria,
+  useUpdateProposal
 } from 'charmClient/hooks/proposals';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
@@ -58,6 +58,7 @@ export function ProposalProperties({
   refreshProposal
 }: ProposalPropertiesProps) {
   const { mutate: mutateNotifications } = useNotifications();
+  const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
@@ -102,13 +103,7 @@ export function ProposalProperties({
     categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
-    evaluations: (proposal?.evaluations ?? []).map((evaluation) => ({
-      ...evaluation,
-      reviewers: evaluation.reviewers.map((reviewer) => ({
-        group: reviewer.roleId ? 'role' : 'user',
-        id: reviewer.roleId ?? (reviewer.userId as string)
-      }))
-    })),
+    evaluations: proposal?.evaluations ?? [],
     rubricCriteria: proposal?.rubricCriteria ?? [],
     publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
     reviewers:
@@ -151,8 +146,7 @@ export function ProposalProperties({
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
     if (proposal) {
-      await charmClient.proposals.updateProposal({
-        proposalId,
+      await updateProposal({
         authors: proposal.authors.map(({ userId }) => userId),
         reviewers: proposal.reviewers.map((reviewer) => ({
           id: reviewer.roleId ?? reviewer.userId ?? (reviewer.systemRole as string),

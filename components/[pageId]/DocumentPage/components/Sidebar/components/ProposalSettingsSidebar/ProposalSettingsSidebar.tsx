@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
+import type { ProposalEvaluationValues } from 'components/[pageId]/DocumentPage/components/Sidebar/components/ProposalSettingsSidebar/components/ProposalEvaluationForm';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
@@ -15,11 +16,11 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { ProposalEvaluationForm } from './components/ProposalEvaluationForm';
 
 export type Props = {
-  proposal?: ProposalPropertiesInput;
-  onChangeProposal?: (updated: ProposalPropertiesInput) => void;
+  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'evaluations'>;
+  onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
 };
 
-export function ProposalSettingsSidebar({ proposal, onChangeProposal }: Props) {
+export function ProposalSettingsSidebar({ proposal, onChangeEvaluation }: Props) {
   const isAdmin = useIsAdmin();
 
   const canEdit = isAdmin;
@@ -37,15 +38,16 @@ export function ProposalSettingsSidebar({ proposal, onChangeProposal }: Props) {
               categoryId={proposal.categoryId}
               evaluation={evaluation}
               onChange={(updated) => {
-                const evaluations = proposal.evaluations.map((e) => (e.id === updated.id ? updated : e));
-                onChangeProposal?.({
-                  ...proposal,
-                  evaluations
-                });
+                onChangeEvaluation?.(evaluation.id, updated);
               }}
             />
           </>
         ))}
+      {proposal && evaluationsWithConfig?.length === 0 && (
+        <Typography variant='body2' color='secondary'>
+          No evaluations configured
+        </Typography>
+      )}
     </Box>
   );
 }

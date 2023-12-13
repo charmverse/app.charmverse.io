@@ -5,7 +5,7 @@ import { findIndex } from 'lodash';
 import type { StepperProps } from './Stepper';
 import { StepperStack } from './StepperIcon';
 
-export function DesktopStepper({ steps, onClick, value }: StepperProps) {
+export function DesktopStepper({ steps, onClick, selected, value }: StepperProps) {
   const currentPosition = value ? findIndex(steps, (step) => step.value === value) : -1;
   return (
     <Grid
@@ -33,7 +33,7 @@ export function DesktopStepper({ steps, onClick, value }: StepperProps) {
                 height='100%'
                 gap={1}
                 onClick={() => !step.disabled && onClick(step.value)}
-                isComplete={step.completed}
+                isSelected={step.value === selected}
                 isCurrent={isCurrent}
                 isDisabled={step.disabled}
               >

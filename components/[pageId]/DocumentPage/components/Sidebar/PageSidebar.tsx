@@ -7,10 +7,8 @@ import { memo } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
-import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import { CommentsSidebar } from './components/CommentsSidebar';
@@ -75,21 +73,22 @@ type SidebarProps = {
   proposalId?: string | null;
   proposal?: EvaluationSidebarProps['proposal'];
   proposalInput?: ProposalSettingsProps['proposal'];
-  onChangeProposal?: (formInput: ProposalSettingsProps['proposal']) => void;
+  onChangeEvaluation?: ProposalSettingsProps['onChangeEvaluation'];
   refreshProposal?: VoidFunction;
   proposalEvaluationId?: string;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { id, proposal, proposalInput, onChangeProposal, refreshProposal, sidebarView, openSidebar, closeSidebar } =
-    props;
+  const { id, proposal, sidebarView, openSidebar, closeSidebar } = props;
   const isMdScreen = useMdScreen();
+  const isCharmVerse = useIsCharmverseSpace();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
 
   const showEvaluationSidebarIcon =
-    proposal?.evaluationType === 'rubric' &&
-    (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed');
+    (proposal?.evaluationType === 'rubric' &&
+      (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
+    (isCharmVerse && !!proposal);
 
   function toggleSidebar() {
     if (sidebarView === null) {
@@ -183,7 +182,7 @@ function SidebarContents({
   proposalEvaluationId,
   proposal,
   proposalInput,
-  onChangeProposal,
+  onChangeEvaluation,
   refreshProposal
 }: SidebarProps) {
   const isCharmVerse = useIsCharmverseSpace();
@@ -191,17 +190,20 @@ function SidebarContents({
     <>
       {sidebarView === 'proposal_evaluation' &&
         (isCharmVerse ? (
-          <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />
-        ) : (
           <ProposalEvaluationSidebar
             pageId={pageId}
             proposal={proposal}
             evaluationId={proposalEvaluationId}
             refreshProposal={refreshProposal}
+            goToEditProposal={() => {
+              openSidebar?.('proposal_evaluation_settings');
+            }}
           />
+        ) : (
+          <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />
         ))}
       {sidebarView === 'proposal_evaluation_settings' && (
-        <ProposalSettingsSidebar proposal={proposalInput} onChangeProposal={onChangeProposal} />
+        <ProposalSettingsSidebar proposal={proposalInput} onChangeEvaluation={onChangeEvaluation} />
       )}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar

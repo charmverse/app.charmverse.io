@@ -9,7 +9,6 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
 
 import { NoCommentsMessage } from '../CommentsSidebar';

@@ -1,12 +1,12 @@
-import type { ProposalEvaluation } from '@charmverse/core/prisma';
+import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
 import { Box, Divider, Typography, FormLabel } from '@mui/material';
 
+import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ProposalRubricCriteriaInput } from 'components/proposals/components/ProposalProperties/components/ProposalRubricCriteriaInput';
 import type { RangeProposalCriteria } from 'components/proposals/components/ProposalProperties/components/ProposalRubricCriteriaInput';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
 
 // result and id are not used for creating evaluations, so add them here
 // leave out permissions which are picked up on the backend based on workflowId
@@ -20,6 +20,25 @@ type Props = {
 };
 
 export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Props) {
+  const reviewerOptions = evaluation.reviewers
+    // .filter((reviewer) => reviewer.group === 'role' || reviewer.group === 'user')
+    .map((reviewer) => ({
+      group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
+      id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
+    }));
+
+  function handleOnChangeReviewers(reviewers: SelectOption[]) {
+    onChange({
+      ...evaluation,
+      reviewers: reviewers.map((r) => ({
+        // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
+        // evaluationId: r.evaluationId,
+        roleId: r.group === 'role' ? r.id : null,
+        systemRole: r.group === 'system_role' ? (r.id as ProposalSystemRole) : null,
+        userId: r.group === 'user' ? r.id : null
+      }))
+    });
+  }
   return (
     <Box ml={3}>
       <Box display='flex' alignItems='center' gap={1} ml='-28px'>
@@ -41,18 +60,10 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange }: Pro
           <UserAndRoleSelect
             data-test='proposal-reviewer-select'
             emptyPlaceholderContent='Select user or role'
-            value={evaluation.reviewers}
+            value={reviewerOptions}
             variant='outlined'
             proposalCategoryId={categoryId}
-            onChange={async (options) => {
-              const reviewers = options.filter(
-                (option) => option.group === 'role' || option.group === 'user'
-              ) as ProposalReviewerInput[];
-              onChange({
-                ...evaluation,
-                reviewers: reviewers.map((option) => ({ group: option.group, id: option.id }))
-              });
-            }}
+            onChange={handleOnChangeReviewers}
           />
         )}
       </Box>

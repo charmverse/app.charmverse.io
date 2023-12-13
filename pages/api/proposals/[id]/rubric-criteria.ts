@@ -31,10 +31,11 @@ async function upsertProposalCriteriaController(
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  const { rubricCriteria } = req.body as RubricCriteriaUpsert;
+  const { rubricCriteria, evaluationId } = req.body as RubricCriteriaUpsert;
 
   const updatedCriteria = await upsertRubricCriteria({
     proposalId,
+    evaluationId,
     rubricCriteria
   });
 

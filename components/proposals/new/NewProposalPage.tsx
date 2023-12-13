@@ -29,11 +29,7 @@ import { usePages } from 'hooks/usePages';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
-import type {
-  ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
+import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
@@ -102,6 +98,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
         contentText: proposalTemplate.page.contentText ?? '',
         content: proposalTemplate.page.content as any,
         proposalTemplateId: selectedTemplate,
+        evaluations: proposalTemplate.evaluations,
         evaluationType: proposalTemplate.evaluationType,
         headerImage: proposalTemplate.page.headerImage,
         icon: proposalTemplate.page.icon,
@@ -192,7 +189,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
       evaluations: workflow.evaluations.map((evaluation, index) => ({
         id: uuid(),
         index,
-        reviewers: [] as ProposalReviewerInput[],
+        reviewers: [],
         rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
         title: evaluation.title,
         type: evaluation.type,
@@ -211,9 +208,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
 
   async function saveForm() {
     await createProposal();
-    if (proposalEvaluationId) {
-      navigateToSpacePath(`/proposals`);
-    }
+    navigateToSpacePath(`/proposals`);
   }
 
   function applyTemplate(templatePage: PageMeta) {
@@ -232,6 +227,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
           proposalTemplateId: templatePage.id,
           workflowId: template.workflowId,
           evaluationType: template.evaluationType,
+          evaluations: template.evaluations,
           rubricCriteria: template.rubricCriteria,
           fields: (template.fields as ProposalFields) || {}
         });
@@ -357,18 +353,14 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                   <PageSidebar
                     id='page-action-sidebar'
                     spaceId={currentSpace.id}
-                    proposalEvaluationId={proposalEvaluationId}
-                    // pagePermissions={pagePermissions}
-                    // editorState={editorState}
                     sidebarView={showSidebar ? 'proposal_evaluation_settings' : null}
                     closeSidebar={() => setShowSidebar(false)}
-                    // openSidebar={setActiveView}
-                    // threads={threads}
                     proposalInput={formInputs}
-                    onChangeProposal={(updated) => {
+                    onChangeEvaluation={(updated) => {
+                      const evaluations = formInputs.evaluations.map((e) => (e.id === updated.id ? updated : e));
                       setFormInputs({
                         ...formInputs,
-                        ...updated
+                        evaluations
                       });
                     }}
                   />

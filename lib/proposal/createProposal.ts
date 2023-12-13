@@ -1,6 +1,6 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Page, ProposalStatus } from '@charmverse/core/prisma';
+import type { Page, ProposalStatus, ProposalReviewer } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, WorkflowEvaluationJson, ProposalWorkflowTyped } from '@charmverse/core/proposals';
@@ -28,7 +28,7 @@ type PageProps = Partial<
 >;
 
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
-  reviewers: ProposalReviewerInput[];
+  reviewers: Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>[];
   rubricCriteria: RubricDataInput[];
   permissions?: WorkflowEvaluationJson['permissions']; // pass these in to override workflow defaults
 };
@@ -98,6 +98,17 @@ export async function createProposal({
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
+  let reviewersInput = reviewers?.map(
+    (r) =>
+      ({
+        // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
+        evaluationId: r.evaluationId,
+        roleId: r.group === 'role' ? r.id : undefined,
+        systemRole: r.group === 'system_role' ? r.id : undefined,
+        userId: r.group === 'user' ? r.id : undefined
+      } as Prisma.ProposalReviewerCreateManyInput)
+  );
+
   // retrieve permissions and apply evaluation ids to reviewers
   if (evaluations.length > 0) {
     evaluations.forEach(({ id: evaluationId, permissions: permissionsInput }, index) => {
@@ -117,25 +128,15 @@ export async function createProposal({
       );
     });
 
-    reviewers = evaluations.flatMap((evaluation, index) =>
+    reviewersInput = evaluations.flatMap((evaluation, index) =>
       evaluation.reviewers.map((reviewer) => ({
         ...reviewer,
+        proposalId,
         evaluationId: evaluationIds[index]
       }))
     );
     proposalStatus = 'published'; // TODO: implement support for drafts
   }
-
-  const reviewersInput = reviewers?.map(
-    (r) =>
-      ({
-        // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
-        evaluationId: r.evaluationId,
-        roleId: r.group === 'role' ? r.id : undefined,
-        systemRole: r.group === 'system_role' ? r.id : undefined,
-        userId: r.group === 'user' ? r.id : undefined
-      } as Prisma.ProposalReviewerCreateManyInput)
-  );
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, , page] = await prisma.$transaction([
@@ -210,6 +211,7 @@ export async function createProposal({
   const upsertedCriteria = rubricCriteria
     ? await upsertRubricCriteria({
         proposalId: proposal.id,
+        evaluationId: null,
         rubricCriteria
       })
     : [];
@@ -217,7 +219,13 @@ export async function createProposal({
   await Promise.all(
     evaluations
       .filter((evaluation) => evaluation.type === 'rubric')
-      .map((evaluation) => upsertRubricCriteria({ proposalId: proposal.id, rubricCriteria: evaluation.rubricCriteria }))
+      .map((evaluation) =>
+        upsertRubricCriteria({
+          evaluationId: evaluation.id,
+          proposalId: proposal.id,
+          rubricCriteria: evaluation.rubricCriteria
+        })
+      )
   );
 
   await publishProposalEvent({

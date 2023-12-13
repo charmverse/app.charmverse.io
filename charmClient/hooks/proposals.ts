@@ -16,6 +16,7 @@ import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
@@ -64,10 +65,13 @@ export function useCreateProposal() {
   return usePOST<Omit<CreateProposalInput, 'userId'>, { id: string }>('/api/proposals');
 }
 
-export function useUpsertRubricCriteria({ proposalId }: { proposalId: string }) {
-  return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/proposals/${proposalId}/rubric-criteria`);
+export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
 }
 
+export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/proposals/${proposalId}/rubric-criteria`);
+}
 export function useUpsertRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
 }
