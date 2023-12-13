@@ -26,23 +26,23 @@ handler.use(requireKeys([{ key: 'wallet', valueType: 'wallet' }], 'body')).post(
  *     tags:
  *       - 'Partner API'
  *     requestBody:
+ *       required: true
  *       content:
  *          application/json:
  *             schema:
- *                 CreateSpaceMemberRequestBody:
- *                   required:
- *                     - wallet
- *                   type: object
- *                   properties:
- *                     summonUserId:
- *                       type: string
- *                       example: 'Cb817Edf301aE'
- *                     email:
- *                       type: string
- *                       example: john.doe@gmail.com
- *                     wallet:
- *                       type: string
- *                       example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
+ *                required:
+ *                  - wallet
+ *                type: object
+ *                properties:
+ *                  summonUserId:
+ *                    type: string
+ *                    example: 'Cb817Edf301aE'
+ *                  email:
+ *                    type: string
+ *                    example: john.doe@gmail.com
+ *                  wallet:
+ *                    type: string
+ *                    example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
  *     responses:
  *       200:
  *         description: User profile and list of roles
