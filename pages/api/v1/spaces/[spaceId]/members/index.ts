@@ -84,7 +84,7 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   await addUserToSpace({
     spaceId,
     userId: user.id,
-    summonUserId: payload.summonUserId
+    userXpsEngineId: payload.summonUserId
   });
 
   await syncSummonSpaceRoles({

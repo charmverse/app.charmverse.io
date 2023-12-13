@@ -7,10 +7,10 @@ import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 type Props = {
   spaceId: string;
   userId: string;
-  summonUserId?: string;
+  userXpsEngineId?: string;
 };
 
-export async function addUserToSpace({ spaceId, userId, summonUserId }: Props): Promise<Space | null> {
+export async function addUserToSpace({ spaceId, userId, userXpsEngineId }: Props): Promise<Space | null> {
   const space = await prisma.space.findFirstOrThrow({ where: { id: spaceId } });
 
   const spaceMembership = await prisma.spaceRole.findFirst({
@@ -46,13 +46,13 @@ export async function addUserToSpace({ spaceId, userId, summonUserId }: Props): 
       }
     });
   }
-  if (summonUserId) {
+  if (userXpsEngineId) {
     await prisma.user.update({
       where: {
         id: userId
       },
       data: {
-        xpsEngineId: summonUserId
+        xpsEngineId: userXpsEngineId
       }
     });
   }
