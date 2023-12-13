@@ -311,7 +311,7 @@ export function ProposalPropertiesBase({
                 <ProposalCategorySelect
                   readOnly={readOnlyCategory}
                   readOnlyMessage={isFromTemplate ? templateTooltip('category', isAdmin) : undefined}
-                  options={proposalCategoriesWithCreatePermission || []}
+                  options={(readOnlyCategory ? categories : proposalCategoriesWithCreatePermission) || []}
                   value={proposalCategory ?? null}
                   onChange={onChangeCategory}
                 />
