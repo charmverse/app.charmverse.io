@@ -27,16 +27,16 @@ export function CopyLink({ tokenGatesAvailable, spaceDomain }: { tokenGatesAvail
   }
 
   return tokenGatesAvailable ? (
-    <Tooltip title='Add a token gate to use this link'>
-      <span>
-        <CopyLinkButton />
-      </span>
-    </Tooltip>
-  ) : (
     <CopyToClipboard text={shareLink} onCopy={onCopy}>
       <span>
         <CopyLinkButton clickable />
       </span>
     </CopyToClipboard>
+  ) : (
+    <Tooltip title='Add a token gate to use this link'>
+      <span>
+        <CopyLinkButton />
+      </span>
+    </Tooltip>
   );
 }
