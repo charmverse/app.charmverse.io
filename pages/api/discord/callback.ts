@@ -27,7 +27,6 @@ handler.get(async (req, res) => {
   const redirectUrl = getDiscordRedirectUrl(req.headers.host, redirectPath);
   const subdomain = getSpaceDomainFromHost(redirectUrl.host);
   const redirect = subdomain ? redirectPath : redirectUrl.pathname + redirectUrl.search;
-
   const tempAuthCode = req.query.code;
 
   if (req.query.error || typeof tempAuthCode !== 'string') {
@@ -73,10 +72,15 @@ handler.get(async (req, res) => {
     return res.redirect(redirect);
   }
 
+  const urlSearchParams = new URLSearchParams();
+
+  if (req.query.guild_id) {
+    urlSearchParams.append('guild_id', req.query.guild_id as string);
+    urlSearchParams.append('type', 'import-roles');
+  }
+
   // When login with discord ?returnUrl is passed after oauth flow, that messes up the whole url
-  res.redirect(
-    `${redirect.split('?')[0]}${req.query.guild_id ? `?guild_id=${req.query.guild_id}&type=import-roles` : ''}`
-  );
+  res.redirect(`${redirect.split('?')[0]}${urlSearchParams.size ? `?${urlSearchParams.toString()}` : ''}`);
 });
 
 export default withSessionRoute(handler);

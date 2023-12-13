@@ -62,6 +62,21 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true,
     hidden: true
   },
+  google: {
+    label: 'Google',
+    default: true,
+    hidden: true
+  },
+  wallet: {
+    label: 'Wallet',
+    default: true,
+    hidden: true
+  },
+  telegram: {
+    label: 'Telegram',
+    default: true,
+    hidden: true
+  },
   email: {
     label: 'Email'
   },

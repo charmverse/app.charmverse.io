@@ -52,6 +52,11 @@ function MemberDirectoryGalleryCard({
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
   const isGithubHidden = !propertiesRecord.github?.enabledViews.includes('gallery');
+  const isGoogleHidden = !propertiesRecord.google?.enabledViews.includes('gallery');
+  const isTelegramHidden = !propertiesRecord.telegram?.enabledViews.includes('gallery');
+  const googleProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.google?.id);
+  const telegramProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.telegram?.id);
+
   const { showUserId } = useMemberDialog();
 
   const isUserCard = user?.id === member.id && currentSpace;
@@ -94,11 +99,17 @@ function MemberDirectoryGalleryCard({
         )}
         <SocialIcons
           gap={1}
-          social={social}
+          social={{
+            ...social,
+            telegramUsername: (telegramProperty?.value as string) ?? '',
+            googleName: (googleProperty?.value as string) ?? ''
+          }}
           showLinkedIn={!isLinkedInHidden}
           showGithub={!isGithubHidden}
           showDiscord={!isDiscordHidden}
           showTwitter={!isTwitterHidden}
+          showGoogle={!isGoogleHidden}
+          showTelegram={!isTelegramHidden}
         />
         {visibleProperties.map((property) => {
           const memberProperty = member.properties.find((mp) => mp.memberPropertyId === property.id);

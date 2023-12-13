@@ -1,5 +1,6 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import TelegramIcon from '@mui/icons-material/Telegram';
 import type { StackProps } from '@mui/material';
 import { Link, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
@@ -15,17 +16,23 @@ export function SocialIcons({
     twitterURL: '',
     githubURL: '',
     discordUsername: '',
-    linkedinURL: ''
+    linkedinURL: '',
+    googleName: '',
+    telegramUsername: ''
   },
   showDiscord = true,
   showTwitter = true,
   showGithub = true,
   showLinkedIn = true,
+  showGoogle = true,
+  showTelegram = true,
   ...props
 }: {
   showDiscord?: boolean;
   showTwitter?: boolean;
   showGithub?: boolean;
+  showGoogle?: boolean;
+  showTelegram?: boolean;
   showLinkedIn?: boolean;
   children?: ReactNode;
   social?: {
@@ -33,6 +40,8 @@ export function SocialIcons({
     githubURL?: string;
     discordUsername?: string;
     linkedinURL?: string;
+    googleName?: string;
+    telegramUsername?: string;
   };
 } & StackProps) {
   return (
@@ -51,6 +60,20 @@ export function SocialIcons({
       {showGithub && social.githubURL && (
         <Link href={social.githubURL} target='_blank' display='flex'>
           <GitHubIcon style={{ color: '#141414', height: iconHeight }} />
+        </Link>
+      )}
+      {showGoogle && social.googleName && (
+        <img
+          src='/images/walletLogos/Google_G.png'
+          style={{
+            width: iconHeight,
+            height: iconHeight
+          }}
+        />
+      )}
+      {showGithub && social.telegramUsername && (
+        <Link href={`https://t.me/${social.telegramUsername}`} target='_blank' display='flex'>
+          <TelegramIcon style={{ color: '#229ED9', height: iconHeight }} />
         </Link>
       )}
       {children}
