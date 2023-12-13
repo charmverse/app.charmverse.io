@@ -10,7 +10,7 @@ type Step = {
 };
 
 export type StepperProps = {
-  selected?: string; // the step you are looking at but not necessarily the one in process
+  selected?: string | null; // the step you are looking at but not necessarily the one in process
   value?: string;
   onClick: (selectedValue: string) => void;
   steps: Step[];

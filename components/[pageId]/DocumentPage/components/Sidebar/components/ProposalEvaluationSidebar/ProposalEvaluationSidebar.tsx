@@ -1,27 +1,16 @@
-import { Edit as EditIcon } from '@mui/icons-material';
-import { Alert, IconButton, SvgIcon } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { RiChatCheckLine } from 'react-icons/ri';
+import { useEffect, useState } from 'react';
 
-import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
-import LoadingComponent from 'components/common/LoadingComponent';
-import type { TabConfig } from 'components/common/MultiTabs';
-import MultiTabs from 'components/common/MultiTabs';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
-import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import { isTruthy } from 'lib/utilities/types';
+import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
 
-import { NoCommentsMessage } from '../CommentsSidebar';
-
-import { RubricAnswersForm } from './RubricAnswersForm';
-import { RubricResults } from './RubricResults';
+import { FeedbackEvaluation } from './components/FeedbackEvaluation';
+import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { RubricEvaluation } from './components/RubricEvaluation';
 
 export type Props = {
   pageId?: string;
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'status' | 'evaluationType'>;
-  evaluationId?: string;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'authors' | 'evaluations' | 'status' | 'evaluationType'>;
+  evaluationId?: string | null;
   refreshProposal?: VoidFunction;
   goToEditProposal: VoidFunction;
 };
@@ -29,113 +18,34 @@ export type Props = {
 export function ProposalEvaluationSidebar({
   pageId,
   proposal,
-  evaluationId,
+  evaluationId = null,
   refreshProposal,
   goToEditProposal
 }: Props) {
-  const evaluation = useMemo(
-    () => proposal?.evaluations.find((e) => e.id === evaluationId),
-    [evaluationId, proposal?.evaluations]
-  );
-  const [rubricView, setRubricView] = useState<number>(0);
-  const isAdmin = useIsAdmin();
-  const { user } = useUser();
-  const { permissions: proposalPermissions } = useProposalPermissions({
-    proposalIdOrPath: proposal?.id
-  });
-  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
-    !!pageId && evaluation?.type === 'rubric' ? pageId : undefined
-  );
-  const canAnswerRubric = proposalPermissions?.evaluate;
-  const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
-  const rubricCriteria = evaluation?.rubricCriteria;
+  const [activeEvaluationId, setActiveEvaluationId] = useState<string | null>(evaluationId);
 
-  const myRubricAnswers = useMemo(
-    () => evaluation?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],
-    [user?.id, evaluation?.rubricAnswers]
-  );
-  const myDraftRubricAnswers = useMemo(
-    () => evaluation?.draftRubricAnswers.filter((answer) => answer.userId === user?.id),
-    [user?.id, evaluation?.draftRubricAnswers]
-  );
+  const evaluation = proposal?.evaluations.find((e) => e.id === activeEvaluationId);
 
-  const canViewRubricAnswers = isAdmin || isReviewer;
+  useEffect(() => {
+    setActiveEvaluationId(evaluationId);
+  }, [evaluationId]);
 
-  async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
-    if (!isDraft) {
-      await refreshProposal?.();
-      // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
-      setRubricView(1);
+  useEffect(() => {
+    if (!evaluationId && proposal?.evaluations.length) {
+      const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+      // load the first evaluation on load by default
+      if (currentEvaluation) {
+        setActiveEvaluationId(currentEvaluation.id);
+      }
     }
+  }, []);
+
+  if (evaluation?.type === 'rubric') {
+    return <RubricEvaluation {...{ pageId, proposal, evaluation, refreshProposal, goToEditProposal }} />;
+  } else if (evaluation?.type === 'feedback') {
+    return <FeedbackEvaluation {...{ proposal, evaluation, goToEditProposal }} />;
+  } else if (evaluation?.type === 'pass_fail') {
+    return <PassFailEvaluation {...{ proposal, evaluation, goToEditProposal }} />;
   }
-  /**
-   *
-   *  Tab visibility rules:
-   *  Evaluate: visible when evaluation is active or closed, and only if you are a reviewer
-   *  Results: visible to anyone when evaluation is active or closed, disabled if you are not a reviewer
-   *
-   * */
-  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results'] : ['Your evaluation'];
-
-  return (
-    <>
-      {evaluationTabs.length > 0 && (
-        <>
-          <Alert severity='info'>
-            {canAnswerRubric
-              ? 'Evaluation results are only visible to Reviewers'
-              : 'Only Reviewers can submit an evaluation'}
-          </Alert>
-
-          <MultiTabs
-            activeTab={rubricView}
-            setActiveTab={setRubricView}
-            tabs={evaluationTabs}
-            endAdornmentComponent={
-              <IconButton onClick={goToEditProposal} size='small'>
-                <EditIcon color='secondary' fontSize='small' />
-              </IconButton>
-            }
-          >
-            {({ value }) => (
-              <>
-                {value === 'Your evaluation' && (
-                  <RubricAnswersForm
-                    key='evaluate'
-                    proposalId={proposal?.id || ''}
-                    answers={myRubricAnswers}
-                    draftAnswers={myDraftRubricAnswers}
-                    criteriaList={rubricCriteria!}
-                    onSubmit={onSubmitEvaluation}
-                    disabled={!canAnswerRubric}
-                  />
-                )}
-                {value === 'Your evaluation' && (
-                  <RubricResults
-                    key='results'
-                    answers={evaluation?.rubricAnswers ?? []}
-                    criteriaList={rubricCriteria || []}
-                  />
-                )}
-              </>
-            )}
-          </MultiTabs>
-        </>
-      )}
-      {evaluationTabs.length === 0 && !proposal && <LoadingComponent isLoading={true} />}
-      {evaluationTabs.length === 0 && proposal && (
-        <NoCommentsMessage
-          icon={
-            <SvgIcon
-              component={RiChatCheckLine}
-              color='secondary'
-              fontSize='large'
-              sx={{ mb: '1px', height: '2em', width: '2em' }}
-            />
-          }
-          message='Evaluation is not enabled for this proposal'
-        />
-      )}
-    </>
-  );
+  return null;
 }

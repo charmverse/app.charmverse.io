@@ -5,7 +5,7 @@ import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sideb
 import { useCharmRouter } from 'hooks/useCharmRouter';
 
 export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDialog?: boolean; pageId?: string }) {
-  const { activeView, setActiveView, persistActiveView } = usePageSidebar();
+  const { activeView, closeSidebar, setActiveView, persistActiveView } = usePageSidebar();
   const { navigateToSpacePath } = useCharmRouter();
 
   const isActive = activeView === 'proposal_evaluation';
@@ -13,7 +13,7 @@ export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDia
   function openEvaluation() {
     // close sidebar if open
     if (isActive) {
-      setActiveView(null);
+      closeSidebar();
     } else if (!isInsideDialog) {
       // open inside full page
       setActiveView('proposal_evaluation');

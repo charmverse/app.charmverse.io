@@ -51,6 +51,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { usePageSidebar } from './components/Sidebar/hooks/usePageSidebar';
+import type { PageSidebarView } from './components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 
 const RewardProperties = dynamic(
@@ -106,15 +107,16 @@ function DocumentPage({
 }: DocumentPageProps) {
   const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   const isCharmVerse = useIsCharmverseSpace();
-  const [proposalEvaluationId, setProposalEvaluationId] = useState<string | undefined>();
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
     activeView: sidebarView,
+    activeEvaluationId,
     persistedActiveView,
     persistActiveView,
     setActiveView,
-    closeSidebar
+    closeSidebar,
+    openEvaluationSidebar
   } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
@@ -218,25 +220,25 @@ function DocumentPage({
   const openEvaluation = useCallback(
     (evaluationId?: string) => {
       if (evaluationId) {
-        if (proposalEvaluationId === evaluationId) {
+        if (activeEvaluationId === evaluationId) {
           // close the sidebar if u click on the active step
-          setActiveView(null);
-          setProposalEvaluationId(undefined);
+          closeSidebar();
           return;
         }
-        setProposalEvaluationId(evaluationId);
-      }
-      if (enableSidebar) {
-        setActiveView('proposal_evaluation');
+        if (enableSidebar) {
+          openEvaluationSidebar(evaluationId);
+        } else {
+          persistActiveView({
+            [page.id]: 'proposal_evaluation'
+          });
+          // go to full page view
+          navigateToSpacePath(`/${page.path}`);
+        }
       } else {
-        persistActiveView({
-          [page.id]: 'proposal_evaluation'
-        });
-        // go to full page view
-        navigateToSpacePath(`/${page.path}`);
+        closeSidebar();
       }
     },
-    [page.path, page.id, sidebarView, setActiveView, proposalEvaluationId, enableSidebar]
+    [page.path, page.id, sidebarView, setActiveView, activeEvaluationId, enableSidebar]
   );
 
   useEffect(() => {
@@ -413,7 +415,7 @@ function DocumentPage({
                     <Box my={2} mb={1}>
                       <EvaluationStepper
                         evaluations={proposal.evaluations || []}
-                        selected={proposalEvaluationId}
+                        selected={activeEvaluationId}
                         isDraft={proposal.status === 'draft'}
                         onClick={openEvaluation}
                       />
@@ -492,7 +494,7 @@ function DocumentPage({
                       pageId={page.id}
                       spaceId={page.spaceId}
                       proposalId={proposalId}
-                      proposalEvaluationId={proposalEvaluationId}
+                      proposalEvaluationId={activeEvaluationId}
                       pagePermissions={pagePermissions}
                       editorState={editorState}
                       sidebarView={sidebarView}

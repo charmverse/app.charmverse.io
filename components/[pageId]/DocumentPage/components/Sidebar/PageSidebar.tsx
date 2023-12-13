@@ -75,7 +75,7 @@ type SidebarProps = {
   proposalInput?: ProposalSettingsProps['proposal'];
   onChangeEvaluation?: ProposalSettingsProps['onChangeEvaluation'];
   refreshProposal?: VoidFunction;
-  proposalEvaluationId?: string;
+  proposalEvaluationId?: string | null;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -129,10 +129,14 @@ function PageSidebarComponent(props: SidebarProps) {
             {openSidebar && (
               <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
                 {showEvaluationSidebarIcon && (
-                  <SidebarViewIcon view='proposal_evaluation' activeView={sidebarView} onClick={openSidebar} />
+                  <SidebarViewIcon
+                    view='proposal_evaluation'
+                    isActive={!!sidebarView?.includes('proposal')}
+                    onClick={openSidebar}
+                  />
                 )}
-                <SidebarViewIcon view='comments' activeView={sidebarView} onClick={openSidebar} />
-                <SidebarViewIcon view='suggestions' activeView={sidebarView} onClick={openSidebar} />
+                <SidebarViewIcon view='comments' isActive={sidebarView === 'comments'} onClick={openSidebar} />
+                <SidebarViewIcon view='suggestions' isActive={sidebarView === 'suggestions'} onClick={openSidebar} />
               </Box>
             )}
           </Box>
@@ -152,12 +156,22 @@ function PageSidebarComponent(props: SidebarProps) {
               <SidebarViewIcon
                 view='proposal_evaluation'
                 size='medium'
-                activeView={sidebarView}
+                isActive={!!sidebarView?.includes('proposal')}
                 onClick={openSidebar}
               />
             )}
-            <SidebarViewIcon view='comments' size='medium' activeView={sidebarView} onClick={openSidebar} />
-            <SidebarViewIcon view='suggestions' size='medium' activeView={sidebarView} onClick={openSidebar} />
+            <SidebarViewIcon
+              view='comments'
+              size='medium'
+              isActive={sidebarView === 'comments'}
+              onClick={openSidebar}
+            />
+            <SidebarViewIcon
+              view='suggestions'
+              size='medium'
+              isActive={sidebarView === 'suggestions'}
+              onClick={openSidebar}
+            />
           </Box>
         )
       }
@@ -167,6 +181,30 @@ function PageSidebarComponent(props: SidebarProps) {
         <SidebarContents {...props} />
       </Box>
     </MobileDialog>
+  );
+}
+
+function SidebarNavigationIcons({
+  showEvaluationSidebarIcon,
+  openSidebar,
+  activeView
+}: {
+  showEvaluationSidebarIcon: boolean;
+  openSidebar: VoidFunction;
+  activeView?: PageSidebarView | null;
+}) {
+  return (
+    <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
+      {showEvaluationSidebarIcon && (
+        <SidebarViewIcon
+          view='proposal_evaluation'
+          isActive={!!activeView?.includes('proposal')}
+          onClick={openSidebar}
+        />
+      )}
+      <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
+      <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
+    </Box>
   );
 }
 
@@ -226,18 +264,18 @@ function SidebarContents({
 
 function SidebarViewIcon({
   view,
-  activeView,
+  isActive,
   size = 'small',
   onClick
 }: {
-  activeView: PageSidebarView | null;
+  isActive: boolean;
   view: PageSidebarView;
   size?: 'small' | 'medium';
   onClick: (view: PageSidebarView) => void;
 }) {
   return (
     <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
-      <IconButton color={activeView === view ? 'inherit' : 'secondary'} size={size} onClick={() => onClick(view)}>
+      <IconButton color={isActive ? 'inherit' : 'secondary'} size={size} onClick={() => onClick(view)}>
         {SIDEBAR_VIEWS[view].icon}
       </IconButton>
     </Tooltip>

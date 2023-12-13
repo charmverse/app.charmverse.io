@@ -32,7 +32,7 @@ export type ProposalRubricData = {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
-type PopulatedEvaluation = ProposalRubricData &
+export type PopulatedEvaluation = ProposalRubricData &
   ProposalEvaluation & {
     reviewers: ProposalWithUsers['reviewers'];
   };

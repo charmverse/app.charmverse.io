@@ -9,7 +9,7 @@ import { Stepper } from './components/Stepper';
 type EvaluationStepperProps = {
   evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'>[];
   isDraft?: boolean;
-  selected?: string; // the evaluation active in the sidebar
+  selected?: string | null; // the evaluation active in the sidebar
   disabled?: boolean; // used for new proposal UI
   onClick?: (selectedValue: string) => void;
 };
@@ -34,7 +34,7 @@ export function EvaluationStepper({
     ...evaluations.map((evaluation) => ({
       label: evaluation.title,
       completed: !!evaluation.result,
-      disabled: disabled || evaluation.type === 'feedback',
+      disabled: !!disabled,
       description: evaluationLabels[evaluation.type],
       value: evaluation.id
     }))

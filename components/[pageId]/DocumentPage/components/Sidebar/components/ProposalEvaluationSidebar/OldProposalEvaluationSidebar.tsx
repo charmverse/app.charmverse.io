@@ -13,8 +13,8 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { NoCommentsMessage } from '../CommentsSidebar';
 
-import { RubricAnswersForm } from './RubricAnswersForm';
-import { RubricResults } from './RubricResults';
+import { RubricAnswersForm } from './components/RubricAnswersForm';
+import { RubricResults } from './components/RubricResults';
 
 type Props = {
   pageId?: string;
