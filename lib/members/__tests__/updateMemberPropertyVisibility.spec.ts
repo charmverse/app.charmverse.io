@@ -31,7 +31,7 @@ beforeAll(async () => {
   property1 = await prisma.memberProperty.create({
     data: {
       name: 'Name',
-      type: 'name',
+      type: 'text',
       space: { connect: { id: u1Space1.id } },
       createdBy: u1.id,
       updatedBy: u1.id

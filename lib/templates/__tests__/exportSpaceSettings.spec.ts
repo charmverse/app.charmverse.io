@@ -104,7 +104,7 @@ describe('exportSpaceSettings', () => {
       data: {
         createdBy: user.id,
         name: 'Test Member Property',
-        type: 'name',
+        type: 'text',
         updatedBy: user.id,
         space: { connect: { id: space.id } },
         permissions: {
