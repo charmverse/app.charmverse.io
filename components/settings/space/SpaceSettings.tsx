@@ -3,17 +3,17 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import {
   Box,
-  Grid,
-  Stack,
-  Typography,
-  TextField,
   FormHelperText,
-  MenuItem,
-  ListItem,
+  Grid,
   List,
-  ListItemText,
+  ListItem,
   ListItemIcon,
-  Select
+  ListItemText,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
@@ -22,7 +22,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaDiscord, FaGoogle, FaTelegram, FaWallet } from 'react-icons/fa';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
@@ -289,6 +288,7 @@ export function SpaceSettings({
                   const value = e.target.value;
                   setPrimaryMemberIdentity(value === 'none' ? null : (value as IdentityType));
                 }}
+                disabled={!isAdmin}
               >
                 <MenuItem value='none'>
                   <Stack flexDirection='row' alignItems='center' gap={1}>
@@ -296,30 +296,14 @@ export function SpaceSettings({
                     <Typography variant='body2'>Member's choice</Typography>
                   </Stack>
                 </MenuItem>
-                <MenuItem value='Discord'>
-                  <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <IdentityIcon size='xSmall' type='Discord' />
-                    <Typography variant='body2'>Discord</Typography>
-                  </Stack>
-                </MenuItem>
-                <MenuItem value='Google'>
-                  <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <IdentityIcon size='xSmall' type='Google' />
-                    <Typography variant='body2'>Google</Typography>
-                  </Stack>
-                </MenuItem>
-                <MenuItem value='Telegram'>
-                  <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <IdentityIcon size='xSmall' type='Telegram' />
-                    <Typography variant='body2'>Telegram</Typography>
-                  </Stack>
-                </MenuItem>
-                <MenuItem value='Wallet'>
-                  <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <IdentityIcon size='xSmall' type='Wallet' />
-                    <Typography variant='body2'>Wallet</Typography>
-                  </Stack>
-                </MenuItem>
+                {(['Discord', 'Google', 'Telegram', 'Wallet'] as IdentityType[]).map((identity) => (
+                  <MenuItem key={identity} value={identity}>
+                    <Stack flexDirection='row' alignItems='center' gap={1}>
+                      <IdentityIcon size='xSmall' type={identity} />
+                      <Typography variant='body2'>{identity}</Typography>
+                    </Stack>
+                  </MenuItem>
+                ))}
               </Select>
             </Box>
           </Grid>
