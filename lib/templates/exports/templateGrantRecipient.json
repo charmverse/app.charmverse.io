@@ -49663,7 +49663,7 @@
         "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
         "name": "Name",
-        "type": "name",
+        "type": "text",
         "options": null,
         "index": 1,
         "enabledViews": [
