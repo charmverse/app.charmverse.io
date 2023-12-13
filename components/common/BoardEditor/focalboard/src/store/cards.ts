@@ -223,8 +223,13 @@ export function sortCards(
           aValue = members[a.page.updatedBy]?.username || '';
           bValue = members[b.page.updatedBy]?.username || '';
         } else if (template.type === 'date') {
-          aValue = aValue === '' ? '' : JSON.parse(aValue as string).from;
-          bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
+          if (typeof aValue !== 'number') {
+            aValue = aValue === '' ? '' : JSON.parse(aValue as string).from;
+          }
+
+          if (typeof bValue !== 'number') {
+            bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
+          }
         }
 
         let result = 0;
