@@ -11,7 +11,8 @@ import type { EditableFields } from 'components/settings/profile/components/User
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { NON_DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { useUser } from 'hooks/useUser';
+import { DEFAULT_MEMBER_PROPERTIES, NON_DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { MemberPropertyValueType, Social, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
@@ -26,20 +27,14 @@ const LINKEDIN_URL_REGEX =
   /^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i;
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
+  const { user: currentUser } = useUser();
   const { memberPropertyValues } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
-  const { data: userDetails } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
+  const { data: userDetails, isLoading: isLoadingUserDetails } = useSWRImmutable(`/current-user-details`, () =>
+    charmClient.getUserDetails()
+  );
 
-  const {
-    memberProperties,
-    isBioRequired,
-    isTimezoneRequired,
-    requiredProperties,
-    nonEmptyRequiredProperties,
-    isGithubRequired,
-    isLinkedinRequired,
-    isTwitterRequired
-  } = useMemo(() => {
+  const data = useMemo(() => {
     const _memberProperties = memberPropertyValues
       ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
       .map((mpv) => mpv.properties)
@@ -47,43 +42,69 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 
     // Role and join date are non editable properties
     const _requiredProperties =
-      _memberProperties?.filter(
-        (p) => p.required && !['role', 'join_date', 'discord', 'profile_pic'].includes(p.type)
-      ) ?? [];
+      _memberProperties?.filter((p) => p.required && !['role', 'join_date', 'profile_pic'].includes(p.type)) ?? [];
+
+    const nameMemberProperty = _memberProperties?.find((p) => p.type === 'name');
+
     const _isTimezoneRequired = _requiredProperties.find((p) => p.type === 'timezone');
     const _isBioRequired = _requiredProperties.find((p) => p.type === 'bio');
     const _isTwitterRequired = _requiredProperties.find((p) => p.type === 'twitter');
     const _isLinkedinRequired = _requiredProperties.find((p) => p.type === 'linked_in');
     const _isGithubRequired = _requiredProperties.find((p) => p.type === 'github');
+    const _isGoogleRequired = _requiredProperties.find((p) => p.type === 'google');
+    const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord');
+    const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet');
+    const _isTelegramRequired = _requiredProperties.find((p) => p.type === 'telegram');
+    const _isNameRequired = _requiredProperties.find((p) => p.type === 'name');
 
     const userDetailsSocial = userDetails?.social as Social;
 
-    const propertiesWithoutValue = _requiredProperties
+    const requiredPropertiesWithoutValue = _requiredProperties
       .filter(
         (rp) =>
           !_memberProperties?.find((mp) => mp.memberPropertyId === rp.memberPropertyId)?.value &&
-          !['bio', 'timezone', 'twitter', 'linked_in', 'github'].includes(rp.type)
+          !DEFAULT_MEMBER_PROPERTIES.includes(rp.type)
       )
       .map((p) => p.memberPropertyId);
 
+    if (nameMemberProperty && _isNameRequired && !nameMemberProperty.value) {
+      requiredPropertiesWithoutValue.push('name');
+    }
+
     if (userDetails && _isTimezoneRequired && !userDetails.timezone) {
-      propertiesWithoutValue.push('timezone');
+      requiredPropertiesWithoutValue.push('timezone');
     }
 
     if (userDetails && _isBioRequired && !userDetails.description) {
-      propertiesWithoutValue.push('bio');
+      requiredPropertiesWithoutValue.push('bio');
     }
 
-    if (userDetails && _isTwitterRequired && !userDetailsSocial?.twitterURL) {
-      propertiesWithoutValue.push('twitter');
+    if (_isTwitterRequired && !userDetailsSocial?.twitterURL) {
+      requiredPropertiesWithoutValue.push('twitter');
     }
 
-    if (userDetails && _isLinkedinRequired && !userDetailsSocial?.linkedinURL) {
-      propertiesWithoutValue.push('linked_in');
+    if (_isLinkedinRequired && !userDetailsSocial?.linkedinURL) {
+      requiredPropertiesWithoutValue.push('linked_in');
     }
 
-    if (userDetails && _isGithubRequired && !userDetailsSocial?.githubURL) {
-      propertiesWithoutValue.push('github');
+    if (_isGithubRequired && !userDetailsSocial?.githubURL) {
+      requiredPropertiesWithoutValue.push('github');
+    }
+
+    if (currentUser && _isWalletRequired && (currentUser.wallets ?? []).length === 0) {
+      requiredPropertiesWithoutValue.push('wallet');
+    }
+
+    if (currentUser && _isGoogleRequired && (currentUser.googleAccounts ?? []).length === 0) {
+      requiredPropertiesWithoutValue.push('google');
+    }
+
+    if (currentUser && _isDiscordRequired && !currentUser.discordUser) {
+      requiredPropertiesWithoutValue.push('discord');
+    }
+
+    if (currentUser && _isTelegramRequired && !currentUser.telegramUser) {
+      requiredPropertiesWithoutValue.push('telegram');
     }
 
     return {
@@ -91,23 +112,22 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       requiredProperties: _requiredProperties,
       isTimezoneRequired: !!_isTimezoneRequired,
       isBioRequired: !!_isBioRequired,
-      nonEmptyRequiredProperties: propertiesWithoutValue.length !== 0,
+      requiredPropertiesWithoutValue,
+      hasEmptyRequiredProperties: requiredPropertiesWithoutValue.length !== 0,
       isTwitterRequired: !!_isTwitterRequired,
       isLinkedinRequired: !!_isLinkedinRequired,
-      isGithubRequired: !!_isGithubRequired
+      isGithubRequired: !!_isGithubRequired,
+      isGoogleRequired: !!_isGoogleRequired,
+      isDiscordRequired: !!_isDiscordRequired,
+      isWalletRequired: !!_isWalletRequired,
+      isTelegramRequired: !!_isTelegramRequired
     };
-  }, [userDetails, memberPropertyValues, currentSpace?.id]);
+  }, [userDetails, memberPropertyValues, currentSpace?.id, currentUser]);
 
   return {
-    memberProperties,
-    requiredProperties,
-    isTimezoneRequired,
-    isBioRequired,
-    nonEmptyRequiredProperties,
-    userDetails,
-    isTwitterRequired,
-    isLinkedinRequired,
-    isGithubRequired
+    ...data,
+    isLoadingUserDetails,
+    userDetails
   };
 }
 
@@ -199,7 +219,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   return {
     values,
     control,
-    isValid,
+    isValid: Object.keys(errors).length === 0,
     errors,
     isDirty,
     setValue,
@@ -217,6 +237,7 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     isLinkedinRequired,
     isTimezoneRequired,
     isTwitterRequired,
+    isLoadingUserDetails,
     userDetails: { id, ...userDetails } = {} as UserDetails
   } = useRequiredMemberProperties({ userId });
   const { showMessage } = useSnackbar();
@@ -224,9 +245,11 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   const {
     formState: { errors, isValid, isDirty, isSubmitting },
+    watch,
     setValue,
     handleSubmit,
-    getValues
+    getValues,
+    reset
   } = useForm({
     mode: 'onChange',
     defaultValues: userDetails,
@@ -249,6 +272,12 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
       })
     )
   });
+
+  useEffect(() => {
+    if (!isLoadingUserDetails) {
+      reset(userDetails);
+    }
+  }, [isLoadingUserDetails]);
 
   const values = {
     description: getValues('description'),

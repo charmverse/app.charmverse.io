@@ -1,6 +1,7 @@
 import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import {
   getAccessibleMemberPropertiesBySpace,
   getAllMemberPropertiesBySpace
@@ -11,6 +12,10 @@ import type { Member } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { replaceS3Domain } from 'lib/utilities/url';
+import type { TelegramAccount } from 'pages/api/telegram/connect';
+
+import type { UserIdentities } from './getMemberUsername';
+import { getMemberUsername } from './getMemberUsername';
 
 export async function getSpaceMembers({
   requestingUserId,
@@ -49,6 +54,11 @@ export async function getSpaceMembers({
             spaceId
           },
     include: {
+      space: {
+        select: {
+          primaryMemberIdentity: true
+        }
+      },
       user: {
         include: {
           profile: true,
@@ -57,9 +67,10 @@ export async function getSpaceMembers({
               spaceId
             }
           },
-          googleAccounts: true,
+          wallets: true,
           telegramUser: true,
-          discordUser: true
+          discordUser: true,
+          googleAccounts: true
         }
       },
       spaceRoleToRole: {
@@ -75,14 +86,44 @@ export async function getSpaceMembers({
     }
   });
 
+  const memberUsernameRecord: Record<string, string> = {};
+
+  for (const spaceRole of spaceRoles) {
+    const memberUsername = getMemberUsername({
+      user: spaceRole.user as UserIdentities,
+      primaryMemberIdentity: spaceRole.space.primaryMemberIdentity
+    });
+    memberUsernameRecord[spaceRole.id] = memberUsername;
+  }
+
   return (
     spaceRoles
       .map((spaceRole): Member => {
-        const { memberPropertyValues = [], ...userData } = spaceRole.user;
+        const {
+          memberPropertyValues = [],
+          googleAccounts,
+          discordUser,
+          wallets = [],
+          telegramUser,
+          ...userData
+        } = spaceRole.user;
+        const properties = getPropertiesWithValues(visibleProperties, memberPropertyValues);
+
+        const visiblePropertyIds = visibleProperties.map((mp) => mp.id);
+
+        properties.forEach((property) => {
+          if (visiblePropertyIds.includes(property.memberPropertyId)) {
+            if (property.type === 'telegram') {
+              property.value = (telegramUser?.account as unknown as TelegramAccount)?.username;
+            } else if (property.type === 'discord') {
+              property.value = (discordUser?.account as unknown as DiscordAccount)?.username;
+            } else if (property.type === 'google') {
+              property.value = googleAccounts[0]?.name;
+            }
+          }
+        });
+
         const roles = spaceRole.spaceRoleToRole.map((sr) => sr.role);
-        const nameProperty = visibleProperties.find((property) => property.type === 'name') ?? null;
-        const memberNameProperty = memberPropertyValues.find((prop) => prop.memberPropertyId === nameProperty?.id);
-        const username = (memberNameProperty?.value as string | undefined) || userData.username;
         return {
           id: userData.id,
           createdAt: userData.createdAt,
@@ -91,15 +132,15 @@ export async function getSpaceMembers({
           profile: (userData.profile as Member['profile']) || undefined,
           avatar: replaceS3Domain(userData.avatar || undefined),
           avatarTokenId: userData.avatarTokenId || undefined,
-          username,
+          username: memberUsernameRecord[spaceRole.id],
           path: userData.path,
           onboarded: spaceRole.onboarded,
           isAdmin: spaceRole.isAdmin,
           isGuest: !!spaceRole.isGuest && !spaceRole.isAdmin,
           joinDate: spaceRole.createdAt.toISOString(),
           hasNftAvatar: hasNftAvatar(spaceRole.user),
-          properties: getPropertiesWithValues(visibleProperties, memberPropertyValues),
-          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, username),
+          properties,
+          searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, memberUsernameRecord[spaceRole.id]),
           roles,
           isBot: userData.isBot ?? undefined
         };

@@ -9,9 +9,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'components/common/Button';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { CreateMemberPropertyPermissionInput, MemberPropertyWithPermissions } from 'lib/members/interfaces';
 
 import { MemberPropertyVisibility } from './MemberPropertyVisibility';
@@ -37,7 +37,7 @@ export function MemberPropertySidebarDetails({
 }: Props) {
   const isAdmin = useIsAdmin();
   const { isFreeSpace } = useIsFreeSpace();
-
+  const { space } = useCurrentSpace();
   const canEditPropertyPermissions = isAdmin && !isFreeSpace;
 
   const memberPropertySidebarItemPopupState = usePopupState({
@@ -65,85 +65,99 @@ export function MemberPropertySidebarDetails({
     }
   }, [memberPropertySidebarItemPopupState.isOpen]);
 
+  const disabled = !isAdmin || space?.primaryMemberIdentity?.toLowerCase() === property.type;
+
   return (
     <>
       <Collapse in={isExpanded} mountOnEnter={true} unmountOnExit={true}>
         <Stack mb={1}>
-          {!['role', 'join_date', 'profile_pic', 'discord'].includes(property.type) ? (
+          {!['role', 'join_date', 'profile_pic'].includes(property.type) ? (
             <Stack flexDirection='row' justifyContent='space-between' mr={2}>
               <Tooltip title={isAdmin ? 'Require members to fill this property during onboarding' : ''}>
                 <Typography pl={4} variant='overline' alignItems='center' display='flex'>
                   Required
                 </Typography>
               </Tooltip>
-              <Checkbox
-                size='small'
-                sx={{
-                  p: 0
-                }}
-                checked={property.required}
-                disabled={!isAdmin}
-                onChange={(e) => {
-                  updateProperty({
-                    id: property.id,
-                    required: e.target.checked
-                  });
-                }}
-              />
+              <Tooltip
+                title={
+                  space?.primaryMemberIdentity?.toLocaleLowerCase() === property.type
+                    ? 'Primary identity must always be required'
+                    : ''
+                }
+              >
+                <div>
+                  <Checkbox
+                    size='small'
+                    sx={{
+                      p: 0
+                    }}
+                    checked={property.required}
+                    disabled={disabled}
+                    onChange={(e) => {
+                      updateProperty({
+                        id: property.id,
+                        required: e.target.checked
+                      });
+                    }}
+                  />
+                </div>
+              </Tooltip>
             </Stack>
           ) : null}
-          <Stack>
-            <Box pl={4} mr={2}>
-              <MemberPropertyVisibility property={property} />
-            </Box>
-            {property?.permissions.length ? (
-              <Stack>
-                <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
-                  <Typography pl={4} variant='overline'>
-                    Restricted to roles:
+          {property.type !== 'wallet' && (
+            <Stack>
+              <Box pl={4} mr={2}>
+                <MemberPropertyVisibility property={property} />
+              </Box>
+              {property?.permissions.length ? (
+                <Stack>
+                  <Tooltip title={`Only members with listed roles can see ${property.name} property.`}>
+                    <Typography pl={4} variant='overline'>
+                      Restricted to roles:
+                    </Typography>
+                  </Tooltip>
+                  {property?.permissions.map((permission) => (
+                    <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
+                      <MenuItem
+                        dense
+                        sx={{
+                          pl: 4,
+                          alignItems: 'center',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          '&:hover .icons': {
+                            opacity: 1
+                          },
+                          flex: 1,
+                          '& .MuiListItemIcon-root': {
+                            minWidth: 30
+                          }
+                        }}
+                      >
+                        <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
+                        {canEditPropertyPermissions && (
+                          <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
+                            <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
+                              <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
+                            </Tooltip>
+                          </IconButton>
+                        )}
+                      </MenuItem>
+                    </Stack>
+                  ))}
+                </Stack>
+              ) : (
+                <Tooltip title={`Everyone in space can see ${property.name} property`} disableInteractive>
+                  <Typography pl={4} variant='overline' alignItems='center' display='flex'>
+                    Everyone in space
+                    <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
                   </Typography>
                 </Tooltip>
-                {property?.permissions.map((permission) => (
-                  <Stack key={permission.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
-                    <MenuItem
-                      dense
-                      sx={{
-                        pl: 4,
-                        alignItems: 'center',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        '&:hover .icons': {
-                          opacity: 1
-                        },
-                        flex: 1,
-                        '& .MuiListItemIcon-root': {
-                          minWidth: 30
-                        }
-                      }}
-                    >
-                      <Typography variant='subtitle2'>{permission.role?.name || '-'}</Typography>
-                      {canEditPropertyPermissions && (
-                        <IconButton size='small' color='secondary' sx={{ opacity: 0 }} className='icons'>
-                          <Tooltip title={`Delete ${permission.role?.name || ''} role from permissions`}>
-                            <DeleteOutlinedIcon fontSize='small' onClick={() => removePermission(permission)} />
-                          </Tooltip>
-                        </IconButton>
-                      )}
-                    </MenuItem>
-                  </Stack>
-                ))}
-              </Stack>
-            ) : (
-              <Tooltip title={`Everyone in space can see ${property.name} property`} disableInteractive>
-                <Typography pl={4} variant='overline' alignItems='center' display='flex'>
-                  Everyone in space
-                  <VisibilityOutlinedIcon fontSize='small' color='secondary' sx={{ ml: 1 }} />
-                </Typography>
-              </Tooltip>
-            )}
-          </Stack>
+              )}
+            </Stack>
+          )}
 
-          {canEditPropertyPermissions && (
+          {canEditPropertyPermissions && property.type !== 'wallet' && (
             <Button
               variant='text'
               size='small'

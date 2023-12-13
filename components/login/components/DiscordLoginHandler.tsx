@@ -17,7 +17,7 @@ export function DiscordLoginHandler({ redirectUrl }: Props) {
   const { popupLogin } = useDiscordConnection();
 
   return isOnCustomDomain ? (
-    <Box onClick={() => popupLogin(redirectUrl ?? '/')}>
+    <Box onClick={() => popupLogin(redirectUrl ?? '/', 'login')}>
       <DiscordLoginItem />
     </Box>
   ) : (
