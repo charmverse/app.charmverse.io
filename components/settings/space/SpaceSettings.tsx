@@ -1,4 +1,4 @@
-import type { PrimaryMemberIdentity, Prisma, Space } from '@charmverse/core/prisma';
+import type { IdentityType, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import {
@@ -92,9 +92,7 @@ export function SpaceSettings({
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
   const [featuresInput, setFeatures] = useState(currentFeatures);
-  const [primaryMemberIdentity, setPrimaryMemberIdentity] = useState<PrimaryMemberIdentity | null>(
-    space.primaryMemberIdentity
-  );
+  const [primaryMemberIdentity, setPrimaryMemberIdentity] = useState<IdentityType | null>(space.primaryMemberIdentity);
   const [memberProfileTypesInput, setMemberProfileProperties] = useState(currentMemberProfileTypes);
   const {
     register,
@@ -289,7 +287,7 @@ export function SpaceSettings({
                 value={primaryMemberIdentity ?? 'none'}
                 onChange={(e) => {
                   const value = e.target.value;
-                  setPrimaryMemberIdentity(value === 'none' ? null : (value as PrimaryMemberIdentity));
+                  setPrimaryMemberIdentity(value === 'none' ? null : (value as IdentityType));
                 }}
               >
                 <MenuItem value='none'>

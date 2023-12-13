@@ -1,4 +1,4 @@
-import type { PrimaryMemberIdentity } from '@charmverse/core/prisma-client';
+import type { IdentityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
@@ -65,7 +65,7 @@ export function getMemberUsername({
   user,
   primaryMemberIdentity
 }: {
-  primaryMemberIdentity: PrimaryMemberIdentity | null;
+  primaryMemberIdentity: IdentityType | null;
   user: UserIdentities;
 }) {
   const username = user.username;
@@ -73,7 +73,7 @@ export function getMemberUsername({
     return username;
   }
 
-  if (primaryMemberIdentity === 'google') {
+  if (primaryMemberIdentity === 'Google') {
     const firstGoogleAccount = user.googleAccounts?.[0];
     if (!firstGoogleAccount) {
       return username;
@@ -81,7 +81,7 @@ export function getMemberUsername({
     return firstGoogleAccount.name;
   }
 
-  if (primaryMemberIdentity === 'discord') {
+  if (primaryMemberIdentity === 'Discord') {
     const discordUserAccount = user.discordUser?.account as unknown as DiscordAccount;
     if (!discordUserAccount) {
       return username;
@@ -89,7 +89,7 @@ export function getMemberUsername({
     return discordUserAccount.username;
   }
 
-  if (primaryMemberIdentity === 'telegram') {
+  if (primaryMemberIdentity === 'Telegram') {
     const telegramUserAccount = user.telegramUser?.account as unknown as TelegramAccount;
     if (!telegramUserAccount) {
       return username;
@@ -97,7 +97,7 @@ export function getMemberUsername({
     return telegramUserAccount.username;
   }
 
-  if (primaryMemberIdentity === 'wallet') {
+  if (primaryMemberIdentity === 'Wallet') {
     const firstWallet = user.wallets?.[0];
     if (!firstWallet) {
       return username;
