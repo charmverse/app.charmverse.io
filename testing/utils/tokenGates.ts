@@ -9,7 +9,7 @@ export async function generateTokenGate({ userId, spaceId }: { spaceId: string; 
             conditionType: 'evmBasic',
             contractAddress: '',
             standardContractType: '',
-            chain: 'etherum',
+            chain: 'ethereum',
             method: '',
             parameters: [':userAddress'],
             returnValueTest: {
