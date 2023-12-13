@@ -3,6 +3,7 @@ import { Stack, Typography } from '@mui/material';
 
 import type { UploadedFileCallback } from 'hooks/useS3UploadInput';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import type { ResizeType } from 'lib/file/constants';
 
 import { Button } from '../Button';
 
@@ -11,12 +12,14 @@ export function ImageUploadButton({
   uploadDisclaimer,
   variant = 'contained',
   fileSizeLimitMB,
+  resizeType,
   ...props
 }: {
   setImage: (image: string) => void;
   uploadDisclaimer?: string;
   variant?: ButtonProps['variant'];
   fileSizeLimitMB?: number;
+  resizeType: ResizeType;
 } & ButtonProps) {
   const onFileUpload: UploadedFileCallback = ({ url }) => {
     setImage(url);
@@ -25,7 +28,7 @@ export function ImageUploadButton({
   const { isUploading, onFileChange, inputRef, openFilePicker } = useS3UploadInput({
     onFileUpload,
     fileSizeLimitMB,
-    resizeType: 'artwork'
+    resizeType
   });
 
   return (

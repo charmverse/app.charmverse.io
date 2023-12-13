@@ -54,7 +54,11 @@ export default function ImageSelector({
                     width: '100%'
                   }}
                 >
-                  <ImageUploadButton setImage={onImageSelect} uploadDisclaimer={uploadDisclaimer} />
+                  <ImageUploadButton
+                    resizeType='artwork'
+                    setImage={onImageSelect}
+                    uploadDisclaimer={uploadDisclaimer}
+                  />
                 </Box>
               ],
               [
