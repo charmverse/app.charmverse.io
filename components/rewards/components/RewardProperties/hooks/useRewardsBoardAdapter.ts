@@ -10,6 +10,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
+import { usePages } from 'hooks/usePages';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
@@ -19,6 +20,7 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import type { Member } from 'lib/members/interfaces';
+import type { PagesMap } from 'lib/pages';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
@@ -32,7 +34,8 @@ import {
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
   REWARD_TOKEN,
-  REWARD_APPLICANTS_COUNT
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
@@ -47,6 +50,9 @@ export function useRewardsBoardAdapter() {
   const { rewards } = useRewards();
   const { rewardBoardBlock, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
+  const hasMilestoneRewards = useMemo(() => rewards?.some((r) => !!r.proposalId), [rewards]);
+  const { pages } = usePages();
+
   const {
     router: { query }
   } = useCharmRouter();
@@ -54,7 +60,8 @@ export function useRewardsBoardAdapter() {
 
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
-    storedBoard: rewardBoardBlock
+    storedBoard: rewardBoardBlock,
+    hasMilestoneRewards
   });
 
   const views = useMemo(
@@ -93,7 +100,13 @@ export function useRewardsBoardAdapter() {
         ?.map((p) => {
           const page = getRewardPage(p.id);
 
-          return mapRewardToCardPage({ reward: p, rewardPage: page, spaceId: space?.id, members: membersRecord });
+          return mapRewardToCardPage({
+            reward: p,
+            rewardPage: page,
+            spaceId: space?.id,
+            members: membersRecord,
+            pages
+          });
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
@@ -112,7 +125,17 @@ export function useRewardsBoardAdapter() {
       : [];
 
     return sortedCardPages;
-  }, [activeView, board, getRewardPage, localViewSettings, membersRecord, rewards, space?.id]);
+  }, [
+    activeView,
+    board,
+    getRewardPage,
+    localViewSettings?.localFilters,
+    localViewSettings?.localSort,
+    membersRecord,
+    pages,
+    rewards,
+    space?.id
+  ]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: rewardBoardBlock,
@@ -124,7 +147,8 @@ export function useRewardsBoardAdapter() {
     reward: boardReward,
     rewardPage,
     spaceId: space?.id,
-    members: membersRecord
+    members: membersRecord,
+    pages
   }).card;
 
   // each reward with fields reflects a card
@@ -149,12 +173,14 @@ function mapRewardToCardPage({
   reward,
   rewardPage,
   spaceId,
-  members
+  members,
+  pages
 }: {
   reward: BoardReward | RewardWithUsers | null;
   rewardPage?: PageMeta;
   spaceId?: string;
   members: Record<string, Member>;
+  pages: PagesMap;
 }): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
@@ -188,7 +214,9 @@ function mapRewardToCardPage({
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
     [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
-    [REWARD_APPLICANTS_COUNT]: validApplications.length.toString()
+    [REWARD_APPLICANTS_COUNT]: validApplications.length.toString(),
+    [REWARD_PROPOSAL_LINK]:
+      (reward && 'proposalId' in reward && reward.proposalId && pages[reward.proposalId]?.path) || ''
   };
 
   const card: Card<RewardPropertyValue> = {
