@@ -1,10 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { createReward } from 'lib/rewards/createReward';
 import { InvalidInputError } from 'lib/utilities/errors';
+import { isTruthy } from 'lib/utilities/types';
+import { relay } from 'lib/websockets/relay';
 
 import { ProposalNotFoundError } from './errors';
 
@@ -52,7 +55,7 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
   let rewardsToCreate = [...pendingRewards];
   const rewardsPromises = rewardsToCreate.map(async ({ page, reward, draftId }) => {
     // create reward
-    await createReward({
+    const { createdPageId } = await createReward({
       ...reward,
       pageProps: page || {},
       spaceId: proposal.spaceId,
@@ -61,9 +64,11 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     });
     // filter out reward from pending rewards
     rewardsToCreate = rewardsToCreate.filter(({ draftId: d }) => d !== draftId);
+
+    return createdPageId;
   });
 
-  await Promise.all(rewardsPromises);
+  const createdPageIds = (await Promise.all(rewardsPromises)).filter(isTruthy);
 
   const updatedFields = { ...fields, pendingRewards: rewardsToCreate };
 
@@ -87,6 +92,15 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
       rewards: true
     }
   });
+
+  const pages = await getPageMetaList(createdPageIds);
+  relay.broadcast(
+    {
+      type: 'pages_created',
+      payload: pages
+    },
+    proposal.spaceId
+  );
 
   return updatedProposal;
 }
