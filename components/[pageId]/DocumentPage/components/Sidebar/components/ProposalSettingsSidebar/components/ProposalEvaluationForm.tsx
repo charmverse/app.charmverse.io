@@ -3,10 +3,11 @@ import { Box, Divider, Typography, FormLabel } from '@mui/material';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { ProposalRubricCriteriaInput } from 'components/proposals/components/ProposalProperties/components/ProposalRubricCriteriaInput';
-import type { RangeProposalCriteria } from 'components/proposals/components/ProposalProperties/components/ProposalRubricCriteriaInput';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
+
+import { ProposalRubricCriteriaInput } from './ProposalRubricCriteriaInput';
+import type { RangeProposalCriteria } from './ProposalRubricCriteriaInput';
 
 // result and id are not used for creating evaluations, so add them here
 // leave out permissions which are picked up on the backend based on workflowId

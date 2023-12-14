@@ -124,7 +124,7 @@
     "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^5.14.18",
     "@mui/lab": "^5.0.0-alpha.118",
-    "@mui/material": "^5.11.7",
+    "@mui/material": "^5.15.0",
     "@mui/x-date-pickers": "^5.0.16",
     "@mux/mux-node": "^7.0.0",
     "@mux/mux-video-react": "^0.7.15",

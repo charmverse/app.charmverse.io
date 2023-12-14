@@ -17,12 +17,10 @@ import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { CustomPropertiesAdapter } from 'components/proposals/components/ProposalProperties/CustomPropertiesAdapter';
-import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 import type { ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
@@ -35,7 +33,6 @@ import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../hooks/useProposalCategories';
-import { EvaluationStepper } from '../EvaluationStepper/EvaluationStepper';
 
 import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
 import { ProposalRubricCriteriaInput } from './components/OldProposalRubricCriteriaInput';
@@ -68,7 +65,6 @@ type ProposalPropertiesProps = {
   readOnlyCategory?: boolean;
   isAdmin?: boolean;
   isFromTemplate?: boolean;
-  isTemplateRequired?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   changeEvaluationStep?: (evaluationId: string) => void;
   pageId?: string;
@@ -97,7 +93,6 @@ export function ProposalPropertiesBase({
   archived,
   isAdmin = false,
   isFromTemplate,
-  isTemplateRequired,
   onChangeRubricCriteria,
   changeEvaluationStep,
   proposalFormInputs,
@@ -124,11 +119,9 @@ export function ProposalPropertiesBase({
   const isCharmVerse = useIsCharmverseSpace();
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
-  const { pages } = usePages();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
   const { lensProfile } = useLensProfile();
-  const { proposalTemplates = [] } = useProposalTemplates();
   const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   const { account } = useWeb3Account();
   const previousConfirmationPopup = usePopupState({
@@ -185,14 +178,6 @@ export function ProposalPropertiesBase({
   const isNewProposal = !pageId;
   const showStatusStepper = !isTemplate && !isCharmVerse;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
-  const templateOptions = proposalTemplates
-    .filter((_proposal) => {
-      if (!proposalCategoryId) {
-        return true;
-      }
-      return _proposal.categoryId === proposalCategoryId;
-    })
-    .map((template) => template.page);
 
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {

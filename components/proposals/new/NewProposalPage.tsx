@@ -13,6 +13,7 @@ import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -26,6 +27,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
+import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
@@ -86,9 +88,10 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
   const { router, navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const isCharmVerse = useIsCharmverseSpace();
-  const [showSidebar, setShowSidebar] = useState(true);
+  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
+  const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const selectedTemplate = router.query.template as string;
   const [workflowId, setWorkflowId] = useState('');
@@ -240,9 +243,13 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
       selectEvaluationWorkflow(workflowOptions[0]);
     }
   }, [!!workflowOptions]);
-
+  const [defaultSidebarView, setDefaultView] = useState('proposal_evaluation_settings');
+  useEffect(() => {
+    setActiveView('proposal_evaluation_settings');
+    setDefaultView('');
+  }, []);
   return (
-    <PrimaryColumn showPageActionSidebar={showSidebar} display='flex' flexDirection='column' sx={{ height: '100%' }}>
+    <PrimaryColumn showPageActionSidebar={!!sidebarView} display='flex' flexDirection='column' sx={{ height: '100%' }}>
       <Box className={`document-print-container ${fontClassName}`} flexGrow={1} overflow='auto'>
         <Box display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage />
@@ -272,6 +279,9 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                   // readOnly={readOnly || !!enableSuggestingMode}
                   setPage={(updatedPage) => {
                     setFormInputs(updatedPage);
+                    if ('title' in updatedPage) {
+                      setPageTitle(updatedPage.title || '');
+                    }
                   }}
                   placeholder='Title (required)'
                 />
@@ -330,7 +340,6 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                       )}
                       <ProposalPropertiesBase
                         isFromTemplate={isFromTemplateSource}
-                        isTemplateRequired={isTemplateRequired}
                         readOnlyRubricCriteria={readOnlyRubricCriteria}
                         readOnlyReviewers={readOnlyReviewers}
                         readOnlyProposalEvaluationType={isFromTemplateSource}
@@ -353,8 +362,8 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                   <PageSidebar
                     id='page-action-sidebar'
                     spaceId={currentSpace.id}
-                    sidebarView={showSidebar ? 'proposal_evaluation_settings' : null}
-                    closeSidebar={() => setShowSidebar(false)}
+                    sidebarView={defaultSidebarView || sidebarView ? 'proposal_evaluation_settings' : null}
+                    closeSidebar={closeSidebar}
                     proposalInput={formInputs}
                     onChangeEvaluation={(evaluationId, updates) => {
                       const evaluations = formInputs.evaluations.map((e) =>

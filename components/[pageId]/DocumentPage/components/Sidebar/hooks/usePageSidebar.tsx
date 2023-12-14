@@ -39,23 +39,25 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
     view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null),
     evaluationId: string | null = null
   ) {
-    if (currentPageId) {
-      setProposalEvaluationId(evaluationId); // clear this value in case it was set before
-      // handle case when a callback is used as the new value
-      if (typeof view === 'function') {
-        return setActiveView((prevView) => {
-          const newValue = view(prevView);
+    setProposalEvaluationId(evaluationId); // clear this value in case it was set before
+    // handle case when a callback is used as the new value
+    if (typeof view === 'function') {
+      return setActiveView((prevView) => {
+        const newValue = view(prevView);
+        if (currentPageId) {
           persistActiveView({
             [currentPageId]: newValue
           });
-          return newValue;
-        });
-      } else {
+        }
+        return newValue;
+      });
+    } else {
+      if (currentPageId) {
         persistActiveView({
           [currentPageId]: view
         });
-        return setActiveView(view);
       }
+      return setActiveView(view);
     }
   }
 

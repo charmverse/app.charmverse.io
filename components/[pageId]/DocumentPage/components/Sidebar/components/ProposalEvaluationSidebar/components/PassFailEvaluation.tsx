@@ -45,9 +45,7 @@ export function PassFailEvaluation({ proposal, evaluation, isCurrent, refreshPro
     <>
       <Box mb={2}>
         <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            {evaluation.type === 'vote' ? 'Vote privileges' : 'Reviewer'}
-          </Typography>
+          <Typography variant='subtitle1'>Reviewer</Typography>
         </FormLabel>
         <UserAndRoleSelect readOnly={true} value={reviewerOptions} onChange={() => {}} />
       </Box>

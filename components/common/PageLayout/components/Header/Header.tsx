@@ -18,6 +18,7 @@ import { DocumentHeaderElements } from './components/DocumentHeaderElements';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
 import RewardsShareButton from './components/RewardsShareButton/RewardsShareButton';
+import { ToggleEvaluationButton } from './components/ToggleEvaluationButton';
 
 export const headerHeight = 56;
 
@@ -50,6 +51,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const forumPostInfo = usePostByPath();
   const isRewardsList = router.route === '/[domain]/rewards';
   const isProposalsPage = router.route === '/[domain]/proposals';
+  const isNewProposalPage = router.route === '/[domain]/proposals/new';
 
   return (
     <StyledToolbar variant='dense'>
@@ -87,6 +89,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
 
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
+          {isNewProposalPage && <ToggleEvaluationButton />}
 
           <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
         </Box>
