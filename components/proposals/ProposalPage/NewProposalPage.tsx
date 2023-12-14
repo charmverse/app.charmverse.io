@@ -4,7 +4,7 @@ import type { PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, DialogActions, Divider, useMediaQuery } from '@mui/material';
+import { Box, Divider, useMediaQuery } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
@@ -16,6 +16,7 @@ import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
+import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
@@ -59,6 +60,9 @@ const StyledContainer = styled(Container)`
 
 const PrimaryColumn = styled(Box)<{ showPageActionSidebar: boolean }>(
   ({ showPageActionSidebar, theme }) => `
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   transition: width ease-in 0.25s;
   ${theme.breakpoints.up('lg')} {
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
@@ -67,21 +71,6 @@ const PrimaryColumn = styled(Box)<{ showPageActionSidebar: boolean }>(
   }
 `
 );
-const StickyFooterContainer = styled(Box)`
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  position: relative;
-  padding: 0 40px 0 30px;
-
-  ${({ theme }) => theme.breakpoints.up('lg')} {
-    width: 860px;
-  }
-
-  ${({ theme }) => theme.breakpoints.up('md')} {
-    padding: 0 80px;
-  }
-`;
 
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boolean; templateId?: string }) {
@@ -126,7 +115,6 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
   } = useNewProposal({
     newProposal
   });
-  const [proposalEvaluationId, setProposalEvaluationId] = useState();
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -244,12 +232,14 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
     }
   }, [!!workflowOptions]);
   const [defaultSidebarView, setDefaultView] = useState('proposal_evaluation_settings');
+
   useEffect(() => {
     setActiveView('proposal_evaluation_settings');
     setDefaultView('');
   }, []);
+
   return (
-    <PrimaryColumn showPageActionSidebar={!!sidebarView} display='flex' flexDirection='column' sx={{ height: '100%' }}>
+    <PrimaryColumn showPageActionSidebar={!!sidebarView}>
       <Box className={`document-print-container ${fontClassName}`} flexGrow={1} overflow='auto'>
         <Box display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage />
@@ -377,22 +367,17 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
           </StyledContainer>
         </Box>
       </Box>
-      <Box display='flex' flexDirection='column'>
-        <Divider light />
-        <StickyFooterContainer className='footer-actions'>
-          <DialogActions sx={{ px: 0 }}>
-            <Button
-              disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
-              disabledTooltip={disabledTooltip}
-              onClick={saveForm}
-              loading={isCreatingProposal}
-              data-test='create-proposal-button'
-            >
-              Save
-            </Button>
-          </DialogActions>
-        </StickyFooterContainer>
-      </Box>
+      <StickyFooterContainer>
+        <Button
+          disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+          disabledTooltip={disabledTooltip}
+          onClick={saveForm}
+          loading={isCreatingProposal}
+          data-test='create-proposal-button'
+        >
+          Save
+        </Button>
+      </StickyFooterContainer>
       <ConfirmDeleteModal
         onClose={() => {
           setSelectedProposalTemplateId(null);
