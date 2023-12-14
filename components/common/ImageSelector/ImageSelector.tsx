@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
+import { ResizeType } from 'lib/file/constants';
 
 import { selectorPopupSizeConfig } from '../CharmEditor/components/common/selectorPopupSizeConfig';
 
@@ -54,7 +55,11 @@ export default function ImageSelector({
                     width: '100%'
                   }}
                 >
-                  <ImageUploadButton setImage={onImageSelect} uploadDisclaimer={uploadDisclaimer} />
+                  <ImageUploadButton
+                    resizeType={ResizeType.Artwork}
+                    setImage={onImageSelect}
+                    uploadDisclaimer={uploadDisclaimer}
+                  />
                 </Box>
               ],
               [

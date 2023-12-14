@@ -6,13 +6,24 @@ import nc from 'next-connect';
 import sharp from 'sharp';
 
 import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
-import { DEFAULT_IMAGE_SIZE, DEFAULT_MAX_FILE_SIZE_MB, FORM_DATA_FILE_PART_NAME } from 'lib/file/constants';
+import type { ResizeType } from 'lib/file/constants';
+import {
+  DEFAULT_IMAGE_SIZE,
+  DEFAULT_MAX_FILE_SIZE_MB,
+  FORM_DATA_FILE_PART_NAME,
+  FORM_DATA_IMAGE_RESIZE_TYPE
+} from 'lib/file/constants';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(resizeImage);
+
+const RESIZE_TYPE_WIDTH: Record<ResizeType, number> = {
+  emoji: DEFAULT_IMAGE_SIZE,
+  artwork: DEFAULT_IMAGE_SIZE
+};
 
 async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
@@ -32,7 +43,9 @@ async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
       return part.name === FORM_DATA_FILE_PART_NAME && (part.mimetype?.includes('image') || false);
     }
   });
-  const [, files] = await form.parse(req);
+
+  const [fields, files] = await form.parse(req);
+  const resizeType = fields[FORM_DATA_IMAGE_RESIZE_TYPE] as ResizeType;
   if (files && files[FORM_DATA_FILE_PART_NAME]) {
     const image = Array.isArray(files[FORM_DATA_FILE_PART_NAME])
       ? files[FORM_DATA_FILE_PART_NAME][0]
@@ -40,7 +53,7 @@ async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
     const optimizedBuffer = await sharp(Buffer.concat(chunks))
       .resize({
         withoutEnlargement: true,
-        width: DEFAULT_IMAGE_SIZE
+        width: resizeType ? RESIZE_TYPE_WIDTH[resizeType] : DEFAULT_IMAGE_SIZE
       })
       .webp({ quality: 80 })
       .toBuffer();
