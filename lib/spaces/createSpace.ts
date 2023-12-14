@@ -115,7 +115,7 @@ export async function createWorkspace({
 
   // ---------- Section for selecting template to create from ----------
   const defaultProposalCategories = generateDefaultProposalCategoriesInput(space.id);
-  const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id });
+  const defaultProperties = generateDefaultPropertiesInput({ userId, spaceId: space.id, addNameProperty: true });
   const defaultPostCategories = generateDefaultPostCategories(space.id);
   const defaultWorkflows = getDefaultWorkflows(space.id);
 
