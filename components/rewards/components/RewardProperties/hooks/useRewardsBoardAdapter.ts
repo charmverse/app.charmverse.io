@@ -200,15 +200,16 @@ function mapRewardToCardPage({
     ...rewardFields.properties,
     [Constants.titleColumnId]: rewardPage?.title || '',
     // add default field values on the fly
-    [REWARDS_AVAILABLE_BLOCK_ID]:
-      reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
-        ? (
-            countRemainingSubmissionSlots({
-              applications: validApplications,
-              limit: reward.maxSubmissions
-            }) as number
-          )?.toString()
-        : '-',
+    [REWARDS_AVAILABLE_BLOCK_ID]: isAssignedReward
+      ? 1
+      : reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
+      ? (
+          countRemainingSubmissionSlots({
+            applications: validApplications,
+            limit: reward.maxSubmissions
+          }) as number
+        )?.toString()
+      : '-',
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     // focalboard component expects a timestamp
