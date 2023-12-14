@@ -1,11 +1,15 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { PermissionsClient, PremiumPermissionsClient } from '@charmverse/core/permissions';
+import type {
+  PermissionsClient,
+  PermissionsEngine,
+  PremiumPermissionsClient,
+  ResourceIdEntity
+} from '@charmverse/core/permissions';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
 import { getPermissionsClient, permissionsApiClient } from './routers';
-import type { PermissionsEngine, ResourceIdEntity } from './routers';
 
 declare module 'http' {
   interface IncomingMessage {
