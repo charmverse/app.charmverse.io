@@ -5,8 +5,8 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { updateProposal } from 'lib/proposal/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -49,6 +49,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       authors: true,
       reviewers: true,
       category: true,
+      rewards: true,
       page: { select: { sourceTemplateId: true } }
     }
   });
@@ -77,13 +78,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     proposal.rubricAnswers = [];
   }
 
-  // Support old model: filter out evaluation-specific reviewers
-  proposal.reviewers = proposal.reviewers.filter((reviewer) => !reviewer.evaluationId);
-
-  return res.status(200).json({
-    ...(proposal as unknown as ProposalWithUsersAndRubric),
-    permissions
-  });
+  return res.status(200).json(mapDbProposalToProposal({ proposal, permissions }));
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {

@@ -57,8 +57,8 @@ export type ProposalWithUsersAndRubric = ProposalWithUsers &
     evaluations: PopulatedEvaluation[];
     page?: { sourceTemplateId: string | null } | null;
     permissions: ProposalPermissionFlags;
+    currentEvaluationId?: string;
   };
-
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };
 }

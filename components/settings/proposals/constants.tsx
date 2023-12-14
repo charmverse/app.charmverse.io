@@ -23,26 +23,26 @@ const defaultProps: SvgIconProps = {
 };
 
 export const evaluationIcons = {
-  [ProposalEvaluationType.feedback]: (props: SvgIconProps = defaultProps) => (
+  [ProposalEvaluationType.feedback]: (props: SvgIconProps = {}) => (
     <Tooltip title='Feedback'>
-      <FeedbackOutlined {...props} />
+      <FeedbackOutlined {...defaultProps} {...props} />
     </Tooltip>
   ),
-  [ProposalEvaluationType.vote]: (props: SvgIconProps = defaultProps) => (
+  [ProposalEvaluationType.vote]: (props: SvgIconProps = {}) => (
     <Tooltip title='Vote'>
-      <HowToVoteOutlined {...props} />
+      <HowToVoteOutlined {...defaultProps} {...props} />
     </Tooltip>
   ),
-  [ProposalEvaluationType.rubric]: (props: SvgIconProps = defaultProps) => (
+  [ProposalEvaluationType.rubric]: (props: SvgIconProps = {}) => (
     <Tooltip title='Rubric'>
-      <SvgIconWithRef inheritViewBox {...props}>
+      <SvgIconWithRef inheritViewBox {...defaultProps} {...props}>
         <RiChatCheckLine />
       </SvgIconWithRef>
     </Tooltip>
   ),
-  [ProposalEvaluationType.pass_fail]: (props: SvgIconProps = defaultProps) => (
+  [ProposalEvaluationType.pass_fail]: (props: SvgIconProps = {}) => (
     <Tooltip title='Pass / Fail'>
-      <SvgIconWithRef inheritViewBox {...props}>
+      <SvgIconWithRef inheritViewBox {...defaultProps} {...props}>
         <MdOutlineThumbsUpDown />
       </SvgIconWithRef>
     </Tooltip>

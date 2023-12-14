@@ -1,4 +1,4 @@
-import type { UserDetails } from '@charmverse/core/dist/cjs/prisma-client';
+import type { UserDetails } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';

@@ -1,7 +1,7 @@
 import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Settings as SettingsIcon } from '@mui/icons-material';
-import { Box, Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import { evaluationIcons } from 'components/settings/proposals/constants';
@@ -40,13 +40,13 @@ export function ProposalSidebarHeader({
           onChange={goToEvaluation}
           goToSettings={goToSettings}
         />
-        <div>
-          {activeEvaluationId && (
+        <Tooltip title='Configure evaluations'>
+          <div>
             <IconButton onClick={goToSettings} size='small'>
-              <SettingsIcon color='secondary' fontSize='small' />
+              <SettingsIcon color={activeEvaluationId ? 'secondary' : 'inherit'} fontSize='small' />
             </IconButton>
-          )}
-        </div>
+          </div>
+        </Tooltip>
       </Box>
       <Divider />
     </>
@@ -75,6 +75,22 @@ function StepSelect({
           onChange(e.target.value as string);
         }
       }}
+      renderValue={(evaluationId) => {
+        const evaluation = options.find((option) => option.id === evaluationId);
+        if (evaluationId === '' || !evaluation) {
+          return (
+            <Typography variant='body2' color='secondary'>
+              Select a step
+            </Typography>
+          );
+        }
+        return (
+          <Stack flexDirection='row' alignItems='center' gap={1}>
+            {evaluationIcons[evaluation.type]?.({ color: 'inherit' })}
+            <Typography variant='body2'>{evaluation.title}</Typography>
+          </Stack>
+        );
+      }}
     >
       {options.map((evaulation) => (
         <MenuItem key={evaulation.id} value={evaulation.id}>
@@ -84,13 +100,6 @@ function StepSelect({
           </Stack>
         </MenuItem>
       ))}
-      <Divider />
-      <MenuItem value=''>
-        <Stack flexDirection='row' alignItems='center' gap={1}>
-          <SettingsIcon fontSize='small' color='secondary' />
-          <Typography variant='body2'>Settings</Typography>
-        </Stack>
-      </MenuItem>
     </StyledSelect>
   );
 }

@@ -1,4 +1,4 @@
-import type { TokenGateToRole } from '@charmverse/core/dist/cjs/prisma-client';
+import type { TokenGateToRole } from '@charmverse/core/prisma-client';
 import type { LitNodeClient } from '@lit-protocol/lit-node-client';
 import type { AuthSig, JsonStoreSigningRequest } from '@lit-protocol/types';
 import useSWRMutation from 'swr/mutation';
