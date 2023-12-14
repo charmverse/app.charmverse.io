@@ -9,12 +9,6 @@ import type { PermissionCompute, PermissionResource } from 'lib/permissions/inte
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 
 export class ProposalPermissionsApi {
-  computeProposalPermissions({ proposalIdOrPath, spaceDomain }: { proposalIdOrPath: string; spaceDomain?: string }) {
-    return http.POST<ProposalPermissionFlags>(`/api/permissions/proposals/compute-proposal-permissions`, {
-      resourceId: !spaceDomain ? proposalIdOrPath : `${spaceDomain}/${proposalIdOrPath}`
-    } as PermissionCompute);
-  }
-
   computeProposalCategoryPermissions(proposalCategoryId: string) {
     return http.POST<ProposalCategoryPermissionFlags>(
       `/api/permissions/proposals/compute-proposal-category-permissions`,
