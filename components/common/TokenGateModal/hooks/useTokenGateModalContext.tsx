@@ -10,7 +10,7 @@ import { mutate } from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import { useCreateLitToken, useCreateTokenGate } from 'charmClient/hooks/tokenGates';
+import { useSaveSigningCondition, useCreateTokenGate } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { Lock, TokenGate } from 'lib/tokenGates/interfaces';
@@ -66,8 +66,8 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
   );
   const [lock, setLock] = useState<Lock>();
   const litClient = useLitProtocol();
-  const { error: tokenError, isMutating: tokenLoading, trigger: triggerToken } = useCreateTokenGate();
-  const { error: litError, isMutating: litLoading, trigger: triggerLitToken } = useCreateLitToken(litClient);
+  const { error: tokenError, isMutating: tokenLoading, trigger: createTokenGate } = useCreateTokenGate();
+  const { error: litError, isMutating: litLoading, trigger: saveSigningCondition } = useSaveSigningCondition(litClient);
   const [flow, setFlow] = useState<Flow>('single');
   const { walletAuthSignature, requestSignature } = useWeb3Account();
   const { space } = useCurrentSpace();
@@ -122,7 +122,7 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
       return;
     }
 
-    const litSuccess = await triggerLitToken({
+    const litSuccess = await saveSigningCondition({
       unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
       chain: authSigTypes[0], // etherum or solana
       authSig,
@@ -130,7 +130,7 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
     });
 
     if (litSuccess) {
-      await triggerToken({
+      await createTokenGate({
         conditions,
         resourceId,
         spaceId,
@@ -149,7 +149,7 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
     if (lock) {
       const id = uuid();
 
-      await triggerToken({
+      await createTokenGate({
         conditions: {
           contract: lock.contract,
           chainId: lock.chainId,

@@ -35,7 +35,7 @@ export function usePUT<T, U = unknown>(path: string) {
 }
 
 // To be used when you need to trigger a get request on demand
-export function useGETTrigger<T, U = unknown>(path: string) {
+export function useGETtrigger<T, U = unknown>(path: string) {
   return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
     const requestUrl = url + getQueryString(arg);
     return http.GET<U>(requestUrl);

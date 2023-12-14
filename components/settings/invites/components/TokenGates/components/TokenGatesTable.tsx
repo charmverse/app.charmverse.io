@@ -48,7 +48,7 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
   const litClient = useLitProtocol();
   const { space } = useCurrentSpace();
   const { connectWallet } = useContext(Web3Connection);
-  const { trigger: verifyLock } = useReviewLock();
+  const { trigger: checkLockDetails } = useReviewLock();
   const { trigger: verifyTokenGate } = useVerifyTokenGate();
 
   async function testLitTokenGate(tokenGate: TokenGate<'lit'>) {
@@ -93,7 +93,7 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
   async function testUnlock({ conditions, walletAddress }: TokenGate<'unlock'> & { walletAddress: string }) {
     const { chainId, contract } = conditions;
     setTestResult({ status: 'loading' });
-    const lockDetails = await verifyLock({ walletAddress, contract, chainId });
+    const lockDetails = await checkLockDetails({ walletAddress, contract, chainId });
 
     if (lockDetails?.balanceOf === 1 && lockDetails.expirationTimestamp) {
       setTestResult({ message: `You have a valid key for this lock`, status: 'success' });

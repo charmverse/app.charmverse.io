@@ -4,6 +4,7 @@ import { getChainById } from 'connectors/chains';
 import type { LitTokenGateConditions, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { LIT_CHAINS } from 'lib/tokenGates/utils';
 import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
+import { sortByDate } from 'lib/utilities/dates';
 
 import { getNFT } from './getNFTs';
 import { updateLocksDetails } from './updateLocksDetails';
@@ -92,9 +93,7 @@ export async function updateTokenGatesDetails(tokenGates: TokenGateWithRoles[]):
     updateTokenGateLitDetails(lit)
   ]);
 
-  const sortedTokenGates = [...updatedUnlockProtocolGates, ...updatedTokenGates].sort((a, b) =>
-    b.createdAt > a.createdAt ? -1 : 1
-  );
+  const sortedTokenGates = [...updatedUnlockProtocolGates, ...updatedTokenGates].sort(sortByDate);
 
   return sortedTokenGates;
 }

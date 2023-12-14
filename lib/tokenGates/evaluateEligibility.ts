@@ -27,9 +27,6 @@ export type TokenGateEvaluationAttempt = {
   spaceIdOrDomain: string;
 };
 
-/**
- * @gateTokens List of Lit-generated tokens we can verify when joining a space
- */
 export type TokenGateEvaluationResult = {
   space: Space;
   walletAddress: string;
@@ -38,6 +35,9 @@ export type TokenGateEvaluationResult = {
   roles: { id: string; name: string }[];
 };
 
+/**
+ * @gateTokens List of Lit-generated tokens we can verify when joining a space
+ */
 export async function evaluateTokenGateEligibility({
   authSig,
   spaceIdOrDomain
@@ -121,7 +121,7 @@ export async function evaluateTokenGateEligibility({
   };
 }
 
-export async function getTokenGateResults(tokenGate: TokenGateWithRoles, authSig: AuthSig) {
+async function getTokenGateResults(tokenGate: TokenGateWithRoles, authSig: AuthSig) {
   if (tokenGate.type === 'unlock') {
     return getUnlockProtocolTokenGateResults(tokenGate, authSig);
   } else {
@@ -129,7 +129,7 @@ export async function getTokenGateResults(tokenGate: TokenGateWithRoles, authSig
   }
 }
 
-export async function getUnlockProtocolTokenGateResults(tokenGate: TokenGateWithRoles<'unlock'>, authSig: AuthSig) {
+async function getUnlockProtocolTokenGateResults(tokenGate: TokenGateWithRoles<'unlock'>, authSig: AuthSig) {
   const result = await getLockDetails({
     walletAddress: authSig.address,
     contract: tokenGate.conditions.contract,
@@ -147,7 +147,8 @@ export async function getUnlockProtocolTokenGateResults(tokenGate: TokenGateWith
 
   return null;
 }
-export async function getLitTokenGateResults(
+
+async function getLitTokenGateResults(
   tokenGate: TokenGateWithRoles<'lit'>,
   authSig: AuthSig
 ): Promise<TokenGateJwt | null> {

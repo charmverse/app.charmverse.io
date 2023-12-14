@@ -18,12 +18,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .get(getTokenGates)
-  .get(requireKeys(['spaceId', 'type', 'conditions']))
+  .use(requireKeys(['spaceId', 'type', 'conditions'], 'body'))
   .use(requireSpaceMembership({ adminOnly: true }))
   .use(requireValidation('tokenGateConditions'))
   .post(saveTokenGate);
 
-async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<PrismaTokengate>) {
+async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
   const spaceId = req.body.spaceId;
 
@@ -55,7 +55,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<PrismaTok
     numberOfConditions
   });
 
-  res.status(200).json(result);
+  res.status(200).end();
 }
 
 async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[]>) {
