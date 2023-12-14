@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { updateTokenGateDetails } from 'lib/blockchain/updateTokenGateDetails';
+import { updateTokenGatesDetails } from 'lib/blockchain/updateTokenGateDetails';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceWithTokenGates } from 'lib/spaces/getSpaceWithTokenGates';
@@ -18,7 +18,7 @@ async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<
   const publicSpace = await getSpaceWithTokenGates(search as string);
 
   // Add identifiable names to token gates
-  const updatedTokenGates = await updateTokenGateDetails(publicSpace?.tokenGates);
+  const updatedTokenGates = await updateTokenGatesDetails(publicSpace?.tokenGates || []);
 
   const updatedPublicSpace: SpaceWithGates | null = publicSpace
     ? { ...publicSpace, tokenGates: updatedTokenGates }

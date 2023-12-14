@@ -31,6 +31,7 @@ beforeAll(async () => {
           roleId: role.id
         }
       },
+      type: 'lit',
       resourceId: {},
       space: {
         connect: {

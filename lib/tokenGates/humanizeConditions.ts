@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
-import type { HumanizedAccsProps } from '@lit-protocol/types';
 import type { TypographyProps } from '@mui/material/Typography';
 import { formatEther, isAddress } from 'viem';
 
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
+import type { TokenGate } from './interfaces';
 import { ALL_LIT_CHAINS } from './utils';
 
 const humanizeComparator = (comparator: string) => {
@@ -41,7 +41,19 @@ export type HumanizeCondition = {
   content: HumanizeConditionsContent[];
 };
 
-export function humanizeConditionsData(conditions: HumanizedAccsProps) {
+export function humanizeUnlockConditionsData(conditions: TokenGate<'unlock'>['conditions']): HumanizeCondition[] {
+  return [
+    {
+      image: conditions.image,
+      content: [
+        { type: 'text', content: 'Unlock Protocol -' },
+        { type: 'text', content: conditions.name }
+      ]
+    }
+  ];
+}
+
+export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditions']): HumanizeCondition[] {
   const myWalletAddress = conditions.myWalletAddress;
   const humanReadableConditions = conditions.unifiedAccessControlConditions
     ?.map<HumanizeCondition | undefined>((acc) => {
@@ -279,6 +291,19 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
     .filter(isTruthy);
 
   return humanReadableConditions || [];
+}
+
+export function humanizeConditionsData(tokenGate: TokenGate, walletAddress: string) {
+  const { type, conditions } = tokenGate;
+
+  switch (type) {
+    case 'lit':
+      return humanizeLitConditionsData({ ...conditions, myWalletAddress: walletAddress });
+    case 'unlock':
+      return humanizeUnlockConditionsData(conditions);
+    default:
+      return [];
+  }
 }
 
 export function humanizeConditions(conditions: HumanizeCondition[]) {

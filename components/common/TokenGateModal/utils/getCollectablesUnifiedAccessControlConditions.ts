@@ -1,4 +1,5 @@
 import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
+import { getChainById } from 'connectors/chains';
 
 import type { FormValues } from '../hooks/useCollectablesForm';
 
@@ -6,6 +7,7 @@ export function getCollectablesUnifiedAccessControlConditions(
   values: FormValues
 ): UnifiedAccessControlConditions | undefined {
   const { collectableOption, chain, contract, tokenId, quantity, poapType, poapId, poapName, poapNameMatch } = values;
+  const chainName = getChainById(Number(chain))?.litNetwork || 'etherum';
 
   if (collectableOption === 'ERC721' && chain && contract) {
     if (tokenId) {
@@ -14,7 +16,7 @@ export function getCollectablesUnifiedAccessControlConditions(
           conditionType: 'evmBasic' as const,
           contractAddress: contract,
           standardContractType: collectableOption,
-          chain,
+          chain: chainName,
           method: 'ownerOf',
           parameters: [tokenId],
           returnValueTest: {
@@ -31,7 +33,7 @@ export function getCollectablesUnifiedAccessControlConditions(
           conditionType: 'evmBasic' as const,
           contractAddress: contract,
           standardContractType: collectableOption,
-          chain,
+          chain: chainName,
           method: 'balanceOf',
           parameters: [':userAddress'],
           returnValueTest: {
@@ -48,7 +50,7 @@ export function getCollectablesUnifiedAccessControlConditions(
         conditionType: 'evmBasic' as const,
         contractAddress: contract,
         standardContractType: collectableOption,
-        chain,
+        chain: chainName,
         method: 'balanceOf',
         parameters: [':userAddress', tokenId],
         returnValueTest: {

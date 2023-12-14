@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import charmClient from 'charmClient';
+import { useReevaluateRoles } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -9,25 +9,26 @@ export function useSpaceGatesReevaluate() {
   const { user, refreshUser } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const { getStoredSignature, account } = useWeb3Account();
+  const { trigger: reevaluateRoles } = useReevaluateRoles();
 
   useEffect(() => {
-    const reevaluateRoles = async () => {
+    const reevaluatedRoles = async () => {
       if (user?.id && currentSpace?.id && account) {
         const authSig = getStoredSignature(account);
         if (!authSig) return;
 
-        const newRoles = await charmClient.tokenGates.reevaluateRoles({
+        const newRoles = await reevaluateRoles({
           spaceId: currentSpace.id,
           userId: user.id,
           authSig
         });
 
-        if (newRoles.length) {
+        if (newRoles?.length) {
           refreshUser();
         }
       }
     };
 
-    reevaluateRoles();
+    reevaluatedRoles();
   }, [account, currentSpace?.id, user?.id]);
 }
