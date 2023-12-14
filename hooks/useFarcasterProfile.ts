@@ -28,7 +28,7 @@ export function useFarcasterProfile() {
     async () => {
       for (const wallet of user!.wallets) {
         const [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
-          `https://searchcaster.xyz/api/profiles?address=${wallet}`,
+          `https://searchcaster.xyz/api/profiles?connected_address=${wallet.address}`,
           {},
           {
             credentials: 'omit'
