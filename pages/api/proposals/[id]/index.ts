@@ -80,9 +80,10 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   // Support old model: filter out evaluation-specific reviewers
   proposal.reviewers = proposal.reviewers.filter((reviewer) => !reviewer.evaluationId);
 
-  (proposal as unknown as ProposalWithUsersAndRubric).permissions = permissions;
-
-  return res.status(200).json(proposal as unknown as ProposalWithUsersAndRubric);
+  return res.status(200).json({
+    ...(proposal as unknown as ProposalWithUsersAndRubric),
+    permissions
+  });
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
