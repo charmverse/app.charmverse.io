@@ -154,7 +154,6 @@ export function RewardPropertiesForm({
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {
     applyUpdates({
       assignedSubmitters: submitters,
-      maxSubmissions: submitters.length,
       approveSubmitters: false,
       allowMultipleApplications: false
     });

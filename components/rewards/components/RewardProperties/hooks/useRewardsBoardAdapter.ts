@@ -221,7 +221,7 @@ function mapRewardToCardPage({
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
     [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
-    [REWARD_APPLICANTS_COUNT]: validApplications.length.toString(),
+    [REWARD_APPLICANTS_COUNT]: isAssignedReward ? 1 : validApplications.length.toString(),
     [REWARD_PROPOSAL_LINK]: proposalLinkValue
   };
 

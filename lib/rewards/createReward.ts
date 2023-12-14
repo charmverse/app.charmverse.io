@@ -87,7 +87,7 @@ export async function createReward({
     fields: fields as any,
     chainId,
     approveSubmitters: isAssignedReward ? false : approveSubmitters,
-    maxSubmissions: isAssignedReward ? assignedSubmitters?.length : maxSubmissions,
+    maxSubmissions: isAssignedReward ? 1 : maxSubmissions,
     rewardAmount,
     rewardToken,
     customReward,
