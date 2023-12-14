@@ -14,7 +14,7 @@ export type UploadedFileCallback = (info: UploadedFileInfo) => void;
 export const useS3UploadInput = ({
   onFileUpload,
   fileSizeLimitMB = DEFAULT_MAX_FILE_SIZE_MB,
-  resizeType = 'emoji'
+  resizeType
 }: {
   onFileUpload: UploadedFileCallback;
   fileSizeLimitMB?: number;

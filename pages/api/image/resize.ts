@@ -20,7 +20,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(resizeImage);
 
-const ResizedTypeWidth: Record<ResizeType, number> = {
+const RESIZE_TYPE_WIDTH: Record<ResizeType, number> = {
   emoji: DEFAULT_IMAGE_SIZE,
   artwork: DEFAULT_IMAGE_SIZE
 };
@@ -53,7 +53,7 @@ async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
     const optimizedBuffer = await sharp(Buffer.concat(chunks))
       .resize({
         withoutEnlargement: true,
-        width: resizeType ? ResizedTypeWidth[resizeType] : DEFAULT_IMAGE_SIZE
+        width: resizeType ? RESIZE_TYPE_WIDTH[resizeType] : DEFAULT_IMAGE_SIZE
       })
       .webp({ quality: 80 })
       .toBuffer();

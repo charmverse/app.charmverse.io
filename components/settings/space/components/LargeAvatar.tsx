@@ -12,6 +12,7 @@ import { AvatarEditMenu } from 'components/settings/space/components/AvatarEditM
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { NFTData } from 'lib/blockchain/getNFTs';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
+import { ResizeType } from 'lib/file/constants';
 import type { UserAvatar } from 'lib/users/interfaces';
 
 import { ProgressOverlay } from './ProgressOverlay';
@@ -96,7 +97,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
 
   const { inputRef, openFilePicker, onFileChange } = useS3UploadInput({
     onFileUpload: updateImageAvatar,
-    resizeType: 'artwork'
+    resizeType: ResizeType.Artwork
   });
 
   function onEditClick(event: React.MouseEvent<HTMLElement>) {
