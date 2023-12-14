@@ -28,6 +28,20 @@ export function createMockProposal(
     spaceId: '',
     status: 'draft',
     fields: null,
+    permissions: {
+      view: true,
+      review: true,
+      vote: true,
+      comment: true,
+      edit: true,
+      delete: true,
+      create_vote: true,
+      evaluate: true,
+      make_public: true,
+      archive: true,
+      unarchive: true,
+      move: true
+    },
     ...input
   };
 }

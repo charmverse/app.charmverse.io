@@ -4,7 +4,8 @@ import type {
   PageComment,
   Proposal,
   ProposalEvaluation,
-  ProposalEvaluationPermission
+  ProposalEvaluationPermission,
+  Vote
 } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
@@ -39,10 +40,16 @@ export type ProposalRubricData = {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
+export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
+  durationDays: number;
+  options: string[];
+};
+
 export type PopulatedEvaluation = ProposalRubricData &
-  ProposalEvaluation & {
+  Omit<ProposalEvaluation, 'voteSettings'> & {
     permissions: ProposalEvaluationPermission[];
     reviewers: ProposalWithUsers['reviewers'];
+    voteSettings: VoteSettings | null;
   };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &

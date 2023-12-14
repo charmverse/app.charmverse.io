@@ -6,6 +6,7 @@ import { useRef } from 'react';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { isTruthy } from 'lib/utilities/types';
@@ -17,6 +18,7 @@ export function NewProposalButton({ showProposal }: { showProposal: (pageId: str
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
+  const { navigateToSpacePath } = useCharmRouter();
 
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -28,6 +30,17 @@ export function NewProposalButton({ showProposal }: { showProposal: (pageId: str
   const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
   function deleteProposalTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
+  }
+
+  function editTemplate(pageId: string) {
+    navigateToSpacePath(`/${pageId}`);
+  }
+  function createTemplate() {
+    navigateToSpacePath('/proposals/new?type=proposal_template');
+  }
+
+  function createFromTemplate(pageId: string) {
+    navigateToSpacePath(`/proposals/new?template=${pageId}`);
   }
 
   return (
@@ -51,6 +64,9 @@ export function NewProposalButton({ showProposal }: { showProposal: (pageId: str
       </Tooltip>
       <TemplatesMenu
         isLoading={isLoadingTemplates}
+        createTemplate={createTemplate}
+        addPageFromTemplate={createFromTemplate}
+        editTemplate={editTemplate}
         pages={proposalTemplatePages}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}

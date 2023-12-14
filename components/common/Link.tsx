@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import type { LinkProps } from '@mui/material';
 import MuiLink from '@mui/material/Link';
 import NextLink from 'next/link';
-import type { MouseEvent } from 'react';
+import type { MouseEvent, MouseEventHandler } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -47,7 +47,11 @@ export default function Link({ external, href, onClick, children, color = 'prima
 
   if (!href) {
     return (
-      <div className={restProps.className} onClick={onClick} data-test={restProps['data-test']}>
+      <div
+        className={restProps.className}
+        onClick={onClick as unknown as MouseEventHandler<HTMLDivElement>}
+        data-test={restProps['data-test']}
+      >
         {children}
       </div>
     );

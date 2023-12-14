@@ -71,9 +71,11 @@ export const customRenderWithContext = (
             >
               <PageSidebarContext.Provider
                 value={{
+                  activeEvaluationId: null,
                   activeView: null,
                   setActiveView: () => {},
                   persistedActiveView: null,
+                  openEvaluationSidebar: () => {},
                   persistActiveView: () => {},
                   closeSidebar: () => {}
                 }}

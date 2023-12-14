@@ -15,7 +15,7 @@ import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getPagePath } from '../pages';
 
-import type { ProposalReviewerInput } from './interface';
+import type { ProposalReviewerInput, VoteSettings } from './interface';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
@@ -31,12 +31,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
   permissions?: WorkflowEvaluationJson['permissions']; // pass these in to override workflow defaults
-  voteSettings?:
-    | (Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
-        durationDays: number;
-        options: string[];
-      })
-    | null;
+  voteSettings?: VoteSettings | null;
 };
 
 export type CreateProposalInput = {

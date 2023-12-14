@@ -8,7 +8,6 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import Link from 'components/common/Link';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import LoadingComponent from '../LoadingComponent';
@@ -20,7 +19,10 @@ import { TemplatePageMenuActions } from './TemplatePageMenuActions';
  */
 interface Props {
   pages?: PageMeta[];
+  createTemplate: () => void;
+  editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
+  addPageFromTemplate: (pageId: string) => void;
   anchorEl?: Element;
   popupState: PopupState;
   boardTitle?: string;
@@ -32,7 +34,10 @@ interface Props {
 export function TemplatesMenu({
   pages,
   anchorEl,
+  addPageFromTemplate,
+  createTemplate,
   deleteTemplate,
+  editTemplate,
   popupState,
   boardTitle,
   enableItemOptions,
@@ -79,16 +84,14 @@ export function TemplatesMenu({
         pages.map((page) => {
           return (
             <MenuItem
-              component={Link}
               data-test={`select-option-${page.id}`}
               key={page.id}
               dense
               sx={{ display: 'flex', justifyContent: 'space-between' }}
-              href={`/proposals/new?template=${page.id}`}
-              // onClick={() => {
-              //   addPageFromTemplate(page.id);
-              //   popupState.close();
-              // }}
+              onClick={() => {
+                addPageFromTemplate(page.id);
+                popupState.close();
+              }}
             >
               <ListItemIcon>
                 <DescriptionOutlinedIcon />
@@ -97,7 +100,14 @@ export function TemplatesMenu({
 
               {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
               <Box ml={1} onClick={(e) => e.stopPropagation()}>
-                {enableItemOptions && <TemplatePageMenuActions deleteTemplate={deleteTemplate} pageId={page.id} />}
+                {enableItemOptions && (
+                  <TemplatePageMenuActions
+                    editTemplate={editTemplate}
+                    deleteTemplate={deleteTemplate}
+                    pageId={page.id}
+                    closeParentPopup={popupState.close}
+                  />
+                )}
               </Box>
             </MenuItem>
           );
@@ -105,11 +115,10 @@ export function TemplatesMenu({
       {enableNewTemplates && [
         <Divider key='templates-menu-divider' />,
         <MenuItem
-          component={Link}
           key='templates-menu-new-item'
           dense
           sx={{ color: `${theme.palette.primary.main} !important` }}
-          href='/proposals/new?type=proposal_template'
+          onClick={createTemplate}
         >
           <AddIcon />
           <ListItemText>New template</ListItemText>

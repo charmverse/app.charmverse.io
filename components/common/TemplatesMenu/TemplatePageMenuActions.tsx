@@ -7,14 +7,22 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
-import Link from 'components/common/Link';
 
 type Props = {
   deleteTemplate: (pageId: string) => void;
+  editTemplate: (showPage: string) => void;
   pageId: string;
+  closeParentPopup: () => void;
+  isDefaultTemplate?: boolean;
 };
 
-export function TemplatePageMenuActions({ deleteTemplate, pageId }: Props) {
+export function TemplatePageMenuActions({
+  deleteTemplate,
+  closeParentPopup,
+  pageId,
+  editTemplate,
+  isDefaultTemplate
+}: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${pageId}` });
 
   return (
@@ -24,7 +32,14 @@ export function TemplatePageMenuActions({ deleteTemplate, pageId }: Props) {
       </IconButton>
 
       <Menu {...bindMenu(popupState)} open={popupState.isOpen}>
-        <MenuItem component={Link} href={`/${pageId}`} target='_blank'>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            popupState.close();
+            closeParentPopup();
+            editTemplate(pageId);
+          }}
+        >
           <EditIcon fontSize='small' />
           <Typography variant='body2' color='text.secondary'>
             Edit
