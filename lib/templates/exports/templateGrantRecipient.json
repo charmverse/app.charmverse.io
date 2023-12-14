@@ -45162,7 +45162,7 @@
                             },
                             "content": [
                               {
-                                "text": "Twitter",
+                                "text": "X",
                                 "type": "text",
                                 "marks": [
                                   {
@@ -49734,7 +49734,7 @@
         "updatedAt": "2023-04-21T11:27:10.697Z",
         "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "name": "Twitter",
+        "name": "X",
         "type": "twitter",
         "options": null,
         "index": 5,
