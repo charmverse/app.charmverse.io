@@ -68,12 +68,14 @@ export function ProposalWorkflowItem({
   }
 
   function updateWorkflowTitle(title: string) {
-    workflow.title = title;
-    onUpdate(workflow);
+    onUpdate({ ...workflow, title });
     setUnsavedChanges(true);
   }
 
-  function changeEvaluationStepOrder(selectedId: string, targetId: string) {
+  function changeEvaluationStepOrder(
+    { id: selectedId }: WorkflowEvaluationJson,
+    { id: targetId }: WorkflowEvaluationJson
+  ) {
     const newOrder = [...workflow.evaluations];
     const propIndex = newOrder.findIndex((val) => val.id === selectedId); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
@@ -81,7 +83,7 @@ export function ProposalWorkflowItem({
     const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
     workflow.evaluations = newOrder;
-    onUpdate(workflow);
+    onUpdate({ ...workflow, evaluations: newOrder });
     setUnsavedChanges(true);
   }
 
@@ -94,20 +96,21 @@ export function ProposalWorkflowItem({
   }
 
   function deleteEvaluationStep(id: string) {
-    workflow.evaluations = workflow.evaluations.filter((evaluation) => evaluation.id !== id);
-    onUpdate(workflow);
+    const evaluations = workflow.evaluations.filter((evaluation) => evaluation.id !== id);
+    onUpdate({ ...workflow, evaluations });
     setUnsavedChanges(true);
   }
 
   // note: this only updates the workflow state, does not save to the db
   function updateEvaluationStep(updates: WorkflowEvaluationJson) {
     const index = workflow.evaluations.findIndex((e) => e.id === updates.id);
+    const evaluations = [...workflow.evaluations];
     if (index === -1) {
-      workflow.evaluations.push(updates);
+      evaluations.push(updates);
     } else {
-      workflow.evaluations[index] = { ...workflow.evaluations[index], ...updates };
+      evaluations[index] = { ...evaluations[index], ...updates };
     }
-    onUpdate(workflow);
+    onUpdate({ ...workflow, evaluations });
     setUnsavedChanges(true);
   }
 
