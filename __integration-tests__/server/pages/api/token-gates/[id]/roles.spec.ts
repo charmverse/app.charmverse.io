@@ -68,6 +68,7 @@ beforeAll(async () => {
       conditions: {},
       createdBy: user1.id,
       resourceId: {},
+      type: 'lit',
       space: {
         connect: {
           id: space.id

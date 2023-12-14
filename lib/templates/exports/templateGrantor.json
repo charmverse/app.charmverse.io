@@ -26137,7 +26137,7 @@
         "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
         "name": "Name",
-        "type": "name",
+        "type": "text",
         "options": null,
         "index": 1,
         "enabledViews": [

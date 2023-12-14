@@ -55,17 +55,9 @@ export function TokenGateDao() {
       <TokenGateBlockchainSelect
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
+        chains={litDaoChains}
         {...register('chain')}
-      >
-        {litDaoChains.map((_chain) => (
-          <MenuItem key={_chain.litNetwork} value={_chain.chainName}>
-            <ListItemIcon>
-              <TokenLogo height={20} src={_chain.iconUrl} />
-            </ListItemIcon>
-            <ListItemText>{_chain.chainName}</ListItemText>
-          </MenuItem>
-        ))}
-      </TokenGateBlockchainSelect>
+      />
       <TextInputField
         label='DAO Contract Address'
         error={errors.contract?.message}

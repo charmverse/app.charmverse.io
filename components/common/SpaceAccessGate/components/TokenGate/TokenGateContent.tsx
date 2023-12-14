@@ -1,4 +1,5 @@
-import { Box, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 import type { TokenGateState } from './hooks/useTokenGates';
 import { TokenGateOption } from './TokenGateOption';
@@ -13,7 +14,7 @@ export function TokenGateContent({ tokenGates, tokenGateResult, isVerifying }: T
           <TokenGateOption
             tokenGate={gate}
             isVerifying={isVerifying}
-            isVerified={tokenGateResult ? tokenGateResult.gateTokens.some((g) => g.tokenGate.id === gate.id) : null}
+            isVerified={tokenGateResult?.eligibleGates.some((g) => g.tokenGateId === gate.id) || null}
           />
           {index < list.length - 1 && (
             <Typography color='secondary' align='center'>

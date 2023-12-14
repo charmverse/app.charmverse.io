@@ -47,7 +47,6 @@ function MemberDirectoryGalleryCard({
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
 
-  const isNameHidden = !propertiesRecord.name?.enabledViews.includes('gallery');
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
@@ -92,11 +91,9 @@ function MemberDirectoryGalleryCard({
         variant='square'
       />
       <Stack p={2} gap={1}>
-        {!isNameHidden && (
-          <Typography gutterBottom variant='h6' mb={0} component='div' noWrap>
-            {member.username}
-          </Typography>
-        )}
+        <Typography gutterBottom variant='h6' mb={0} component='div' noWrap>
+          {member.username}
+        </Typography>
         <SocialIcons
           gap={1}
           social={{

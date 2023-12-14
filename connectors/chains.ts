@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
+import networks from '@unlock-protocol/networks';
 import type { Chain } from 'viem/chains';
 import {
   arbitrum,
@@ -99,6 +100,7 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: sepolia.id,
     viem: sepolia,
+    alchemyUrl: 'https://eth-sepolia.g.alchemy.com',
     gnosisUrl: 'https://safe-transaction-sepolia.safe.global',
     chainName: 'Ethereum - Sepolia',
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
@@ -464,21 +466,21 @@ export type IChainDetailsWithLit = IChainDetails & { litNetwork: NonNullable<ICh
 
 export const litChains: IChainDetailsWithLit[] = RPCList.filter(
   (chain): chain is IChainDetailsWithLit => !!chain.litNetwork
-).sort((a, b) => {
-  // Createa function that will return mainnets first, then testnets
-  const isMainnet = (chain: IChainDetailsWithLit) => !chain.testnet;
+).sort(sortChainList);
+
+export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
+  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
+);
+
+const unlockNetworkIds = Object.values(networks).map((n: any) => n.id);
+export const unlockChains = RPCList.filter((chain) => unlockNetworkIds.includes(chain.chainId)).sort(sortChainList);
+
+function sortChainList<T extends IChainDetails>(a: T, b: T) {
+  const isMainnet = (chain: T) => !chain.testnet;
   if (isMainnet(a) && !isMainnet(b)) {
     return -1;
   } else if (!isMainnet(a) && isMainnet(b)) {
     return 1;
   }
   return 0;
-});
-
-export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
-);
-
-export const getChainDetailsFromLitNetwork = (network?: string) => {
-  return litChains.find((chain) => chain.litNetwork === network);
-};
+}

@@ -28,7 +28,6 @@ const seeds = [
 
 export const memberPropertyTypes = [
   'profile_pic',
-  'name',
   'role',
   'bio',
   'discord',

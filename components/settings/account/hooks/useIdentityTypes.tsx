@@ -2,14 +2,19 @@ import { useMemo } from 'react';
 
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import type { IntegrationModel } from 'components/settings/profile/components/IdentityModal';
+import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
+import { useLensProfile } from './useLensProfile';
+
 export function useIdentityTypes() {
   const { user } = useUser();
+  const { lensProfile } = useLensProfile();
+  const { farcasterProfile } = useFarcasterProfile();
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (!user) {
@@ -80,6 +85,24 @@ export function useIdentityTypes() {
       });
     });
 
+    if (lensProfile) {
+      types.push({
+        type: 'Lens',
+        username: lensProfile.metadata?.displayName ?? (lensProfile.handle?.fullHandle ?? '').split('/')[1] ?? '',
+        isInUse: user.identityType === 'Lens',
+        icon: <IdentityIcon type='Lens' />
+      });
+    }
+
+    if (farcasterProfile) {
+      types.push({
+        type: 'Farcaster',
+        username: farcasterProfile.body.username ?? '',
+        isInUse: user.identityType === 'Farcaster',
+        icon: <IdentityIcon type='Farcaster' />
+      });
+    }
+
     types.push({
       type: 'RandomName',
       username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
@@ -88,7 +111,7 @@ export function useIdentityTypes() {
     });
 
     return types;
-  }, [user]);
+  }, [user, lensProfile, farcasterProfile]);
 
   return identityTypes;
 }
