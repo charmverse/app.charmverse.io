@@ -4,7 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { getPermissionsClient, premiumPermissionsApiClient } from './routers';
+import { getPermissionsClient, permissionsApiClient } from './routers';
 import type { PermissionsEngine, ResourceIdEntity } from './routers';
 
 declare module 'http' {
@@ -47,7 +47,7 @@ export function providePermissionClients({ key, location, resourceIdType }: Midd
     // Provide different base client based on space paid tier
     req.basePermissionsClient = clientWithInfo.client;
     // Always provide premium client
-    req.premiumPermissionsClient = premiumPermissionsApiClient;
+    req.premiumPermissionsClient = permissionsApiClient;
 
     req.spacePermissionsEngine = clientWithInfo.type;
 

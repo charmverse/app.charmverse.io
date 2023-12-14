@@ -4,14 +4,14 @@ import type {
   PermissionsEngine,
   PremiumPermissionsClient
 } from '@charmverse/core/permissions';
-import { PermissionsApiClient, checkSpaceSpaceSubscriptionInfo } from '@charmverse/core/permissions';
+import { PermissionsApiClient, getSpacePermissionsType } from '@charmverse/core/permissions';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 
 import { PublicPermissionsClient } from './client';
 
 export const publicClient = new PublicPermissionsClient();
-export const premiumPermissionsApiClient = new PermissionsApiClient({
+export const permissionsApiClient = new PermissionsApiClient({
   authKey: permissionsApiAuthKey,
   baseUrl: permissionsApiUrl
 });
@@ -28,14 +28,14 @@ export async function getPermissionsClient({
   resourceId,
   resourceIdType = 'space'
 }: GetPermissionClient): Promise<SpacePermissionsClient> {
-  const spaceInfo = await checkSpaceSpaceSubscriptionInfo({
+  const spaceInfo = await getSpacePermissionsType({
     resourceId,
     resourceIdType
   });
 
   if (spaceInfo.tier !== 'free') {
-    return { type: 'premium', client: premiumPermissionsApiClient, spaceId: spaceInfo.spaceId };
+    return { type: spaceInfo.permissionType, client: permissionsApiClient, spaceId: spaceInfo.spaceId };
   } else {
-    return { type: 'free', client: publicClient, spaceId: spaceInfo.spaceId };
+    return { type: spaceInfo.permissionType, client: publicClient, spaceId: spaceInfo.spaceId };
   }
 }

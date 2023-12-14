@@ -11,7 +11,7 @@ import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/co
 import { ActionNotPermittedError } from 'lib/middleware';
 import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPermissionsClient, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/routers';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
@@ -242,7 +242,7 @@ export class SpaceEventHandler {
           createdPage.spaceId
         );
 
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+        await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
           event: 'created',
           pageId: createdPage.id
         });
@@ -356,7 +356,7 @@ export class SpaceEventHandler {
           }
         }
 
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+        await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
           event: 'repositioned',
           pageId
         });
@@ -482,7 +482,7 @@ export class SpaceEventHandler {
           },
           this.spaceId
         );
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+        await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
           event: 'repositioned',
           pageId
         });
@@ -615,7 +615,7 @@ export class SpaceEventHandler {
             },
             this.spaceId
           );
-          await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
             event: 'repositioned',
             pageId
           });

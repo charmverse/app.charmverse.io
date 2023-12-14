@@ -2,7 +2,7 @@ import type { ProposalCategoryPermission, Space, User } from '@charmverse/core/p
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
@@ -44,7 +44,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const computed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -85,7 +85,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const computed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -119,7 +119,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
     });
 
     // Non logged in user test case
-    const publicComputed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const publicComputed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: undefined
     });
