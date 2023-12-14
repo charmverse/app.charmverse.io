@@ -30,8 +30,8 @@ beforeAll(async () => {
   // Create name property manually as generateMemberProperty don't allow creating default properties
   property1 = await prisma.memberProperty.create({
     data: {
-      name: 'Name',
-      type: 'text',
+      name: 'Avatar',
+      type: 'profile_pic',
       space: { connect: { id: u1Space1.id } },
       createdBy: u1.id,
       updatedBy: u1.id
