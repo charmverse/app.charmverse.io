@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ListProposalsRequest, ProposalWithUsers } from '@charmverse/core/proposals';
+import { getCurrentEvaluation, type ProposalWithUsers } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { withSessionRoute } from 'lib/session/withSession';
+import { getOldProposalStatus } from 'lib/proposal/getOldProposalStatus';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -42,9 +42,24 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
       authors: true,
       reviewers: true,
       category: true,
-      evaluations: true
+      evaluations: {
+        include: {
+          reviewers: true
+        }
+      }
     }
   });
 
-  return res.status(200).json(proposals);
+  const proposalsWithUsers: ProposalWithUsers[] = proposals.map(({ evaluations, ...proposal }) => {
+    const currentEvaluation = getCurrentEvaluation(evaluations);
+    const reviewers = currentEvaluation ? currentEvaluation.reviewers : proposal.reviewers;
+    return {
+      ...proposal,
+      reviewers,
+      evaluationType: currentEvaluation?.type || proposal.evaluationType,
+      status: getOldProposalStatus({ status: proposal.status, evaluations })
+    };
+  });
+
+  return res.status(200).json(proposalsWithUsers);
 }

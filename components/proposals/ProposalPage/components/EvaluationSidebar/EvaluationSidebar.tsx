@@ -38,10 +38,17 @@ export function EvaluationSidebar({
     // set the first evaluation by default if evaluationIdFromContext is not provided
     if (proposal && !evaluationIdFromContext && !activeEvaluationId) {
       const sidebarEvaluations = proposal.evaluations.filter((e) => evaluationTypesWithSidebar.includes(e.type));
+      // open current evaluation by default
       if (currentEvaluation && sidebarEvaluations.some((e) => e.id === currentEvaluation.id)) {
         setActiveEvaluationId(currentEvaluation.id);
-      } else if (sidebarEvaluations.length > 0) {
+      }
+      // go to the first evaluation
+      else if (sidebarEvaluations.length > 0) {
         setActiveEvaluationId(sidebarEvaluations[0].id);
+      }
+      // in this case, there are no evaluations that appear in the sidebar, so go to settings
+      else {
+        goToSettings();
       }
     }
   }, [!!proposal, !!evaluationIdFromContext, !!activeEvaluationId]);

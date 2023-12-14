@@ -24,5 +24,5 @@ export function getOldProposalStatus({
   } else if (currentEvaluation?.type === 'pass_fail') {
     return currentEvaluation.result ? 'reviewed' : 'evaluation_active'; // we doint have a review_active
   }
-  return 'published'; // this should never happen
+  return status;
 }

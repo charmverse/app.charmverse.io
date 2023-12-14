@@ -31,6 +31,9 @@ export function ProposalSidebarHeader({
   const selectableEvaluations = useMemo(() => {
     return evaluations.filter((evaluation) => evaluationTypesWithSidebar.includes(evaluation.type));
   }, [evaluations]);
+  if (selectableEvaluations.length === 0) {
+    return null;
+  }
   return (
     <>
       <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center'>
