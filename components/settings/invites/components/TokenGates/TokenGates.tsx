@@ -25,11 +25,11 @@ export function TokenGates({ isAdmin, space, popupState }: TokenGatesProps) {
         isAdmin={isAdmin}
         tokenGates={data}
         refreshTokenGates={async () => {
-          mutate();
+          await mutate();
         }}
       />
       <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} size='large'>
-        <TokenGateModalProvider onClose={closeTokenGateModal}>
+        <TokenGateModalProvider onClose={closeTokenGateModal} refreshTokenGates={() => mutate()}>
           <TokenGateModal />
         </TokenGateModalProvider>
       </Modal>
