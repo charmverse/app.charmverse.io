@@ -64,10 +64,30 @@ export function useRewardsBoardAdapter() {
     hasMilestoneRewards
   });
 
-  const views = useMemo(
-    () => board.fields.viewIds.map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView).filter(Boolean),
-    [board.fields.viewIds, rewardBlocks]
-  );
+  const views = useMemo(() => {
+    return board.fields.viewIds
+      .map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView)
+      .filter(Boolean)
+      .map((v) => {
+        const view = { ...v };
+        if (v.fields.viewType === 'table' && v.fields?.visiblePropertyIds?.length) {
+          const visibleIds = [...v.fields.visiblePropertyIds];
+          if (hasMilestoneRewards) {
+            const proposalIndex = visibleIds.indexOf(REWARD_PROPOSAL_LINK);
+            if (proposalIndex === -1) {
+              const titleIndex = visibleIds.indexOf(Constants.titleColumnId);
+              visibleIds.splice(titleIndex === 0 ? titleIndex + 1 : 0, 0, REWARD_PROPOSAL_LINK);
+            }
+          } else {
+            visibleIds.filter((id) => id !== REWARD_PROPOSAL_LINK);
+          }
+
+          view.fields.visiblePropertyIds = Array.from(new Set(visibleIds));
+        }
+
+        return view;
+      });
+  }, [board.fields.viewIds, hasMilestoneRewards, rewardBlocks]);
   const queryViewType =
     viewTypeToBlockId[query?.viewId?.toString() as IViewType] || query?.viewId?.toString() || DEFAULT_VIEW_BLOCK_ID;
 

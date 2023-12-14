@@ -113,7 +113,7 @@ export function getDefaultRewardProperties(hasMilestoneRewards?: boolean): IProp
   ];
 
   if (hasMilestoneRewards) {
-    properties.push(rewardDbProperties.rewardProposalLink());
+    properties.unshift(rewardDbProperties.rewardProposalLink());
   }
 
   return properties;
