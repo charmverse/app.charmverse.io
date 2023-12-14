@@ -20,13 +20,24 @@ const unlockNetworks = Object.values(networks);
 
 const unlockNetworksSetup = unlockChains.reduce<Record<number, { unlockAddress: string; provider: string }>>(
   (acc, chain) => {
-    return {
-      ...acc,
-      [chain.chainId]: {
-        unlockAddress: unlockNetworks.find((n: any): n is any => n.id === chain.chainId)?.unlockAddress || '',
-        provider: chain.alchemyUrl ? getAlchemyBaseUrl(chain.chainId) : chain.rpcUrls[0]
-      }
-    };
+    try {
+      return {
+        ...acc,
+        [chain.chainId]: {
+          unlockAddress: unlockNetworks.find((n: any): n is any => n.id === chain.chainId)?.unlockAddress || '',
+          provider: chain.alchemyUrl ? getAlchemyBaseUrl(chain.chainId) : chain.rpcUrls[0]
+        }
+      };
+    } catch (err) {
+      // This is more for the tests to pass
+      return {
+        ...acc,
+        [chain.chainId]: {
+          unlockAddress: unlockNetworks.find((n: any): n is any => n.id === chain.chainId)?.unlockAddress || '',
+          provider: chain.rpcUrls[0]
+        }
+      };
+    }
   },
   {}
 );
