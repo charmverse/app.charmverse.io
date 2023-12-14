@@ -48,7 +48,7 @@ export async function getLockDetails(values: GetLockPayload, withMetadata?: bool
   try {
     const web3Service = getUnlockService();
     const lock = await web3Service.getLock(contract, chainId);
-    const locksmithData = withMetadata ? await getLockMetadata(values) : undefined;
+    const locksmithData = withMetadata ? await getLockMetadata({ contract, chainId }) : undefined;
 
     const lockMetadata: Lock = {
       name: lock?.name,

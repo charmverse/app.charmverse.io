@@ -130,7 +130,7 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
         await testLitTokenGate(tokenGate);
       }
     } else {
-      await connectWallet();
+      connectWallet();
     }
   }
 
