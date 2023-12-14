@@ -200,7 +200,7 @@ function PropertyValueElement(props: Props) {
         }}
         size='small'
         component={Link}
-        href={propertyValue[1]}
+        href={getAbsolutePath(propertyValue[1] as string, domain)}
       />
     );
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
