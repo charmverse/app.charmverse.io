@@ -93,7 +93,7 @@ export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | n
     case 'Farcaster': {
       return (
         <img
-          src='/images/logos/farcaster_logo.svg'
+          src='/images/logos/farcaster_logo.png'
           style={{
             width,
             height

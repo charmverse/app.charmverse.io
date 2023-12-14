@@ -88,7 +88,7 @@ export function useIdentityTypes() {
     if (lensProfile) {
       types.push({
         type: 'Lens',
-        username: (lensProfile.metadata?.displayName ?? lensProfile.handle?.fullHandle ?? '').split('/')[1],
+        username: lensProfile.metadata?.displayName ?? (lensProfile.handle?.fullHandle ?? '').split('/')[1] ?? '',
         isInUse: user.identityType === 'Lens',
         icon: <IdentityIcon type='Lens' />
       });
@@ -97,7 +97,7 @@ export function useIdentityTypes() {
     if (farcasterProfile) {
       types.push({
         type: 'Farcaster',
-        username: farcasterProfile.body.displayName ?? '',
+        username: farcasterProfile.body.username ?? '',
         isInUse: user.identityType === 'Farcaster',
         icon: <IdentityIcon type='Farcaster' />
       });
