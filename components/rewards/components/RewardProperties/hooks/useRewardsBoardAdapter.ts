@@ -191,7 +191,11 @@ function mapRewardToCardPage({
 
   const proposalPage = reward && 'proposalId' in reward && reward.proposalId ? pages[reward.proposalId] : null;
   const proposalLinkValue = proposalPage ? [proposalPage.title, `/${proposalPage.path}`] : '';
+  const assignedSubmitters =
+    reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
+  const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
 
+  rewardFields.isAssigned = isAssignedReward;
   rewardFields.properties = {
     ...rewardFields.properties,
     [Constants.titleColumnId]: rewardPage?.title || '',
@@ -212,7 +216,7 @@ function mapRewardToCardPage({
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
-    [REWARDS_APPLICANTS_BLOCK_ID]: validApplications.map((a) => a.createdBy),
+    [REWARDS_APPLICANTS_BLOCK_ID]: isAssignedReward ? assignedSubmitters : validApplications.map((a) => a.createdBy),
     [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',

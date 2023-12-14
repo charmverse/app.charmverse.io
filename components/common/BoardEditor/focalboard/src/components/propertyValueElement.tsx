@@ -250,8 +250,12 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-    // do not show value in reward row
-  } else if (propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID && Array.isArray(propertyValue)) {
+    // Do not show  applicants in regular reward
+  } else if (
+    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID &&
+    Array.isArray(propertyValue) &&
+    !card.fields.isAssigned
+  ) {
     propertyValueElement = null;
   } else if (
     propertyTemplate.type === 'person' ||
