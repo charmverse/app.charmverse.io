@@ -189,6 +189,9 @@ function mapRewardToCardPage({
       ? reward.applications.filter((application) => members[application.createdBy])
       : [];
 
+  const proposalPage = reward && 'proposalId' in reward && reward.proposalId ? pages[reward.proposalId] : null;
+  const proposalLinkValue = proposalPage ? [proposalPage.title, `/${proposalPage.path}`] : '';
+
   rewardFields.properties = {
     ...rewardFields.properties,
     [Constants.titleColumnId]: rewardPage?.title || '',
@@ -215,8 +218,7 @@ function mapRewardToCardPage({
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
     [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
     [REWARD_APPLICANTS_COUNT]: validApplications.length.toString(),
-    [REWARD_PROPOSAL_LINK]:
-      (reward && 'proposalId' in reward && reward.proposalId && pages[reward.proposalId]?.path) || ''
+    [REWARD_PROPOSAL_LINK]: proposalLinkValue
   };
 
   const card: Card<RewardPropertyValue> = {
