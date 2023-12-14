@@ -97,7 +97,8 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [{ tokenGateId: tokenGate.id, signedToken: 'jwt1' }]
+      tokens: [{ tokenGateId: tokenGate.id, signedToken: 'jwt1' }],
+      walletAddress: '0x123'
     });
     await deleteTokenGate(tokenGate.id);
 
@@ -149,7 +150,8 @@ describe('verifyTokenGateMembership', () => {
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
         { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ]
+      ],
+      walletAddress: '0x123'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -203,7 +205,8 @@ describe('verifyTokenGateMembership', () => {
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
         { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ]
+      ],
+      walletAddress: '0x123'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -274,7 +277,8 @@ describe('verifyTokenGateMembership', () => {
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
         { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ]
+      ],
+      walletAddress: '0x123'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -336,7 +340,8 @@ describe('verifyTokenGateMembership', () => {
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
         { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ]
+      ],
+      walletAddress: '0x123'
     });
     await deleteTokenGate(tokenGate1.id);
 
@@ -411,7 +416,8 @@ describe('verifyTokenGateMembership', () => {
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
         { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ]
+      ],
+      walletAddress: '0x123'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
