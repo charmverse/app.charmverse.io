@@ -4,6 +4,7 @@ import { Box, FormLabel, Stack, Typography } from '@mui/material';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
+import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -45,9 +46,16 @@ export function PassFailEvaluation({ proposal, evaluation, isCurrent, refreshPro
     <>
       <Box mb={2}>
         <FormLabel>
-          <Typography variant='subtitle1'>Reviewer</Typography>
+          <Typography sx={{ mb: 1 }} variant='subtitle1'>
+            Reviewer
+          </Typography>
         </FormLabel>
-        <UserAndRoleSelect readOnly={true} value={reviewerOptions} onChange={() => {}} />
+        <UserAndRoleSelect
+          systemRoles={[allMembersSystemRole]}
+          readOnly={true}
+          value={reviewerOptions}
+          onChange={() => {}}
+        />
       </Box>
       {!evaluation.result && (
         <Box display='flex' justifyContent='space-between' alignItems='center'>

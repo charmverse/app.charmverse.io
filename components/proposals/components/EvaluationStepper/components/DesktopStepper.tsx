@@ -1,12 +1,11 @@
 import CheckIcon from '@mui/icons-material/Check';
 import { Grid, Stack, Tooltip, Typography } from '@mui/material';
-import { findIndex } from 'lodash';
 
 import type { StepperProps } from './Stepper';
 import { StepperStack } from './StepperIcon';
 
 export function DesktopStepper({ steps, onClick, selected, value }: StepperProps) {
-  const currentPosition = value ? findIndex(steps, (step) => step.value === value) : -1;
+  const currentPosition = value ? steps.findIndex((step) => step.value === value) : -1;
   return (
     <Grid
       container

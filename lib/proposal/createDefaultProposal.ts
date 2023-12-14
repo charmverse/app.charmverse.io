@@ -36,7 +36,7 @@ export async function createDefaultProposal({
       {
         index: 0,
         ...getDefaultFeedbackEvaluation(),
-        reviewers: [{ systemRole: 'space_member' }],
+        reviewers: [], // reviewers are irrelevant for Feebdack
         rubricCriteria: []
       },
       {

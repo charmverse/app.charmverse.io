@@ -3,11 +3,13 @@ import { Box, Divider, Typography, FormLabel } from '@mui/material';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { extraEvaluationRoles } from 'components/settings/proposals/components/EvaluationPermissions';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
-import { ProposalRubricCriteriaInput } from './ProposalRubricCriteriaInput';
-import type { RangeProposalCriteria } from './ProposalRubricCriteriaInput';
+import { RubricCriteriaInput } from './RubricCriteriaInput';
+import type { RangeProposalCriteria } from './RubricCriteriaInput';
+import { VoteInput } from './VoteInput';
 
 // result and id are not used for creating evaluations, so add them here
 // leave out permissions which are picked up on the backend based on workflowId
@@ -49,7 +51,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readO
       <Divider sx={{ my: 1 }} />
       <FormLabel required={evaluation.type !== 'vote'}>
         <Typography component='span' variant='subtitle1'>
-          {evaluation.type === 'vote' ? 'Vote privileges' : 'Reviewer'}
+          {evaluation.type === 'vote' ? 'Voter' : 'Reviewer'}
         </Typography>
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
@@ -63,6 +65,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readO
             emptyPlaceholderContent='Select user or role'
             value={reviewerOptions}
             readOnly={readOnly}
+            systemRoles={extraEvaluationRoles}
             variant='outlined'
             proposalCategoryId={categoryId}
             onChange={handleOnChangeReviewers}
@@ -77,18 +80,37 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readO
             </Typography>
           </FormLabel>
           <Box display='flex' flex={1} flexDirection='column'>
-            <ProposalRubricCriteriaInput
+            <RubricCriteriaInput
               readOnly={readOnly}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
                 onChange({
-                  ...evaluation,
                   rubricCriteria: rubricCriteria as ProposalEvaluationInput['rubricCriteria']
                 })
               }
               answers={[]}
             />
           </Box>
+        </>
+      )}
+      {evaluation.type === 'vote' && (
+        <>
+          {/* <FormLabel required>
+            <Typography component='span' variant='subtitle1'>
+              Vote settings
+            </Typography>
+          </FormLabel> */}
+          {/* <Box display='flex' flex={1} flexDirection='column'> */}
+          <VoteInput
+            readOnly={readOnly}
+            value={evaluation.voteSettings}
+            onChange={(voteSettings) =>
+              onChange({
+                voteSettings
+              })
+            }
+          />
+          {/* </Box> */}
         </>
       )}
     </Box>

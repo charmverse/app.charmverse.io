@@ -1,10 +1,10 @@
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
-import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
 
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
@@ -12,7 +12,10 @@ import { RubricEvaluation } from './components/RubricEvaluation';
 
 export type Props = {
   pageId?: string;
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'authors' | 'evaluations' | 'status' | 'evaluationType'>;
+  proposal?: Pick<
+    ProposalWithUsersAndRubric,
+    'id' | 'authors' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'
+  >;
   evaluationId?: string | null;
   refreshProposal?: VoidFunction;
   goToEditProposal: VoidFunction;

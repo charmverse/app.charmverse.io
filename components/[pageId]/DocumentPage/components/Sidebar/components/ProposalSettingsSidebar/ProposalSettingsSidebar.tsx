@@ -8,7 +8,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';

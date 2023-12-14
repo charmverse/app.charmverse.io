@@ -1,10 +1,10 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { Box, ButtonGroup, Stack } from '@mui/material';
 
 import { Button } from 'components/common/Button';
 import { evaluationIcons } from 'components/settings/proposals/constants';
-import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
 
 const StyledButton = styled(Button, { shouldForwardProp: (prop) => prop !== 'isDraft' })<{ isDraft?: boolean }>(
   ({ isDraft }) => `

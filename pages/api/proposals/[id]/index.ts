@@ -42,7 +42,8 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
           reviewers: true,
           rubricCriteria: true,
           rubricAnswers: true,
-          draftRubricAnswers: true
+          draftRubricAnswers: true,
+          vote: true
         }
       },
       authors: true,
@@ -55,12 +56,12 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-  const computed = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
   });
-  if (computed.read !== true) {
+  if (permissions.view !== true) {
     throw new NotFoundError();
   }
 
@@ -69,22 +70,17 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     userId
   });
 
-  const reviewerIds =
-    !spaceRole || spaceRole.isAdmin
-      ? []
-      : await getAllReviewerUserIds({
-          proposalId: proposal.id
-        });
-
-  const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
+  const canSeeAnswers = spaceRole?.isAdmin || permissions.evaluate || permissions.review;
 
   if (!canSeeAnswers) {
     proposal.draftRubricAnswers = [];
     proposal.rubricAnswers = [];
   }
 
-  // filter out evaluation-specific reviewers
+  // Support old model: filter out evaluation-specific reviewers
   proposal.reviewers = proposal.reviewers.filter((reviewer) => !reviewer.evaluationId);
+
+  (proposal as unknown as ProposalWithUsersAndRubric).permissions = permissions;
 
   return res.status(200).json(proposal as unknown as ProposalWithUsersAndRubric);
 }

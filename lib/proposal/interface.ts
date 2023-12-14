@@ -1,3 +1,4 @@
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   Page,
   PageComment,
@@ -48,6 +49,7 @@ export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData & {
     evaluations: PopulatedEvaluation[];
     page?: { sourceTemplateId: string | null } | null;
+    permissions: ProposalPermissionFlags;
   };
 
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {

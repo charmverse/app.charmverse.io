@@ -6,7 +6,6 @@ import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hoo
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { isTruthy } from 'lib/utilities/types';
@@ -26,12 +25,10 @@ export function OldProposalEvaluationSidebar({ pageId, proposalId }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  const { permissions: proposalPermissions } = useProposalPermissions({
-    proposalIdOrPath: proposalId
-  });
   const { data: reviewerUserIds } = useGetAllReviewerUserIds(
     !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
   );
+  const proposalPermissions = proposal?.permissions;
   const canAnswerRubric = proposalPermissions?.evaluate;
   const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
   const rubricCriteria = proposal?.rubricCriteria;

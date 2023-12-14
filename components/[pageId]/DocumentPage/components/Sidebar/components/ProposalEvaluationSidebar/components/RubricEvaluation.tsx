@@ -7,7 +7,6 @@ import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
@@ -19,7 +18,7 @@ import { RubricResults } from './RubricResults';
 
 export type Props = {
   pageId?: string;
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'status' | 'evaluationType'>;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'>;
   evaluation: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
   goToEditProposal: VoidFunction;
@@ -29,9 +28,7 @@ export function RubricEvaluation({ pageId, proposal, evaluation, refreshProposal
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  const { permissions: proposalPermissions } = useProposalPermissions({
-    proposalIdOrPath: proposal?.id
-  });
+  const proposalPermissions = proposal?.permissions;
   const { data: reviewerUserIds } = useGetAllReviewerUserIds(
     !!pageId && evaluation?.type === 'rubric' ? pageId : undefined
   );

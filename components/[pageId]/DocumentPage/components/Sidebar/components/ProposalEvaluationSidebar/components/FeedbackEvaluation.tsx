@@ -1,14 +1,13 @@
-import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, FormLabel, Typography } from '@mui/material';
 
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
+import { extraEvaluationRoles } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMembers } from 'hooks/useMembers';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 export type Props = {
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'authors' | 'evaluations' | 'status' | 'evaluationType'>;
@@ -20,6 +19,7 @@ export type Props = {
 export function FeedbackEvaluation({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
   const isAdmin = useIsAdmin();
   const { user } = useUser();
+  const { showMessage } = useSnackbar();
   const { trigger: updateProposalEvaluation, isMutating } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
   const reviewerOptions = evaluation.permissions
@@ -28,7 +28,8 @@ export function FeedbackEvaluation({ proposal, isCurrent, evaluation, refreshPro
       group: permission.roleId ? 'role' : permission.userId ? 'user' : 'system_role',
       id: (permission.roleId ?? permission.userId ?? permission.systemRole) as string
     }));
-  const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === evaluation.id) || -1;
+  const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === evaluation.id) ?? -1;
+
   const nextEvaluation = proposal?.evaluations[currentEvaluationIndex + 1];
   const isMover = isAdmin || proposal?.authors.some((author) => author.userId === user?.id);
   const disabledTooltip = !isCurrent
@@ -37,10 +38,14 @@ export function FeedbackEvaluation({ proposal, isCurrent, evaluation, refreshPro
     ? 'You do not have permission to move this evaluation'
     : null;
   async function onMoveForward() {
-    await updateProposalEvaluation({
-      evaluationId: evaluation.id,
-      result: 'pass'
-    });
+    try {
+      await updateProposalEvaluation({
+        evaluationId: evaluation.id,
+        result: 'pass'
+      });
+    } catch (error) {
+      showMessage((error as Error).message, 'error');
+    }
     refreshProposal?.();
   }
 
@@ -48,11 +53,16 @@ export function FeedbackEvaluation({ proposal, isCurrent, evaluation, refreshPro
     <>
       <Box mb={2}>
         <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            {evaluation.type === 'vote' ? 'Vote privileges' : 'Reviewer'}
+          <Typography sx={{ mb: 1 }} variant='subtitle1'>
+            Reviewer
           </Typography>
         </FormLabel>
-        <UserAndRoleSelect readOnly={true} value={reviewerOptions} onChange={() => {}} />
+        <UserAndRoleSelect
+          readOnly={true}
+          systemRoles={extraEvaluationRoles}
+          value={reviewerOptions}
+          onChange={() => {}}
+        />
       </Box>
       <Box display='flex' justifyContent='flex-end' alignItems='center'>
         {/* <FormLabel>

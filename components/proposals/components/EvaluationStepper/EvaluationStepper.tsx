@@ -1,6 +1,5 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
-
-import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { evaluationLabels } from '../ProposalProperties/components/ProposalEvaluationSelect';
 

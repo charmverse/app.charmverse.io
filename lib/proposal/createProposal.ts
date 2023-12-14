@@ -1,6 +1,6 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Page, ProposalStatus, ProposalReviewer } from '@charmverse/core/prisma';
+import type { Page, ProposalStatus, ProposalReviewer, Vote } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, WorkflowEvaluationJson, ProposalWorkflowTyped } from '@charmverse/core/proposals';
@@ -31,6 +31,12 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
   permissions?: WorkflowEvaluationJson['permissions']; // pass these in to override workflow defaults
+  voteSettings?:
+    | (Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
+        durationDays: number;
+        options: string[];
+      })
+    | null;
 };
 
 export type CreateProposalInput = {
@@ -73,7 +79,7 @@ export async function createProposal({
   }
 
   const proposalId = uuid();
-  let proposalStatus: ProposalStatus = 'draft';
+  const proposalStatus: ProposalStatus = 'draft';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
 
@@ -136,7 +142,7 @@ export async function createProposal({
         evaluationId: evaluationIds[index]
       }))
     );
-    proposalStatus = 'published'; // TODO: implement support for drafts
+    // proposalStatus = 'published'; // TODO: implement support for drafts
   }
 
   // Using a transaction to ensure both the proposal and page gets created together

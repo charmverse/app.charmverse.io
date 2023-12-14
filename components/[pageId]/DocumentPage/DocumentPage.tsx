@@ -26,8 +26,6 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { EvaluationStepper } from 'components/proposals/components/EvaluationStepper/EvaluationStepper';
-import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -129,12 +127,12 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { permissions: proposalPermissions } = useProposalPermissions({ proposalIdOrPath: proposalId });
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
+  const proposalPermissions = proposal?.permissions;
 
   const card = useAppSelector((state) => {
     if (page?.type !== 'card' && page?.type !== 'card_template') {

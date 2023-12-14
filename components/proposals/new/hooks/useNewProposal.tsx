@@ -3,11 +3,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
+import type { ProposalEvaluationValues } from 'components/[pageId]/DocumentPage/components/Sidebar/components/ProposalSettingsSidebar/components/ProposalEvaluationForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
+import { isTruthy } from 'lib/utilities/types';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -115,8 +117,9 @@ export function useNewProposal({ newProposal }: Props) {
     if (formInputs.reviewers.length === 0) {
       disabledTooltip = 'Reviewers are required';
     }
-  } else if (formInputs.evaluations.some((evaluation) => evaluation.type !== 'feedback' && !evaluation.reviewers)) {
-    disabledTooltip = 'Reviewers are required';
+  } else {
+    // get the first validation error from the evaluations
+    disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }
 
   return {
@@ -128,6 +131,25 @@ export function useNewProposal({ newProposal }: Props) {
     isCreatingProposal,
     contentUpdated
   };
+}
+
+function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
+  switch (evaluation.type) {
+    case 'feedback':
+      return false;
+    case 'rubric':
+      return evaluation.reviewers.length === 0
+        ? 'Reviewers are required'
+        : evaluation.rubricCriteria.length === 0
+        ? 'Rubric criteria are required'
+        : false;
+    case 'pass_fail':
+      return evaluation.reviewers.length === 0 ? 'Reviewers are required' : false;
+    case 'vote':
+      return !evaluation.voteSettings ? 'Vote details are required' : false;
+    default:
+      return false;
+  }
 }
 
 function emptyState({

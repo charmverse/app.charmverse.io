@@ -1,12 +1,11 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
 import { ProposalEvaluationType } from '@charmverse/core/prisma';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { Typography } from '@mui/material';
-import { findIndex } from 'lodash';
 import { useState } from 'react';
 
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import { getCurrentEvaluation } from 'lib/proposal/workflows/getCurrentEvaluation';
 
 type Props = {
   evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'>[];
@@ -29,7 +28,7 @@ export function ProposalEvaluationSelect({ evaluations, isDraft, readOnly, onCha
   const [selectedChange, setSelectedChange] = useState<{ message: string; value: string } | null>(null);
   const currentEvaluation = getCurrentEvaluation(evaluations);
   const currentValue = isDraft ? 'draft' : currentEvaluation?.id;
-  const currentEvaluationIndex = findIndex(evaluations, (option) => option.id === currentValue);
+  const currentEvaluationIndex = evaluations.findIndex((option) => option.id === currentValue);
 
   const propertyOptions = [
     {
@@ -70,8 +69,8 @@ export function ProposalEvaluationSelect({ evaluations, isDraft, readOnly, onCha
   function onSelectOption(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;
     if (newValue) {
-      const currentIndex = findIndex(propertyOptions, (option) => option.value === currentValue);
-      const newIndex = findIndex(propertyOptions, (option) => option.value === newValue);
+      const currentIndex = propertyOptions.findIndex((option) => option.value === currentValue);
+      const newIndex = propertyOptions.findIndex((option) => option.value === newValue);
       if (newIndex > currentIndex) {
         setSelectedChange({ message: 'Are you sure you want to proceed?', value: newValue });
       } else if (newIndex < currentIndex) {

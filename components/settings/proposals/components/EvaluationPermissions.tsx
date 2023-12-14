@@ -21,7 +21,18 @@ type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit'
 
 export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
 
-const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
+export const allMembersSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='All members of this space'>
+      <MembersIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.space_member,
+  label: 'Members'
+} as const;
+
+export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   {
     group: 'system_role',
     icon: (
@@ -52,16 +63,7 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
     id: ProposalSystemRole.all_reviewers,
     label: 'All Reviewers'
   },
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='All members of this space'>
-        <MembersIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.space_member,
-    label: 'Members'
-  }
+  allMembersSystemRole
 ];
 
 const permissionOperationPlaceholders = {

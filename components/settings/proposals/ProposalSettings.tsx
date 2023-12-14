@@ -10,6 +10,7 @@ import {
 } from 'charmClient/hooks/spaces';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -25,7 +26,7 @@ export function ProposalSpaceSettings({ space }: { space: Space }) {
   const { mappedFeatures } = useSpaceFeatures();
   const [expanded, setExpanded] = useState<string | false>(false);
   const [workflows, setWorkflows] = useState<WorkflowTemplateFormItem[]>([]);
-  const { data: currentWorkflowTemplates } = useGetProposalWorkflows(space.id);
+  const { data: currentWorkflowTemplates, isLoading: loadingWorkflows } = useGetProposalWorkflows(space.id);
   const { trigger: upsertWorkflow } = useUpsertProposalWorkflow(space.id);
   const { trigger: deleteWorkflow } = useDeleteProposalWorkflow(space.id);
   const { showMessage } = useSnackbar();
@@ -107,6 +108,7 @@ export function ProposalSpaceSettings({ space }: { space: Space }) {
           </span>
         </Tooltip>
       </Legend>
+      {loadingWorkflows && <LoadingComponent minHeight={200} />}
       {workflows.map((workflow, index) => (
         <ProposalWorkflowItem
           key={workflow.id}

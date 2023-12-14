@@ -14,7 +14,6 @@ import {
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -61,9 +60,6 @@ export function ProposalProperties({
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
-  const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
-    proposalIdOrPath: proposalId
-  });
   const { setupLensProfile } = useLensProfile();
   const { mutateProposals } = useProposals();
   const { account } = useWeb3Account();
@@ -78,6 +74,7 @@ export function ProposalProperties({
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
+  const proposalPermissions = proposal?.permissions;
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
   const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
@@ -127,12 +124,7 @@ export function ProposalProperties({
         }
       }
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      await Promise.all([
-        refreshProposal(),
-        refreshProposalFlowFlags(),
-        refreshPagePermissions(),
-        refreshProposalPermissions()
-      ]);
+      await Promise.all([refreshProposal(), refreshProposalFlowFlags(), refreshPagePermissions()]);
       mutateNotifications();
       mutateProposals();
     }
