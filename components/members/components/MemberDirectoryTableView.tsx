@@ -149,19 +149,6 @@ function MemberDirectoryTableRow({
                 </TableCell>
               );
             }
-            case 'name': {
-              const content = (
-                <Typography fontWeight='bold'>{(memberProperty.value as string) ?? member.username}</Typography>
-              );
-
-              return (
-                <TableCell key={property.id}>
-                  <Box sx={{ cursor: 'pointer' }} onClick={() => showUserId(member.id)}>
-                    {content}
-                  </Box>
-                </TableCell>
-              );
-            }
             case 'bio': {
               return (
                 <TableCell key={property.id}>

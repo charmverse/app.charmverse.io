@@ -12929,7 +12929,7 @@
         "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
         "name": "Name",
-        "type": "name",
+        "type": "text",
         "options": null,
         "index": 1,
         "enabledViews": [
@@ -13000,7 +13000,7 @@
         "updatedAt": "2023-02-07T16:12:47.223Z",
         "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "name": "Twitter",
+        "name": "X",
         "type": "twitter",
         "options": null,
         "index": 5,
