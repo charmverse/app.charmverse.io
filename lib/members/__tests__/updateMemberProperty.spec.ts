@@ -39,13 +39,17 @@ describe('updateMemberProperty', () => {
         id: space.id
       }
     });
-    const property = await generateMemberProperty({
-      index: 3,
-      type: 'discord',
-      userId: user.id,
-      spaceId: space.id,
-      name: 'Discord'
+
+    const property = await prisma.memberProperty.create({
+      data: {
+        name: 'Discord',
+        type: 'discord',
+        space: { connect: { id: space.id } },
+        createdBy: user.id,
+        updatedBy: user.id
+      }
     });
+
     await expect(
       updateMemberProperty({
         id: property.id,
