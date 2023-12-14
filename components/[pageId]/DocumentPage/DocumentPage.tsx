@@ -13,7 +13,6 @@ import {
   useUpsertRubricCriteria
 } from 'charmClient/hooks/proposals';
 import { useGetReward } from 'charmClient/hooks/rewards';
-import type { ProposalEvaluationValues } from 'components/[pageId]/DocumentPage/components/Sidebar/components/ProposalSettingsSidebar/components/ProposalEvaluationForm';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -25,7 +24,8 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import { EvaluationStepper } from 'components/proposals/components/EvaluationStepper/EvaluationStepper';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
+import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -498,6 +498,7 @@ function DocumentPage({
                       sidebarView={sidebarView}
                       closeSidebar={closeSidebar}
                       openSidebar={setActiveView}
+                      openEvaluationSidebar={openEvaluationSidebar}
                       threads={threads}
                       proposal={proposal}
                       proposalInput={proposal}

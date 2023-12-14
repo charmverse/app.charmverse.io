@@ -73,7 +73,7 @@ export const CriteriaRow = styled(Box)`
   }
 `;
 
-export function RubricCriteriaInput({ readOnly, readOnlyMessage, value, onChange, proposalStatus, answers }: Props) {
+export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, proposalStatus, answers }: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
 
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);

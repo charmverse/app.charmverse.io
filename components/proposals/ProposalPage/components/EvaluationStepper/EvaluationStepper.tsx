@@ -1,6 +1,7 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
 import { evaluationLabels } from '../ProposalProperties/components/ProposalEvaluationSelect';
 
 import { Stepper } from './components/Stepper';
@@ -33,7 +34,7 @@ export function EvaluationStepper({
     ...evaluations.map((evaluation) => ({
       label: evaluation.title,
       completed: !!evaluation.result,
-      disabled: !!disabled,
+      disabled: !!disabled || !evaluationTypesWithSidebar.includes(evaluation.type),
       description: evaluationLabels[evaluation.type],
       value: evaluation.id
     }))

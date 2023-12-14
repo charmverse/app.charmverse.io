@@ -3,13 +3,13 @@ import { Box, Divider, Typography, FormLabel } from '@mui/material';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { extraEvaluationRoles } from 'components/settings/proposals/components/EvaluationPermissions';
+import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
-import { RubricCriteriaInput } from './RubricCriteriaInput';
-import type { RangeProposalCriteria } from './RubricCriteriaInput';
-import { VoteInput } from './VoteInput';
+import { RubricCriteria } from './RubricCriteria';
+import type { RangeProposalCriteria } from './RubricCriteria';
+import { VoteOptions } from './VoteOptions';
 
 // result and id are not used for creating evaluations, so add them here
 // leave out permissions which are picked up on the backend based on workflowId
@@ -23,7 +23,7 @@ type Props = {
   readOnly: boolean;
 };
 
-export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readOnly }: Props) {
+export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly }: Props) {
   const reviewerOptions = evaluation.reviewers
     // .filter((reviewer) => reviewer.group === 'role' || reviewer.group === 'user')
     .map((reviewer) => ({
@@ -44,7 +44,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readO
   }
   return (
     <Box ml={3}>
-      <Box display='flex' alignItems='center' gap={1} ml='-28px'>
+      <Box display='flex' alignItems='center' gap='5px' ml='-25px'>
         {evaluationIcons[evaluation.type]()}
         <Typography variant='h6'>{evaluation.title}</Typography>
       </Box>
@@ -65,7 +65,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readO
             emptyPlaceholderContent='Select user or role'
             value={reviewerOptions}
             readOnly={readOnly}
-            systemRoles={extraEvaluationRoles}
+            systemRoles={[allMembersSystemRole]}
             variant='outlined'
             proposalCategoryId={categoryId}
             onChange={handleOnChangeReviewers}
@@ -80,7 +80,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readO
             </Typography>
           </FormLabel>
           <Box display='flex' flex={1} flexDirection='column'>
-            <RubricCriteriaInput
+            <RubricCriteria
               readOnly={readOnly}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
@@ -101,7 +101,7 @@ export function ProposalEvaluationForm({ evaluation, categoryId, onChange, readO
             </Typography>
           </FormLabel> */}
           {/* <Box display='flex' flex={1} flexDirection='column'> */}
-          <VoteInput
+          <VoteOptions
             readOnly={readOnly}
             value={evaluation.voteSettings}
             onChange={(voteSettings) =>

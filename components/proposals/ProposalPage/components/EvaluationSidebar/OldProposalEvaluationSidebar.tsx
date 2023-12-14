@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { NoCommentsMessage } from 'components/[pageId]/DocumentPage/components/Sidebar/components/CommentsSidebar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
@@ -10,10 +11,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { isTruthy } from 'lib/utilities/types';
 
-import { NoCommentsMessage } from '../CommentsSidebar';
-
-import { RubricAnswersForm } from './components/RubricAnswersForm';
 import { RubricResults } from './components/RubricResults';
+import { RubricAnswersForm } from './components/RubricReviewForm';
 
 type Props = {
   pageId?: string;

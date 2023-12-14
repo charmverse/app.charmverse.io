@@ -4,15 +4,16 @@ import type { PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, DialogActions, Stack, Divider, useMediaQuery } from '@mui/material';
+import { Box, DialogActions, Divider, useMediaQuery } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
-import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
+import { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
+import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
@@ -35,10 +36,9 @@ import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
-import { EvaluationStepper } from '../components/EvaluationStepper/EvaluationStepper';
-import type { ProposalPropertiesInput } from '../components/ProposalProperties/ProposalPropertiesBase';
-import { ProposalPropertiesBase } from '../components/ProposalProperties/ProposalPropertiesBase';
-
+import { EvaluationStepper } from './components/EvaluationStepper/EvaluationStepper';
+import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
+import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
 import { WorkflowSelect } from './components/WorkflowSelect';
 import type { NewProposalInput } from './hooks/useNewProposal';
@@ -269,15 +269,10 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                 isContentControlled
                 key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
               >
-                {/* temporary? disable editing of page title when in suggestion mode */}
-                <PageHeader
-                  headerImage={formInputs.headerImage}
-                  icon={formInputs.icon}
-                  readOnly={false}
+                <PageTitleInput
                   updatedAt={new Date().toString()}
-                  title={formInputs.title || ''}
-                  // readOnly={readOnly || !!enableSuggestingMode}
-                  setPage={(updatedPage) => {
+                  value={formInputs.title || ''}
+                  onChange={(updatedPage) => {
                     setFormInputs(updatedPage);
                     if ('title' in updatedPage) {
                       setPageTitle(updatedPage.title || '');
@@ -356,26 +351,27 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                         readOnlyCustomProperties={readOnlyCustomProperties}
                       />
                     </div>
+                    {currentSpace && (
+                      <PageSidebar
+                        id='page-action-sidebar'
+                        spaceId={currentSpace.id}
+                        sidebarView={defaultSidebarView || sidebarView ? 'proposal_evaluation_settings' : null}
+                        closeSidebar={closeSidebar}
+                        proposalInput={formInputs}
+                        isNewProposal
+                        onChangeEvaluation={(evaluationId, updates) => {
+                          const evaluations = formInputs.evaluations.map((e) =>
+                            e.id === evaluationId ? { ...e, ...updates } : e
+                          );
+                          setFormInputs({
+                            ...formInputs,
+                            evaluations
+                          });
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
-                {currentSpace && (
-                  <PageSidebar
-                    id='page-action-sidebar'
-                    spaceId={currentSpace.id}
-                    sidebarView={defaultSidebarView || sidebarView ? 'proposal_evaluation_settings' : null}
-                    closeSidebar={closeSidebar}
-                    proposalInput={formInputs}
-                    onChangeEvaluation={(evaluationId, updates) => {
-                      const evaluations = formInputs.evaluations.map((e) =>
-                        e.id === evaluationId ? { ...e, ...updates } : e
-                      );
-                      setFormInputs({
-                        ...formInputs,
-                        evaluations
-                      });
-                    }}
-                  />
-                )}
               </CharmEditor>
             </Box>
           </StyledContainer>

@@ -12,16 +12,14 @@ import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/propos
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 export type Props = {
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'authors' | 'evaluations' | 'status' | 'evaluationType'>;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
   evaluation: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
   isCurrent: boolean;
 };
 
-export function PassFailEvaluation({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
-  const isAdmin = useIsAdmin();
+export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
   const { membersRecord } = useMembers();
-  const { user } = useUser();
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
@@ -29,7 +27,7 @@ export function PassFailEvaluation({ proposal, evaluation, isCurrent, refreshPro
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
 
-  const isReviewer = isAdmin || evaluation.reviewers.some((author) => author.userId === user?.id);
+  const isReviewer = proposal?.permissions.evaluate;
   const reviewedBy = evaluation.decidedBy ? membersRecord[evaluation.decidedBy] : null;
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent ? 'Evaluation is not current' : !isReviewer ? 'You are not a reviewer' : null;

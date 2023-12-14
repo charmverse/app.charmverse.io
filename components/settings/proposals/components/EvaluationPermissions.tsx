@@ -29,7 +29,7 @@ export const allMembersSystemRole = {
     </Tooltip>
   ),
   id: ProposalSystemRole.space_member,
-  label: 'Members'
+  label: 'All members'
 } as const;
 
 export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [

@@ -20,8 +20,6 @@ import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import type { ProposalPageAndPropertiesInput } from '../../new/NewProposalPage';
-
 interface Props {
   pageId?: string;
   closeDialog: () => void;

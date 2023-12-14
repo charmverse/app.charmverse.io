@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 
 import getPageLayout from 'components/common/PageLayout/getLayout';
-import { NewProposalPage } from 'components/proposals/new/NewProposalPage';
+import { NewProposalPage } from 'components/proposals/ProposalPage/NewProposalPage';
 
 export default function PageView() {
   const router = useRouter();

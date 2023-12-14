@@ -14,7 +14,7 @@ import { Button } from 'components/common/Button';
 import {
   IntegerInput,
   CriteriaRow
-} from 'components/proposals/components/ProposalProperties/components/OldProposalRubricCriteriaInput';
+} from 'components/proposals/ProposalPage/components/ProposalProperties/components/OldProposalRubricCriteriaInput';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 

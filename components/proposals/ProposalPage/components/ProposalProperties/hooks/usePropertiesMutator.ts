@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ProposalsMutator } from 'components/proposals/components/ProposalProperties/proposalsMutator';
+import { ProposalsMutator } from 'components/proposals/ProposalPage/components/ProposalProperties/proposalsMutator';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { ProposalFieldsProp, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 

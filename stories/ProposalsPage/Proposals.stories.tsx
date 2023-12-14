@@ -5,8 +5,8 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
 import { HeaderSpacer, StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
-import type { ProposalPageAndPropertiesInput } from 'components/proposals/new/NewProposalPage';
-import { NewProposalPage as ProposalPageComponent } from 'components/proposals/new/NewProposalPage';
+import type { ProposalPageAndPropertiesInput } from 'components/proposals/ProposalPage/NewProposalPage';
+import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { createMockPage } from 'testing/mocks/page';

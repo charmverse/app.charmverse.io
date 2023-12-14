@@ -3,10 +3,9 @@ import { useEffect, useState } from 'react';
 
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import { FeedbackEvaluation } from './components/FeedbackEvaluation';
-import { PassFailEvaluation } from './components/PassFailEvaluation';
-import { RubricEvaluation } from './components/RubricEvaluation';
-import { ProposalSidebarHeader } from './ProposalSidebarHeader';
+import { evaluationTypesWithSidebar, ProposalSidebarHeader } from './components/ProposalSidebarHeader';
+import { RubricSidebar } from './components/RubricSidebar';
+import { VoteSidebar } from './components/VoteSidebar';
 
 export type Props = {
   pageId?: string;
@@ -16,15 +15,15 @@ export type Props = {
   >;
   evaluationId?: string | null;
   refreshProposal?: VoidFunction;
-  goToEditProposal: VoidFunction;
+  goToSettings: VoidFunction;
 };
 
-export function ProposalEvaluationSidebar({
+export function EvaluationSidebar({
   pageId,
   proposal,
   evaluationId: evaluationIdFromContext = null,
   refreshProposal,
-  goToEditProposal
+  goToSettings
 }: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | null>(evaluationIdFromContext);
   const currentEvaluation = getCurrentEvaluation(proposal?.evaluations || []);
@@ -37,10 +36,15 @@ export function ProposalEvaluationSidebar({
 
   useEffect(() => {
     // set the first evaluation by default if evaluationIdFromContext is not provided
-    if (currentEvaluation && !evaluationIdFromContext && !activeEvaluationId) {
-      setActiveEvaluationId(currentEvaluation.id);
+    if (proposal && !evaluationIdFromContext && !activeEvaluationId) {
+      const sidebarEvaluations = proposal.evaluations.filter((e) => evaluationTypesWithSidebar.includes(e.type));
+      if (currentEvaluation && sidebarEvaluations.some((e) => e.id === currentEvaluation.id)) {
+        setActiveEvaluationId(currentEvaluation.id);
+      } else if (sidebarEvaluations.length > 0) {
+        setActiveEvaluationId(sidebarEvaluations[0].id);
+      }
     }
-  }, [!!currentEvaluation, !!evaluationIdFromContext, !!activeEvaluationId]);
+  }, [!!proposal, !!evaluationIdFromContext, !!activeEvaluationId]);
 
   const isCurrent = currentEvaluation?.id === evaluation?.id;
 
@@ -50,18 +54,13 @@ export function ProposalEvaluationSidebar({
         activeEvaluationId={activeEvaluationId}
         evaluations={proposal?.evaluations || []}
         goToEvaluation={setActiveEvaluationId}
-        goToSettings={goToEditProposal}
+        goToSettings={goToSettings}
       />
 
       {evaluation?.type === 'rubric' && (
-        <RubricEvaluation {...{ pageId, proposal, isCurrent, evaluation, refreshProposal, goToEditProposal }} />
+        <RubricSidebar {...{ pageId, proposal, isCurrent, evaluation, refreshProposal }} />
       )}
-      {evaluation?.type === 'feedback' && (
-        <FeedbackEvaluation {...{ proposal, isCurrent, evaluation, goToEditProposal }} />
-      )}
-      {evaluation?.type === 'pass_fail' && (
-        <PassFailEvaluation {...{ proposal, isCurrent, evaluation, refreshProposal }} />
-      )}
+      {evaluation?.type === 'vote' && <VoteSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />}
     </>
   );
 }

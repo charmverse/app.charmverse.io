@@ -1,4 +1,5 @@
 import { VoteType } from '@charmverse/core/prisma';
+import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
@@ -29,7 +30,13 @@ type CreateVoteModalProps = {
   value: ProposalEvaluationInput['voteSettings'];
 };
 
-export function VoteInput({ readOnly, value, onChange }: CreateVoteModalProps) {
+const StyledVoteOptions = styled.div`
+  & .MuiInputBase-input {
+    box-sizing: content-box;
+  }
+`;
+
+export function VoteOptions({ readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
   const [options, setOptions] = useState<string[]>(value?.options ?? []);
@@ -65,7 +72,7 @@ export function VoteInput({ readOnly, value, onChange }: CreateVoteModalProps) {
   }, [voteType, options, maxChoices, durationDays, passThreshold]);
 
   return (
-    <>
+    <StyledVoteOptions>
       <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' mb={1}>
         <FormLabel>
           <Typography component='span' variant='subtitle1'>
@@ -81,61 +88,59 @@ export function VoteInput({ readOnly, value, onChange }: CreateVoteModalProps) {
         />
       </Stack>
 
-      <Box className='octo-propertyrow' mb='0 !important'>
-        <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            Options
-          </Typography>
-        </FormLabel>
-        <RadioGroup
-          row
-          defaultValue={voteType}
-          value={voteType}
-          onChange={(e) => {
-            setVoteType(e.target.value as VoteType);
-          }}
-          sx={{ mb: 1 }}
-        >
-          <FormControlLabel
-            disabled={readOnly}
-            value={VoteType.Approval}
-            control={<Radio />}
-            label='Yes / No / Abstain'
-          />
-          <FormControlLabel
-            disabled={readOnly}
-            value={VoteType.SingleChoice}
-            control={<Radio />}
-            label='Custom Options'
-            sx={{ mr: 0 }}
-          />
-        </RadioGroup>
-        {voteType === VoteType.SingleChoice && (
-          <Stack mb={2}>
-            <InlineVoteOptions options={options} setOptions={setOptions} />
-            <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
-              <FormLabel>
-                <Typography component='span' variant='subtitle1'>
-                  Max choices
-                </Typography>
-              </FormLabel>
-              <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
-            </Stack>
-          </Stack>
-        )}
-
-        {maxChoices === 1 && (
-          <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+      <FormLabel>
+        <Typography component='span' variant='subtitle1'>
+          Options
+        </Typography>
+      </FormLabel>
+      <RadioGroup
+        row
+        defaultValue={voteType}
+        value={voteType}
+        onChange={(e) => {
+          setVoteType(e.target.value as VoteType);
+        }}
+        sx={{ mb: 1 }}
+      >
+        <FormControlLabel
+          disabled={readOnly}
+          value={VoteType.Approval}
+          control={<Radio />}
+          label='Yes / No / Abstain'
+        />
+        <FormControlLabel
+          disabled={readOnly}
+          value={VoteType.SingleChoice}
+          control={<Radio />}
+          label='Custom Options'
+          sx={{ mr: 0 }}
+        />
+      </RadioGroup>
+      {voteType === VoteType.SingleChoice && (
+        <Stack mb={2}>
+          <InlineVoteOptions options={options} setOptions={setOptions} />
+          <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
-                Pass Threshold (%)
+                Max choices
               </Typography>
             </FormLabel>
-            <NumericFieldWithButtons disabled={readOnly} value={passThreshold} onChange={setPassThreshold} max={100} />
+            <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
           </Stack>
-        )}
-      </Box>
-    </>
+        </Stack>
+      )}
+
+      {maxChoices === 1 && (
+        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Pass Threshold (%)
+            </Typography>
+          </FormLabel>
+          <NumericFieldWithButtons disabled={readOnly} value={passThreshold} onChange={setPassThreshold} max={100} />
+        </Stack>
+      )}
+    </StyledVoteOptions>
   );
 }
 

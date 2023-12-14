@@ -1,39 +1,30 @@
-import { Edit as EditIcon } from '@mui/icons-material';
-import { Alert, IconButton, SvgIcon } from '@mui/material';
+import { Alert, SvgIcon } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
-import { useGetAllReviewerUserIds } from 'charmClient/hooks/proposals';
+import { NoCommentsMessage } from 'components/[pageId]/DocumentPage/components/Sidebar/components/CommentsSidebar';
 import LoadingComponent from 'components/common/LoadingComponent';
-import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
-import { NoCommentsMessage } from '../../CommentsSidebar';
-
-import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
+import { RubricAnswersForm } from './RubricReviewForm';
 
 export type Props = {
   pageId?: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'>;
   evaluation: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
-  goToEditProposal: VoidFunction;
 };
 
-export function RubricEvaluation({ pageId, proposal, evaluation, refreshProposal, goToEditProposal }: Props) {
+export function RubricSidebar({ pageId, proposal, evaluation, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
   const proposalPermissions = proposal?.permissions;
-  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
-    !!pageId && evaluation?.type === 'rubric' ? pageId : undefined
-  );
   const canAnswerRubric = proposalPermissions?.evaluate;
-  const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
   const rubricCriteria = evaluation?.rubricCriteria;
 
   const myRubricAnswers = useMemo(
@@ -45,7 +36,7 @@ export function RubricEvaluation({ pageId, proposal, evaluation, refreshProposal
     [user?.id, evaluation?.draftRubricAnswers]
   );
 
-  const canViewRubricAnswers = isAdmin || isReviewer;
+  const canViewRubricAnswers = isAdmin || canAnswerRubric;
 
   async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
     if (!isDraft) {
@@ -73,16 +64,7 @@ export function RubricEvaluation({ pageId, proposal, evaluation, refreshProposal
               : 'Only Reviewers can submit an evaluation'}
           </Alert>
 
-          <MultiTabs
-            activeTab={rubricView}
-            setActiveTab={setRubricView}
-            tabs={evaluationTabs}
-            endAdornmentComponent={
-              <IconButton onClick={goToEditProposal} size='small'>
-                <EditIcon color='secondary' fontSize='small' />
-              </IconButton>
-            }
-          >
+          <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs}>
             {({ value }) => (
               <>
                 {value === 'Your evaluation' && (

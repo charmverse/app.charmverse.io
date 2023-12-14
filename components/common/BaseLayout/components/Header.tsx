@@ -50,7 +50,6 @@ function UserMenu() {
   const { user, logoutUser } = useUser();
   const router = useRouter();
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'menu-dropdown' });
-
   const isLoginPage = router.pathname === '/';
 
   async function logout() {
