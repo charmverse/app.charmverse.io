@@ -1,4 +1,4 @@
-import { humanizeConditions, humanizeConditionsData } from '../humanizeConditions';
+import { humanizeConditions, humanizeLitConditionsData } from '../humanizeConditions';
 
 describe('humanizeConditions', () => {
   const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
@@ -24,7 +24,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Controls wallet with address 0x1bd0…07f4');
   });
@@ -50,7 +50,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: walletAddress });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: walletAddress });
     const result = humanizeConditions(data);
     expect(result).toBe('Controls your wallet 0x1bd0…07f4');
   });
@@ -76,7 +76,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns at least 1 ETH on Optimism');
   });
@@ -102,7 +102,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns at least 12 BNB on Bsc');
   });
@@ -128,7 +128,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns at least 0.0000001 ETH on Ethereum');
   });
@@ -155,7 +155,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns at least 12 of Pepe tokens on Ethereum');
   });
@@ -197,7 +197,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owner of a ETHDenver POAP on Xdai or Owner of a ETHDenver POAP on Ethereum');
   });
@@ -223,7 +223,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns any POAP');
   });
@@ -249,7 +249,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Is a member of the DAO at 0x3806…ddce');
   });
@@ -276,7 +276,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns at least 1 of Charmed & Optimistic nft on Optimism');
   });
@@ -303,7 +303,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owner of Charmed & Optimistic 71 on Optimism');
   });
@@ -328,7 +328,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Cask subscriber to provider test for plan 5467 on Ethereum');
   });
@@ -355,7 +355,7 @@ describe('humanizeConditions', () => {
         }
       ]
     };
-    const data = humanizeConditionsData({ ...conditions, myWalletAddress: '' });
+    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns at least 1 of Pepe tokens with token id 72 on Ethereum');
   });

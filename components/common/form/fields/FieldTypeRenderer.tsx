@@ -22,7 +22,6 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'text':
       case 'phone':
       case 'url':
-      case 'name':
       case 'email': {
         return <TextInputField {...fieldProps} ref={ref} />;
       }

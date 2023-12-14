@@ -5,6 +5,7 @@ import { TokenGateDao } from './TokenGateDao';
 import { TokenGateHome } from './TokenGateHome';
 import { TokenGateReview } from './TokenGateReview';
 import { TokenGateTokens } from './TokenGateTokens';
+import { TokenGateUnlockProtocol } from './TokenGateUnlockProtocol';
 import { TokenGateWallet } from './TokenGateWallet';
 
 export function TokenGateContent() {
@@ -32,6 +33,10 @@ export function TokenGateContent() {
 
   if (displayedPage === 'dao') {
     return <TokenGateDao />;
+  }
+
+  if (displayedPage === 'unlock') {
+    return <TokenGateUnlockProtocol />;
   }
 
   return null;
