@@ -6,11 +6,8 @@ export async function updateLocksDetails<T extends { conditions: Pick<Lock, 'con
 ): Promise<T[]> {
   const updatedUnlockProtocolGates = await Promise.all(
     unlockTokenGates.map(async (gate) => {
-      const lock = await getLockDetails(
-        { contract: gate.conditions.contract, chainId: gate.conditions.chainId },
-        false
-      );
-      return { ...gate, ...lock };
+      const lock = await getLockDetails({ contract: gate.conditions.contract, chainId: gate.conditions.chainId }, true);
+      return { ...gate, conditions: lock };
     })
   );
 
