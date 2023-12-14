@@ -1,4 +1,3 @@
-import type { Space } from '@charmverse/core/prisma';
 import { useEffect, useState } from 'react';
 
 import { useEvaluateTokenGateEligibility, useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
@@ -42,13 +41,13 @@ export function useTokenGates({
   const { spaces, setSpaces } = useSpaces();
   const { getStoredSignature } = useWeb3Account();
   const { refreshUser, user } = useUser();
-  const { trigger: verifyTokenGate } = useVerifyTokenGate();
+  const { trigger: verifyTokenGateAndJoin } = useVerifyTokenGate();
 
   const [joiningSpace, setJoiningSpace] = useState(false);
   const tokenGates = space.tokenGates;
   const {
     data: tokenGateResult,
-    trigger: triggerEvaluateTokenGate,
+    trigger: evaluateSpaceTokenGates,
     isMutating: isVerifying
   } = useEvaluateTokenGateEligibility();
 
@@ -60,10 +59,10 @@ export function useTokenGates({
         evaluateEligibility(signature);
       }
     }
-  }, [user, account]);
+  }, [user, account, autoVerify]);
 
   async function evaluateEligibility(authSig: AuthSig) {
-    await triggerEvaluateTokenGate(
+    await evaluateSpaceTokenGates(
       {
         authSig,
         spaceIdOrDomain: space.id
@@ -80,28 +79,25 @@ export function useTokenGates({
     setJoiningSpace(true);
 
     try {
-      await verifyTokenGate({
-        commit: true,
-        spaceId: tokenGateResult?.space.id as string,
-        tokens:
-          tokenGateResult?.gateTokens.map((tk) => {
-            return {
-              signedToken: tk.signedToken,
-              tokenGateId: tk.tokenGate.id
-            };
-          }) ?? [],
-        joinType
-      });
+      if (account) {
+        await verifyTokenGateAndJoin({
+          commit: true,
+          spaceId: space.id,
+          tokens: tokenGateResult?.eligibleGates ?? [],
+          joinType,
+          walletAddress: account
+        });
+      }
 
-      showMessage(`You have joined the ${tokenGateResult?.space.name} space.`, 'success');
+      showMessage(`You have joined the ${space.name} space.`, 'success');
 
       await refreshUser();
 
-      const spaceExists = spaces.some((s) => s.id === tokenGateResult?.space.id);
+      const spaceExists = spaces.some((s) => s.id === space.id);
 
       // Refresh spaces as otherwise the redirect will not work
       if (!spaceExists) {
-        setSpaces([...spaces, tokenGateResult?.space as Space]);
+        setSpaces([...spaces, space]);
       }
       onSuccess?.();
     } catch (err: any) {

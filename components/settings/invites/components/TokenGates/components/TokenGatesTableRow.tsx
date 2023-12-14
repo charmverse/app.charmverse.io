@@ -21,7 +21,7 @@ type Props = {
   tokenGate: TokenGateWithRoles;
   spaceId?: string;
   refreshTokenGates: () => Promise<void>;
-  testConnect?: (tokenGate: TokenGateWithRoles) => Promise<void>;
+  testConnect: (tokenGate: TokenGateWithRoles) => Promise<void>;
 };
 
 export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testConnect, refreshTokenGates }: Props) {
@@ -83,7 +83,7 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
           >
             <Box component='span'>
               <Chip
-                onClick={() => testConnect?.(tokenGate)}
+                onClick={() => testConnect(tokenGate)}
                 sx={{ width: 90 }}
                 clickable={!!account && !isLoadingUpdateTokenGates && !isLoadingDeleteTokenGate}
                 color='secondary'

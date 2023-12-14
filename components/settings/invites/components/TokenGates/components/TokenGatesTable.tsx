@@ -1,15 +1,15 @@
 import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
-import { TableHead } from '@mui/material';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
 import { useContext, useState } from 'react';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import { useReviewLock, useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
+import { useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -48,7 +48,6 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
   const litClient = useLitProtocol();
   const { space } = useCurrentSpace();
   const { connectWallet } = useContext(Web3Connection);
-  const { trigger: checkLockDetails } = useReviewLock();
   const { trigger: verifyTokenGate } = useVerifyTokenGate();
 
   async function testLitTokenGate(tokenGate: TokenGate<'lit'>) {
@@ -66,13 +65,21 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
         ...tokenGate.conditions
       });
 
-      await verifyTokenGate({
-        commit: false,
-        spaceId: space?.id as string,
-        tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }]
-      });
-
-      setTestResult({ status: 'success' });
+      if (account && space?.id) {
+        await verifyTokenGate(
+          {
+            commit: false,
+            spaceId: space.id,
+            tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }],
+            walletAddress: account
+          },
+          {
+            onSuccess: () => {
+              setTestResult({ status: 'success' });
+            }
+          }
+        );
+      }
     } catch (error) {
       log.warn('Error when verifying wallet', error);
       let message = '';
@@ -90,25 +97,35 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
     }
   }
 
-  async function testUnlock({ conditions, walletAddress }: TokenGate<'unlock'> & { walletAddress: string }) {
-    const { chainId, contract } = conditions;
+  async function testUnlock(tokenGate: TokenGate<'unlock'>) {
     setTestResult({ status: 'loading' });
-    const lockDetails = await checkLockDetails({ walletAddress, contract, chainId });
-
-    if (lockDetails?.balanceOf === 1 && lockDetails.expirationTimestamp) {
-      setTestResult({ message: `You have a valid key for this lock`, status: 'success' });
-    } else {
-      setTestResult({ message: 'Your address does not meet the requirements for this lock', status: 'error' });
+    if (space?.id && account) {
+      await verifyTokenGate(
+        {
+          commit: false,
+          spaceId: space.id,
+          tokens: [{ signedToken: '', tokenGateId: tokenGate.id }],
+          walletAddress: account
+        },
+        {
+          onError: () => {
+            setTestResult({ message: 'Your address does not meet the requirements for this lock', status: 'error' });
+          },
+          onSuccess: () => {
+            setTestResult({
+              message: `Your address does not meet requirements: ${shortenHex(account)}`,
+              status: 'success'
+            });
+          }
+        }
+      );
     }
   }
 
   async function testConnect(tokenGate: TokenGate) {
     if (account) {
       if (tokenGate.type === 'unlock') {
-        await testUnlock({
-          ...tokenGate,
-          walletAddress: account
-        });
+        await testUnlock(tokenGate);
       } else if (litClient && tokenGate.type === 'lit') {
         await testLitTokenGate(tokenGate);
       }
@@ -152,7 +169,7 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
                 account={account}
                 tokenGate={tokenGate}
                 refreshTokenGates={refreshTokenGates}
-                testConnect={account ? testConnect : undefined}
+                testConnect={testConnect}
               />
             ))}
           </TableBody>
