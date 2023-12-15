@@ -31,7 +31,14 @@ handler
     getRewards
   )
   .use(requireUser)
-  .post(createRewardController);
+  .post(
+    providePermissionClients({
+      key: 'spaceId',
+      location: 'body',
+      resourceIdType: 'space'
+    }),
+    createRewardController
+  );
 
 async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUsers[]>) {
   const spaceId = req.query.spaceId as string;
