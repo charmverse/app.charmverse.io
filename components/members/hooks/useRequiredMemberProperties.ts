@@ -238,7 +238,6 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   const {
     formState: { errors, isValid, isDirty, isSubmitting },
-    watch,
     setValue,
     handleSubmit,
     getValues,
@@ -268,7 +267,17 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   useEffect(() => {
     if (!isLoadingUserDetails) {
-      reset(userDetails);
+      reset({
+        ...userDetails,
+        social:
+          userDetails.social === null
+            ? {
+                twitterURL: '',
+                githubURL: '',
+                linkedinURL: ''
+              }
+            : userDetails.social
+      });
     }
   }, [isLoadingUserDetails]);
 

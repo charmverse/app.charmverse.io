@@ -6,7 +6,6 @@ import type {
 } from '@lit-protocol/types';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
-import { mutate } from 'swr';
 import { v4 as uuid } from 'uuid';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
@@ -59,7 +58,15 @@ export const TokenGateModalContext = createContext<Readonly<IContext>>({
   error: undefined
 });
 
-export function TokenGateModalProvider({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+export function TokenGateModalProvider({
+  children,
+  onClose,
+  refreshTokenGates
+}: {
+  children: ReactNode;
+  onClose: () => void;
+  refreshTokenGates: () => void;
+}) {
   const [displayedPage, setDisplayedPage] = useState<DisplayedPage>('home');
   const [unifiedAccessControlConditions, setUnifiedAccessControlConditions] = useState<UnifiedAccessControlConditions>(
     []
@@ -138,7 +145,7 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
         id: tokenGateId
       });
 
-      mutate(`/api/token-gates`);
+      refreshTokenGates();
     }
 
     resetModal();
@@ -161,7 +168,7 @@ export function TokenGateModalProvider({ children, onClose }: { children: ReactN
         id
       });
 
-      mutate(`/api/token-gates`);
+      refreshTokenGates();
       resetModal();
       onClose();
     }
