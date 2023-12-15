@@ -427,42 +427,40 @@ export class SpaceEventHandler {
         const { documentNode, documentRoom, participant, position, content } = pageDetails;
         const lastValidPos = dropPos ?? documentNode.content.size;
 
-        if (position !== null) {
-          return;
-        }
-
-        if (documentRoom && participant) {
-          await participant.handleDiff(
-            {
-              type: 'diff',
-              ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+        if (position === null) {
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+                  pageId,
+                  pos: lastValidPos,
+                  path: pagePath,
+                  type: pageType
+                }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_reordered'
+              }
+            );
+          } else {
+            await this.applyDiffAndSaveDocument({
+              content,
+              pageId: newParentId,
+              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 path: pagePath,
                 type: pageType
-              }),
-              doc: documentRoom.doc.content,
-              c: participant.messages.client,
-              s: participant.messages.server,
-              v: documentRoom.doc.version,
-              rid: 0,
-              cid: -1
-            },
-            {
-              socketEvent: 'page_reordered'
-            }
-          );
-        } else {
-          await this.applyDiffAndSaveDocument({
-            content,
-            pageId: newParentId,
-            diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
-              pageId,
-              pos: lastValidPos,
-              path: pagePath,
-              type: pageType
-            })
-          });
+              })
+            });
+          }
         }
 
         // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
@@ -558,44 +556,42 @@ export class SpaceEventHandler {
         const { documentNode, documentRoom, participant, position, content } = pageDetails;
         const lastValidPos = documentNode.content.size;
 
-        if (position !== null) {
-          return;
-        }
-
-        if (documentRoom && participant) {
-          await participant.handleDiff(
-            {
-              type: 'diff',
-              ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+        if (position === null) {
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+                  pageId,
+                  pos: lastValidPos,
+                  isLinkedPage,
+                  path: pagePath,
+                  type: pageType
+                }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_reordered'
+              }
+            );
+          } else {
+            await this.applyDiffAndSaveDocument({
+              content,
+              pageId: newParentId,
+              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 isLinkedPage,
                 path: pagePath,
                 type: pageType
-              }),
-              doc: documentRoom.doc.content,
-              c: participant.messages.client,
-              s: participant.messages.server,
-              v: documentRoom.doc.version,
-              rid: 0,
-              cid: -1
-            },
-            {
-              socketEvent: 'page_reordered'
-            }
-          );
-        } else {
-          await this.applyDiffAndSaveDocument({
-            content,
-            pageId: newParentId,
-            diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
-              pageId,
-              pos: lastValidPos,
-              isLinkedPage,
-              path: pagePath,
-              type: pageType
-            })
-          });
+              })
+            });
+          }
         }
 
         if (!isLinkedPage && !isStaticPage && !isForumCategory) {
@@ -711,11 +707,8 @@ export class SpaceEventHandler {
 
       const { documentRoom, participant, content, position: _nodePos } = pageDetails;
       const position = nodePos ?? _nodePos;
-      if (position === null) {
-        return;
-      }
 
-      if (documentRoom && participant) {
+      if (documentRoom && participant && position !== null) {
         await participant.handleDiff(
           {
             type: 'diff',
@@ -736,17 +729,19 @@ export class SpaceEventHandler {
           { socketEvent: event }
         );
       } else {
-        await this.applyDiffAndSaveDocument({
-          content,
-          pageId,
-          diffs: [
-            {
-              from: position,
-              to: position + 1,
-              stepType: 'replace'
-            }
-          ]
-        });
+        if (position !== null) {
+          await this.applyDiffAndSaveDocument({
+            content,
+            pageId,
+            diffs: [
+              {
+                from: position,
+                to: position + 1,
+                stepType: 'replace'
+              }
+            ]
+          });
+        }
 
         // If the user is not in the document or the position of the page node is not found (present in sidebar)
         if (event === 'page_deleted') {
