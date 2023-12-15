@@ -17,7 +17,6 @@ import AddBountyButton from 'components/common/BoardEditor/focalboard/src/compon
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -27,6 +26,7 @@ import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/in
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
+import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -51,7 +51,6 @@ import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { usePageSidebar } from './components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
-import { StickyFooterContainer } from './components/StickyFooterContainer';
 
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
@@ -521,9 +520,7 @@ function DocumentPage({
               )}
             </Container>
           </Box>
-          <StickyFooterContainer>
-            <Button data-test='create-proposal-button'>Save</Button>
-          </StickyFooterContainer>
+          <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
         </ScrollContainer>
       </div>
     </>

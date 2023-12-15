@@ -3,6 +3,7 @@ import type {
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 
 import type {
@@ -68,6 +69,10 @@ export function useCreateProposal() {
 
 export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
+}
+
+export function usePublishProposalStatus({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ newStatus: ProposalStatus }>(`/api/proposals/${proposalId}/status`);
 }
 
 export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {

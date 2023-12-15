@@ -1,4 +1,3 @@
-import type { WorkspaceEvent } from '@charmverse/core/prisma';
 import { ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -53,7 +52,7 @@ export async function updateProposalStatus({
       })
   );
 
-  if (!statusFlow[newStatus]) {
+  if (newStatus !== 'published' && !statusFlow[newStatus]) {
     throw new InvalidStateError(`Invalid transition to proposal status "${newStatus}"`);
   }
 

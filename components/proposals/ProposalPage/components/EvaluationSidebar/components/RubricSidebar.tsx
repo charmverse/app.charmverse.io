@@ -9,6 +9,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
+import { RubricDecision } from './RubricDecision';
 import { RubricResults } from './RubricResults';
 import { RubricAnswersForm } from './RubricReviewForm';
 
@@ -16,10 +17,11 @@ export type Props = {
   pageId?: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'>;
   evaluation: PopulatedEvaluation;
+  isCurrent?: boolean;
   refreshProposal?: VoidFunction;
 };
 
-export function RubricSidebar({ pageId, proposal, evaluation, refreshProposal }: Props) {
+export function RubricSidebar({ pageId, proposal, isCurrent, evaluation, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
@@ -52,7 +54,7 @@ export function RubricSidebar({ pageId, proposal, evaluation, refreshProposal }:
    *  Results: visible to anyone when evaluation is active or closed, disabled if you are not a reviewer
    *
    * */
-  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results'] : ['Your evaluation'];
+  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results', 'Decision'] : ['Your evaluation'];
 
   return (
     <>
@@ -78,11 +80,20 @@ export function RubricSidebar({ pageId, proposal, evaluation, refreshProposal }:
                     disabled={!canAnswerRubric}
                   />
                 )}
-                {value === 'Your evaluation' && (
+                {value === 'Results' && (
                   <RubricResults
                     key='results'
                     answers={evaluation?.rubricAnswers ?? []}
                     criteriaList={rubricCriteria || []}
+                  />
+                )}
+                {value === 'Decision' && (
+                  <RubricDecision
+                    isCurrent={!!isCurrent}
+                    key='results'
+                    evaluation={evaluation}
+                    proposal={proposal}
+                    refreshProposal={refreshProposal}
                   />
                 )}
               </>
