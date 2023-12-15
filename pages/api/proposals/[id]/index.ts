@@ -37,6 +37,9 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
         }
       },
       evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
         include: {
           permissions: true,
           reviewers: true,
@@ -95,10 +98,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
       id: proposalId
     },
     include: {
-      authors: true,
       reviewers: true,
-      rubricAnswers: true,
-      rubricCriteria: true,
       page: {
         select: {
           type: true

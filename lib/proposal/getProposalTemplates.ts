@@ -69,6 +69,9 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
       category: true,
       page: true,
       evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
         include: {
           permissions: true,
           reviewers: true,

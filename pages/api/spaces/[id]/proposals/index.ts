@@ -44,6 +44,9 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
       reviewers: true,
       category: true,
       evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
         include: {
           reviewers: true
         }
