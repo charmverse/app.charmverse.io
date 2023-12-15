@@ -32,6 +32,9 @@ function SummonPlayerStatistics({ label, value }: { label: string; value: string
 export function SummonProfileWidget({ summonProfile }: { summonProfile: SummonUserProfile }) {
   const theme = useTheme();
 
+  const achievements = summonProfile.meta.achievements;
+  const trophies = summonProfile.meta.trophies;
+
   return (
     <ProfileWidget
       title='Summon Profile'
@@ -64,8 +67,11 @@ export function SummonProfileWidget({ summonProfile }: { summonProfile: SummonUs
           <Stack gap={1} width='100%'>
             <SummonPlayerStatistics label='Rank' value={summonProfile.meta.rank} />
             <SummonPlayerStatistics label='XP' value={summonProfile.meta.xp} />
-            <SummonPlayerStatistics label='Achievements' value={summonProfile.meta.achievements.length} />
-            <SummonPlayerStatistics label='Skills' value={summonProfile.meta.trophies.length} />
+            <SummonPlayerStatistics
+              label='Achievements'
+              value={Array.isArray(achievements) ? achievements.length : achievements}
+            />
+            <SummonPlayerStatistics label='Skills' value={Array.isArray(trophies) ? trophies.length : trophies} />
           </Stack>
         </Stack>
       )}
