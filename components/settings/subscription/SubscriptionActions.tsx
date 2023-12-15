@@ -1,4 +1,4 @@
-import type { SubscriptionTier } from '@charmverse/core/prisma-client';
+import type { SubscriptionTier } from '@charmverse/core/prisma';
 import Stack from '@mui/material/Stack';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 

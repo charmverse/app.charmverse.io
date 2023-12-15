@@ -21,7 +21,10 @@ export function mapDbProposalToProposal({
   const proposalWithUsers = {
     ...rest,
     permissions,
-    currentEvaluationId: proposal.evaluations.length ? getCurrentEvaluation(proposal.evaluations)?.id : undefined,
+    currentEvaluationId:
+      proposal.status !== 'draft' && proposal.evaluations.length
+        ? getCurrentEvaluation(proposal.evaluations)?.id
+        : undefined,
     status: getOldProposalStatus(proposal),
     // Support old model: filter out evaluation-specific reviewers
     reviewers: proposal.reviewers.filter((reviewer) => !reviewer.evaluationId),

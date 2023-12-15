@@ -1,3 +1,4 @@
+import { Close as CloseIcon } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { Grid, Stack, Tooltip, Typography } from '@mui/material';
 
@@ -33,12 +34,15 @@ export function DesktopStepper({ steps, onClick, selected, value }: StepperProps
                 gap={1}
                 onClick={() => !step.disabled && onClick(step.value)}
                 isSelected={step.value === selected}
+                result={step.result}
                 isCurrent={isCurrent}
                 isDisabled={step.disabled}
               >
                 <div className='stepper-icon' data-test={`proposal-status-stepper-${step.value}`}>
-                  {currentPosition > position ? (
+                  {step.result === 'pass' ? (
                     <CheckIcon fontSize='small' />
+                  ) : step.result === 'fail' ? (
+                    <CloseIcon fontSize='small' />
                   ) : (
                     <Typography fontWeight={500}>{position + 1}</Typography>
                   )}

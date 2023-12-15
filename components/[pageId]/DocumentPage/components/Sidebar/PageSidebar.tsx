@@ -44,7 +44,7 @@ export const SIDEBAR_VIEWS = {
   proposal_evaluation_settings: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
     tooltip: 'Manage reviewers, rubric, and vote options',
-    title: 'Evaluation'
+    title: 'Evaluation settings'
   },
   comments: {
     icon: <MessageOutlined fontSize='small' />,
@@ -85,7 +85,8 @@ function PageSidebarComponent(props: SidebarProps) {
   const isMdScreen = useMdScreen();
   const isCharmVerse = useIsCharmverseSpace();
   const isOpen = sidebarView !== null;
-  const sidebarTitle = props.isNewProposal ? 'Evaluation settings' : sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
+  // const sidebarTitle = props.isNewProposal ? 'Evaluation settings' : sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
+  const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
 
   const showEvaluationSidebarIcon =
     (proposal?.evaluationType === 'rubric' &&

@@ -4,6 +4,7 @@ import { Settings as SettingsIcon } from '@mui/icons-material';
 import { Box, Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
+import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 
@@ -43,7 +44,7 @@ export function ProposalSidebarHeader({
           onChange={goToEvaluation}
           goToSettings={goToSettings}
         />
-        <Tooltip title='Configure evaluations'>
+        <Tooltip title={SIDEBAR_VIEWS.proposal_evaluation_settings.tooltip}>
           <div>
             <IconButton onClick={goToSettings} size='small'>
               <SettingsIcon color={activeEvaluationId ? 'secondary' : 'inherit'} fontSize='small' />
@@ -83,7 +84,7 @@ function StepSelect({
         if (evaluationId === '' || !evaluation) {
           return (
             <Typography variant='body2' color='secondary'>
-              Select a step
+              Select step
             </Typography>
           );
         }

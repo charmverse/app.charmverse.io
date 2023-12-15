@@ -57,7 +57,7 @@ export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposa
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <FormLabel>
             <Typography component='span' variant='subtitle1'>
-              Submit your review:
+              Submit review:
             </Typography>
           </FormLabel>
           <Box display='flex' justifyContent='flex-end' gap={1}>

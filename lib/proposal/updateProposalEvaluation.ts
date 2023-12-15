@@ -40,7 +40,8 @@ export async function updateProposalEvaluation({
         },
         data: {
           result,
-          decidedBy
+          decidedBy,
+          completedAt: new Date()
         }
       });
     }

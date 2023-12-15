@@ -1,9 +1,12 @@
 import { Box, FormLabel, Typography } from '@mui/material';
+import { useState } from 'react';
 
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+
+type PassFailResult = NonNullable<PopulatedEvaluation['result']>;
 
 export type Props = {
   evaluationId?: string;
@@ -13,9 +16,11 @@ export type Props = {
 
 export function ReviewPassFailButton({ proposalId, evaluationId, refreshProposal }: Props) {
   const { showMessage } = useSnackbar();
-  const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
-  async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
+  const [selected, setSelected] = useState<PassFailResult | null>(null);
+  const { trigger: updateProposalEvaluation, isMutating: isSaving } = useUpdateProposalEvaluation({ proposalId });
+  async function onSubmitReview(result: PassFailResult) {
     try {
+      setSelected(result);
       await updateProposalEvaluation({
         evaluationId,
         result
@@ -27,17 +32,17 @@ export function ReviewPassFailButton({ proposalId, evaluationId, refreshProposal
   }
 
   return (
-    <Box display='flex' justifyContent='space-between' alignItems='center'>
+    <Box display='flex' justifyContent='flex-end' alignItems='center' gap={2}>
       <FormLabel>
         <Typography component='span' variant='subtitle1'>
-          Submit your review:
+          Submit review:
         </Typography>
       </FormLabel>
       <Box display='flex' justifyContent='flex-end' gap={1}>
-        <Button onClick={() => onSubmitReview('fail')} color='error'>
+        <Button loading={selected === 'fail' && isSaving} onClick={() => onSubmitReview('fail')} color='error'>
           Reject
         </Button>
-        <Button onClick={() => onSubmitReview('pass')} color='success'>
+        <Button loading={selected === 'pass' && isSaving} onClick={() => onSubmitReview('pass')} color='success'>
           Pass
         </Button>
       </Box>

@@ -1,12 +1,14 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
+
 import { DesktopStepper } from './DesktopStepper';
 import { MobileStepper } from './MobileStepper';
 
-type Step = {
+export type Step = {
   label: string;
   description: string;
-  completed: boolean;
   disabled: boolean;
   value: string;
+  result: ProposalEvaluationResult | null;
 };
 
 export type StepperProps = {

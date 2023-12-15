@@ -335,6 +335,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                 </div>
                 {currentSpace && (
                   <PageSidebar
+                    isNewProposal
                     id='page-action-sidebar'
                     spaceId={currentSpace.id}
                     sidebarView={defaultSidebarView || sidebarView ? 'proposal_evaluation_settings' : null}

@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getOldProposalStatus } from 'lib/proposal/getOldProposalStatus';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -63,3 +64,5 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
 
   return res.status(200).json(proposalsWithUsers);
 }
+
+export default withSessionRoute(handler);

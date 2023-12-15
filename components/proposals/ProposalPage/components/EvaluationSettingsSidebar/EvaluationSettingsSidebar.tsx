@@ -1,4 +1,4 @@
-import { Box, Card, FormLabel, Typography } from '@mui/material';
+import { Box, Card, Typography } from '@mui/material';
 
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
@@ -31,11 +31,6 @@ export function EvaluationSettingsSidebar({ proposal, showHeader, goToEvaluation
           goToSettings={() => undefined}
         />
       )}
-      <FormLabel>
-        <Typography component='span' variant='subtitle1'>
-          Settings
-        </Typography>
-      </FormLabel>
       <Box display='flex' flex={1} flexDirection='column'>
         {proposal &&
           evaluationsWithConfig?.map((evaluation) => (

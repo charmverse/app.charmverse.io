@@ -27,7 +27,7 @@ export function ProposalStickyFooter({
     view = 'feedback';
   } else if (proposal?.status === 'draft') {
     view = 'draft';
-  } else if (currentEvaluation?.type === 'pass_fail') {
+  } else if (currentEvaluation?.type === 'pass_fail' && !currentEvaluation.result) {
     view = 'pass_fail';
   }
 

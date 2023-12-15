@@ -412,12 +412,12 @@ function DocumentPage({
                   <Divider />
                 </>
               )}
-              {page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
+              {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
                 <Box my={2} className='font-family-default'>
                   <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
                 </Box>
               )}
-              {page.type === 'proposal' && !isLoading && pageVote && (
+              {!isCharmVerse && page.type === 'proposal' && !isLoading && pageVote && (
                 <Box my={2} className='font-family-default'>
                   <VoteDetail
                     cancelVote={cancelVote}
