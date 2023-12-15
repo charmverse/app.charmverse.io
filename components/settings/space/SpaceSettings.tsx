@@ -57,6 +57,7 @@ import { SettingsItem } from './components/SettingsItem';
 export type FormValues = {
   name: string;
   spaceImage?: string | null;
+  spaceArtwork?: string | null;
   domain: string;
   notificationToggles: NotificationToggles;
 };
@@ -64,6 +65,7 @@ export type FormValues = {
 const schema: yup.Schema<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(),
+  spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
   domain: yup
     .string()
@@ -136,6 +138,7 @@ export function SpaceSettings({
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
+  const watchSpaceArtwork = watch('spaceArtwork');
 
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
@@ -158,7 +161,8 @@ export function SpaceSettings({
       name: values.name,
       domain: values.domain,
       primaryMemberIdentity,
-      spaceImage: values.spaceImage
+      spaceImage: values.spaceImage,
+      spaceArtwork: values.spaceArtwork
     });
 
     if (newDomain) {
@@ -306,6 +310,20 @@ export function SpaceSettings({
                 ))}
               </Select>
             </Box>
+          </Grid>
+          <Grid item>
+            <FieldLabel>Custom Artwork</FieldLabel>
+            <Typography variant='caption' mb={2} component='p'>
+              Show your artwork for onboarding users.
+            </Typography>
+            <Avatar
+              name={watchName}
+              variant='rounded'
+              image={watchSpaceArtwork}
+              updateImage={(url: string) => setValue('spaceArtwork', url, { shouldDirty: true })}
+              editable={isAdmin}
+            />
+            <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
           </Grid>
           <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>
@@ -458,6 +476,7 @@ export function SpaceSettings({
                 data-test='submit-space-update'
                 disabled={isMutating || !dataChanged}
                 type='submit'
+                loading={isMutating}
               >
                 Save
               </Button>
@@ -590,6 +609,7 @@ function _getFormValues(space: Space): FormValues {
   return {
     name: space.name,
     spaceImage: space.spaceImage,
+    spaceArtwork: space.spaceArtwork,
     domain: space.domain,
     notificationToggles
   };
