@@ -95,7 +95,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
     updateAvatar?.(userAvatar);
   }
 
-  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput({
+  const { inputRef, isUploading, openFilePicker, onFileChange } = useS3UploadInput({
     onFileUpload: updateImageAvatar,
     resizeType: ResizeType.Artwork
   });
@@ -114,7 +114,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
 
   return (
     <StyledBox>
-      <ProgressOverlay isLoading={isSaving}>
+      <ProgressOverlay isLoading={isSaving || isUploading}>
         <input type='file' hidden accept='image/*' ref={inputRef} onChange={onFileChange} />
         <StyledAvatarWithIcons
           alwaysShow={props.alwaysShowEdit}
