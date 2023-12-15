@@ -5,33 +5,25 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'space'
-    })
-  )
-  .get(getProposals);
+handler.get(getProposals);
 
 async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
   const userId = req.session.user?.id;
 
-  const { spaceId, categoryIds, onlyAssigned, useProposalEvaluationPermissions } =
-    req.query as any as ListProposalsRequest & ProposalPermissionsSwitch;
+  const spaceId = req.query.id as string;
 
+  const { categoryIds, onlyAssigned, useProposalEvaluationPermissions } = req.query as any as ListProposalsRequest &
+    ProposalPermissionsSwitch;
   const proposalIds = await permissionsApiClient.proposals.getAccessibleProposalIds({
-    spaceId,
     categoryIds,
     onlyAssigned,
     userId,
+    spaceId,
     useProposalEvaluationPermissions
   });
 
@@ -39,6 +31,10 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
     where: {
       id: {
         in: proposalIds
+      },
+      page: {
+        // Ignore proposal templates
+        type: 'proposal'
       }
     },
     include: {
