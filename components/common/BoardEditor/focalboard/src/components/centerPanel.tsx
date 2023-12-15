@@ -145,7 +145,7 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, isActiveView]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = useMemo(() => {
+  const { cardPages, cardPageIds } = useMemo(() => {
     const result = _cards
       .map((card) => ({
         card,
@@ -153,10 +153,24 @@ function CenterPanel(props: Props) {
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
 
-    return isActiveView ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort) : [];
+    const _cardPages = isActiveView
+      ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort)
+      : [];
+
+    const _cardPageIds = new Set<string>();
+    _cardPages.forEach((cardPage) => _cardPageIds.add(cardPage.card.id));
+
+    return {
+      cardPages: _cardPages,
+      cardPageIds: _cardPageIds
+    };
   }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
 
   const cards = cardPages.map(({ card }) => card);
+
+  useEffect(() => {
+    setCheckedIds((checkedIds) => checkedIds.filter((id) => cardPageIds.has(id)));
+  }, [cardPageIds]);
 
   let groupByProperty = _groupByProperty;
   if (

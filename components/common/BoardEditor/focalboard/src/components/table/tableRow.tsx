@@ -78,6 +78,7 @@ export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`
   }
 
   padding: 0;
+  margin-left: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 export const columnWidth = (
