@@ -20,7 +20,8 @@ handler.get(getPages);
 async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const userId = req.session?.user?.id;
 
-  const { spaceId, archived, limit, search, useProposalEvaluationPermissions } = req.query as any as PagesRequest &
+  const spaceId = req.query.id as string;
+  const { archived, limit, search, useProposalEvaluationPermissions } = req.query as any as PagesRequest &
     ProposalPermissionsSwitch;
 
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
@@ -88,7 +89,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
         }) as Prisma.PageUncheckedCreateInput
       });
 
-      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+      await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
         event: 'created',
         pageId: createdPage.id
       });
