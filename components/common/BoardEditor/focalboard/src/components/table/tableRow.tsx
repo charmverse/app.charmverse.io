@@ -220,13 +220,13 @@ function TableRow(props: Props) {
       {!props.readOnly && (
         <>
           <Box className='icons row-actions' onClick={handleClick} ref={cardHandlerRef}>
-            <Box className='charm-drag-handle'>
+            <Box className='charm-drag-handle disable-drag-selection'>
               <DragIndicatorIcon color='secondary' />
             </Box>
           </Box>
           {setCheckedIds && (
             <StyledCheckbox
-              className='table-row-checkbox'
+              className='table-row-checkbox disable-drag-selection'
               checked={isChecked}
               show={isChecked}
               onChange={() => {

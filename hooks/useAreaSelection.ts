@@ -52,8 +52,9 @@ export function useAreaSelection({ container = { current: document.body }, readO
 
       const containerElement = container.current;
       const isTableRowCheckbox =
-        (e.target as HTMLElement)?.classList.contains('table-row-checkbox') ||
-        (e.target as HTMLElement)?.parentElement?.classList.contains('table-row-checkbox');
+        (e.target as HTMLElement)?.classList.contains('disable-drag-selection') ||
+        (e.target as HTMLElement)?.parentElement?.classList.contains('disable-drag-selection');
+
       if (isTableRowCheckbox) return;
 
       if (containerElement && containerElement.contains(e.target as HTMLElement)) {
