@@ -117,7 +117,7 @@ export function useNewProposal({ newProposal }: Props) {
     if (formInputs.reviewers.length === 0) {
       disabledTooltip = 'Reviewers are required';
     }
-  } else {
+  } else if (!disabledTooltip) {
     // get the first validation error from the evaluations
     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }

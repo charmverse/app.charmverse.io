@@ -215,15 +215,15 @@ export async function createProposal({
     : [];
 
   await Promise.all(
-    evaluations
-      .filter((evaluation) => evaluation.type === 'rubric')
-      .map((evaluation) =>
-        upsertRubricCriteria({
-          evaluationId: evaluation.id,
+    evaluations.map(async (evaluation, index) => {
+      if (evaluation.rubricCriteria.length > 0) {
+        await upsertRubricCriteria({
+          evaluationId: evaluationIds[index],
           proposalId: proposal.id,
           rubricCriteria: evaluation.rubricCriteria
-        })
-      )
+        });
+      }
+    })
   );
 
   await publishProposalEvent({
