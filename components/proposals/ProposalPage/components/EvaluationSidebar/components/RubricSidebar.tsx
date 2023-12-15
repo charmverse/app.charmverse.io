@@ -24,7 +24,7 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  const proposalPermissions = proposal?.permissions;
+  const proposalPermissions = isCurrent ? proposal?.permissions : undefined;
   const canAnswerRubric = proposalPermissions?.evaluate;
   const rubricCriteria = evaluation?.rubricCriteria;
   const myRubricAnswers = useMemo(

@@ -9,15 +9,16 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
 export type Props = {
+  isCurrent: boolean;
   pageId?: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
   evaluation: PopulatedEvaluation;
 };
 
-export function VoteSidebar({ pageId, proposal, evaluation }: Props) {
+export function VoteSidebar({ pageId, isCurrent, proposal, evaluation }: Props) {
   const { data: votes, mutate: refreshVotes, isLoading } = useGetVotesForPage(pageId ? { pageId } : undefined);
   const { showMessage } = useSnackbar();
-  const isReviewer = proposal?.permissions.evaluate;
+  const isReviewer = isCurrent && proposal?.permissions.evaluate;
 
   async function castVote(voteId: string, choices: string[]) {
     try {
