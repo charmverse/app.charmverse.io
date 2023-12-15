@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getOldProposalStatus } from 'lib/proposal/getOldProposalStatus';
+import { mapDbProposalToProposalLite } from 'lib/proposal/mapDbProposalToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -43,6 +44,7 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
       authors: true,
       reviewers: true,
       category: true,
+      rewards: true,
       evaluations: {
         orderBy: {
           index: 'asc'
@@ -54,15 +56,8 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
     }
   });
 
-  const proposalsWithUsers: ProposalWithUsers[] = proposals.map(({ evaluations, ...proposal }) => {
-    const currentEvaluation = getCurrentEvaluation(evaluations);
-    const reviewers = currentEvaluation ? currentEvaluation.reviewers : proposal.reviewers;
-    return {
-      ...proposal,
-      reviewers,
-      evaluationType: currentEvaluation?.type || proposal.evaluationType,
-      status: getOldProposalStatus({ status: proposal.status, evaluations })
-    };
+  const proposalsWithUsers: ProposalWithUsers[] = proposals.map((proposal) => {
+    return mapDbProposalToProposalLite({ proposal });
   });
 
   return res.status(200).json(proposalsWithUsers);

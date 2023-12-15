@@ -1,5 +1,5 @@
+import type { ProposalEvaluation, ProposalStatus } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import type { ProposalEvaluation, ProposalStatus } from '@prisma/client';
 /**
  * find the first evalation that does not have a result
  *
