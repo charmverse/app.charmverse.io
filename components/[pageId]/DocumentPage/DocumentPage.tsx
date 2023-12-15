@@ -173,6 +173,7 @@ function DocumentPage({
   const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
+  const hideCardDetails = isRewardsPage && page.bountyId;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
@@ -390,7 +391,7 @@ function DocumentPage({
                 )}
                 <CardPropertiesWrapper>
                   {/* Property list */}
-                  {card && board && (
+                  {card && board && !hideCardDetails && (
                     <>
                       <CardDetailProperties
                         syncWithPageId={page.syncWithPageId}
