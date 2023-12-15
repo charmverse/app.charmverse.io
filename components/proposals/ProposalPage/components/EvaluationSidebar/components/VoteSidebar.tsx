@@ -60,6 +60,8 @@ export function VoteSidebar({ pageId, proposal, evaluation }: Props) {
     );
   }
 
+  vote.title = evaluation.title;
+
   return (
     <VoteDetail
       castVote={castVote}

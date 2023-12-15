@@ -36,7 +36,7 @@ const updateVoteStatus = async () => {
   });
 
   const passedEvaluations = evaluationsToUpdate.filter((e) => passedVotes.some((vote) => vote.id === e.voteId));
-  const failedEvaluations = evaluationsToUpdate.filter((e) => passedVotes.some((vote) => vote.id === e.voteId));
+  const failedEvaluations = evaluationsToUpdate.filter((e) => rejectedVotes.some((vote) => vote.id === e.voteId));
 
   await prisma.$transaction([
     // update passed votes

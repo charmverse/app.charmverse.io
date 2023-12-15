@@ -135,7 +135,7 @@ export function VoteDetail({
     <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold' component='span'>
-          {!isProposal ? title : 'Poll on this proposal'}
+          {title || 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu
           deleteVote={deleteVote}
