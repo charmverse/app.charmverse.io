@@ -46,11 +46,12 @@ export const StepperStack = styled(Stack)<{
         width: 100%;
         box-shadow: ${
           isPastOrPresent
-            ? `0 0 0 2px ${theme.palette.background.default}, 0 0 0 5px ${currentColor}`
+            ? `0 0 0 3px ${theme.palette.background.default}, 0 0 0 6px ${currentColor}`
             : `0 0 0 3px ${currentColor}`
         };
         opacity: ${isSelected ? 1 : 0};
         transition: opacity 150ms ease-in-out;
+        z-index: -1;
       }
     }
 
