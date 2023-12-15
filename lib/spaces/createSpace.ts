@@ -176,6 +176,7 @@ export async function createWorkspace({
       folderPath: sourceDataPath,
       spaceId: space.id
     });
+
     await prisma.$transaction([
       prisma.memberProperty.createMany({ data: defaultProperties }),
       ...seedPagesTransactionInput.blocksToCreate.map((input) => prisma.block.create({ data: input })),
