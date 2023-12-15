@@ -78,6 +78,7 @@ type SidebarProps = {
   refreshProposal?: VoidFunction;
   proposalEvaluationId?: string | null;
   isNewProposal?: boolean;
+  isProposalTemplate?: boolean;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -203,6 +204,7 @@ function SidebarContents({
   proposalInput,
   onChangeEvaluation,
   refreshProposal,
+  isProposalTemplate,
   isNewProposal
 }: SidebarProps) {
   const isCharmVerse = useIsCharmverseSpace();
@@ -213,6 +215,7 @@ function SidebarContents({
           <EvaluationSidebar
             pageId={pageId}
             proposal={proposal}
+            isTemplate={isProposalTemplate}
             evaluationId={proposalEvaluationId}
             refreshProposal={refreshProposal}
             goToSettings={() => {
@@ -225,7 +228,7 @@ function SidebarContents({
       {sidebarView === 'proposal_evaluation_settings' && (
         <EvaluationSettingsSidebar
           proposal={proposalInput}
-          showHeader={!isNewProposal}
+          showHeader={!isNewProposal && !isProposalTemplate}
           onChangeEvaluation={onChangeEvaluation}
           goToEvaluation={(evaluationId) => {
             openEvaluationSidebar?.(evaluationId);

@@ -14,6 +14,7 @@ import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
+import type { PageSidebarView } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
@@ -59,8 +60,14 @@ const StyledContainer = styled(Container)`
 `;
 
 // Note: this component is only used before a page is saved to the DB
-export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boolean; templateId?: string }) {
-  const { router, navigateToSpacePath } = useCharmRouter();
+export function NewProposalPage({
+  isTemplate,
+  templateId: templateIdFromUrl
+}: {
+  isTemplate?: boolean;
+  templateId?: string;
+}) {
+  const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const isCharmVerse = useIsCharmverseSpace();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
@@ -68,28 +75,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
-  const selectedTemplate = router.query.template as string;
   const [workflowId, setWorkflowId] = useState('');
-  const proposalTemplate = proposalTemplates?.find((t) => t.id === selectedTemplate);
-  const newProposal: NewProposalInput = proposalTemplate
-    ? {
-        contentText: proposalTemplate.page.contentText ?? '',
-        content: proposalTemplate.page.content as any,
-        proposalTemplateId: selectedTemplate,
-        evaluations: proposalTemplate.evaluations,
-        evaluationType: proposalTemplate.evaluationType,
-        headerImage: proposalTemplate.page.headerImage,
-        icon: proposalTemplate.page.icon,
-        categoryId: proposalTemplate.categoryId as string,
-        reviewers: proposalTemplate.reviewers.map((reviewer) => ({
-          group: reviewer.roleId ? 'role' : 'user',
-          id: (reviewer.roleId ?? reviewer.userId) as string
-        })),
-        rubricCriteria: proposalTemplate.rubricCriteria,
-        fields: (proposalTemplate.fields as any) || {},
-        type: 'proposal'
-      }
-    : null;
   const {
     formInputs,
     setFormInputs,
@@ -99,9 +85,8 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
     clearFormInputs,
     createProposal
   } = useNewProposal({
-    newProposal
+    newProposal: { type: isTemplate ? 'proposal_template' : 'proposal' }
   });
-  const [proposalEvaluationId, setProposalEvaluationId] = useState();
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -189,43 +174,56 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
     navigateToSpacePath(`/proposals`);
   }
 
-  function applyTemplate(templatePage: PageMeta) {
-    if (templatePage && templatePage.proposalId) {
-      // Fetch the proposal page to get its content
-      const template = proposalTemplates?.find((_proposalTemplate) => _proposalTemplate.page.id === templatePage.id);
-      if (template) {
-        setFormInputs({
-          categoryId: template.categoryId,
-          content: template.page.content as PageContent,
-          contentText: template.page.contentText,
-          reviewers: template.reviewers.map((reviewer) => ({
-            group: reviewer.roleId ? 'role' : 'user',
-            id: reviewer.roleId ?? (reviewer.userId as string)
-          })),
-          proposalTemplateId: templatePage.id,
-          workflowId: template.workflowId,
-          evaluationType: template.evaluationType,
-          evaluations: template.evaluations,
-          rubricCriteria: template.rubricCriteria,
-          fields: (template.fields as ProposalFields) || {}
-        });
-      }
+  function applyTemplate(_templateId: string) {
+    const template = proposalTemplates?.find((t) => t.id === _templateId);
+    if (template) {
+      setFormInputs({
+        categoryId: template.categoryId,
+        content: template.page.content as PageContent,
+        contentText: template.page.contentText,
+        reviewers: template.reviewers.map((reviewer) => ({
+          group: reviewer.roleId ? 'role' : 'user',
+          id: reviewer.roleId ?? (reviewer.userId as string)
+        })),
+        proposalTemplateId: _templateId,
+        headerImage: template.page.headerImage,
+        icon: template.page.icon,
+        workflowId: template.workflowId,
+        evaluationType: template.evaluationType,
+        evaluations: template.evaluations,
+        rubricCriteria: template.rubricCriteria,
+        fields: (template.fields as ProposalFields) || {},
+        type: 'proposal'
+      });
     }
   }
 
+  // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
+  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>('proposal_evaluation_settings');
+  const internalSidebarView = defaultSidebarView || sidebarView;
+
   useEffect(() => {
-    if (workflowOptions?.length && !workflowId) {
+    setActiveView('proposal_evaluation_settings');
+    setDefaultView(null);
+  }, []);
+
+  // populate workflow if not set and template is not selected
+  useEffect(() => {
+    if (workflowOptions?.length && !workflowId && !templateIdFromUrl) {
       selectEvaluationWorkflow(workflowOptions[0]);
     }
   }, [!!workflowOptions]);
-  const [defaultSidebarView, setDefaultView] = useState('proposal_evaluation_settings');
+
+  // populate with template if selected
   useEffect(() => {
-    setActiveView('proposal_evaluation_settings');
-    setDefaultView('');
-  }, []);
+    if (templateIdFromUrl && !isLoadingTemplates) {
+      applyTemplate(templateIdFromUrl);
+    }
+  }, [templateIdFromUrl, isLoadingTemplates]);
+
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-      <PrimaryColumn showPageActionSidebar={!!sidebarView}>
+      <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
@@ -291,7 +289,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                                   clearTemplate();
                                   // if user has not updated the content, then just overwrite everything
                                 } else if (formInputs.contentText?.length === 0) {
-                                  applyTemplate(template);
+                                  applyTemplate(template.id);
                                 } else {
                                   // set value to trigger a prompt
                                   setSelectedProposalTemplateId(template?.id ?? null);
@@ -338,7 +336,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                     isNewProposal
                     id='page-action-sidebar'
                     spaceId={currentSpace.id}
-                    sidebarView={defaultSidebarView || sidebarView ? 'proposal_evaluation_settings' : null}
+                    sidebarView={internalSidebarView || null}
                     closeSidebar={closeSidebar}
                     proposalInput={formInputs}
                     onChangeEvaluation={(evaluationId, updates) => {
@@ -377,10 +375,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
           secondaryButtonText='Go back'
           question='Are you sure you want to overwrite your current content with the proposal template content?'
           onConfirm={() => {
-            const templatePage = templateOptions.find((template) => template.id === selectedProposalTemplateId);
-            if (templatePage) {
-              applyTemplate(templatePage);
-            }
+            applyTemplate(selectedProposalTemplateId!);
             setSelectedProposalTemplateId(null);
           }}
         />

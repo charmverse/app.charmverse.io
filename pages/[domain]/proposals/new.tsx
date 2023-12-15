@@ -7,7 +7,6 @@ export default function PageView() {
   const router = useRouter();
   const isTemplate = router.query.type === 'proposal_template';
   const selectedTemplate = router.query.template as string;
-
   return <NewProposalPage templateId={selectedTemplate} isTemplate={isTemplate} />;
 }
 

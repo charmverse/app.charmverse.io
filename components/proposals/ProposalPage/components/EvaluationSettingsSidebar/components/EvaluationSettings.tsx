@@ -9,7 +9,7 @@ import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
 import { RubricCriteria } from './RubricCriteria';
 import type { RangeProposalCriteria } from './RubricCriteria';
-import { VoteOptions } from './VoteOptions';
+import { VoteSettings } from './VoteSettings';
 
 // result and id are not used for creating evaluations, so add them here
 // leave out permissions which are picked up on the backend based on workflowId
@@ -101,7 +101,7 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly 
             </Typography>
           </FormLabel> */}
           {/* <Box display='flex' flex={1} flexDirection='column'> */}
-          <VoteOptions
+          <VoteSettings
             readOnly={readOnly}
             value={evaluation.voteSettings}
             onChange={(voteSettings) =>

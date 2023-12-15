@@ -14,7 +14,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 
-export function NewProposalButton({ showProposal }: { showProposal: (pageId: string) => void }) {
+export function NewProposalButton() {
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
@@ -36,11 +36,11 @@ export function NewProposalButton({ showProposal }: { showProposal: (pageId: str
     navigateToSpacePath(`/${pageId}`);
   }
   function createTemplate() {
-    navigateToSpacePath('/proposals/new?type=proposal_template');
+    navigateToSpacePath('/proposals/new', { type: 'proposal_template' });
   }
 
   function createFromTemplate(pageId: string) {
-    navigateToSpacePath(`/proposals/new?template=${pageId}`);
+    navigateToSpacePath(`/proposals/new`, { template: pageId });
   }
 
   return (

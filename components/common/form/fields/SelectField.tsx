@@ -1,4 +1,4 @@
-import { Chip, MenuItem, TextField } from '@mui/material';
+import { Chip, MenuItem, TextField, Typography } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
@@ -158,7 +158,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               />
             ))
           }
-          noOptionsText={noOptionsText || 'No options available'}
+          noOptionsText={<Typography variant='caption'>{noOptionsText || 'No options available'}</Typography>}
           renderInput={(params) => (
             <TextField
               inputRef={inputRef}

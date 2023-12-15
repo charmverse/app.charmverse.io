@@ -9,6 +9,7 @@ import { VoteSidebar } from './components/VoteSidebar';
 
 export type Props = {
   pageId?: string;
+  isTemplate?: boolean;
   proposal?: Pick<
     ProposalWithUsersAndRubric,
     'id' | 'authors' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'
@@ -20,6 +21,7 @@ export type Props = {
 
 export function EvaluationSidebar({
   pageId,
+  isTemplate,
   proposal,
   evaluationId: evaluationIdFromContext = null,
   refreshProposal,
@@ -35,8 +37,15 @@ export function EvaluationSidebar({
   }, [evaluationIdFromContext]);
 
   useEffect(() => {
-    // set the first evaluation by default if evaluationIdFromContext is not provided
-    if (proposal && !evaluationIdFromContext && !activeEvaluationId) {
+    if (evaluationIdFromContext) {
+      return;
+    }
+    // if we were not provided a specific evaluation, go to the default view
+    if (isTemplate) {
+      goToSettings();
+    }
+    // check for activeEvaluationId in case the user has navigated between steps (and evaluationIdFromContext was not updated)
+    else if (proposal && !activeEvaluationId) {
       const sidebarEvaluations = proposal.evaluations.filter((e) => evaluationTypesWithSidebar.includes(e.type));
       // open current evaluation by default
       if (currentEvaluation && sidebarEvaluations.some((e) => e.id === currentEvaluation.id)) {

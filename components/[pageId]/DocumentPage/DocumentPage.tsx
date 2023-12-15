@@ -477,7 +477,10 @@ function DocumentPage({
                   />
                 )}
                 {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-                {(enableComments || enableSuggestingMode || page.type === 'proposal') && (
+                {(enableComments ||
+                  enableSuggestingMode ||
+                  page.type === 'proposal' ||
+                  page.type === 'proposal_template') && (
                   <PageSidebar
                     id='page-action-sidebar'
                     pageId={page.id}
@@ -494,6 +497,7 @@ function DocumentPage({
                     proposal={proposal}
                     proposalInput={proposal}
                     onChangeEvaluation={onChangeEvaluation}
+                    isProposalTemplate={page.type === 'proposal_template'}
                     refreshProposal={refreshProposal}
                   />
                 )}

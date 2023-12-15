@@ -30,13 +30,13 @@ type CreateVoteModalProps = {
   value: ProposalEvaluationInput['voteSettings'];
 };
 
-const StyledVoteOptions = styled.div`
+const StyledVoteSettings = styled.div`
   & .MuiInputBase-input {
     box-sizing: content-box;
   }
 `;
 
-export function VoteOptions({ readOnly, value, onChange }: CreateVoteModalProps) {
+export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
   const [options, setOptions] = useState<string[]>(value?.options ?? []);
@@ -72,7 +72,7 @@ export function VoteOptions({ readOnly, value, onChange }: CreateVoteModalProps)
   }, [voteType, options, maxChoices, durationDays, passThreshold]);
 
   return (
-    <StyledVoteOptions>
+    <StyledVoteSettings>
       <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' mb={1}>
         <FormLabel>
           <Typography component='span' variant='subtitle1'>
@@ -140,7 +140,7 @@ export function VoteOptions({ readOnly, value, onChange }: CreateVoteModalProps)
           <NumericFieldWithButtons disabled={readOnly} value={passThreshold} onChange={setPassThreshold} max={100} />
         </Stack>
       )}
-    </StyledVoteOptions>
+    </StyledVoteSettings>
   );
 }
 

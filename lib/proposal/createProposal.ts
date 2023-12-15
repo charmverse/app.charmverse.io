@@ -137,7 +137,6 @@ export async function createProposal({
         evaluationId: evaluationIds[index]
       }))
     );
-    // proposalStatus = 'published'; // TODO: implement support for drafts
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
@@ -159,16 +158,12 @@ export async function createProposal({
         },
         evaluations: {
           createMany: {
-            data:
-              // we dont save evaluations as part of the template, since they link to workflow id instead
-              pageProps?.type === 'proposal_template'
-                ? []
-                : evaluations.map((evaluation, index) => ({
-                    id: evaluationIds[index],
-                    index: evaluation.index,
-                    title: evaluation.title,
-                    type: evaluation.type
-                  }))
+            data: evaluations.map((evaluation, index) => ({
+              id: evaluationIds[index],
+              index: evaluation.index,
+              title: evaluation.title,
+              type: evaluation.type
+            }))
           }
         },
         fields

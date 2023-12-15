@@ -1,9 +1,12 @@
 import type { ProposalReviewer, ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { VoteSettings } from './interface';
+
 export type UpdateEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
+  voteSettings: VoteSettings | null;
   result?: ProposalEvaluationResult | null;
   decidedBy?: string;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
@@ -14,6 +17,7 @@ export async function updateProposalEvaluation({
   evaluationId,
   result,
   decidedBy,
+  voteSettings,
   reviewers
 }: UpdateEvaluationRequest) {
   await prisma.$transaction(async (tx) => {
@@ -42,6 +46,16 @@ export async function updateProposalEvaluation({
           result,
           decidedBy,
           completedAt: new Date()
+        }
+      });
+    }
+    if (voteSettings) {
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          voteSettings
         }
       });
     }

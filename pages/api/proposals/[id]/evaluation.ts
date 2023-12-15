@@ -112,6 +112,7 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     evaluationId,
     result,
     decidedBy: result ? userId : undefined,
+    voteSettings: req.body.voteSettings,
     reviewers
   });
 

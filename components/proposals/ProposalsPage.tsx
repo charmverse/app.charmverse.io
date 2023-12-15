@@ -121,7 +121,7 @@ export function ProposalsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewProposalButton showProposal={openPage} />
+                <NewProposalButton />
               </Box>
             </Box>
           </Box>
