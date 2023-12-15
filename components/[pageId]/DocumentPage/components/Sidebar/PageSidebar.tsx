@@ -88,7 +88,6 @@ function PageSidebarComponent(props: SidebarProps) {
   const isOpen = sidebarView !== null;
   // const sidebarTitle = props.isNewProposal ? 'Evaluation settings' : sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
-
   const showEvaluationSidebarIcon =
     (proposal?.evaluationType === 'rubric' &&
       (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
@@ -216,6 +215,7 @@ function SidebarContents({
             pageId={pageId}
             proposal={proposal}
             isTemplate={isProposalTemplate}
+            isNewProposal={isNewProposal}
             evaluationId={proposalEvaluationId}
             refreshProposal={refreshProposal}
             goToSettings={() => {

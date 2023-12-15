@@ -10,6 +10,7 @@ import { VoteSidebar } from './components/VoteSidebar';
 export type Props = {
   pageId?: string;
   isTemplate?: boolean;
+  isNewProposal?: boolean;
   proposal?: Pick<
     ProposalWithUsersAndRubric,
     'id' | 'authors' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'
@@ -22,6 +23,7 @@ export type Props = {
 export function EvaluationSidebar({
   pageId,
   isTemplate,
+  isNewProposal,
   proposal,
   evaluationId: evaluationIdFromContext = null,
   refreshProposal,
@@ -41,7 +43,7 @@ export function EvaluationSidebar({
       return;
     }
     // if we were not provided a specific evaluation, go to the default view
-    if (isTemplate) {
+    if (isTemplate || isNewProposal) {
       goToSettings();
     }
     // check for activeEvaluationId in case the user has navigated between steps (and evaluationIdFromContext was not updated)

@@ -512,7 +512,9 @@ function DocumentPage({
             )}
           </Container>
         </Box>
-        {proposal && <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />}
+        {proposal && page.type === 'proposal' && (
+          <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
+        )}
       </PrimaryColumn>
     </>
   );

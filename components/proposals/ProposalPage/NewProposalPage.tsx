@@ -338,6 +338,7 @@ export function NewProposalPage({
                     spaceId={currentSpace.id}
                     sidebarView={internalSidebarView || null}
                     closeSidebar={closeSidebar}
+                    openSidebar={setActiveView}
                     proposalInput={formInputs}
                     onChangeEvaluation={(evaluationId, updates) => {
                       const evaluations = formInputs.evaluations.map((e) =>
