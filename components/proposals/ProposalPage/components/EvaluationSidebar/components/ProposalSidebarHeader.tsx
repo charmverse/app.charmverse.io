@@ -4,7 +4,7 @@ import { Settings as SettingsIcon } from '@mui/icons-material';
 import { Box, Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
-import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
+import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/constants';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 

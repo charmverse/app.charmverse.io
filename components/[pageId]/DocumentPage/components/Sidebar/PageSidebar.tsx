@@ -1,10 +1,8 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
-import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
-import { Box, IconButton, Slide, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
 import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
-import { RiChatCheckLine } from 'react-icons/ri';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { EvaluationSettingsSidebar } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/EvaluationSettingsSidebar';
@@ -19,6 +17,7 @@ import type { ThreadWithComments } from 'lib/threads/interfaces';
 import { CommentsSidebar } from './components/CommentsSidebar';
 import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
+import { SIDEBAR_VIEWS } from './constants';
 import type { PageSidebarView } from './hooks/usePageSidebar';
 
 const DesktopContainer = styled.div`
@@ -34,29 +33,6 @@ const DesktopContainer = styled.div`
   background: ${({ theme }) => theme.palette.background.default};
   border-left: 1px solid var(--input-border);
 `;
-
-export const SIDEBAR_VIEWS = {
-  proposal_evaluation: {
-    icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'View evaluation',
-    title: 'Evaluation'
-  },
-  proposal_evaluation_settings: {
-    icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'Manage reviewers, rubric, and vote options',
-    title: 'Evaluation settings'
-  },
-  comments: {
-    icon: <MessageOutlined fontSize='small' />,
-    tooltip: 'View all comments',
-    title: 'Comments'
-  },
-  suggestions: {
-    icon: <RateReviewOutlined fontSize='small' />,
-    tooltip: 'View all suggestions',
-    title: 'Suggestions'
-  }
-} as const;
 
 type SidebarProps = {
   // eslint-disable-next-line react/no-unused-prop-types
