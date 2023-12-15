@@ -3,7 +3,7 @@ import type { ProposalReviewer, ProposalEvaluationResult } from '@charmverse/cor
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-import { createVote as createVoteService } from 'lib/votes';
+import { createVote as createVoteService } from 'lib/votes/createVote';
 import type { VoteDTO } from 'lib/votes/interfaces';
 
 import type { VoteSettings } from './interface';
