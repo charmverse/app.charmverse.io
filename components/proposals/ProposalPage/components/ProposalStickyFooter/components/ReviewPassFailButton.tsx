@@ -40,7 +40,7 @@ export function ReviewPassFailButton({ proposalId, evaluationId, refreshProposal
       </FormLabel>
       <Box display='flex' justifyContent='flex-end' gap={1}>
         <Button loading={selected === 'fail' && isSaving} onClick={() => onSubmitReview('fail')} color='error'>
-          Reject
+          Decline
         </Button>
         <Button loading={selected === 'pass' && isSaving} onClick={() => onSubmitReview('pass')} color='success'>
           Pass

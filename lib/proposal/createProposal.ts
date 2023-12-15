@@ -160,6 +160,7 @@ export async function createProposal({
           createMany: {
             data: evaluations.map((evaluation, index) => ({
               id: evaluationIds[index],
+              voteSettings: evaluation.voteSettings || undefined,
               index: evaluation.index,
               title: evaluation.title,
               type: evaluation.type

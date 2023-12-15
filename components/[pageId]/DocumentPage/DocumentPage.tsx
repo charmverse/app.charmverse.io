@@ -93,7 +93,7 @@ function DocumentPage({
   close,
   enableSidebar
 }: DocumentPageProps) {
-  const { cancelVote, castVote, deleteVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
+  const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   const isCharmVerse = useIsCharmverseSpace();
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath, router } = useCharmRouter();
@@ -420,8 +420,6 @@ function DocumentPage({
               {!isCharmVerse && page.type === 'proposal' && !isLoading && pageVote && (
                 <Box my={2} className='font-family-default'>
                   <VoteDetail
-                    cancelVote={cancelVote}
-                    deleteVote={deleteVote}
                     castVote={castVote}
                     updateDeadline={updateDeadline}
                     vote={pageVote}

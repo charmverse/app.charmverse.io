@@ -75,10 +75,8 @@ export function EvaluationSidebar({
         goToSettings={goToSettings}
       />
 
-      {evaluation?.type === 'rubric' && (
-        <RubricSidebar {...{ pageId, proposal, isCurrent, evaluation, refreshProposal }} />
-      )}
-      {evaluation?.type === 'vote' && <VoteSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />}
+      {evaluation?.type === 'rubric' && <RubricSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />}
+      {evaluation?.type === 'vote' && <VoteSidebar {...{ proposal, pageId, isCurrent, evaluation }} />}
     </>
   );
 }

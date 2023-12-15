@@ -5,7 +5,6 @@ import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
-import { useMembers } from 'hooks/useMembers';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -17,7 +16,6 @@ export type Props = {
 };
 
 export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
-  const { membersRecord } = useMembers();
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
@@ -26,7 +24,6 @@ export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposa
   }));
 
   const isReviewer = proposal?.permissions.evaluate;
-  const reviewedBy = evaluation.decidedBy ? membersRecord[evaluation.decidedBy] : null;
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent ? 'Evaluation is not current' : !isReviewer ? 'You are not a reviewer' : null;
 
@@ -67,7 +64,7 @@ export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposa
               disabledTooltip={disabledTooltip}
               color='error'
             >
-              Reject
+              Decline
             </Button>
             <Button
               onClick={() => onSubmitReview('pass')}
@@ -84,8 +81,7 @@ export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposa
         <Stack flexDirection='row' gap={2} alignItems='center'>
           <ApprovedIcon color='success' fontSize='large' />
           <Box>
-            <Typography>Approved by {reviewedBy?.username}</Typography>
-            <Typography variant='caption'>{completedDate}</Typography>
+            <Typography>Approved {completedDate}</Typography>
           </Box>
         </Stack>
       )}
@@ -93,8 +89,7 @@ export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposa
         <Stack flexDirection='row' gap={2} alignItems='center'>
           <RejectedIcon color='error' fontSize='large' />
           <Box>
-            <Typography>Rejected by {reviewedBy?.username}</Typography>
-            <Typography variant='caption'>{completedDate}</Typography>
+            <Typography>Declined {completedDate}</Typography>
           </Box>
         </Stack>
       )}

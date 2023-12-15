@@ -1,7 +1,6 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-import { useMembers } from 'hooks/useMembers';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
@@ -26,7 +25,6 @@ export function EvaluationStepper({
   selected,
   onClick = () => {}
 }: EvaluationStepperProps) {
-  const { membersRecord } = useMembers();
   const currentEvaluation = getCurrentEvaluation(evaluations);
   const currentValue = isDraft ? 'draft' : currentEvaluation?.id;
   const steps: Step[] = [
@@ -43,8 +41,7 @@ export function EvaluationStepper({
         evaluation.type === 'feedback' && evaluation.result
           ? `Completed ${completedDate}`
           : evaluation.decidedBy
-          ? `${evaluation.result === 'pass' ? 'Passed' : 'Rejected'} by ${
-              membersRecord[evaluation.decidedBy]?.username
+          ? `${evaluation.result === 'pass' ? 'Passed' : 'Declined'}
             }`
           : evaluationLabels[evaluation.type];
       return {

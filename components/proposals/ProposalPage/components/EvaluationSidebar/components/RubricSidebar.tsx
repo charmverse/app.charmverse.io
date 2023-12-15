@@ -14,14 +14,13 @@ import { RubricDecision } from './RubricDecision';
 import { RubricResults } from './RubricResults';
 
 export type Props = {
-  pageId?: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'>;
   evaluation: PopulatedEvaluation;
   isCurrent?: boolean;
   refreshProposal?: VoidFunction;
 };
 
-export function RubricSidebar({ pageId, proposal, isCurrent, evaluation, refreshProposal }: Props) {
+export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
