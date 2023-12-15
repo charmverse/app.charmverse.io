@@ -125,7 +125,7 @@ export function IdentityProviders() {
     disconnectTelegramError?.error;
 
   const onIdentityChange = async (event: SelectChangeEvent<string>) => {
-    const val = identityTypes.find((t) => t.username === event.target.value);
+    const val = identityTypes.find((t) => t.type === event.target.value);
 
     if (val) {
       await saveUser({
@@ -149,13 +149,13 @@ export function IdentityProviders() {
         </InputLabel>
         <Box display='flex' alignItems='center'>
           <Select
-            value={user?.username}
+            value={user?.identityType ?? ''}
             onChange={onIdentityChange}
             disabled={isLoadingUserUpdate}
             sx={{ width: '400px', mr: 1 }}
           >
             {identityTypes.map((identity) => (
-              <MenuItem key={identity.username} value={identity.username}>
+              <MenuItem key={identity.type} value={identity.type}>
                 <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
                   {identity.username}
                   <Chip variant='filled' label={identity.type.replace(/([A-Z])/g, ' $1').trim()} sx={{ ml: 2 }} />
