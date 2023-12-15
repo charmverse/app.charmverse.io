@@ -11,7 +11,7 @@ export function ProposalStickyFooter({
   proposal,
   refreshProposal
 }: {
-  proposal?: ProposalWithUsersAndRubric;
+  proposal: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }) {
   const isCharmVerse = useIsCharmverseSpace();
@@ -19,7 +19,7 @@ export function ProposalStickyFooter({
     return null;
   }
 
-  const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
+  const currentEvaluation = proposal.evaluations.find((e) => e.id === proposal.currentEvaluationId);
 
   // determine which buttons we need
   let view: string | undefined;
@@ -30,6 +30,7 @@ export function ProposalStickyFooter({
   } else if (currentEvaluation?.type === 'pass_fail') {
     view = 'pass_fail';
   }
+
   if (!view) {
     return null;
   }
@@ -38,11 +39,11 @@ export function ProposalStickyFooter({
     <StickyFooterContainer>
       {view === 'draft' && <PublishDraftButton {...{ proposal, refreshProposal }} />}
       {view === 'feedback' && (
-        <CompleteFeedbackButton {...{ proposal, evaluationId: proposal?.currentEvaluationId, refreshProposal }} />
+        <CompleteFeedbackButton {...{ proposal, evaluationId: proposal.currentEvaluationId, refreshProposal }} />
       )}
       {view === 'pass_fail' && (
         <ReviewPassFailButton
-          {...{ proposalId: proposal?.id, evaluationId: proposal?.currentEvaluationId, refreshProposal }}
+          {...{ proposalId: proposal?.id, evaluationId: proposal.currentEvaluationId, refreshProposal }}
         />
       )}
     </StickyFooterContainer>

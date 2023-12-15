@@ -11,9 +11,9 @@ import { v4 as uuid } from 'uuid';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
-import { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
+import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
-import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
@@ -58,20 +58,6 @@ const StyledContainer = styled(Container)`
   margin-bottom: 180px;
 `;
 
-const PrimaryColumn = styled(Box)<{ showPageActionSidebar: boolean }>(
-  ({ showPageActionSidebar, theme }) => `
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  transition: width ease-in 0.25s;
-  ${theme.breakpoints.up('lg')} {
-    width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
-    height: calc(100vh - 65px);
-    // overflow: ${showPageActionSidebar ? 'auto' : 'inherit'};
-  }
-`
-);
-
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boolean; templateId?: string }) {
   const { router, navigateToSpacePath } = useCharmRouter();
@@ -115,6 +101,7 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
   } = useNewProposal({
     newProposal
   });
+  const [proposalEvaluationId, setProposalEvaluationId] = useState();
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -232,16 +219,14 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
     }
   }, [!!workflowOptions]);
   const [defaultSidebarView, setDefaultView] = useState('proposal_evaluation_settings');
-
   useEffect(() => {
     setActiveView('proposal_evaluation_settings');
     setDefaultView('');
   }, []);
-
   return (
-    <PrimaryColumn showPageActionSidebar={!!sidebarView}>
-      <Box className={`document-print-container ${fontClassName}`} flexGrow={1} overflow='auto'>
-        <Box display='flex' flexDirection='column'>
+    <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+      <PrimaryColumn showPageActionSidebar={!!sidebarView}>
+        <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
           <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
@@ -259,10 +244,15 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                 isContentControlled
                 key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
               >
-                <PageTitleInput
+                {/* temporary? disable editing of page title when in suggestion mode */}
+                <PageHeader
+                  headerImage={formInputs.headerImage}
+                  icon={formInputs.icon}
+                  readOnly={false}
                   updatedAt={new Date().toString()}
-                  value={formInputs.title || ''}
-                  onChange={(updatedPage) => {
+                  title={formInputs.title || ''}
+                  // readOnly={readOnly || !!enableSuggestingMode}
+                  setPage={(updatedPage) => {
                     setFormInputs(updatedPage);
                     if ('title' in updatedPage) {
                       setPageTitle(updatedPage.title || '');
@@ -341,60 +331,59 @@ export function NewProposalPage({ isTemplate, templateId }: { isTemplate?: boole
                         readOnlyCustomProperties={readOnlyCustomProperties}
                       />
                     </div>
-                    {currentSpace && (
-                      <PageSidebar
-                        id='page-action-sidebar'
-                        spaceId={currentSpace.id}
-                        sidebarView={defaultSidebarView || sidebarView ? 'proposal_evaluation_settings' : null}
-                        closeSidebar={closeSidebar}
-                        proposalInput={formInputs}
-                        isNewProposal
-                        onChangeEvaluation={(evaluationId, updates) => {
-                          const evaluations = formInputs.evaluations.map((e) =>
-                            e.id === evaluationId ? { ...e, ...updates } : e
-                          );
-                          setFormInputs({
-                            ...formInputs,
-                            evaluations
-                          });
-                        }}
-                      />
-                    )}
                   </div>
                 </div>
+                {currentSpace && (
+                  <PageSidebar
+                    id='page-action-sidebar'
+                    spaceId={currentSpace.id}
+                    sidebarView={defaultSidebarView || sidebarView ? 'proposal_evaluation_settings' : null}
+                    closeSidebar={closeSidebar}
+                    proposalInput={formInputs}
+                    onChangeEvaluation={(evaluationId, updates) => {
+                      const evaluations = formInputs.evaluations.map((e) =>
+                        e.id === evaluationId ? { ...e, ...updates } : e
+                      );
+                      setFormInputs({
+                        ...formInputs,
+                        evaluations
+                      });
+                    }}
+                  />
+                )}
               </CharmEditor>
             </Box>
           </StyledContainer>
         </Box>
-      </Box>
-      <StickyFooterContainer>
-        <Button
-          disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
-          disabledTooltip={disabledTooltip}
-          onClick={saveForm}
-          loading={isCreatingProposal}
-          data-test='create-proposal-button'
-        >
-          Save
-        </Button>
-      </StickyFooterContainer>
-      <ConfirmDeleteModal
-        onClose={() => {
-          setSelectedProposalTemplateId(null);
-        }}
-        open={!!selectedProposalTemplateId}
-        title='Overwriting your content'
-        buttonText='Overwrite'
-        secondaryButtonText='Go back'
-        question='Are you sure you want to overwrite your current content with the proposal template content?'
-        onConfirm={() => {
-          const templatePage = templateOptions.find((template) => template.id === selectedProposalTemplateId);
-          if (templatePage) {
-            applyTemplate(templatePage);
-          }
-          setSelectedProposalTemplateId(null);
-        }}
-      />
-    </PrimaryColumn>
+        <StickyFooterContainer>
+          <Button
+            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+            disabledTooltip={disabledTooltip}
+            onClick={saveForm}
+            loading={isCreatingProposal}
+            data-test='create-proposal-button'
+          >
+            Save
+          </Button>
+        </StickyFooterContainer>
+        <ConfirmDeleteModal
+          onClose={() => {
+            setSelectedProposalTemplateId(null);
+          }}
+          open={!!selectedProposalTemplateId}
+          title='Overwriting your content'
+          buttonText='Overwrite'
+          secondaryButtonText='Go back'
+          question='Are you sure you want to overwrite your current content with the proposal template content?'
+          onConfirm={() => {
+            const templatePage = templateOptions.find((template) => template.id === selectedProposalTemplateId);
+            if (templatePage) {
+              applyTemplate(templatePage);
+            }
+            setSelectedProposalTemplateId(null);
+          }}
+        />
+      </PrimaryColumn>
+    </Box>
   );
 }

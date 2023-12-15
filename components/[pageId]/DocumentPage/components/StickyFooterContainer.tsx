@@ -1,8 +1,13 @@
 import styled from '@emotion/styled';
-import { Box, DialogActions, Divider } from '@mui/material';
+import { DialogActions, Divider } from '@mui/material';
 import type { ReactNode } from 'react';
 
-const Container = styled(Box)`
+const Wrapper = styled.div`
+  background: var(--background-default);
+  z-index: var(--z-index-drawer);
+`;
+
+const Contents = styled.div`
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
@@ -20,11 +25,11 @@ const Container = styled(Box)`
 
 export function StickyFooterContainer({ children }: { children: ReactNode }) {
   return (
-    <Box display='flex' flexDirection='column'>
+    <Wrapper>
       <Divider light />
-      <Container className='footer-actions'>
+      <Contents className='footer-actions'>
         <DialogActions sx={{ px: 0 }}>{children}</DialogActions>
-      </Container>
-    </Box>
+      </Contents>
+    </Wrapper>
   );
 }

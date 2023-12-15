@@ -8,9 +8,9 @@ export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDia
   const { activeView, closeSidebar, setActiveView, persistActiveView } = usePageSidebar();
   const { navigateToSpacePath } = useCharmRouter();
 
-  const isActive = activeView === 'proposal_evaluation';
+  const isActive = activeView?.includes('proposal');
 
-  function openEvaluation() {
+  function toggleEvaluation() {
     // close sidebar if open
     if (isActive) {
       closeSidebar();
@@ -28,7 +28,7 @@ export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDia
 
   return (
     <Tooltip arrow title={isActive ? 'Close evaluation' : 'Open evaluation'}>
-      <IconButton onClick={openEvaluation} sx={{ backgroundColor: isActive ? 'var(--input-bg)' : '' }}>
+      <IconButton onClick={toggleEvaluation} sx={{ backgroundColor: isActive ? 'var(--input-bg)' : '' }}>
         {SIDEBAR_VIEWS.proposal_evaluation.icon}
       </IconButton>
     </Tooltip>
