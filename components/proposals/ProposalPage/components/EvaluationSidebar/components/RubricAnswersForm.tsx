@@ -20,6 +20,7 @@ export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
 type Props = {
   proposalId: string;
+  evaluationId?: string;
   disabled: boolean; // for non-reviewers
   answers?: ProposalRubricCriteriaAnswer[];
   draftAnswers?: ProposalRubricCriteriaAnswer[];
@@ -55,7 +56,15 @@ const StyledRating = styled(Rating)`
   }
 `;
 
-export function RubricAnswersForm({ proposalId, criteriaList = [], answers, disabled, draftAnswers, onSubmit }: Props) {
+export function RubricAnswersForm({
+  proposalId,
+  evaluationId,
+  criteriaList = [],
+  answers,
+  disabled,
+  draftAnswers,
+  onSubmit
+}: Props) {
   const hasDraft = !!draftAnswers?.length;
 
   const [showDraftAnswers, setShowDraftAnswers] = useState(hasDraft);
@@ -98,12 +107,14 @@ export function RubricAnswersForm({ proposalId, criteriaList = [], answers, disa
     const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
     await upsertRubricCriteriaAnswer({
       // @ts-ignore -  TODO: make answer types match
-      answers: filteredAnswers
+      answers: filteredAnswers,
+      evaluationId
     });
     // if draft is showing, delete it now that we updated the answers
     if (showDraftAnswers) {
       await deleteRubricCriteriaAnswers({
-        isDraft: true
+        isDraft: true,
+        evaluationId
       });
     }
     onSubmit({ isDraft: false });
@@ -115,6 +126,7 @@ export function RubricAnswersForm({ proposalId, criteriaList = [], answers, disa
     await upsertDraftRubricCriteriaAnswer({
       // @ts-ignore -  TODO: make answer types match
       answers: filteredAnswers,
+      evaluationId,
       isDraft: true
     });
     // switch to draft before updating the parent context, or else the two Alerts will flicker one after the other
@@ -124,7 +136,8 @@ export function RubricAnswersForm({ proposalId, criteriaList = [], answers, disa
 
   async function deleteDraftAnswers() {
     await deleteRubricCriteriaAnswers({
-      isDraft: true
+      isDraft: true,
+      evaluationId
     });
     // update the answers from parent context before switching from 'draft' view
     await onSubmit({ isDraft: true });

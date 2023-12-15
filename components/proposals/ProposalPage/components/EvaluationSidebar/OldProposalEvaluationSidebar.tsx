@@ -11,8 +11,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { isTruthy } from 'lib/utilities/types';
 
+import { RubricAnswersForm } from './components/RubricAnswersForm';
 import { RubricResults } from './components/RubricResults';
-import { RubricAnswersForm } from './components/RubricReviewForm';
 
 type Props = {
   pageId?: string;

@@ -14,6 +14,8 @@ export function mapDbProposalToProposal({
     evaluations: ProposalEvaluation[];
     rewards: { id: string }[];
     reviewers: { evaluationId: string | null }[];
+    rubricAnswers: { evaluationId: string | null }[];
+    draftRubricAnswers: { evaluationId: string | null }[];
   };
   permissions?: ProposalPermissionFlags;
 }): ProposalWithUsersAndRubric {
@@ -26,7 +28,9 @@ export function mapDbProposalToProposal({
         ? getCurrentEvaluation(proposal.evaluations)?.id
         : undefined,
     status: getOldProposalStatus(proposal),
-    // Support old model: filter out evaluation-specific reviewers
+    // Support old model: filter out evaluation-specific reviewers and rubric answers
+    rubricAnswers: proposal.rubricAnswers.filter((answer) => !answer.evaluationId),
+    draftRubricAnswers: proposal.draftRubricAnswers.filter((answer) => !answer.evaluationId),
     reviewers: proposal.reviewers.filter((reviewer) => !reviewer.evaluationId),
     rewardIds: rewards.map((r) => r.id) || null
   };

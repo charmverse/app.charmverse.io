@@ -72,10 +72,13 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   });
 
   const canSeeAnswers = spaceRole?.isAdmin || permissions.evaluate || permissions.review;
-
   if (!canSeeAnswers) {
     proposal.draftRubricAnswers = [];
     proposal.rubricAnswers = [];
+    proposal.evaluations.forEach((evaluation) => {
+      evaluation.draftRubricAnswers = [];
+      evaluation.rubricAnswers = [];
+    });
   }
 
   return res.status(200).json(mapDbProposalToProposal({ proposal, permissions }));

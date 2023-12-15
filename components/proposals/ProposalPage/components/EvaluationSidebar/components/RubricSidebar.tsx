@@ -9,9 +9,9 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
+import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricDecision } from './RubricDecision';
 import { RubricResults } from './RubricResults';
-import { RubricAnswersForm } from './RubricReviewForm';
 
 export type Props = {
   pageId?: string;
@@ -28,7 +28,6 @@ export function RubricSidebar({ pageId, proposal, isCurrent, evaluation, refresh
   const proposalPermissions = proposal?.permissions;
   const canAnswerRubric = proposalPermissions?.evaluate;
   const rubricCriteria = evaluation?.rubricCriteria;
-
   const myRubricAnswers = useMemo(
     () => evaluation?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],
     [user?.id, evaluation?.rubricAnswers]
@@ -73,6 +72,7 @@ export function RubricSidebar({ pageId, proposal, isCurrent, evaluation, refresh
                   <RubricAnswersForm
                     key='evaluate'
                     proposalId={proposal?.id || ''}
+                    evaluationId={evaluation.id}
                     answers={myRubricAnswers}
                     draftAnswers={myDraftRubricAnswers}
                     criteriaList={rubricCriteria!}
