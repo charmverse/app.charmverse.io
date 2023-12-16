@@ -6,6 +6,7 @@ import { useDrop } from 'react-dnd';
 
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
+import useKeydownPress from 'hooks/useKeydownPress';
 import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -74,7 +75,18 @@ function Table(props: Props): JSX.Element {
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
   const areaSelection = useAreaSelection({ readOnly, container: selectContainerRef });
-  const { selection, setSelection, setDrawArea } = areaSelection;
+  const { setSelection, setDrawArea } = areaSelection;
+
+  useKeydownPress(
+    () => {
+      setCheckedIds?.([]);
+    },
+    {
+      ctrl: false,
+      key: 'Escape',
+      shift: false
+    }
+  );
 
   const { offset, resizingColumn } = useEfficientDragLayer((monitor) => {
     if (monitor.getItemType() === 'horizontalGrip') {

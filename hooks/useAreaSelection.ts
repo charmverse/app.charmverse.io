@@ -51,11 +51,12 @@ export function useAreaSelection({ container = { current: document.body }, readO
       setMouseDown(true);
 
       const containerElement = container.current;
-      const isTableRowCheckbox =
+      // Skip if the click is on a disable-drag-selection element, don't start the selection box
+      const disableDragSelectionElement =
         (e.target as HTMLElement)?.classList.contains('disable-drag-selection') ||
         (e.target as HTMLElement)?.parentElement?.classList.contains('disable-drag-selection');
 
-      if (isTableRowCheckbox) return;
+      if (disableDragSelectionElement) return;
 
       if (containerElement && containerElement.contains(e.target as HTMLElement)) {
         document.addEventListener('mousemove', handleMouseMove);
