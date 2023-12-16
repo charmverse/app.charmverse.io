@@ -6,8 +6,10 @@ import { useState, useRef } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
 import charmClient from 'charmClient';
+import type { TagSelectProps } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import type { UserSelectProps } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -98,7 +100,7 @@ function PropertyMenu({
         open={popupState.isOpen}
         style={{
           position: 'relative',
-          top: -32.5,
+          top: -32,
           height: '100%'
         }}
         elevation={1}
@@ -130,32 +132,31 @@ function SelectPropertyTemplateMenu({
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
+  const tagSelectProps: TagSelectProps = {
+    canEditOptions: true,
+    multiselect: propertyTemplate.type === 'multiSelect',
+    propertyValue: propertyValue as string,
+    options: propertyTemplate.options,
+    onChange: (newValue) => {
+      mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+    },
+    onUpdateOption: (option) => {
+      mutator.changePropertyOption(board, propertyTemplate, option);
+    },
+    onDeleteOption: (option) => {
+      mutator.deletePropertyOption(board, propertyTemplate, option);
+    },
+    onCreateOption: (newValue) => {
+      mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+    },
+    displayType: 'table'
+  };
+
   return (
     <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
-      {({ isPropertyOpen }) => {
-        return (
-          <TagSelect
-            isOpen={isPropertyOpen}
-            canEditOptions
-            multiselect={propertyTemplate.type === 'multiSelect'}
-            propertyValue={propertyValue as string}
-            options={propertyTemplate.options}
-            onChange={async (newValue) => {
-              await mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
-            }}
-            onUpdateOption={(option) => {
-              mutator.changePropertyOption(board, propertyTemplate, option);
-            }}
-            onDeleteOption={(option) => {
-              mutator.deletePropertyOption(board, propertyTemplate, option);
-            }}
-            onCreateOption={(newValue) => {
-              mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
-            }}
-            displayType='table'
-          />
-        );
-      }}
+      {({ isPropertyOpen }) =>
+        isPropertyOpen ? <TagSelect opened {...tagSelectProps} /> : <TagSelect {...tagSelectProps} />
+      }
     </PropertyMenu>
   );
 }
@@ -171,46 +172,45 @@ function PersonPropertyTemplateMenu({
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
+  const userSelectProps: UserSelectProps = {
+    memberIds: typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? [],
+    onChange: (newValue) => {
+      mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+      const previousValue = propertyValue
+        ? typeof propertyValue === 'string'
+          ? [propertyValue]
+          : (propertyValue as string[])
+        : [];
+      const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+      charmClient.createEvents({
+        spaceId: board.spaceId,
+        payload: newUserIds
+          .map((userId) =>
+            cards.map(
+              (card) =>
+                ({
+                  cardId: card.id,
+                  cardProperty: {
+                    id: propertyTemplate.id,
+                    name: propertyTemplate.name,
+                    value: userId
+                  },
+                  scope: WebhookEventNames.CardPersonPropertyAssigned
+                } as CreateEventPayload)
+            )
+          )
+          .flat()
+      });
+    },
+    displayType: 'table',
+    showEmptyPlaceholder: true
+  };
+
   return (
     <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
-      {({ isPropertyOpen }) => {
-        return (
-          <UserSelect
-            open={isPropertyOpen}
-            displayType='table'
-            memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
-            onChange={(newValue) => {
-              mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
-              const previousValue = propertyValue
-                ? typeof propertyValue === 'string'
-                  ? [propertyValue]
-                  : (propertyValue as string[])
-                : [];
-              const newUserIds = newValue.filter((id) => !previousValue.includes(id));
-              charmClient.createEvents({
-                spaceId: board.spaceId,
-                payload: newUserIds
-                  .map((userId) =>
-                    cards.map(
-                      (card) =>
-                        ({
-                          cardId: card.id,
-                          cardProperty: {
-                            id: propertyTemplate.id,
-                            name: propertyTemplate.name,
-                            value: userId
-                          },
-                          scope: WebhookEventNames.CardPersonPropertyAssigned
-                        } as CreateEventPayload)
-                    )
-                  )
-                  .flat()
-              });
-            }}
-            showEmptyPlaceholder
-          />
-        );
-      }}
+      {({ isPropertyOpen }) =>
+        isPropertyOpen ? <UserSelect opened {...userSelectProps} /> : <UserSelect {...userSelectProps} />
+      }
     </PropertyMenu>
   );
 }

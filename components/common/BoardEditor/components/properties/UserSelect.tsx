@@ -13,7 +13,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-type Props = {
+export type UserSelectProps = {
   memberIds: string[];
   readOnly?: boolean;
   onChange: (memberIds: string[]) => void;
@@ -21,7 +21,7 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
   'data-test'?: string;
-  open?: boolean;
+  opened?: boolean;
   error?: string;
 };
 
@@ -113,15 +113,11 @@ export function UserSelect({
   readOnly,
   showEmptyPlaceholder,
   wrapColumn,
-  open,
+  opened,
   'data-test': dataTest,
   error
-}: Props): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(open);
-
-  useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
+}: UserSelectProps): JSX.Element | null {
+  const [isOpen, setIsOpen] = useState(opened);
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {
