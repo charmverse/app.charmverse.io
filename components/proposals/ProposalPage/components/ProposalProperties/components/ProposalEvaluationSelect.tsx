@@ -20,7 +20,7 @@ export const evaluationLabels = {
   [ProposalEvaluationType.feedback]: 'Request feedback',
   [ProposalEvaluationType.vote]: 'Evaluation by vote',
   [ProposalEvaluationType.rubric]: 'Evaluation by rubric',
-  [ProposalEvaluationType.pass_fail]: 'Reviewer approval is required to proceed'
+  [ProposalEvaluationType.pass_fail]: 'Approval is required to proceed'
 };
 
 // allow user to change the current evaluation step

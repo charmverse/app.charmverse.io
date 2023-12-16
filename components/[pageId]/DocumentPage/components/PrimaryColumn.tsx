@@ -13,7 +13,7 @@ export const PrimaryColumn = styled.div<{
   }
 
   // main content
-  & > :first-child {
+  & > :first-of-type {
     flex-grow: 1;
     min-height: 1px;
     overflow: auto;

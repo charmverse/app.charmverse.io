@@ -4,7 +4,10 @@ import { Stack } from '@mui/material';
 
 const stepperSize = 25;
 
-export const StepperStack = styled(Stack)<{
+export const StepperStack = styled(Stack, {
+  shouldForwardProp: (prop) =>
+    prop !== 'isDisabled' && prop !== 'isSelected' && prop !== 'isCurrent' && prop !== 'result'
+})<{
   isCurrent: boolean;
   result: ProposalEvaluationResult | null;
   isSelected: boolean;

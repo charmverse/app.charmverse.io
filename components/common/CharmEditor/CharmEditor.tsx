@@ -201,7 +201,7 @@ type CharmEditorProps = {
 function CharmEditor({
   colorMode,
   enableSuggestingMode = false,
-  content = defaultContent,
+  content,
   children,
   onContentChange,
   style,
