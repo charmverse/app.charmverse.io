@@ -18,6 +18,7 @@ import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../mutator';
+import DateRange from '../properties/dateRange/dateRange';
 import { validatePropertyValue } from '../propertyValueElement';
 
 const StyledStack = styled(Stack)`
@@ -250,6 +251,33 @@ function TextPropertyTemplateMenu({
   );
 }
 
+function DatePropertyTemplateMenu({
+  cards,
+  propertyTemplate
+}: {
+  cards: Card[];
+  propertyTemplate: IPropertyTemplate<PropertyType>;
+}) {
+  const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
+
+  return (
+    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+      {() => {
+        return (
+          <DateRange
+            wrapColumn
+            value={propertyValue?.toString()}
+            showEmptyPlaceholder
+            onChange={(newValue) => {
+              mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+            }}
+          />
+        );
+      }}
+    </PropertyMenu>
+  );
+}
+
 function PropertyTemplateMenu({
   propertyTemplate,
   cards,
@@ -308,7 +336,7 @@ function PropertyTemplateMenu({
     }
 
     case 'date': {
-      return null;
+      return <DatePropertyTemplateMenu cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
 
     default: {

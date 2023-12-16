@@ -17,7 +17,7 @@ import CheckboxOption from '../../../widgets/menu/checkboxOption';
 import 'react-day-picker/lib/style.css';
 
 type Props = {
-  className: string;
+  className?: string;
   value: string;
   showEmptyPlaceholder?: boolean;
   onChange: (value: string) => void;
