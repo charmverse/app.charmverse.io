@@ -15,7 +15,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
         draggable="true"
       >
         <div
-          class="charm-drag-handle MuiBox-root css-0"
+          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -112,7 +112,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
         draggable="true"
       >
         <div
-          class="charm-drag-handle MuiBox-root css-0"
+          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -209,7 +209,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
         draggable="true"
       >
         <div
-          class="charm-drag-handle MuiBox-root css-0"
+          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -354,7 +354,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
         draggable="true"
       >
         <div
-          class="charm-drag-handle MuiBox-root css-0"
+          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"
@@ -529,7 +529,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
         draggable="true"
       >
         <div
-          class="charm-drag-handle MuiBox-root css-0"
+          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
         >
           <svg
             aria-hidden="true"

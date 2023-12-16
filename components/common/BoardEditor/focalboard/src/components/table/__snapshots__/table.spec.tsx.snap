@@ -288,7 +288,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
@@ -426,7 +426,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
@@ -967,7 +967,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
@@ -1099,7 +1099,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
@@ -1637,7 +1637,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
@@ -1775,7 +1775,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
@@ -2316,7 +2316,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
@@ -2448,7 +2448,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               draggable="true"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
               >
                 <svg
                   aria-hidden="true"
