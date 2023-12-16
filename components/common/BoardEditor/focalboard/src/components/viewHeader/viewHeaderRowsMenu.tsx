@@ -11,6 +11,7 @@ import { TextInput } from 'components/common/BoardEditor/components/properties/T
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -273,7 +274,7 @@ function PropertyTemplateMenu({
     'person'
   ].includes(propertyTemplate.type);
 
-  if (!isValidType) {
+  if (!isValidType || propertyTemplate.id === Constants.titleColumnId) {
     return null;
   }
 
@@ -299,15 +300,19 @@ function PropertyTemplateMenu({
     }
     case 'select':
     case 'multiSelect': {
-      return <SelectPropertyTemplateMenu board={board} cards={cards} propertyTemplate={propertyTemplate} />;
+      return <SelectPropertyTemplateMenu board={board} cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
 
     case 'person': {
-      return <PersonPropertyTemplateMenu board={board} cards={cards} propertyTemplate={propertyTemplate} />;
+      return <PersonPropertyTemplateMenu board={board} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+    }
+
+    case 'date': {
+      return null;
     }
 
     default: {
-      return <TextPropertyTemplateMenu cards={cards} propertyTemplate={propertyTemplate} />;
+      return <TextPropertyTemplateMenu cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
   }
 }

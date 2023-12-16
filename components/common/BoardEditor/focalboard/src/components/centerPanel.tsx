@@ -42,7 +42,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -168,9 +167,10 @@ function CenterPanel(props: Props) {
 
   const cards = cardPages.map(({ card }) => card);
 
+  // Make sure the checkedIds are still cards that exist
   useEffect(() => {
     setCheckedIds((checkedIds) => checkedIds.filter((id) => cardPageIds.has(id)));
-  }, [cardPageIds]);
+  }, [cardPageIds.size]);
 
   let groupByProperty = _groupByProperty;
   if (
