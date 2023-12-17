@@ -1,4 +1,5 @@
 import type { ProposalFormFieldType } from '@charmverse/core/prisma-client';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -11,7 +12,6 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import ShortTextIcon from '@mui/icons-material/ShortText';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import type { ReactNode } from 'react';
-import { FaWallet } from 'react-icons/fa';
 
 export const formFieldTypes: ProposalFormFieldType[] = [
   'text',
@@ -52,7 +52,7 @@ export const fieldTypeIconRecord: Record<ProposalFormFieldType, ReactNode> = {
   email: <AlternateEmailIcon fontSize='small' />,
   select: <ArrowDropDownCircleIcon fontSize='small' />,
   multiselect: <ListIcon fontSize='small' />,
-  wallet: <FaWallet fontSize='small' />,
+  wallet: <AccountBalanceWalletIcon fontSize='small' />,
   date: <CalendarMonthIcon fontSize='small' />,
   label: <TextFieldsIcon fontSize='small' />,
   person: <PersonIcon fontSize='small' />

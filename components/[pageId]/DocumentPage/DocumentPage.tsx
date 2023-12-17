@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
+import { v4 } from 'uuid';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
@@ -449,7 +450,19 @@ function DocumentPage({
                     />
                   )}
                 </CardPropertiesWrapper>
-                <FormFields />
+                <FormFields
+                  formFields={[
+                    {
+                      description: 'Give your page a title',
+                      index: 0,
+                      name: 'Title',
+                      options: [],
+                      private: false,
+                      required: true,
+                      type: 'text'
+                    }
+                  ]}
+                />
               </CharmEditor>
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (

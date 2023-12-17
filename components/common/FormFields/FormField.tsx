@@ -15,8 +15,10 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import { useState } from 'react';
 
+import { Button } from '../Button';
+import { DateInputField } from '../form/fields/DateInputField';
 import { NumberInputField } from '../form/fields/NumberInputField';
 import { SelectField } from '../form/fields/SelectField';
 import { TextInputField } from '../form/fields/TextInputField';
@@ -31,7 +33,25 @@ const FormFieldContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
 `;
 
-function FormFieldInput({ type }: { type: ProposalFormFieldType }) {
+interface FormFieldProps {
+  formField: ProposalFormFieldInput;
+  updateFormField: (updatedFormField: Partial<ProposalFormFieldInput>) => void;
+  onDuplicate: VoidFunction;
+  onDelete: VoidFunction;
+  toggleOpen: VoidFunction;
+}
+
+function FormFieldInput({
+  type,
+  label,
+  required = false,
+  description
+}: {
+  type: ProposalFormFieldType;
+  label?: string;
+  required?: boolean;
+  description?: string;
+}) {
   switch (type) {
     case 'text':
     case 'email':
@@ -43,22 +63,36 @@ function FormFieldInput({ type }: { type: ProposalFormFieldType }) {
       return (
         <TextInputField
           disabled
+          description={description}
           placeholder='Your answer'
           multiline={type === 'text_multiline'}
           rows={type === 'text_multiline' ? 3 : 1}
+          required={required}
+          label={label}
         />
       );
     }
     case 'number': {
-      return <NumberInputField disabled placeholder='Your answer' />;
+      return (
+        <NumberInputField
+          label={label}
+          required={required}
+          description={description}
+          disabled
+          placeholder='Your answer'
+        />
+      );
     }
     case 'date': {
       return (
-        <DateTimePicker
-          value={new Date()}
+        <DateInputField
+          label={label}
+          required={required}
+          value={new Date().toString()}
           onChange={() => {}}
           disabled
-          renderInput={(props) => <TextField placeholder='Your answer' fullWidth {...props} />}
+          placeholder='Your answer'
+          description={description}
         />
       );
     }
@@ -73,6 +107,9 @@ function FormFieldInput({ type }: { type: ProposalFormFieldType }) {
           placeholder='Your answer'
           onChange={() => {}}
           value=''
+          required={required}
+          label={label}
+          description={description}
         />
       );
     }
@@ -82,19 +119,9 @@ function FormFieldInput({ type }: { type: ProposalFormFieldType }) {
   }
 }
 
-export function FormField({
-  formField,
-  updateFormField,
-  onDuplicate,
-  onDelete
-}: {
-  formField: ProposalFormFieldInput;
-  updateFormField: (updatedFormField: Partial<ProposalFormFieldInput>) => void;
-  onDuplicate: VoidFunction;
-  onDelete: VoidFunction;
-}) {
+function ExpandedFormField({ formField, onDelete, onDuplicate, updateFormField }: Omit<FormFieldProps, 'isCollapsed'>) {
   return (
-    <FormFieldContainer>
+    <>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
         <Select<ProposalFormFieldType>
           value={formField.type}
@@ -120,6 +147,7 @@ export function FormField({
           })}
         </Select>
         <PopperPopup
+          closeOnClick
           popupContent={
             <MenuList>
               <MenuItem onClick={onDuplicate}>
@@ -186,6 +214,38 @@ export function FormField({
         </Stack>
         <Typography variant='caption'>Only Authors, Reviewers and Admins can see the answer</Typography>
       </Stack>
+    </>
+  );
+}
+
+export function FormField(
+  props: FormFieldProps & {
+    isOpen?: boolean;
+  }
+) {
+  return (
+    <FormFieldContainer>
+      {!props.isOpen ? (
+        <FormFieldInput
+          type={props.formField.type}
+          description={props.formField.description ?? ''}
+          label={props.formField.name}
+          required={props.formField.required}
+        />
+      ) : (
+        <ExpandedFormField {...props} />
+      )}
+      <Button
+        color='secondary'
+        variant='outlined'
+        onClick={props.toggleOpen}
+        size='small'
+        sx={{
+          width: 'fit-content'
+        }}
+      >
+        {!props.isOpen ? 'Expand' : 'Collapse'}
+      </Button>
     </FormFieldContainer>
   );
 }

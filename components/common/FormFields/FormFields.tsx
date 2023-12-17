@@ -7,15 +7,23 @@ import { Button } from '../Button';
 import { FormField } from './FormField';
 import type { ProposalFormFieldInput } from './interfaces';
 
-export function FormFields() {
-  const [formFields, setFormFields] = useState<ProposalFormFieldInput[]>([]);
+export function FormFields({ formFields: initialFormFields = [] }: { formFields?: ProposalFormFieldInput[] }) {
+  const [formFields, setFormFields] = useState<
+    (ProposalFormFieldInput & {
+      isOpen: boolean;
+    })[]
+  >(initialFormFields.map((formField) => ({ ...formField, isOpen: false })));
 
   function updateFormField({
     index,
     updatedFormField
   }: {
     index: number;
-    updatedFormField: Partial<ProposalFormFieldInput>;
+    updatedFormField: Partial<
+      ProposalFormFieldInput & {
+        isOpen: boolean;
+      }
+    >;
   }) {
     setFormFields((prev) => {
       const newFormFields = [...prev];
@@ -38,7 +46,8 @@ export function FormFields() {
           index: prev.length,
           options: [],
           private: false,
-          required: true
+          required: true,
+          isOpen: true
         }
       ];
     });
@@ -74,6 +83,10 @@ export function FormFields() {
     <Stack gap={1}>
       {formFields.map((formField, index) => (
         <FormField
+          toggleOpen={() => {
+            updateFormField({ index, updatedFormField: { isOpen: !formField.isOpen } });
+          }}
+          isOpen={formField.isOpen}
           formField={formField}
           updateFormField={(updatedFormField) => {
             updateFormField({ index, updatedFormField });

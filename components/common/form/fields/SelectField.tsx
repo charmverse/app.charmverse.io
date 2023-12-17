@@ -35,6 +35,7 @@ type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
 export const SelectField = forwardRef<HTMLDivElement, Props>(
   (
     {
+      description,
       required,
       label,
       iconLabel,
@@ -52,6 +53,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       className,
       forcePopupIcon = 'auto',
       noOptionsText,
+      helperText,
       ...inputProps
     },
     ref
@@ -107,7 +109,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     }, [isOpened, isOptionEditOpened]);
 
     return (
-      <FieldWrapper label={label} required={required} inline={inline} iconLabel={iconLabel}>
+      <FieldWrapper description={description} label={label} required={required} inline={inline} iconLabel={iconLabel}>
         <Autocomplete
           data-test='autocomplete'
           className={className}
@@ -164,6 +166,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               size='small'
               placeholder={!selectedOptions.length ? placeholder : undefined}
               error={!!inputProps.error}
+              helperText={helperText}
             />
           )}
           getOptionLabel={(option: SelectOptionType) => {
