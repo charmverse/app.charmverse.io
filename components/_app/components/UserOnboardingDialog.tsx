@@ -102,7 +102,7 @@ function UserOnboardingDialog({
   hasEmptyRequiredProperties?: boolean;
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
-  const { requiredProperties, requiredPropertiesWithoutValue } = useRequiredMemberProperties({
+  const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
   const {
@@ -225,7 +225,9 @@ function UserOnboardingDialog({
             control={memberPropertiesControl}
             errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
-            onChange={onMemberPropertiesChange}
+            onChange={(values) =>
+              onMemberPropertiesChange(values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value })))
+            }
             userId={currentUser.id}
             showCollectionOptions
           />

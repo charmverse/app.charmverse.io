@@ -1,16 +1,17 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
 import { useState } from 'react';
+import { v4 } from 'uuid';
 
 import { Button } from '../Button';
-import type { SelectOptionType } from '../form/fields/Select/interfaces';
 
+import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
-import type { ProposalFormFieldInput } from './interfaces';
+import type { FormFieldInput } from './interfaces';
 
-export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formFields?: ProposalFormFieldInput[] }) {
+export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formFields?: FormFieldInput[] }) {
   const [formFields, setFormFields] = useState<
-    (ProposalFormFieldInput & {
+    (FormFieldInput & {
       isOpen: boolean;
     })[]
   >(initialFormFields.map((formField) => ({ ...formField, isOpen: false })));
@@ -21,7 +22,7 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
   }: {
     index: number;
     updatedFormField: Partial<
-      ProposalFormFieldInput & {
+      FormFieldInput & {
         isOpen: boolean;
       }
     >;
@@ -59,7 +60,8 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
       const newFormFields = [...prev];
       newFormFields.splice(index, 0, {
         ...newFormFields[index],
-        index: index + 1
+        index: index + 1,
+        options: newFormFields[index].options?.map((option) => ({ ...option, id: v4() })) ?? []
       });
 
       return newFormFields.map((formField, i) => ({

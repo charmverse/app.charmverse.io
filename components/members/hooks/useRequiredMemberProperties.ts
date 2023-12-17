@@ -7,6 +7,7 @@ import useSWRImmutable from 'swr/immutable';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -129,90 +130,31 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const { space } = useCurrentSpace();
 
-  const {
-    control,
-    formState: { isValid, errors, isDirty, isSubmitting },
-    reset,
-    getValues,
-    setValue,
-    handleSubmit
-  } = useForm({
-    mode: 'onChange',
-    resolver: yupResolver(
-      yup.object(
-        memberProperties.reduce((acc, property) => {
-          if (!NON_DEFAULT_MEMBER_PROPERTIES.includes(property.type)) {
-            return acc;
-          }
-
-          const isRequired = property.required;
-
-          if (isRequired) {
-            if (property.type === 'multiselect') {
-              acc[property.memberPropertyId] = yup.array().of(yup.string()).required();
-              return acc;
-            }
-
-            acc[property.memberPropertyId] = property.type === 'number' ? yup.number().required() : requiredString;
-
-            return acc;
-          }
-
-          if (property.type === 'multiselect') {
-            acc[property.memberPropertyId] = yup.array().of(yup.string());
-            return acc;
-          }
-
-          acc[property.memberPropertyId] = property.type === 'number' ? yup.number() : nonRequiredString;
-
-          return acc;
-        }, {} as Record<string, any>)
-      )
-    )
-  });
+  const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit, setValue } =
+    useFormFields({
+      fields: memberProperties
+        .filter((p) => NON_DEFAULT_MEMBER_PROPERTIES.includes(p.type))
+        .map((p) => ({
+          ...p,
+          id: p.memberPropertyId
+        })),
+      onSubmit: async (values) => {
+        if (space) {
+          await updateSpaceValues(
+            space.id,
+            Object.entries(values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+          );
+          refreshPropertyValues();
+        }
+      }
+    });
 
   const values = getValues();
-
-  useEffect(() => {
-    if (!memberProperties) {
-      return;
-    }
-    const defaultValues = memberProperties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-      if (NON_DEFAULT_MEMBER_PROPERTIES.includes(prop.type)) {
-        acc[prop.memberPropertyId] = prop.value;
-      }
-      return acc;
-    }, {});
-
-    reset(defaultValues);
-  }, [memberProperties, reset]);
-
-  const onSubmit = () => {
-    if (isDirty && isValid && space) {
-      return handleSubmit(async () => {
-        await updateSpaceValues(
-          space.id,
-          Object.entries(getValues()).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
-        );
-        refreshPropertyValues();
-      })();
-    }
-  };
-
-  function onFormChange(fields: UpdateMemberPropertyValuePayload[]) {
-    fields.forEach((field) => {
-      setValue(field.memberPropertyId, field.value, {
-        shouldDirty: true,
-        shouldValidate: true,
-        shouldTouch: true
-      });
-    });
-  }
 
   return {
     values,
     control,
-    isValid: Object.keys(errors).length === 0,
+    isValid,
     errors,
     isDirty,
     setValue,

@@ -11,9 +11,10 @@ type Props = {
   iconLabel?: ReactNode;
   required?: boolean;
   description?: string;
+  endAdornment?: ReactNode;
 };
 
-export function FieldWrapper({ description, required, children, label, inline, iconLabel }: Props) {
+export function FieldWrapper({ endAdornment, description, required, children, label, inline, iconLabel }: Props) {
   if (!label) {
     return children as JSX.Element;
   }
@@ -31,6 +32,7 @@ export function FieldWrapper({ description, required, children, label, inline, i
                   *
                 </Typography>
               )}
+              {endAdornment}
             </FieldLabel>
           )}
         </Box>

@@ -3,9 +3,7 @@ import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
-import { getFieldTypeRules } from 'components/common/form/fields/util';
 import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
-import { useMembers } from 'hooks/useMembers';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberCollections } from '../../../../../../hooks/useMemberCollections';
@@ -32,7 +30,6 @@ export function MemberPropertiesForm({
   errors,
   control
 }: Props) {
-  const { membersRecord } = useMembers();
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
   const { memberProperties } = useRequiredMemberProperties({
     userId
@@ -58,7 +55,6 @@ export function MemberPropertiesForm({
             key={property.memberPropertyId}
             name={property.memberPropertyId}
             control={control}
-            rules={getFieldTypeRules(property.type)}
             render={({ field }) => (
               <FieldTypeRenderer
                 {...field}

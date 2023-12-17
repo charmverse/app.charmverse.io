@@ -1,5 +1,6 @@
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
+import { DateTime } from 'luxon';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -9,14 +10,36 @@ type Props = ControlFieldProps & FieldProps;
 
 export const DateInputField = forwardRef<HTMLDivElement, Props>(
   (
-    { label, description, iconLabel, inline, required, onChange, value, error, helperText, disabled, placeholder },
+    {
+      label,
+      endAdornment,
+      description,
+      iconLabel,
+      inline,
+      required,
+      onChange,
+      value,
+      error,
+      helperText,
+      disabled,
+      placeholder
+    },
     ref
   ) => {
     return (
-      <FieldWrapper description={description} required={required} label={label} inline={inline} iconLabel={iconLabel}>
+      <FieldWrapper
+        endAdornment={endAdornment}
+        description={description}
+        required={required}
+        label={label}
+        inline={inline}
+        iconLabel={iconLabel}
+      >
         <DateTimePicker
-          value={value}
-          onChange={(_value) => onChange?.(_value)}
+          value={value ? DateTime.fromJSDate(new Date(value)) : undefined}
+          onChange={(_value) => {
+            onChange?.(_value?.toJSDate().getTime());
+          }}
           disabled={disabled}
           renderInput={(props) => (
             <TextField

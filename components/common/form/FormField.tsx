@@ -20,8 +20,9 @@ import { Button } from '../Button';
 import PopperPopup from '../PopperPopup';
 
 import { fieldTypeIconRecord, fieldTypeLabelRecord, formFieldTypes } from './constants';
-import { EditableFormFieldInput, FormFieldInput, type FormFieldInputProps } from './FormFieldInput';
-import type { ProposalFormFieldInput } from './interfaces';
+import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
+import type { SelectOptionType } from './fields/Select/interfaces';
+import type { FormFieldInput } from './interfaces';
 
 const FormFieldContainer = styled(Stack)`
   border: 1px solid ${(props) => props.theme.palette.divider};
@@ -29,11 +30,15 @@ const FormFieldContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
 `;
 
-export interface FormFieldProps extends FormFieldInputProps {
-  updateFormField: (updatedFormField: Partial<ProposalFormFieldInput>) => void;
+export interface FormFieldProps {
+  updateFormField: (updatedFormField: Partial<FormFieldInput>) => void;
   onDuplicate: VoidFunction;
   onDelete: VoidFunction;
   toggleOpen: VoidFunction;
+  formField: FormFieldInput;
+  onCreateOption?: (option: SelectOptionType) => void;
+  onDeleteOption?: (option: SelectOptionType) => void;
+  onUpdateOption?: (option: SelectOptionType) => void;
 }
 
 function ExpandedFormField({
@@ -109,29 +114,38 @@ function ExpandedFormField({
         }}
         placeholder='Add your description here (optional)'
       />
-      <EditableFormFieldInput
-        formField={formField}
-        onCreateOption={onCreateOption}
-        onDeleteOption={onDeleteOption}
-        onUpdateOption={onUpdateOption}
-      />
+      {formField.type !== 'label' && (
+        <FieldTypeRenderer
+          type={formField.type as any}
+          onCreateOption={onCreateOption}
+          onDeleteOption={onDeleteOption}
+          onUpdateOption={onUpdateOption}
+          placeholder='Your answer'
+          // Enable select and multiselect fields to be able to create options
+          disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
+          value={formField.type === 'date' ? new Date().toString() : ''}
+          options={formField.options}
+        />
+      )}
       <Divider
         sx={{
           my: 1
         }}
       />
 
-      <Stack>
-        <Stack gap={0.5} flexDirection='row' alignItems='center'>
-          <Switch
-            size='small'
-            checked={formField.required}
-            onChange={(e) => updateFormField({ required: e.target.checked })}
-          />
-          <Typography>Required</Typography>
+      {formField.type !== 'label' && (
+        <Stack>
+          <Stack gap={0.5} flexDirection='row' alignItems='center'>
+            <Switch
+              size='small'
+              checked={formField.required}
+              onChange={(e) => updateFormField({ required: e.target.checked })}
+            />
+            <Typography>Required</Typography>
+          </Stack>
+          <Typography variant='caption'>Authors must answer this question</Typography>
         </Stack>
-        <Typography variant='caption'>Authors must answer this question</Typography>
-      </Stack>
+      )}
 
       <Stack>
         <Stack gap={0.5} flexDirection='row' alignItems='center'>
@@ -153,19 +167,33 @@ export function FormField(
     isOpen?: boolean;
   }
 ) {
+  const { isOpen, formField, toggleOpen } = props;
+
   return (
     <FormFieldContainer>
-      {!props.isOpen ? <FormFieldInput formField={props.formField} /> : <ExpandedFormField {...props} />}
+      {!isOpen ? (
+        <FieldTypeRenderer
+          type={formField.type as any}
+          description={formField.description ?? ''}
+          disabled
+          label={formField.name}
+          required={formField.required}
+          options={formField.options}
+          placeholder={formField.type === 'date' ? new Date().toString() : 'Your answer'}
+        />
+      ) : (
+        <ExpandedFormField {...props} />
+      )}
       <Button
         color='secondary'
         variant='outlined'
-        onClick={props.toggleOpen}
+        onClick={toggleOpen}
         size='small'
         sx={{
           width: 'fit-content'
         }}
       >
-        {!props.isOpen ? 'Expand' : 'Collapse'}
+        {!isOpen ? 'Expand' : 'Collapse'}
       </Button>
     </FormFieldContainer>
   );
