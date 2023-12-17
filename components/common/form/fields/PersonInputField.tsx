@@ -1,6 +1,3 @@
-import TextField from '@mui/material/TextField';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import { DateTime } from 'luxon';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -11,25 +8,24 @@ import { InputSearchMemberMultiple } from '../InputSearchMember';
 type Props = ControlFieldProps & FieldProps;
 
 export const PersonInputField = forwardRef<HTMLDivElement, Props>(
-  (
-    {
-      label,
-      endAdornment,
-      description,
-      iconLabel,
-      inline,
-      required,
-      onChange,
-      value,
-      error,
-      helperText,
-      disabled,
-      placeholder
-    },
-    ref
-  ) => {
+  ({
+    label,
+    endAdornment,
+    description,
+    iconLabel,
+    inline,
+    required,
+    onChange,
+    value,
+    error,
+    helperText,
+    disabled,
+    placeholder,
+    fieldWrapperSx
+  }) => {
     return (
       <FieldWrapper
+        sx={fieldWrapperSx}
         endAdornment={endAdornment}
         description={description}
         required={required}

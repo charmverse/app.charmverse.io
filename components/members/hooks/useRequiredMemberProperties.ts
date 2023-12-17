@@ -14,11 +14,11 @@ import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { DEFAULT_MEMBER_PROPERTIES, NON_DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
-import type { MemberPropertyValueType, Social, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { Social } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
 
-const requiredString = yup.string().required().ensure().trim();
+const requiredString = (msg: string) => yup.string().required(msg).ensure().trim();
 
 const nonRequiredString = yup.string().notRequired().trim();
 
@@ -183,23 +183,24 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     setValue,
     handleSubmit,
     getValues,
-    reset
+    reset,
+    trigger
   } = useForm({
     mode: 'onChange',
     defaultValues: userDetails,
     resolver: yupResolver(
       yup.object({
-        description: isBioRequired ? requiredString : nonRequiredString,
-        timezone: isTimezoneRequired ? requiredString : nonRequiredString,
+        description: isBioRequired ? requiredString('Bio is required') : nonRequiredString,
+        timezone: isTimezoneRequired ? requiredString('Timezone is required') : nonRequiredString,
         social: yup.object({
           twitterURL: isTwitterRequired
-            ? requiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link')
+            ? requiredString('Twitter is required').matches(TWITTER_URL_REGEX, 'Invalid Twitter link')
             : nonRequiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link'),
           githubURL: isGithubRequired
-            ? requiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link')
+            ? requiredString('Github is required').matches(GITHUB_URL_REGEX, 'Invalid GitHub link')
             : nonRequiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link'),
           linkedinURL: isLinkedinRequired
-            ? requiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
+            ? requiredString('Linkedin is required').matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
             : nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link'),
           discordUsername: nonRequiredString
         })
@@ -220,8 +221,9 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
               }
             : userDetails.social
       });
+      trigger();
     }
-  }, [isLoadingUserDetails]);
+  }, [isLoadingUserDetails, reset, trigger]);
 
   const values = {
     description: getValues('description'),

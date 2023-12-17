@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
   Divider,
   IconButton,
@@ -134,16 +136,13 @@ function ExpandedFormField({
       />
 
       {formField.type !== 'label' && (
-        <Stack>
-          <Stack gap={0.5} flexDirection='row' alignItems='center'>
-            <Switch
-              size='small'
-              checked={formField.required}
-              onChange={(e) => updateFormField({ required: e.target.checked })}
-            />
-            <Typography>Required</Typography>
-          </Stack>
-          <Typography variant='caption'>Authors must answer this question</Typography>
+        <Stack gap={0.5} flexDirection='row' alignItems='center'>
+          <Switch
+            size='small'
+            checked={formField.required}
+            onChange={(e) => updateFormField({ required: e.target.checked })}
+          />
+          <Typography>Required</Typography>
         </Stack>
       )}
 
@@ -156,7 +155,7 @@ function ExpandedFormField({
           />
           <Typography>Private</Typography>
         </Stack>
-        <Typography variant='caption'>Only Authors, Reviewers and Admins can see the answer</Typography>
+        <Typography variant='caption'>Only Authors, Reviewers and Admins can see the input</Typography>
       </Stack>
     </>
   );
@@ -170,31 +169,30 @@ export function FormField(
   const { isOpen, formField, toggleOpen } = props;
 
   return (
-    <FormFieldContainer>
-      {!isOpen ? (
-        <FieldTypeRenderer
-          type={formField.type as any}
-          description={formField.description ?? ''}
-          disabled
-          label={formField.name}
-          required={formField.required}
-          options={formField.options}
-          placeholder={formField.type === 'date' ? new Date().toString() : 'Your answer'}
-        />
+    <FormFieldContainer flexDirection='row' gap={1} alignItems='flex-start'>
+      {isOpen ? (
+        <KeyboardArrowUpIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
       ) : (
-        <ExpandedFormField {...props} />
+        <KeyboardArrowDownIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
       )}
-      <Button
-        color='secondary'
-        variant='outlined'
-        onClick={toggleOpen}
-        size='small'
-        sx={{
-          width: 'fit-content'
-        }}
-      >
-        {!isOpen ? 'Expand' : 'Collapse'}
-      </Button>
+      <Stack gap={1} width='100%'>
+        {!isOpen ? (
+          <FieldTypeRenderer
+            fieldWrapperSx={{
+              my: 0
+            }}
+            type={formField.type as any}
+            description={formField.description ?? ''}
+            disabled
+            label={formField.name}
+            required={formField.required}
+            options={formField.options}
+            placeholder={formField.type === 'date' ? new Date().toString() : 'Your answer'}
+          />
+        ) : (
+          <ExpandedFormField {...props} />
+        )}
+      </Stack>
     </FormFieldContainer>
   );
 }

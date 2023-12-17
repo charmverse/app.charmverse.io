@@ -1,4 +1,5 @@
 import type { ProposalFormField } from '@charmverse/core/prisma-client';
+import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
@@ -12,6 +13,12 @@ interface TFormFieldInput {
   id: string;
   value: string | string[];
 }
+
+const FormFieldInputsContainer = styled(Stack)`
+  border: 1px solid ${(props) => props.theme.palette.divider};
+  padding: ${(props) => props.theme.spacing(2)};
+  gap: ${(props) => props.theme.spacing(1)};
+`;
 
 export function FormFieldInputs({
   formFields,
@@ -30,7 +37,7 @@ export function FormFieldInputs({
   });
 
   return (
-    <Stack gap={1}>
+    <FormFieldInputsContainer>
       <Box display='flex' flexDirection='column' gap={1}>
         {formFields.map((formField) => (
           <Controller
@@ -79,6 +86,6 @@ export function FormFieldInputs({
           </Button>
         </Stack>
       )}
-    </Stack>
+    </FormFieldInputsContainer>
   );
 }

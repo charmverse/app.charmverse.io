@@ -22,7 +22,8 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
       error,
       helperText,
       disabled,
-      placeholder
+      placeholder,
+      fieldWrapperSx
     },
     ref
   ) => {
@@ -34,6 +35,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
         label={label}
         inline={inline}
         iconLabel={iconLabel}
+        sx={fieldWrapperSx}
       >
         <DateTimePicker
           value={value ? DateTime.fromJSDate(new Date(value)) : undefined}

@@ -1,5 +1,6 @@
 import type { MemberPropertyType, ProposalFormFieldType } from '@charmverse/core/prisma';
 import type { ProposalFormField } from '@charmverse/core/prisma-client';
+import type { SxProps } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -31,6 +32,7 @@ export type FieldProps = {
   helperText?: ReactNode;
   description?: string;
   endAdornment?: ReactNode;
+  fieldWrapperSx?: SxProps;
 } & SelectFieldProps;
 
 export type FormFieldInput = Pick<

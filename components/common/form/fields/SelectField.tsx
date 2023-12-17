@@ -55,6 +55,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       forcePopupIcon = 'auto',
       noOptionsText,
       helperText,
+      fieldWrapperSx,
       ...inputProps
     },
     ref
@@ -117,6 +118,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
         required={required}
         inline={inline}
         iconLabel={iconLabel}
+        sx={fieldWrapperSx}
       >
         <Autocomplete
           data-test='autocomplete'
