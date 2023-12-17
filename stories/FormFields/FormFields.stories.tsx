@@ -1,11 +1,11 @@
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import { FormFields as CustomFormFields } from 'components/common/FormFields/FormFields';
+import { FormFieldsEditor } from 'components/common/FormFields/FormFieldsEditor';
 
 export function FormFields() {
   return (
     <GlobalContext>
-      <CustomFormFields
+      <FormFieldsEditor
         formFields={[
           {
             description: 'This is a description',
@@ -23,6 +23,6 @@ export function FormFields() {
 }
 
 export default {
-  title: 'FormFields/FormFields',
+  title: 'FormFields/FormFieldsEditor',
   component: FormFields
 };

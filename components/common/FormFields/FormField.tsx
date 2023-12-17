@@ -17,13 +17,10 @@ import {
 } from '@mui/material';
 
 import { Button } from '../Button';
-import { DateInputField } from '../form/fields/DateInputField';
-import { NumberInputField } from '../form/fields/NumberInputField';
-import { SelectField } from '../form/fields/SelectField';
-import { TextInputField } from '../form/fields/TextInputField';
 import PopperPopup from '../PopperPopup';
 
 import { fieldTypeIconRecord, fieldTypeLabelRecord, formFieldTypes } from './constants';
+import { EditableFormFieldInput, FormFieldInput, type FormFieldInputProps } from './FormFieldInput';
 import type { ProposalFormFieldInput } from './interfaces';
 
 const FormFieldContainer = styled(Stack)`
@@ -32,93 +29,22 @@ const FormFieldContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
 `;
 
-interface FormFieldProps {
-  formField: ProposalFormFieldInput;
+export interface FormFieldProps extends FormFieldInputProps {
   updateFormField: (updatedFormField: Partial<ProposalFormFieldInput>) => void;
   onDuplicate: VoidFunction;
   onDelete: VoidFunction;
   toggleOpen: VoidFunction;
 }
 
-function FormFieldInput({
-  type,
-  label,
-  required = false,
-  description
-}: {
-  type: ProposalFormFieldType;
-  label?: string;
-  required?: boolean;
-  description?: string;
-}) {
-  switch (type) {
-    case 'text':
-    case 'email':
-    case 'url':
-    case 'phone':
-    case 'label':
-    case 'text_multiline':
-    case 'wallet': {
-      return (
-        <TextInputField
-          disabled
-          description={description}
-          placeholder='Your answer'
-          multiline={type === 'text_multiline'}
-          rows={type === 'text_multiline' ? 3 : 1}
-          required={required}
-          label={label}
-        />
-      );
-    }
-    case 'number': {
-      return (
-        <NumberInputField
-          label={label}
-          required={required}
-          description={description}
-          disabled
-          placeholder='Your answer'
-        />
-      );
-    }
-    case 'date': {
-      return (
-        <DateInputField
-          label={label}
-          required={required}
-          value={new Date().toString()}
-          onChange={() => {}}
-          disabled
-          placeholder='Your answer'
-          description={description}
-        />
-      );
-    }
-    case 'select':
-    case 'person':
-    case 'multiselect': {
-      return (
-        <SelectField
-          disabled
-          multiselect={type === 'multiselect'}
-          options={[]}
-          placeholder='Your answer'
-          onChange={() => {}}
-          value=''
-          required={required}
-          label={label}
-          description={description}
-        />
-      );
-    }
-    default: {
-      return null;
-    }
-  }
-}
-
-function ExpandedFormField({ formField, onDelete, onDuplicate, updateFormField }: Omit<FormFieldProps, 'isCollapsed'>) {
+function ExpandedFormField({
+  formField,
+  onDelete,
+  onDuplicate,
+  updateFormField,
+  onCreateOption,
+  onDeleteOption,
+  onUpdateOption
+}: Omit<FormFieldProps, 'isCollapsed'>) {
   return (
     <>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
@@ -183,7 +109,12 @@ function ExpandedFormField({ formField, onDelete, onDuplicate, updateFormField }
         }}
         placeholder='Add your description here (optional)'
       />
-      <FormFieldInput type={formField.type} />
+      <EditableFormFieldInput
+        formField={formField}
+        onCreateOption={onCreateOption}
+        onDeleteOption={onDeleteOption}
+        onUpdateOption={onUpdateOption}
+      />
       <Divider
         sx={{
           my: 1
@@ -224,16 +155,7 @@ export function FormField(
 ) {
   return (
     <FormFieldContainer>
-      {!props.isOpen ? (
-        <FormFieldInput
-          type={props.formField.type}
-          description={props.formField.description ?? ''}
-          label={props.formField.name}
-          required={props.formField.required}
-        />
-      ) : (
-        <ExpandedFormField {...props} />
-      )}
+      {!props.isOpen ? <FormFieldInput formField={props.formField} /> : <ExpandedFormField {...props} />}
       <Button
         color='secondary'
         variant='outlined'

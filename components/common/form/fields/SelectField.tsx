@@ -18,7 +18,7 @@ type SelectProps = {
   disabled?: boolean;
   canEditOptions?: boolean;
   noOptionsText?: string;
-  onChange: (option: string | string[]) => void;
+  onChange?: (option: string | string[]) => void;
   onCreateOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
   onDeleteOption?: (option: SelectOptionType) => void;
@@ -86,7 +86,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
         onCreateOption(tempValueOption);
       }
 
-      inputProps.onChange(newValue || '');
+      inputProps.onChange?.(newValue || '');
     }
 
     useEffect(() => {

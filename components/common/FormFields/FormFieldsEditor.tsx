@@ -3,11 +3,12 @@ import { Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { Button } from '../Button';
+import type { SelectOptionType } from '../form/fields/Select/interfaces';
 
 import { FormField } from './FormField';
 import type { ProposalFormFieldInput } from './interfaces';
 
-export function FormFields({ formFields: initialFormFields = [] }: { formFields?: ProposalFormFieldInput[] }) {
+export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formFields?: ProposalFormFieldInput[] }) {
   const [formFields, setFormFields] = useState<
     (ProposalFormFieldInput & {
       isOpen: boolean;
@@ -79,6 +80,40 @@ export function FormFields({ formFields: initialFormFields = [] }: { formFields?
     });
   }
 
+  function onCreateOption(index: number, option: SelectOptionType) {
+    setFormFields((prev) => {
+      const newFormFields = [...prev];
+      const options = newFormFields[index].options ?? [];
+      options.push(option);
+      return newFormFields;
+    });
+  }
+
+  function onDeleteOption(index: number, option: SelectOptionType) {
+    setFormFields((prev) => {
+      const newFormFields = [...prev];
+      const options = newFormFields[index].options ?? [];
+      const newOptions = options.filter((o) => o.id !== option.id);
+      newFormFields[index].options = newOptions;
+      return newFormFields;
+    });
+  }
+
+  function onUpdateOption(index: number, option: SelectOptionType) {
+    setFormFields((prev) => {
+      const newFormFields = [...prev];
+      const options = newFormFields[index].options ?? [];
+      const newOptions = options.map((o) => {
+        if (o.id === option.id) {
+          return option;
+        }
+        return o;
+      });
+      newFormFields[index].options = newOptions;
+      return newFormFields;
+    });
+  }
+
   return (
     <Stack gap={1}>
       {formFields.map((formField, index) => (
@@ -94,6 +129,15 @@ export function FormFields({ formFields: initialFormFields = [] }: { formFields?
           key={`${formField.type}-${index.toString()}`}
           onDuplicate={() => duplicateFormField(index)}
           onDelete={() => deleteFormField(index)}
+          onCreateOption={(option) => {
+            onCreateOption(index, option);
+          }}
+          onDeleteOption={(option) => {
+            onDeleteOption(index, option);
+          }}
+          onUpdateOption={(option) => {
+            onUpdateOption(index, option);
+          }}
         />
       ))}
       <Button

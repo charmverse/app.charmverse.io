@@ -22,7 +22,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import { FormFields } from 'components/common/FormFields/FormFields';
+import { FormFieldsEditor } from 'components/common/FormFields/FormFieldsEditor';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -450,6 +450,19 @@ function DocumentPage({
                     />
                   )}
                 </CardPropertiesWrapper>
+                <FormFieldsEditor
+                  formFields={[
+                    {
+                      description: 'Give your page a title',
+                      index: 0,
+                      name: 'Title',
+                      options: [],
+                      private: false,
+                      required: true,
+                      type: 'text'
+                    }
+                  ]}
+                />
               </CharmEditor>
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
