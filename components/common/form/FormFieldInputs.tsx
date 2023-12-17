@@ -15,25 +15,23 @@ interface TFormFieldInput {
 
 export function FormFieldInputs({
   formFields,
-  onSave,
-  readOnly
+  onSave
 }: {
   formFields: (Pick<ProposalFormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
     value: string | string[];
   })[];
-  onSave: (formFieldInputs: TFormFieldInput[]) => void;
-  readOnly?: boolean;
+  onSave?: (formFieldInputs: TFormFieldInput[]) => void;
 }) {
   const { control, errors, isValid, isDirty, isSubmitting, onFormChange, onSubmit } = useFormFields({
     fields: formFields,
     onSubmit: (_values) => {
-      onSave(Object.entries(_values).map(([id, value]) => ({ id, value })));
+      onSave?.(Object.entries(_values).map(([id, value]) => ({ id, value })));
     }
   });
 
   return (
     <Stack gap={1}>
-      <Box display='flex' flexDirection='column'>
+      <Box display='flex' flexDirection='column' gap={1}>
         {formFields.map((formField) => (
           <Controller
             key={formField.id}
@@ -44,7 +42,7 @@ export function FormFieldInputs({
                 {...field}
                 endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
                 description={formField.description ?? ''}
-                disabled={readOnly}
+                disabled={!onSave}
                 type={formField.type}
                 label={formField.name}
                 options={formField.options as SelectOptionType[]}
@@ -63,7 +61,7 @@ export function FormFieldInputs({
           />
         ))}
       </Box>
-      {!readOnly && (
+      {onSave && (
         <Stack
           alignSelf='flex-end'
           sx={{
