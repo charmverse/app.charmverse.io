@@ -450,19 +450,6 @@ function DocumentPage({
                     />
                   )}
                 </CardPropertiesWrapper>
-                <FormFields
-                  formFields={[
-                    {
-                      description: 'Give your page a title',
-                      index: 0,
-                      name: 'Title',
-                      options: [],
-                      private: false,
-                      required: true,
-                      type: 'text'
-                    }
-                  ]}
-                />
               </CharmEditor>
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (

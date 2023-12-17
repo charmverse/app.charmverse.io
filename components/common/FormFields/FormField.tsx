@@ -15,7 +15,6 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useState } from 'react';
 
 import { Button } from '../Button';
 import { DateInputField } from '../form/fields/DateInputField';
