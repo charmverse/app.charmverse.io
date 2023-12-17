@@ -31,9 +31,11 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'email':
       case 'url':
       case 'phone':
+      case 'short_text':
       case 'wallet': {
         return <TextInputField {...fieldProps} ref={ref} />;
       }
+      case 'long_text':
       case 'text_multiline': {
         return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
       }

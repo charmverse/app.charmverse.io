@@ -1,10 +1,10 @@
 import { type FormFieldType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown';
+import ChevronRightIcon from '@mui/icons-material/ArrowRight';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
   Divider,
   IconButton,
@@ -171,9 +171,9 @@ export function FormField(
   return (
     <FormFieldContainer flexDirection='row' gap={1} alignItems='flex-start'>
       {isOpen ? (
-        <KeyboardArrowUpIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
+        <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
       ) : (
-        <KeyboardArrowDownIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
+        <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
       )}
       <Stack gap={1} width='100%'>
         {!isOpen ? (
