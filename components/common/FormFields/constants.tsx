@@ -13,7 +13,7 @@ import ShortTextIcon from '@mui/icons-material/ShortText';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import type { ReactNode } from 'react';
 
-export const formFieldTypes: ProposalFormFieldType[] = [
+export const formFieldTypes = [
   'text',
   'text_multiline',
   'number',
