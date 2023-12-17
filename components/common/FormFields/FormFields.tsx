@@ -1,4 +1,3 @@
-import { ProposalFormFieldType, type ProposalFormField } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
 import { useState } from 'react';
@@ -33,7 +32,7 @@ export function FormFields() {
       return [
         ...prev,
         {
-          type: ProposalFormFieldType.text,
+          type: 'text',
           name: 'Title',
           description: '',
           index: prev.length,

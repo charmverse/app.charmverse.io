@@ -2,7 +2,6 @@ import { Check } from '@mui/icons-material';
 import { Box, Paper } from '@mui/material';
 
 import { Button } from 'components/common/Button';
-import { FormFields } from 'components/common/FormFields/FormFields';
 
 export default {
   title: 'common/Buttons',
@@ -114,7 +113,6 @@ export function Primary() {
           <Button endIcon={<Check />}>End Icon</Button>
         </Box>
       </Box>
-      <FormFields />
     </Paper>
   );
 }

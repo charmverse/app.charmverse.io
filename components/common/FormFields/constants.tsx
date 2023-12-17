@@ -13,6 +13,21 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import type { ReactNode } from 'react';
 import { FaWallet } from 'react-icons/fa';
 
+export const formFieldTypes: ProposalFormFieldType[] = [
+  'text',
+  'text_multiline',
+  'number',
+  'phone',
+  'url',
+  'email',
+  'select',
+  'multiselect',
+  'wallet',
+  'date',
+  'label',
+  'person'
+] as const;
+
 export const fieldTypeLabelRecord: Record<ProposalFormFieldType, string> = {
   date: 'Date',
   email: 'Email',

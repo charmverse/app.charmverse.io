@@ -1,4 +1,4 @@
-import type { MemberPropertyType, Prisma } from '@charmverse/core/dist/cjs/prisma-client';
+import type { MemberPropertyType, Prisma } from '@charmverse/core/prisma-client';
 
 import { DEFAULT_MEMBER_PROPERTIES, HIDDEN_MEMBER_PROPERTIES, MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 

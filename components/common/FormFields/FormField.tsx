@@ -1,8 +1,13 @@
-import { ProposalFormFieldType } from '@charmverse/core/prisma-client';
+import { type ProposalFormFieldType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Divider, MenuItem, Select, Stack, Switch, TextField, Typography } from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers';
 
-import { fieldTypeIconRecord, fieldTypeLabelRecord } from './constants';
+import { NumberInputField } from '../form/fields/NumberInputField';
+import { SelectField } from '../form/fields/SelectField';
+import { TextInputField } from '../form/fields/TextInputField';
+
+import { fieldTypeIconRecord, fieldTypeLabelRecord, formFieldTypes } from './constants';
 import type { ProposalFormFieldInput } from './interfaces';
 
 const FormFieldContainer = styled(Stack)`
@@ -13,29 +18,46 @@ const FormFieldContainer = styled(Stack)`
 
 function FormFieldInput({ type }: { type: ProposalFormFieldType }) {
   switch (type) {
-    case 'text': {
+    case 'text':
+    case 'email':
+    case 'url':
+    case 'phone':
+    case 'label':
+    case 'text_multiline':
+    case 'wallet': {
       return (
-        <TextField
-          sx={{
-            padding: 1
-          }}
+        <TextInputField
           disabled
           placeholder='Your answer'
-          variant='outlined'
+          multiline={type === 'text_multiline'}
+          rows={type === 'text_multiline' ? 3 : 1}
         />
       );
     }
-    case 'text_multiline': {
+    case 'number': {
+      return <NumberInputField disabled placeholder='Your answer' />;
+    }
+    case 'date': {
       return (
-        <TextField
-          sx={{
-            padding: 1
-          }}
+        <DateTimePicker
+          value={new Date()}
+          onChange={() => {}}
           disabled
-          multiline
+          renderInput={(props) => <TextField placeholder='Your answer' fullWidth {...props} />}
+        />
+      );
+    }
+    case 'select':
+    case 'person':
+    case 'multiselect': {
+      return (
+        <SelectField
+          disabled
+          multiselect={type === 'multiselect'}
+          options={[]}
           placeholder='Your answer'
-          rows={3}
-          variant='outlined'
+          onChange={() => {}}
+          value=''
         />
       );
     }
@@ -65,14 +87,13 @@ export function FormField({
           width: 'fit-content'
         }}
         variant='outlined'
-        size='small'
       >
-        {Object.keys(ProposalFormFieldType).map((fieldType) => {
+        {formFieldTypes.map((fieldType) => {
           return (
             <MenuItem key={fieldType} value={fieldType}>
               <Stack flexDirection='row' gap={1} alignItems='center'>
-                {fieldTypeIconRecord[fieldType as ProposalFormFieldType]}
-                {fieldTypeLabelRecord[fieldType as ProposalFormFieldType]}
+                {fieldTypeIconRecord[fieldType]}
+                {fieldTypeLabelRecord[fieldType]}
               </Stack>
             </MenuItem>
           );
@@ -81,10 +102,6 @@ export function FormField({
       <TextField
         value={formField.name}
         onChange={(e) => updateFormField({ name: e.target.value })}
-        sx={{
-          backgroundColor: 'background.light',
-          border: 'none'
-        }}
         placeholder='Title'
       />
       <TextField
