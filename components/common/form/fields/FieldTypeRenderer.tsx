@@ -10,6 +10,7 @@ import FieldLabel from '../FieldLabel';
 
 import { DateInputField } from './DateInputField';
 import { FieldWrapper } from './FieldWrapper';
+import { PersonInputField } from './PersonInputField';
 
 type TextProps = {
   type: Exclude<FieldType, 'select' | 'multiselect'>;
@@ -42,6 +43,10 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
 
       case 'date': {
         return <DateInputField {...fieldProps} ref={ref} />;
+      }
+
+      case 'person': {
+        return <PersonInputField {...fieldProps} ref={ref} />;
       }
 
       case 'label': {

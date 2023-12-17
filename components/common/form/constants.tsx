@@ -24,8 +24,8 @@ export const formFieldTypes = [
   'multiselect',
   'wallet',
   'date',
-  'label',
-  'person'
+  'person',
+  'label'
 ] as const;
 
 export const fieldTypeLabelRecord: Record<ProposalFormFieldType, string> = {

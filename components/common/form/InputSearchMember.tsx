@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
+import type { ReactNode } from 'react';
 import { createRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
@@ -40,6 +41,8 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   openOnFocus?: boolean;
   allowEmail?: boolean;
   inputVariant?: 'standard' | 'outlined' | 'filled';
+  helperText?: ReactNode;
+  error?: boolean;
 }
 
 function InputSearchMemberBase({
@@ -49,6 +52,8 @@ function InputSearchMemberBase({
   openOnFocus = false,
   inputVariant,
   allowEmail,
+  helperText,
+  error,
   ...props
 }: Props) {
   const inputRef = createRef<HTMLInputElement>();
@@ -97,6 +102,8 @@ function InputSearchMemberBase({
         // @ts-ignore - MUI types are wrong
         <TextField
           {...params}
+          helperText={helperText}
+          error={error}
           placeholder={placeholder ?? ''}
           size='small'
           autoFocus={openOnFocus}
@@ -121,6 +128,8 @@ interface IInputSearchMemberMultipleProps
   disableCloseOnSelect?: boolean;
   allowEmail?: boolean;
   inputVariant?: 'standard' | 'outlined' | 'filled';
+  helperText?: ReactNode;
+  error?: boolean;
 }
 
 export function InputSearchMemberMultiple({
@@ -154,7 +163,7 @@ export function InputSearchMemberMultiple({
     <InputSearchMemberBase
       filterSelectedOptions
       multiple
-      placeholder='Select users'
+      placeholder={props.placeholder ?? 'Select members'}
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}

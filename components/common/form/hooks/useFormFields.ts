@@ -59,7 +59,7 @@ export function useFormFields({
             }
             case 'number': {
               acc[property.id] = yup.string().test('is-number', 'Invalid number', (value) => {
-                return isRequired ? !Number.isNaN(value) : true;
+                return isRequired ? (value ? !Number.isNaN(value) : false) : true;
               });
               break;
             }
@@ -79,7 +79,13 @@ export function useFormFields({
                 .array()
                 .of(yup.string().uuid())
                 .test('is-uuid', 'Invalid uuid', (value) => {
-                  return isRequired ? (value ? value.every((v) => (v ? isUUID(v) : false)) : false) : true;
+                  return isRequired
+                    ? value
+                      ? value.length === 0
+                        ? false
+                        : value.every((v) => (v ? isUUID(v) : false))
+                      : false
+                    : true;
                 });
               break;
             }

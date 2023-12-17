@@ -1,5 +1,6 @@
 import { capitalize } from 'lodash';
 import { GlobalContext } from 'stories/lib/GlobalContext';
+import { members } from 'stories/lib/mockData';
 import { v4 } from 'uuid';
 
 import { formFieldTypes } from 'components/common/form/constants';
@@ -128,7 +129,7 @@ export function FormFieldsInputsDisplay() {
               break;
             }
             case 'person': {
-              value = 'John Doe';
+              value = [members[0].id];
               break;
             }
             default: {
