@@ -130,14 +130,18 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const { space } = useCurrentSpace();
 
+  const nonDefaultMemberProperties = useMemo(() => {
+    return memberProperties
+      .filter((p) => NON_DEFAULT_MEMBER_PROPERTIES.includes(p.type))
+      .map((p) => ({
+        ...p,
+        id: p.memberPropertyId
+      }));
+  }, [memberProperties]);
+
   const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit, setValue } =
     useFormFields({
-      fields: memberProperties
-        .filter((p) => NON_DEFAULT_MEMBER_PROPERTIES.includes(p.type))
-        .map((p) => ({
-          ...p,
-          id: p.memberPropertyId
-        })),
+      fields: nonDefaultMemberProperties,
       onSubmit: async (values) => {
         if (space) {
           await updateSpaceValues(

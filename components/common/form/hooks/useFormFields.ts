@@ -1,6 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -22,6 +22,7 @@ export function useFormFields({
   }[];
   onSubmit: (values: FieldValues) => void;
 }) {
+  const [formInitialized, setFormInitialized] = useState(false);
   const {
     control,
     formState: { isValid, errors, isDirty, isSubmitting },
@@ -121,6 +122,9 @@ export function useFormFields({
   const values = getValues();
 
   useEffect(() => {
+    if (formInitialized) {
+      return;
+    }
     const defaultValues = fields.reduce<Record<string, string | string[]>>((acc, prop) => {
       acc[prop.id] =
         prop.type === 'multiselect' || prop.type === 'person'
@@ -133,7 +137,8 @@ export function useFormFields({
 
     reset(defaultValues);
     trigger();
-  }, [fields, reset, trigger]);
+    setFormInitialized(true);
+  }, [fields, reset, trigger, formInitialized]);
 
   function onFormChange(updatedFields: { id: string; value: string | string[] | Prisma.JsonValue }[]) {
     updatedFields.forEach((updatedField) => {
