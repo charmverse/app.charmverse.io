@@ -4,6 +4,7 @@ import { Controller } from 'react-hook-form';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { useRequiredMemberProperties } from 'components/members/hooks/useRequiredMemberProperties';
+import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberCollections } from '../../../../../../hooks/useMemberCollections';
@@ -50,30 +51,35 @@ export function MemberPropertiesForm({
   return (
     <Box>
       <Box display='flex' flexDirection='column'>
-        {memberProperties?.map((property) => (
-          <Controller
-            key={property.memberPropertyId}
-            name={property.memberPropertyId}
-            control={control}
-            render={({ field }) => (
-              <FieldTypeRenderer
-                {...field}
-                type={property.type}
-                label={property.name}
-                options={property.options}
-                error={errors[property.memberPropertyId] as any}
-                onCreateOption={(option) => createOption(property, option)}
-                onUpdateOption={(option) => updateOption(property, option)}
-                onDeleteOption={(option) => deleteOption(property, option)}
-                required={property.required}
-                onChange={(e) => {
-                  field.onChange(e);
-                  handleOnChange(property.memberPropertyId, typeof e?.target?.value === 'string' ? e.target.value : e);
-                }}
-              />
-            )}
-          />
-        ))}
+        {memberProperties
+          ?.filter((mp) => !DEFAULT_MEMBER_PROPERTIES.includes(mp.type))
+          ?.map((property) => (
+            <Controller
+              key={property.memberPropertyId}
+              name={property.memberPropertyId}
+              control={control}
+              render={({ field }) => (
+                <FieldTypeRenderer
+                  {...field}
+                  type={property.type}
+                  label={property.name}
+                  options={property.options}
+                  error={errors[property.memberPropertyId] as any}
+                  onCreateOption={(option) => createOption(property, option)}
+                  onUpdateOption={(option) => updateOption(property, option)}
+                  onDeleteOption={(option) => deleteOption(property, option)}
+                  required={property.required}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleOnChange(
+                      property.memberPropertyId,
+                      typeof e?.target?.value === 'string' ? e.target.value : e
+                    );
+                  }}
+                />
+              )}
+            />
+          ))}
       </Box>
       {showCollectionOptions && (
         <Stack gap={3}>
