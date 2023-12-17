@@ -42,7 +42,7 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
       return [
         ...prev,
         {
-          type: 'text',
+          type: 'short_text',
           name: 'Title',
           description: '',
           index: prev.length,

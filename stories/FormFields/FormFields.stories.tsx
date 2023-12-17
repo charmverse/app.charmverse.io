@@ -21,7 +21,7 @@ export function FormFieldsEditor() {
             options: [],
             private: false,
             required: true,
-            type: 'text'
+            type: 'short_text'
           }
         ]}
       />
@@ -92,7 +92,7 @@ export function FormFieldsInputsDisplay() {
               value = 'Label';
               break;
             }
-            case 'text_multiline': {
+            case 'long_text': {
               value = 'This is a multiline text';
               break;
             }
@@ -120,7 +120,7 @@ export function FormFieldsInputsDisplay() {
               value = options[0].id;
               break;
             }
-            case 'text': {
+            case 'short_text': {
               value = 'This is a text';
               break;
             }

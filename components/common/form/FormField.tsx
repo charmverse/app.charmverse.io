@@ -1,4 +1,4 @@
-import { type ProposalFormFieldType } from '@charmverse/core/prisma-client';
+import { type FormFieldType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
@@ -55,11 +55,11 @@ function ExpandedFormField({
   return (
     <>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-        <Select<ProposalFormFieldType>
+        <Select<FormFieldType>
           value={formField.type}
           onChange={(e) =>
             updateFormField({
-              type: e.target.value as ProposalFormFieldType
+              type: e.target.value as FormFieldType
             })
           }
           sx={{

@@ -1,4 +1,4 @@
-import type { ProposalFormFieldType } from '@charmverse/core/prisma-client';
+import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
@@ -14,8 +14,8 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import type { ReactNode } from 'react';
 
 export const formFieldTypes = [
-  'text',
-  'text_multiline',
+  'short_text',
+  'long_text',
   'number',
   'phone',
   'url',
@@ -28,7 +28,7 @@ export const formFieldTypes = [
   'label'
 ] as const;
 
-export const fieldTypeLabelRecord: Record<ProposalFormFieldType, string> = {
+export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
   email: 'Email',
   label: 'Label',
@@ -37,15 +37,15 @@ export const fieldTypeLabelRecord: Record<ProposalFormFieldType, string> = {
   person: 'Person',
   phone: 'Phone',
   select: 'Select',
-  text: 'Short Text',
-  text_multiline: 'Long Text',
+  short_text: 'Short Text',
+  long_text: 'Long Text',
   url: 'URL',
   wallet: 'Wallet Address'
 };
 
-export const fieldTypeIconRecord: Record<ProposalFormFieldType, ReactNode> = {
-  text: <ShortTextIcon fontSize='small' />,
-  text_multiline: <NotesIcon fontSize='small' />,
+export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
+  short_text: <ShortTextIcon fontSize='small' />,
+  long_text: <NotesIcon fontSize='small' />,
   number: <NumbersIcon fontSize='small' />,
   phone: <PhoneIcon fontSize='small' />,
   url: <LinkIcon fontSize='small' />,

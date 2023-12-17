@@ -1,12 +1,12 @@
-import type { MemberPropertyType, ProposalFormFieldType } from '@charmverse/core/prisma';
-import type { ProposalFormField } from '@charmverse/core/prisma-client';
+import type { MemberPropertyType, FormFieldType } from '@charmverse/core/prisma';
+import type { FormField } from '@charmverse/core/prisma-client';
 import type { SxProps } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 
 // TODO: We might need more generic types in the future
-export type FieldType = MemberPropertyType | ProposalFormFieldType;
+export type FieldType = MemberPropertyType | FormFieldType;
 
 export type ControlFieldProps = {
   onChange?: (value: any) => void;
@@ -35,9 +35,6 @@ export type FieldProps = {
   fieldWrapperSx?: SxProps;
 } & SelectFieldProps;
 
-export type FormFieldInput = Pick<
-  ProposalFormField,
-  'description' | 'name' | 'index' | 'required' | 'private' | 'type'
-> & {
+export type FormFieldInput = Pick<FormField, 'description' | 'name' | 'index' | 'required' | 'private' | 'type'> & {
   options?: SelectOptionType[];
 };

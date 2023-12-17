@@ -1,4 +1,4 @@
-import type { ProposalFormField } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { Controller } from 'react-hook-form';
@@ -24,7 +24,7 @@ export function FormFieldInputs({
   formFields,
   onSave
 }: {
-  formFields: (Pick<ProposalFormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
+  formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
     value: string | string[];
   })[];
   onSave?: (formFieldInputs: TFormFieldInput[]) => void;
