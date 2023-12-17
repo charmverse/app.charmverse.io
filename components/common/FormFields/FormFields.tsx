@@ -44,6 +44,32 @@ export function FormFields() {
     });
   }
 
+  function duplicateFormField(index: number) {
+    setFormFields((prev) => {
+      const newFormFields = [...prev];
+      newFormFields.splice(index, 0, {
+        ...newFormFields[index],
+        index: index + 1
+      });
+
+      return newFormFields.map((formField, i) => ({
+        ...formField,
+        index: i
+      }));
+    });
+  }
+
+  function deleteFormField(index: number) {
+    setFormFields((prev) => {
+      const newFormFields = [...prev];
+      newFormFields.splice(index, 1);
+      return newFormFields.map((formField, i) => ({
+        ...formField,
+        index: i
+      }));
+    });
+  }
+
   return (
     <Stack gap={1}>
       {formFields.map((formField, index) => (
@@ -53,6 +79,8 @@ export function FormFields() {
             updateFormField({ index, updatedFormField });
           }}
           key={`${formField.type}-${index.toString()}`}
+          onDuplicate={() => duplicateFormField(index)}
+          onDelete={() => deleteFormField(index)}
         />
       ))}
       <Button

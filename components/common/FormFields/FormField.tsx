@@ -1,11 +1,26 @@
 import { type ProposalFormFieldType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Divider, MenuItem, Select, Stack, Switch, TextField, Typography } from '@mui/material';
+import { MoreHoriz } from '@mui/icons-material';
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import {
+  Divider,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  MenuList,
+  Select,
+  Stack,
+  Switch,
+  TextField,
+  Typography
+} from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 
 import { NumberInputField } from '../form/fields/NumberInputField';
 import { SelectField } from '../form/fields/SelectField';
 import { TextInputField } from '../form/fields/TextInputField';
+import PopperPopup from '../PopperPopup';
 
 import { fieldTypeIconRecord, fieldTypeLabelRecord, formFieldTypes } from './constants';
 import type { ProposalFormFieldInput } from './interfaces';
@@ -69,36 +84,64 @@ function FormFieldInput({ type }: { type: ProposalFormFieldType }) {
 
 export function FormField({
   formField,
-  updateFormField
+  updateFormField,
+  onDuplicate,
+  onDelete
 }: {
   formField: ProposalFormFieldInput;
   updateFormField: (updatedFormField: Partial<ProposalFormFieldInput>) => void;
+  onDuplicate: VoidFunction;
+  onDelete: VoidFunction;
 }) {
   return (
     <FormFieldContainer>
-      <Select<ProposalFormFieldType>
-        value={formField.type}
-        onChange={(e) =>
-          updateFormField({
-            type: e.target.value as ProposalFormFieldType
-          })
-        }
-        sx={{
-          width: 'fit-content'
-        }}
-        variant='outlined'
-      >
-        {formFieldTypes.map((fieldType) => {
-          return (
-            <MenuItem key={fieldType} value={fieldType}>
-              <Stack flexDirection='row' gap={1} alignItems='center'>
-                {fieldTypeIconRecord[fieldType]}
-                {fieldTypeLabelRecord[fieldType]}
-              </Stack>
-            </MenuItem>
-          );
-        })}
-      </Select>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Select<ProposalFormFieldType>
+          value={formField.type}
+          onChange={(e) =>
+            updateFormField({
+              type: e.target.value as ProposalFormFieldType
+            })
+          }
+          sx={{
+            width: 'fit-content'
+          }}
+          variant='outlined'
+        >
+          {formFieldTypes.map((fieldType) => {
+            return (
+              <MenuItem key={fieldType} value={fieldType}>
+                <Stack flexDirection='row' gap={1} alignItems='center'>
+                  {fieldTypeIconRecord[fieldType]}
+                  {fieldTypeLabelRecord[fieldType]}
+                </Stack>
+              </MenuItem>
+            );
+          })}
+        </Select>
+        <PopperPopup
+          popupContent={
+            <MenuList>
+              <MenuItem onClick={onDuplicate}>
+                <ListItemIcon>
+                  <ContentCopyOutlinedIcon fontSize='small' />
+                </ListItemIcon>
+                <Typography variant='subtitle1'>Duplicate</Typography>
+              </MenuItem>
+              <MenuItem onClick={onDelete}>
+                <ListItemIcon>
+                  <DeleteOutlinedIcon fontSize='small' />
+                </ListItemIcon>
+                <Typography variant='subtitle1'>Delete</Typography>
+              </MenuItem>
+            </MenuList>
+          }
+        >
+          <IconButton size='small'>
+            <MoreHoriz fontSize='small' />
+          </IconButton>
+        </PopperPopup>
+      </Stack>
       <TextField
         value={formField.name}
         onChange={(e) => updateFormField({ name: e.target.value })}
@@ -132,7 +175,7 @@ export function FormField({
         <Typography variant='caption'>Authors must answer this question</Typography>
       </Stack>
 
-      <Stack my={1}>
+      <Stack>
         <Stack gap={0.5} flexDirection='row' alignItems='center'>
           <Switch
             size='small'
