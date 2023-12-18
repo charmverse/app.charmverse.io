@@ -58,7 +58,12 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
 
       case 'label': {
         return (
-          <Stack my={1}>
+          <Stack
+            my={1}
+            sx={{
+              ...fieldProps.fieldWrapperSx
+            }}
+          >
             <Box alignItems='center' display='flex' gap={1}>
               <FieldLabel noWrap>{fieldProps.label}</FieldLabel>
             </Box>

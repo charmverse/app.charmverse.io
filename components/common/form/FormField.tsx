@@ -195,6 +195,9 @@ export function FormField(
 
   const [{ canDrop, isOverCurrent }, drop] = useDrop<FormFieldInput, any, { canDrop: boolean; isOverCurrent: boolean }>(
     () => ({
+      canDrop(item) {
+        return item.id !== formField.id;
+      },
       accept: 'item',
       drop: async (droppedProperty, monitor) => {
         const didDrop = monitor.didDrop();
@@ -228,6 +231,7 @@ export function FormField(
     <Stack flexDirection='row' gap={1} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
       <div ref={drag}>
         <DragIndicatorIcon
+          color='secondary'
           sx={{
             cursor: 'pointer'
           }}
