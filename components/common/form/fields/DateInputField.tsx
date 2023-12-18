@@ -45,13 +45,16 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
           disabled={disabled}
           renderInput={(props) => (
             <TextField
-              placeholder={placeholder}
+              {...props}
               fullWidth
+              inputProps={{
+                ...props.inputProps,
+                placeholder
+              }}
               disabled={disabled}
               error={!!error}
               ref={ref}
               helperText={helperText}
-              {...props}
             />
           )}
         />

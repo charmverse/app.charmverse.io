@@ -163,12 +163,12 @@ export function InputSearchMemberMultiple({
     <InputSearchMemberBase
       filterSelectedOptions
       multiple
-      placeholder={props.placeholder ?? 'Select members'}
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
+      placeholder={defaultValue?.length !== 0 || value.length !== 0 ? undefined : props.placeholder ?? 'Select members'}
       options={members.filter((member) => !member.isBot)}
     />
   );

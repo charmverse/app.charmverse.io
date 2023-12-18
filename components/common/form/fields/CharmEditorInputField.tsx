@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import { forwardRef } from 'react';
 
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -9,6 +10,8 @@ type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: numb
 
 export const CharmEditorInputField = forwardRef<HTMLDivElement, Props>(
   ({ placeholder, fieldWrapperSx, error, ...inputProps }) => {
+    const theme = useTheme();
+
     return (
       <FieldWrapper sx={fieldWrapperSx} {...inputProps}>
         <CharmEditor
@@ -26,7 +29,8 @@ export const CharmEditorInputField = forwardRef<HTMLDivElement, Props>(
             left: 0,
             backgroundColor: 'var(--input-bg)',
             border: error ? '1px solid var(--text-red)' : '1px solid var(--input-border)',
-            minHeight: 150
+            minHeight: 150,
+            color: inputProps.disabled ? theme.palette.text.disabled : ''
           }}
         />
       </FieldWrapper>

@@ -6,6 +6,7 @@ import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isUUID, isUrl, isValidEmail } from 'lib/utilities/strings';
 
@@ -39,6 +40,8 @@ export function useFormFields({
             Array.isArray(prop.value)
             ? prop.value
             : []
+          : prop.type === 'short_text' || prop.type === 'long_text'
+          ? prop.value ?? emptyDocument
           : prop.value ?? '';
       return acc;
     }, {}),

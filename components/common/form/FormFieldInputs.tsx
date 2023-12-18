@@ -26,10 +26,11 @@ export function FormFieldInputs({
 }: {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
     value: Prisma.JsonValue;
+    placeholder?: string;
   })[];
   onSave?: (formFieldInputs: TFormFieldInput[]) => void;
 }) {
-  const { control, errors, isValid, isDirty, isSubmitting, onFormChange, onSubmit } = useFormFields({
+  const { control, errors, isValid, values, getValues, isDirty, isSubmitting, onFormChange, onSubmit } = useFormFields({
     fields: formFields,
     onSubmit: (_values) => {
       onSave?.(Object.entries(_values).map(([id, value]) => ({ id, value })));
@@ -47,6 +48,7 @@ export function FormFieldInputs({
             render={({ field }) => (
               <FieldTypeRenderer
                 {...field}
+                placeholder={formField.placeholder}
                 endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
                 description={formField.description ?? ''}
                 disabled={!onSave}
