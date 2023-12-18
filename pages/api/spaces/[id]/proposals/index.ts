@@ -1,13 +1,11 @@
 import type { ProposalPermissionsSwitch } from '@charmverse/core/dist/cjs/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation, type ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { permissionsApiClient } from 'lib/permissions/api/routers';
-import { getOldProposalStatus } from 'lib/proposal/getOldProposalStatus';
 import { mapDbProposalToProposalLite } from 'lib/proposal/mapDbProposalToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
