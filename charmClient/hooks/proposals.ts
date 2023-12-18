@@ -79,8 +79,8 @@ export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
 }
 
-export function usePublishProposalStatus({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<{ newStatus: ProposalStatus }>(`/api/proposals/${proposalId}/status`);
+export function useUpdateProposalStatusOnly({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ newStatus: 'draft' | 'published' }>(`/api/proposals/${proposalId}/status-only`);
 }
 
 export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {

@@ -5,7 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import MuiLink from '@mui/material/Link';
 import NextLink from 'next/link';
 import type { ComponentProps, ElementType, MouseEventHandler } from 'react';
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSubdomainPath } from 'lib/utilities/browser';
@@ -31,15 +31,35 @@ export type InputProps<C extends ElementType = ElementType> = ButtonProps &
 export const CharmedButton = forwardRef<HTMLButtonElement, InputProps<ElementType>>((_props, ref) => {
   const { children, loading, loadingMessage, disabledTooltip, disabled, ...props } = _props;
 
+  // add a small delay so we dont show and hide loading immediately
+  const [delayedLoading, setDelayedLoading] = useState(false);
+  const loadingTimeout = useRef<NodeJS.Timeout | undefined>();
+
+  useEffect(() => {
+    clearTimeout(loadingTimeout.current);
+    loadingTimeout.current = setTimeout(() => {
+      setDelayedLoading(true);
+    }, 300);
+
+    return () => clearTimeout(loadingTimeout.current);
+  }, [loading, setDelayedLoading]);
+
+  if (delayedLoading && props?.endIcon) {
+    props.endIcon = <StyledSpinner color='inherit' size={15} />;
+  }
+  if (delayedLoading && props?.startIcon) {
+    props.startIcon = <StyledSpinner color='inherit' size={15} />;
+  }
+
   const buttonComponent = (
-    <StyledButton ref={ref} {...props} disabled={loading || disabled}>
-      {loading && loadingMessage ? loadingMessage : children}
-      {loading && <StyledSpinner color='inherit' size={15} />}
+    <StyledButton ref={ref} {...props} disabled={delayedLoading || disabled}>
+      {delayedLoading && loadingMessage ? loadingMessage : children}
+      {delayedLoading && !props.endIcon && !props.startIcon && <StyledSpinner color='inherit' size={15} />}
     </StyledButton>
   );
   if (disabledTooltip) {
     return (
-      <Tooltip title={disabled ? disabledTooltip : ''}>
+      <Tooltip title={disabled ? disabledTooltip : ''} enterDelay={100}>
         <span>{buttonComponent}</span>
       </Tooltip>
     );

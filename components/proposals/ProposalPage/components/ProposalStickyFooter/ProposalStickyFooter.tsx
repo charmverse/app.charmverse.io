@@ -1,9 +1,17 @@
+import type { ProposalEvaluationType } from '@charmverse/core/prisma';
+import { Box } from '@mui/material';
+
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
+import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
+
+import { CompleteDraftButton } from './components/CompleteDraftButton';
 import { CompleteFeedbackButton } from './components/CompleteFeedbackButton';
-import { PublishDraftButton } from './components/PublishDraftButton';
+import { GoBackButton } from './components/GoBackButton';
+import { OpenEvaluationButton } from './components/OpenEvaluationButton';
+
+export type EvaluationTypeOrDraft = ProposalEvaluationType | 'draft';
 
 // Currently this is just used for proposals but there's no reason not to add logic for other page types here
 export function ProposalStickyFooter({
@@ -13,31 +21,51 @@ export function ProposalStickyFooter({
   proposal: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }) {
-  const isCharmVerse = useIsCharmverseSpace();
-  if (!isCharmVerse) {
-    return null;
-  }
-
   const currentEvaluation = proposal.evaluations.find((e) => e.id === proposal.currentEvaluationId);
+  const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === currentEvaluation?.id) ?? -1;
+
+  const previousStep = proposal.evaluations[currentEvaluationIndex - 1];
+  const nextStep = proposal.evaluations[currentEvaluationIndex + 1];
 
   // determine which buttons we need
-  let view: string | undefined;
-  if (currentEvaluation?.type === 'feedback') {
-    view = 'feedback';
+  let evaluationTypeOrDraft: EvaluationTypeOrDraft | undefined;
+  if (currentEvaluation) {
+    evaluationTypeOrDraft = currentEvaluation?.type;
   } else if (proposal?.status === 'draft') {
-    view = 'draft';
+    evaluationTypeOrDraft = 'draft';
   }
 
-  if (!view) {
+  const hasSidebarEvaluation = evaluationTypesWithSidebar.includes(evaluationTypeOrDraft as ProposalEvaluationType);
+
+  if (!evaluationTypeOrDraft) {
+    // this should never happen
     return null;
   }
 
   return (
     <StickyFooterContainer>
-      {view === 'draft' && <PublishDraftButton {...{ proposal, refreshProposal }} />}
-      {view === 'feedback' && (
-        <CompleteFeedbackButton {...{ proposal, evaluationId: proposal.currentEvaluationId, refreshProposal }} />
-      )}
+      <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
+        <GoBackButton
+          proposalId={proposal.id}
+          previousStep={previousStep}
+          isDraft={proposal.status === 'draft'}
+          disabled={!proposal.permissions.move}
+          onSubmit={refreshProposal}
+        />
+        {evaluationTypeOrDraft === 'draft' && (
+          <CompleteDraftButton proposalId={proposal.id} nextStep={nextStep} onSubmit={refreshProposal} />
+        )}
+        {evaluationTypeOrDraft === 'feedback' && (
+          <CompleteFeedbackButton nextStep={nextStep} proposalId={proposal.id} onSubmit={refreshProposal} />
+        )}
+        {hasSidebarEvaluation && (
+          <OpenEvaluationButton
+            disabled={!proposal.permissions.move}
+            isEvaluationSidebarOpen={false}
+            onClick={refreshProposal}
+          />
+        )}
+      </Box>
     </StickyFooterContainer>
   );
 }

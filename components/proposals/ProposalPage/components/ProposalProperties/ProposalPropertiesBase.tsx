@@ -15,7 +15,6 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
@@ -33,12 +32,12 @@ import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../../hooks/useProposalCategories';
+import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationSettings';
 
 import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
 import { ProposalRubricCriteriaInput } from './components/OldProposalRubricCriteriaInput';
 import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
-import { ProposalEvaluationSelect } from './components/ProposalEvaluationSelect';
 import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 

@@ -501,7 +501,7 @@ function DocumentPage({
             )}
           </Container>
         </Box>
-        {proposal && page.type === 'proposal' && (
+        {isCharmVerse && proposal && page.type === 'proposal' && (
           <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
         )}
       </PrimaryColumn>

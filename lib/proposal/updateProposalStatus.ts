@@ -12,6 +12,10 @@ import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { ProposalNotFoundError } from './errors';
 import type { ProposalWithUsersAndRubric } from './interface';
 
+/**
+ *
+ * @deprecated Use updateProposalStatusOnly instead
+ */
 export async function updateProposalStatus({
   proposalId,
   newStatus,
