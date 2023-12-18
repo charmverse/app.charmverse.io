@@ -21,6 +21,7 @@ import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
 import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
@@ -48,6 +49,8 @@ export function ProposalRewards({
   assignedSubmitters
 }: Props) {
   useRewardsNavigation(rewardQueryKey);
+  const { mappedFeatures } = useSpaceFeatures();
+  const rewardsTitle = mappedFeatures.rewards.title;
 
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
@@ -99,7 +102,7 @@ export function ProposalRewards({
       <Stack>
         <Stack flexDirection='row' alignItems='center' height='fit-content' flex={1} className='octo-propertyrow'>
           <PropertyLabel readOnly highlighted>
-            Reward
+            {rewardsTitle}
           </PropertyLabel>
 
           <Stack gap={0.5} flex={1}>
@@ -156,7 +159,7 @@ export function ProposalRewards({
     <Stack>
       <Stack flexDirection='row' alignItems='center' height='fit-content' flex={1} className='octo-propertyrow'>
         <PropertyLabel readOnly highlighted>
-          Reward
+          {rewardsTitle}
         </PropertyLabel>
         {!!pendingRewards?.length && (
           <Stack gap={0.5} flex={1}>
