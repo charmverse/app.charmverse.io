@@ -39,6 +39,8 @@ export function getTitle(page: DisplayedPage) {
       return 'Wallet Condition';
     case 'dao':
       return 'DAO Condition';
+    case 'unlock':
+      return 'Unlock Protocol Condition';
     default:
       return 'Select Condition';
   }

@@ -50,13 +50,6 @@ export function MemberPropertiesForm({
     onChange(updateData);
   }
 
-  function getPlaceholder(type: string) {
-    if (type === 'name') {
-      return membersRecord[userId]?.username;
-    }
-    return undefined;
-  }
-
   return (
     <Box>
       <Box display='flex' flexDirection='column'>
@@ -72,7 +65,6 @@ export function MemberPropertiesForm({
                 type={property.type}
                 label={property.name}
                 options={property.options}
-                placeholder={getPlaceholder(property.type)}
                 error={errors[property.memberPropertyId] as any}
                 onCreateOption={(option) => createOption(property, option)}
                 onUpdateOption={(option) => updateOption(property, option)}

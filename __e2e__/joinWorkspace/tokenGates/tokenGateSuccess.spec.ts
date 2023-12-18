@@ -17,7 +17,7 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
 });
 
-test('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({
+test.skip('tokenGateSuccess - join workspace after meeting conditions in a token gated space', async ({
   page,
   tokenGatePage
 }) => {

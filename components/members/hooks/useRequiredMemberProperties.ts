@@ -44,8 +44,6 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     const _requiredProperties =
       _memberProperties?.filter((p) => p.required && !['role', 'join_date', 'profile_pic'].includes(p.type)) ?? [];
 
-    const nameMemberProperty = _memberProperties?.find((p) => p.type === 'name');
-
     const _isTimezoneRequired = _requiredProperties.find((p) => p.type === 'timezone');
     const _isBioRequired = _requiredProperties.find((p) => p.type === 'bio');
     const _isTwitterRequired = _requiredProperties.find((p) => p.type === 'twitter');
@@ -55,7 +53,6 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord');
     const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet');
     const _isTelegramRequired = _requiredProperties.find((p) => p.type === 'telegram');
-    const _isNameRequired = _requiredProperties.find((p) => p.type === 'name');
 
     const userDetailsSocial = userDetails?.social as Social;
 
@@ -66,10 +63,6 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
           !DEFAULT_MEMBER_PROPERTIES.includes(rp.type)
       )
       .map((p) => p.memberPropertyId);
-
-    if (nameMemberProperty && _isNameRequired && !nameMemberProperty.value) {
-      requiredPropertiesWithoutValue.push('name');
-    }
 
     if (userDetails && _isTimezoneRequired && !userDetails.timezone) {
       requiredPropertiesWithoutValue.push('timezone');
@@ -148,7 +141,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     resolver: yupResolver(
       yup.object(
         memberProperties.reduce((acc, property) => {
-          if (!['name', ...NON_DEFAULT_MEMBER_PROPERTIES].includes(property.type)) {
+          if (!NON_DEFAULT_MEMBER_PROPERTIES.includes(property.type)) {
             return acc;
           }
 
@@ -185,7 +178,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
       return;
     }
     const defaultValues = memberProperties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-      if (['name', ...NON_DEFAULT_MEMBER_PROPERTIES].includes(prop.type)) {
+      if (NON_DEFAULT_MEMBER_PROPERTIES.includes(prop.type)) {
         acc[prop.memberPropertyId] = prop.value;
       }
       return acc;
@@ -245,7 +238,6 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   const {
     formState: { errors, isValid, isDirty, isSubmitting },
-    watch,
     setValue,
     handleSubmit,
     getValues,
@@ -275,7 +267,17 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
 
   useEffect(() => {
     if (!isLoadingUserDetails) {
-      reset(userDetails);
+      reset({
+        ...userDetails,
+        social:
+          userDetails.social === null
+            ? {
+                twitterURL: '',
+                githubURL: '',
+                linkedinURL: ''
+              }
+            : userDetails.social
+      });
     }
   }, [isLoadingUserDetails]);
 

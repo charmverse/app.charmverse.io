@@ -13,6 +13,7 @@ export type UpdateableSpaceFields = Partial<
     | 'domain'
     | 'name'
     | 'spaceImage'
+    | 'spaceArtwork'
     | 'features'
     | 'memberProfiles'
     | 'notificationToggles'
@@ -61,6 +62,7 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       domain,
       name: updates.name,
       spaceImage: updates.spaceImage,
+      spaceArtwork: updates.spaceArtwork,
       hiddenFeatures: updates.hiddenFeatures,
       notificationToggles: updates.notificationToggles as any,
       features: updates.features as any,

@@ -19739,7 +19739,7 @@
         "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
         "name": "Name",
-        "type": "name",
+        "type": "text",
         "options": null,
         "index": 1,
         "enabledViews": [

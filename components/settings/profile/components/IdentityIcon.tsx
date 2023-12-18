@@ -78,6 +78,30 @@ export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | n
     case 'VerifiedEmail':
       return <EmailIcon style={{ height, width }} />;
 
+    case 'Lens': {
+      return (
+        <img
+          src='/images/logos/lens_logo.svg'
+          style={{
+            width,
+            height
+          }}
+        />
+      );
+    }
+
+    case 'Farcaster': {
+      return (
+        <img
+          src='/images/logos/farcaster_logo.png'
+          style={{
+            width,
+            height
+          }}
+        />
+      );
+    }
+
     case 'RandomName':
     default:
       return <PersonIcon style={{ color: '#777', height, width }} />;

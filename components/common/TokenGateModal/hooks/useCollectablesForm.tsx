@@ -20,12 +20,12 @@ const schema = yup.object({
     .oneOf(collectableOptionIds, 'Invalid collectable option')
     .test('empty-collectable-option-check', 'Selection is required', (option) => !!option),
   chain: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
     then: () => yup.string().required('Chain is required'),
     otherwise: () => yup.string()
   }),
   contract: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
     then: () =>
       yup
         .string()

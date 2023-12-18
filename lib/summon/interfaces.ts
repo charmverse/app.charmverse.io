@@ -18,8 +18,8 @@ export type SummonUserInventory = {
   id: string;
   user: string;
   meta: {
-    achievements: any[];
-    trophies: any[];
+    achievements: any[] | number;
+    trophies: any[] | number;
     xp: number; // ex: 2761
     rank: number; // ex: 3.519999999999
     rankName: string; // ex: 'mighty mouse';

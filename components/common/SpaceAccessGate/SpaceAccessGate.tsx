@@ -104,6 +104,14 @@ export function SpaceAccessGate({
 
   const noGateConditions = !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled;
 
+  const hasRoles = tokenGate.tokenGateResult?.eligibleGates
+    ?.map((gate) => gate.tokenGateId)
+    .some((id) =>
+      tokenGate.tokenGates?.find((tk) => {
+        return tk.id === id && tk.tokenGateToRoles.length > 0;
+      })
+    );
+
   return (
     <>
       <SpaceBanModal
@@ -170,9 +178,7 @@ export function SpaceAccessGate({
         ) : (
           <Alert severity='success'>
             You can join this space.{' '}
-            {tokenGate.tokenGateResult?.roles.length > 0
-              ? 'You will also receive the roles attached to each condition you passed.'
-              : ''}
+            {hasRoles ? 'You will also receive the roles attached to each condition you passed.' : ''}
           </Alert>
         ))}
 

@@ -38,10 +38,10 @@ function ConnectedAccount({
   loading?: boolean;
 }) {
   return (
-    <Stack gap={1} width={275}>
+    <Stack gap={1} minWidth={275} width='fit-content'>
       <FieldWrapper label={label} required={required}>
         <Button loading={loading} onClick={onClick} color='secondary' variant='outlined' disabled={disabled}>
-          <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%'>
+          <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%' gap={2}>
             {children}
             {!loading ? icon : null}
           </Stack>
