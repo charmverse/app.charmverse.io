@@ -267,7 +267,7 @@
     "@depay/web3-mock": "^13.18.1",
     "@lit-protocol/types": "^2.2.61",
     "@next/eslint-plugin-next": "^13.5.6",
-    "@playwright/test": "^1.39.0",
+    "@playwright/test": "^1.40.1",
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-interactions": "^7.5.3",
     "@storybook/addon-links": "^7.5.3",

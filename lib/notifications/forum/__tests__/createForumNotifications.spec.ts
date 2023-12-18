@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { assignRole } from 'lib/roles';
 import { getPostEntity, getSpaceEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -54,7 +54,7 @@ describe(`Test forum events and notifications`, () => {
       name: 'Post Moderator'
     });
 
-    await premiumPermissionsApiClient.forum.upsertPostCategoryPermission({
+    await permissionsApiClient.forum.upsertPostCategoryPermission({
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id,
       assignee: {
