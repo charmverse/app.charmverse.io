@@ -192,7 +192,7 @@ function DocumentPage({
 
   const openEvaluation = useCallback(
     (evaluationId?: string) => {
-      if (evaluationId) {
+      if (evaluationId || !isCharmVerse) {
         if (activeEvaluationId === evaluationId) {
           // close the sidebar if u click on the active step
           closeSidebar();

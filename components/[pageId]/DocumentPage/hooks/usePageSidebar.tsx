@@ -13,7 +13,7 @@ export type IPageSidebarContext = {
   setActiveView: (view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) => void;
   isInsideDialog?: boolean;
   closeSidebar: () => void;
-  openEvaluationSidebar: (evaluationId: string) => void;
+  openEvaluationSidebar: (evaluationId?: string) => void;
   persistedActiveView: Record<string, PageSidebarView | null> | null;
   persistActiveView: Dispatch<SetStateAction<Record<string, PageSidebarView | null> | null>>;
 };
@@ -60,7 +60,8 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  function openEvaluationSidebar(evaluationId: string) {
+  // note: evaluationId is optional to support the old proposal flow.
+  function openEvaluationSidebar(evaluationId?: string) {
     _setActiveView('proposal_evaluation', evaluationId);
   }
 

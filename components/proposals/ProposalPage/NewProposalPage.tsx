@@ -199,7 +199,9 @@ export function NewProposalPage({
   }
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
-  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>('proposal_evaluation_settings');
+  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
+    isCharmVerse ? 'proposal_evaluation_settings' : null
+  );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
   useEffect(() => {
