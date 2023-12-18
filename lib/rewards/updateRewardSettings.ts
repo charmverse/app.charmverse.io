@@ -75,7 +75,7 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
         rewardToken: updateContent.rewardToken,
         allowMultipleApplications: isAssignedReward ? false : updateContent.allowMultipleApplications,
         approveSubmitters: isAssignedReward ? false : updateContent.approveSubmitters,
-        maxSubmissions: isAssignedReward ? updateContent.assignedSubmitters?.length : updateContent.maxSubmissions,
+        maxSubmissions: isAssignedReward ? 1 : updateContent.maxSubmissions,
         fields: updateContent.fields as any
       },
       select: { id: true }

@@ -1,22 +1,20 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
-import { Box, Stack, TextField, Typography } from '@mui/material';
+import { Box, Stack, TextField } from '@mui/material';
 import type { CryptoCurrency } from 'connectors/chains';
 import { getChainById } from 'connectors/chains';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
-import TokenLogo from 'components/common/TokenLogo';
+import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardTokenSelect } from 'components/rewards/components/RewardProperties/components/RewardTokenSelect';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { getTokenInfo } from 'lib/tokens/tokenData';
 import { isTruthy } from 'lib/utilities/types';
 
 export type RewardTokenDetails = {
@@ -56,17 +54,6 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
       rewardAmount: currentReward?.rewardAmount || undefined
     }
   });
-
-  const tokenInfo =
-    (!!currentReward &&
-      !!currentReward.chainId &&
-      !!currentReward.rewardToken &&
-      getTokenInfo({
-        chainId: currentReward?.chainId,
-        symbolOrAddress: currentReward?.rewardToken,
-        methods: paymentMethods
-      })) ||
-    null;
 
   const watchChainId = watch('chainId');
 
@@ -137,34 +124,14 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
     return null;
   }
 
-  const currentChain = currentReward.chainId && getChainById(currentReward.chainId);
-
   return (
     <>
       <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={openTokenSettings}>
-        {tokenInfo ? (
-          <Stack direction='row'>
-            <Box
-              component='span'
-              sx={{
-                width: 25,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
-            </Box>
-
-            <Typography component='span' variant='subtitle1' fontWeight='normal'>
-              {currentReward.rewardAmount}
-            </Typography>
-            <Typography ml={0.5} component='span' variant='subtitle1' fontWeight='normal'>
-              {tokenInfo.tokenSymbol?.toUpperCase()} {currentChain ? `(${currentChain.chainName})` : ''}
-            </Typography>
-          </Stack>
-        ) : (
-          <EmptyPlaceholder>Empty</EmptyPlaceholder>
-        )}
+        <RewardTokenInfo
+          chainId={currentReward.chainId}
+          symbolOrAddress={currentReward.rewardToken}
+          rewardAmount={currentReward.rewardAmount}
+        />
       </SelectPreviewContainer>
 
       <Dialog

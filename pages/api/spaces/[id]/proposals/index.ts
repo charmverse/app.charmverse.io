@@ -1,11 +1,13 @@
-import type { ProposalPermissionsSwitch } from '@charmverse/core/dist/cjs/permissions';
+import type { ProposalPermissionsSwitch } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest, ProposalWithUsers } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
+import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -40,10 +42,11 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
     include: {
       authors: true,
       reviewers: true,
-      category: true
+      category: true,
+      rewards: true
     }
   });
 
-  return res.status(200).json(proposals);
+  return res.status(200).json(proposals.map(mapDbProposalToProposal));
 }
 export default withSessionRoute(handler);

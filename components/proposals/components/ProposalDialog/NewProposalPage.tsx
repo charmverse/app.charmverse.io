@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -38,7 +38,7 @@ type Props = {
   contentUpdated: boolean;
 };
 
-const StyledContainer = styled(Container)`
+const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
 

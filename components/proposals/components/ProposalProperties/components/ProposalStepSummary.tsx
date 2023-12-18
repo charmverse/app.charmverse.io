@@ -1,12 +1,13 @@
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
-import { ArrowBackIos } from '@mui/icons-material';
+import { ArrowBackIos, Create } from '@mui/icons-material';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import { Stack, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 
 import { Button } from 'components/common/Button';
+import { CreateProposalRewardsButton } from 'components/proposals/components/ProposalRewards/CreateProposalRewardsButton';
 import {
   proposalStatusDetails,
   getProposalStatuses,
@@ -19,6 +20,8 @@ type Props = {
   handleProposalStatusUpdate: (newStatus: ProposalStatus) => Promise<void>;
   archived?: boolean | null;
   evaluationType?: ProposalEvaluationType;
+  canCreateRewards?: boolean;
+  proposalId?: string;
 };
 
 export function ProposalStepSummary({
@@ -26,7 +29,9 @@ export function ProposalStepSummary({
   proposalFlowFlags,
   handleProposalStatusUpdate,
   archived,
-  evaluationType
+  evaluationType,
+  canCreateRewards,
+  proposalId
 }: Props) {
   const statuses = getProposalStatuses(evaluationType);
   const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
@@ -82,6 +87,8 @@ export function ProposalStepSummary({
               {PROPOSAL_STATUS_LABELS[nextStatus]}
             </Button>
           )}
+
+          {!nextStatus && canCreateRewards && proposalId && <CreateProposalRewardsButton proposalId={proposalId} />}
         </Stack>
       </Stack>
     </Stack>

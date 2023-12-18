@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import {
-  useGetAllReviewerUserIds,
+  useGetIsReviewer,
   useGetProposalDetails,
   useGetProposalFlowFlags,
   useUpsertRubricCriteria
@@ -64,16 +64,14 @@ export function ProposalProperties({
 
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
-  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
-    !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
-  );
+  const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
   const { data: proposalFlowFlags, mutate: refreshProposalFlowFlags } = useGetProposalFlowFlags(proposalId);
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
-  const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
+
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
   const isTemplate = proposalPage.type === 'proposal_template';
   const sourceTemplate = isFromTemplateSource
@@ -83,14 +81,17 @@ export function ProposalProperties({
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
     !isAdmin && sourceTemplate?.fields
-      ? Object.entries((sourceTemplate?.fields as ProposalFields).properties)?.reduce((acc, [key, value]) => {
-          if (!value) {
-            return acc;
-          }
+      ? Object.entries((sourceTemplate?.fields as unknown as ProposalFields).properties)?.reduce(
+          (acc, [key, value]) => {
+            if (!value) {
+              return acc;
+            }
 
-          acc.push(key);
-          return acc;
-        }, [] as string[])
+            acc.push(key);
+            return acc;
+          },
+          [] as string[]
+        )
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
@@ -204,6 +205,8 @@ export function ProposalProperties({
         readOnlyCustomProperties={readOnlyCustomProperties}
         isEvaluationSidebarOpen={isEvaluationSidebarOpen}
         openEvaluation={openEvaluation}
+        isReviewer={isReviewer}
+        rewardIds={proposal?.rewardIds}
       />
       {isPublishingToLens && (
         <CreateLensPublication

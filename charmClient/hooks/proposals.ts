@@ -33,6 +33,9 @@ export function useGetAllReviewerUserIds(proposalId: MaybeString) {
   return useGET<string[]>(proposalId ? `/api/proposals/${proposalId}/get-user-reviewerids` : null);
 }
 
+export function useGetIsReviewer(proposalId: MaybeString) {
+  return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
+}
 export function useGetReviewerPool(categoryId: MaybeString) {
   return useGET<ProposalReviewerPool>(categoryId ? `/api/proposals/reviewer-pool?resourceId=${categoryId}` : null);
 }
@@ -103,4 +106,8 @@ export function useUpdateProposalBlocks(spaceId: string) {
 
 export function useDeleteProposalBlocks(spaceId: string) {
   return useDELETE<string[]>(`/api/spaces/${spaceId}/proposals/blocks`);
+}
+
+export function useCreateProposalRewards(proposalId: string) {
+  return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
 }

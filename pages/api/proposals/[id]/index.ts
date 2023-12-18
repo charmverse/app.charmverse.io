@@ -7,6 +7,7 @@ import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { updateProposal } from 'lib/proposal/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -38,6 +39,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       },
       authors: true,
       reviewers: true,
+      rewards: true,
       category: true,
       page: { select: { sourceTemplateId: true } }
     }
@@ -74,7 +76,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     proposal.rubricAnswers = [];
   }
 
-  return res.status(200).json(proposal as unknown as ProposalWithUsersAndRubric);
+  return res.status(200).json(mapDbProposalToProposal(proposal));
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {

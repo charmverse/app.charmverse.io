@@ -42,9 +42,14 @@ type Props = {
   addPageFromTemplate?: (templateId: string) => void;
   selectedTemplate?: RewardTemplate | null;
   resetTemplate?: VoidFunction;
+  forcedApplicationType?: RewardApplicationType;
 };
 
-const getApplicationType = (values: UpdateableRewardFields) => {
+const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
+  if (forcedApplicationType) {
+    return forcedApplicationType;
+  }
+
   let applicationType: RewardApplicationType = values?.approveSubmitters ? 'application_required' : 'direct_submission';
 
   if (values?.assignedSubmitters?.length) {
@@ -65,10 +70,11 @@ export function RewardPropertiesForm({
   expandedByDefault,
   addPageFromTemplate,
   selectedTemplate,
-  resetTemplate
+  resetTemplate,
+  forcedApplicationType
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
-    getApplicationType(values)
+    getApplicationType(values, forcedApplicationType)
   );
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
@@ -79,7 +85,6 @@ export function RewardPropertiesForm({
   }));
 
   const isAssignedReward = rewardApplicationType === 'assigned';
-
   const { templates: rewardTemplates = [] } = useRewardTemplates();
 
   const setRewardApplicationType = useCallback((updatedType: RewardApplicationType) => {
@@ -149,7 +154,6 @@ export function RewardPropertiesForm({
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {
     applyUpdates({
       assignedSubmitters: submitters,
-      maxSubmissions: submitters.length,
       approveSubmitters: false,
       allowMultipleApplications: false
     });
@@ -284,7 +288,7 @@ export function RewardPropertiesForm({
                 Application Type
               </PropertyLabel>
               <RewardApplicationType
-                readOnly={readOnly}
+                readOnly={readOnly || !!forcedApplicationType}
                 value={rewardApplicationType}
                 onChange={setRewardApplicationType}
               />
