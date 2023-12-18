@@ -28,8 +28,7 @@ export function AttachRewardButton({
 }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
 
-  const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
-    useNewReward();
+  const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
 
   function closeDialog() {
     clearRewardValues();
