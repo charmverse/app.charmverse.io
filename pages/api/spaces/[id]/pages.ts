@@ -1,5 +1,6 @@
+import type { ProposalPermissionsSwitch } from '@charmverse/core/dist/cjs/permissions';
 import { log } from '@charmverse/core/log';
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta, PagesRequest } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -8,38 +9,64 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'space'
-    })
-  )
-  .get(getPages);
+handler.get(getPages);
 
 async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
-  const spaceId = req.query.id as string;
-  const archived = req.query.archived === 'true';
   const userId = req.session?.user?.id;
-  const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : undefined;
-  const search = typeof req.query.search === 'string' ? req.query.search : undefined;
 
-  const accessiblePages = await req.basePermissionsClient.pages.getAccessiblePages({
+  const spaceId = req.query.id as string;
+  const { archived, limit, search, useProposalEvaluationPermissions } = req.query as any as PagesRequest &
+    ProposalPermissionsSwitch;
+
+  const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
     userId,
     archived,
     limit,
-    search
+    search,
+    useProposalEvaluationPermissions
   });
 
-  accessiblePages.forEach((page) => {
+  const pages: PageMeta[] = await prisma.page.findMany({
+    where: {
+      spaceId,
+      id: {
+        in: accessiblePageIds
+      }
+    },
+    select: {
+      id: true,
+      deletedAt: true,
+      deletedBy: true,
+      createdAt: true,
+      createdBy: true,
+      updatedAt: true,
+      updatedBy: true,
+      title: true,
+      headerImage: true,
+      icon: true,
+      path: true,
+      parentId: true,
+      spaceId: true,
+      type: true,
+      boardId: true,
+      index: true,
+      cardId: true,
+      proposalId: true,
+      bountyId: true,
+      hasContent: true,
+      galleryImage: true,
+      syncWithPageId: true
+    }
+  });
+
+  pages.forEach((page) => {
     page.galleryImage = replaceS3Domain(page.galleryImage);
     page.headerImage = replaceS3Domain(page.headerImage);
     page.icon = replaceS3Domain(page.icon);
@@ -47,7 +74,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
 
   const createdPages: PageMeta[] = [];
 
-  if (accessiblePages.length === 0 && !search) {
+  if (pages.length === 0 && !search) {
     const totalPages = await prisma.page.count({
       where: {
         spaceId
@@ -62,7 +89,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
         }) as Prisma.PageUncheckedCreateInput
       });
 
-      await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+      await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
         event: 'created',
         pageId: createdPage.id
       });
@@ -72,7 +99,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     }
   }
 
-  return res.status(200).json([...accessiblePages, ...createdPages]);
+  return res.status(200).json(pages.length ? pages : createdPages);
 }
 
 export default withSessionRoute(handler);

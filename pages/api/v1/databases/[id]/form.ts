@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { apiHandler } from 'lib/public-api/handler';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
@@ -48,7 +48,7 @@ export async function createFormResponse(req: NextApiRequest, res: NextApiRespon
     userId: req.botUser.id
   });
 
-  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+  await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
     event: 'created',
     pageId: card.id
   });

@@ -16,6 +16,7 @@ import { isTruthy } from 'lib/utilities/types';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
+import { useIsCharmverseSpace } from './useIsCharmverseSpace';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -55,6 +56,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
   const dispatch = useAppDispatch();
+  const useProposalEvaluationPermissions = useIsCharmverseSpace();
   const { sendMessage, subscribe } = useWebSocketClient();
   const pagesDispatched = useRef(false);
   const {
@@ -68,7 +70,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         return {};
       }
 
-      const pagesRes = await charmClient.pages.getPages(currentSpace.id);
+      const pagesRes = await charmClient.pages.getPages({ spaceId: currentSpace.id, useProposalEvaluationPermissions });
       const pagesDict: PagesContext['pages'] = {};
       pagesRes?.forEach((page) => {
         pagesDict[page.id] = page;
