@@ -175,11 +175,9 @@ export async function createProposal({
       }
     }),
     prisma.proposalReviewer.createMany({
-      // we dont save evaluations as part of the template, since they link to workflow id instead
       data: reviewersInput
     }),
     prisma.proposalEvaluationPermission.createMany({
-      // we dont save evaluations as part of the template, since they link to workflow id instead
       data: pageProps?.type === 'proposal_template' ? [] : evaluationPermissionsToCreate
     }),
     createPage({

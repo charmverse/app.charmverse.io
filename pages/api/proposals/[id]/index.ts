@@ -60,6 +60,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
+  // TODO: use Mo's new core permissions client
   const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
