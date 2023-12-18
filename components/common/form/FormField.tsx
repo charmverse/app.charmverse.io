@@ -5,6 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown';
 import ChevronRightIcon from '@mui/icons-material/ArrowRight';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   Chip,
   Divider,
@@ -18,6 +19,9 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { useDrag, useDrop } from 'react-dnd';
+
+import { mergeRefs } from 'lib/utilities/react';
 
 import PopperPopup from '../PopperPopup';
 
@@ -26,16 +30,23 @@ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import type { FormFieldInput } from './interfaces';
 
-const FormFieldContainer = styled(Stack)`
-  border: 1px solid ${(props) => props.theme.palette.divider};
+const FormFieldContainer = styled(Stack)<{ dragDirection?: 'top' | 'bottom' }>`
+  border: 1px solid ${({ theme }) => theme.palette.divider};
+  box-shadow: ${({ dragDirection, theme }) =>
+    dragDirection === 'top'
+      ? `0px -2px 0px ${theme.palette.action.focus}`
+      : dragDirection === 'bottom'
+      ? `0px 2px 0px ${theme.palette.action.focus}`
+      : ''};
   padding: ${(props) => props.theme.spacing(1)};
   gap: ${(props) => props.theme.spacing(1)};
   flex-direction: row;
   align-items: flex-start;
+  width: 100%;
 `;
 
 export interface FormFieldProps {
-  updateFormField: (updatedFormField: Partial<FormFieldInput>) => void;
+  updateFormField: (updatedFormField: Partial<FormFieldInput> & { id: string }) => void;
   onDuplicate: VoidFunction;
   onDelete: VoidFunction;
   toggleOpen: VoidFunction;
@@ -61,7 +72,8 @@ function ExpandedFormField({
           value={formField.type}
           onChange={(e) =>
             updateFormField({
-              type: e.target.value as FormFieldType
+              type: e.target.value as FormFieldType,
+              id: formField.id
             })
           }
           sx={{
@@ -106,13 +118,13 @@ function ExpandedFormField({
       </Stack>
       <TextField
         value={formField.name}
-        onChange={(e) => updateFormField({ name: e.target.value })}
+        onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
         placeholder='Title'
         error={!formField.name}
       />
       <TextField
         value={formField.description}
-        onChange={(e) => updateFormField({ description: e.target.value })}
+        onChange={(e) => updateFormField({ description: e.target.value, id: formField.id })}
         sx={{
           backgroundColor: 'background.light',
           border: 'none'
@@ -143,7 +155,7 @@ function ExpandedFormField({
           <Switch
             size='small'
             checked={formField.required}
-            onChange={(e) => updateFormField({ required: e.target.checked })}
+            onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
           />
           <Typography>Required</Typography>
         </Stack>
@@ -154,7 +166,7 @@ function ExpandedFormField({
           <Switch
             size='small'
             checked={formField.private}
-            onChange={(e) => updateFormField({ private: e.target.checked })}
+            onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
           />
           <Typography>Private</Typography>
         </Stack>
@@ -169,34 +181,84 @@ export function FormField(
     isOpen?: boolean;
   }
 ) {
-  const { isOpen, formField, toggleOpen } = props;
+  const { isOpen, formField, toggleOpen, updateFormField } = props;
+
+  const [{ offset }, drag, dragPreview] = useDrag(() => ({
+    type: 'item',
+    item: formField,
+    collect(monitor) {
+      return {
+        offset: monitor.getDifferenceFromInitialOffset()
+      };
+    }
+  }));
+
+  const [{ canDrop, isOverCurrent }, drop] = useDrop<FormFieldInput, any, { canDrop: boolean; isOverCurrent: boolean }>(
+    () => ({
+      accept: 'item',
+      drop: async (droppedProperty, monitor) => {
+        const didDrop = monitor.didDrop();
+        if (didDrop) {
+          return;
+        }
+        updateFormField({
+          index: formField.index,
+          id: droppedProperty.id
+        });
+      },
+      collect: (monitor) => {
+        let canDropItem: boolean = true;
+        try {
+          canDropItem = monitor.canDrop();
+        } catch {
+          canDropItem = false;
+        }
+        return {
+          isOverCurrent: monitor.isOver({ shallow: true }),
+          canDrop: canDropItem
+        };
+      }
+    }),
+    [formField]
+  );
+
+  const isAdjacentActive = canDrop && isOverCurrent;
 
   return (
-    <FormFieldContainer>
-      {isOpen ? (
-        <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
-      ) : (
-        <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
-      )}
-      <Stack gap={1} width='100%'>
-        {!isOpen ? (
-          <FieldTypeRenderer
-            fieldWrapperSx={{
-              my: 0
-            }}
-            endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
-            type={formField.type as any}
-            description={formField.description ?? ''}
-            disabled
-            label={formField.name}
-            required={formField.required}
-            options={formField.options}
-            placeholder={formField.type === 'date' ? new Date().toString() : 'Your answer'}
-          />
+    <Stack flexDirection='row' gap={1} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
+      <div ref={drag}>
+        <DragIndicatorIcon
+          sx={{
+            cursor: 'pointer'
+          }}
+        />
+      </div>
+      <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
+        {isOpen ? (
+          <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
         ) : (
-          <ExpandedFormField {...props} />
+          <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
         )}
-      </Stack>
-    </FormFieldContainer>
+        <Stack gap={1} width='100%'>
+          {!isOpen ? (
+            <FieldTypeRenderer
+              fieldWrapperSx={{
+                my: 0
+              }}
+              endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
+              type={formField.type as any}
+              description={formField.description ?? ''}
+              disabled
+              label={formField.name}
+              required={formField.required}
+              options={formField.options}
+              placeholder={formField.type === 'date' ? new Date().toString() : 'Your answer'}
+            />
+          ) : (
+            <ExpandedFormField {...props} />
+          )}
+        </Stack>
+      </FormFieldContainer>
+    </Stack>
   );
 }

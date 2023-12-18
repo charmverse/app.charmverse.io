@@ -22,24 +22,33 @@ export function FormFieldsEditor({
     })[]
   >(initialFormFields.map((formField) => ({ ...formField, isOpen: false })));
 
-  function updateFormField({
-    index,
-    updatedFormField
-  }: {
-    index: number;
+  function updateFormField(
     updatedFormField: Partial<
       FormFieldInput & {
         isOpen: boolean;
       }
-    >;
-  }) {
+    > & {
+      id: string;
+    }
+  ) {
     setFormFields((prev) => {
+      const index = prev.findIndex((f) => f.id === updatedFormField.id);
       const newFormFields = [...prev];
-      newFormFields[index] = {
-        ...newFormFields[index],
-        ...updatedFormField
-      };
-      return newFormFields;
+      const newIndex = updatedFormField.index;
+      if (typeof newIndex === 'number') {
+        newFormFields.splice(newIndex, 0, newFormFields.splice(index, 1)[0]);
+        return newFormFields.map((formField, _index) => ({
+          ...formField,
+          ...(_index === updatedFormField.index ? updatedFormField : {}),
+          index: _index
+        }));
+      } else {
+        newFormFields[index] = {
+          ...newFormFields[index],
+          ...updatedFormField
+        };
+        return newFormFields;
+      }
     });
   }
 
@@ -55,14 +64,16 @@ export function FormFieldsEditor({
           options: [],
           private: false,
           required: true,
-          isOpen: true
+          isOpen: true,
+          id: v4()
         }
       ];
     });
   }
 
-  function duplicateFormField(index: number) {
+  function duplicateFormField(fieldId: string) {
     setFormFields((prev) => {
+      const index = prev.findIndex((f) => f.id === fieldId);
       const newFormFields = [...prev];
       newFormFields.splice(index, 0, {
         ...newFormFields[index],
@@ -77,8 +88,9 @@ export function FormFieldsEditor({
     });
   }
 
-  function deleteFormField(index: number) {
+  function deleteFormField(fieldId: string) {
     setFormFields((prev) => {
+      const index = prev.findIndex((f) => f.id === fieldId);
       const newFormFields = [...prev];
       newFormFields.splice(index, 1);
       return newFormFields.map((formField, i) => ({
@@ -88,8 +100,9 @@ export function FormFieldsEditor({
     });
   }
 
-  function onCreateOption(index: number, option: SelectOptionType) {
+  function onCreateOption(fieldId: string, option: SelectOptionType) {
     setFormFields((prev) => {
+      const index = prev.findIndex((f) => f.id === fieldId);
       const newFormFields = [...prev];
       const options = newFormFields[index].options ?? [];
       options.push(option);
@@ -97,8 +110,9 @@ export function FormFieldsEditor({
     });
   }
 
-  function onDeleteOption(index: number, option: SelectOptionType) {
+  function onDeleteOption(fieldId: string, option: SelectOptionType) {
     setFormFields((prev) => {
+      const index = prev.findIndex((f) => f.id === fieldId);
       const newFormFields = [...prev];
       const options = newFormFields[index].options ?? [];
       const newOptions = options.filter((o) => o.id !== option.id);
@@ -111,8 +125,9 @@ export function FormFieldsEditor({
     onSave(formFields.map(({ isOpen, ...formField }) => formField));
   }
 
-  function onUpdateOption(index: number, option: SelectOptionType) {
+  function onUpdateOption(fieldId: string, option: SelectOptionType) {
     setFormFields((prev) => {
+      const index = prev.findIndex((f) => f.id === fieldId);
       const newFormFields = [...prev];
       const options = newFormFields[index].options ?? [];
       const newOptions = options.map((o) => {
@@ -130,27 +145,27 @@ export function FormFieldsEditor({
 
   return (
     <Stack p={1} gap={1}>
-      {formFields.map((formField, index) => (
+      {formFields.map((formField) => (
         <FormField
           toggleOpen={() => {
-            updateFormField({ index, updatedFormField: { isOpen: !formField.isOpen } });
+            updateFormField({ isOpen: !formField.isOpen, id: formField.id });
           }}
           isOpen={formField.isOpen}
           formField={formField}
           updateFormField={(updatedFormField) => {
-            updateFormField({ index, updatedFormField });
+            updateFormField(updatedFormField);
           }}
-          key={`${formField.type}-${index.toString()}`}
-          onDuplicate={() => duplicateFormField(index)}
-          onDelete={() => deleteFormField(index)}
+          key={formField.id}
+          onDuplicate={() => duplicateFormField(formField.id)}
+          onDelete={() => deleteFormField(formField.id)}
           onCreateOption={(option) => {
-            onCreateOption(index, option);
+            onCreateOption(formField.id, option);
           }}
           onDeleteOption={(option) => {
-            onDeleteOption(index, option);
+            onDeleteOption(formField.id, option);
           }}
           onUpdateOption={(option) => {
-            onUpdateOption(index, option);
+            onUpdateOption(formField.id, option);
           }}
         />
       ))}
