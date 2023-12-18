@@ -37,11 +37,6 @@ export function ProposalStickyFooter({
 
   const hasSidebarEvaluation = evaluationTypesWithSidebar.includes(evaluationTypeOrDraft as ProposalEvaluationType);
 
-  if (!evaluationTypeOrDraft) {
-    // this should never happen
-    return null;
-  }
-
   return (
     <StickyFooterContainer>
       <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
