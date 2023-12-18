@@ -6,6 +6,7 @@ import ChevronRightIcon from '@mui/icons-material/ArrowRight';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
+  Chip,
   Divider,
   IconButton,
   ListItemIcon,
@@ -18,7 +19,6 @@ import {
   Typography
 } from '@mui/material';
 
-import { Button } from '../Button';
 import PopperPopup from '../PopperPopup';
 
 import { fieldTypeIconRecord, fieldTypeLabelRecord, formFieldTypes } from './constants';
@@ -181,6 +181,7 @@ export function FormField(
             fieldWrapperSx={{
               my: 0
             }}
+            endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
             type={formField.type as any}
             description={formField.description ?? ''}
             disabled

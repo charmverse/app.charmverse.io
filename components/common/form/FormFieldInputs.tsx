@@ -30,7 +30,7 @@ export function FormFieldInputs({
   })[];
   onSave?: (formFieldInputs: TFormFieldInput[]) => void;
 }) {
-  const { control, errors, isValid, values, getValues, isDirty, isSubmitting, onFormChange, onSubmit } = useFormFields({
+  const { control, errors, isValid, isDirty, isSubmitting, onFormChange, onSubmit } = useFormFields({
     fields: formFields,
     onSubmit: (_values) => {
       onSave?.(Object.entries(_values).map(([id, value]) => ({ id, value })));
