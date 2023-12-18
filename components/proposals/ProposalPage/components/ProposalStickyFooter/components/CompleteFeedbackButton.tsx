@@ -9,18 +9,19 @@ import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/c
 export type Props = {
   proposalId: string;
   disabledTooltip?: string;
-  nextStep?: Pick<ProposalEvaluationValues, 'id' | 'title'>;
+  currentStep?: { id: string };
+  nextStep?: { title: string };
   onSubmit?: VoidFunction;
 };
 
-export function CompleteFeedbackButton({ proposalId, disabledTooltip, nextStep, onSubmit }: Props) {
+export function CompleteFeedbackButton({ proposalId, disabledTooltip, currentStep, nextStep, onSubmit }: Props) {
   const { showMessage } = useSnackbar();
   const { trigger: updateProposalEvaluation, isMutating } = useUpdateProposalEvaluation({ proposalId });
 
   async function onMoveForward() {
     try {
       await updateProposalEvaluation({
-        evaluationId: nextStep?.id,
+        evaluationId: currentStep?.id,
         result: 'pass'
       });
     } catch (error) {

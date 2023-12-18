@@ -15,6 +15,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
 
   // const evaluationToShowInSidebar = proposal?.permissions.evaluate && proposal?.currentEvaluationId;
   let evaluationToShowInSidebar: string | undefined;
+
   const currentEvaluation = proposal?.evaluations.find((evaluation) => evaluation.id === proposal?.currentEvaluationId);
   if (currentEvaluation && evaluationTypesWithSidebar.includes(currentEvaluation.type)) {
     evaluationToShowInSidebar = currentEvaluation.id;
@@ -26,7 +27,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       proposal,
       permissions: proposal?.permissions,
       evaluationToShowInSidebar,
-      refreshProposal,
+      refreshProposal: () => refreshProposal(), // wrap it in a function so click handlers dont pass in the event
       async onChangeEvaluation(evaluationId: string, updatedEvaluation: Partial<ProposalEvaluationValues>) {
         if (updatedEvaluation.rubricCriteria) {
           await upsertRubricCriteria({

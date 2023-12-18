@@ -51,7 +51,12 @@ export function ProposalStickyFooter({
           <CompleteDraftButton proposalId={proposal.id} nextStep={nextStep} onSubmit={refreshProposal} />
         )}
         {evaluationTypeOrDraft === 'feedback' && (
-          <CompleteFeedbackButton nextStep={nextStep} proposalId={proposal.id} onSubmit={refreshProposal} />
+          <CompleteFeedbackButton
+            currentStep={currentEvaluation}
+            nextStep={nextStep}
+            proposalId={proposal.id}
+            onSubmit={refreshProposal}
+          />
         )}
         {hasSidebarEvaluation && (
           <OpenEvaluationButton
