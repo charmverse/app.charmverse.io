@@ -1,5 +1,5 @@
 import type { MemberPropertyType, FormFieldType } from '@charmverse/core/prisma';
-import type { FormField } from '@charmverse/core/prisma-client';
+import type { FormField, Prisma } from '@charmverse/core/prisma-client';
 import type { SxProps } from '@mui/material';
 import type { ReactNode } from 'react';
 
@@ -10,7 +10,7 @@ export type FieldType = MemberPropertyType | FormFieldType;
 
 export type ControlFieldProps = {
   onChange?: (value: any) => void;
-  value?: string;
+  value?: string | string[] | Prisma.JsonValue;
 };
 
 export type SelectFieldProps = {

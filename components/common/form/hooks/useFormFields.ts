@@ -1,6 +1,5 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useState } from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -22,17 +21,25 @@ export function useFormFields({
   }[];
   onSubmit: (values: FieldValues) => void;
 }) {
-  const [formInitialized, setFormInitialized] = useState(false);
   const {
     control,
     formState: { isValid, errors, isDirty, isSubmitting },
-    reset,
     getValues,
     setValue,
     handleSubmit,
-    trigger
+    reset
   } = useForm({
     mode: 'onChange',
+    defaultValues: fields.reduce<Record<string, Prisma.JsonValue>>((acc, prop) => {
+      acc[prop.id] =
+        prop.type === 'multiselect' || prop.type === 'person'
+          ? // Convert to array if not already as yup expects array
+            Array.isArray(prop.value)
+            ? prop.value
+            : []
+          : prop.value ?? '';
+      return acc;
+    }, {}),
     resolver: yupResolver(
       yup.object(
         fields.reduce((acc, property) => {
@@ -121,26 +128,7 @@ export function useFormFields({
 
   const values = getValues();
 
-  useEffect(() => {
-    if (formInitialized) {
-      return;
-    }
-    const defaultValues = fields.reduce<Record<string, string | string[]>>((acc, prop) => {
-      acc[prop.id] =
-        prop.type === 'multiselect' || prop.type === 'person'
-          ? Array.isArray(prop.value)
-            ? prop.value
-            : []
-          : prop.value ?? '';
-      return acc;
-    }, {});
-
-    reset(defaultValues);
-    trigger();
-    setFormInitialized(true);
-  }, [fields, reset, trigger, formInitialized]);
-
-  function onFormChange(updatedFields: { id: string; value: string | string[] | Prisma.JsonValue }[]) {
+  function onFormChange(updatedFields: { id: string; value: Prisma.JsonValue }[]) {
     updatedFields.forEach((updatedField) => {
       setValue(updatedField.id, updatedField.value, {
         shouldDirty: true,
@@ -160,11 +148,17 @@ export function useFormFields({
     getValues,
     isSubmitting,
     onSubmit: () => {
-      if (isDirty && isValid) {
-        return handleSubmit(async () => {
-          onSubmit(values);
-        })();
+      if (!isDirty || !isValid) {
+        return;
       }
+      handleSubmit((_values) => {
+        onSubmit(_values);
+        // Reset dirty state after submit
+        reset(_values, {
+          keepDirty: false,
+          keepDirtyValues: false
+        });
+      })();
     },
     onFormChange
   };

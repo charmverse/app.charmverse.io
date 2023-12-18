@@ -109,7 +109,6 @@ function UserOnboardingDialog({
     control: memberPropertiesControl,
     errors: memberPropertiesErrors,
     isValid: isMemberPropertiesValid,
-    values: memberPropertiesValues,
     onFormChange: onMemberPropertiesChange,
     isDirty: isMemberPropertiesDirty,
     isSubmitting: isMemberPropertiesSubmitting,
@@ -221,7 +220,6 @@ function UserOnboardingDialog({
           <ConnectedAccounts user={currentUser} setIsOnboardingModalOpen={setIsOnboardingModalOpen} />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
-            values={memberPropertiesValues}
             control={memberPropertiesControl}
             errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}

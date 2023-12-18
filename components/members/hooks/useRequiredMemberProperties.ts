@@ -1,6 +1,6 @@
 import type { UserDetails } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -129,6 +129,7 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   const { memberProperties = [] } = useRequiredMemberProperties({ userId });
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const { space } = useCurrentSpace();
+  const { mutateMembers } = useMembers();
 
   const nonDefaultMemberProperties = useMemo(() => {
     return memberProperties
@@ -139,19 +140,19 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
       }));
   }, [memberProperties]);
 
-  const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit, setValue } =
-    useFormFields({
-      fields: nonDefaultMemberProperties,
-      onSubmit: async (values) => {
-        if (space) {
-          await updateSpaceValues(
-            space.id,
-            Object.entries(values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
-          );
-          refreshPropertyValues();
-        }
+  const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit } = useFormFields({
+    fields: nonDefaultMemberProperties,
+    onSubmit: async (values) => {
+      if (space) {
+        await updateSpaceValues(
+          space.id,
+          Object.entries(values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+        );
+        refreshPropertyValues();
+        mutateMembers();
       }
-    });
+    }
+  });
 
   const values = getValues();
 
@@ -161,8 +162,6 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     isValid,
     errors,
     isDirty,
-    setValue,
-    getValues,
     isSubmitting,
     onSubmit,
     onFormChange
@@ -176,7 +175,6 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     isLinkedinRequired,
     isTimezoneRequired,
     isTwitterRequired,
-    isLoadingUserDetails,
     userDetails: { id, ...userDetails } = {} as UserDetails
   } = useRequiredMemberProperties({ userId });
   const { showMessage } = useSnackbar();
@@ -187,11 +185,17 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     setValue,
     handleSubmit,
     getValues,
-    reset,
-    trigger
+    reset
   } = useForm({
     mode: 'onChange',
-    defaultValues: userDetails,
+    defaultValues: {
+      ...userDetails,
+      social: userDetails.social ?? {
+        twitterURL: '',
+        githubURL: '',
+        linkedinURL: ''
+      }
+    },
     resolver: yupResolver(
       yup.object({
         description: isBioRequired ? requiredString('Bio is required') : nonRequiredString,
@@ -205,35 +209,11 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
             : nonRequiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link'),
           linkedinURL: isLinkedinRequired
             ? requiredString('Linkedin is required').matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
-            : nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link'),
-          discordUsername: nonRequiredString
+            : nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
         })
       })
     )
   });
-
-  useEffect(() => {
-    if (!isLoadingUserDetails) {
-      reset({
-        ...userDetails,
-        social:
-          userDetails.social === null
-            ? {
-                twitterURL: '',
-                githubURL: '',
-                linkedinURL: ''
-              }
-            : userDetails.social
-      });
-      trigger();
-    }
-  }, [isLoadingUserDetails, reset, trigger]);
-
-  const values = {
-    description: getValues('description'),
-    social: getValues('social'),
-    timezone: getValues('timezone')
-  };
 
   function onFormChange(fields: EditableFields) {
     Object.entries(fields).forEach(([key, value]) => {
@@ -245,12 +225,17 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     });
   }
 
+  const values = getValues();
+
   function onSubmit() {
     if (isDirty && isValid) {
-      return handleSubmit(async () => {
+      return handleSubmit(async (_values) => {
         await charmClient.updateUserDetails(getValues());
-        await mutate('/current-user-details');
-        await mutateMembers();
+        await Promise.all([mutate('/current-user-details'), mutateMembers()]);
+        reset(_values, {
+          keepDirty: false,
+          keepDirtyValues: false
+        });
         showMessage('Profile updated', 'success');
       })();
     }

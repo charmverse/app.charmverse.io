@@ -8,6 +8,7 @@ import { Button } from '../Button';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { useFormFields } from './hooks/useFormFields';
+import { FieldType } from './interfaces';
 
 interface TFormFieldInput {
   id: string;

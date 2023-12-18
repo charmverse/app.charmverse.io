@@ -1,4 +1,4 @@
-import { Box, Stack, SxProps, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
@@ -9,7 +9,6 @@ import type { ControlFieldProps, FieldProps, FieldType } from 'components/common
 import FieldLabel from '../FieldLabel';
 
 import { DateInputField } from './DateInputField';
-import { FieldWrapper } from './FieldWrapper';
 import { PersonInputField } from './PersonInputField';
 
 type TextProps = {
@@ -70,6 +69,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
         return (
           <SelectField
             {...(fieldProps as SelectProps)}
+            value={fieldProps.value as string}
             ref={ref}
             options={options}
             onCreateOption={onCreateOption}
@@ -84,6 +84,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
           <SelectField
             {...(fieldProps as SelectProps)}
             ref={ref}
+            value={fieldProps.value as string[]}
             multiselect
             options={options}
             onCreateOption={onCreateOption}

@@ -17,7 +17,6 @@ type Props = {
   showCollectionOptions?: boolean;
   userId: string;
   refreshPropertyValues: VoidFunction;
-  values: FieldValues;
   errors: FieldErrors<FieldValues>;
   control: Control<FieldValues, any>;
 };
@@ -27,7 +26,6 @@ export function MemberPropertiesForm({
   userId,
   refreshPropertyValues,
   showCollectionOptions,
-  values,
   errors,
   control
 }: Props) {
@@ -38,15 +36,6 @@ export function MemberPropertiesForm({
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
     memberId: userId
   });
-  function handleOnChange(propertyId: string, option: any) {
-    const submitData = { ...values, [propertyId]: option };
-    const updateData: UpdateMemberPropertyValuePayload[] = Object.keys(submitData).map((key) => ({
-      memberPropertyId: key,
-      value: submitData[key]
-    }));
-
-    onChange(updateData);
-  }
 
   return (
     <Box>
@@ -71,10 +60,12 @@ export function MemberPropertiesForm({
                   required={property.required}
                   onChange={(e) => {
                     field.onChange(e);
-                    handleOnChange(
-                      property.memberPropertyId,
-                      typeof e?.target?.value === 'string' ? e.target.value : e
-                    );
+                    onChange([
+                      {
+                        memberPropertyId: property.memberPropertyId,
+                        value: typeof e?.target?.value === 'string' ? e.target.value : e
+                      }
+                    ]);
                   }}
                 />
               )}
