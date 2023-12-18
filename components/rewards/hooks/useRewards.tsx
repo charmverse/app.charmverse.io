@@ -19,6 +19,7 @@ type RewardsContextType = {
   refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
   creatingInlineReward: boolean;
   setCreatingInlineReward: (isCreating: boolean) => void;
+  getRewardById: (id: string) => RewardWithUsers | undefined;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
@@ -30,7 +31,8 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   updateReward: () => Promise.resolve(),
   refreshReward: () => Promise.resolve() as any,
   creatingInlineReward: false,
-  setCreatingInlineReward: () => {}
+  setCreatingInlineReward: () => {},
+  getRewardById: () => undefined
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
@@ -113,6 +115,13 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     };
   }, [mutateRewards, subscribe]);
 
+  const getRewardById = useCallback(
+    (id: string) => {
+      return rewards?.find((reward) => reward.id === id);
+    },
+    [rewards]
+  );
+
   const value = useMemo(
     () => ({
       rewards,
@@ -122,7 +131,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       refreshReward,
       setRewards: mutateRewards,
       setCreatingInlineReward,
-      creatingInlineReward
+      creatingInlineReward,
+      getRewardById
     }),
     [
       rewards,
@@ -132,7 +142,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       updateReward,
       refreshReward,
       creatingInlineReward,
-      setCreatingInlineReward
+      setCreatingInlineReward,
+      getRewardById
     ]
   );
 

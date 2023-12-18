@@ -1,14 +1,11 @@
 import { Box } from '@mui/material';
 import { rest } from 'msw';
-import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
-import { HeaderSpacer, StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
-import type { ProposalPageAndPropertiesInput } from 'components/proposals/ProposalPage/NewProposalPage';
+import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
@@ -33,59 +30,10 @@ export function ProposalsPage() {
 ProposalsPage.parameters = ProposalsPageStory.parameters;
 
 export function NewProposal() {
-  // const [contentUpdated, setContentUpdated] = useState(false);
-
-  // const evaluationWorkflows = getDefaultWorkflows(spaces[0].id);
-  // const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>({
-  //   authors: [],
-  //   categoryId: null,
-  //   content: null,
-  //   contentText: '',
-  //   evaluations: [],
-  //   evaluationType: 'rubric',
-  //   headerImage: null,
-  //   icon: null,
-  //   proposalTemplateId: null,
-  //   reviewers: [],
-  //   rubricCriteria: [
-  //     {
-  //       id: '1',
-  //       index: -1,
-  //       title: 'Spelling and grammar',
-  //       description: 'Has correct punctuation',
-  //       type: 'range',
-  //       parameters: {
-  //         min: 0,
-  //         max: 1
-  //       }
-  //     },
-  //     {
-  //       id: '2',
-  //       index: -1,
-  //       title: 'Five stars',
-  //       type: 'range',
-  //       parameters: {
-  //         min: 1,
-  //         max: 5
-  //       }
-  //     }
-  //   ],
-  //   title: 'A simple proposition',
-  //   fields: { properties: {} },
-  //   type: 'proposal'
-  // });
-
   return (
     <GlobalContext>
       <HeaderSpacer />
-      <ProposalPageComponent
-      // formInputs={formInputs}
-      // setFormInputs={(_formInputs) => {
-      //   setContentUpdated(true);
-      //   setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
-      // }}
-      // contentUpdated={contentUpdated}
-      />
+      <ProposalPageComponent />
     </GlobalContext>
   );
 }

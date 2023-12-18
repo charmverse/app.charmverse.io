@@ -1,5 +1,5 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
-import type { Proposal, ProposalAuthor, ProposalCategory } from '@charmverse/core/prisma-client';
+import type { Proposal } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { ProposalEvaluation } from '@prisma/client';

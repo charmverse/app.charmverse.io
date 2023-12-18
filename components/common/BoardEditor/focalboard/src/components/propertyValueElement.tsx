@@ -1,7 +1,7 @@
 import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma';
 import { stringUtils } from '@charmverse/core/utilities';
 import PersonIcon from '@mui/icons-material/Person';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
@@ -35,7 +35,8 @@ import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_APPLICANTS_COUNT
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
@@ -186,6 +187,22 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
+  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
+    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
+      return null;
+    }
+
+    return (
+      <Chip
+        label={propertyValue[0]}
+        sx={{
+          cursor: 'pointer'
+        }}
+        size='small'
+        component={Link}
+        href={getAbsolutePath(propertyValue[1] as string, domain)}
+      />
+    );
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
     if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
       return typeof subRowsEmptyValueContent === 'string' ? (
@@ -233,8 +250,12 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-    // do not show value in reward row
-  } else if (propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID && Array.isArray(propertyValue)) {
+    // Do not show  applicants in regular reward
+  } else if (
+    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID &&
+    Array.isArray(propertyValue) &&
+    !card.fields.isAssigned
+  ) {
     propertyValueElement = null;
   } else if (
     propertyTemplate.type === 'person' ||

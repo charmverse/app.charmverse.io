@@ -2,7 +2,7 @@ import { Alert, SvgIcon } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
-import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useGetProposalDetails, useGetIsReviewer } from 'charmClient/hooks/proposals';
 import { NoCommentsMessage } from 'components/[pageId]/DocumentPage/components/Sidebar/components/CommentsSidebar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
@@ -24,12 +24,8 @@ export function OldProposalEvaluationSidebar({ pageId, proposalId }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  const { data: reviewerUserIds } = useGetAllReviewerUserIds(
-    !!pageId && proposal?.evaluationType === 'rubric' ? pageId : undefined
-  );
-  const proposalPermissions = proposal?.permissions;
-  const canAnswerRubric = proposalPermissions?.evaluate;
-  const isReviewer = !!(user?.id && reviewerUserIds?.includes(user.id));
+  const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
+  const canAnswerRubric = proposal?.permissions.evaluate || proposal?.permissions.review;
   const rubricCriteria = proposal?.rubricCriteria;
 
   const myRubricAnswers = useMemo(

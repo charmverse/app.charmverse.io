@@ -12,19 +12,22 @@ import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
+import { DateTime } from 'luxon';
 
 /*****
  * NOTE: This script creates new users and spaces for Gitcoin projects.
  * It also updates mixpanel profiles so make sure to have prod mixpanel api key set in .env
  */
 
-const START_ID = 100;
+const START_ID = 1100;
 const CHAIN_ID = 1;
+
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
 const projectRegistry = getProjectRegistryContract({ providerOrSigner: provider, chainId: CHAIN_ID });
 const FILE_PATH = './gitcoin-projects.csv';
 const HOMEPAGE_TITLE = 'Information Hub';
+const EXTRA_BLOCK_QUOTA = 20; //20k blocks
 
 async function getProjectCount() {
   const projectsCount = await projectRegistry.projectsCount();
@@ -102,6 +105,14 @@ async function importGitCoinProjects() {
         await updateTrackGroupProfile(space, 'gitcoin');
         // trackUserAction('create_new_workspace', { userId: adminUserId, spaceId: space.id, template: 'default', source: 'gitcoin' });
         // [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
+
+        await prisma.additionalBlockQuota.create({
+          data:{
+            spaceId: space.id,
+            blockCount: EXTRA_BLOCK_QUOTA,
+            expiresAt: DateTime.local().plus({ years: 1 }).endOf('day').toJSDate()
+          }
+        })
 
         const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl };
         projectsData.push(projectInfo);

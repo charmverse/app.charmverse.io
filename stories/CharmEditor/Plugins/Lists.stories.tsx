@@ -1,7 +1,7 @@
 import { Paper } from '@mui/material';
 import { Provider } from 'react-redux';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import { _, jsonDoc } from 'testing/prosemirror/builders';
 
@@ -21,9 +21,9 @@ export default {
     (Story: any) => (
       <Provider store={store}>
         <Paper sx={{ p: 4 }}>
-          <Container>
+          <PageEditorContainer>
             <Story />
-          </Container>
+          </PageEditorContainer>
         </Paper>
       </Provider>
     )

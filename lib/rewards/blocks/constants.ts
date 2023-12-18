@@ -14,6 +14,7 @@ export const REWARD_TOKEN = '__rewardToken';
 export const REWARD_CHAIN = '__rewardChain';
 export const REWARD_CUSTOM_VALUE = '__rewardCustomValue';
 export const REWARD_APPLICANTS_COUNT = '__rewardApplicantsCount';
+export const REWARD_PROPOSAL_LINK = '__rewardProposalLink';
 
 export const defaultRewardPropertyIds = [
   REWARD_STATUS_BLOCK_ID,
@@ -27,5 +28,6 @@ export const defaultRewardPropertyIds = [
   REWARD_TOKEN,
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
-  REWARD_APPLICANTS_COUNT
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK
 ];

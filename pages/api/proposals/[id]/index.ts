@@ -50,10 +50,10 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
         }
       },
       authors: true,
-      reviewers: true,
       category: true,
-      rewards: true,
-      page: { select: { sourceTemplateId: true } }
+      page: { select: { sourceTemplateId: true } },
+      reviewers: true,
+      rewards: true
     }
   });
 

@@ -15,11 +15,14 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
+import { AttachRewardButton } from 'components/proposals/components/ProposalRewards/AttachRewardButton';
+import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
 import type { ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
@@ -85,6 +88,8 @@ type ProposalPropertiesProps = {
   openEvaluation?: (evaluationId?: string) => void;
   isEvaluationSidebarOpen?: boolean;
   canSeeEvaluation?: boolean;
+  isReviewer?: boolean;
+  rewardIds?: string[] | null;
 };
 
 export function ProposalPropertiesBase({
@@ -113,8 +118,11 @@ export function ProposalPropertiesBase({
   openEvaluation,
   isEvaluationSidebarOpen,
   canSeeEvaluation,
-  readOnlyCustomProperties
+  readOnlyCustomProperties,
+  isReviewer,
+  rewardIds
 }: ProposalPropertiesProps) {
+  const { user } = useUser();
   const isCharmVerse = useIsCharmverseSpace();
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
@@ -170,6 +178,7 @@ export function ProposalPropertiesBase({
     }
   }
 
+  const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -177,6 +186,7 @@ export function ProposalPropertiesBase({
   const isNewProposal = !pageId;
   const showStatusStepper = !isTemplate && !isCharmVerse;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
+  const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
 
   async function onChangeCategory(updatedCategory: ProposalCategory | null) {
     if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
@@ -227,6 +237,8 @@ export function ProposalPropertiesBase({
                 proposalStatus={proposalStatus}
                 handleProposalStatusUpdate={handleProposalStatusUpdate}
                 evaluationType={proposalFormInputs.evaluationType}
+                proposalId={proposalId}
+                canCreateRewards={isReviewer && !!pendingRewards.length}
               />
             )}
           </Grid>
@@ -267,19 +279,6 @@ export function ProposalPropertiesBase({
         </Stack>
       )}
       <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-        {/* {isCharmVerse && !isNewProposal && !isTemplate && (
-          <Box className='octo-propertyrow' mb='0 !important'>
-            <PropertyLabel readOnly highlighted>
-              Evaluation step
-            </PropertyLabel>
-            <ProposalEvaluationSelect
-              evaluations={proposalFormInputs.evaluations}
-              isDraft={proposalStatus === 'draft'}
-              onChange={handleEvaluationChange}
-              readOnly={isNewProposal || !!archived}
-            />
-          </Box>
-        )} */}
         {showStatusStepper && (
           <Box mt={2} mb={2}>
             <OldProposalStepper
@@ -473,13 +472,56 @@ export function ProposalPropertiesBase({
           </Box>
         )}
 
+        <ProposalRewards
+          pendingRewards={pendingRewards}
+          reviewers={proposalReviewers}
+          assignedSubmitters={proposalAuthorIds}
+          rewardIds={rewardIds || []}
+          readOnly={!isReviewer && !isAuthor}
+          onSave={(pendingReward) => {
+            const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
+            if (!isExisting) {
+              setProposalFormInputs({
+                fields: {
+                  ...proposalFormInputs.fields,
+                  pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || []), pendingReward]
+                }
+              });
+
+              return;
+            }
+
+            setProposalFormInputs({
+              fields: {
+                ...proposalFormInputs.fields,
+                pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].map((draft) => {
+                  if (draft.draftId === pendingReward.draftId) {
+                    return pendingReward;
+                  }
+                  return draft;
+                })
+              }
+            });
+          }}
+          onDelete={(draftId: string) => {
+            setProposalFormInputs({
+              fields: {
+                ...proposalFormInputs.fields,
+                pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].filter(
+                  (draft) => draft.draftId !== draftId
+                )
+              }
+            });
+          }}
+        />
+
         <CustomPropertiesAdapter
           readOnly={readOnlyAuthors}
           readOnlyProperties={readOnlyCustomProperties}
           proposal={proposalFormInputs}
           onChange={(properties: ProposalPropertiesField) => {
             setProposalFormInputs({
-              fields: { properties: properties ? { ...properties } : {} }
+              fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
             });
           }}
         />

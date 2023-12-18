@@ -1,6 +1,7 @@
 import type { ProposalCategory, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import { check } from 'prettier';
 
 import { generateUserAndSpace, generateSpaceUser, generateRole } from 'testing/setupDatabase';
 import { generateProposalCategory, generateProposal } from 'testing/utils/proposals';
@@ -87,6 +88,33 @@ describe('isProposalReviewer', () => {
       userId: reviewerByRole.id
     });
     expect(isReviewer).toBe(false);
+  });
+
+  it('should return true if user has a role that is a reviewer for the proposal and roles mode is enabled', async () => {
+    const reviewerByRole = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
+
+    const spaceRole = await prisma.spaceRole.findUnique({
+      where: {
+        spaceUser: {
+          spaceId: space.id,
+          userId: reviewerByRole.id
+        }
+      }
+    });
+
+    await prisma.spaceRoleToRole.create({
+      data: {
+        role: { connect: { id: role.id } },
+        spaceRole: { connect: { id: spaceRole?.id as string } }
+      }
+    });
+
+    const isReviewer = await isProposalReviewer({
+      proposal,
+      userId: reviewerByRole.id,
+      checkRoles: true
+    });
+    expect(isReviewer).toBe(true);
   });
 
   it('should return false if user is not a reviewer for the proposal', async () => {

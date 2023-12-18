@@ -11,12 +11,12 @@ import { v4 as uuid } from 'uuid';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -55,7 +55,7 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   type: PageType;
 };
 
-const StyledContainer = styled(Container)`
+const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
 

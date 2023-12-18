@@ -1,4 +1,4 @@
-import type { ProposalPermissionsSwitch } from '@charmverse/core/dist/cjs/permissions';
+import type { ProposalPermissionsSwitch } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
