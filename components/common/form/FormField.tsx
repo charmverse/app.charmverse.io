@@ -28,8 +28,10 @@ import type { FormFieldInput } from './interfaces';
 
 const FormFieldContainer = styled(Stack)`
   border: 1px solid ${(props) => props.theme.palette.divider};
-  padding: ${(props) => props.theme.spacing(2)};
+  padding: ${(props) => props.theme.spacing(1)};
   gap: ${(props) => props.theme.spacing(1)};
+  flex-direction: row;
+  align-items: flex-start;
 `;
 
 export interface FormFieldProps {
@@ -106,6 +108,7 @@ function ExpandedFormField({
         value={formField.name}
         onChange={(e) => updateFormField({ name: e.target.value })}
         placeholder='Title'
+        error={!formField.name}
       />
       <TextField
         value={formField.description}
@@ -169,7 +172,7 @@ export function FormField(
   const { isOpen, formField, toggleOpen } = props;
 
   return (
-    <FormFieldContainer flexDirection='row' gap={1} alignItems='flex-start'>
+    <FormFieldContainer>
       {isOpen ? (
         <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
       ) : (

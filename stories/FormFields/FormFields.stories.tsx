@@ -8,7 +8,7 @@ import { formFieldTypes } from 'components/common/form/constants';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldInputs as CustomFormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { FormFieldsEditor as CustomFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import { createDocumentWithText, emptyDocument } from 'lib/prosemirror/constants';
+import { createDocumentWithText } from 'lib/prosemirror/constants';
 import { brandColorNames } from 'theme/colors';
 
 export function FormFieldsEditor() {

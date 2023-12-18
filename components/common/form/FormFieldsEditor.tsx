@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useState } from 'react';
 import { v4 } from 'uuid';
 
@@ -9,7 +9,13 @@ import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
 import type { FormFieldInput } from './interfaces';
 
-export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formFields?: FormFieldInput[] }) {
+export function FormFieldsEditor({
+  formFields: initialFormFields = [],
+  onSave
+}: {
+  onSave: (formFields: FormFieldInput[]) => void;
+  formFields?: FormFieldInput[];
+}) {
   const [formFields, setFormFields] = useState<
     (FormFieldInput & {
       isOpen: boolean;
@@ -101,6 +107,10 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
     });
   }
 
+  function saveFormFields() {
+    onSave(formFields.map(({ isOpen, ...formField }) => formField));
+  }
+
   function onUpdateOption(index: number, option: SelectOptionType) {
     setFormFields((prev) => {
       const newFormFields = [...prev];
@@ -116,8 +126,10 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
     });
   }
 
+  const hasEmptyName = formFields.some((formField) => !formField.name);
+
   return (
-    <Stack gap={1}>
+    <Stack p={1} gap={1}>
       {formFields.map((formField, index) => (
         <FormField
           toggleOpen={() => {
@@ -151,10 +163,28 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
         size='small'
         color='secondary'
         onClick={addNewFormField}
-        my={1}
       >
         Add an input
       </Button>
+      {formFields.length !== 0 && (
+        <Box
+          sx={{
+            width: 'fit-content'
+          }}
+        >
+          <Button
+            onClick={saveFormFields}
+            disabledTooltip={
+              hasEmptyName
+                ? 'Please fill out all field names before saving'
+                : 'Please add at least one field before saving'
+            }
+            disabled={formFields.length === 0 || hasEmptyName}
+          >
+            Save
+          </Button>
+        </Box>
+      )}
     </Stack>
   );
 }

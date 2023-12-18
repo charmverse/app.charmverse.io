@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 
-// TODO: We might need more generic types in the future
 export type FieldType = MemberPropertyType | FormFieldType;
 
 export type ControlFieldProps = {
@@ -35,6 +34,6 @@ export type FieldProps = {
   fieldWrapperSx?: SxProps;
 } & SelectFieldProps;
 
-export type FormFieldInput = Pick<FormField, 'description' | 'name' | 'index' | 'required' | 'private' | 'type'> & {
+export type FormFieldInput = Omit<FormField, 'formId' | 'id' | 'parentFieldId' | 'options'> & {
   options?: SelectOptionType[];
 };
