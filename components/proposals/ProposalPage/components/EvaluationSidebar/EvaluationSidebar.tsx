@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
+import { PassFailSidebar } from './components/PassFailSidebar';
 import { evaluationTypesWithSidebar, ProposalSidebarHeader } from './components/ProposalSidebarHeader';
 import { RubricSidebar } from './components/RubricSidebar/RubricSidebar';
 import { VoteSidebar } from './components/VoteSidebar';
@@ -74,7 +75,9 @@ export function EvaluationSidebar({
         goToEvaluation={setActiveEvaluationId}
         goToSettings={goToSettings}
       />
-
+      {evaluation?.type === 'pass_fail' && (
+        <PassFailSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />
+      )}
       {evaluation?.type === 'rubric' && <RubricSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />}
       {evaluation?.type === 'vote' && <VoteSidebar {...{ proposal, pageId, isCurrent, evaluation }} />}
     </>
