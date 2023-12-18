@@ -13,7 +13,7 @@ export function FormFieldsEditor({
   formFields: initialFormFields = [],
   onSave
 }: {
-  onSave: (formFields: FormFieldInput[]) => void;
+  onSave?: (formFields: FormFieldInput[]) => void;
   formFields?: FormFieldInput[];
 }) {
   const [formFields, setFormFields] = useState<
@@ -32,19 +32,28 @@ export function FormFieldsEditor({
     }
   ) {
     setFormFields((prev) => {
-      const index = prev.findIndex((f) => f.id === updatedFormField.id);
+      const updatedFieldIndex = prev.findIndex((f) => f.id === updatedFormField.id);
       const newFormFields = [...prev];
+      // If the index was changed, we need to move the form field to the new index
       const newIndex = updatedFormField.index;
       if (typeof newIndex === 'number') {
-        newFormFields.splice(newIndex, 0, newFormFields.splice(index, 1)[0]);
-        return newFormFields.map((formField, _index) => ({
-          ...formField,
-          ...(_index === updatedFormField.index ? updatedFormField : {}),
-          index: _index
-        }));
+        newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
+        return newFormFields.map((formField, index) => {
+          if (index === newIndex) {
+            return {
+              ...formField,
+              ...updatedFormField
+            };
+          }
+
+          return {
+            ...formField,
+            index
+          };
+        });
       } else {
-        newFormFields[index] = {
-          ...newFormFields[index],
+        newFormFields[updatedFieldIndex] = {
+          ...newFormFields[updatedFieldIndex],
           ...updatedFormField
         };
         return newFormFields;
@@ -122,7 +131,7 @@ export function FormFieldsEditor({
   }
 
   function saveFormFields() {
-    onSave(formFields.map(({ isOpen, ...formField }) => formField));
+    onSave?.(formFields.map(({ isOpen, ...formField }) => formField));
   }
 
   function onUpdateOption(fieldId: string, option: SelectOptionType) {
@@ -181,7 +190,7 @@ export function FormFieldsEditor({
       >
         Add an input
       </Button>
-      {formFields.length !== 0 && (
+      {formFields.length !== 0 && onSave && (
         <Box
           sx={{
             width: 'fit-content'

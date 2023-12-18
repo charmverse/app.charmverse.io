@@ -37,7 +37,7 @@ const FormFieldContainer = styled(Stack)<{ dragDirection?: 'top' | 'bottom' }>`
       ? `0px -2px 0px ${theme.palette.action.focus}`
       : dragDirection === 'bottom'
       ? `0px 2px 0px ${theme.palette.action.focus}`
-      : ''};
+      : 'none'};
   padding: ${(props) => props.theme.spacing(1)};
   gap: ${(props) => props.theme.spacing(1)};
   flex-direction: row;
