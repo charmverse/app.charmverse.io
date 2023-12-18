@@ -1,9 +1,9 @@
 import { SubscriptionRequiredError } from '@charmverse/core/errors';
+import type { ResourceIdEntity } from '@charmverse/core/permissions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import type { ResourceIdEntity } from 'lib/permissions/api/routers';
 
 /**
  * Build that generates a middleware that can resolve if the space has paid feature access based on a resource Id value and where to find that value

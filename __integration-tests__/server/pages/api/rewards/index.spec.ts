@@ -86,9 +86,7 @@ describe('POST /api/rewards - createRewardController', () => {
   let userCookie: string;
 
   beforeAll(async () => {
-    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
-    user = generated.user;
-    space = generated.space;
+    ({ user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false }));
     await prisma.spacePermission.create({
       data: {
         space: { connect: { id: space.id } },

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { createDatabaseCardPage, validateCreationData } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 
@@ -49,7 +49,7 @@ export async function createCard(req: NextApiRequest, res: NextApiResponse) {
     createdBy: req.botUser.id
   });
 
-  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+  await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
     event: 'created',
     pageId: card.id
   });

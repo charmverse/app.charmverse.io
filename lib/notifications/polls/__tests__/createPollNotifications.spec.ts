@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
 import { createVote } from 'lib/votes/createVote';
@@ -127,7 +127,7 @@ describe(`Test vote events and notifications`, () => {
       name: 'Post Moderator'
     });
 
-    await premiumPermissionsApiClient.forum.upsertPostCategoryPermission({
+    await permissionsApiClient.forum.upsertPostCategoryPermission({
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id,
       assignee: {

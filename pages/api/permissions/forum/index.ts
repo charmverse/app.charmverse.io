@@ -5,7 +5,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import type { PermissionResource } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -36,7 +36,7 @@ async function upsertPostCategoryPermissionController(
 ) {
   const input = req.body as AssignedPostCategoryPermission;
 
-  const permissions = await premiumPermissionsApiClient.forum.computePostCategoryPermissions({
+  const permissions = await permissionsApiClient.forum.computePostCategoryPermissions({
     resourceId: input.postCategoryId,
     userId: req.session.user.id
   });
@@ -45,7 +45,7 @@ async function upsertPostCategoryPermissionController(
     throw new ActionNotPermittedError('You cannot manage permissions for this category.');
   }
 
-  const newPermission = await premiumPermissionsApiClient.forum.upsertPostCategoryPermission(input);
+  const newPermission = await permissionsApiClient.forum.upsertPostCategoryPermission(input);
 
   res.status(201).json(newPermission);
 }
@@ -68,7 +68,7 @@ async function removePostCategoryPermission(req: NextApiRequest, res: NextApiRes
     throw new DataNotFoundError('Post category not found');
   }
 
-  const permissions = await premiumPermissionsApiClient.forum.computePostCategoryPermissions({
+  const permissions = await permissionsApiClient.forum.computePostCategoryPermissions({
     resourceId: postCategory.id,
     userId: req.session.user.id
   });
@@ -77,7 +77,7 @@ async function removePostCategoryPermission(req: NextApiRequest, res: NextApiRes
     throw new ActionNotPermittedError('You cannot manage permissions for this category.');
   }
 
-  await premiumPermissionsApiClient.forum.deletePostCategoryPermission({ permissionId });
+  await permissionsApiClient.forum.deletePostCategoryPermission({ permissionId });
 
   res.status(200).json({ success: true });
 }

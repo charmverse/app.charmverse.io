@@ -1,6 +1,7 @@
 import type {
   ProposalCategoryWithPermissions,
   ProposalFlowPermissionFlags,
+  ProposalPermissionsSwitch,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma-client';
@@ -41,8 +42,15 @@ export function useGetReviewerPool(categoryId: MaybeString) {
 export function useGetProposalFlowFlags(proposalId: MaybeString) {
   return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
 }
-export function useGetProposalsBySpace({ spaceId, categoryIds }: Partial<ListProposalsRequest>) {
-  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, { categoryIds });
+export function useGetProposalsBySpace({
+  spaceId,
+  categoryIds,
+  useProposalEvaluationPermissions
+}: Partial<ListProposalsRequest & ProposalPermissionsSwitch>) {
+  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
+    categoryIds,
+    useProposalEvaluationPermissions
+  });
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {

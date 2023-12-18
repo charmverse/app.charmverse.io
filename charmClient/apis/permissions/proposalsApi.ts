@@ -1,8 +1,4 @@
-import type {
-  AssignedProposalCategoryPermission,
-  ProposalCategoryPermissionFlags,
-  ProposalPermissionFlags
-} from '@charmverse/core/permissions';
+import type { AssignedProposalCategoryPermission, ProposalCategoryPermissionFlags } from '@charmverse/core/permissions';
 
 import * as http from 'adapters/http';
 import type { PermissionCompute, PermissionResource } from 'lib/permissions/interfaces';

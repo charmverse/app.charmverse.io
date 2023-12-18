@@ -1,3 +1,4 @@
+import type { ProposalPermissionsSwitch } from '@charmverse/core/dist/cjs/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation, type ProposalWithUsers } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -5,39 +6,38 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { getOldProposalStatus } from 'lib/proposal/getOldProposalStatus';
 import { mapDbProposalToProposalLite } from 'lib/proposal/mapDbProposalToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'space'
-    })
-  )
-  .get(getProposals);
+handler.get(getProposals);
 
 async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
-  const categoryIds = req.query.categoryIds;
   const userId = req.session.user?.id;
-  const spaceId = req.query.id as string;
-  const onlyAssigned = req.query.onlyAssigned === 'true';
 
-  const proposalIds = await req.basePermissionsClient.proposals.getAccessibleProposalIds({
-    spaceId,
+  const spaceId = req.query.id as string;
+
+  const { categoryIds, onlyAssigned, useProposalEvaluationPermissions } = req.query as any as ListProposalsRequest &
+    ProposalPermissionsSwitch;
+  const proposalIds = await permissionsApiClient.proposals.getAccessibleProposalIds({
     categoryIds,
     onlyAssigned,
-    userId
+    userId,
+    spaceId,
+    useProposalEvaluationPermissions
   });
 
   const proposals = await prisma.proposal.findMany({
     where: {
       id: {
         in: proposalIds
+      },
+      page: {
+        // Ignore proposal templates
+        type: 'proposal'
       }
     },
     include: {

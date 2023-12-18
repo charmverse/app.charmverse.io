@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
@@ -40,7 +40,7 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
 
   // If this is a paid space, we only want to provide the user with templates within categories where they can create a proposal
   if (space?.paidTier !== 'free') {
-    const accessibleCategories = await premiumPermissionsApiClient.proposals
+    const accessibleCategories = await permissionsApiClient.proposals
       .getAccessibleProposalCategories({
         spaceId,
         userId
