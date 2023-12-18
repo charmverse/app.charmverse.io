@@ -1,4 +1,4 @@
-import type { FormField } from '@charmverse/core/prisma-client';
+import type { FormField, Prisma } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { Controller } from 'react-hook-form';
@@ -8,11 +8,10 @@ import { Button } from '../Button';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { useFormFields } from './hooks/useFormFields';
-import { FieldType } from './interfaces';
 
 interface TFormFieldInput {
   id: string;
-  value: string | string[];
+  value: Prisma.JsonValue;
 }
 
 const FormFieldInputsContainer = styled(Stack)`
@@ -26,7 +25,7 @@ export function FormFieldInputs({
   onSave
 }: {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
-    value: string | string[];
+    value: Prisma.JsonValue;
   })[];
   onSave?: (formFieldInputs: TFormFieldInput[]) => void;
 }) {

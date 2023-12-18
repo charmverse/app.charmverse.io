@@ -10,7 +10,7 @@ export type FieldType = MemberPropertyType | FormFieldType;
 
 export type ControlFieldProps = {
   onChange?: (value: any) => void;
-  value?: string | string[] | Prisma.JsonValue;
+  value?: Prisma.JsonValue;
 };
 
 export type SelectFieldProps = {

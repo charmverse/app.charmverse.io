@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isUUID, isUrl, isValidEmail } from 'lib/utilities/strings';
 
 import type { FieldType } from '../interfaces';
@@ -112,6 +114,13 @@ export function useFormFields({
             case 'url': {
               acc[property.id] = yup.string().test('is-url', 'Invalid url', (value) => {
                 return isRequired ? (value ? isUrl(value) : false) : true;
+              });
+              break;
+            }
+            case 'long_text':
+            case 'short_text': {
+              acc[property.id] = yup.object().test('is-required', 'Required', (value) => {
+                return isRequired ? !checkIsContentEmpty(value as PageContent) : true;
               });
               break;
             }

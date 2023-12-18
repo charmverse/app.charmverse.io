@@ -99,11 +99,9 @@ export function charmEditorPlugins({
       key: floatingMenuPluginKey,
       readOnly
     }),
-    tabIndent.plugins()
+    tabIndent.plugins(),
+    placeholderPlugin(placeholderText)
   ];
-  if (!readOnly) {
-    basePlugins.push(placeholderPlugin(placeholderText));
-  }
   return () => basePlugins;
 }
 

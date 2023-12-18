@@ -4,11 +4,9 @@ import type { Theme } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
-import { v4 } from 'uuid';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
@@ -22,8 +20,6 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
-import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
