@@ -203,16 +203,18 @@ export function NewProposalPage({
   const internalSidebarView = defaultSidebarView || sidebarView;
 
   useEffect(() => {
-    setActiveView('proposal_evaluation_settings');
-    setDefaultView(null);
+    if (isCharmVerse) {
+      setActiveView('proposal_evaluation_settings');
+      setDefaultView(null);
+    }
   }, []);
 
   // populate workflow if not set and template is not selected
   useEffect(() => {
-    if (workflowOptions?.length && !workflowId && !templateIdFromUrl) {
+    if (isCharmVerse && workflowOptions?.length && !workflowId && !templateIdFromUrl) {
       selectEvaluationWorkflow(workflowOptions[0]);
     }
-  }, [!!workflowOptions]);
+  }, [!!workflowOptions, isCharmVerse]);
 
   // populate with template if selected
   useEffect(() => {
