@@ -15,7 +15,7 @@ export type Props = {
   isCurrent: boolean;
 };
 
-export function RubricDecision({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
+export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({

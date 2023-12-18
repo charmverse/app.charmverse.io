@@ -7,11 +7,6 @@ import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
-import {
-  useUpdateProposalEvaluation,
-  useGetProposalDetails,
-  useUpsertRubricCriteria
-} from 'charmClient/hooks/proposals';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
@@ -24,7 +19,6 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
@@ -50,8 +44,9 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PrimaryColumn } from './components/PrimaryColumn';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
-import { usePageSidebar } from './components/Sidebar/hooks/usePageSidebar';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
+import { usePageSidebar } from './hooks/usePageSidebar';
+import { useProposal } from './hooks/useProposal';
 
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
@@ -117,12 +112,16 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
-  const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
-  const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
+  const {
+    proposal,
+    permissions: proposalPermissions,
+    evaluationToShowInSidebar,
+    refreshProposal,
+    onChangeEvaluation
+  } = useProposal({ proposalId });
+
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
-  const proposalPermissions = proposal?.permissions;
 
   const card = useAppSelector((state) => {
     if (page?.type !== 'card' && page?.type !== 'card_template') {
@@ -189,21 +188,6 @@ function DocumentPage({
       // clear out error in case we re-subscribed
       setConnectionError(null);
     }
-  }
-
-  async function onChangeEvaluation(evaluationId: string, updatedEvaluation: Partial<ProposalEvaluationValues>) {
-    if (updatedEvaluation.rubricCriteria) {
-      await upsertRubricCriteria({
-        evaluationId,
-        rubricCriteria: updatedEvaluation.rubricCriteria
-      });
-    } else {
-      await updateProposalEvaluation({
-        evaluationId,
-        ...updatedEvaluation
-      });
-    }
-    await refreshProposal();
   }
 
   const openEvaluation = useCallback(
@@ -297,6 +281,12 @@ function DocumentPage({
       setActiveView(defaultView);
     }
   }, [!!persistedActiveView, enableSidebar, page.id]);
+
+  useEffect(() => {
+    if (enableSidebar && evaluationToShowInSidebar) {
+      openEvaluation(evaluationToShowInSidebar);
+    }
+  }, [evaluationToShowInSidebar, enableSidebar]);
 
   // keep a ref in sync for printing
   const printRef = useRef(null);

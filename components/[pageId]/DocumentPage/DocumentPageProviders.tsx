@@ -1,4 +1,4 @@
-import { PageSidebarProvider } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
+import { PageSidebarProvider } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { CharmEditorProvider } from 'hooks/useCharmEditor';
 import { CurrentPageProvider } from 'hooks/useCurrentPage';
 import { ThreadsProvider } from 'hooks/useThreads';

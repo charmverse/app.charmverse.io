@@ -1,13 +1,21 @@
 import type { ProposalEvaluation } from '@charmverse/core/prisma';
+import { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
-import { evaluationLabels } from '../ProposalProperties/components/ProposalEvaluationSelect';
 
 import type { Step } from './components/Stepper';
 import { Stepper } from './components/Stepper';
+
+const evaluationLabels = {
+  draft: 'Only authors can view and edit',
+  [ProposalEvaluationType.feedback]: 'Request feedback',
+  [ProposalEvaluationType.vote]: 'Evaluation by vote',
+  [ProposalEvaluationType.rubric]: 'Evaluation by rubric',
+  [ProposalEvaluationType.pass_fail]: 'Approval is required to proceed'
+};
 
 type EvaluationStepperProps = {
   evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'result' | 'type'> &

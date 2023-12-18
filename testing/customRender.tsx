@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { SWRConfig } from 'swr';
 
-import { PageSidebarContext } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
+import { PageSidebarContext } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { SnackbarContext } from 'hooks/useSnackbar';
 import { SpacesContext } from 'hooks/useSpaces';
 import type { IContext } from 'hooks/useUser';

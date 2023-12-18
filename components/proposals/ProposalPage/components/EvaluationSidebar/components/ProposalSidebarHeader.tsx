@@ -8,7 +8,7 @@ import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sideb
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 
-export const evaluationTypesWithSidebar: ProposalEvaluationType[] = ['rubric', 'vote'];
+export const evaluationTypesWithSidebar: ProposalEvaluationType[] = ['pass_fail', 'rubric', 'vote'];
 
 const StyledSelect = styled(Select)`
   .MuiOutlinedInput-notchedOutline {

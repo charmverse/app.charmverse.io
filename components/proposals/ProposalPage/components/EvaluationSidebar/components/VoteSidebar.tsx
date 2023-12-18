@@ -56,7 +56,7 @@ export function VoteSidebar({ pageId, isCurrent, proposal, evaluation }: Props) 
             }}
           />
         }
-        message='No vote has been initiated yet'
+        message='Vote has not been initiated yet'
       />
     );
   }

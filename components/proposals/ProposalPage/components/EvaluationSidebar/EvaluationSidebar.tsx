@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 import { evaluationTypesWithSidebar, ProposalSidebarHeader } from './components/ProposalSidebarHeader';
-import { RubricSidebar } from './components/RubricSidebar';
+import { RubricSidebar } from './components/RubricSidebar/RubricSidebar';
 import { VoteSidebar } from './components/VoteSidebar';
 
 export type Props = {

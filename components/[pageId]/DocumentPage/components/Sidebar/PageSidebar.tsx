@@ -14,11 +14,12 @@ import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
+import type { PageSidebarView } from '../../hooks/usePageSidebar';
+
 import { CommentsSidebar } from './components/CommentsSidebar';
 import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 import { SIDEBAR_VIEWS } from './constants';
-import type { PageSidebarView } from './hooks/usePageSidebar';
 
 const DesktopContainer = styled.div`
   position: fixed;

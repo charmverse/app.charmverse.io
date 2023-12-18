@@ -9,8 +9,9 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
+import { PassFailSidebar } from '../PassFailSidebar';
+
 import { RubricAnswersForm } from './RubricAnswersForm';
-import { RubricDecision } from './RubricDecision';
 import { RubricResults } from './RubricResults';
 
 export type Props = {
@@ -82,12 +83,12 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
                 {value === 'Results' && (
                   <RubricResults
                     key='results'
-                    answers={evaluation?.rubricAnswers ?? []}
+                    answers={evaluation?.rubricAnswers}
                     criteriaList={rubricCriteria || []}
                   />
                 )}
                 {value === 'Decision' && (
-                  <RubricDecision
+                  <PassFailSidebar
                     isCurrent={!!isCurrent}
                     key='results'
                     evaluation={evaluation}

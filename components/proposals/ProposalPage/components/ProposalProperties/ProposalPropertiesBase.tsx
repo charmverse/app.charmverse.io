@@ -268,7 +268,7 @@ export function ProposalPropertiesBase({
         </Stack>
       )}
       <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-        {isCharmVerse && !isNewProposal && !isTemplate && (
+        {/* {isCharmVerse && !isNewProposal && !isTemplate && (
           <Box className='octo-propertyrow' mb='0 !important'>
             <PropertyLabel readOnly highlighted>
               Evaluation step
@@ -280,7 +280,7 @@ export function ProposalPropertiesBase({
               readOnly={isNewProposal || !!archived}
             />
           </Box>
-        )}
+        )} */}
         {showStatusStepper && (
           <Box mt={2} mb={2}>
             <OldProposalStepper

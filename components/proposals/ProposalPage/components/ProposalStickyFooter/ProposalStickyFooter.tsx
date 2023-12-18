@@ -4,7 +4,6 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 import { CompleteFeedbackButton } from './components/CompleteFeedbackButton';
 import { PublishDraftButton } from './components/PublishDraftButton';
-import { ReviewPassFailButton } from './components/ReviewPassFailButton';
 
 // Currently this is just used for proposals but there's no reason not to add logic for other page types here
 export function ProposalStickyFooter({
@@ -27,8 +26,6 @@ export function ProposalStickyFooter({
     view = 'feedback';
   } else if (proposal?.status === 'draft') {
     view = 'draft';
-  } else if (currentEvaluation?.type === 'pass_fail' && !currentEvaluation.result) {
-    view = 'pass_fail';
   }
 
   if (!view) {
@@ -40,11 +37,6 @@ export function ProposalStickyFooter({
       {view === 'draft' && <PublishDraftButton {...{ proposal, refreshProposal }} />}
       {view === 'feedback' && (
         <CompleteFeedbackButton {...{ proposal, evaluationId: proposal.currentEvaluationId, refreshProposal }} />
-      )}
-      {view === 'pass_fail' && (
-        <ReviewPassFailButton
-          {...{ proposalId: proposal?.id, evaluationId: proposal.currentEvaluationId, refreshProposal }}
-        />
       )}
     </StickyFooterContainer>
   );

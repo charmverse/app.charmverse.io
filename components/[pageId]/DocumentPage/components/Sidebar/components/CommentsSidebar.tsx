@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
-import type { PageSidebarView } from 'components/[pageId]/DocumentPage/components/Sidebar/hooks/usePageSidebar';
+import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';

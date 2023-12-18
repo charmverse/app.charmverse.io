@@ -14,11 +14,10 @@ import {
   Accordion as MuiAccordion
 } from '@mui/material';
 import { mean, sum } from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMembers } from 'hooks/useMembers';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { isNumber } from 'lib/utilities/numbers';
 
@@ -55,8 +54,6 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
-
-  const { membersRecord } = useMembers();
 
   const summaryTypeLabel = criteriaSummaryType === 'average' ? 'Average' : 'Sum';
 
@@ -108,6 +105,13 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
       setExpandedCriteria(isExpanded ? criteriaId : false);
     };
   }
+
+  useEffect(() => {
+    // Expand the first criteria if there is only one
+    if (populatedCriteria.length === 1) {
+      setExpandedCriteria(populatedCriteria[0].id);
+    }
+  }, [populatedCriteria?.length]);
 
   return (
     <>
