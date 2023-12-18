@@ -76,8 +76,14 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
     setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
   }
 
-  function handleCancelNewWorkflow(id: string) {
-    setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
+  function handleCancelWorkflowChanges(id: string) {
+    const currentWorkflow = currentWorkflowTemplates?.find((workflow) => workflow.id === id);
+    if (currentWorkflow) {
+      handleUpdateWorkflow({ ...currentWorkflow });
+    } else {
+      // if it is a new workflow, remove it
+      setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
+    }
   }
 
   function duplicateWorkflow(workflow: WorkflowTemplateFormItem) {
@@ -118,7 +124,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
           onSave={handleSaveWorkflow}
           onUpdate={handleUpdateWorkflow}
           onDelete={handleDeleteWorkflow}
-          onCancel={handleCancelNewWorkflow}
+          onCancelChanges={handleCancelWorkflowChanges}
           onDuplicate={duplicateWorkflow}
           readOnly={!isAdmin}
         />

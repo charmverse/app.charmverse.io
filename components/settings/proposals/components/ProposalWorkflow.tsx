@@ -19,6 +19,7 @@ import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 
@@ -37,7 +38,7 @@ export function ProposalWorkflowItem({
   onUpdate,
   onDuplicate,
   onDelete,
-  onCancel,
+  onCancelChanges,
   readOnly
 }: {
   isExpanded: boolean;
@@ -46,7 +47,7 @@ export function ProposalWorkflowItem({
   onUpdate: (workflow: WorkflowTemplateFormItem) => void;
   onSave: (workflow: ProposalWorkflowTyped) => void;
   onDelete: (id: string) => void;
-  onCancel: (id: string) => void;
+  onCancelChanges: (id: string) => void;
   onDuplicate: (workflow: ProposalWorkflowTyped) => void;
   readOnly: boolean;
 }) {
@@ -63,8 +64,9 @@ export function ProposalWorkflowItem({
     onDelete(workflow.id);
   }
 
-  function cancelNewWorkflow() {
-    onCancel(workflow.id);
+  function cancelChanges() {
+    setUnsavedChanges(false);
+    onCancelChanges(workflow.id);
   }
 
   function updateWorkflowTitle(title: string) {
@@ -87,7 +89,7 @@ export function ProposalWorkflowItem({
     setUnsavedChanges(true);
   }
 
-  function addEvaluationStep(evaluation?: WorkflowEvaluationJson) {
+  function openNewEvaluationStepModal(evaluation?: WorkflowEvaluationJson) {
     const newEvaluation = getDefaultEvaluation(evaluation);
     setActiveEvaluation({
       ...newEvaluation,
@@ -115,7 +117,7 @@ export function ProposalWorkflowItem({
   }
 
   function duplicateEvaluationStep(evaluation: WorkflowEvaluationJson) {
-    addEvaluationStep(evaluation);
+    openNewEvaluationStepModal(evaluation);
   }
 
   function closeEvaluationStep() {
@@ -134,6 +136,8 @@ export function ProposalWorkflowItem({
       showMessage('Error saving workflow', 'error');
     }
   }
+
+  usePreventReload(hasUnsavedChanges);
 
   let disabledTooltip: string | undefined;
   if (!workflow.title) {
@@ -216,12 +220,12 @@ export function ProposalWorkflowItem({
                 ))}
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>
-                <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
+                <Button disabled={readOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>
                   + Add step
                 </Button>
                 <Stack flexDirection='row' gap={1}>
-                  {workflow.isNew && (
-                    <Button variant='outlined' color='secondary' onClick={cancelNewWorkflow}>
+                  {hasUnsavedChanges && (
+                    <Button variant='outlined' color='secondary' onClick={cancelChanges}>
                       Cancel
                     </Button>
                   )}
