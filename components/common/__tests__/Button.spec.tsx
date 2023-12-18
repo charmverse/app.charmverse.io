@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 import { Button } from 'components/common/Button';
 import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
@@ -51,7 +51,9 @@ describe('Atomic Button component', () => {
         test label
       </Button>
     );
-    expect(renderedButton.getByText('loading...')).toBeDefined();
+    await waitFor(() => {
+      expect(renderedButton.getByText('loading...')).toBeDefined();
+    });
 
     // loading state indicator
     expect(renderedButton.getByRole('progressbar')).toBeDefined();
